@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PlansCalcHectarPopulation extends PersonAlgorithm implements PersonAlgorithmI {
 
@@ -117,7 +117,7 @@ public class PlansCalcHectarPopulation extends PersonAlgorithm implements Person
 //		if (act.getType() != "h") {
 //			Gbl.errorMsg("Person id=" + person.getId() + " does not have a first act with type 'h'");
 //		}
-		CoordI c = act.getCoord();
+		Coord c = act.getCoord();
 		if (c == null) {
 			Gbl.errorMsg("Person id=" + person.getId() + " does not have a coord at the first act (of type 'h')");
 		}

@@ -34,7 +34,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class PersonFilter {
 
@@ -58,7 +58,7 @@ public class PersonFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		double radius = 30000.0;
-		final Coord center = new Coord(683518.0,246836.0);
+		final CoordImpl center = new CoordImpl(683518.0,246836.0);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("  => area of interest (aoi): center=" + center + "; radius=" + radius);
 

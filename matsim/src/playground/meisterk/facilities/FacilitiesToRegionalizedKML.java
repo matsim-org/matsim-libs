@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.misc.Time;
 
@@ -146,8 +146,8 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 		// transform coordinates incl. toggle easting and northing
 		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
-		CoordI northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
-		CoordI northWestWGS84 = trafo.transform(northWestCH1903);
+		Coord northWestCH1903 = new CoordImpl(facility.getCenter().getX(), facility.getCenter().getY());
+		Coord northWestWGS84 = trafo.transform(northWestCH1903);
 
 		// have to iterate this over opening times
 		int dayCounter = 0;

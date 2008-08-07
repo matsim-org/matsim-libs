@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 
 public class NetworkTransform {
@@ -40,8 +40,8 @@ public class NetworkTransform {
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
 			Node n = n_it.next();
-			CoordI coord = n.getCoord();
-			CoordI new_coord = transformer.transform(coord);
+			Coord coord = n.getCoord();
+			Coord new_coord = transformer.transform(coord);
 			coord.setXY(new_coord.getX(), new_coord.getY());
 		}
 	}

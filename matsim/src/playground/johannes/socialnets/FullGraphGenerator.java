@@ -40,7 +40,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.xml.sax.SAXException;
 
 import edu.uci.ics.jung.graph.Edge;
@@ -144,8 +144,8 @@ private static final String PERSON_KEY = "person";
 				if(!v1.equals(v2)) {
 					Person p1 = (Person) ((UndirectedSparseVertex)v1).getUserDatum(PERSON_KEY);
 					Person p2 = (Person) ((UndirectedSparseVertex)v2).getUserDatum(PERSON_KEY);
-					CoordI c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
-					CoordI c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
+					Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
+					Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
 					
 					double dist = c1.calcDistance(c2)/1000;
 					
@@ -182,7 +182,7 @@ private static final String PERSON_KEY = "person";
 			writer.write(p.getId().toString());
 			writer.write("\t");
 			
-			CoordI c = p.getSelectedPlan().getFirstActivity().getCoord();
+			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
 			writer.write(String.valueOf(c.getX()));
 			writer.write("\t");
 			writer.write(String.valueOf(c.getY()));

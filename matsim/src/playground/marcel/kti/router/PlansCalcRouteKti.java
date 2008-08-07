@@ -34,7 +34,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -73,8 +73,8 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	}
 
 	public double handleSwissPtLeg(final Act fromAct, final Leg leg, final Act toAct) {
-		CoordI fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
-		CoordI toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
+		Coord fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
+		Coord toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
 
 		final List<Location> froms = this.municipalities.getNearestLocations(fromStop);
 		final List<Location> tos = this.municipalities.getNearestLocations(toStop);

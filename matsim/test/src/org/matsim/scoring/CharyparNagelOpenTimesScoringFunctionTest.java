@@ -9,8 +9,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
@@ -30,7 +30,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Facilities facilities = new Facilities();
 		Gbl.getWorld().setFacilityLayer(facilities);
 		
-		CoordI defaultCoord = new Coord(0.0, 0.0);
+		Coord defaultCoord = new CoordImpl(0.0, 0.0);
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 		
 		Activity noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);

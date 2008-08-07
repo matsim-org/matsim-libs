@@ -39,7 +39,7 @@ import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 
 /**
@@ -166,7 +166,7 @@ public class LinkStatsAnalyser {
 
 			for (int i=0; i<24; i++) {
 				count.createVolume(i+1, linkVolumes[i] );
-				count.setCoord(new Coord(this.network.getLink(linkId).getCenter().getX(),
+				count.setCoord(new CoordImpl(this.network.getLink(linkId).getCenter().getX(),
 						this.network.getLink(linkId).getCenter().getY()));
 			}
 		}

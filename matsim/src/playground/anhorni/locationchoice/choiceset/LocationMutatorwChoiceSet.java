@@ -13,7 +13,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 import playground.anhorni.locationchoice.LocationMutator;
 
@@ -81,7 +81,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	protected abstract boolean handleSubChain(SubChain subChain, double speed, int trialNr);
 	
-	protected boolean modifyLocation(Act act, CoordI startCoord, CoordI endCoord, double radius, int trialNr) {
+	protected boolean modifyLocation(Act act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
 		ArrayList<Facility> choiceSet = this.computeChoiceSet
 		(startCoord, endCoord, radius, act.getType());
@@ -137,7 +137,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	
-	private ArrayList<Facility>  computeChoiceSet(CoordI coordStart, CoordI coordEnd, 
+	private ArrayList<Facility>  computeChoiceSet(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;

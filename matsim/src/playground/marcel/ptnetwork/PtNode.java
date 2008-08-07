@@ -21,12 +21,12 @@
 package playground.marcel.ptnetwork;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class PtNode extends Node{
 
 	protected PtNode(final String id, final String x, final String y, final String type) {
-		super(new IdImpl(id), new Coord(x, y), type);
+		super(new IdImpl(id), new CoordImpl(x, y), type);
 	}
 
 	protected int actTime = Integer.MAX_VALUE;

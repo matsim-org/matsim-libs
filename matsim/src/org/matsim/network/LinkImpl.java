@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.ResizableArray;
 import org.matsim.utils.misc.Time;
 
@@ -90,9 +90,9 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	 * @see org.matsim.network.Link#calcDistance(org.matsim.utils.geometry.CoordI)
 	 */
 	@Override
-	public final double calcDistance(final CoordI coord) {
-		CoordI fc = this.from.getCoord();
-		CoordI tc =  this.to.getCoord();
+	public final double calcDistance(final Coord coord) {
+		Coord fc = this.from.getCoord();
+		Coord tc =  this.to.getCoord();
 		double tx = tc.getX();    double ty = tc.getY();
 		double fx = fc.getX();    double fy = fc.getY();
 		double zx = coord.getX(); double zy = coord.getY();

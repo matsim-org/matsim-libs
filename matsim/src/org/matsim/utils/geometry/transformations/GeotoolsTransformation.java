@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
@@ -79,7 +79,7 @@ public class GeotoolsTransformation implements CoordinateTransformationI {
 		}
 	}
 
-	public CoordI transform(CoordI coord) {
+	public Coord transform(Coord coord) {
 		Point p = null;
 		try {
 			p = (Point) JTS.transform(MGC.coord2Point(coord), transform);

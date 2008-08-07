@@ -31,7 +31,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -102,7 +102,7 @@ public class PersonSetHomeLoc extends PersonAlgorithm implements PlanAlgorithmI 
 	@Override
 	public void run(Person person) {
 		Integer p_id = Integer.valueOf(person.getId().toString());
-		Coord coord = persons.getPerson(p_id).getHousehold().getCoord();
+		CoordImpl coord = persons.getPerson(p_id).getHousehold().getCoord();
 		Facility f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
 		Plan plan = person.getSelectedPlan();
 		Iterator act_it = plan.getIteratorAct();

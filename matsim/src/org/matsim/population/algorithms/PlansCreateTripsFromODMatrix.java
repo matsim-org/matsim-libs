@@ -30,7 +30,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
@@ -77,7 +77,7 @@ public class PlansCreateTripsFromODMatrix {
 						person.setCarAvail("yes");
 						person.setEmployed("yes");
 						Plan plan = person.createPlan(true);
-						CoordI coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
+						Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;
 
 						double rnd = Gbl.random.nextDouble();

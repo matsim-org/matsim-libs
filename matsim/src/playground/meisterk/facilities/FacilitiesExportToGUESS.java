@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
@@ -207,8 +207,8 @@ public class FacilitiesExportToGUESS {
 		while(f_i.hasNext()) {
 
 			Facility f = (Facility)f_i.next();
-			CoordI chCoord = f.getCenter();
-			CoordI lonLat = ct.transform(chCoord);
+			Coord chCoord = f.getCenter();
+			Coord lonLat = ct.transform(chCoord);
 
 			workCapacity = f.getActivity("work").getCapacity();
 
@@ -504,7 +504,7 @@ public class FacilitiesExportToGUESS {
 
 	}
 
-	public KML createFacilitiesKML(CoordI chCoord, int sizeClass) {
+	public KML createFacilitiesKML(Coord chCoord, int sizeClass) {
 
 		double regionSize = 0;
 		int kmlX = 0, kmlY = 0;
@@ -564,8 +564,8 @@ public class FacilitiesExportToGUESS {
 
 			// create the corners
 			CH1903LV03toWGS84 transform = new CH1903LV03toWGS84();
-			CoordI southWestCorner = transform.transform(new Coord(kmlX, kmlY));
-			CoordI northEastCorner = transform.transform(new Coord(kmlX + regionSize, kmlY + regionSize));
+			Coord southWestCorner = transform.transform(new CoordImpl(kmlX, kmlY));
+			Coord northEastCorner = transform.transform(new CoordImpl(kmlX + regionSize, kmlY + regionSize));
 
 			// create the region
 			Region theRegion = new Region(

@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class FacilitiesScenarioCut {
 
@@ -35,7 +35,7 @@ public class FacilitiesScenarioCut {
 	private final double minY;
 	private final double maxY;
 
-	public FacilitiesScenarioCut(final CoordI min, final CoordI max) {
+	public FacilitiesScenarioCut(final Coord min, final Coord max) {
 		super();
 		this.minX = min.getX();
 		this.maxX = max.getX();
@@ -51,7 +51,7 @@ public class FacilitiesScenarioCut {
 		while (fid_it.hasNext()) {
 			Id fid = fid_it.next();
 			Facility f = facilities.getFacilities().get(fid);
-			CoordI coord = f.getCenter();
+			Coord coord = f.getCenter();
 			double x = coord.getX();
 			double y = coord.getY();
 			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {

@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * Moves the geographical location of act's a random amount to north/south and east/west,
@@ -59,7 +59,7 @@ public class ActLocationFalsifier extends PersonAlgorithm implements PlanAlgorit
 		Iterator<BasicActImpl> actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
 			Act act = (Act) actIter.next();
-			CoordI coord = act.getCoord();
+			Coord coord = act.getCoord();
 			coord.setXY(coord.getX() + (Gbl.random.nextDouble() - 0.5) *  this.totalDistance,
 					coord.getY() + (Gbl.random.nextDouble() - 0.5) * this.totalDistance);
 			act.setLink(null);

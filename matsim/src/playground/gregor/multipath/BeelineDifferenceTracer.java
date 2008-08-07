@@ -20,7 +20,7 @@
 
 package playground.gregor.multipath;
 
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * The BeelineDifferenceTracer calculates the deviance from the hypothetical OD connection for a given Coord.
@@ -34,8 +34,8 @@ import org.matsim.utils.geometry.shared.Coord;
  */
 public class BeelineDifferenceTracer {
 	
-	private Coord orig;
-	private Coord dest;
+	private CoordImpl orig;
+	private CoordImpl dest;
 	
 	private double distOD;
 	private double sqrDistOD;
@@ -45,7 +45,7 @@ public class BeelineDifferenceTracer {
 	private double crit = 0.9;
 	private final double coef = 0.99;
 	
-	public BeelineDifferenceTracer(Coord orig, Coord dest){
+	public BeelineDifferenceTracer(CoordImpl orig, CoordImpl dest){
 		
 		TRACE_WEIGHT = 1;
 		
@@ -77,7 +77,7 @@ public class BeelineDifferenceTracer {
 	}
 	
 	//TODO take old deviance into account to make the trace function smoother ...
-	public double getTrace(double oldTrace, Coord  oldCoord, double linkLength, Coord newCoord){
+	public double getTrace(double oldTrace, CoordImpl  oldCoord, double linkLength, CoordImpl newCoord){
 		double newDiff = getDeviance(newCoord);
 		newDiff = newDiff >= 0 ? newDiff : 0;
 //		
@@ -105,7 +105,7 @@ public class BeelineDifferenceTracer {
 	}
 	
 	
-	private double getDeviance(Coord explored){
+	private double getDeviance(CoordImpl explored){
 		
 		double distExplDest = explored.calcDistance(this.dest);
 		double distOrigExpl = this.orig.calcDistance(explored);
@@ -137,10 +137,10 @@ public class BeelineDifferenceTracer {
 	
 	//debug
 	public static void main(String [] args){
-		Coord A = new Coord(0,0);
-		Coord B1 = new Coord(10,0);
-		Coord B2 = new Coord(0,10);
-		Coord C = new Coord(20,20);
+		CoordImpl A = new CoordImpl(0,0);
+		CoordImpl B1 = new CoordImpl(10,0);
+		CoordImpl B2 = new CoordImpl(0,10);
+		CoordImpl C = new CoordImpl(20,20);
 		BeelineDifferenceTracer dt = new BeelineDifferenceTracer(A,C);
 		double dist1 = dt.getDeviance(B1);
 		double dist2 = dt.getDeviance(B2);

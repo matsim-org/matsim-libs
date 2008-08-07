@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PlansScenarioCut {
 
@@ -45,7 +45,7 @@ public class PlansScenarioCut {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansScenarioCut(final CoordI min, final CoordI max) {
+	public PlansScenarioCut(final Coord min, final Coord max) {
 		super();
 		this.minX = min.getX();
 		this.maxX = max.getX();
@@ -76,7 +76,7 @@ public class PlansScenarioCut {
 				Iterator<?> a_it = plan.getIteratorAct();
 				while (a_it.hasNext()) {
 					Act a = (Act)a_it.next();
-					CoordI coord = a.getCoord();
+					Coord coord = a.getCoord();
 					if (coord == null) { 
 						throw new RuntimeException("Module requires 'act coord'");
 					}

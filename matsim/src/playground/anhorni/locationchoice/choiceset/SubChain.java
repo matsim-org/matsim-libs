@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.population.Act;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class SubChain {
 	
@@ -15,8 +15,8 @@ public class SubChain {
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 	
-	private CoordI startCoord = null;
-	private CoordI endCoord = null;
+	private Coord startCoord = null;
+	private Coord endCoord = null;
 
 	
 	public SubChain() {
@@ -37,19 +37,19 @@ public class SubChain {
 		this.ttBudget = ttBudget;
 	}
 
-	public CoordI getStartCoord() {
+	public Coord getStartCoord() {
 		return startCoord;
 	}
 
-	public void setStartCoord(CoordI startCoord) {
+	public void setStartCoord(Coord startCoord) {
 		this.startCoord = startCoord;
 	}
 
-	public CoordI getEndCoord() {
+	public Coord getEndCoord() {
 		return endCoord;
 	}
 
-	public void setEndCoord(CoordI endCoord) {
+	public void setEndCoord(Coord endCoord) {
 		this.endCoord = endCoord;
 	}
 

@@ -7,7 +7,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.vis.kml.ColorStyle;
@@ -80,8 +80,8 @@ public class Network2Kml {
 			Iterator it = this.network.getLinks().values().iterator();
 			while (it.hasNext()){
 				Link link = (Link) it.next();
-				CoordI from = transform.transform(link.getFromNode().getCoord());
-				CoordI to = transform.transform(link.getToNode().getCoord());
+				Coord from = transform.transform(link.getFromNode().getCoord());
+				Coord to = transform.transform(link.getToNode().getCoord());
 
 
 				LineString ls = new LineString(new Point(from.getX(),from.getY(),Double.NaN), new Point(to.getX(),to.getY(),Double.NaN));

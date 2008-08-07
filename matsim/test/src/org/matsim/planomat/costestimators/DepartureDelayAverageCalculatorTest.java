@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 
@@ -50,8 +50,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double fromY = 100.0;
 		double toX = 100.0;
 		double toY = 200.0;
-		Node fromNode = network.createNode(new IdImpl("1"), new Coord(fromX, fromY));
-		Node toNode = network.createNode(new IdImpl("2"), new Coord(toX, toY));
+		Node fromNode = network.createNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
+		Node toNode = network.createNode(new IdImpl("2"), new CoordImpl(toX, toY));
 		network.createLink(new IdImpl(LINK_ID), fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 		
 	}

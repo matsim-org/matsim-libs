@@ -38,8 +38,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -63,7 +63,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String WALK = "walk";
 	private static final String W = "w";
 	private static final String H = "h";
-	private static final Coord ZERO = new Coord(0.0,0.0);
+	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 	private final Persons persons;
 	private final Municipalities municipalities; // Da cambiare per PersonStreaming
 	private ModelModeChoice model;
@@ -102,8 +102,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		// setting subtour parameters
 		if (plan == null) { Gbl.errorMsg("Person id=" + plan.getPerson().getId() + "does not have a selected plan."); }
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
-		CoordI home_coord = null;
-		CoordI work_coord = null;
+		Coord home_coord = null;
+		Coord work_coord = null;
 		act_it.hasNext();
 		double dist_h_w = 0.0;
 		while (act_it.hasNext()) {

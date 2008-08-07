@@ -12,7 +12,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -39,7 +39,7 @@ public class ShapeFilePolygonWriter {
 	}
 	
 	
-	public void writePolygon(CoordI[] coords, String outfile) {
+	public void writePolygon(Coord[] coords, String outfile) {
 
 		Collection<Feature> features = getFeature(getLinearRing(coords));
 		
@@ -55,7 +55,7 @@ public class ShapeFilePolygonWriter {
 		}
 	}
 
-	public LinearRing getLinearRing(CoordI[] coords) {
+	public LinearRing getLinearRing(Coord[] coords) {
 		Coordinate[] coordinates = new Coordinate[coords.length];
 		for (int i = 0; i < coords.length; i++) {
 			coordinates[i] = new Coordinate(coords[i].getX(), coords[i].getY());

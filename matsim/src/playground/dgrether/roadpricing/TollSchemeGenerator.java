@@ -37,10 +37,10 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Document;
@@ -75,9 +75,9 @@ public class TollSchemeGenerator {
 
 	private static final String EQUILOUTFILE = "../testData/output/equil/moutArea.kmz";
 
-	private static final CoordI[] equilPolyCoords = { new Coord(-10000, -10000),
-			new Coord(-10000, 10000), new Coord(10000, 10000),
-			new Coord(10000, -10000) };
+	private static final Coord[] equilPolyCoords = { new CoordImpl(-10000, -10000),
+			new CoordImpl(-10000, 10000), new CoordImpl(10000, 10000),
+			new CoordImpl(10000, -10000) };
 
 //	private static final String IVTCHCONF = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/baseCase/config.xml";
 
@@ -129,7 +129,7 @@ public class TollSchemeGenerator {
 	"8.468355740492342,47.39746691123316,0 8.470883682949605,47.39656743520219,0 8.471627920840675,47.39394790751316,0 8.466070295798161,47.39433939496237,0 8.468607322537721,47.39135729003962,0 " +
 	"8.467614108595754,47.39018181322238,0 8.464771613486562,47.39097562237137,0 8.44864283511221,47.37986637690101,0 ";
 
-	private static final CoordI centerCoord = new Coord(0, 0);
+	private static final Coord centerCoord = new CoordImpl(0, 0);
 	//6 o'clock
 	private static final double START = 21600;
 	//9 o'clock
@@ -143,7 +143,7 @@ public class TollSchemeGenerator {
 
 	private NetworkLayer network;
 
-	private CoordI[] usedCoords;
+	private Coord[] usedCoords;
 
 	private ScenarioData scenario;
 
@@ -212,7 +212,7 @@ public class TollSchemeGenerator {
 		
 	}
 	
-	private void writeShapeFile(NetworkLayer network, CoordI [] coords) {
+	private void writeShapeFile(NetworkLayer network, Coord [] coords) {
 		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut + "Network.shp");
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");	
 	}
@@ -270,21 +270,21 @@ public class TollSchemeGenerator {
 		return scheme;
 	}
 
-	private CoordI[] parseGoogleEarthCoord(Config config) {
+	private Coord[] parseGoogleEarthCoord(Config config) {
 		String[] coords3d = this.usedGoogleEarthCoords.split(" ");
 		String[] singleCoords;
 		double x, y;
 		CoordinateTransformationI transform = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84, config
 						.global().getCoordinateSystem());
-		CoordI c, coord;
-		CoordI[] ret = new CoordI[coords3d.length];
+		Coord c, coord;
+		Coord[] ret = new Coord[coords3d.length];
 		int i = 0;
 		for (String s : coords3d) {
 			singleCoords = s.split(",");
 			x = Double.parseDouble(singleCoords[0]);
 			y = Double.parseDouble(singleCoords[1]);
-			c = new Coord(x, y);
+			c = new CoordImpl(x, y);
 //			log.debug("read coordinate with x: " + x + " y: " + y);
 			coord = transform.transform(c);
 //			log.debug("transformed coordinate with x: " + coord.getX() + " y: "
@@ -332,8 +332,8 @@ public class TollSchemeGenerator {
 			org.matsim.utils.vis.kml.Polygon p = new org.matsim.utils.vis.kml.Polygon(
 					false, true, AltitudeMode.CLAMP_TO_GROUND);
 			org.matsim.utils.vis.kml.LinearRing ring = new org.matsim.utils.vis.kml.LinearRing();
-			CoordI transC;
-			for (CoordI c : this.usedCoords) {
+			Coord transC;
+			for (Coord c : this.usedCoords) {
 				transC = transform.transform(c);
 				ring.addCoordinate(new org.matsim.utils.vis.kml.Point(transC.getX(),
 						transC.getY(), 0));
@@ -360,7 +360,7 @@ public class TollSchemeGenerator {
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;
-		for (CoordI c : this.usedCoords) {
+		for (Coord c : this.usedCoords) {
 			geoToolCoords[i] = new Coordinate(c.getX(), c.getY());
 			i++;
 		}

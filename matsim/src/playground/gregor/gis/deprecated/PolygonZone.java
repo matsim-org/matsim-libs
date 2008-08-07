@@ -22,7 +22,7 @@ package playground.gregor.gis.deprecated;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.AbstractLocation;
 
 /**
@@ -41,12 +41,12 @@ public class PolygonZone extends AbstractLocation {
 
 	private static final Logger log = Logger.getLogger(PolygonZone.class);
 
-	private CoordI[] shell = null;
+	private Coord[] shell = null;
 	private double area = Double.NaN;
 
 	private final String name;
 
-	protected PolygonZone(final PolygonZoneLayer layer, final Id id, final CoordI center, final CoordI[] shell,
+	protected PolygonZone(final PolygonZoneLayer layer, final Id id, final Coord center, final Coord[] shell,
 			final double area, final String name) {
 		super(layer, id, center);
 		this.shell = setShell(shell);
@@ -55,7 +55,7 @@ public class PolygonZone extends AbstractLocation {
 
 	}
 
-	private CoordI[] setShell(final CoordI[] shell) {
+	private Coord[] setShell(final Coord[] shell) {
 		if (!shell[0].equals(shell[shell.length - 1])) {
 			log.warn("The first and the last coordinate of a polygon have to be equal! Automatically closing the polygon now.");
 			return closePolygon(shell);
@@ -67,12 +67,12 @@ public class PolygonZone extends AbstractLocation {
 	// query methods
 	// ////////////////////////////////////////////////////////////////////
 
-	public final boolean contains(final CoordI coord) {
+	public final boolean contains(final Coord coord) {
 
 		// lets reinvent the wheel ...
 		int counter = 0;
 		double xinters;
-		CoordI c1, c2;
+		Coord c1, c2;
 		c1 = this.shell[0];
 		for (int i = 1; i < this.shell.length; i++) {
 			c2 = this.shell[i];
@@ -97,18 +97,18 @@ public class PolygonZone extends AbstractLocation {
 		return this.name;
 	}
 
-	public CoordI[] getShell() {
+	public Coord[] getShell() {
 		return this.shell.clone();
 	}
 
 	@Override
-	public double calcDistance(final CoordI coord) {
+	public double calcDistance(final Coord coord) {
 		// TODO [gl] Auto-generated method stub
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
-	private CoordI[] closePolygon(final CoordI[] shell) {
-		CoordI[] enlShell = new CoordI[shell.length + 1];
+	private Coord[] closePolygon(final Coord[] shell) {
+		Coord[] enlShell = new Coord[shell.length + 1];
 		System.arraycopy(shell, 0, enlShell, 0, shell.length);
 		enlShell[shell.length] = shell[0];
 		return enlShell;

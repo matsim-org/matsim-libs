@@ -27,8 +27,8 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -72,12 +72,12 @@ public class WorldCreateRasterLayer {
 		}
 
 		System.out.println("      calculate extent...");
-		CoordI min = new Coord(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
-		CoordI max = new Coord(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 		ZoneLayer zonelayer = (ZoneLayer)world.getBottomLayer();
 		for (Zone zone : (Collection<Zone>)zonelayer.getLocations().values()) {
-			CoordI z_min = zone.getMin();
-			CoordI z_max = zone.getMax();
+			Coord z_min = zone.getMin();
+			Coord z_max = zone.getMax();
 			if (z_min.getX() < min.getX()) { min.setX(z_min.getX()); }
 			if (z_min.getY() < min.getY()) { min.setY(z_min.getY()); }
 			if (z_max.getX() > max.getX()) { max.setX(z_max.getX()); }
@@ -102,9 +102,9 @@ public class WorldCreateRasterLayer {
 		TreeMap<Id, Zone> zones = (TreeMap<Id, Zone>) layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
-				CoordI z_min = new Coord(min.getX()+j*this.cellsize,min.getY()+i*this.cellsize);
-				CoordI z_max = new Coord(min.getX()+(j+1)*this.cellsize,min.getY()+(i+1)*this.cellsize);
-				CoordI z_center = new Coord((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
+				Coord z_min = new CoordImpl(min.getX()+j*this.cellsize,min.getY()+i*this.cellsize);
+				Coord z_max = new CoordImpl(min.getX()+(j+1)*this.cellsize,min.getY()+(i+1)*this.cellsize);
+				Coord z_center = new CoordImpl((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
 				Zone zone = new Zone(layer,new IdImpl(j+i*m),z_center,z_min,z_max,this.cellsize*this.cellsize,"raster("+i+","+j+")");
 				zones.put(zone.getId(), zone);
 			}

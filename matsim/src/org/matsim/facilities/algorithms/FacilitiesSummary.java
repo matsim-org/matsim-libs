@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilitiesSummary {
 
@@ -37,8 +37,8 @@ public class FacilitiesSummary {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
 		int act_cnt = 0;
-		Coord min_coord = new Coord(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
-		Coord max_coord = new Coord(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		CoordImpl min_coord = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		CoordImpl max_coord = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 		//            home,work,education,shop,leisure
 		int caps[] = {0   ,   0,        0,   0,      0};
 		int unlimit_cap_cnt = 0;

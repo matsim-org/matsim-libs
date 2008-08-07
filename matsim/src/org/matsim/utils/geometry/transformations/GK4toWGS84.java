@@ -20,9 +20,9 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Transforms coordinates from Gauss Krueger 4 to WGS84
@@ -68,7 +68,7 @@ public class GK4toWGS84 implements CoordinateTransformationI {
 		(1097 * Math.pow(e1, 4) / 512)
 	};
 
-	public CoordI transform(final CoordI coord) {
+	public Coord transform(final Coord coord) {
 
 		double easting = coord.getX();
 		double northing = coord.getY();
@@ -105,7 +105,7 @@ public class GK4toWGS84 implements CoordinateTransformationI {
 		latitude = latitude * 180.0 / Math.PI;
 		longitude = longitude * 180.0 / Math.PI;
 
-		return new Coord(longitude, latitude);
+		return new CoordImpl(longitude, latitude);
 	}
 
 }

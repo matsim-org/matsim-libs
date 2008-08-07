@@ -31,8 +31,8 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -112,7 +112,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				if (Integer.parseInt(f_id.toString()) >= min_id_given) { Gbl.errorMsg("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
 
 				// home facility creation
-				CoordI coord = new Coord(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
+				Coord coord = new CoordImpl(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
 				Facility f = facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id

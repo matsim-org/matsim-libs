@@ -35,6 +35,6 @@ public interface CoordinateTransformationI {
 	 * @param coord The coordinate to transform.
 	 * @return The transformed coordinate.
 	 */
-	public CoordI transform(CoordI coord);
+	public Coord transform(Coord coord);
 	
 }

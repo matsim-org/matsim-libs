@@ -37,8 +37,8 @@ import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalculator{
@@ -78,7 +78,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 	}
 
 
-	public ArrayList<PtNode> getNearestPedNodes(final Coord coord) {
+	public ArrayList<PtNode> getNearestPedNodes(final CoordImpl coord) {
 		// this method is nowhere used, and with the QuadTree could be implemented
 		// much faster than it is at the moment. remove?
 		ArrayList<PtNode> nearestNodes = new ArrayList<PtNode>();
@@ -247,7 +247,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		return route;
 	}
 
-	public Route dijkstraGetCheapestRoute(final CoordI fromCoord, final CoordI toCoord, final double depTime, final int searchRadius) {
+	public Route dijkstraGetCheapestRoute(final Coord fromCoord, final Coord toCoord, final double depTime, final int searchRadius) {
 
 		ArrayList<PtNode> depNodes = this.getPedNodesWithin(searchRadius, fromCoord);
 		ArrayList<PtNode> arrNodes = this.getPedNodesWithin(searchRadius, toCoord);
@@ -379,7 +379,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		return route;
 	}
 
-	public Route dijkstraGetCheapestRouteLogger (final Coord fromCoord, final Coord toCoord, final int depTime,final int searchRadius,final BufferedWriter out){
+	public Route dijkstraGetCheapestRouteLogger (final CoordImpl fromCoord, final CoordImpl toCoord, final int depTime,final int searchRadius,final BufferedWriter out){
 		Route route = null;
 		int touchedNodes = 0;
 		try {
@@ -502,7 +502,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 	 * @param startPoint
 	 * @return list of nearest nodes
 	 */
-	public ArrayList<PtNode>getPedNodesWithin(final int searchRadius, final CoordI startPoint) {
+	public ArrayList<PtNode>getPedNodesWithin(final int searchRadius, final Coord startPoint) {
 
 		Collection<PtNode> nodes = this.pedNodeQuadTree.get(startPoint.getX(), startPoint.getY(), searchRadius);
 

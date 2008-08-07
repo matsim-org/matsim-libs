@@ -20,9 +20,9 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Transforms coordinates from a synthetic coordinate system to WGS84. The 
@@ -36,10 +36,10 @@ import org.matsim.utils.geometry.shared.Coord;
  */
 public class AtlantisToWGS84 implements CoordinateTransformationI {
 
-	public CoordI transform(CoordI coord) {
+	public Coord transform(Coord coord) {
 		double latitude = coord.getY() / 10000.0 + 10.0;
 		double longitude = coord.getX() / 10000.0 - 30.0;
-		return new Coord(longitude, latitude);
+		return new CoordImpl(longitude, latitude);
 	}
 
 }

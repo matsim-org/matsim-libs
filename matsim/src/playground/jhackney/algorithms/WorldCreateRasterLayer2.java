@@ -26,8 +26,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -84,8 +84,8 @@ public class WorldCreateRasterLayer2 {
 		}
 
 		System.out.println("      calculate extent...");
-		CoordI min = new Coord(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
-		CoordI max = new Coord(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
+		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
+		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
 
 		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		FacilitiesFindScenarioMinMaxCoords fff= new FacilitiesFindScenarioMinMaxCoords();
@@ -112,9 +112,9 @@ public class WorldCreateRasterLayer2 {
 		TreeMap<Id,Zone> zones = (TreeMap<Id,Zone>)layer.getLocations();
 		for (int i=0; i<n ; i++) {
 			for (int j=0; j<m; j++) {
-				CoordI z_min = new Coord(min.getX()+j*cellsize,min.getY()+i*cellsize);
-				CoordI z_max = new Coord(min.getX()+(j+1)*cellsize,min.getY()+(i+1)*cellsize);
-				CoordI z_center = new Coord((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
+				Coord z_min = new CoordImpl(min.getX()+j*cellsize,min.getY()+i*cellsize);
+				Coord z_max = new CoordImpl(min.getX()+(j+1)*cellsize,min.getY()+(i+1)*cellsize);
+				Coord z_center = new CoordImpl((z_min.getX()+z_max.getX())/2.0,(z_min.getY()+z_max.getY())/2.0);
 				Zone zone = new Zone(layer,new IdImpl(j+i*m),z_center,z_min,z_max,cellsize*cellsize,"raster("+i+","+j+")");
 				zones.put(zone.getId(),zone);
 			}

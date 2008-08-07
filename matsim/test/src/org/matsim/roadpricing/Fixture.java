@@ -34,7 +34,7 @@ import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 
 /**
@@ -59,12 +59,12 @@ public class Fixture {
 		 * to travel along one link.		 */
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod("01:00:00");
-		Node node1 = network.createNode(new IdImpl(1), new Coord(0, 0));
-		Node node2 = network.createNode(new IdImpl(2), new Coord(100, 0));
-		Node node3 = network.createNode(new IdImpl(3), new Coord(200, 0));
-		Node node4 = network.createNode(new IdImpl(4), new Coord(300, 0));
-		Node node5 = network.createNode(new IdImpl(5), new Coord(400, 0));
-		Node node6 = network.createNode(new IdImpl(6), new Coord(500, 0));
+		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
+		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(200, 0));
+		Node node4 = network.createNode(new IdImpl(4), new CoordImpl(300, 0));
+		Node node5 = network.createNode(new IdImpl(5), new CoordImpl(400, 0));
+		Node node6 = network.createNode(new IdImpl(6), new CoordImpl(500, 0));
 		// freespeed 18km/h = 5m/s --> 20s for 100m
 		network.createLink(new IdImpl(0), node1, node2, 100, 5, 100, 1);
 		network.createLink(new IdImpl(1), node2, node3, 100, 5, 100, 1);

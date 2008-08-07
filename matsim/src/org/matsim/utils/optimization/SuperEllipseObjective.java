@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * Objective Function based on a SuperEllipse. The superellipse is defined as
@@ -81,7 +81,7 @@ public class SuperEllipseObjective implements ObjectiveI {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Collection<CoordI> coords;	// list of points which the calculated superelliptic region should cover
+	private final Collection<Coord> coords;	// list of points which the calculated superelliptic region should cover
 	private final double minCover;
 
 	private double theta;
@@ -92,7 +92,7 @@ public class SuperEllipseObjective implements ObjectiveI {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public SuperEllipseObjective(Collection<CoordI> coords, double minCover, double theta) {
+	public SuperEllipseObjective(Collection<Coord> coords, double minCover, double theta) {
 		this.coords = coords;
 		this.minCover = minCover;
 		this.theta = theta;
@@ -191,9 +191,9 @@ public class SuperEllipseObjective implements ObjectiveI {
 	private final double getCover(ParamPoint p, double a) {
 		int cntTotal = 0;
 		int cntInside = 0;
-		Iterator<CoordI> iter = this.coords.iterator();
+		Iterator<Coord> iter = this.coords.iterator();
 		while (iter.hasNext()) {
-			CoordI coord = iter.next();
+			Coord coord = iter.next();
 			cntTotal++;
 			if (isPointWithin(coord, p, a)) {
 				cntInside++;
@@ -204,7 +204,7 @@ public class SuperEllipseObjective implements ObjectiveI {
 	}
 
 
-	private final boolean isPointWithin(CoordI coord, ParamPoint p, double a) {
+	private final boolean isPointWithin(Coord coord, ParamPoint p, double a) {
 
 		double x0 = p.getValue(X_idx);
 		double y0 = p.getValue(Y_idx);

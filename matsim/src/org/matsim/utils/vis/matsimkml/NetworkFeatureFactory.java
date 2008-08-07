@@ -25,7 +25,7 @@ import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.Feature;
@@ -105,15 +105,15 @@ public class NetworkFeatureFactory {
 		folder.setName(l.getId().toString());
 		Placemark p = new Placemark("link" + l.getId().toString());
 		p.setName(l.getId().toString());
-		CoordI fromCoord = this.coordTransform.transform(l.getFromNode().getCoord());
-		CoordI toCoord = this.coordTransform.transform(l.getToNode().getCoord());
+		Coord fromCoord = this.coordTransform.transform(l.getFromNode().getCoord());
+		Coord toCoord = this.coordTransform.transform(l.getToNode().getCoord());
 		LineString line = new LineString(new Point(fromCoord.getX(), fromCoord.getY(), 0.0), new Point(toCoord.getX(), toCoord.getY(), 0.0));
 		p.setGeometry(line);
 		p.setStyleUrl(networkStyle.getStyleUrl());
 		p.setDescription(description);
 
 		Placemark pointPlacemark = new Placemark("linkCenter" + l.getId());
-		CoordI centerCoord = this.coordTransform.transform(l.getCenter());
+		Coord centerCoord = this.coordTransform.transform(l.getCenter());
 		Point point = new Point(centerCoord.getX(), centerCoord.getY(), 0.0);
 		pointPlacemark.setGeometry(point);
 		pointPlacemark.setStyleUrl(networkStyle.getStyleUrl());
@@ -128,7 +128,7 @@ public class NetworkFeatureFactory {
 	public Feature createNodeFeature(final Node n, Style networkStyle) {
 		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
 		p.setName(n.getId().toString());
-		CoordI coord = this.coordTransform.transform(n.getCoord());
+		Coord coord = this.coordTransform.transform(n.getCoord());
 		Point point = new Point(coord.getX(), coord.getY(), 0.0);
 		p.setGeometry(point);
 		p.setStyleUrl(networkStyle.getStyleUrl());
@@ -139,7 +139,7 @@ public class NetworkFeatureFactory {
 	public Feature createActFeature(Act act, Style style) {
 		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
 		p.setName("Activity on link: " + act.getLinkId().toString());
-		CoordI coord = this.coordTransform.transform(act.getCoord());
+		Coord coord = this.coordTransform.transform(act.getCoord());
 		Point point = new Point(coord.getX(), coord.getY(), 0.0);
 		p.setGeometry(point);
 		p.setStyleUrl(style.getStyleUrl());

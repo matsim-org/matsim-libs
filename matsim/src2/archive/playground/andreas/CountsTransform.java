@@ -10,14 +10,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class CountsTransform implements TabularFileHandlerI{
 	
-	HashMap<Integer, Coord> xYCoords = new HashMap<Integer, Coord>();
+	HashMap<Integer, CoordImpl> xYCoords = new HashMap<Integer, CoordImpl>();
 
 	/**
 	 * coordFile has to be structered as follows:<br>
@@ -126,7 +126,7 @@ public class CountsTransform implements TabularFileHandlerI{
 		} else {
 			
 			if(row[0].length() != 0 && !row[0].startsWith("\"")){
-				Coord coord = new Coord(Double.parseDouble(row[1]), Double.parseDouble(row[2]));
+				CoordImpl coord = new CoordImpl(Double.parseDouble(row[1]), Double.parseDouble(row[2]));
 				xYCoords.put(Integer.parseInt(row[0]), coord);		
 
 			} else System.err.println("Could not read: " + row[0] + row[1] + row[2]);

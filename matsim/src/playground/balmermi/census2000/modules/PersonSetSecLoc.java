@@ -33,8 +33,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Persons;
@@ -52,7 +52,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 	private static final String EDUCATION = "education";
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";
-	private static final Coord ZERO = new Coord(0.0,0.0);
+	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
 	private final Facilities facilities;
 	private final Persons persons;
@@ -225,7 +225,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		return null;
 	}
 
-	private final Facility getFacility(CoordI coord, double radius, String act_type) {
+	private final Facility getFacility(Coord coord, double radius, String act_type) {
 		Collection<Facility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
@@ -234,7 +234,7 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 		return this.getFacility(fs,act_type);
 	}
 
-	private final Facility getFacility(Coord coord1, Coord coord2, double radius, String act_type) {
+	private final Facility getFacility(CoordImpl coord1, CoordImpl coord2, double radius, String act_type) {
 		Collection<Facility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
@@ -250,8 +250,8 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 
 	@Override
 	public void run(Person person) {
-		CoordI home_coord = null;
-		CoordI prim_coord = null;
+		Coord home_coord = null;
+		Coord prim_coord = null;
 		Plan plan = person.getSelectedPlan();
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
@@ -293,8 +293,8 @@ public class PersonSetSecLoc extends PersonAlgorithm implements PlanAlgorithmI {
 			double radius = Math.sqrt(dx*dx+dy*dy)/3.0;
 			dx = dx/6.0;
 			dy = dy/6.0;
-			Coord coord1 = new Coord(home_coord.getX()+dx,home_coord.getY()+dy);
-			Coord coord2 = new Coord(prim_coord.getX()-dx,prim_coord.getY()+dy);
+			CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
+			CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
 			act_it = plan.getIteratorAct();
 			while (act_it.hasNext()) {
 				Act act = (Act)act_it.next();

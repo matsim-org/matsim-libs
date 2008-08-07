@@ -23,13 +23,13 @@ package playground.marcel.ptnetwork.tempelements;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class TempHb {
 
 	public String ID = null;
 	public String name = null;
-	public Coord coord = new Coord(0.0,0.0);
+	public CoordImpl coord = new CoordImpl(0.0,0.0);
 	public List<TempHP> hps= new ArrayList<TempHP>();
 
 	public TempHb(){

@@ -23,8 +23,8 @@ package playground.ciarif.models.subtours;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public abstract class ModelModeChoice {
 	
@@ -44,7 +44,7 @@ public abstract class ModelModeChoice {
 	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
 	protected double prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
-	protected CoordI home_coord; //Coordinates of the home facility of the agent
+	protected Coord home_coord; //Coordinates of the home facility of the agent
 	protected boolean ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check the reason it works like this
 	protected boolean pt; // pt possible 
 	//////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ public abstract class ModelModeChoice {
 		return true;
 	}
 	
-	public final boolean setHomeCoord(CoordI home_coord) {
+	public final boolean setHomeCoord(Coord home_coord) {
 		if (home_coord.getX()<0 && home_coord.getY()<0) { return false; }
 		this.home_coord = home_coord;
 		return true;

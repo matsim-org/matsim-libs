@@ -26,9 +26,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
@@ -144,7 +144,7 @@ public class KmlSnapshotWriter implements SnapshotWriterI {
 			return;
 		}
 
-		CoordI coord = this.coordTransform.transform(new Coord(position.getEasting(), position.getNorthing()));
+		Coord coord = this.coordTransform.transform(new CoordImpl(position.getEasting(), position.getNorthing()));
 		Point point = new Point(coord.getX(), coord.getY(), 0.0);
 		this.timeGeometry.addGeometry(point);
 	}

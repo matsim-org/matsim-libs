@@ -40,9 +40,9 @@ import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.world.World;
 
@@ -88,7 +88,7 @@ public class EvacuationAreaFileGenerator {
 			
 			
 			double distance = Math.max(p.getExteriorRing().getEnvelopeInternal().getHeight(),p.getExteriorRing().getEnvelopeInternal().getWidth());
-			Coord coord = (Coord) MGC.point2Coord(p.getCentroid());
+			CoordImpl coord = (CoordImpl) MGC.point2Coord(p.getCentroid());
 			Collection<Node> nodes = this.network.getNearestNodes(coord, distance * 2);
 			handleNodes(nodes,p);
 			

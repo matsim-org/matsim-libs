@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class Subtour {
 		
@@ -18,7 +18,7 @@ public class Subtour {
 	private ArrayList<Integer> nodes;
 	private int purpose; // 0 := work; 1 := edu; 2 := shop 3:=leisure
 	private int mode;
-	private CoordI start_coord;
+	private Coord start_coord;
 	private int prev_subtour;
 	private double distance; 
 	private int start_udeg;
@@ -48,7 +48,7 @@ public class Subtour {
 		this.distance = distance;
 	}
 	
-	public void setStart_coord(CoordI start_coord) {
+	public void setStart_coord(Coord start_coord) {
 		this.start_coord = start_coord;
 	}
 	
@@ -98,7 +98,7 @@ public class Subtour {
 		return distance;
 	}
 
-	public CoordI getStart_coord() {
+	public Coord getStart_coord() {
 		return start_coord;
 	}
 	

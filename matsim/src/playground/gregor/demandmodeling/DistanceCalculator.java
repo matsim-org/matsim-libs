@@ -33,7 +33,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class DistanceCalculator {
 	private final static Logger log = Logger.getLogger(DistanceCalculator.class);
@@ -73,7 +73,7 @@ public class DistanceCalculator {
 						
 			double xcoord = Double.parseDouble(entry[7]);
 			double ycoord = Double.parseDouble(entry[8]);
-			Coord actCoord = new Coord(xcoord, ycoord);
+			CoordImpl actCoord = new CoordImpl(xcoord, ycoord);
 						
 			Household hh = this.housholds.get(id);
 			if (hh == null) {
@@ -115,7 +115,7 @@ public class DistanceCalculator {
 			
 			Household hh = new Household();
 			hh.id = id;
-			Coord c = new Coord(xcoord,ycoord);
+			CoordImpl c = new CoordImpl(xcoord,ycoord);
 			hh.home = c;
 			this.housholds.put(id, hh);
 		}
@@ -140,7 +140,7 @@ public class DistanceCalculator {
 	
 	private static class Household {
 		String id;
-		Coord home;
+		CoordImpl home;
 	}
 	
 

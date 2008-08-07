@@ -20,9 +20,9 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * Transforms coordinates from the Swiss-Grid coordinate system to WGS84.
@@ -35,7 +35,7 @@ import org.matsim.utils.geometry.shared.Coord;
  */
 public class WGS84toCH1903LV03 implements CoordinateTransformationI {
 
-	public CoordI transform(CoordI coord) {
+	public Coord transform(Coord coord) {
 
 		double lonNorm = (coord.getX() * 3600 - 26782.5) / 10000;
 		double latNorm = (coord.getY() * 3600 - 169028.66) / 10000;
@@ -57,7 +57,7 @@ public class WGS84toCH1903LV03 implements CoordinateTransformationI {
 		
 		/* Important Note: in the Swiss Grid, y describes easting and x describes 
 		 * northing, contrary to the usual naming conventions!		 */ 
-		return new Coord(CH1903Y, CH1903X);
+		return new CoordImpl(CH1903Y, CH1903X);
 	}
 
 }

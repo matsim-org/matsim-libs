@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * Basic geographical class in MATSim.
@@ -47,7 +47,7 @@ public abstract class AbstractLocation implements Location {
 	// I'm not that happy the Ids can change (otherwise it would not be an id)!
 	protected Id id;
 	protected final Layer layer;
-	protected final CoordI center;
+	protected final Coord center;
 
 	// points to the zones of the lower resolution layer
 	protected final TreeMap<Id,Location> up_mapping = new TreeMap<Id,Location>();
@@ -65,7 +65,7 @@ public abstract class AbstractLocation implements Location {
 	 * @param id The unique id of that location.
 	 * @param center The center of that location. Does not have to be the middle of the location object.
 	 */
-	protected AbstractLocation(final Layer layer, final Id id, final CoordI center) {
+	protected AbstractLocation(final Layer layer, final Id id, final Coord center) {
 		this.layer = layer;
 		this.id = id;
 		this.center = center;
@@ -81,7 +81,7 @@ public abstract class AbstractLocation implements Location {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public abstract double calcDistance(final CoordI coord);
+	public abstract double calcDistance(final Coord coord);
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
@@ -187,7 +187,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getCenter()
 	 */
-	public final CoordI getCenter() {
+	public final Coord getCenter() {
 		return this.center;
 	}
 

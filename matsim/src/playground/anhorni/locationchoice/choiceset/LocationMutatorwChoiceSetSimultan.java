@@ -7,7 +7,7 @@ import org.matsim.controler.Controler;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet {
 	
@@ -49,8 +49,8 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			return true;
 		}
 		
-		CoordI startCoord = subChain.getStartCoord();
-		CoordI endCoord = subChain.getEndCoord();
+		Coord startCoord = subChain.getStartCoord();
+		Coord endCoord = subChain.getEndCoord();
 		double ttBudget = subChain.getTtBudget();		
 		
 		Act prevAct = subChain.getFirstPrimAct();

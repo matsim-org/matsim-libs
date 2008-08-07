@@ -22,8 +22,8 @@ package org.matsim.world;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * A geographical object in MATSim. It describes a zone as a rectangle.
@@ -44,8 +44,8 @@ public class Zone extends AbstractLocation {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private CoordI min    = null;
-	private CoordI max    = null;
+	private Coord min    = null;
+	private Coord max    = null;
 	private double area  = Double.NaN;
 	private String name  = null;
 
@@ -53,7 +53,7 @@ public class Zone extends AbstractLocation {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Zone(final ZoneLayer layer, final Id id, final CoordI center) {
+	protected Zone(final ZoneLayer layer, final Id id, final Coord center) {
 		super(layer,id,center);
 		this.setMin(center);
 		this.setMax(center);
@@ -61,15 +61,15 @@ public class Zone extends AbstractLocation {
 		this.setName(null);
 	}
 
-	protected Zone(final ZoneLayer layer, final Id id, final CoordI center,
-			final CoordI min, final CoordI max) {
+	protected Zone(final ZoneLayer layer, final Id id, final Coord center,
+			final Coord min, final Coord max) {
 		this(layer, id, center);
 		this.setMin(min);
 		this.setMax(max);
 	}
 
-	public Zone(final ZoneLayer layer, final Id id, final CoordI center,
-	               final CoordI min, final CoordI max, final double area, final String name) {
+	public Zone(final ZoneLayer layer, final Id id, final Coord center,
+	               final Coord min, final Coord max, final double area, final String name) {
 		this(layer, id, center, min, max);
 		this.setArea(area);
 		this.setName(name);
@@ -100,11 +100,11 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.utils.geometry.CoordI)
+	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.utils.geometry.Coord)
 	 * @return distance to that zone
 	 */
 	@Override
-	public final double calcDistance(final CoordI coord) {
+	public final double calcDistance(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();
 		double minX = this.min.getX();
@@ -117,35 +117,35 @@ public class Zone extends AbstractLocation {
 			return 0.0;
 		} else if ((x < minX) && (maxY < y)) {
 			// case 2
-			Coord refPt = new Coord(minX, maxY);
+			CoordImpl refPt = new CoordImpl(minX, maxY);
 			return refPt.calcDistance(coord);
 		} else if ((minX <= x) && (x <= maxX) && (maxY < y)) {
 			// case 3
-			Coord refPt = new Coord(x, maxY);
+			CoordImpl refPt = new CoordImpl(x, maxY);
 			return refPt.calcDistance(coord);
 		} else if ((maxX < x) && (maxY < y)) {
 			// case 4
-			Coord refPt = new Coord(maxX, maxY);
+			CoordImpl refPt = new CoordImpl(maxX, maxY);
 			return refPt.calcDistance(coord);
 		} else if ((x < minX) && (minY <= y) && (y <= maxY)) {
 			// case 5
-			Coord refPt = new Coord(minX, y);
+			CoordImpl refPt = new CoordImpl(minX, y);
 			return refPt.calcDistance(coord);
 		} else if ((maxX < x) && (minY <= y) && (y <= maxY)) {
 			// case 6
-			Coord refPt = new Coord(maxX, y);
+			CoordImpl refPt = new CoordImpl(maxX, y);
 			return refPt.calcDistance(coord);
 		} else if ((x < minX) && (y < minY)) {
 			// case 7
-			Coord refPt = new Coord(minX, minY);
+			CoordImpl refPt = new CoordImpl(minX, minY);
 			return refPt.calcDistance(coord);
 		} else if ((minX <= x) && (x <= maxX) && (y < minY)) {
 			// case 8
-			Coord refPt = new Coord(x, minY);
+			CoordImpl refPt = new CoordImpl(x, minY);
 			return refPt.calcDistance(coord);
 		} else if ((maxX < x) && (y < maxY)) {
 			// case 9
-			Coord refPt = new Coord(maxX, minY);
+			CoordImpl refPt = new CoordImpl(maxX, minY);
 			return refPt.calcDistance(coord);
 		} else {
 			Gbl.errorMsg("This should never happen!");
@@ -157,7 +157,7 @@ public class Zone extends AbstractLocation {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final boolean contains(final CoordI coord) {
+	public final boolean contains(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();
 		if ((this.min.getX() <= x) && (x <= this.max.getX()) && (this.min.getY() <= y) && (y <= this.max.getY())) {
@@ -180,12 +180,12 @@ public class Zone extends AbstractLocation {
 		this.name = name;
 	}
 
-	public final void setMin(final CoordI min) {
+	public final void setMin(final Coord min) {
 		if ((min != null) && (min.getX() <= this.center.getX()) && (min.getY() <= this.center.getY())) { this.min = min; }
 		else { this.min = this.center; }
 	}
 
-	public final void setMax(final CoordI max) {
+	public final void setMax(final Coord max) {
 		if ((max != null) && (max.getX() >= this.center.getX()) && (max.getY() >= this.center.getY())) { this.max = max; }
 		else { this.max = this.center; }
 	}
@@ -194,11 +194,11 @@ public class Zone extends AbstractLocation {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final CoordI getMin() {
+	public final Coord getMin() {
 		return this.min;
 	}
 
-	public final CoordI getMax() {
+	public final Coord getMax() {
 		return this.max;
 	}
 

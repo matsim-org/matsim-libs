@@ -60,7 +60,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
@@ -266,7 +266,7 @@ public class DistanceAnalysis {
 
 		this.personTree = new QuadTree<Person>(0,0,3*this.envelope.getMaxX(),3*this.envelope.getMaxY());
 		for (Person person : this.population.getPersons().values()){
-			CoordI c = person.getSelectedPlan().getFirstActivity().getCoord();
+			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
 			this.personTree.put(c.getX(), c.getY(), person);
 		}
 

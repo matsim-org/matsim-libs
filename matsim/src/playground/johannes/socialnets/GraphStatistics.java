@@ -47,7 +47,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.snowball.Histogram;
@@ -349,8 +349,8 @@ public class GraphStatistics {
 			double x2 = (Double)v2.getUserDatum(UserDataKeys.X_COORD);
 			double y2 = (Double)v2.getUserDatum(UserDataKeys.Y_COORD);
 			
-			Coord c1 = new Coord(x1, y1);
-			Coord c2 = new Coord(x2, y2);
+			CoordImpl c1 = new CoordImpl(x1, y1);
+			CoordImpl c2 = new CoordImpl(x2, y2);
 			values.add(c1.calcDistance(c2));
 		}
 		

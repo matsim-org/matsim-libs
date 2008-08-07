@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
@@ -93,7 +93,7 @@ public class PersonCalcActivitySpace extends PersonAlgorithm {
 		if (activity_type.equals("all")) { a_it = know.getActivities().iterator(); }
 		else { a_it = know.getActivities(this.activity_type).iterator(); }
 		// Creating coordinate list
-		ArrayList<CoordI> coords = new ArrayList<CoordI>();
+		ArrayList<Coord> coords = new ArrayList<Coord>();
 		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCenter()); }
 		
 		System.out.println("----------------------------------------------------------------------");

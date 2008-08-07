@@ -37,8 +37,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 import com.sun.tools.xjc.model.CPluginCustomization;
 
@@ -89,10 +89,10 @@ public class RndNetworkGenerator {
 		long randomSeed = Gbl.getConfig().global().getRandomSeed();
 		Random rnd = new Random(randomSeed);
 		
-		CoordI center = getMean(plans);
+		Coord center = getMean(plans);
 		double radius = mixingRadius;
-		CoordI min = new Coord(center.getX() - radius, center.getY() - radius);
-		CoordI max = new Coord(center.getX() + radius, center.getY() + radius);
+		Coord min = new CoordImpl(center.getX() - radius, center.getY() - radius);
+		Coord max = new CoordImpl(center.getX() + radius, center.getY() + radius);
 		
 		List<Vertex> cluster1 = new LinkedList<Vertex>();
 		List<Vertex> cluster2 = new LinkedList<Vertex>();
@@ -228,7 +228,7 @@ public class RndNetworkGenerator {
 		return g;
 	}
 	
-	private static CoordI getMean(Population plans) {
+	private static Coord getMean(Population plans) {
 		double sumX = 0;
 		double sumY = 0;
 		for(Person p : plans) {
@@ -238,18 +238,18 @@ public class RndNetworkGenerator {
 		double x = sumX/(double)plans.getPersons().size();
 		double y = sumY/(double)plans.getPersons().size();
 		
-		return new Coord(x, y);
+		return new CoordImpl(x, y);
 	}
 	
 	private static double getTieProba(Vertex v1, Vertex v2) {
 //		Double x1 = (Double) v1.getUserDatum(UserDataKeys.X_COORD);
 //		Double y1 = (Double) v1.getUserDatum(UserDataKeys.Y_COORD);
 		VertexAttributes attr1 = (VertexAttributes)v1.getUserDatum(ATTRIBUTES_KEY);
-		CoordI c1 = new Coord(attr1.x, attr1.y);
+		Coord c1 = new CoordImpl(attr1.x, attr1.y);
 //		Double x2 = (Double) v2.getUserDatum(UserDataKeys.X_COORD);
 //		Double y2 = (Double) v2.getUserDatum(UserDataKeys.Y_COORD);
 		VertexAttributes attr2 = (VertexAttributes)v2.getUserDatum(ATTRIBUTES_KEY);
-		CoordI c2 = new Coord(attr2.x, attr2.y);
+		Coord c2 = new CoordImpl(attr2.x, attr2.y);
 		
 		double dist = c1.calcDistance(c2)/1000.0;
 //		int dv1 = v1.degree();

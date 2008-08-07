@@ -30,7 +30,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * Basic collection of same geographical objects in MATSim.
@@ -154,7 +154,7 @@ public abstract class Layer {
 	 * @param center the center coordinate of the to-be-returned locations.
 	 * @return all locations whose center coordinate equals <code>center</code>
 	 */
-	public final List<Location> getLocations(final CoordI center) {
+	public final List<Location> getLocations(final Coord center) {
 		/* Hmm, shouldn't there be at most one location with equal center? -marcel/17mar2008 */
 		ArrayList<Location> locs = new ArrayList<Location>();
 		Iterator<Location> loc_it = this.locations.values().iterator();
@@ -171,7 +171,7 @@ public abstract class Layer {
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
 	 */
-	public final ArrayList<Location> getNearestLocations(final CoordI coord) {
+	public final ArrayList<Location> getNearestLocations(final Coord coord) {
 		return getNearestLocations(coord, null);
 	}
 
@@ -183,7 +183,7 @@ public abstract class Layer {
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
 	 */
-	public final ArrayList<Location> getNearestLocations(final CoordI coord, final Location excludeLocation) {
+	public final ArrayList<Location> getNearestLocations(final Coord coord, final Location excludeLocation) {
 		ArrayList<Location> locs = new ArrayList<Location>();
 		double shortestDistance = Double.MAX_VALUE;
 		Iterator<Location> loc_it = this.locations.values().iterator();

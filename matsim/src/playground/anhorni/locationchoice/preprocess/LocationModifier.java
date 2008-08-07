@@ -16,8 +16,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
@@ -60,10 +60,10 @@ public class LocationModifier extends Modifier {
 		/* assign a random location around Bellevue with a radius of 30km
 		 * -> tailored for WU project
 		 */
-		this.assignRandomLocation(new Coord(683508.50, 246832.91), 30000);
+		this.assignRandomLocation(new CoordImpl(683508.50, 246832.91), 30000);
 	}
 
-	private void assignRandomLocation(CoordI coords, double radius) {
+	private void assignRandomLocation(Coord coords, double radius) {
 
 		log.info("running assignRandomLocation:");
 		Iterator<Person> person_iter = this.plans.getPersons().values().iterator();

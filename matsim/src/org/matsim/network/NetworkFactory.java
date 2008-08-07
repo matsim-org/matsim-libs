@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * @author dgrether
@@ -49,7 +49,7 @@ public class NetworkFactory {
 		}
 	}
 
-	protected Node newNode(final Id id, final CoordI coord, final String type) {
+	protected Node newNode(final Id id, final Coord coord, final String type) {
 		return new Node(id, coord, type);
 	}
 

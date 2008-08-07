@@ -40,8 +40,8 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -129,8 +129,8 @@ public class PlansCreateFromCensus2000 {
 			List<Activity> acts = new ArrayList<Activity>();
 			Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			Zone zone = (Zone)home_f.getUpMapping().values().iterator().next();
-			CoordI max = new Coord(((Zone)zone).getMax());
-			CoordI min = new Coord(((Zone)zone).getMin());
+			Coord max = new CoordImpl(((Zone)zone).getMax());
+			Coord min = new CoordImpl(((Zone)zone).getMin());
 			while (acts.isEmpty()) {
 				QuadTree<Facility> qt = this.fqts.get(act_type);
 				List<Facility> fs = new ArrayList<Facility>();
@@ -211,8 +211,8 @@ public class PlansCreateFromCensus2000 {
 			}
 			else {
 				log.debug("        pid="+p.getId()+", act_type="+act_type+", zone="+zone.getId()+": no facilities for educ found in that zone!");
-				CoordI max = new Coord(((Zone)zone).getMax());
-				CoordI min = new Coord(((Zone)zone).getMin());
+				Coord max = new CoordImpl(((Zone)zone).getMax());
+				Coord min = new CoordImpl(((Zone)zone).getMin());
 				while (acts.isEmpty()) {
 					max.setX(max.getX()+1000.0);
 					max.setY(max.getY()+1000.0);
@@ -321,8 +321,8 @@ public class PlansCreateFromCensus2000 {
 
 		// 6. if no work facilities in that zone found, try to find some by extension of the search area until something found
 		if (facs.isEmpty()) { log.debug("        pid="+p.getId()+", jobnr="+job+", zone="+zone.getId()+": no facilities for work found in that zone!"); }
-		CoordI max = new Coord(((Zone)zone).getMax());
-		CoordI min = new Coord(((Zone)zone).getMin());
+		Coord max = new CoordImpl(((Zone)zone).getMax());
+		Coord min = new CoordImpl(((Zone)zone).getMin());
 		while (facs.isEmpty()) {
 			max.setX(max.getX()+1000.0);
 			max.setY(max.getY()+1000.0);

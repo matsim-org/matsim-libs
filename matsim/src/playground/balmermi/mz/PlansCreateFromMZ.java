@@ -39,8 +39,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class PlansCreateFromMZ {
@@ -120,14 +120,14 @@ public class PlansCreateFromMZ {
 				entries[3] = Integer.toString(departure);
 
 				// start coordinate (round to hectare)
-				CoordI from = new Coord(entries[4].trim(),entries[5].trim());
+				Coord from = new CoordImpl(entries[4].trim(),entries[5].trim());
 				from.setX(Math.round(from.getX()/100.0)*100);
 				from.setY(Math.round(from.getY()/100.0)*100);
 				entries[4] = Double.toString(from.getX());
 				entries[5] = Double.toString(from.getY());
 				
 				// start coordinate (round to hectare)
-				CoordI to = new Coord(entries[6].trim(),entries[7].trim());
+				Coord to = new CoordImpl(entries[6].trim(),entries[7].trim());
 				to.setX(Math.round(to.getX()/100.0)*100);
 				to.setY(Math.round(to.getY()/100.0)*100);
 				entries[6] = Double.toString(to.getX());
@@ -328,8 +328,8 @@ public class PlansCreateFromMZ {
 			Act prev_act = (Act)act_it.next();
 			while (act_it.hasNext()) {
 				Act curr_act = (Act)act_it.next();
-				CoordI prevc = prev_act.getCoord();
-				CoordI currc = curr_act.getCoord();
+				Coord prevc = prev_act.getCoord();
+				Coord currc = curr_act.getCoord();
 				if ((currc.getX()==prevc.getX())&& (currc.getY()==currc.getY())) { ids.add(p.getId()); }
 				prev_act = curr_act;
 			}
@@ -355,8 +355,8 @@ public class PlansCreateFromMZ {
 				Act prev_act = (Act)plan.getActsLegs().get(i-2);
 				Leg leg = (Leg)plan.getActsLegs().get(i-1);
 				Act curr_act = (Act)plan.getActsLegs().get(i);
-				CoordI prevc = prev_act.getCoord();
-				CoordI currc = curr_act.getCoord();
+				Coord prevc = prev_act.getCoord();
+				Coord currc = curr_act.getCoord();
 				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
 					Act act2 = (Act)plan2.getActsLegs().get(plan2.getActsLegs().size()-1);
 					act2.setEndTime(curr_act.getEndTime());

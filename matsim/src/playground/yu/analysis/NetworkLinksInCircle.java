@@ -30,7 +30,7 @@ import java.util.Set;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * this class is based on
@@ -50,7 +50,7 @@ public class NetworkLinksInCircle {
 	}
 
 	public Set<Link> getLinks(double x, double y, double radius) {
-		Coord center = new Coord(x, y);
+		CoordImpl center = new CoordImpl(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));
 		for (Link link : this.network.getLinks().values()) {

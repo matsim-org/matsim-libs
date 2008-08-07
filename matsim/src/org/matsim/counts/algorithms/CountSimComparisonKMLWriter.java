@@ -41,9 +41,9 @@ import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.vis.kml.ColorStyle;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;
@@ -405,7 +405,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		Link link;
 		Placemark placemark;
 		double relativeError;
-		CoordI coord;
+		Coord coord;
 		Point point;
 		for (CountSimComparison csc : countSimComparisonList) {
 			linkid = csc.getId();
@@ -449,15 +449,15 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param l
 	 * @return the CoordI instance
 	 */
-	private CoordI calculatePlacemarkPosition(final Link l) {
-		CoordI coordFrom = l.getFromNode().getCoord();
-		CoordI coordTo = l.getToNode().getCoord();
+	private Coord calculatePlacemarkPosition(final Link l) {
+		Coord coordFrom = l.getFromNode().getCoord();
+		Coord coordTo = l.getToNode().getCoord();
 		double xDiff = coordTo.getX() - coordFrom.getX();
 		double yDiff = coordTo.getY() - coordFrom.getY();
 		double length = Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 		double scale = 0.4;
 		scale = l.getLength() * scale;
-		CoordI vec = new Coord(coordFrom.getX() + (xDiff * scale/length), coordFrom.getY() + (yDiff * scale/length));
+		Coord vec = new CoordImpl(coordFrom.getX() + (xDiff * scale/length), coordFrom.getY() + (yDiff * scale/length));
 		return vec;
 	}
 	/**

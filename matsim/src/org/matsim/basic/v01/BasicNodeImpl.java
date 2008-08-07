@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class BasicNodeImpl implements BasicNode {
 	protected final Map<Id, BasicLink> inlinks  = new LinkedHashMap<Id, BasicLink>(4, 0.95f);
@@ -37,10 +37,10 @@ public class BasicNodeImpl implements BasicNode {
 	 * by its from- and to-node. Therefore, the BasicNode MUST have a coordinate
 	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
 	 * not extend Location. */
-	protected final CoordI coord;
+	protected final Coord coord;
 	protected final Id id;
 
-	public BasicNodeImpl(Id id, CoordI coord) {
+	public BasicNodeImpl(Id id, Coord coord) {
 		this.id = id;
 		if (coord == null) { Gbl.errorMsg("Coord must be defined!"); }
 		this.coord = coord;
@@ -65,7 +65,7 @@ public class BasicNodeImpl implements BasicNode {
 	}
 
 	// TODO [balmermi] see above why ...
-	public CoordI getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
 

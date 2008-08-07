@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Feature;
@@ -175,8 +175,8 @@ public class PopulationExportToKML {
 
 			Person p = it.next();
 			Act homeActivitiy = ((Act)p.getPlans().get(0).getActsLegs().get(0));
-			CoordI chCoord = homeActivitiy.getCoord();
-			CoordI lonLat = ct.transform(chCoord);
+			Coord chCoord = homeActivitiy.getCoord();
+			Coord lonLat = ct.transform(chCoord);
 
 			age = p.getAge();
 
@@ -411,7 +411,7 @@ public class PopulationExportToKML {
 
 	}
 
-	public KML createFacilitiesKML(CoordI chCoord, int sizeClass) {
+	public KML createFacilitiesKML(Coord chCoord, int sizeClass) {
 
 		double regionSize = 0;
 		int kmlX = 0, kmlY = 0;

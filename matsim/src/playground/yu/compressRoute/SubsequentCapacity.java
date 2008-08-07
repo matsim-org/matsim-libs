@@ -32,7 +32,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
@@ -142,8 +142,8 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		Node to = l.getToNode();
 		Node from = l.getFromNode();
 
-		Coord cFrom = from.getCoord();
-		Coord cTo = to.getCoord();
+		CoordImpl cFrom = from.getCoord();
+		CoordImpl cTo = to.getCoord();
 		double xTo = cTo.getX();
 		double yTo = cTo.getY();
 		double crtLinkTheta = Math
@@ -153,7 +153,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 			resultLinkId = nextLinksIds.get(0);
 		else if (nextLinksIds.size() > 1) {
 			for (String nextLinkId : nextLinksIds) {
-				Coord cNextTo = outLinksMap.get(nextLinkId).getToNode()
+				CoordImpl cNextTo = outLinksMap.get(nextLinkId).getToNode()
 						.getCoord();
 				double outLinkTheta = Math.atan2(cNextTo.getY() - yTo, cNextTo
 						.getX()

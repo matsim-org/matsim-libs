@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.PriorityQueue;
 
 import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 
 public class FloodlineGenerator {
@@ -58,7 +58,7 @@ public class FloodlineGenerator {
 			double time = Double.parseDouble(tokline[3]); 
 			double x = Double.parseDouble(tokline[0]);
 			double y = Double.parseDouble(tokline[1]);
-			CoordI c = new Coord(x,y);
+			Coord c = new CoordImpl(x,y);
 			FloodEvent e = new FloodEvent(flooding, time,c);
 			this.events.add(e);
 			line = infile.readLine();
@@ -83,9 +83,9 @@ public class FloodlineGenerator {
 	}
 	
 	
-	public Collection<CoordI> getAllFlodded() {
+	public Collection<Coord> getAllFlodded() {
 		
-		ArrayList<CoordI> coords = new ArrayList<CoordI>();
+		ArrayList<Coord> coords = new ArrayList<Coord>();
 		
 		for (FloodEvent e : this.events) {
 			coords.add(e.coord);
@@ -99,10 +99,10 @@ public class FloodlineGenerator {
 	public class FloodEvent implements Comparable {
 
 		private double time;
-		private CoordI coord;
+		private Coord coord;
 		private double flooding;
 		
-		public FloodEvent(double flooding, double time, CoordI c) {
+		public FloodEvent(double flooding, double time, Coord c) {
 			this.time = time;
 			this.coord = c;
 			this.flooding = flooding;

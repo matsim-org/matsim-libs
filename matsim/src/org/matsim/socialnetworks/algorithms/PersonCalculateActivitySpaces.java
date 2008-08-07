@@ -27,7 +27,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.EgoNet;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PersonCalculateActivitySpaces {
 
@@ -41,13 +41,13 @@ public class PersonCalculateActivitySpaces {
 		double aSd = 0.;
 
 		Act myAct = (Act) ego.getSelectedPlan().getActsLegs().get(0);
-		CoordI egoHomeCoord = myAct.getCoord();
+		Coord egoHomeCoord = myAct.getCoord();
 		EgoNet personNet = ego.getKnowledge().getEgoNet();
 		ArrayList<Person> alters = personNet.getAlters();
 		for (Person myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
 			myAct = (Act) myAlter.getSelectedPlan().getActsLegs().get(0);
-			CoordI myAlterCoord = myAct.getCoord();
+			Coord myAlterCoord = myAct.getCoord();
 			aSd = aSd + egoHomeCoord.calcDistance(myAlterCoord);
 		}
 		aSd = aSd / alters.size();

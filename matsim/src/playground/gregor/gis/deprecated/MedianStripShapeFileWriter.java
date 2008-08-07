@@ -40,7 +40,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.GeotoolsTransformation;
@@ -153,8 +153,8 @@ public class MedianStripShapeFileWriter {
 		int i = 0;
 		for (Link link : this.links){
 
-			CoordI a = transform.transform(link.getFromNode().getCoord());
-			CoordI b = transform.transform(link.getToNode().getCoord());
+			Coord a = transform.transform(link.getFromNode().getCoord());
+			Coord b = transform.transform(link.getToNode().getCoord());
 
 			Coordinate [] coords = {MGC.coord2Coordinate(a),MGC.coord2Coordinate(b)};
 			LineString ls = new LineString(coords,pm,i);

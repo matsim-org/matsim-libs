@@ -25,7 +25,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Layer;
 
 /**
@@ -53,8 +53,8 @@ public class PolygonZoneLayer extends Layer{
 		super(type,name);
 	}
 	
-	public final PolygonZone createPolygonZone( final Id id, final CoordI center,
-            final CoordI[] shell, final double area, final String name){
+	public final PolygonZone createPolygonZone( final Id id, final Coord center,
+            final Coord[] shell, final double area, final String name){
 //		IdI i = new Id(id);
 		if (this.locations.containsKey(id)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
 		

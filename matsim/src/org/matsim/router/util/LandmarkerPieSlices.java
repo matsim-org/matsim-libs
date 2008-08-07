@@ -33,13 +33,13 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 class LandmarkerPieSlices extends NetworkAlgorithm {
 
 	private Node[] landmarks;
 
-	private Coord center = null;
+	private CoordImpl center = null;
 
 	private int roleIndex;
 
@@ -285,7 +285,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 	}
 
-	public Coord getCenter(final Collection<? extends Node> nodes) {
+	public CoordImpl getCenter(final Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];
@@ -295,7 +295,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		double centerX = (maxX - minX) / 2 + minX;
 		double centerY = (maxY - minY) / 2 + minY;
 
-		return new Coord(centerX, centerY);
+		return new CoordImpl(centerX, centerY);
 	}
 
 	public Node[] getLandmarks() {
@@ -334,7 +334,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 	/**
 	 * @return the middle
 	 */
-	public Coord getMiddle() {
+	public CoordImpl getMiddle() {
 		return this.center;
 	}
 

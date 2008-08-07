@@ -34,7 +34,7 @@ import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Executor;
 import org.matsim.utils.collections.QuadTree.Rect;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
@@ -53,7 +53,7 @@ public class QueryLinkId implements OTFQuery {
 	double width = 0;
 	double height = 0;
 	
-	public Map<Coord, String> linkIds = new HashMap<Coord, String>();
+	public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
 
 	public QueryLinkId(double x,double y) {
 		this.sx = x;
@@ -110,12 +110,12 @@ public class QueryLinkId implements OTFQuery {
 							
 							minDist = dist;
 							Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-							linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+							linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 						}
 					
 				} else {
 					Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-					linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+					linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 				}
 			}
 		}

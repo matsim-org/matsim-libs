@@ -37,7 +37,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -281,7 +281,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			else {
 				to_fac = this.getPrimActFacility(to_facs,WORK);
 			}
-			Coord coord = (Coord)to_fac.getCenter();
+			CoordImpl coord = (CoordImpl)to_fac.getCenter();
 			for (int i= 0; i<work_list.size(); i++) {
 				Act a = work_list.get(i);
 				a.setCoord(coord);
@@ -303,7 +303,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			else {
 				to_fac = this.getPrimActFacility(to_facs,EDUCATION);
 			}
-			Coord coord = (Coord)to_fac.getCenter();
+			CoordImpl coord = (CoordImpl)to_fac.getCenter();
 			for (int i= 0; i<educ_list.size(); i++) {
 				Act a = educ_list.get(i);
 				a.setCoord(coord);

@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 
 public class BasicActImpl implements BasicAct {
@@ -33,7 +33,7 @@ public class BasicActImpl implements BasicAct {
 	protected BasicLink link = null;
 	protected Facility facility = null;
 
-	private CoordI coord = null;
+	private Coord coord = null;
 
 	protected double startTime = Time.UNDEFINED_TIME;
 	protected double dur = Time.UNDEFINED_TIME;
@@ -70,11 +70,11 @@ public class BasicActImpl implements BasicAct {
 		this.facility = facility;
 	}
 
-	public final CoordI getCoord() {
+	public final Coord getCoord() {
 		return this.coord;
 	}
 
-	public void setCoord(final CoordI coord) {
+	public void setCoord(final Coord coord) {
 		this.coord = coord;
 	}
 

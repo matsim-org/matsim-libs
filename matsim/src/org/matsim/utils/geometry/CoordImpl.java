@@ -18,34 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.geometry.shared;
+package org.matsim.utils.geometry;
 
 import java.io.Serializable;
 
-import org.matsim.utils.geometry.CoordI;
 
-public class Coord implements Serializable, CoordI {
+public class CoordImpl implements Serializable, Coord {
 
 	private static final long serialVersionUID = 1L;
 
 	private double x = 0.0;
 	private double y = 0.0;
 
-	public Coord(final double x, final double y) {
+	public CoordImpl(final double x, final double y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public Coord(final String x, final String y) {
+	public CoordImpl(final String x, final String y) {
 		this(Double.parseDouble(x), Double.parseDouble(y));
 	}
 
-	public Coord(final CoordI coord) {
+	public CoordImpl(final Coord coord) {
 		this.x = coord.getX();
 		this.y = coord.getY();
 	}
 
-	public final double calcDistance(final CoordI other) {
+	public final double calcDistance(final Coord other) {
 		//depending on the coordinate system that is used, determining the
 		//distance based on the euclidean distance will lead to wrong results.
 		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
@@ -81,10 +80,10 @@ public class Coord implements Serializable, CoordI {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof CoordI)) {
+		if (!(other instanceof Coord)) {
 			return false;
 		}
-		CoordI o = (CoordI)other;
+		Coord o = (Coord)other;
 		return ((this.x == o.getX()) && (this.y == o.getY()));
 	}
 

@@ -23,8 +23,8 @@ package org.matsim.basic.v01;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.AbstractLocation;
 
 public class BasicLinkImpl
@@ -47,7 +47,7 @@ implements BasicLink
 	// If this is not O.K., then the BasicLink must not extend Location.
 	public BasicLinkImpl(final NetworkLayer network, final Id id, final BasicNode from, final BasicNode to) {
 		super(network, id, 
-				new Coord(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
+				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
 		);
 		this.from = from;
 		this.to = to;
@@ -57,7 +57,7 @@ implements BasicLink
 	// of that link. A better version is implemented in org.matsim.demandmodeling.network.Link.
 	// It would be better to implement the version in Link here and remove the one in Link.
 	@Override
-	public double calcDistance(final CoordI coord) {
+	public double calcDistance(final Coord coord) {
 		return this.center.calcDistance(coord);
 	}
 

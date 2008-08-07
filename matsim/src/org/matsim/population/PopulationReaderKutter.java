@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -159,7 +159,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		private final ZoneLayer tvzLayer;
 		private Person currPerson = null;
 		private Plan currPlan = null;
-		private CoordI currHome = null;
+		private Coord currHome = null;
 		private int currTime = 0;
 
 		public PersonRowHandler() {
@@ -207,7 +207,7 @@ public class PopulationReaderKutter implements PopulationReader {
 
 			try {
 				Zone zone = (Zone)this.tvzLayer.getLocation(cellid);
-				CoordI coord = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
+				Coord coord = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
 				String activity = "";
 				int duration = 0;
 				boolean skipActivity = false;

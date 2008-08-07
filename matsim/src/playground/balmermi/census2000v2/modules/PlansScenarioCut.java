@@ -30,7 +30,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -44,14 +44,14 @@ public class PlansScenarioCut {
 
 	private final static Logger log = Logger.getLogger(PlansScenarioCut.class);
 
-	private final CoordI min;
-	private final CoordI max;
+	private final Coord min;
+	private final Coord max;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansScenarioCut(final CoordI min, final CoordI max) {
+	public PlansScenarioCut(final Coord min, final Coord max) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.min = min;
 		this.max = max;
@@ -75,7 +75,7 @@ public class PlansScenarioCut {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
 				Act act = (Act)plan.getActsLegs().get(i);
-				CoordI c = act.getCoord();
+				Coord c = act.getCoord();
 				if ((c.getX()<min.getX()) || (c.getX()>max.getX()) || (c.getY()<min.getY()) || (c.getY()>max.getY())) {
 					removeids.add(p.getId());
 				}

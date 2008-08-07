@@ -30,7 +30,7 @@ import org.matsim.counts.Counts;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class CountsFilter {
 
@@ -53,7 +53,7 @@ public class CountsFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		double radius = 30000.0;
-		final Coord center = new Coord(683518.0,246836.0);
+		final CoordImpl center = new CoordImpl(683518.0,246836.0);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("  => area of interest (aoi): center=" + center + "; radius=" + radius);
 

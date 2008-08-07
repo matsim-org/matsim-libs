@@ -87,9 +87,9 @@ import org.matsim.router.util.TravelTimeI;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.ColorStyle;
@@ -308,8 +308,8 @@ public class MyRuns {
 		final String KML21_USE_COMPRESSION = "useCompression";
 		final String SEP = System.getProperty("file.separator");
 
-		CoordI worldCoord;
-		CoordI geometryCoord;
+		Coord worldCoord;
+		Coord geometryCoord;
 		Placemark pl;
 
 		String myKMLFilename =
@@ -526,7 +526,7 @@ public class MyRuns {
 				agentFolder.addFeature(pl);
 
 				worldCoord = act.getCoord();
-				geometryCoord = trafo.transform(new Coord(worldCoord.getX(), worldCoord.getY()));
+				geometryCoord = trafo.transform(new CoordImpl(worldCoord.getX(), worldCoord.getY()));
 				Point actPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
 				pl.setGeometry(actPoint);
 
@@ -555,13 +555,13 @@ public class MyRuns {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.utils.geometry.shared.Coord fromNodeWorldCoord = fromNode.getCoord();
-		org.matsim.utils.geometry.shared.Coord fromNodeGeometryCoord = (Coord) trafo.transform(new Coord(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		org.matsim.utils.geometry.CoordImpl fromNodeWorldCoord = fromNode.getCoord();
+		org.matsim.utils.geometry.CoordImpl fromNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.utils.geometry.shared.Coord toNodeWorldCoord = toNode.getCoord();
-		org.matsim.utils.geometry.shared.Coord toNodeGeometryCoord = (Coord) trafo.transform(new Coord(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		org.matsim.utils.geometry.CoordImpl toNodeWorldCoord = toNode.getCoord();
+		org.matsim.utils.geometry.CoordImpl toNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
 		linkPlacemark = new Placemark(

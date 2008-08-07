@@ -28,8 +28,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
@@ -127,8 +127,8 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 		
 		// ch.cut.640000.200000.740000.310000.xml
-		CoordI min = new Coord(640000.0,200000.0);
-		CoordI max = new Coord(740000.0,310000.0);
+		Coord min = new CoordImpl(640000.0,200000.0);
+		Coord max = new CoordImpl(740000.0,310000.0);
 
 		System.out.println("  running person modules... ");
 		new PersonCreateFakePlanFromKnowledge().run(plans);

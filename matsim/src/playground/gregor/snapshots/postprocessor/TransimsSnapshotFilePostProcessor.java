@@ -31,7 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.World;
 
 import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;

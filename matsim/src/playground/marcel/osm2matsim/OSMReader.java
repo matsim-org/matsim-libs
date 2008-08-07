@@ -28,8 +28,8 @@ import java.util.Stack;
 
 import org.matsim.counts.Count;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -215,14 +215,14 @@ public class OSMReader extends MatsimXmlParser {
 		public final double lon;
 		public boolean used = false;
 		public int ways = 0;
-		public final CoordI coord;
+		public final Coord coord;
 		public static final WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
 
 		public OSMNode(final long id, final double lat, final double lon) {
 			this.id = id;
 			this.lat = lat;
 			this.lon = lon;
-			this.coord = transform.transform(new Coord(lon, lat));
+			this.coord = transform.transform(new CoordImpl(lon, lat));
 		}
 	}
 

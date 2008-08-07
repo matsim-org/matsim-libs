@@ -36,7 +36,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
@@ -109,7 +109,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 			while (iter.hasNext()){
 				Facility facility = iter.next();
 				
-				Coord bellevue = new Coord(683508.50, 246832.91);
+				CoordImpl bellevue = new CoordImpl(683508.50, 246832.91);
 				if (facility.getCenter().calcDistance(bellevue) <= 30000) {
 												
 					Iterator<Activity> act_it=facility.getActivities().values().iterator();

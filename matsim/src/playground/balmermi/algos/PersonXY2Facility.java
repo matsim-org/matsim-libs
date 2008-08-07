@@ -35,7 +35,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
@@ -152,7 +152,7 @@ public class PersonXY2Facility extends PersonAlgorithm implements PlanAlgorithmI
 		Iterator<?> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
-			CoordI coord = act.getCoord();
+			Coord coord = act.getCoord();
 			QuadTree<Facility> qt = null;
 			if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
 			else if (act.getType().startsWith(W)) { qt = this.fqts.get(W); }
@@ -170,7 +170,7 @@ public class PersonXY2Facility extends PersonAlgorithm implements PlanAlgorithmI
 
 			act.setFacility(f);
 			act.setLink(l);
-			CoordI coord_f = f.getCenter();
+			Coord coord_f = f.getCenter();
 			act.setCoord(coord_f);
 		}
 	}

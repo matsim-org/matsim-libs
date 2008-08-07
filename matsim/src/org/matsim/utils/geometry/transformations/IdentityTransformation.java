@@ -20,7 +20,7 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.utils.geometry.CoordinateTransformationI;
  */
 public class IdentityTransformation implements CoordinateTransformationI {
 
-	public CoordI transform(CoordI coord) {
+	public Coord transform(Coord coord) {
 		return coord;
 	}
 

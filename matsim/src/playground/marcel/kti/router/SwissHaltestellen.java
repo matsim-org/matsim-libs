@@ -29,20 +29,20 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.CalcBoundingBox;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 
 public class SwissHaltestellen {
 
-	private final QuadTree<CoordI> haltestellen;
+	private final QuadTree<Coord> haltestellen;
 
 	private static final Logger log = Logger.getLogger(SwissHaltestellen.class);
 
 	public SwissHaltestellen(final NetworkLayer network) {
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(network);
-		this.haltestellen = new QuadTree<CoordI>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+		this.haltestellen = new QuadTree<Coord>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
 	}
 
 	public void readFile(final String filename) throws FileNotFoundException, IOException {
@@ -51,7 +51,7 @@ public class SwissHaltestellen {
 		while ((line = reader.readLine()) != null) {
 			String[] parts = StringUtils.explode(line, '\t');
 			if (parts.length == 7) {
-				Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 				this.haltestellen.put(coord.getX(), coord.getY(), coord);
 			} else {
 				log.warn("Could not parse line: " + line);
@@ -59,7 +59,7 @@ public class SwissHaltestellen {
 		}
 	}
 
-	public CoordI getClosestLocation(final CoordI coord) {
+	public Coord getClosestLocation(final Coord coord) {
 		return this.haltestellen.get(coord.getX(), coord.getY());
 	}
 }

@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.StringUtils;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 
 public class VisumNetworkReader {
@@ -100,7 +100,7 @@ public class VisumNetworkReader {
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.Stop stop = new VisumNetwork.Stop(new IdImpl(parts[idxNo]), parts[idxName],
-					new Coord(Double.parseDouble(parts[idxXcoord]), Double.parseDouble(parts[idxYcoord])));
+					new CoordImpl(Double.parseDouble(parts[idxXcoord]), Double.parseDouble(parts[idxYcoord])));
 			this.network.addStop(stop);
 			// proceed to next line
 			line = reader.readLine();

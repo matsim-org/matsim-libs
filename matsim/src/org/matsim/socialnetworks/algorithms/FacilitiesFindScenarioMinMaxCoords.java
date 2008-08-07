@@ -22,13 +22,13 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilitiesFindScenarioMinMaxCoords {
 
-	private CoordI minCoord;
-	private CoordI maxCoord;
+	private Coord minCoord;
+	private Coord maxCoord;
 
 	public FacilitiesFindScenarioMinMaxCoords() {
 		super();
@@ -44,7 +44,7 @@ public class FacilitiesFindScenarioMinMaxCoords {
 		double max_y = Double.MIN_VALUE;
 
 		for (Facility f : facilities.getFacilities().values()) {
-			CoordI c = f.getCenter();
+			Coord c = f.getCenter();
 			if(c.getX()<=min_x){
 				min_x=c.getX();
 			}
@@ -58,13 +58,13 @@ public class FacilitiesFindScenarioMinMaxCoords {
 				max_y=c.getY();
 			}
 		}
-		minCoord = new Coord(min_x, min_y);
-		maxCoord = new Coord(max_x, max_y);
+		minCoord = new CoordImpl(min_x, min_y);
+		maxCoord = new CoordImpl(max_x, max_y);
 	}
-	public CoordI getMinCoord(){
+	public Coord getMinCoord(){
 		return this.minCoord;
 	}
-	public CoordI getMaxCoord(){
+	public Coord getMaxCoord(){
 		return this.maxCoord;
 	}
 }

@@ -38,7 +38,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
@@ -52,7 +52,7 @@ public class PlanFilter {
 	public static void subPopulation(final String[] args) {
 		System.out.println("RUN: subPopulation");
 
-		final Coord center = new Coord(683518.0, 246836.0); // Bellevue, Zrh
+		final CoordImpl center = new CoordImpl(683518.0, 246836.0); // Bellevue, Zrh
 		double[] smallRadiuses = {5000, 7000, 9000};
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
@@ -120,7 +120,7 @@ public class PlanFilter {
 	public static void generateSubsets(final String[] args) {
 		System.out.println("RUN: generateSubset");
 
-		final Coord center = new Coord(683518.0, 246836.0); // Bellevue, Zrh
+		final CoordImpl center = new CoordImpl(683518.0, 246836.0); // Bellevue, Zrh
 		double smallRadius = 7000;
 		double bigRadius = 14000;
 

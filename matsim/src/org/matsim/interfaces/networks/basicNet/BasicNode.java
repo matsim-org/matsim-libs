@@ -23,7 +23,7 @@ package org.matsim.interfaces.networks.basicNet;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * A topological representation of an network node.
@@ -83,5 +83,5 @@ public interface BasicNode {
      */
     public Map<Id, ? extends BasicLink> getOutLinks();
 
-    public CoordI getCoord();
+    public Coord getCoord();
 }

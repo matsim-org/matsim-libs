@@ -21,7 +21,7 @@
 package playground.dgrether.analysis;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 
 /**
@@ -41,7 +41,7 @@ public class PlanComparisonStringWriter implements PlanComparisonWriter {
 	public void write(PlanComparison pc) {
 		double score1, score2;
 		String linesep = System.getProperty("line.separator");
-		CoordI coordinates;
+		Coord coordinates;
 		_buffer = new StringBuffer();
 		_buffer.append("Id");
 		_buffer.append("\t");

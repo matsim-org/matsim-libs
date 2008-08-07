@@ -27,8 +27,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class Act extends BasicActImpl /*implements Serializable*/ {
@@ -51,7 +51,7 @@ public class Act extends BasicActImpl /*implements Serializable*/ {
 		if (((x==null) && (y!=null)) || ((x!=null) && (y==null))) {
 			Gbl.errorMsg(this + "[either both or non of the coordinates must exist.]");
 		} else if ((x!=null) && (y!=null)) {
-			this.setCoord(new Coord(x.doubleValue(), y.doubleValue())); // set the coord, because they are defined
+			this.setCoord(new CoordImpl(x.doubleValue(), y.doubleValue())); // set the coord, because they are defined
 		} else if (link == null) { // both coords are == null, therefore link MUST exist
 			Gbl.errorMsg(this + "[the coord AND the link is not defined! forbidden!]");
 		}
@@ -76,7 +76,7 @@ public class Act extends BasicActImpl /*implements Serializable*/ {
 	public Act(final String type, final double x, final double y, final Link link,
 			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
 		this.type = type.intern();
-		this.setCoord(new Coord(x, y));
+		this.setCoord(new CoordImpl(x, y));
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -87,7 +87,7 @@ public class Act extends BasicActImpl /*implements Serializable*/ {
 	public Act(final Act act) {
 		this.type = act.type;
 		// Act coord could be null according to first c'tor!
-		CoordI c = act.getCoord() == null ? null : new Coord(act.getCoord());
+		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
 		this.setCoord(c);
 		this.link = act.link;
 		this.startTime = act.startTime;

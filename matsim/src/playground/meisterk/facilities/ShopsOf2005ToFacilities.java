@@ -50,8 +50,8 @@ import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.misc.Time;
@@ -769,9 +769,9 @@ public class ShopsOf2005ToFacilities {
 					// transform coordinates
 					String[] coordinates = point.getCoordinates().get(0).split(",");
 					//System.out.println(point.getCoordinates().get(0));
-					CoordI wgs84Coords = new Coord(coordinates[0], coordinates[1]);
+					Coord wgs84Coords = new CoordImpl(coordinates[0], coordinates[1]);
 					WGS84toCH1903LV03 trafo = new WGS84toCH1903LV03();
-					CoordI ch1903Coordinates = trafo.transform(wgs84Coords);
+					Coord ch1903Coordinates = trafo.transform(wgs84Coords);
 
 					// round coordinates to meters
 					ch1903Coordinates.setXY((int) ch1903Coordinates.getX(), (int) ch1903Coordinates.getY());
@@ -1658,8 +1658,8 @@ public class ShopsOf2005ToFacilities {
 		PlacemarkType aShopOpeningPeriod = null;
 		PointType aPointType = null;
 		TimeSpanType aTimeSpanType = null;
-		CoordI northWestCH1903 = null;
-		CoordI northWestWGS84 = null;
+		Coord northWestCH1903 = null;
+		Coord northWestWGS84 = null;
 
 		// as a start, let's use the week April, 21 to April 27, 2008 as THE week
 		final int MONDAY_DAY = 21;
@@ -1742,7 +1742,7 @@ public class ShopsOf2005ToFacilities {
 				aShop.setDescription(facilityId);
 
 				// transform coordinates incl. toggle easting and northing
-				northWestCH1903 = new Coord(facility.getCenter().getX(), facility.getCenter().getY());
+				northWestCH1903 = new CoordImpl(facility.getCenter().getX(), facility.getCenter().getY());
 				northWestWGS84 = trafo.transform(northWestCH1903);
 
 				// have to iterate this over opening times

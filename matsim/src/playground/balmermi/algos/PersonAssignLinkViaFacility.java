@@ -33,7 +33,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 
 public class PersonAssignLinkViaFacility extends PersonAlgorithm {
@@ -132,7 +132,7 @@ public class PersonAssignLinkViaFacility extends PersonAlgorithm {
 			Iterator<?> a_it = p.getIteratorAct();
 			while (a_it.hasNext()) {
 				Act a = (Act)a_it.next();
-				CoordI coord = a.getCoord();
+				Coord coord = a.getCoord();
 				if (coord == null) { Gbl.errorMsg("Something is wrong!"); }
 				char type = a.getType().charAt(0);
 				Facility f = null;

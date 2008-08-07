@@ -38,8 +38,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class GrowingCirclesLocationMutator extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -64,7 +64,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 	private static final String LEISURE_2 = "leisure_sports";
 	
 	
-	private static final Coord ZERO = new Coord(0.0,0.0);
+	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
 	private NetworkLayer network;
 	//private final Persons persons;
@@ -249,7 +249,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		return null;
 	}
 
-	private final Facility getFacility(final CoordI coord, final double radius, final String act_type) {
+	private final Facility getFacility(final Coord coord, final double radius, final String act_type) {
 		final Collection<Facility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
@@ -258,7 +258,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 		return this.getFacility(fs,act_type);
 	}
 
-	private final Facility getFacility(final Coord coord1, final Coord coord2, final double radius, final String act_type) {
+	private final Facility getFacility(final CoordImpl coord1, final CoordImpl coord2, final double radius, final String act_type) {
 		final Collection<Facility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
@@ -274,8 +274,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 
 	@Override
 	public void run(final Person person) {
-		CoordI home_coord = null;
-		CoordI prim_coord = null;
+		Coord home_coord = null;
+		Coord prim_coord = null;
 		final Plan plan = person.getSelectedPlan();
 		Iterator<BasicActImpl> act_it = plan.getIteratorAct();
 		while (act_it.hasNext()) {
@@ -318,8 +318,8 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 			final double radius = Math.sqrt(dx*dx+dy*dy)/3.0;
 			dx = dx/6.0;
 			dy = dy/6.0;
-			final Coord coord1 = new Coord(home_coord.getX()+dx,home_coord.getY()+dy);
-			final Coord coord2 = new Coord(prim_coord.getX()-dx,prim_coord.getY()+dy);
+			final CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
+			final CoordImpl coord2 = new CoordImpl(prim_coord.getX()-dx,prim_coord.getY()+dy);
 			act_it = plan.getIteratorAct();
 			while (act_it.hasNext()) {
 				final Act act = (Act)act_it.next();

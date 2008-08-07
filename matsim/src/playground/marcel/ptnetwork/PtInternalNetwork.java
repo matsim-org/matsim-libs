@@ -32,7 +32,7 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 import playground.marcel.ptnetwork.tempelements.TempFZP;
@@ -1144,16 +1144,16 @@ public class PtInternalNetwork {
 			double minY = Double.POSITIVE_INFINITY;
 			double maxX = Double.NEGATIVE_INFINITY;
 			double maxY = Double.NEGATIVE_INFINITY;
-			ArrayList<Coord> newCoords = new ArrayList<Coord>();
-			ArrayList<Coord> oldCoords = new ArrayList<Coord>();
+			ArrayList<CoordImpl> newCoords = new ArrayList<CoordImpl>();
+			ArrayList<CoordImpl> oldCoords = new ArrayList<CoordImpl>();
 			while ((tmp = rdr.readLine()) != null && tmp.trim().equals("") == false) {
 				String[] data = tmp.split(";");
 				double newX = Double.parseDouble(data[1]);
 				double newY = Double.parseDouble(data[2]);
 				double oldX = Double.parseDouble(data[3]);
 				double oldY = Double.parseDouble(data[4]);
-				Coord newCoord = new Coord(newX, newY);
-				Coord oldCoord = new Coord(oldX, oldY);
+				CoordImpl newCoord = new CoordImpl(newX, newY);
+				CoordImpl oldCoord = new CoordImpl(oldX, oldY);
 				newCoords.add(newCoord);
 				oldCoords.add(oldCoord);
 				if (oldX < minX) { minX = oldX; }
@@ -1162,16 +1162,16 @@ public class PtInternalNetwork {
 				if (oldY > maxY) { maxY = oldY; }
 			}
 			// now generate the quadtree: oldX/oldY -> newCoord
-			QuadTree<Coord> quadTree = new QuadTree<Coord>(minX, minY, maxX, maxY);
+			QuadTree<CoordImpl> quadTree = new QuadTree<CoordImpl>(minX, minY, maxX, maxY);
 			for (int i = 0, max = oldCoords.size(); i < max; i++) {
-				Coord oldCoord = oldCoords.get(i);
-				Coord newCoord = newCoords.get(i);
+				CoordImpl oldCoord = oldCoords.get(i);
+				CoordImpl newCoord = newCoords.get(i);
 				quadTree.put(oldCoord.getX(), oldCoord.getY(), newCoord);
 			}
 			System.out.println("replacing coords");
 			for (TempLine line : this.lines.values()) {
 				for (TempHP hp : line.hps) {
-					Coord newCoord = quadTree.get(hp.getCoord().getX(), hp.getCoord().getY());
+					CoordImpl newCoord = quadTree.get(hp.getCoord().getX(), hp.getCoord().getY());
 					hp.setCoord(newCoord.getX(), newCoord.getY());
 				}
 			}

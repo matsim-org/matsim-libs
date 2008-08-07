@@ -3,7 +3,7 @@ package org.matsim.world;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public interface Location {
 
@@ -13,7 +13,7 @@ public interface Location {
 	 * @param coord The coordinate from which the distance to that location should be calculated.
 	 * @return the distance to that location
 	 */
-	public abstract double calcDistance(final CoordI coord);
+	public abstract double calcDistance(final Coord coord);
 
 	/**
 	 * Connects two location of two different layers. The layers have to be 'neighbors' which
@@ -42,7 +42,7 @@ public interface Location {
 
 	public abstract Layer getLayer();
 
-	public abstract CoordI getCenter();
+	public abstract Coord getCenter();
 
 	public abstract Location getUpLocation(Id id);
 

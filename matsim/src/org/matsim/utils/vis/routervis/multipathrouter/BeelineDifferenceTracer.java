@@ -20,7 +20,7 @@
 
 package org.matsim.utils.vis.routervis.multipathrouter;
 
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * The BeelineDifferenceTracer calculates the deviance from the hypothetical OD connection for a given Coord.
@@ -34,8 +34,8 @@ import org.matsim.utils.geometry.shared.Coord;
  */
 public class BeelineDifferenceTracer {
 	
-	private final Coord orig;
-	private final Coord dest;
+	private final CoordImpl orig;
+	private final CoordImpl dest;
 	
 	private final double distOD;
 	private final double sqrDistOD;
@@ -45,7 +45,7 @@ public class BeelineDifferenceTracer {
 	private double crit = 0.9;
 	private final static double coef = 0.99;
 	
-	public BeelineDifferenceTracer(final Coord orig, final Coord dest){
+	public BeelineDifferenceTracer(final CoordImpl orig, final CoordImpl dest){
 		
 		this.TRACE_WEIGHT = 1;
 		this.orig = orig;
@@ -76,7 +76,7 @@ public class BeelineDifferenceTracer {
 	}
 	
 	//TODO take old deviance into account to make the trace function smoother ...
-	public double getTrace(final double oldTrace, final Coord  oldCoord, final double linkLength, final Coord newCoord){
+	public double getTrace(final double oldTrace, final CoordImpl  oldCoord, final double linkLength, final CoordImpl newCoord){
 		double newDiff = getDeviance(newCoord);
 		newDiff = newDiff >= 0 ? newDiff : 0;
 //		
@@ -104,7 +104,7 @@ public class BeelineDifferenceTracer {
 	}
 	
 	
-	private double getDeviance(final Coord explored){
+	private double getDeviance(final CoordImpl explored){
 		
 		final double distExplDest = explored.calcDistance(this.dest);
 		final double distOrigExpl = this.orig.calcDistance(explored);
@@ -136,10 +136,10 @@ public class BeelineDifferenceTracer {
 	
 	//debug
 	public static void main(final String [] args){
-		final Coord A = new Coord(0,0);
-		final Coord B1 = new Coord(10,0);
-		final Coord B2 = new Coord(0,10);
-		final Coord C = new Coord(20,20);
+		final CoordImpl A = new CoordImpl(0,0);
+		final CoordImpl B1 = new CoordImpl(10,0);
+		final CoordImpl B2 = new CoordImpl(0,10);
+		final CoordImpl C = new CoordImpl(20,20);
 		final BeelineDifferenceTracer dt = new BeelineDifferenceTracer(A,C);
 		final double dist1 = dt.getDeviance(B1);
 		final double dist2 = dt.getDeviance(B2);

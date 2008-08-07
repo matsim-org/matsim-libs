@@ -115,9 +115,9 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
@@ -389,8 +389,8 @@ public class MyRuns {
 		plans.printPlansCount();
 		System.out.println("  done.");
 
-		final Coord minCoord = new Coord(Math.min(x1, x2), Math.min(y1, y2));
-		final Coord maxCoord = new Coord(Math.max(x1, x2), Math.max(y1, y2));
+		final CoordImpl minCoord = new CoordImpl(Math.min(x1, x2), Math.min(y1, y2));
+		final CoordImpl maxCoord = new CoordImpl(Math.max(x1, x2), Math.max(y1, y2));
 		new PlansFilterArea(minCoord, maxCoord).run(plans); // requires PLANS.NO_STREAMING
 
 		System.out.println("  writing plans...");
@@ -408,7 +408,7 @@ public class MyRuns {
 	public static void filterPlansWithRouteInArea(final String[] args, final double x, final double y, final double radius) {
 		System.out.println("RUN: filterPlansWithRouteInArea");
 
-		final Coord center = new Coord(x, y);
+		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		final Config config = Gbl.createConfig(args);
@@ -489,8 +489,8 @@ public class MyRuns {
 		plans.printPlansCount();
 		System.out.println("  done.");
 
-		final Coord minCoord = summary.getMinCoord();
-		final Coord maxCoord = summary.getMaxCoord();
+		final CoordImpl minCoord = summary.getMinCoord();
+		final CoordImpl maxCoord = summary.getMaxCoord();
 		new PlansFilterArea(minCoord, maxCoord).run(plans);
 
 		System.out.println("  writing plans...");
@@ -1020,10 +1020,10 @@ public class MyRuns {
 				System.out.println("plan # " + counter);
 			}
 			final Plan plan = person.getPlans().get(0);
-			CoordI depCoord = ((Act)plan.getActsLegs().get(0)).getCoord();
+			Coord depCoord = ((Act)plan.getActsLegs().get(0)).getCoord();
 			for (int i = 2, maxi = plan.getActsLegs().size(); i < maxi; i = i + 2) {
 				final Leg leg = ((Leg)plan.getActsLegs().get(i-1));
-				final CoordI arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
+				final Coord arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
 				final double depTime = leg.getDepTime();
 				try {
 					final Route route = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
@@ -1378,7 +1378,7 @@ public class MyRuns {
 	public static void subNetwork(final String[] args, final double x, final double y, final double minRadius, final double radiusStep, final double maxRadius) {
 		System.out.println("RUN: subNetwork");
 
-		final Coord center = new Coord(x, y);
+		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		final Config config = Gbl.createConfig(args);
@@ -2012,8 +2012,8 @@ public class MyRuns {
 		for (Link link : network.getLinks().values()) {
 			Integer volume = linkVolumes.get(link.getId());
 			if (volume == null) volume = 0;
-			final CoordI fromCoord = coordTransform.transform(link.getFromNode().getCoord());
-			final CoordI toCoord = coordTransform.transform(link.getToNode().getCoord());
+			final Coord fromCoord = coordTransform.transform(link.getFromNode().getCoord());
+			final Coord toCoord = coordTransform.transform(link.getToNode().getCoord());
 			final Point fromPoint = new Point(fromCoord.getX(), fromCoord.getY(), volume);
 			final Point toPoint = new Point(toCoord.getX(), toCoord.getY(), volume);
 			final LineString lineString = new LineString(fromPoint, toPoint, true, true, Geometry.AltitudeMode.RELATIVE_TO_GROUND);

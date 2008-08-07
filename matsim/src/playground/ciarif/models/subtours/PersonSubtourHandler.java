@@ -9,8 +9,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class PersonSubtourHandler {
 	
@@ -59,8 +59,8 @@ public class PersonSubtourHandler {
 			ArrayList<Integer> subtour = subtours.get(i);
 			int mainpurpose = 3; //mainpurpose:  0 := work; 1 := edu; 2 := shop 3:=leisure
 			double d = 0.0;
-			CoordI start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
-			CoordI prev = start;
+			Coord start = ((Act)plan.getActsLegs().get(subtour.get(0))).getCoord();
+			Coord prev = start;
 			String type = null;
 			for (int k=1; k<subtour.size()-1; k=k+1) { 
 				type = ((Act)plan.getActsLegs().get(subtour.get(k))).getType().substring(0,1);
@@ -76,7 +76,7 @@ public class PersonSubtourHandler {
 					else if (type.equals(E)) {mainpurpose = 1;}
 					else if (type.equals(S)) {mainpurpose = 2;}
 				} 
-				CoordI curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
+				Coord curr = ((Act)plan.getActsLegs().get(subtour.get(k))).getCoord();
 				if (curr.getX()>0 && curr.getY()>0) {d = d + curr.calcDistance(prev);}
 				prev = curr;
 				

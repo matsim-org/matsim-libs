@@ -3,7 +3,7 @@ package playground.andreas.intersection.tl;
 import java.util.TreeMap;
 
 import org.matsim.network.Link;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * 
@@ -54,7 +54,7 @@ public class CalculateAngle {
 	
 	private TreeMap<Double, Link> calculateOutLinksSortedByAngle() {
 		
-		Coord coordInLink = getVector(this.inLink);
+		CoordImpl coordInLink = getVector(this.inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		
 		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
@@ -63,7 +63,7 @@ public class CalculateAngle {
 			
 			if (!(outLink.getToNode().equals(this.inLink.getFromNode()))){
 				
-				Coord coordOutLink = getVector(outLink);
+				CoordImpl coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
 				
 				double thetaDiff = thetaOutLink - thetaInLink;
@@ -82,10 +82,10 @@ public class CalculateAngle {
 		return leftLane;
 	}	
 	
-	private Coord getVector(Link link){
+	private CoordImpl getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
-		return new Coord(x, y);
+		return new CoordImpl(x, y);
 	}
 	
 }

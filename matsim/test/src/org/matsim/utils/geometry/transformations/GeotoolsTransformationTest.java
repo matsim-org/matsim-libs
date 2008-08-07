@@ -21,9 +21,9 @@
 package org.matsim.utils.geometry.transformations;
 
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformationI;
-import org.matsim.utils.geometry.shared.Coord;
 
 /**
  * @author laemmel
@@ -42,10 +42,10 @@ public class GeotoolsTransformationTest extends MatsimTestCase {
 		double targetY = -0.7521976363533539;
 		double delta = 1e-16;
 		
-		CoordI coordWGS84UTM47S = new Coord(x,y);
+		Coord coordWGS84UTM47S = new CoordImpl(x,y);
 		
 		CoordinateTransformationI transform = new GeotoolsTransformation(fromCRS,toCRS);
-		CoordI coordWGS84 = transform.transform(coordWGS84UTM47S);
+		Coord coordWGS84 = transform.transform(coordWGS84UTM47S);
 		double xWGS84 = coordWGS84.getX();
 		double yWGS84 = coordWGS84.getY();
 		

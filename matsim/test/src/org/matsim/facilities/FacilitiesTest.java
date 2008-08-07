@@ -24,7 +24,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * Tests several aspects of Facilities.
@@ -36,9 +36,9 @@ public class FacilitiesTest extends MatsimTestCase {
 	public void testAlgorithms() {
 		final Facilities facilities = new Facilities();
 		// create 3 facilities
-		facilities.createFacility(new IdImpl(1), new Coord(1.0, 1.0));
-		facilities.createFacility(new IdImpl(2), new Coord(2.0, 2.0));
-		facilities.createFacility(new IdImpl(3), new Coord(3.0, 3.0));
+		facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
+		facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
+		facilities.createFacility(new IdImpl(3), new CoordImpl(3.0, 3.0));
 		// create 2 algo and add them to the facilities-object
 		MockAlgo1 algo1 = new MockAlgo1();
 		MockAlgo2 algo2 = new MockAlgo2();
@@ -67,15 +67,15 @@ public class FacilitiesTest extends MatsimTestCase {
 		facilities.addAlgorithm(algo1);
 		facilities.addAlgorithm(algo2);
 		// create a first facility
-		Facility f1 = facilities.createFacility(new IdImpl(1), new Coord(1.0, 1.0));
+		Facility f1 = facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
 		facilities.finishFacility(f1);
 		assertEquals(1, algo1.getCounter());
 		assertEquals(1, algo2.getCounter());
 		assertEquals("in streaming, facilities should contain no facility", 0, facilities.getFacilities().size());
 		// create two other facilities
-		Facility f2 = facilities.createFacility(new IdImpl(2), new Coord(2.0, 2.0));
+		Facility f2 = facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
 		facilities.finishFacility(f2);
-		Facility f3 = facilities.createFacility(new IdImpl(3), new Coord(3.0, 3.0));
+		Facility f3 = facilities.createFacility(new IdImpl(3), new CoordImpl(3.0, 3.0));
 		facilities.finishFacility(f3);
 		assertEquals(3, algo1.getCounter());
 		assertEquals(3, algo2.getCounter());

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
@@ -57,28 +57,28 @@ public abstract class WorldUtils {
 	 *
 	 * @author mrieser
 	 */
-	public static final CoordI getRandomCoordInZone(final Zone zone, final Layer layer) {
-		CoordI min = zone.getMin();
+	public static final Coord getRandomCoordInZone(final Zone zone, final Layer layer) {
+		Coord min = zone.getMin();
 
 		if ((min != null) && (!(min.equals(zone.getMax())))) {
 			// we know min and max of the zone-area, choose randomly in this area
-			CoordI max = zone.getMax();
+			Coord max = zone.getMax();
 			double x = min.getX() + Gbl.random.nextDouble()*(max.getX() - min.getX());
 			double y = min.getY() + Gbl.random.nextDouble()*(max.getY() - min.getY());
-			return new Coord(x, y);
+			return new CoordImpl(x, y);
 		}
 
 		double x, y;
 		// min is not defined --> place the random point within a circle around the center
 		// first, determine radius of circle. for this, search the nearest (neighbor) zone
-		CoordI center = zone.getCenter();
+		Coord center = zone.getCenter();
 		ArrayList<Location> nearestZones = layer.getNearestLocations(center, zone);
 		double shortestDistance = Double.MAX_VALUE;
 		Iterator<Location> zoneIter = nearestZones.iterator();
 		while (zoneIter.hasNext()) {
 			Zone aZone = (Zone)zoneIter.next();
-			CoordI zoneMin = aZone.getMin();
-			CoordI zoneCenter = aZone.getCenter();
+			Coord zoneMin = aZone.getMin();
+			Coord zoneCenter = aZone.getCenter();
 			double radius;
 			if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
 				// the distance is center-to-center, only take 0.7 times the distance as radius
@@ -104,7 +104,7 @@ public abstract class WorldUtils {
 			x = center.getX();
 			y = center.getY();
 		}
-		return new Coord(x, y);
+		return new CoordImpl(x, y);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public abstract class WorldUtils {
 	 *
 	 * @author mrieser
 	 */
-	public static double distancePointLinesegment(final CoordI lineFrom, final CoordI lineTo, final CoordI point) {
+	public static double distancePointLinesegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
 		/* The shortest distance is where the tangent of the line goes through "point".
 		 * The dot product (point - P) dot (lineTo - lineFrom) must be 0, when P is a point
 		 * on the line. P can be substituted with lineFrom + u*(lineTo - lineFrom).
@@ -158,7 +158,7 @@ public abstract class WorldUtils {
 			// (x | y) is not on the line segment, but after lineTo
 			return lineTo.calcDistance(point);
 		}
-		return new Coord(lineFrom.getX() + u*lineDX, lineFrom.getY() + u*lineDY).calcDistance(point);
+		return new CoordImpl(lineFrom.getX() + u*lineDX, lineFrom.getY() + u*lineDY).calcDistance(point);
 	}
 
 }

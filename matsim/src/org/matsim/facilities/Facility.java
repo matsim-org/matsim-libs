@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.AbstractLocation;
 
 public class Facility extends AbstractLocation {
@@ -115,7 +115,7 @@ public class Facility extends AbstractLocation {
 	private double sumCapacityPenaltyFactor = 0.0;
 
 
-	protected Facility(final Facilities layer, final Id id, final CoordI center) {
+	protected Facility(final Facilities layer, final Id id, final Coord center) {
 		super(layer,id,center);
 		this.arrivals = new int [this.numberOfTimeBins];
 		this.departures = new int [this.numberOfTimeBins];
@@ -135,7 +135,7 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public double calcDistance(CoordI coord) {
+	public double calcDistance(Coord coord) {
 		return this.center.calcDistance(coord);
 	}
 

@@ -35,7 +35,7 @@ import org.matsim.population.ActivitySpaceSuperEllipse;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PersonDrawActivitySpace extends PersonAlgorithm {
 
@@ -62,7 +62,7 @@ public class PersonDrawActivitySpace extends PersonAlgorithm {
 	private final void writeLocations(Activity a, FileWriter fw)
 			throws IOException {
 		BufferedWriter out = new BufferedWriter(fw);
-		CoordI c = a.getFacility().getCenter();
+		Coord c = a.getFacility().getCenter();
 		out.write(c.getX() + "\t" + c.getY() + "\n");
 		out.flush();
 		out.close();

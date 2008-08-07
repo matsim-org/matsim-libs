@@ -55,7 +55,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.caching.SceneLayer;
@@ -373,29 +373,29 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		final double pixelsizeStreet = 5;
 		Rectangle2D test = new InfoText("0000000").getBounds();
 		
-		Coord size  = mouseMan.getPixelsize();
+		CoordImpl size  = mouseMan.getPixelsize();
 		if(size.getX()*pixelsizeStreet < cellWidth && size.getX()*pixelsizeStreet < cellWidth) {
-			Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>();
+			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>();
 			// Query linkIds
 			Rect rect = mouseMan.getBounds();
 			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX + clientQ.offsetEast, rect.minY + clientQ.offsetNorth, rect.maxX - rect.minX, rect.maxY - rect.minY);
 			QueryLinkId linkIdQuery = (QueryLinkId)clientQ.doQuery(new QueryLinkId(dest));
 			double xRaster = test.getWidth(), yRaster = test.getHeight();
 			
-			for( Coord coord : linkIdQuery.linkIds.keySet()) {
+			for( CoordImpl coord : linkIdQuery.linkIds.keySet()) {
 				// draw linkId
 				float east = (float)coord.getX() -(float)getQuad().offsetEast;
 				float north = (float)coord.getY() - (float)getQuad().offsetNorth;
 				
 				float textX = (float) (((int)(east / xRaster) +1)*xRaster);
 				float textY = north -(float)(north % yRaster) +80;
-				Coord text = new Coord(textX,textY);
+				CoordImpl text = new CoordImpl(textX,textY);
 				int i = 1;
 				
 				while (xymap.get(text) != null) {
-					text = new Coord(textX,  i* (float)yRaster + textY);
+					text = new CoordImpl(textX,  i* (float)yRaster + textY);
 					if(xymap.get(text) == null) break;
-					text = new Coord(textX + i* (float)xRaster, textY);
+					text = new CoordImpl(textX + i* (float)xRaster, textY);
 					if(xymap.get(text) == null) break;
 //					text = new Coord(textX - i* (float)xRaster, textY);
 //					if(xymap.get(text) == null) break;

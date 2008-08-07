@@ -62,8 +62,8 @@ import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.population.algorithms.PlansFilterActInArea;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
-import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
@@ -543,7 +543,7 @@ int three=0;
 		String configFile = "./configs/evacuationConf.xml";
 
 		double radius = 1000;
-		Coord center = new Coord(4595406.5, 5821171.5);
+		CoordImpl center = new CoordImpl(4595406.5, 5821171.5);
 
 		HashMap<Id,Link> areaOfInteresst = new HashMap<Id,Link>();
 
@@ -779,8 +779,8 @@ int three=0;
 //		network.beforeSim();
 
 		System.out.println("extracting links ... ");
-		Coord A = network.getNode("101472392").getCoord();
-		Coord B = network.getNode("101465289").getCoord();
+		CoordImpl A = network.getNode("101472392").getCoord();
+		CoordImpl B = network.getNode("101465289").getCoord();
 		double maxX = Math.max(A.getX(),B.getX());
 		double maxY = Math.max(A.getY(),B.getY());
 		double minX = Math.min(A.getX(),B.getX());
@@ -796,8 +796,8 @@ int three=0;
 
 		int extracted = 0;
 		for (Link link : network.getLinks().values()) {
-			Coord from = link.getFromNode().getCoord();
-			Coord to = link.getToNode().getCoord();
+			CoordImpl from = link.getFromNode().getCoord();
+			CoordImpl to = link.getToNode().getCoord();
 			if ((from.getX() <= maxX) && (from.getX() >= minX)) {
 				if ((from.getY() <= maxY) && (from.getY() >= minY)) {
 					if ((to.getX() <= maxX) && (to.getX() >= minX)) {

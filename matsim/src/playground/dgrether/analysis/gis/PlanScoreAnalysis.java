@@ -48,7 +48,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -126,7 +126,7 @@ public class PlanScoreAnalysis {
 		}
 	}
 
-	private Feature createHomeFeature(double score, CoordI loc, Id id) {
+	private Feature createHomeFeature(double score, Coord loc, Id id) {
 		Coordinate coord = new Coordinate(loc.getX(), loc.getY());
 		CoordinateSequence coords = new CoordinateArraySequence(
 				new Coordinate[] { coord });
@@ -167,7 +167,7 @@ public class PlanScoreAnalysis {
 
 			Plan plan;
 			double score1, score2;
-			CoordI loc;
+			Coord loc;
 			Id id;
 			for (Person person : plans.getPersons().values()) {
 				plan = person.getSelectedPlan();

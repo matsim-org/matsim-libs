@@ -33,7 +33,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -91,15 +91,15 @@ public class PersonSubTourAnalysis extends PersonAlgorithm implements PlanAlgori
 
 		// calculate the SubTour distance (in 1 km time bins)
 		double d = 0.0;
-		CoordI prev = ((Act)plan.getActsLegs().get(start)).getCoord();
+		Coord prev = ((Act)plan.getActsLegs().get(start)).getCoord();
 		for (int k=start+2; k<=i; k=k+2) {
-			CoordI curr = ((Act)plan.getActsLegs().get(k)).getCoord();
+			Coord curr = ((Act)plan.getActsLegs().get(k)).getCoord();
 			d = d + curr.calcDistance(prev);
 			prev = curr;
 		}
 		prev = ((Act)plan.getActsLegs().get(j)).getCoord();
 		for (int k=j+2; k<=end; k=k+2) {
-			CoordI curr = ((Act)plan.getActsLegs().get(k)).getCoord();
+			Coord curr = ((Act)plan.getActsLegs().get(k)).getCoord();
 			d = d + curr.calcDistance(prev);
 			prev = curr;
 		}

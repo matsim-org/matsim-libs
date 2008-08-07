@@ -32,7 +32,7 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.socialnetworks.socialnet.EgoNet;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
 import org.matsim.utils.optimization.EllipseObjective;
@@ -110,7 +110,7 @@ public class PersonCalcEgoSpace extends PersonAlgorithm {
 		
 		
 		// Creating coordinate list
-		ArrayList<CoordI> coords = new ArrayList<CoordI>();
+		ArrayList<Coord> coords = new ArrayList<Coord>();
 		while (a_it.hasNext()) { coords.add(a_it.next().getFacility().getCenter()); }
 
 		System.out.println("----------------------------------------------------------------------");

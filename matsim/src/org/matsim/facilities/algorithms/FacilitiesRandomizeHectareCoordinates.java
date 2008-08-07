@@ -23,7 +23,7 @@ package org.matsim.facilities.algorithms;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class FacilitiesRandomizeHectareCoordinates {
 
@@ -31,7 +31,7 @@ public class FacilitiesRandomizeHectareCoordinates {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		for (Facility f : facilities.getFacilities().values()) {
-			CoordI coord = f.getCenter();
+			Coord coord = f.getCenter();
 			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + Gbl.random.nextInt(99));
 			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + Gbl.random.nextInt(99));
 		}

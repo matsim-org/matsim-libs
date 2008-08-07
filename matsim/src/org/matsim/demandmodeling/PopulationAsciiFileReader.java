@@ -29,7 +29,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -107,9 +107,9 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 			log.warn("Income is not supported by the current version of MATSim. Column 5 will be ignored");
 			Plan plan = p.createPlan(true);
 			Zone homeZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[1]));
-			CoordI homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
+			Coord homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
 			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));
-			CoordI primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
+			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + Gbl.random.nextDouble() * TWOHOURS;
 			String homeEndTimeString = Time.writeTime(homeEndTime, Time.TIMEFORMAT_HHMMSS);
 			try {

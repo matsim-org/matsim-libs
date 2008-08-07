@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  *
@@ -46,9 +46,9 @@ public interface BasicAct {
 
 	public void setType(final String type);
 
-	public CoordI getCoord();
+	public Coord getCoord();
 
-	public void setCoord(CoordI coordinates);
+	public void setCoord(Coord coordinates);
 
 	public double getStartTime();
 

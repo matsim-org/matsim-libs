@@ -30,8 +30,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -50,7 +50,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 	private static final String W = "w";
 	private static final String S = "s";
 	private static final String H = "h";
-	private static final Coord ZERO = new Coord(0.0,0.0);
+	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
 	private ModelModeChoice model;
 	private final Persons persons;
@@ -77,8 +77,8 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 		double plan_dist = 0.0;
 		int mainpurpose = 3; // 0 := w; 1 := e; 2 := s 3:=l
 		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
-		CoordI home_coord = null;
-		CoordI work_coord = null;
+		Coord home_coord = null;
+		Coord work_coord = null;
 		act_it.hasNext(); // first act is always 'home'
 		Act prev_act = (Act)act_it.next();
 		while (act_it.hasNext()) {

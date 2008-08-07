@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -86,7 +86,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 		String x = meta.getValue("x");
 		String y = meta.getValue("y");
 		if (x != null && y != null) {
-			this.currcount.setCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
+			this.currcount.setCoord(new CoordImpl(Double.parseDouble(x), Double.parseDouble(y)));
 		}
 	}
 

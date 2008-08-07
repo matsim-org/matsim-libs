@@ -31,8 +31,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * Filters all persons out whose routes do not lead at least once through
@@ -40,7 +40,7 @@ import org.matsim.utils.geometry.shared.Coord;
  * persons to the next algorithm that travel at least once on a link of
  * the <code>areaOfInterest</code>. For the case a leg is missing route
  * information, and thus missing the information which links are used,
- * an {@linkplain #setAlternativeAOI(Coord, double) alternative area of
+ * an {@linkplain #setAlternativeAOI(CoordImpl, double) alternative area of
  * interest can be specified}, given by its center and a radius. In that
  * case it is tested whether the bee-line connecting the start and end
  * point of the leg leads through the alternative aoi-circle.
@@ -51,7 +51,7 @@ import org.matsim.utils.geometry.shared.Coord;
 public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 
 	private final Map<Id, Link> areaOfInterest;
-	private Coord aoiCenter = null;
+	private CoordImpl aoiCenter = null;
 	private double aoiRadius = 0.0;
 
 	public PersonIntersectAreaFilter(final PersonAlgorithmI nextAlgorithm, final Map<Id, Link> areaOfInterest) {
@@ -69,7 +69,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 	 * @param aoiCenter
 	 * @param aoiRadius
 	 */
-	public void setAlternativeAOI(final Coord aoiCenter, final double aoiRadius) {
+	public void setAlternativeAOI(final CoordImpl aoiCenter, final double aoiRadius) {
 		this.aoiCenter = aoiCenter;
 		this.aoiRadius = aoiRadius;
 	}
@@ -117,8 +117,8 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 			// we cannot use the bee-line decision if we don't know the alternative aoi-center
 			return false;
 		}
-		CoordI fromCoord = fromAct.getCoord();
-		CoordI toCoord = toAct.getCoord();
+		Coord fromCoord = fromAct.getCoord();
+		Coord toCoord = toAct.getCoord();
 
 		if (fromCoord == null) {
 			fromCoord = fromAct.getLink().getCenter();

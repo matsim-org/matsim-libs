@@ -30,8 +30,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer implements Iterable<Facility> {
@@ -74,7 +74,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Facility createFacility(final Id id, final CoordI center) {
+	public final Facility createFacility(final Id id, final Coord center) {
 		if (this.locations.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
@@ -92,7 +92,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 	}
 
 	public final Facility createFacility(final String id, final String x, final String y) {
-		return this.createFacility(new IdImpl(id),new Coord(x,y));
+		return this.createFacility(new IdImpl(id),new CoordImpl(x,y));
 	}
 
 	//////////////////////////////////////////////////////////////////////

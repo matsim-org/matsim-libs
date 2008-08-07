@@ -23,7 +23,7 @@ package org.matsim.counts;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class Count {
 
@@ -31,7 +31,7 @@ public class Count {
 	private String csId;
 
 	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
-	private CoordI coord;
+	private Coord coord;
 
 
 	protected Count(final Id locId, final String csId) {
@@ -75,14 +75,14 @@ public class Count {
 		return this.volumes;
 	}
 
-	public void setCoord(final CoordI coord) {
+	public void setCoord(final Coord coord) {
 		this.coord = coord;
 	}
 
 	/** @return Returns the exact coordinate, where this counting station is
 	 * located, or null if no exact location is available.
 	 **/
-	public CoordI getCoord() {
+	public Coord getCoord() {
 		return this.coord;
 	}
 

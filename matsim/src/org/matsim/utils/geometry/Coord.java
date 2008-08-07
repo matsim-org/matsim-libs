@@ -30,7 +30,7 @@ package org.matsim.utils.geometry;
  *   (0/0) ---->
  */
 
-public interface CoordI {
+public interface Coord {
 
 	public void setX(final double x); 
 
@@ -58,6 +58,6 @@ public interface CoordI {
 	 */
 // 	public boolean equals(Object o);
 // 	
- 	public double calcDistance(final CoordI other);
+ 	public double calcDistance(final Coord other);
 	
 }

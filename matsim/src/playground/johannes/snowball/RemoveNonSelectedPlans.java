@@ -35,8 +35,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlansScenarioCut;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * @author illenberger
@@ -70,10 +70,10 @@ public class RemoveNonSelectedPlans {
 			p.addPlan(selected);
 		}
 		
-		CoordI center = getMean(plans);
+		Coord center = getMean(plans);
 		double radius = 20000;
-		CoordI min = new Coord(center.getX() - radius, center.getY() - radius);
-		CoordI max = new Coord(center.getX() + radius, center.getY() + radius);
+		Coord min = new CoordImpl(center.getX() - radius, center.getY() - radius);
+		Coord max = new CoordImpl(center.getX() + radius, center.getY() + radius);
 		new PlansScenarioCut(min, max).run(plans);
 		
 		System.out.println("Removing persons...");
@@ -96,7 +96,7 @@ public class RemoveNonSelectedPlans {
 		writer.write();
 	}
 
-	private static CoordI getMean(Population plans) {
+	private static Coord getMean(Population plans) {
 		double sumX = 0;
 		double sumY = 0;
 		for(Person p : plans) {
@@ -106,6 +106,6 @@ public class RemoveNonSelectedPlans {
 		double x = sumX/(double)plans.getPersons().size();
 		double y = sumY/(double)plans.getPersons().size();
 		
-		return new Coord(x, y);
+		return new CoordImpl(x, y);
 	}
 }

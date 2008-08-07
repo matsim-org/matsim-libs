@@ -33,7 +33,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class SocialNetwork {
 
@@ -135,8 +135,8 @@ public class SocialNetwork {
 //			for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[Gbl.random.nextInt(personList.length)];
 			Person person2 = personList[Gbl.random.nextInt(personList.length)];
-			CoordI home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
-			CoordI home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			Coord home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			Coord home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
 			double distance = home1.calcDistance(home2);
 			double pdist=c*Math.pow((distance+rmin),-alpha);
 
@@ -260,8 +260,8 @@ public class SocialNetwork {
 //		for (int i = 0; i < numLinks; i++) {
 			Person person1 = personList[Gbl.random.nextInt(personList.length)];
 			Person person2 = personList[Gbl.random.nextInt(personList.length)];
-			CoordI home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
-			CoordI home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			Coord home1=((Act)person1.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
+			Coord home2=((Act)person2.getSelectedPlan().getActsLegs().get(0)).getFacility().getCenter();
 			double distance = home1.calcDistance(home2);
 			
 //			makeSocialContact( person1, person2, -1);

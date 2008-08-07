@@ -35,7 +35,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class RandomPlansGenerator extends NetworkAlgorithm {
 
@@ -246,7 +246,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 	private ArrayList<Node> getToNodes(final int fromCellRow, final int fromCellColumn, final ArrayList<Node>[][] cells) {
 		ArrayList<Node> toNodes = new ArrayList<Node>();
-		Coord fromCellCenter = getCellCenter(fromCellRow, fromCellColumn);
+		CoordImpl fromCellCenter = getCellCenter(fromCellRow, fromCellColumn);
 		if (2*this.cellSize >= this.givenFromToDistance) {
 			for (int i = Math.max(fromCellRow-1, 0); i < Math.min(fromCellRow+2, cells.length); i++) {
 				for (int j = Math.max(fromCellColumn-1, 0);
@@ -259,7 +259,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		} else {
 			for (int i = 0; i < cells.length; i++) {
 				for (int j = 0; j < cells[0].length; j++) {
-					Coord c = getCellCenter(j, i);
+					CoordImpl c = getCellCenter(j, i);
 					double dist = c.calcDistance(fromCellCenter);
 					if ((dist > (this.givenFromToDistance - this.cellSize))
 							&& (dist < (this.givenFromToDistance + this.cellSize))) {
@@ -271,8 +271,8 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		return toNodes;
 	}
 
-	private Coord getCellCenter(final int fromCellRow, final int fromCellColumn) {
-		return new Coord(this.minX + this.cellSize*(fromCellColumn+0.5),
+	private CoordImpl getCellCenter(final int fromCellRow, final int fromCellColumn) {
+		return new CoordImpl(this.minX + this.cellSize*(fromCellColumn+0.5),
 				this.minY + (fromCellRow+0.5));
 	}
 

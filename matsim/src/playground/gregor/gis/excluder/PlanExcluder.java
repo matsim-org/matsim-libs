@@ -35,7 +35,7 @@ import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 
@@ -71,7 +71,7 @@ public class PlanExcluder {
 		Population plans = new Population();
 		for (Person person : this.plans.getPersons().values()) {
 			
-			CoordI c = person.getSelectedPlan().getFirstActivity().getCoord();
+			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
 			Point p  = MGC.coord2Point(c);
 			
 			for (Polygon po : this.ps) {

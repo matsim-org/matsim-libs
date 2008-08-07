@@ -34,7 +34,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
@@ -97,11 +97,11 @@ public class Subsequent extends MatsimXmlWriter {
 			if (outNodes.size() > 1) {
 
 				for (Node out : outNodes) {
-					Coord cFrom = from.getCoord();
-					Coord cTo = to.getCoord();
+					CoordImpl cFrom = from.getCoord();
+					CoordImpl cTo = to.getCoord();
 					double xTo = cTo.getX();
 					double yTo = cTo.getY();
-					Coord cOut = out.getCoord();
+					CoordImpl cOut = out.getCoord();
 					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut
 							.getX()
 							- xTo)

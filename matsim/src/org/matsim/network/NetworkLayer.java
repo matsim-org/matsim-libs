@@ -31,8 +31,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -90,14 +90,14 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 	/** Usage of this method is discouraged, as the method will soon be deprecated. */
 	public final Node createNode(final String id, final String x, final String y, final String type) {
-		return createNode(new IdImpl(id), new Coord(x, y), type);
+		return createNode(new IdImpl(id), new CoordImpl(x, y), type);
 	}
 
-	public final Node createNode(final Id id, final CoordI coord) {
+	public final Node createNode(final Id id, final Coord coord) {
 		return createNode(id, coord, null);
 	}
 
-	public final Node createNode(final Id id, final CoordI coord, final String nodeType) {
+	public final Node createNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -267,7 +267,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 *          the coordinate for which the closest link should be found
 	 * @return the link found closest to coord
 	 */
-	public Link getNearestLink(final CoordI coord) {
+	public Link getNearestLink(final Coord coord) {
 		Link nearestLink = null;
 		Node nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
@@ -335,7 +335,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	// TODO [balmermi] there should be only one 'getNearestLink' method
 	// which returns either the nearest 'left' or 'right' entry link, based on a global
 	// config param.
-	public Link getNearestRightEntryLink(final CoordI coord) {
+	public Link getNearestRightEntryLink(final Coord coord) {
 		Link nearestRightLink = null;
 		Link nearestOverallLink = null;
 		Node nearestNode = null;
@@ -402,7 +402,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	public Node getNearestNode(final Coord coord) {
+	public Node getNearestNode(final CoordImpl coord) {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY());
 	}
 
@@ -413,7 +413,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+	public Collection<Node> getNearestNodes(final CoordImpl coord, final double distance) {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
 

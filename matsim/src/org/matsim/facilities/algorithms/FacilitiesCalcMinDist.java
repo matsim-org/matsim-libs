@@ -22,7 +22,7 @@ package org.matsim.facilities.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class FacilitiesCalcMinDist {
 
@@ -36,12 +36,12 @@ public class FacilitiesCalcMinDist {
 		double min_dist = Double.MAX_VALUE;
 
 		for (Facility f : facilities.getFacilities().values()) {
-			CoordI c = f.getCenter();
+			Coord c = f.getCenter();
 			System.out.println("      Facility id = " + f.getId());
 
 			for (Facility f2 : facilities.getFacilities().values()) {
 				if (!f2.equals(f)) {
-					CoordI c2 = f2.getCenter();
+					Coord c2 = f2.getCenter();
 					double dist = c2.calcDistance(c);
 					if (dist < min_dist) { min_dist = dist; }
 					if (dist == 0.0) {

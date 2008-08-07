@@ -23,8 +23,8 @@ package org.matsim.utils;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
@@ -37,10 +37,10 @@ public class WorldUtilsTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testDistancePointLinesegment() {
-		Coord p1 = new Coord(10, 20);
-		Coord p2 = new Coord(10, 30);
-		Coord p3 = new Coord(10, 40);
-		Coord p4 = new Coord(20, 30);
+		CoordImpl p1 = new CoordImpl(10, 20);
+		CoordImpl p2 = new CoordImpl(10, 30);
+		CoordImpl p3 = new CoordImpl(10, 40);
+		CoordImpl p4 = new CoordImpl(20, 30);
 
 		assertEquals(10.0, WorldUtils.distancePointLinesegment(p1, p3, p4), 1e-10);
 
@@ -77,7 +77,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 		layer.createZone("2", "30", "15", "9", "0", "51", "30", null, "another zone");
 
 		for (int i = 0; i < 900; i++) {
-			CoordI c = WorldUtils.getRandomCoordInZone(zone, layer);
+			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);
 			assertTrue("Coordinate is out of bounds: x = " + c.getX(), c.getX() >= minX);
 			assertTrue("Coordinate is out of bounds: x = " + c.getX(), c.getX() <= maxX);
 			assertTrue("Coordinate is out of bounds: y = " + c.getY(), c.getY() >= minY);
@@ -108,11 +108,11 @@ public class WorldUtilsTest extends MatsimTestCase {
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
 		Zone zone = layer.createZone("1", "4.5", "9", null, null, null, null, null, "center zone");
 		Zone zone2 = layer.createZone("2", "30", "15", "9", null, null, null, null, "another zone");
-		CoordI center = zone.getCenter();
+		Coord center = zone.getCenter();
 		final double distance = center.calcDistance(zone2.getCenter());
 
 		for (int i = 0; i < 700; i++) {
-			CoordI c = WorldUtils.getRandomCoordInZone(zone, layer);
+			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);
 			if (c.getX() < minX) {
 				minX = c.getX();
 			}

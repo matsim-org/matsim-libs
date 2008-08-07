@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * Test for {@link QuadTree}.
@@ -318,11 +318,11 @@ public class QuadTreeTest extends MatsimTestCase {
 	 */
 	static class TestExecutor extends QuadTree.Executor<String> {
 
-		public final Collection<Tuple<Coord, String>> objects = new ArrayList<Tuple<Coord, String>>();
+		public final Collection<Tuple<CoordImpl, String>> objects = new ArrayList<Tuple<CoordImpl, String>>();
 
 		@Override
 		public void execute(final double x, final double y, final String object) {
-			this.objects.add(new Tuple<Coord, String>(new Coord(x, y), object));
+			this.objects.add(new Tuple<CoordImpl, String>(new CoordImpl(x, y), object));
 		}
 
 	}

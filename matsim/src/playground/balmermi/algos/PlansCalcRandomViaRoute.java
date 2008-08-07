@@ -38,7 +38,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgorithmI {
@@ -177,13 +177,13 @@ public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgo
 		if (dist < 1000.0) { dist = 1000.0; } 
 		x = x + (Gbl.random.nextDouble()-0.5)*dist;
 		y = y + (Gbl.random.nextDouble()-0.5)*dist;
-		Coord coord = new Coord(x,y);
+		CoordImpl coord = new CoordImpl(x,y);
 		Node viaNode = this.network.getNearestNode(coord);
 		while ((viaNode == startNode) || (viaNode == endNode)) {
 			dist = dist + 1000.0;
 			x = x + (Gbl.random.nextDouble()-0.5)*dist;
 			y = y + (Gbl.random.nextDouble()-0.5)*dist;
-			coord = new Coord(x,y);
+			coord = new CoordImpl(x,y);
 			viaNode = this.network.getNearestNode(coord);
 		}
 

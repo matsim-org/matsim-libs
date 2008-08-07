@@ -30,7 +30,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class PersonSetNearestFacCoord extends PersonAlgorithm implements PlanAlgorithmI {
 
@@ -99,7 +99,7 @@ public class PersonSetNearestFacCoord extends PersonAlgorithm implements PlanAlg
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
 			String type = this.getFacilityActType(act.getType());
-			CoordI coord = act.getCoord();
+			Coord coord = act.getCoord();
 			if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }
 			double nearest_dist = Double.MAX_VALUE;
 			Facility nearest_f = null;

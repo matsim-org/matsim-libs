@@ -25,8 +25,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * The collection of zone objects in MATSim.
@@ -58,12 +58,12 @@ public class ZoneLayer extends Layer {
 	                             final String area, final String zoneName) {
 		Id i = new IdImpl(id);
 		if (this.locations.containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
-		CoordI center = null;
-		CoordI min = null;
-		CoordI max = null;
-		if ((center_x != null) && (center_y != null)) { center = new Coord(center_x, center_y); }
-		if ((min_x != null) && (min_y != null)) { min = new Coord(min_x, min_y); }
-		if ((max_x != null) && (max_y != null)) { max = new Coord(max_x, max_y); }
+		Coord center = null;
+		Coord min = null;
+		Coord max = null;
+		if ((center_x != null) && (center_y != null)) { center = new CoordImpl(center_x, center_y); }
+		if ((min_x != null) && (min_y != null)) { min = new CoordImpl(min_x, min_y); }
+		if ((max_x != null) && (max_y != null)) { max = new CoordImpl(max_x, max_y); }
 		Zone z = new Zone(this, new IdImpl(id), center, min, max);
 		if (area != null) {
 			z.setArea(Double.parseDouble(area));

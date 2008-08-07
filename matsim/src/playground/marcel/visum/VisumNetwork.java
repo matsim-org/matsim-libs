@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class VisumNetwork {
 
@@ -50,14 +50,14 @@ public class VisumNetwork {
 	 * @param distance
 	 * @return list of stops, empty list if no stop is found.
 	 */
-	public Collection<Stop> findStops(final CoordI coord, final double distance) {
+	public Collection<Stop> findStops(final Coord coord, final double distance) {
 		if (this.stopsQT == null) {
 			this.cacheStops();
 		}
 		return this.stopsQT.get(coord.getX(), coord.getY(), distance);
 	}
 
-	public Stop findNearestStop(final CoordI coord) {
+	public Stop findNearestStop(final Coord coord) {
 		if (this.stopsQT == null) {
 			this.cacheStops();
 		}
@@ -99,9 +99,9 @@ public class VisumNetwork {
 	public static class Stop {
 		public final Id id;
 		public final String name;
-		public final CoordI coord;
+		public final Coord coord;
 
-		public Stop(final Id id, final String name, final CoordI coord) {
+		public Stop(final Id id, final String name, final Coord coord) {
 			this.id = id;
 			this.name = name;
 			this.coord = coord;

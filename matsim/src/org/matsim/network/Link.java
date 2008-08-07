@@ -1,12 +1,12 @@
 package org.matsim.network;
 
 import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 
 public interface Link extends BasicLink, Location {
 
-	public double calcDistance(final CoordI coord);
+	public double calcDistance(final Coord coord);
 
 	// DS TODO try to remove these and update references
 	// (for the time being, they are here because otherwise the returned type is wrong. kai)

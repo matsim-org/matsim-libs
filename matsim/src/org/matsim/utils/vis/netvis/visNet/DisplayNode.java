@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
 
 /**
@@ -42,7 +42,7 @@ public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	private final Map<Id, BasicLink> inLinks;
 	private final Map<Id, BasicLink> outLinks;
-	private CoordI coord = null;
+	private Coord coord = null;
 	private double displayValue;
 	private String displayLabel;
 	protected Id id;
@@ -87,11 +87,11 @@ public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	// -------------------- IMPLEMENTATION OF TrafficNodeI --------------------
 
-	public void setCoord(CoordI coord) {
+	public void setCoord(Coord coord) {
 		this.coord = coord;
 	}
 
-	public CoordI getCoord() {
+	public Coord getCoord() {
 		return coord;
 	}
 

@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 public class NetworkScenarioCut {
 
@@ -37,7 +37,7 @@ public class NetworkScenarioCut {
 	
 	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
-	public NetworkScenarioCut(final CoordI min, final CoordI max) {
+	public NetworkScenarioCut(final Coord min, final Coord max) {
 		super();
 		this.minX = min.getX();
 		this.maxX = max.getX();
@@ -52,7 +52,7 @@ public class NetworkScenarioCut {
 		Iterator<? extends Node> n_it = network.getNodes().values().iterator();
 		while (n_it.hasNext()) {
 			Node n = n_it.next();
-			CoordI coord = n.getCoord();
+			Coord coord = n.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();
 			if (!((x < this.maxX) && (this.minX < x) && (y < this.maxY) && (this.minY < y))) {

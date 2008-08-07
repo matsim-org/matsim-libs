@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class TempHP {
 
@@ -36,7 +36,7 @@ public class TempHP {
 	private String hp_Id;
 	private String hb_Id;
 	private String name;
-	private Coord coord;
+	private CoordImpl coord;
 	private int direct;
 
 	public LinkedList<String> oldIDs = new LinkedList<String>();
@@ -55,7 +55,7 @@ public class TempHP {
 		}
 		this.name = parent.name;
 		this.direct=parent.direct;
-		this.coord =  new Coord(parent.coord);
+		this.coord =  new CoordImpl(parent.coord);
 		this.oldIDs.clear();
 		this.oldIDs.addAll(parent.oldIDs);
 
@@ -76,7 +76,7 @@ public class TempHP {
 		}
 
 		this.name = parent.name;
-		this.coord =  new Coord(parent.coord.getX(), parent.coord.getY());
+		this.coord =  new CoordImpl(parent.coord.getX(), parent.coord.getY());
 		this.oldIDs.clear();
 		this.oldIDs.addAll(parent.oldIDs);
 
@@ -94,7 +94,7 @@ public class TempHP {
 		this.hp_Id=null;
 		this.hb_Id=null;
 		this.name=null;
-		this.coord= new Coord("0","0");
+		this.coord= new CoordImpl("0","0");
 		this.direct=1;
 	}
 
@@ -130,7 +130,7 @@ public class TempHP {
 		this.name=newname;
 	}
 
-	public Coord getCoord(){
+	public CoordImpl getCoord(){
 		return this.coord;
 	}
 

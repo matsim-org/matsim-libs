@@ -33,7 +33,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * Some tests for org.matsim.population.filters.PersonIntersectAreaFilter.
@@ -117,14 +117,14 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
 		filter = new PersonIntersectAreaFilter(null, aoi);
-		filter.setAlternativeAOI(new Coord(100, 0), 20.0);
+		filter.setAlternativeAOI(new CoordImpl(100, 0), 20.0);
 		assertFalse("test bee-line with too small alternative aoi", filter.judge(person));
 
 		// test bee-line with big enough alternative aoi
 		aoi.clear();
 		aoi.put(link2.getId(), link2);
 		filter = new PersonIntersectAreaFilter(null, aoi);
-		filter.setAlternativeAOI(new Coord(100, 0), 80.0);
+		filter.setAlternativeAOI(new CoordImpl(100, 0), 80.0);
 		assertTrue("test bee-line with big enough alternative aoi", filter.judge(person));
 
 	}

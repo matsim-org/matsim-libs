@@ -29,8 +29,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
-import org.matsim.utils.geometry.CoordI;
-import org.matsim.utils.geometry.shared.Coord;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000.data.Persons;
 //import playground.ciarif.models.ModelMobiliyTools;
@@ -48,7 +48,7 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 	private static final String UNKNOWN = "unknown";
 	private static final String W = "w";
 	private static final String H = "h";
-	private static final Coord ZERO = new Coord(0.0,0.0);
+	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
 	private final ModelMobilityTools model = new ModelMobilityTools();
 	private final Persons persons;
@@ -71,8 +71,8 @@ public class PersonMobilityToolModel extends PersonAlgorithm implements PlanAlgo
 	public void run(Person person) {
 		playground.balmermi.census2000.data.Person p = this.persons.getPerson(Integer.parseInt(person.getId().toString()));
 		Iterator<BasicActImpl> act_it = person.getSelectedPlan().getIteratorAct();
-		CoordI home_coord = null;
-		CoordI work_coord = null;
+		Coord home_coord = null;
+		Coord work_coord = null;
 		while (act_it.hasNext()) {
 			Act act = (Act)act_it.next();
 			if (H.equals(act.getType())) { home_coord = act.getCoord(); }

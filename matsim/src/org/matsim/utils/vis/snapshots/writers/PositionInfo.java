@@ -22,7 +22,7 @@ package org.matsim.utils.vis.snapshots.writers;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.utils.geometry.CoordI;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -74,7 +74,7 @@ public class PositionInfo {
 		this.link = link;
 		this.speed = speed;
 		this.distanceOnLink = distanceOnLink;
-		CoordI fromCoord = link.getFromNode().getCoord();
+		Coord fromCoord = link.getFromNode().getCoord();
 		double dx = -fromCoord.getX() + link.getToNode().getCoord().getX();
 		double dy = -fromCoord.getY() + link.getToNode().getCoord().getY();
 		double theta = 0.0;
