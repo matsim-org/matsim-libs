@@ -23,7 +23,7 @@ package org.matsim.network;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.testcases.MatsimTestCase;
@@ -345,7 +345,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change2);
 
 
-		QueueNetworkLayer qNetwork = new QueueNetworkLayer(network);
+		QueueNetwork qNetwork = new QueueNetwork(network);
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 
@@ -395,7 +395,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
 
-		QueueNetworkLayer qNetwork = new QueueNetworkLayer(network);
+		QueueNetwork qNetwork = new QueueNetwork(network);
 		QueueLink qLink = qNetwork.getQueueLink(new IdImpl("1"));
 		qLink.finishInit();
 

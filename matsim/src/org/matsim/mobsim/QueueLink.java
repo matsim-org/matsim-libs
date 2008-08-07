@@ -114,16 +114,16 @@ public class QueueLink {
 
 	private final Link link;
 
-	private final QueueNetworkLayer queueNetworkLayer;
+	private final QueueNetwork queueNetwork;
 
 	private final QueueNode toQueueNode;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
-	public QueueLink(final Link l, final QueueNetworkLayer queueNetworkLayer, final QueueNode toNode) {
+	public QueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		this.link = l;
-		this.queueNetworkLayer = queueNetworkLayer;
+		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 
 		// yy: I am really not so happy about these indirect constructors with
@@ -354,7 +354,7 @@ public class QueueLink {
 
 	public void activateLink() {
 		if (!this.active) {
-			this.queueNetworkLayer.addActiveLink(this);
+			this.queueNetwork.addActiveLink(this);
 			this.active = true;
 		}
 	}
@@ -395,7 +395,7 @@ public class QueueLink {
 
 	/*package*/ protected void addParking(final Vehicle veh) {
 		this.parkingList.add(veh);
-		this.queueNetworkLayer.setLinkActivation(
+		this.queueNetwork.setLinkActivation(
 				veh.getDepartureTime_s(), this);
 	}
 

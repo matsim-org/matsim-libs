@@ -34,7 +34,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -70,7 +70,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 	public QSim(Events events, Population population, NetworkLayer network, String signalSystems, String groupDefinitions, boolean useOTF) {
 		super(network, population, events);
 
-		this.network = new QueueNetworkLayer(this.networkLayer, new TrafficLightQueueNetworkFactory());
+		this.network = new QueueNetwork(this.networkLayer, new TrafficLightQueueNetworkFactory());
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
 		this.useOTF = useOTF;

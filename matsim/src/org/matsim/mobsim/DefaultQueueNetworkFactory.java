@@ -30,16 +30,16 @@ import org.matsim.network.Node;
 public final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
 
 	/**
-	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueLink(org.matsim.network.Link, org.matsim.mobsim.QueueNetworkLayer)
+	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueLink(org.matsim.network.Link, org.matsim.mobsim.QueueNetwork)
 	 */
-	public QueueLink newQueueLink(Link link, QueueNetworkLayer queueNetwork, QueueNode toQueueNode) {
+	public QueueLink newQueueLink(Link link, QueueNetwork queueNetwork, QueueNode toQueueNode) {
 		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
 
 	/**
-	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.QueueNetworkLayer)
+	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.QueueNetwork)
 	 */
-	public QueueNode newQueueNode(Node node, QueueNetworkLayer queueNetwork) {
+	public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
 		return new QueueNode(node, queueNetwork);
 	}
 

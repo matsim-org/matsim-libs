@@ -37,7 +37,7 @@ import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
@@ -55,7 +55,7 @@ public class EstimReactiveLinkTT implements
 		EventHandlerAgentWait2LinkI,
 		TravelTimeI {
 
-//	private QueueNetworkLayer queueNetwork;
+//	private QueueNetwork queueNetwork;
 	
 	private double capacityFactor;
 	
@@ -67,7 +67,7 @@ public class EstimReactiveLinkTT implements
 
 	private double lastTravelTime;
 
-	public EstimReactiveLinkTT(QueueNetworkLayer network) {
+	public EstimReactiveLinkTT(QueueNetwork network) {
 //		queueNetwork = network;
 	}
 	

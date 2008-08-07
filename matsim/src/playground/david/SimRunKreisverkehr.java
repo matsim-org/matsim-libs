@@ -141,7 +141,7 @@ public class SimRunKreisverkehr {
 //	World world = World.getSingleton() ;
 //	//NetworkLayer network = world.createNetworkLayer() ;
 //
-//	QueueNetworkLayer net = new QueueNetworkLayer();
+//	QueueNetwork net = new QueueNetwork();
 //	//NetworkReader  = new Networl
 //	world.setNetworkLayer(net);
 //

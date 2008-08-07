@@ -45,7 +45,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 	private Link link;
 
-	private QueueNetworkLayer queueNetwork;
+	private QueueNetwork queueNetwork;
 
 	private QueueLink qlink;
 
@@ -59,7 +59,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		this.link = this.network.createLink("1", "1", "2", "1", "1",
 				"1", "1", null, null);
 		super.loadConfig(null);
-		this.queueNetwork = new QueueNetworkLayer(this.network);
+		this.queueNetwork = new QueueNetwork(this.network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 	}
@@ -121,7 +121,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Link link1 = network.createLink("1", "1", "2", "1", "1", "1", "1", null, null);
 		Link link2 = network.createLink("2", "2", "3", "1", "1", "1", "1", null, null);
 		Gbl.createWorld().setNetworkLayer(network);
-		this.queueNetwork = new QueueNetworkLayer(network);
+		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 

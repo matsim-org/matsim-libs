@@ -31,7 +31,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
@@ -116,7 +116,7 @@ public class QueryAgentPlan implements OTFQuery {
 		return vertex;
 	}
 	
-	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
 		Person person = plans.getPerson(this.agentID);
 		if (person == null) return;
 

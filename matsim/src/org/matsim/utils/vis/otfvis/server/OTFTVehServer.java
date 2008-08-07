@@ -31,7 +31,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
@@ -67,7 +67,7 @@ public class OTFTVehServer implements OTFServerRemote {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		QueueNetwork qnet = new QueueNetwork(net);
 
 		this.quad = new OTFServerQuad(qnet);
 		this.quad.fillQuadTree(new OTFDefaultNetWriterFactoryImpl());

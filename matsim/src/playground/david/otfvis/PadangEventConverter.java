@@ -21,7 +21,7 @@
 package playground.david.otfvis;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
@@ -42,7 +42,7 @@ public class PadangEventConverter {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		QueueNetwork qnet = new QueueNetwork(net);
 
 
 		String eventFile = Gbl.getConfig().getParam("events","outputFile");

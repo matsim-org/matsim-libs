@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Link;
@@ -19,8 +19,8 @@ public class QNode extends QueueNode{
 
 	private SignalSystemControlerImpl myNodeTrafficLightControler;
 	
-	public QNode(Node n, QueueNetworkLayer queueNetworkLayer) {
-		super(n,  queueNetworkLayer);
+	public QNode(Node n, QueueNetwork queueNetwork) {
+		super(n,  queueNetwork);
 	}
 
 	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
@@ -48,7 +48,7 @@ public class QNode extends QueueNode{
 
 					Link link = this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
 					
-					QLink qLink = (QLink) this.queueNetworkLayer.getQueueLink(link.getId());
+					QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
 					
 					List <Link> toLinks = new ArrayList<Link>();
 					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
@@ -79,7 +79,7 @@ public class QNode extends QueueNode{
 			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
 				Link link = iter.next();
 				
-				QLink qLink = (QLink) this.queueNetworkLayer.getQueueLink(link.getId());
+				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
 				
 
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
@@ -106,7 +106,7 @@ public class QNode extends QueueNode{
 		Link nextLink = ((QVehicle)veh).chooseNextLink();
 		
 		if (nextLink != null) {
-			QLink nextQLink = (QLink) this.queueNetworkLayer.getQueueLink(nextLink.getId());
+			QLink nextQLink = (QLink) this.queueNetwork.getQueueLink(nextLink.getId());
 		
 			if (nextQLink.hasSpace()) {
 				pseudoLink.pollFirstFromBuffer();

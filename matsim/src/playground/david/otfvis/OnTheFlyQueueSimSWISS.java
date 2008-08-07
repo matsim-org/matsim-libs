@@ -23,7 +23,7 @@ package playground.david.otfvis;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -68,7 +68,7 @@ public class OnTheFlyQueueSimSWISS {
 		config.simulation().setSnapshotFile("output/OTFQuadfileSCHWEIZ2.mvi");
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setEndTime(Time.parseTime("00:00:11"));
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		QueueNetwork qnet = new QueueNetwork(net);
 		sim = new QueueSimulation(net, population, events);
 
 

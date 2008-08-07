@@ -48,11 +48,11 @@ public class QueueNode {
 
 	private Node node;
 
-	public QueueNetworkLayer queueNetworkLayer;
+	public QueueNetwork queueNetwork;
 
-	public QueueNode(Node n, QueueNetworkLayer queueNetworkLayer) {
+	public QueueNode(Node n, QueueNetwork queueNetwork) {
 		this.node = n;
-		this.queueNetworkLayer = queueNetworkLayer;
+		this.queueNetwork = queueNetwork;
 	}
 
 	private void buildCache() {
@@ -60,7 +60,7 @@ public class QueueNode {
 				.size()];
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.queueNetworkLayer.getLinks().get(
+			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(
 					l.getId());
 			i++;
 		}
@@ -87,12 +87,12 @@ public class QueueNode {
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
 		Link nextLink = veh.chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
-		QueueLink currentQueueLink = this.queueNetworkLayer
+		QueueLink currentQueueLink = this.queueNetwork
 				.getQueueLink(currentLink.getId());
 		// veh has to move over node
 		if (nextLink != null) {
 
-		QueueLink nextQueueLink = this.queueNetworkLayer.getQueueLink(nextLink
+		QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink
 				.getId());
 
 			if (nextQueueLink.hasSpace()) {

@@ -28,7 +28,7 @@ import java.util.Map;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.Link;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
@@ -121,7 +121,7 @@ public class QueryLinkId implements OTFQuery {
 		}
 	}
 	
-	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
 		double minDist = Double.POSITIVE_INFINITY, dist = 0, epsilon = 0.0001;
 		
 		// just look in a certain region around the actual point, 

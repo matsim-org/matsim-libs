@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueNetworkLayer.java
+ * QueueNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -39,14 +39,14 @@ import org.matsim.network.Node;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
- * QueueNetworkLayer is responsible for creating the QueueLinks/Nodes and for
+ * QueueNetwork is responsible for creating the QueueLinks/Nodes and for
  * implementing doSim
  *
  * @author david
  * @author mrieser
  * @author dgrether
  */
-public class QueueNetworkLayer /* extends NetworkLayer */{
+public class QueueNetwork{
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -77,11 +77,11 @@ public class QueueNetworkLayer /* extends NetworkLayer */{
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	public QueueNetworkLayer(NetworkLayer networkLayer) {
+	public QueueNetwork(NetworkLayer networkLayer) {
 		this(networkLayer, new DefaultQueueNetworkFactory());
 	}
 
-	public QueueNetworkLayer(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public QueueNetwork(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);

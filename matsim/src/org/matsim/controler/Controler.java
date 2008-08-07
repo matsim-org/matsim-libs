@@ -74,7 +74,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.ExternalMobsim;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
@@ -500,13 +500,13 @@ public class Controler {
 	}
 
 	/**
-	 * Loads the network for the simulation.  In most cases, this should be an instance of {@link QueueNetworkLayer}
+	 * Loads the network for the simulation.  In most cases, this should be an instance of {@link QueueNetwork}
 	 * for the standard QueueSimulation.
 	 * <br>
 	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
 	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
 	 * it is recommended to pass a custom network and population using the special
-	 * {@link #Controler(Config, QueueNetworkLayer, Population) Constructor}.
+	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
 	 *
 	 * @return The network to be used for the simulation.
 	 */
@@ -520,7 +520,7 @@ public class Controler {
 	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
 	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
 	 * it is recommended to pass a custom network and population using the special
-	 * {@link #Controler(Config, QueueNetworkLayer, Population) Constructor}.
+	 * {@link #Controler(Config, QueueNetwork, Population) Constructor}.
 	 *
 	 * @return The population to be used for the simulation.
 	 */

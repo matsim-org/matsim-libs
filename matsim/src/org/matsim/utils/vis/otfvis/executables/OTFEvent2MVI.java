@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.run.Events2Snapshot;
@@ -38,7 +38,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFEvent2MVI(QueueNetworkLayer net, String eventFileName, String outFileName, double interval_s) {
+	public OTFEvent2MVI(QueueNetwork net, String eventFileName, String outFileName, double interval_s) {
 		super(interval_s, net, outFileName);
 		this.eventFileName = eventFileName;
 	}
@@ -76,7 +76,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		QueueNetwork qnet = new QueueNetwork(net);
 
 		String eventFile = null;
 		eventFile = "output/current/ITERS/it.0/0.events.txt.gz";

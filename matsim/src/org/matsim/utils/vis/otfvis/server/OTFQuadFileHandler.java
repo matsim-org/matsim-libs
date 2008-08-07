@@ -42,7 +42,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;
@@ -65,7 +65,7 @@ public class OTFQuadFileHandler {
 	public static final int MINORVERSION = 3;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriterI {
-		protected final QueueNetworkLayer net;
+		protected final QueueNetwork net;
 		protected OTFServerQuad quad = null;
 		private final String fileName;
 		protected final double interval_s;
@@ -77,7 +77,7 @@ public class OTFQuadFileHandler {
 
 		private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 
-		public Writer(double intervall_s, QueueNetworkLayer network, String fileName) {
+		public Writer(double intervall_s, QueueNetwork network, String fileName) {
 			this.net = network;
 			this.interval_s = intervall_s;
 			this.fileName = fileName;

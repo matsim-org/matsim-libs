@@ -27,7 +27,7 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
@@ -144,7 +144,7 @@ public class OTFVis {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetworkLayer(net), eventFile, mviFile, snapshotPeriod);
+		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}
 }

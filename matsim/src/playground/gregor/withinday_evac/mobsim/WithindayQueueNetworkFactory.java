@@ -22,19 +22,19 @@ package playground.gregor.withinday_evac.mobsim;
 
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkFactory;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
 public class WithindayQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink>{
 
-	public QueueLink newQueueLink(final Link link, final QueueNetworkLayer queueNetwork,
+	public QueueLink newQueueLink(final Link link, final QueueNetwork queueNetwork,
 			final QueueNode toQueueNode) {
 		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
 
-	public QueueNode newQueueNode(final Node node, final QueueNetworkLayer queueNetwork) {
+	public QueueNode newQueueNode(final Node node, final QueueNetwork queueNetwork) {
 		// TODO Auto-generated method stub
 		return  new WithindayQueueNode(node, queueNetwork);
 	}

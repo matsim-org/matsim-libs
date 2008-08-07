@@ -27,7 +27,7 @@ import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -74,7 +74,7 @@ public class DSOnePercentBerlin10sTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
+		QueueNetwork qnet = new QueueNetwork(network);
 		double sum = 0.0;
 
 		for (QueueLink link : qnet.getLinks().values()) {

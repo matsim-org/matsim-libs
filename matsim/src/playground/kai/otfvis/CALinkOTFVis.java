@@ -18,7 +18,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
@@ -95,8 +95,8 @@ class CALink extends QueueLink {
 
 	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
 
-	public CALink(Link l, QueueNetworkLayer queueNetworkLayer, QueueNode toNode) {
-		super(l, queueNetworkLayer, toNode);
+	public CALink(Link l, QueueNetwork queueNetwork, QueueNode toNode) {
+		super(l, queueNetwork, toNode);
 		
 		double rnd = Gbl.random.nextDouble() ;
 		

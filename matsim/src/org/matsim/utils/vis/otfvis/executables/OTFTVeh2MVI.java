@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.StringUtils;
@@ -41,7 +41,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetworkLayer net, String vehFileName, String outFileName, double interval_s) {
+	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, String outFileName, double interval_s) {
 		super(interval_s, net, outFileName);
 		this.vehFileName = vehFileName;
 	}
@@ -160,7 +160,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
-		QueueNetworkLayer qnet = new QueueNetworkLayer(net);
+		QueueNetwork qnet = new QueueNetwork(net);
 
 		OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s);
 		test.convert();

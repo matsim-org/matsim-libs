@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.interfaces;
 import java.io.Serializable;
 
 import org.matsim.events.Events;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
@@ -32,7 +32,7 @@ public interface OTFQuery extends Serializable{
 	public void setId(String id);
 	// while this returns true, the query is send to the server EVERY Tick
 	public boolean isAlive();
-	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) ;
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) ;
 	public void remove();
 	public void draw(OTFDrawer drawer);
 	public Type getType();

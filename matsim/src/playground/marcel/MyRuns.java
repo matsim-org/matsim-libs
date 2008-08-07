@@ -2457,7 +2457,7 @@ public class MyRuns {
 //		Gbl.startMeasurement();
 //		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 //		Gbl.printRoundTime();
-//		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
+//		QueueNetwork qnet = new QueueNetwork(network);
 //		Gbl.printRoundTime();
 
 

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.mobsim.Vehicle;
@@ -37,10 +37,10 @@ public class QLink extends QueueLink {
 	private double freeSpeedTT;
 	private double effectiveCelleSize;
 	
-	public QLink(final Link l, final QueueNetworkLayer queueNetworkLayer, final QueueNode toNode) {
-		super(l, queueNetworkLayer, toNode);
+	public QLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
+		super(l, queueNetwork, toNode);
 		
-		this.effectiveCelleSize = queueNetworkLayer.getNetworkLayer().getEffectiveCellSize();
+		this.effectiveCelleSize = queueNetwork.getNetworkLayer().getEffectiveCellSize();
 
 		this.freeSpeedTT = this.getLink().getLength() / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
 		// Original LinkErstellen

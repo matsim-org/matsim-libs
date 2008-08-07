@@ -25,7 +25,7 @@ package playground.gregor.withinday_evac.mobsim;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.Node;
@@ -34,8 +34,8 @@ import org.matsim.network.Node;
 public class WithindayQueueNode extends QueueNode {
 	private static final Logger log = Logger.getLogger(WithindayQueueNode.class);
 	
-	public WithindayQueueNode(final Node n, final QueueNetworkLayer queueNetworkLayer) {
-		super(n, queueNetworkLayer);
+	public WithindayQueueNode(final Node n, final QueueNetwork queueNetwork) {
+		super(n, queueNetwork);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

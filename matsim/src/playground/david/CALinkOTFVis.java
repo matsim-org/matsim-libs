@@ -18,7 +18,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
@@ -83,8 +83,8 @@ class CALink extends QueueLink {
 
 	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
 
-	public CALink(Link l, QueueNetworkLayer queueNetworkLayer, QueueNode toNode) {
-		super(l, queueNetworkLayer, toNode);
+	public CALink(Link l, QueueNetwork queueNetwork, QueueNode toNode) {
+		super(l, queueNetwork, toNode);
 		MyCAVeh veh = new MyCAVeh(3) ;
 		veh.setTruck(true) ;
 		cells[0][0] = veh ;
@@ -369,7 +369,7 @@ public class CALinkOTFVis extends Thread {
 			super(address, res);
 			this.DELAYSIM = 20;
 
-			verbot = createButton("†-Verbot ist AUS", "vb", null, "toggle †berholverbot");
+			verbot = createButton("ï¿½-Verbot ist AUS", "vb", null, "toggle ï¿½berholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
 			verbot.setBorderPainted(true);
 			verbot.setMargin(new Insets(10, 10, 10, 10));
@@ -381,7 +381,7 @@ public class CALinkOTFVis extends Thread {
 		protected boolean onAction(String command) {
 			if(command.equals("vb")) {
 				CALink.ueberholverbot = !CALink.ueberholverbot;
-				verbot.setText(CALink.ueberholverbot ? "†-Verbot ist AN" :"†-Verbot ist AUS");
+				verbot.setText(CALink.ueberholverbot ? "ï¿½-Verbot ist AN" :"ï¿½-Verbot ist AUS");
 			}
 			return false; // return id command was handeled
 		}

@@ -24,7 +24,7 @@ import java.util.Collection;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
@@ -50,7 +50,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 	int activityNr = -1;
 	double finished = 0;
 
-	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
 		Person person = plans.getPerson(this.agentID);
 		if (person == null) return;
 

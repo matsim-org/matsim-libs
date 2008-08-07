@@ -23,7 +23,7 @@ package playground.gregor.withinday_evac.mobsim;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkFactory;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Vehicle;
@@ -53,7 +53,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 			final Population plans, final Events events, final playground.gregor.withinday_evac.WithindayControler withindayControler) {
 		super(net, plans, events);
 		final QueueNetworkFactory< QueueNode, QueueLink> factory = new WithindayQueueNetworkFactory();
-		final QueueNetworkLayer qNet = new QueueNetworkLayer(net,factory);
+		final QueueNetwork qNet = new QueueNetwork(net,factory);
 		this.network = qNet;
 		this.controler = withindayControler;
 		this.setVehiclePrototye(OccupiedVehicle.class);

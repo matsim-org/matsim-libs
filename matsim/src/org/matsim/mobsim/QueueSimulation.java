@@ -59,7 +59,7 @@ public class QueueSimulation {
 
 	private final Config config;
 	protected final Population plans;
-	protected QueueNetworkLayer network;
+	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
 	protected static Events events = null; // TODO [MR] instead of making this static and Links/Nodes using QueueSimulation.getEvents(), Gbl should hold a global events-object
@@ -90,7 +90,7 @@ public class QueueSimulation {
 		setEvents(events);
 		this.plans = plans;
 
-		this.network = new QueueNetworkLayer(network);
+		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
 	}
 

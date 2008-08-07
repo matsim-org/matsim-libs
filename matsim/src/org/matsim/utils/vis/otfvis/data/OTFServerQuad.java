@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.mobsim.QueueNode;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
@@ -92,13 +92,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	protected double maxEasting;
 	protected double minNorthing;
 	protected double maxNorthing;
-	transient private QueueNetworkLayer net;
+	transient private QueueNetwork net;
 
 	// Change this, find better way to transport this info into Writers
 	public static double offsetEast;
 	public static double offsetNorth;
 
-	public OTFServerQuad(QueueNetworkLayer net) {
+	public OTFServerQuad(QueueNetwork net) {
 		super(0,0,0,0);
 		updateBoundingBox(net);
 		// has to be done later, as we do not know the writers yet!
@@ -115,7 +115,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		this.maxNorthing = maxY+1;
 	}
 
-	public void updateBoundingBox(QueueNetworkLayer net){
+	public void updateBoundingBox(QueueNetwork net){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
 		this.minNorthing = Double.POSITIVE_INFINITY;

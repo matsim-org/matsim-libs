@@ -21,7 +21,7 @@
 package org.matsim.utils.vis.otfvis.opengl.queries;
 
 import org.matsim.events.Events;
-import org.matsim.mobsim.QueueNetworkLayer;
+import org.matsim.mobsim.QueueNetwork;
 import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -42,7 +42,7 @@ public class QueryToggleShowParking implements OTFQuery {
 		
 	}
 
-	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
 		OTFLinkAgentsHandler.showParked = !OTFLinkAgentsHandler.showParked;
 	}
 

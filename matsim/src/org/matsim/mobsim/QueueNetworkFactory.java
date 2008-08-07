@@ -30,8 +30,8 @@ import org.matsim.network.Node;
 public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> {
 
 
-	public QN newQueueNode(Node node, QueueNetworkLayer queueNetwork);
+	public QN newQueueNode(Node node, QueueNetwork queueNetwork);
 
-	public QL newQueueLink(Link link, QueueNetworkLayer queueNetwork, QN queueNode);
+	public QL newQueueLink(Link link, QueueNetwork queueNetwork, QN queueNode);
 
 }
