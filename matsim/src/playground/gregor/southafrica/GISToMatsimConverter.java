@@ -25,9 +25,9 @@ import java.util.Collection;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Envelope;
 

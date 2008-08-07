@@ -63,10 +63,10 @@ import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.matsim.world.World;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

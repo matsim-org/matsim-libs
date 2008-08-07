@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.utils;
+package org.matsim.utils.gis;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +33,16 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.FactoryException;
-
+/**
+ * 
+ * This is a simple utility class that provides methods to write Feature instances 
+ * of the geotools framework to an esri shape file.
+ * @author glaemmel
+ *
+ */
 public class ShapeFileWriter {
+	
+	
 	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
 
 

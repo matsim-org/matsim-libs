@@ -30,9 +30,9 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 
 public class ChangeAttributeOrder {

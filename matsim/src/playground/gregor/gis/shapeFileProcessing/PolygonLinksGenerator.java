@@ -35,9 +35,9 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.sun.opengl.impl.Java2D;
 import com.vividsolutions.jts.geom.Coordinate;

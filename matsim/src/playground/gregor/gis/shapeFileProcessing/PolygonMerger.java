@@ -33,8 +33,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

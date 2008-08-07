@@ -42,9 +42,9 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

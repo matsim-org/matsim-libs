@@ -32,9 +32,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.NetworkWriter;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Envelope;
 

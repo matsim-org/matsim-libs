@@ -29,10 +29,10 @@ import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.utils.gis.ShapeFileReader;
+import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import playground.gregor.gis.utils.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
 
