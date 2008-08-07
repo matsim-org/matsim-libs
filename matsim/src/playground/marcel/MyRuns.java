@@ -20,8 +20,12 @@
 
 package playground.marcel;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -64,7 +69,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -2448,13 +2452,50 @@ public class MyRuns {
 	}
 
 	public static void someTest(final String[] args) {
-		Config config = Gbl.createConfig(args);
-		NetworkLayer network = new NetworkLayer();
-		Gbl.startMeasurement();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		Gbl.printRoundTime();
-		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
-		Gbl.printRoundTime();
+//		Config config = Gbl.createConfig(args);
+//		NetworkLayer network = new NetworkLayer();
+//		Gbl.startMeasurement();
+//		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+//		Gbl.printRoundTime();
+//		QueueNetworkLayer qnet = new QueueNetworkLayer(network);
+//		Gbl.printRoundTime();
+
+
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for (int i = 0; i < 20; i++) {
+			list.add(i);
+		}
+		for (Integer i : list) {
+			System.out.println(i);
+		}
+		System.out.println("size: " + list.size());
+
+		Iterator<Integer> iter = list.iterator();
+		while (iter.hasNext()) {
+			Integer i = iter.next();
+			if (i.intValue() % 3 == 0) {
+				System.out.println("remove");
+				iter.remove();
+			}
+		}
+		System.out.println("size: " + list.size());
+
+		for (Integer i : list) {
+			System.out.println(i);
+		}
+
+
+		try {
+			Scanner input = new Scanner(new BufferedReader(new FileReader(new File("test.txt"))));
+			BufferedReader reader = new BufferedReader(new FileReader(new File("test.txt")));
+
+
+			input.next();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -2503,7 +2544,7 @@ public class MyRuns {
 //		cleanNetwork(args);
 //		calcNofLanes(args);
 //		falsifyNetwork(args);
-		subNetwork(args, 683518.0, 246836.0, 1000.0, 1000.0, 50000.0); // Belleue Zrh, 1-50km
+//		subNetwork(args, 683518.0, 246836.0, 1000.0, 1000.0, 50000.0); // Belleue Zrh, 1-50km
 
 /* ***   M A T R I C E S   *** */
 //		visumMatrixTest(args);
@@ -2546,7 +2587,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-//		someTest(args);
+		someTest(args);
 
 //		Gbl.printSystemInfo();
 
