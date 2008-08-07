@@ -37,10 +37,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -134,7 +134,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * 
 	 * @author mrieser
 	 */
-	private static class LinkAnalyzer implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
 		public final String linkId;
 		public double firstCarEnter = Double.POSITIVE_INFINITY;
 		public double lastCarEnter = Double.NEGATIVE_INFINITY;
@@ -462,7 +462,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class BottleneckTravelTimeAnalyzer implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+	private static class BottleneckTravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 		private final HashMap<String, Double> agentDepTimes = new HashMap<String, Double>(); // <AgentId, Time>
 		private int agentCounter = 0;

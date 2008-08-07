@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerActivityStartI.java
+ * ActStartEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,6 +22,6 @@ package org.matsim.events.handler;
 
 import org.matsim.events.ActStartEvent;
 
-public interface EventHandlerActivityStartI extends EventHandlerI {
+public interface ActStartEventHandler extends EventHandler {
 	public void handleEvent (ActStartEvent event);
 }

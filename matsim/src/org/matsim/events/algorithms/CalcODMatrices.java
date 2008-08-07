@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -36,7 +36,7 @@ import org.matsim.utils.misc.Time;
 import org.matsim.world.Location;
 import org.matsim.world.ZoneLayer;
 
-public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI {
+public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureEventHandler {
 
 	private final NetworkLayer network;
 	private final ZoneLayer tvzLayer;

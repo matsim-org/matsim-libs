@@ -31,7 +31,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Person;
@@ -55,7 +55,7 @@ public class QueryAgentEvents implements OTFQuery {
 	 */
 	private static final long serialVersionUID = -7388598935268835323L;
 
-	public static class MyEventsHandler implements BasicEventHandlerI, Serializable{
+	public static class MyEventsHandler implements BasicEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
 		public static List<BasicEvent> events = new ArrayList<BasicEvent>();

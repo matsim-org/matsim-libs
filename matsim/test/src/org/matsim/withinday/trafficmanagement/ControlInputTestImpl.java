@@ -36,7 +36,7 @@ public class ControlInputTestImpl extends AbstractControlInputImpl {
 	}
 
 	/**
-	 * @see org.matsim.events.handler.EventHandlerI#reset(int)
+	 * @see org.matsim.events.handler.EventHandler#reset(int)
 	 */
 	public void reset(final int iteration) {
 

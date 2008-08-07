@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -35,7 +35,7 @@ import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
 public class EventsWait2LinkTest {
-	public static class EventsWait2Link implements EventHandlerAgentWait2LinkI {
+	public static class EventsWait2Link implements AgentWait2LinkEventHandler {
 		private BufferedWriter writer = null;
 
 		public EventsWait2Link(final String outputFilename) {

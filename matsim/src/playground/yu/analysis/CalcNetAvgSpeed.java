@@ -28,9 +28,9 @@ import java.util.TreeMap;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -40,8 +40,8 @@ import org.matsim.network.NetworkLayer;
  * @author ychen
  *
  */
-public class CalcNetAvgSpeed implements EventHandlerLinkEnterI,
-		EventHandlerLinkLeaveI, EventHandlerAgentArrivalI {
+public class CalcNetAvgSpeed implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler {
 	/**
 	 * @param lengthSum -
 	 *            the sum of all the covered distance [km].

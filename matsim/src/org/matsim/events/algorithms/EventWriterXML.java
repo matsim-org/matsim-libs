@@ -25,10 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.events.handler.BasicEventHandler;
 import org.xml.sax.Attributes;
 
-public class EventWriterXML implements BasicEventHandlerI {
+public class EventWriterXML implements BasicEventHandler {
 	private BufferedWriter out = null;
 
 	public EventWriterXML(final String filename) {

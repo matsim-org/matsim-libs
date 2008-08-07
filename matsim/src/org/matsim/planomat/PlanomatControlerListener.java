@@ -25,7 +25,7 @@ import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.handler.EventHandlerI;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.router.util.TravelTimeI;
@@ -39,7 +39,7 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 		Controler controler = event.getControler();
 		NetworkLayer network = controler.getNetwork();
 		this.linkTravelTimeCalculatorForPlanomat = initTravelTimeIForPlanomat(network);
-		controler.getEvents().addHandler((EventHandlerI) this.linkTravelTimeCalculatorForPlanomat);
+		controler.getEvents().addHandler((EventHandler) this.linkTravelTimeCalculatorForPlanomat);
 
 		int timeBinSize = 900;
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(network, timeBinSize);
@@ -48,7 +48,7 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		this.tDepDelayCalc.reset(event.getIteration());
-		((EventHandlerI) this.linkTravelTimeCalculatorForPlanomat).reset(event.getIteration());
+		((EventHandler) this.linkTravelTimeCalculatorForPlanomat).reset(event.getIteration());
 	}
 
 	private TravelTimeI initTravelTimeIForPlanomat(final NetworkLayer network) {

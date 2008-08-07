@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.NetworkLayer;
 
 /**
@@ -33,7 +33,7 @@ import org.matsim.network.NetworkLayer;
  *
  * @author mrieser
  */
-public class VolumesAnalyzer implements EventHandlerLinkLeaveI {
+public class VolumesAnalyzer implements LinkLeaveEventHandler {
 
 	private final int timeBinSize;
 	private final int maxTime;

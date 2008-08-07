@@ -12,9 +12,9 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -31,8 +31,8 @@ import org.matsim.utils.misc.Time;
  * @author illenberger
  *
  */
-public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI,
-		EventHandlerAgentArrivalI {
+public class EventBasedTTProvider implements TravelTimeI, LinkEnterEventHandler, LinkLeaveEventHandler,
+		AgentArrivalEventHandler {
 
 	// =====================================================================
 	// private fields

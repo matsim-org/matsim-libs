@@ -36,14 +36,14 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -69,10 +69,10 @@ import org.matsim.withinday.trafficmanagement.controlinput.ControlInputWriter;
  */
 
 public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
-		EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
-		EventHandlerAgentWait2LinkI, EventHandlerAgentStuckI,
-		EventHandlerAgentDepartureI, EventHandlerAgentArrivalI,
-		EventHandlerActivityStartI, EventHandlerActivityEndI, ControlInput {
+		LinkLeaveEventHandler, LinkEnterEventHandler,
+		AgentWait2LinkEventHandler, AgentStuckEventHandler,
+		AgentDepartureEventHandler, AgentArrivalEventHandler,
+		ActStartEventHandler, ActEndEventHandler, ControlInput {
 
 	private final List<Link> inLinksMainRoute = new ArrayList<Link>();
 

@@ -15,13 +15,13 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -32,7 +32,7 @@ import playground.andreas.intersection.sim.QSim;
  * @author aneumann
  *
  */
-public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI, EventHandlerActivityEndI, EventHandlerActivityStartI, EventHandlerAgentArrivalI, EventHandlerAgentDepartureI, EventHandlerAgentWait2LinkI{
+public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler{
 	
 	BufferedWriter writer = null;
 	

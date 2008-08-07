@@ -26,14 +26,14 @@ import java.util.TreeMap;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
 
-public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerAgentStuckI, EventHandlerAgentWait2LinkI {
+public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {
 
 	private TreeMap<String, ArrayList<Double>> stuckLinkTimes = new TreeMap<String, ArrayList<Double>>(); // <Link, <Time>>, the times an agent is stuck for each link
 	private int[] stuckTimes = new int[24*4 + 1]; // the time of day agents get stuck; counts per 15min-slots; up to 24 hours

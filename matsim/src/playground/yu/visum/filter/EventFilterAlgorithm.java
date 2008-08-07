@@ -1,12 +1,12 @@
 package playground.yu.visum.filter;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.events.handler.BasicEventHandler;
 
 /**
  * @author  ychen
  */
-public class EventFilterAlgorithm implements BasicEventHandlerI, EventFilterI {
+public class EventFilterAlgorithm implements BasicEventHandler, EventFilterI {
 	private EventFilterI nextFilter = null;
 
 	private int count = 0;

@@ -32,10 +32,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.SimulationTimer;
@@ -49,10 +49,10 @@ import org.matsim.utils.misc.Time;
  *
  */
 public class EstimReactiveLinkTT implements
-		EventHandlerLinkEnterI,
-		EventHandlerLinkLeaveI,
-		EventHandlerAgentArrivalI,
-		EventHandlerAgentWait2LinkI,
+		LinkEnterEventHandler,
+		LinkLeaveEventHandler,
+		AgentArrivalEventHandler,
+		AgentWait2LinkEventHandler,
 		TravelTimeI {
 
 //	private QueueNetwork queueNetwork;

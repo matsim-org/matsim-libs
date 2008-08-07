@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerAgentArrivalI.java
+ * AgentStuckEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentStuckEvent;
 
-public interface EventHandlerAgentArrivalI extends EventHandlerI {
-	public void handleEvent (AgentArrivalEvent event);
+public interface AgentStuckEventHandler extends EventHandler {
+	public void handleEvent (AgentStuckEvent event);
 }

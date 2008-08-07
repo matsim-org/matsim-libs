@@ -4,10 +4,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 /**
  * This EventHandler implementation counts the travel time of
  * all agents and provides the average travel time per
@@ -15,9 +15,9 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
  * @author dgrether
  *
  */
-public class MyEventHandler implements EventHandlerLinkEnterI,
-		EventHandlerLinkLeaveI, EventHandlerAgentArrivalI,
-		EventHandlerAgentDepartureI{
+public class MyEventHandler implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler,
+		AgentDepartureEventHandler{
 
 	private double travelTime = 0.0;
 

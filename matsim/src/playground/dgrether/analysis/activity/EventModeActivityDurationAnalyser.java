@@ -33,8 +33,8 @@ import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -102,7 +102,7 @@ public class EventModeActivityDurationAnalyser {
 
 	}
 	
-	private static class ActivityDurationHandler implements EventHandlerActivityEndI, EventHandlerActivityStartI{
+	private static class ActivityDurationHandler implements ActEndEventHandler, ActStartEventHandler{
 
 		Map<Id, ActStartEvent> eventMap = new HashMap<Id, ActStartEvent>();
 		

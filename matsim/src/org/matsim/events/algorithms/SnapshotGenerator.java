@@ -35,12 +35,12 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
@@ -53,8 +53,8 @@ import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriterI;
 
-public class SnapshotGenerator implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerLinkEnterI,
-		EventHandlerLinkLeaveI, EventHandlerAgentWait2LinkI, EventHandlerAgentStuckI {
+public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentWait2LinkEventHandler, AgentStuckEventHandler {
 
 	private final NetworkLayer network;
 	private int lastSnapshotIndex = -1;

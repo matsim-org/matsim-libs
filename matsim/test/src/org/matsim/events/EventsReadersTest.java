@@ -32,22 +32,22 @@ import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.EventsReaderXMLv1;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EventsReadersTest extends MatsimTestCase {
 
 
-	static class TestHandler implements EventHandlerActivityEndI, EventHandlerAgentDepartureI, EventHandlerAgentWait2LinkI,
-			EventHandlerLinkLeaveI, EventHandlerLinkEnterI, EventHandlerAgentArrivalI, EventHandlerActivityStartI,
-			EventHandlerAgentStuckI {
+	static class TestHandler implements ActEndEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+			LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, ActStartEventHandler,
+			AgentStuckEventHandler {
 
 		public int eventCounter = 0;
 

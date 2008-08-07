@@ -38,9 +38,9 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -49,7 +49,7 @@ import org.matsim.utils.misc.Time;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class LegHistogram implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
+public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	private int iteration = 0;
 	private final int binSize;

@@ -31,10 +31,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -60,8 +60,8 @@ the outflow through the bottleneck and the free flow velocity.
 */
 
 public class ControlInputImplSB extends AbstractControlInputImpl
-implements EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
-EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput{
+implements LinkLeaveEventHandler, LinkEnterEventHandler,
+AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput{
 
 	private static final Logger log = Logger.getLogger(ControlInputImplSB.class);
 

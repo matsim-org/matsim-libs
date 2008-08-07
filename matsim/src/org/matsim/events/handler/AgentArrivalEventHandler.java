@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerI.java
+ * AgentArrivalEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,7 +20,8 @@
 
 package org.matsim.events.handler;
 
-public interface EventHandlerI {
-	// resets this handler to it's inital condition 
-	public void reset(int iteration);
+import org.matsim.events.AgentArrivalEvent;
+
+public interface AgentArrivalEventHandler extends EventHandler {
+	public void handleEvent (AgentArrivalEvent event);
 }

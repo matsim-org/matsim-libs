@@ -16,8 +16,8 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -27,7 +27,7 @@ import playground.andreas.intersection.sim.QSim;
  * @author aneumann
  *
  */
-public class TravelTimeTest2a extends MatsimTestCase implements	EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
+public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	MeasurePoint beginningOfLink2 = null;	
 

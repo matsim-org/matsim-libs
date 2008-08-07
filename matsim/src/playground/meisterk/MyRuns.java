@@ -43,7 +43,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerI;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesProductionKTI;
@@ -735,16 +735,16 @@ public class MyRuns {
 		String estimatorName = Gbl.getConfig().planomat().getLegTravelTimeEstimatorName();
 		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
 			estimator = new MyRecentEventsBasedEstimator();
-			events.addHandler((EventHandlerI) estimator);
+			events.addHandler((EventHandler) estimator);
 
 		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
 			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, timeBinSize);
 			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
-			events.addHandler((EventHandlerI) linkTravelTimeEstimator);
+			events.addHandler((EventHandler) linkTravelTimeEstimator);
 		} else if (estimatorName.equalsIgnoreCase("CharyparEtAlCompatibleLegTravelTimeEstimator")) {
 			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, timeBinSize);
 			estimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
-			events.addHandler((EventHandlerI) linkTravelTimeEstimator);
+			events.addHandler((EventHandler) linkTravelTimeEstimator);
 			events.addHandler(tDepDelayCalc);
 
 		}

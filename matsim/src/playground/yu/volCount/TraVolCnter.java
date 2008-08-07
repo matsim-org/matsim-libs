@@ -29,16 +29,16 @@ import java.util.HashMap;
 
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
 /**
  * counts Agents in network for every timeBin
  * @author ychen
  * 
  */
-public class TraVolCnter implements EventHandlerLinkEnterI,
-		EventHandlerLinkLeaveI {
+public class TraVolCnter implements LinkEnterEventHandler,
+		LinkLeaveEventHandler {
 	/**
 	 * netVols<tIndex, netVol>
 	 */

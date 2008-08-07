@@ -32,9 +32,9 @@ import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYLineChart;
@@ -45,8 +45,8 @@ import org.matsim.utils.misc.Time;
  * @author ychen
  * 
  */
-public class LegDistance implements EventHandlerLinkEnterI,
-		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
+public class LegDistance implements LinkEnterEventHandler,
+		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private final NetworkLayer network;
 	private int binSize;
 	private double[] legDistances;

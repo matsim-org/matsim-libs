@@ -69,7 +69,7 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.handler.EventHandlerI;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
@@ -412,7 +412,7 @@ public class Controler {
 		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
 
 			estimator = new MyRecentEventsBasedEstimator();
-			this.events.addHandler((EventHandlerI) estimator);
+			this.events.addHandler((EventHandler) estimator);
 
 		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
 			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);

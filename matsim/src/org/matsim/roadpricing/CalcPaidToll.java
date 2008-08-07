@@ -25,8 +25,8 @@ import java.util.TreeMap;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
@@ -38,7 +38,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  *
  * @author mrieser
  */
-public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWait2LinkI {
+public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventHandler {
 
 	static class AgentInfo {
 		public double toll = 0.0;

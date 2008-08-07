@@ -29,8 +29,8 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -39,7 +39,7 @@ import org.matsim.testcases.MatsimTestCase;
  *
  */
 public class TravelTimeTest extends MatsimTestCase implements
-		EventHandlerLinkLeaveI, EventHandlerLinkEnterI {
+		LinkLeaveEventHandler, LinkEnterEventHandler {
 
   private Map<Id, Map<Id, Double>> agentTravelTimes;
 

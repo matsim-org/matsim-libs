@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -40,7 +40,7 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class DpDurWriter implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
+public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 	private int maxDur = 0;
 
 	private BufferedWriter out = null;

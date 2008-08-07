@@ -27,14 +27,14 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.population.Route;
 import org.matsim.world.Location;
 
 public class MyRecentEventsBasedEstimator
-implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
+implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	public MyRecentEventsBasedEstimator() {
 		super();

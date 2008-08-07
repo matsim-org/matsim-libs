@@ -32,8 +32,8 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -47,8 +47,8 @@ import org.matsim.world.World;
  * @author yu
  * 
  */
-public class TripDurationHandler implements EventHandlerAgentDepartureI,
-		EventHandlerAgentArrivalI {
+public class TripDurationHandler implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	private final NetworkLayer network;
 
 	private final Population plans;

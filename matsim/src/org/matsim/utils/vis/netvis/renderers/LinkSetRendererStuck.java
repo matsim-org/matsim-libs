@@ -34,7 +34,7 @@ import javax.swing.JFrame;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
@@ -178,7 +178,7 @@ public class LinkSetRendererStuck extends RendererA {
 		this.toolbar = toolbar;
 	}
 
-	private class StuckEventCollector implements EventHandlerAgentStuckI {
+	private class StuckEventCollector implements AgentStuckEventHandler {
 
 		public void handleEvent(final AgentStuckEvent event) {
 			ArrayList<Double> times = LinkSetRendererStuck.this.stuckTimes.get(event.linkId);

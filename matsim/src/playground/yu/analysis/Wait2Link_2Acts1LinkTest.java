@@ -32,7 +32,7 @@ import java.util.Set;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -135,7 +135,7 @@ public class Wait2Link_2Acts1LinkTest {
 		}
 	}
 
-	public static class Wait2Link implements EventHandlerAgentWait2LinkI {
+	public static class Wait2Link implements AgentWait2LinkEventHandler {
 		private final Set<AgentLinkPair> agentLinksPairs;
 		private BufferedWriter writer;
 		private int overlapCount;

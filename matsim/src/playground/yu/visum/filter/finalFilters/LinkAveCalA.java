@@ -112,7 +112,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see org.matsim.demandmodeling.events.handler.BasicEventHandlerI#handleEvent(
+	 * @see org.matsim.demandmodeling.BasicEventHandler.handler.BasicEventHandlerI#handleEvent(
 	 *      org.matsim.demandmodeling.events.BasicEvent)
 	 */
 	@Override

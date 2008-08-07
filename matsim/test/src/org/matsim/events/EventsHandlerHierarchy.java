@@ -20,9 +20,9 @@
 
 package org.matsim.events;
 
-import org.matsim.events.handler.BasicEventHandlerI;
-import org.matsim.events.handler.EventHandlerI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.BasicEventHandler;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EventsHandlerHierarchy extends MatsimTestCase {
@@ -31,7 +31,7 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 
 	int resetCalled = 0;
 
-	class A implements BasicEventHandlerI, EventHandlerLinkLeaveI {
+	class A implements BasicEventHandler, LinkLeaveEventHandler {
 
 		public void handleEvent(final BasicEvent event) {
 			System.out.println("Event handled");
@@ -50,13 +50,13 @@ public class EventsHandlerHierarchy extends MatsimTestCase {
 
 	class B extends A {};
 
-	class C extends A implements BasicEventHandlerI, EventHandlerLinkLeaveI {
+	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {
 		};
 
 	public final void testHandlerHierarchy() {
 		Events events = new Events();
 
-		EventHandlerI cc = new B();
+		EventHandler cc = new B();
 		events.processEvent(new LinkLeaveEvent(0., "", 0, ""));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);

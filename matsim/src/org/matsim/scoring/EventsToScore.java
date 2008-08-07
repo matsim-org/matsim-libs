@@ -28,9 +28,9 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -45,7 +45,7 @@ import org.matsim.population.Population;
  *
  * @author mrieser
  */
-public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI, EventHandlerAgentStuckI {
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;

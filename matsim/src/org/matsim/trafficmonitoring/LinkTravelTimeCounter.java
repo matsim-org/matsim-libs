@@ -27,15 +27,15 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
 /**
  * @author dgrether
  */
-public class LinkTravelTimeCounter implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI,
-EventHandlerAgentArrivalI {
+public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEventHandler,
+AgentArrivalEventHandler {
 	/**
 	 * singleton variable
 	 */

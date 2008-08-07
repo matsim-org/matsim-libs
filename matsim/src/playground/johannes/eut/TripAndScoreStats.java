@@ -41,8 +41,8 @@ import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.population.Person;
 import org.matsim.utils.io.IOUtils;
 
@@ -51,7 +51,7 @@ import org.matsim.utils.io.IOUtils;
  *
  */
 public class TripAndScoreStats implements StartupListener, ShutdownListener,
-		IterationEndsListener, EventHandlerAgentWait2LinkI, EventHandlerAgentArrivalI {
+		IterationEndsListener, AgentWait2LinkEventHandler, AgentArrivalEventHandler {
 
 	private final static String TAB = "\t";
 	

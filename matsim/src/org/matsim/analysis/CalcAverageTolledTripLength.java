@@ -25,8 +25,8 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -38,7 +38,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  *
  * @author mrieser
  */
-public class CalcAverageTolledTripLength implements EventHandlerLinkEnterI, EventHandlerAgentArrivalI {
+public class CalcAverageTolledTripLength implements LinkEnterEventHandler, AgentArrivalEventHandler {
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;

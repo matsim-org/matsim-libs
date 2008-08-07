@@ -27,9 +27,9 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
@@ -82,7 +82,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 
 
-	private class TestSingleIterationEventHandler implements EventHandlerLinkEnterI, EventHandlerActivityStartI, EventHandlerActivityEndI {
+	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActStartEventHandler, ActEndEventHandler {
 
 		private double agentOneTime, agentTwoTime;
 

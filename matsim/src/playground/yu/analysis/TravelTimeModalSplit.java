@@ -32,9 +32,9 @@ import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -46,8 +46,8 @@ import org.matsim.utils.misc.Time;
  * @author ychen
  * 
  */
-public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
-		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
+public class TravelTimeModalSplit implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private final NetworkLayer network;
 
 	private final Population plans;

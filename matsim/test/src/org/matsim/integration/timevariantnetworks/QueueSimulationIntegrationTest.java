@@ -27,8 +27,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
@@ -215,7 +215,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class TestTravelTimeCalculator implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+	private static class TestTravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private final Person person1;
 		private final Person person2;

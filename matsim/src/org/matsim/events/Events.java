@@ -29,22 +29,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.handler.BasicEventHandlerI;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.BasicEventHandler;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
 /**
  * EventHandling
  * <ol>
  * <li>Create a new class MyEventClass extends BasicEvent</li>
- * <li>Create a new interface MyEventHandlerI extends EventHandlerI</li>
+ * <li>Create a new interface MyEventHandlerI extends EventHandler</li>
  * <li>add method public void handleEvent(MyEvent event) to it</li>
  * <li>ready to go, just implement the interface somewhere and add a
  * HandlerObject with a call to <code>Events.addHandler(HandlerObject)</code></li>
@@ -59,23 +59,23 @@ public class Events {
 	static private class HandlerData {
 
 		public Class<?> eventklass;
-		public ArrayList<EventHandlerI> handlerList = new ArrayList<EventHandlerI>(5);
+		public ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
 		public Method method;
 		public HandlerData(final Class<?> eventklass, final Method method) {
 			this.eventklass = eventklass;
 			this.method = method;
 		}
-		public void removeHandler(final EventHandlerI handler) {
+		public void removeHandler(final EventHandler handler) {
 			this.handlerList.remove(handler);
 		}
 	}
 
 	static private class HandlerInfo {
 		public final Class<?> eventClass;
-		public final EventHandlerI eventHandler;
+		public final EventHandler eventHandler;
 		public final Method method;
 
-		public HandlerInfo(final Class<?> eventClass, final EventHandlerI eventHandler, final Method method) {
+		public HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
 			this.eventClass = eventClass;
 			this.eventHandler = eventHandler;
 			this.method = method;
@@ -117,7 +117,7 @@ public class Events {
 		log.info(" event # " + this.counter);
 	}
 
-	public void addHandler (final EventHandlerI handler) {
+	public void addHandler (final EventHandler handler) {
 		Map<Class<?>, Object> addedHandlers = new HashMap<Class<?>, Object>();
 		Class<?> test = handler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
@@ -134,7 +134,7 @@ public class Events {
 		this.cacheHandlers.clear();
 	}
 
-	public final void removeHandler(final EventHandlerI handler) {
+	public final void removeHandler(final EventHandler handler) {
 		log.info("removing Event-Handler: " + handler.getClass().getName());
 		for (HandlerData handlerList : this.handlerData) {
 			handlerList.removeHandler(handler);
@@ -154,9 +154,9 @@ public class Events {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
-		Set<EventHandlerI> resetHandlers = new HashSet<EventHandlerI>();
+		Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
 		for (HandlerData handlerdata : this.handlerData) {
-			for (EventHandlerI handler : handlerdata.handlerList) {
+			for (EventHandler handler : handlerdata.handlerList) {
 				if (!resetHandlers.contains(handler)) {
 					log.info("  " + handler.getClass().getName());
 					handler.reset(iteration);
@@ -174,7 +174,7 @@ public class Events {
 		this.nextCounterMsg = 1;
 	}
 
-	private void addHandlerInterfaces(final EventHandlerI handler, final Class<?> handlerClass) {
+	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
 			if (method.getName().equals("handleEvent")) {
@@ -216,7 +216,7 @@ public class Events {
 		while (klass != Object.class) {
 			HandlerData dat = findHandler(klass);
 			if (dat != null) {
-				for(EventHandlerI handler: dat.handlerList) {
+				for(EventHandler handler: dat.handlerList) {
 					info.add(new HandlerInfo(klass, handler, dat.method));
 				}
 			}
@@ -229,34 +229,34 @@ public class Events {
 	}
 
 	// these method is purely for performance reasons and need not be implemented
-	private boolean callHandlerFast(final Class<?> klass, final BasicEvent ev, final EventHandlerI handler) {
+	private boolean callHandlerFast(final Class<?> klass, final BasicEvent ev, final EventHandler handler) {
 
 		if (klass == BasicEvent.class) {
-			((BasicEventHandlerI)handler).handleEvent(ev);
+			((BasicEventHandler)handler).handleEvent(ev);
 			return true;
 		} else if (klass == LinkLeaveEvent.class) {
-			((EventHandlerLinkLeaveI)handler).handleEvent((LinkLeaveEvent)ev);
+			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
 		} else if (klass == LinkEnterEnter.class) {
-			((EventHandlerLinkEnterI)handler).handleEvent((LinkEnterEnter)ev);
+			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEnter)ev);
 			return true;
 		} else if (klass == ActEndEvent.class) {
-			((EventHandlerActivityEndI)handler).handleEvent((ActEndEvent)ev);
+			((ActEndEventHandler)handler).handleEvent((ActEndEvent)ev);
 			return true;
 		} else if (klass == ActStartEvent.class) {
-			((EventHandlerActivityStartI)handler).handleEvent((ActStartEvent)ev);
+			((ActStartEventHandler)handler).handleEvent((ActStartEvent)ev);
 			return true;
 		} else if (klass == AgentArrivalEvent.class) {
-			((EventHandlerAgentArrivalI)handler).handleEvent((AgentArrivalEvent)ev);
+			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);
 			return true;
 		} else if (klass == AgentDepartureEvent.class) {
-			((EventHandlerAgentDepartureI)handler).handleEvent((AgentDepartureEvent)ev);
+			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
 		} else if (klass == AgentStuckEvent.class) {
-			((EventHandlerAgentStuckI)handler).handleEvent((AgentStuckEvent)ev);
+			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
 			return true;
 		} else if (klass == AgentWait2LinkEvent.class) {
-			((EventHandlerAgentWait2LinkI)handler).handleEvent((AgentWait2LinkEvent)ev);
+			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
 			return true;
 		}
 		return false;
@@ -266,7 +266,7 @@ public class Events {
 		log.info("currently registered event-handlers:");
 		for (HandlerData handlerType : this.handlerData) {
 			log.info("+ " + handlerType.eventklass.getName());
-			for (EventHandlerI handler : handlerType.handlerList) {
+			for (EventHandler handler : handlerType.handlerList) {
 				log.info("  - " + handler.getClass().getName());
 			}
 		}

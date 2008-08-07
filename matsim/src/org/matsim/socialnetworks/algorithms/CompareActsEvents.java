@@ -1,10 +1,10 @@
 package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.population.Act;
 
-public class CompareActsEvents implements EventHandlerAgentArrivalI {
+public class CompareActsEvents implements AgentArrivalEventHandler {
 
 	double starttime=0;
 	double endtime=0;

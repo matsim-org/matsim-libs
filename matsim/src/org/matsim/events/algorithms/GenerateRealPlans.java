@@ -31,12 +31,12 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -55,12 +55,12 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class GenerateRealPlans implements EventHandlerActivityStartI,
-		EventHandlerActivityEndI,
-		EventHandlerAgentArrivalI,
-		EventHandlerAgentDepartureI,
-		EventHandlerAgentStuckI,
-		EventHandlerLinkEnterI {
+public class GenerateRealPlans implements ActStartEventHandler,
+		ActEndEventHandler,
+		AgentArrivalEventHandler,
+		AgentDepartureEventHandler,
+		AgentStuckEventHandler,
+		LinkEnterEventHandler {
 
 	private final Population realplans = new Population(Population.NO_STREAMING);
 	private Population oldplans = null;

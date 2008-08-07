@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerAgentDepartureI.java
+ * AgentDepartureEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,6 +22,6 @@ package org.matsim.events.handler;
 
 import org.matsim.events.AgentDepartureEvent;
 
-public interface EventHandlerAgentDepartureI extends EventHandlerI {
+public interface AgentDepartureEventHandler extends EventHandler {
 	public void handleEvent (AgentDepartureEvent event);
 }

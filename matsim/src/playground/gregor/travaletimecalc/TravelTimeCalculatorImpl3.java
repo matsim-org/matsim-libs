@@ -26,17 +26,17 @@ import java.util.Vector;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.misc.Time;
 
 
-public class TravelTimeCalculatorImpl3 implements EventHandlerLinkEnterI,
-EventHandlerLinkLeaveI, EventHandlerAgentArrivalI, TravelTimeI {
+public class TravelTimeCalculatorImpl3 implements LinkEnterEventHandler,
+LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTimeI {
 
 // EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();

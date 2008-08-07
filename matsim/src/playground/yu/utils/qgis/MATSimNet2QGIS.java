@@ -40,7 +40,7 @@ import org.geotools.referencing.CRS;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerI;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -147,7 +147,7 @@ public class MATSimNet2QGIS {
 	}
 
 	public void readEvents(final String eventsFilename,
-			final EventHandlerI handler) {
+			final EventHandler handler) {
 		Events events = new Events();
 		events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);

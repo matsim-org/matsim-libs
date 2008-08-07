@@ -34,14 +34,14 @@ import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.utils.io.IOUtils;
 
 /**
  * @author illenberger
  *
  */
-public class LinkCounter implements EventHandlerLinkEnterI, IterationEndsListener, IterationStartsListener {
+public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
 
 	private int count;
 	

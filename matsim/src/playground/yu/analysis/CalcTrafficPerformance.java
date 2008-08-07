@@ -21,7 +21,7 @@
 package playground.yu.analysis;
 
 import org.matsim.events.LinkEnterEnter;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -31,7 +31,7 @@ import org.matsim.network.NetworkLayer;
  * @author ychen
  *
  */
-public class CalcTrafficPerformance implements EventHandlerLinkEnterI {
+public class CalcTrafficPerformance implements LinkEnterEventHandler {
 	private double lengthSum = 0;
 	private NetworkLayer network = null;
 

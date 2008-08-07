@@ -25,8 +25,8 @@ import java.util.HashMap;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -37,7 +37,7 @@ import org.matsim.network.NetworkLayer;
  * @author meisterk
  *
  */
-public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartureI, EventHandlerLinkLeaveI {
+public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
 
 	private NetworkLayer network;
 	private int timeBinSize;

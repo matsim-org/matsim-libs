@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerLinkLeaveI.java
+ * BasicEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.BasicEvent;
 
-public interface EventHandlerLinkLeaveI extends EventHandlerI {
-	public void handleEvent (LinkLeaveEvent event);
+public interface BasicEventHandler extends EventHandler {
+	public void handleEvent (BasicEvent event);
 }

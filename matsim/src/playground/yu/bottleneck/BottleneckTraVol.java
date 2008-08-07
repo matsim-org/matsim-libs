@@ -25,8 +25,8 @@ import java.io.IOException;
 
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
@@ -37,7 +37,7 @@ import org.matsim.utils.misc.Time;
  * @author ychen
  *
  */
-public class BottleneckTraVol implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHandler {
 //	--------------------------MEMBER VARIABLES---------------------------------
 	private BufferedWriter out = null;
 	private int cnt;

@@ -24,7 +24,7 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
+import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
@@ -37,7 +37,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.world.World;
 
-class StuckAndAbortCounter implements EventHandlerAgentStuckI
+class StuckAndAbortCounter implements AgentStuckEventHandler
 {
 
 	public int stuckvehs = 0;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerActivityEndI.java
+ * EventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,7 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.ActEndEvent;
-
-public interface EventHandlerActivityEndI extends EventHandlerI {
-	public void handleEvent (ActEndEvent event);
+public interface EventHandler {
+	// resets this handler to it's inital condition 
+	public void reset(int iteration);
 }

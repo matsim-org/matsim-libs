@@ -30,7 +30,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.Events;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
+import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
@@ -416,7 +416,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private final static class EnterLinkEventCounter implements EventHandlerLinkEnterI {
+	private final static class EnterLinkEventCounter implements LinkEnterEventHandler {
 		private final String linkId;
 		private int counter = 0;
 		public EnterLinkEventCounter(final String linkId) {

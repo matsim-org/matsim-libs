@@ -24,10 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.handler.BasicEventHandlerI;
+import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.utils.io.IOUtils;
 
-public class EventWriterTXT implements BasicEventHandlerI {
+public class EventWriterTXT implements BasicEventHandler {
 	private BufferedWriter out = null;
 
 	public EventWriterTXT(final String filename) {

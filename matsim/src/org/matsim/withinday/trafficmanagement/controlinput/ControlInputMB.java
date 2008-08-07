@@ -33,10 +33,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -67,8 +67,8 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  */
 
 public class ControlInputMB extends AbstractControlInputImpl implements
-		EventHandlerLinkLeaveI, EventHandlerLinkEnterI,
-		EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, ControlInput {
+		LinkLeaveEventHandler, LinkEnterEventHandler,
+		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
 
 	// User parameters:
 

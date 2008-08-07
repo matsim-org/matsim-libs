@@ -33,20 +33,20 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
 /**
  * Sets the correct leg-number in events. For each agent, a counter is increased with every departure event, starting with 0 at the first departure event.
  *
  * @author mrieser
  */
-public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI, EventHandlerAgentWait2LinkI,
-		EventHandlerAgentStuckI, EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+public class CalcLegNumber implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler,
+		AgentStuckEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	/**
 	 * Map containing <agent-id, legCount>.

@@ -25,8 +25,8 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.events.handler.EventHandlerActivityEndI;
-import org.matsim.events.handler.EventHandlerActivityStartI;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
@@ -34,7 +34,7 @@ import org.matsim.facilities.Facility;
  *
  * @author anhorni
  */
-public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHandlerActivityEndI {
+public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHandler {
 
 	private Facilities facilities = null;
 	private int scaleNumberOfPersons = 1;

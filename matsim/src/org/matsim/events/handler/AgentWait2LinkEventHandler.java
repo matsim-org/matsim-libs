@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerAgentWait2LinkI.java
+ * AgentWait2LinkEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,6 +22,6 @@ package org.matsim.events.handler;
 
 import org.matsim.events.AgentWait2LinkEvent;
 
-public interface EventHandlerAgentWait2LinkI extends EventHandlerI {
+public interface AgentWait2LinkEventHandler extends EventHandler {
 	public void handleEvent (AgentWait2LinkEvent event);
 }

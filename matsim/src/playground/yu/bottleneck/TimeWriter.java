@@ -30,8 +30,8 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerAgentDepartureI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -44,8 +44,8 @@ import org.matsim.world.World;
  * 
  * @author ychen
  */
-public class TimeWriter implements EventHandlerAgentDepartureI,
-		EventHandlerAgentArrivalI {
+public class TimeWriter implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	// -------------------------MEMBER
 	// VARIABLES---------------------------------
 	private BufferedWriter out = null;

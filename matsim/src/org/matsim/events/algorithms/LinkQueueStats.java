@@ -28,8 +28,8 @@ import java.util.TreeSet;
 
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -38,7 +38,7 @@ import org.matsim.utils.misc.Time;
  *
  * @author mrieser
  */
-public class LinkQueueStats implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI {
+public class LinkQueueStats implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private String linkId;
 	private SortedSet<Double> enterTimes = new TreeSet<Double>();

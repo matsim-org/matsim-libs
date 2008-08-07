@@ -27,9 +27,9 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.events.handler.EventHandlerLinkEnterI;
-import org.matsim.events.handler.EventHandlerLinkLeaveI;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.charts.XYScatterChart;
@@ -42,7 +42,7 @@ import org.matsim.utils.charts.XYScatterChart;
  *
  * @author mrieser
  */
-public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArrivalI {
+public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
 
 	/** The id of the link we're interesetd in. */
 	private final String linkId;

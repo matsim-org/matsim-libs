@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventHandlerAgentStuckI.java
+ * LinkLeaveEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.LinkLeaveEvent;
 
-public interface EventHandlerAgentStuckI extends EventHandlerI {
-	public void handleEvent (AgentStuckEvent event);
+public interface LinkLeaveEventHandler extends EventHandler {
+	public void handleEvent (LinkLeaveEvent event);
 }
