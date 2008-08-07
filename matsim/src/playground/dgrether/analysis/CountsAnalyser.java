@@ -26,10 +26,10 @@ import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.config.Config;
+import org.matsim.counts.ComparisionErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.ComparisionErrorStatsCalculator;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
