@@ -1,7 +1,7 @@
 package playground.wrashid.DES;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentDepartureEvent;
 
 public abstract class EventMessage extends SelfhandleMessage {
 	Vehicle vehicle;

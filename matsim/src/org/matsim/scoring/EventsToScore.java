@@ -25,9 +25,9 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -68,7 +68,7 @@ public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAge
 	/* (non-Javadoc)
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentDepartureI#handleEvent(org.matsim.demandmodeling.events.EventAgentDeparture)
 	 */
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.startLeg(event.time, event.leg);
 	}
@@ -76,7 +76,7 @@ public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAge
 	/* (non-Javadoc)
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentArrivalI#handleEvent(org.matsim.demandmodeling.events.EventAgentArrival)
 	 */
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.endLeg(event.time);
 	}
@@ -84,7 +84,7 @@ public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAge
 	/* (non-Javadoc)
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentStuckI#handleEvent(org.matsim.demandmodeling.events.EventAgentStuck)
 	 */
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.agentStuck(event.time);
 	}

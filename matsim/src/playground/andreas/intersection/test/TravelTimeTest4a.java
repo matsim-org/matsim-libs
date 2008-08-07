@@ -7,8 +7,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
@@ -61,7 +61,7 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 		
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		
 		if (event.linkId.equalsIgnoreCase("101") || event.linkId.equalsIgnoreCase("201") ||
 				event.linkId.equalsIgnoreCase("301") || event.linkId.equalsIgnoreCase("401")) {
@@ -77,7 +77,7 @@ public class TravelTimeTest4a extends MatsimTestCase implements	EventHandlerLink
 		
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 
 		if (event.linkId.equalsIgnoreCase("20") || event.linkId.equalsIgnoreCase("40") ||
 				event.linkId.equalsIgnoreCase("60") || event.linkId.equalsIgnoreCase("80")) {

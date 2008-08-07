@@ -27,8 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 
@@ -54,7 +54,7 @@ public class TraVolCnter implements EventHandlerLinkEnterI,
 	 * 
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerLinkEnterI#handleEvent(org.matsim.demandmodeling.events.EventLinkEnter)
 	 */
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		// TODO save entertime into agentTimer
 		String agentId = event.agentId;
 		if (!agentTimer.containsKey(agentId))
@@ -69,7 +69,7 @@ public class TraVolCnter implements EventHandlerLinkEnterI,
 	 * 
 	 * @see org.matsim.demandmodeling.events.handler.EventHandlerLinkLeaveI#handleEvent(org.matsim.demandmodeling.events.EventLinkLeave)
 	 */
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		String agentId = event.agentId;
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event.time; tbIdx++) {

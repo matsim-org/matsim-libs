@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.network.NetworkLayer;
 
@@ -47,7 +47,7 @@ public class VolumesAnalyzer implements EventHandlerLinkLeaveI {
 		this.links = new HashMap<String, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		String linkid = event.linkId;
 		int[] volumes = this.links.get(linkid);
 		if (volumes == null) {

@@ -23,7 +23,7 @@ package org.matsim.trafficmonitoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 
 
@@ -76,9 +76,9 @@ public class LinkSensorManager implements EventHandlerLinkLeaveI {
 	}
 	/**
 	 * For each LinkLeaveEvent the corresponding traffic count value is incremented.
-	 * @see org.matsim.events.handler.EventHandlerLinkLeaveI#handleEvent(org.matsim.events.EventLinkLeave)
+	 * @see org.matsim.events.handler.EventHandlerLinkLeaveI#handleEvent(org.matsim.events.LinkLeaveEvent)
 	 */
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		if (this.linkCountMap.containsKey(event.linkId)) {
 			int i = this.linkCountMap.get(event.linkId).intValue();
 			i++;

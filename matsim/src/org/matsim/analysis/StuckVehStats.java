@@ -23,9 +23,9 @@ package org.matsim.analysis;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
@@ -49,12 +49,12 @@ public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerA
 		reset(-1);
 	}
 	
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		depTimes.put(event.agentId, event.time);
 	}
 
 	// DS TODO can not see if slot handling is corrupted through int -> double transition MR??
-	public void handleEvent(EventAgentWait2Link event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		wait2linkTimes.put(event.agentId, event.time);
 		Double depTime = depTimes.get(event.agentId);
 		if (depTime != null) {
@@ -64,7 +64,7 @@ public class StuckVehStats implements EventHandlerAgentDepartureI, EventHandlerA
 		}
 	}
 
-	public void handleEvent(EventAgentStuck event) {
+	public void handleEvent(AgentStuckEvent event) {
 		ArrayList<Double> times = stuckLinkTimes.get(event.linkId);			
 		if (times == null) {
 			times = new ArrayList<Double>(50);

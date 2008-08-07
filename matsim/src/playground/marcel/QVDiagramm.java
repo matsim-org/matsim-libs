@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
@@ -82,21 +82,21 @@ public class QVDiagramm implements EventHandlerLinkEnterI, EventHandlerLinkLeave
 		this.linkLength = link.getLength();
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
 		if (this.linkId.equals(event.linkId)) {
 			this.agents.put(event.agentId, Double.valueOf(event.time));
 		}
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// delete the enter time, because the agent won't leave this link for a while now...
 		if (this.linkId.equals(event.linkId)) {
 			this.agents.remove(event.agentId);
 		}
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		if (this.linkId.equals(event.linkId)) {
 			if ((int)event.time / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.

@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -114,7 +114,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new EventAgentStuck(now, veh.getDriver().getId().toString(), 
+							new AgentStuckEvent(now, veh.getDriver().getId().toString(), 
 									veh.getCurrentLegNumber(), currentLink.getId().toString(), 
 									veh.getDriver(), veh.getCurrentLeg(), currentLink));
 				}

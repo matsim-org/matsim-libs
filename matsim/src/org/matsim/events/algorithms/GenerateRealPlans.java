@@ -25,12 +25,12 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -88,7 +88,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		this.network = network;
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		Plan plan;
 		double time = event.time;
 		if (event.agent != null) {
@@ -102,7 +102,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		finishLeg(event.agentId, leg);
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		Plan plan;
 		String agentId;
 		double time = event.time;
@@ -149,7 +149,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		}
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		Plan plan;
 		double time = event.time;
 		Id linkId;
@@ -181,7 +181,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		}
 	}
 
-	public void handleEvent(final EventActivityStart event) {
+	public void handleEvent(final ActStartEvent event) {
 		Plan plan;
 		if (event.agent != null) {
 			plan = getPlanForPerson(event.agent);
@@ -199,7 +199,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		}
 	}
 
-	public void handleEvent(final EventActivityEnd event) {
+	public void handleEvent(final ActEndEvent event) {
 		Plan plan;
 		if (event.agent != null) {
 			plan = getPlanForPerson(event.agent);
@@ -232,7 +232,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		}
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		Link link = null;
 		if (event.link != null) {
 			link = event.link;

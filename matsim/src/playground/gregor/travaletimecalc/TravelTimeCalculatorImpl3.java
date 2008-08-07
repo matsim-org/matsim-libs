@@ -23,9 +23,9 @@ package playground.gregor.travaletimecalc;
 import java.util.HashMap;
 import java.util.Vector;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
@@ -82,12 +82,12 @@ resetTravelTimes();
 //////////////////////////////////////////////////////////////////////
 // Implementation of EventAlgorithmI
 //////////////////////////////////////////////////////////////////////
-public void handleEvent(EventLinkEnter event) {
+public void handleEvent(LinkEnterEnter event) {
 EnterEvent e = new EnterEvent(event.linkId, event.time);
 this.enterEvents.put(event.agentId, e);
 }
 
-public void handleEvent(EventLinkLeave event) {
+public void handleEvent(LinkLeaveEvent event) {
 EnterEvent e = this.enterEvents.remove(event.agentId);
 if ((e != null) && e.linkId.equals(event.linkId)) {
 	double timediff = event.time - e.time;
@@ -98,7 +98,7 @@ if ((e != null) && e.linkId.equals(event.linkId)) {
 }
 }
 
-public void handleEvent(EventAgentArrival event) {
+public void handleEvent(AgentArrivalEvent event) {
 // remove EnterEvents from list when an agent arrives.
 // otherwise, the activity duration would counted as travel time, when the
 // agent departs again and leaves the link!

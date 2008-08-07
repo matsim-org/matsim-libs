@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
@@ -83,9 +83,9 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 
 	/* ------------------------MEMBER VARIABLE------------------------------ */
 	/**
-	 * String - AgentID EventLinkEnter - an event of EventLinkEnter
+	 * String - AgentID LinkEnterEnter - an event of LinkEnterEnter
 	 */
-	private Map<String, EventLinkEnter> enters = new HashMap<String, EventLinkEnter>();
+	private Map<String, LinkEnterEnter> enters = new HashMap<String, LinkEnterEnter>();
 
 	protected long timeBinMinimum = -1;
 
@@ -117,15 +117,15 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 */
 	@Override
 	public void handleEvent(BasicEvent event) {
-		if (event instanceof EventLinkEnter) { // event.getClass().equals(EventLinkEnter.class))
+		if (event instanceof LinkEnterEnter) { // event.getClass().equals(LinkEnterEnter.class))
 												// {
-			this.enters.put(event.agentId, (EventLinkEnter) event);
-		} else if (event instanceof EventLinkLeave) { // event.getClass().equals(EventLinkLeave.class))
+			this.enters.put(event.agentId, (LinkEnterEnter) event);
+		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
 														// {
 			String agentId = event.agentId;
 			if (this.enters.containsKey(agentId))
 				if (this.enters.get(agentId).linkId
-						.equals(((EventLinkLeave) event).linkId)) {
+						.equals(((LinkLeaveEvent) event).linkId)) {
 					count();
 					count();
 					compute(this.enters.remove(agentId), event.time);
@@ -262,7 +262,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 *            the point of time of the event called "leaving a link" with
 	 *            unit second
 	 */
-	public abstract void compute(EventLinkEnter enter, double leaveTime_s);
+	public abstract void compute(LinkEnterEnter enter, double leaveTime_s);
 
 	/**
 	 * This function does nothing and must be overridden by subclasses and

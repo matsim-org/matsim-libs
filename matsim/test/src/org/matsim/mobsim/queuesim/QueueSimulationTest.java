@@ -28,7 +28,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
@@ -423,7 +423,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			this.linkId = linkId;
 		}
 
-		public void handleEvent(final EventLinkEnter event) {
+		public void handleEvent(final LinkEnterEnter event) {
 			if (event.linkId.equals(this.linkId)) this.counter++;
 		}
 

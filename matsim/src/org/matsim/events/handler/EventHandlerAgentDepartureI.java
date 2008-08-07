@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentDepartureEvent;
 
 public interface EventHandlerAgentDepartureI extends EventHandlerI {
-	public void handleEvent (EventAgentDeparture event);
+	public void handleEvent (AgentDepartureEvent event);
 }

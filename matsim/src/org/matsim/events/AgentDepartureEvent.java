@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventAgentArrival.java
+ * AgentDepartureEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,27 +26,27 @@ import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventAgentArrival extends AgentEvent {
+public class AgentDepartureEvent extends AgentEvent {
 
-	public EventAgentArrival(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
+	public AgentDepartureEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}
 
-	public EventAgentArrival(double time, String agentId, int legId, String linkId) {
+	public AgentDepartureEvent(double time, String agentId, int legId, String linkId) {
 		super(time, agentId, legId, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(0));
-		impl.addAttribute("","","type", "", "arrival");
+		//impl.addAttribute("","","Flag", "", Integer.toString(6));
+		impl.addAttribute("","","type", "", "departure");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "0\tarrival";
+		return asString() + "6\tdeparture";
 	}
 
 }

@@ -23,8 +23,8 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.gbl.Gbl;
@@ -143,12 +143,12 @@ public class DepartureDelayAverageCalculator implements EventHandlerAgentDepartu
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId), event.legId);
 		this.departureEventsTimes.put(depEvent, event.time);
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		DepartureEvent removeMe = new DepartureEvent(new IdImpl(event.agentId), event.legId);
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {

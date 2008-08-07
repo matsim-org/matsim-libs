@@ -35,9 +35,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -83,15 +83,15 @@ public class LegHistogram implements EventHandlerAgentDepartureI, EventHandlerAg
 
 	/* Implementation of eventhandler-Interfaces */
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		this.countsDep[getBinIndex(event.time)]++;
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.countsArr[getBinIndex(event.time)]++;
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		this.countsStuck[getBinIndex(event.time)]++;
 	}
 

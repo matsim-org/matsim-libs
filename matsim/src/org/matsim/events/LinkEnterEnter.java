@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventAgentStuck.java
+ * LinkEnterEnter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,32 +21,31 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventAgentStuck extends AgentEvent {
+public class LinkEnterEnter extends LinkEvent {
 
-	public EventAgentStuck(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
-		super(time, agentId, legId, linkId, agent, leg, link);
+	public LinkEnterEnter(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
+		super(time, agentId, linkId, agent, legNumber, link);
 	}
 
-	public EventAgentStuck(double time, String agentId, int legId, String linkId) {
-		super(time, agentId, legId, linkId);
+	public LinkEnterEnter(final double time, final String agentId, final int legNumber, final String linkId) {
+		super(time, agentId, legNumber, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(3));
-		impl.addAttribute("","","type", "", "stuckAndAbort");
+		//impl.addAttribute("","","Flag", "", Integer.toString(5));
+		impl.addAttribute("","","type", "", "entered link");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "3\tstuckAndAbort";
+		return asString() + "5\tentered link";
 	}
 
 }

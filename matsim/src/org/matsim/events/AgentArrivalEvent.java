@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventActivityEnd.java
+ * AgentArrivalEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,32 +21,32 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventActivityEnd extends ActEvent {
+public class AgentArrivalEvent extends AgentEvent {
 
-	public EventActivityEnd(double time, String agentId, Person agent, Link link, Act act) {
-		super(time, agentId, agent, link, act);
+	public AgentArrivalEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
+		super(time, agentId, legId, linkId, agent, leg, link);
 	}
 
-	public EventActivityEnd(double time, String agentId, String linkId, int actId, String acttype) {
-		super(time, agentId, linkId, actId, acttype);
+	public AgentArrivalEvent(double time, String agentId, int legId, String linkId) {
+		super(time, agentId, legId, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(8));
-		impl.addAttribute("","","type", "", "actend");
+		//impl.addAttribute("","","Flag", "", Integer.toString(0));
+		impl.addAttribute("","","type", "", "arrival");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "8\tactend"+ " " + this.acttype;
+		return asString() + "0\tarrival";
 	}
 
 }

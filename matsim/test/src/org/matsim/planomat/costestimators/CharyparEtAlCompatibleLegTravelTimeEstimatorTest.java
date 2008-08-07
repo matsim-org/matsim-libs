@@ -22,9 +22,9 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
 import org.matsim.population.Route;
@@ -79,8 +79,8 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		// next, a departure delay of 5s at the origin link is added
 		departureTime = Time.parseTime("06:05:00");
 		double depDelay = Time.parseTime("00:00:05");
-		EventAgentDeparture depEvent = new EventAgentDeparture(departureTime, TEST_PERSON_ID, 0, originAct.getLink().getId().toString());
-		EventLinkLeave leaveEvent = new EventLinkLeave(departureTime + depDelay, TEST_PERSON_ID, 0, originAct.getLink().getId().toString());
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(departureTime, TEST_PERSON_ID, 0, originAct.getLink().getId().toString());
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, TEST_PERSON_ID, 0, originAct.getLink().getId().toString());
 
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -111,13 +111,13 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		BasicEvent event = null;
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < links.length; linkCnt++) {
-				event = new EventLinkEnter(
+				event = new LinkEnterEnter(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]), 
 						TEST_PERSON_ID, 
 						TEST_LEG_NR, 
 						links[linkCnt].getId().toString());
 				events.processEvent(event);
-				event = new EventLinkLeave(
+				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]), 
 						TEST_PERSON_ID, 
 						TEST_LEG_NR, 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventLinkEnter.java
+ * AgentWait2LinkEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,31 +21,32 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventLinkEnter extends LinkEvent {
+public class AgentWait2LinkEvent extends AgentEvent {
 
-	public EventLinkEnter(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
-		super(time, agentId, linkId, agent, legNumber, link);
+	public AgentWait2LinkEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
+		super(time, agentId, legId, linkId, agent, leg, link);
 	}
 
-	public EventLinkEnter(final double time, final String agentId, final int legNumber, final String linkId) {
-		super(time, agentId, legNumber, linkId);
+	public AgentWait2LinkEvent(double time, String aId, int legId, String linkId) {
+		super(time, aId, legId, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(5));
-		impl.addAttribute("","","type", "", "entered link");
+		//impl.addAttribute("","","Flag", "", Integer.toString(4));
+		impl.addAttribute("","","type", "", "wait2link");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "5\tentered link";
+		return asString() + "4\twait2link";
 	}
 
 }

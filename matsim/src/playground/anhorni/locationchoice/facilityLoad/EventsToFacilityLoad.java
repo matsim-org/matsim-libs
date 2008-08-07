@@ -23,8 +23,8 @@ package playground.anhorni.locationchoice.facilityLoad;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.facilities.Facilities;
@@ -53,14 +53,14 @@ public class EventsToFacilityLoad implements EventHandlerActivityStartI, EventHa
 		}
 	}
 
-	public void handleEvent(final EventActivityStart event) {
+	public void handleEvent(final ActStartEvent event) {
 		Facility facility = event.act.getFacility();		
 		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
 			facility.addArrival(event.time, this.scaleNumberOfPersons);
 		}
 	}
 
-	public void handleEvent(final EventActivityEnd event) {
+	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
 		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
 			facility.addDeparture(event.time);

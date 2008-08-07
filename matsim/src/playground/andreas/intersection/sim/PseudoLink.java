@@ -7,10 +7,10 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
@@ -151,7 +151,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 			if (veh.getDestinationLink().getId() == this.realLink.getLink().getId()) {
 
-				QSim.getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+				QSim.getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 				veh.reachActivity(now, this.realLink);
 				this.storageQueue.poll();
@@ -290,7 +290,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 			veh.leaveActivity(now);
 
-			QSim.getEvents().processEvent(new EventAgentDeparture(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+			QSim.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 					this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			Leg actLeg = veh.getCurrentLeg();
@@ -316,7 +316,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 			addToFlowQueue(veh, now);
 
-			QSim.getEvents().processEvent(new EventAgentWait2Link(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
+			QSim.getEvents().processEvent(new AgentWait2LinkEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(), this.realLink.getLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.realLink.getLink()));
 
 			this.parkToLinkQueue.poll(); // remove the just handled vehicle from parkToLinkQueue
 		}
@@ -374,7 +374,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		double now = SimulationTimer.getTime();
 		QVehicle veh = this.flowQueue.poll();
 
-		QSim.getEvents().processEvent(new EventLinkLeave(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+		QSim.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.realLink.getLink().getId().toString(), veh.getDriver(), this.realLink.getLink()));
 
 		return veh;

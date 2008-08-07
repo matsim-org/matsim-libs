@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.events.AgentEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -91,7 +91,7 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		this(300, network, plans);
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		tmpDptTimes.put(event.agentId, event.time);
 	}
 
@@ -99,11 +99,11 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		tmpDptTimes.clear();
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		handleEventIntern(event);
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		handleEventIntern(event);
 	}
 

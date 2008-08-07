@@ -22,10 +22,10 @@ package org.matsim.trafficmonitoring;
 
 import java.util.HashMap;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -96,12 +96,12 @@ EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.time);
 		this.enterEvents.put(event.agentId, e);
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
@@ -112,14 +112,14 @@ EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
 		}
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!
 		this.enterEvents.remove(event.agentId);
 	}
 
-	public void handleEvent(EventAgentStuck event) {
+	public void handleEvent(AgentStuckEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);

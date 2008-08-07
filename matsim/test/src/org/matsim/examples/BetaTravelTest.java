@@ -33,10 +33,10 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -167,7 +167,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.leaveTimes.clear();
 		}
 
-		public void handleEvent(final EventLinkEnter event) {
+		public void handleEvent(final LinkEnterEnter event) {
 			if (event.linkId.equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.time));
 				if (event.time < this.firstCarEnter) this.firstCarEnter = event.time;
@@ -175,7 +175,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final EventLinkLeave event) {
+		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.linkId.equals(this.linkId)) {
 				this.leaveTimes.add(Double.valueOf(event.time));
 				if (event.time < this.firstCarLeave) this.firstCarLeave = event.time;
@@ -474,13 +474,13 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.arrTimes = new double[popSize];
 		}
 
-		public void handleEvent(final EventAgentDeparture event) {
+		public void handleEvent(final AgentDepartureEvent event) {
 			if (event.legId == 0) {
 				this.agentDepTimes.put(event.agentId, Double.valueOf(event.time));
 			}
 		}
 
-		public void handleEvent(final EventAgentArrival event) {
+		public void handleEvent(final AgentArrivalEvent event) {
 			String agentId = event.agentId;
 			Double depTime = this.agentDepTimes.remove(agentId);
 			if (depTime != null) {

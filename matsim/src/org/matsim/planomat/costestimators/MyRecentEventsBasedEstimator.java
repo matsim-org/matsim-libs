@@ -24,9 +24,9 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -106,7 +106,7 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, origin.getId(), destination.getId(), "car"));
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 
 		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId), event.legId);
 
@@ -114,7 +114,7 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.linkId));
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 
 		IdImpl agentId = new IdImpl(event.agentId);
 
@@ -129,7 +129,7 @@ implements LegTravelTimeEstimator, EventHandlerAgentDepartureI, EventHandlerAgen
 		this.legTravelTimeEstimations.put(newLtte, travelTime);
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		// TODO [KM] Auto-generated method stub
 
 	}

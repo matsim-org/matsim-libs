@@ -39,8 +39,8 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.population.Person;
@@ -181,7 +181,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)persons.size();
 	}
 	
-	public void handleEvent(EventAgentWait2Link event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		departures.put(event.agent, event.time);
 	}
 
@@ -190,7 +190,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		tripDurations = new HashMap<Person, Double>();
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		Double time = departures.get(event.agent);
 		if(time != null) {
 			double deltaT = event.time - time;

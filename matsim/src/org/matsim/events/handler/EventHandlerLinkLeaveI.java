@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.LinkLeaveEvent;
 
 public interface EventHandlerLinkLeaveI extends EventHandlerI {
-	public void handleEvent (EventLinkLeave event);
+	public void handleEvent (LinkLeaveEvent event);
 }

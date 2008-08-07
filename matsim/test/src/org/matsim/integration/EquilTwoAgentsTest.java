@@ -24,9 +24,9 @@ import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -88,7 +88,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		private double agentOneScore, agentTwoScore;
 
-		public void handleEvent(final EventLinkEnter e) {
+		public void handleEvent(final LinkEnterEnter e) {
 			// TODO [DG,MR,performance] do not create new IdImpl for every event, but do it once as static members.
 			System.out.println("Enter Link:" + e.linkId + " at Time: " + e.time);
 			if (e.link.getId().equals(new IdImpl("6"))) {
@@ -123,7 +123,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final EventActivityStart e) {
+		public void handleEvent(final ActStartEvent e) {
 			System.out.println("Start Activity " + e.acttype + " : Time: " + Time.writeTime(e.time) + " Agent: " + e.agentId);
 			System.out.println("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()));
 			if (e.agent.getId().equals(new IdImpl("1"))) {
@@ -190,7 +190,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final EventActivityEnd e) {
+		public void handleEvent(final ActEndEvent e) {
 			System.out.println("End Activity " + e.acttype + " : Time: " + Time.writeTime(e.time) + " Agent: " + e.agentId);
 			System.out.println("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()));
 

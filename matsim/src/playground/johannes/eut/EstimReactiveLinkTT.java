@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -75,19 +75,19 @@ public class EstimReactiveLinkTT implements
 		this.linkTTCalculators = new LinkedHashMap<BasicLink, LinkTTCalculator>();
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		increaseCount(event.link, event.agent, event.time);
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		decreaseCount(event.link, event.agent, event.time);
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		decreaseCount(event.link, event.agent, event.time);
 	}
 
-	public void handleEvent(EventAgentWait2Link event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		increaseCount(event.link, event.agent, event.time);
 	}
 

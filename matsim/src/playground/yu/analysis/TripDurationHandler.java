@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.BasicPlan.Type;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -70,11 +70,11 @@ public class TripDurationHandler implements EventHandlerAgentDepartureI,
 		this.plans = plans;
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		tmpDptTimes.put(event.agentId, event.time);
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		double time = event.time;
 		String agentId = event.agentId;
 		Double dptTime = tmpDptTimes.get(agentId);

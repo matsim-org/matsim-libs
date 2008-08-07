@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.utils.io.IOUtils;
@@ -128,12 +128,12 @@ public class DpDurWriter implements EventHandlerAgentDepartureI, EventHandlerAge
 		}
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		String agentId=event.agentId;
 		agentDepTimes.put(agentId, (int) event.time);
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		String agentId=event.agentId;
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = agentDepTimes.remove(agentId);

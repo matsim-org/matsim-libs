@@ -3,8 +3,8 @@ package playground.wrashid.DES;
 import java.util.ArrayList;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -63,7 +63,7 @@ public class EndLegMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.END_LEG)){
-			event=new EventAgentArrival(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
+			event=new AgentArrivalEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
 		}
 		
 		SimulationParameters.events.processEvent(event);

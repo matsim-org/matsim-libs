@@ -33,9 +33,9 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -170,14 +170,14 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final EventAgentArrival arrival) {
+	public void handleEvent(final AgentArrivalEvent arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.linkId);
 		if (sc != null)
 			sc.removeTmpEnterTime(arrival.agentId);
 	}
 
 	@Override
-	public void handleEvent(final EventLinkEnter enter) {
+	public void handleEvent(final LinkEnterEnter enter) {
 		String linkId = enter.linkId;
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
@@ -192,7 +192,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final EventLinkLeave leave) {
+	public void handleEvent(final LinkLeaveEvent leave) {
 		double time = leave.time;
 		int timeBin = getBinIdx(time);
 		String linkId = leave.linkId;

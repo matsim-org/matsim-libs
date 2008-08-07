@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -59,7 +59,7 @@ public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerA
 		this.legCounters.clear();
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		IdImpl id = new IdImpl(event.agentId);
 		Integer counter = this.legCounters.get(id);
 		if (counter == null) {
@@ -70,19 +70,19 @@ public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerA
 		this.legCounters.put(id, Integer.valueOf(event.legId));
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		setLegNumber(event);
 	}
 
-	public void handleEvent(final EventAgentWait2Link event) {
+	public void handleEvent(final AgentWait2LinkEvent event) {
 		setLegNumber(event);
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		setLegNumber(event);
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		Integer counter = this.legCounters.get(new IdImpl(event.agentId));
 		if (counter == null) {
 			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");
@@ -91,7 +91,7 @@ public class CalcLegNumber implements EventHandlerAgentDepartureI, EventHandlerA
 		event.legId = counter.intValue();
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		Integer counter = this.legCounters.get(new IdImpl(event.agentId));
 		if (counter == null) {
 			log.warn("Cannot find leg counter for agent " + event.agentId + " for event at time " + event.time + ". Most likely, a departure-event is missing for this agent.");

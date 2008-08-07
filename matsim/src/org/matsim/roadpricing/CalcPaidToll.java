@@ -23,8 +23,8 @@ package org.matsim.roadpricing;
 import java.util.TreeMap;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.network.Link;
@@ -66,7 +66,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 		}
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		Link link = event.link;
 		if (link == null) {
 			link = (Link) this.network.getLocation(event.linkId);
@@ -74,7 +74,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 		this.handler.handleEvent(event, link);
 	}
 
-	public void handleEvent(final EventAgentWait2Link event) {
+	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = event.link;
 		if (link == null) {
 			link = (Link) this.network.getLocation(event.linkId);
@@ -140,7 +140,7 @@ public class CalcPaidToll implements EventHandlerLinkEnterI, EventHandlerAgentWa
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicEvent event, final Link link) {
-			if (event instanceof EventAgentWait2Link) {
+			if (event instanceof AgentWait2LinkEvent) {
 				/* we do not handle wait2link-events for distance toll, because the agent
 				 * must not pay twice for this link, and he (likely) paid already when
 				 * arriving at this link.  */

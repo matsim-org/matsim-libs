@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventAgentDeparture.java
+ * LinkLeaveEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,32 +21,30 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventAgentDeparture extends AgentEvent {
+public class LinkLeaveEvent extends LinkEvent {
 
-	public EventAgentDeparture(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
-		super(time, agentId, legId, linkId, agent, leg, link);
+	public LinkLeaveEvent(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
+		super(time, agentId, linkId, agent, legNumber, link);
 	}
 
-	public EventAgentDeparture(double time, String agentId, int legId, String linkId) {
-		super(time, agentId, legId, linkId);
+	public LinkLeaveEvent(final double time, final String agentId, final int legNumber, final String linkId) {
+		super(time, agentId, legNumber, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(6));
-		impl.addAttribute("","","type", "", "departure");
+		impl.addAttribute("","","type", "", "left link");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "6\tdeparture";
+		return asString() + "2\tleft link";
 	}
 
 }

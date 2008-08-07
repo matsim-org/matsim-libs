@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.LinkEnterEnter;
 
 public interface EventHandlerLinkEnterI extends EventHandlerI {
-	public void handleEvent (EventLinkEnter event);
+	public void handleEvent (LinkEnterEnter event);
 }

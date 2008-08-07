@@ -31,7 +31,7 @@ import java.util.TreeMap;
 
 import javax.swing.JFrame;
 
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -180,7 +180,7 @@ public class LinkSetRendererStuck extends RendererA {
 
 	private class StuckEventCollector implements EventHandlerAgentStuckI {
 
-		public void handleEvent(final EventAgentStuck event) {
+		public void handleEvent(final AgentStuckEvent event) {
 			ArrayList<Double> times = LinkSetRendererStuck.this.stuckTimes.get(event.linkId);
 			if (times == null) {
 				times = new ArrayList<Double>(50);

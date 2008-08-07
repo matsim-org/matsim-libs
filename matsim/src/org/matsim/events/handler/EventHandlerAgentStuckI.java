@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentStuckEvent;
 
 public interface EventHandlerAgentStuckI extends EventHandlerI {
-	public void handleEvent (EventAgentStuck event);
+	public void handleEvent (AgentStuckEvent event);
 }

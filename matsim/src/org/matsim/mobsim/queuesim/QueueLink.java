@@ -29,12 +29,12 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -223,7 +223,7 @@ public class QueueLink {
 
 	private void processVehicleArrival(final double now, final Vehicle veh) {
 		QueueSimulation.getEvents().processEvent(
-				new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+				new AgentArrivalEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.link));
 		// Need to inform the veh that it now reached its destination.
 		veh.reachActivity(now, this);
@@ -248,7 +248,7 @@ public class QueueLink {
 
 			// Generate departure event
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentDeparture(now, veh.getDriver().getId().toString(), veh
+					new AgentDepartureEvent(now, veh.getDriver().getId().toString(), veh
 							.getCurrentLegNumber(), this.link.getId().toString(), veh.getDriver(), veh
 							.getCurrentLeg(), this.link));
 
@@ -296,7 +296,7 @@ public class QueueLink {
 			}
 			addToBuffer(veh, now);
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentWait2Link(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					new AgentWait2LinkEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), this.link));
 		}
 	}
@@ -414,7 +414,7 @@ public class QueueLink {
 		this.vehQueue.add(veh);
 		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(now)));
 		QueueSimulation.getEvents().processEvent(
-				new EventLinkEnter(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+				new LinkEnterEnter(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						this.link.getId().toString(), veh.getDriver(), this.link));
 	}
 
@@ -442,7 +442,7 @@ public class QueueLink {
 			v2.setLastMovedTime(now);
 		}
 
-		QueueSimulation.getEvents().processEvent(new EventLinkLeave(now, veh.getDriver().getId().toString(),
+		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId().toString(),
 				veh.getCurrentLegNumber(), this.link.getId().toString(), veh.getDriver(), this.link));
 
 		return veh;
@@ -735,7 +735,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.parkingList) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.parkingList.size());
@@ -744,7 +744,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.waitingList.size());
@@ -753,7 +753,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
@@ -762,7 +762,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+					new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 							this.link.getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 		}
 		Simulation.decLiving(this.buffer.size());

@@ -1,6 +1,6 @@
 package org.matsim.socialnetworks.algorithms;
 
-import org.matsim.events.EventAgentArrival;
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.population.Act;
 
@@ -69,7 +69,7 @@ public class CompareActsEvents implements EventHandlerAgentArrivalI {
 		return overlap;
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		// TODO Auto-generated method stub
 		this.starttime=event.time;
 	}

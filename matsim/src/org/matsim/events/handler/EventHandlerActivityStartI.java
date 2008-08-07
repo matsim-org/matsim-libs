@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventActivityStart;
+import org.matsim.events.ActStartEvent;
 
 public interface EventHandlerActivityStartI extends EventHandlerI {
-	public void handleEvent (EventActivityStart event);
+	public void handleEvent (ActStartEvent event);
 }

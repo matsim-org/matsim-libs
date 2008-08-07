@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventActivityEnd;
+import org.matsim.events.ActEndEvent;
 
 public interface EventHandlerActivityEndI extends EventHandlerI {
-	public void handleEvent (EventActivityEnd event);
+	public void handleEvent (ActEndEvent event);
 }

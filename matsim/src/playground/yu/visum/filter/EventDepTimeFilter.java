@@ -4,7 +4,7 @@
 package playground.yu.visum.filter;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -18,7 +18,7 @@ public class EventDepTimeFilter extends EventFilterA {
 
 	@Override
 	public boolean judge(BasicEvent event) {
-		if (event.getClass().equals(EventAgentDeparture.class)) {
+		if (event.getClass().equals(AgentDepartureEvent.class)) {
 			return (event.time<criterionMAX)&&(event.time>criterionMIN);
 		}
 		return isResult();

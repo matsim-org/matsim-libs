@@ -31,8 +31,8 @@ import java.util.PriorityQueue;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -257,7 +257,7 @@ public class QueueSimulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Vehicle veh : teleportationList) {
-			new EventAgentStuck(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+			new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 					veh.getCurrentLink().getId().toString(), veh.getDriver(),
 					veh.getCurrentLeg(), veh.getCurrentLink());
 		}
@@ -353,7 +353,7 @@ public class QueueSimulation {
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new EventAgentArrival(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
+				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
 						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
 	  			veh.reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 

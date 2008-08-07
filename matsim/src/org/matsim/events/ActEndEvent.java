@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventLinkLeave.java
+ * ActEndEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,30 +21,32 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventLinkLeave extends LinkEvent {
+public class ActEndEvent extends ActEvent {
 
-	public EventLinkLeave(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
-		super(time, agentId, linkId, agent, legNumber, link);
+	public ActEndEvent(double time, String agentId, Person agent, Link link, Act act) {
+		super(time, agentId, agent, link, act);
 	}
 
-	public EventLinkLeave(final double time, final String agentId, final int legNumber, final String linkId) {
-		super(time, agentId, legNumber, linkId);
+	public ActEndEvent(double time, String agentId, String linkId, int actId, String acttype) {
+		super(time, agentId, linkId, actId, acttype);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		impl.addAttribute("","","type", "", "left link");
+		//impl.addAttribute("","","Flag", "", Integer.toString(8));
+		impl.addAttribute("","","type", "", "actend");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "2\tleft link";
+		return asString() + "8\tactend"+ " " + this.acttype;
 	}
 
 }

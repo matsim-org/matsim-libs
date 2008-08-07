@@ -234,29 +234,29 @@ public class Events {
 		if (klass == BasicEvent.class) {
 			((BasicEventHandlerI)handler).handleEvent(ev);
 			return true;
-		} else if (klass == EventLinkLeave.class) {
-			((EventHandlerLinkLeaveI)handler).handleEvent((EventLinkLeave)ev);
+		} else if (klass == LinkLeaveEvent.class) {
+			((EventHandlerLinkLeaveI)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
-		} else if (klass == EventLinkEnter.class) {
-			((EventHandlerLinkEnterI)handler).handleEvent((EventLinkEnter)ev);
+		} else if (klass == LinkEnterEnter.class) {
+			((EventHandlerLinkEnterI)handler).handleEvent((LinkEnterEnter)ev);
 			return true;
-		} else if (klass == EventActivityEnd.class) {
-			((EventHandlerActivityEndI)handler).handleEvent((EventActivityEnd)ev);
+		} else if (klass == ActEndEvent.class) {
+			((EventHandlerActivityEndI)handler).handleEvent((ActEndEvent)ev);
 			return true;
-		} else if (klass == EventActivityStart.class) {
-			((EventHandlerActivityStartI)handler).handleEvent((EventActivityStart)ev);
+		} else if (klass == ActStartEvent.class) {
+			((EventHandlerActivityStartI)handler).handleEvent((ActStartEvent)ev);
 			return true;
-		} else if (klass == EventAgentArrival.class) {
-			((EventHandlerAgentArrivalI)handler).handleEvent((EventAgentArrival)ev);
+		} else if (klass == AgentArrivalEvent.class) {
+			((EventHandlerAgentArrivalI)handler).handleEvent((AgentArrivalEvent)ev);
 			return true;
-		} else if (klass == EventAgentDeparture.class) {
-			((EventHandlerAgentDepartureI)handler).handleEvent((EventAgentDeparture)ev);
+		} else if (klass == AgentDepartureEvent.class) {
+			((EventHandlerAgentDepartureI)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
-		} else if (klass == EventAgentStuck.class) {
-			((EventHandlerAgentStuckI)handler).handleEvent((EventAgentStuck)ev);
+		} else if (klass == AgentStuckEvent.class) {
+			((EventHandlerAgentStuckI)handler).handleEvent((AgentStuckEvent)ev);
 			return true;
-		} else if (klass == EventAgentWait2Link.class) {
-			((EventHandlerAgentWait2LinkI)handler).handleEvent((EventAgentWait2Link)ev);
+		} else if (klass == AgentWait2LinkEvent.class) {
+			((EventHandlerAgentWait2LinkI)handler).handleEvent((AgentWait2LinkEvent)ev);
 			return true;
 		}
 		return false;

@@ -23,8 +23,8 @@ package org.matsim.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.matrices.Entry;
@@ -57,7 +57,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 	// Implementation of EventAlgorithmI
 	//////////////////////////////////////////////////////////////////////
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		double time = event.time;
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
@@ -70,7 +70,7 @@ public class CalcODMatrices implements EventHandlerAgentArrivalI, EventHandlerAg
 		}
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		double time = event.time;
 		if (time < this.minTime) {
 			return;

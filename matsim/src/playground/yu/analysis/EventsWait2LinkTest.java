@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
@@ -50,7 +50,7 @@ public class EventsWait2LinkTest {
 			}
 		}
 
-		public void handleEvent(final EventAgentWait2Link event) {
+		public void handleEvent(final AgentWait2LinkEvent event) {
 			try {
 				writer.write(event.agentId + "\t" + event.linkId + "\n");
 				writer.flush();

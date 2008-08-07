@@ -29,12 +29,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -95,32 +95,32 @@ public class GregorsSnapshotGenerator implements EventHandlerAgentDepartureI, Ev
 		return this.snapshotWriters.remove(writer);
 	}
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).departure(getEventAgent(event));
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).arrival(getEventAgent(event));
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).enter(getEventAgent(event));
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).leave(getEventAgent(event));
 	}
 
-	public void handleEvent(final EventAgentWait2Link event) {
+	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).wait2link(getEventAgent(event));
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.time);
 		this.eventLinks.get(event.linkId).stuck(getEventAgent(event));
 	}

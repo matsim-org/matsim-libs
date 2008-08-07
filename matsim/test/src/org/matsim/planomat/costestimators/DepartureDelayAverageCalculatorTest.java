@@ -22,8 +22,8 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
@@ -66,8 +66,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 		
 		// this gives a delay of 36s
-		EventAgentDeparture depEvent = new EventAgentDeparture(6.01 * 3600, PERSON_ID, 0, LINK_ID);
-		EventLinkLeave leaveEvent = new EventLinkLeave(6.02 * 3600, PERSON_ID, 0, LINK_ID);
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, 0, LINK_ID);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, 0, LINK_ID);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -77,8 +77,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		assertEquals(depDelay, 36.0);
 		
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new EventAgentDeparture(6.02 * 3600, PERSON_ID, 0, LINK_ID);
-		leaveEvent = new EventLinkLeave(6.04 * 3600, PERSON_ID, 0, LINK_ID);
+		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, 0, LINK_ID);
+		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, 0, LINK_ID);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);

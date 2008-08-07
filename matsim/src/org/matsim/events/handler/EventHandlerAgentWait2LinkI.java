@@ -20,8 +20,8 @@
 
 package org.matsim.events.handler;
 
-import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.AgentWait2LinkEvent;
 
 public interface EventHandlerAgentWait2LinkI extends EventHandlerI {
-	public void handleEvent (EventAgentWait2Link event);
+	public void handleEvent (AgentWait2LinkEvent event);
 }

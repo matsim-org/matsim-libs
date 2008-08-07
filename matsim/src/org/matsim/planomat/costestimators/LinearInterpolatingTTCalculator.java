@@ -22,9 +22,9 @@ package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
@@ -212,12 +212,12 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		resetTravelTimes();
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		this.enterEvents.put(e, event.time);
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = new EnterEvent(event.linkId, event.agentId);
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
@@ -233,7 +233,7 @@ implements EventHandlerLinkEnterI, EventHandlerLinkLeaveI, EventHandlerAgentArri
 		}
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!

@@ -36,9 +36,9 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.events.AgentEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
@@ -119,17 +119,17 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 
 	/* Implementation of eventhandler-Interfaces */
 
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		internHandleEvent(event, this.dep, this.carDep, this.ptDep,
 				this.otherDep);
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		internHandleEvent(event, this.arr, this.carArr, this.ptArr,
 				this.otherArr);
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		internHandleEvent(event, this.stuck, this.carStuck, null,
 				this.otherStuck);
 	}

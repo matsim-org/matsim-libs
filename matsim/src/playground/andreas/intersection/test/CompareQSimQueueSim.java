@@ -7,13 +7,13 @@ import java.io.IOException;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
@@ -78,7 +78,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		
   	}  	
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -87,7 +87,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		}
 	}	
 	
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -101,7 +101,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 	public void reset(int iteration) {
 	}
 
-	public void handleEvent(EventActivityEnd event) {
+	public void handleEvent(ActEndEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -111,7 +111,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		
 	}
 
-	public void handleEvent(EventActivityStart event) {
+	public void handleEvent(ActStartEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -121,7 +121,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -131,7 +131,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();
@@ -141,7 +141,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	EventHandlerL
 		
 	}
 
-	public void handleEvent(EventAgentWait2Link event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		try {
 			this.writer.write(event.toString());
 			this.writer.newLine();

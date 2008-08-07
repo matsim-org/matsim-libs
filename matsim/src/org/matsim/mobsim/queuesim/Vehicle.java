@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
@@ -291,7 +291,7 @@ public class Vehicle implements DrawableAgentI {
 	 */
 	protected void leaveActivity(final double now) {
 		Act act = (Act)this.actslegs.get(this.nextActivity - 2);
-		QueueSimulation.getEvents().processEvent(new EventActivityEnd(now, this.driverId, this.driver, this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.driverId, this.driver, this.currentLink, act));
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class Vehicle implements DrawableAgentI {
 	 protected void reachActivity(final double now, QueueLink currentQueueLink) {
 		Act act = (Act)this.actslegs.get(this.nextActivity);
 		// no actStartEvent for first act.
-		QueueSimulation.getEvents().processEvent(new EventActivityStart(now, this.driverId, this.driver, this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.driverId, this.driver, this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue
 		if (!initNextLeg()) {
 			Simulation.decLiving();

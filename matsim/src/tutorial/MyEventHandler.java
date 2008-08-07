@@ -1,9 +1,9 @@
 package tutorial;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -35,19 +35,19 @@ public class MyEventHandler implements EventHandlerLinkEnterI,
 		this.travelTime = 0.0;
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		this.travelTime -= event.time;
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		this.travelTime += event.time;
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		this.travelTime += event.time;
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		this.travelTime -= event.time;
 	}
 }

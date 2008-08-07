@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -308,7 +308,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 	}
 
 	@Override
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 
 		// Must be done before super.handleEvent as that removes entries
 		if (this.ttMeasured.containsKey(event.linkId)) {
@@ -329,7 +329,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 	}
 
 	@Override
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
 		if (this.ttMeasured.containsKey(event.linkId)
@@ -355,7 +355,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		super.handleEvent(event);
 	}
 
-	private void updateFlow(int flowResolution, EventLinkLeave event) {
+	private void updateFlow(int flowResolution, LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
@@ -399,7 +399,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		}
 	}
 
-	private void updateFlow(double flowUpdateTime, EventLinkLeave event) {
+	private void updateFlow(double flowUpdateTime, LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
@@ -452,12 +452,12 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 	}
 
 	@Override
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		super.handleEvent(event);
 	}
 
 	@Override
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		super.handleEvent(event);
 	}
 

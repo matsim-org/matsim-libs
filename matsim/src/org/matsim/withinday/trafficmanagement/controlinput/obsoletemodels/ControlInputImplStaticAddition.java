@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -161,7 +161,7 @@ public class ControlInputImplStaticAddition extends AbstractControlInputImpl
 	}
 
 	@Override
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 
 		if (this.ttMeasured.containsKey(event.linkId)) {
 			this.enterLinkEvents.put(event.agentId, event.time);
@@ -171,7 +171,7 @@ public class ControlInputImplStaticAddition extends AbstractControlInputImpl
 	}
 
 	@Override
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 
 		if (this.ttMeasured.containsKey(event.linkId)) {
 			Double enterTime = this.enterLinkEvents.remove(event.agentId);
@@ -258,12 +258,12 @@ public class ControlInputImplStaticAddition extends AbstractControlInputImpl
 	}
 
 	@Override
-	public void handleEvent(final EventAgentDeparture event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		super.handleEvent(event);
 	}
 
 	@Override
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		super.handleEvent(event);
 	}
 

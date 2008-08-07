@@ -26,8 +26,8 @@ import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -88,7 +88,7 @@ public class TRBAnalysis implements EventHandlerAgentDepartureI, EventHandlerAge
 		}
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		this.agentDepartures.put(event.agentId, Double.valueOf(event.time));
 	}
 
@@ -96,7 +96,7 @@ public class TRBAnalysis implements EventHandlerAgentDepartureI, EventHandlerAge
 		// nothing to do
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		double depTime = this.agentDepartures.remove(event.agentId).doubleValue();
 		double travTime = event.time - depTime;
 		int slot = getTimeSlot(depTime);

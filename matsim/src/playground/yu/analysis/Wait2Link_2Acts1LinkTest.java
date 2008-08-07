@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.events.EventAgentWait2Link;
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandlerAgentWait2LinkI;
@@ -157,7 +157,7 @@ public class Wait2Link_2Acts1LinkTest {
 			overlapCount = 0;
 		}
 
-		public void handleEvent(final EventAgentWait2Link event) {
+		public void handleEvent(final AgentWait2LinkEvent event) {
 			for (AgentLinkPair alp : agentLinksPairs)
 				if (alp.agentId.equals(event.agentId)
 						&& alp.linkId.equals(event.linkId)

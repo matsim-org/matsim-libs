@@ -33,11 +33,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.BasicEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 
 public class EventsReaderDEQv1 {
@@ -158,19 +158,19 @@ public class EventsReaderDEQv1 {
 
 		switch (flag) {
 			case 2:
-				event = new EventLinkLeave(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new LinkLeaveEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 5:
-				event = new EventLinkEnter(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new LinkEnterEnter(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 4:
-				event = new EventAgentWait2Link(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 6:
-				event = new EventAgentDeparture(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentDepartureEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 			case 0:
-				event = new EventAgentArrival(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentArrivalEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
 				break;
 		}
 		return event;

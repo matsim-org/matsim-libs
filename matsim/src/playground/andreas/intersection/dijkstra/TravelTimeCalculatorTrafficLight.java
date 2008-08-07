@@ -2,9 +2,9 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.HashMap;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -62,7 +62,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 
 		if (event.link == null) {
 			event.link = (Link)this.network.getLocation(event.linkId);
@@ -81,7 +81,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	}
 
 	@Override
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 //		EnterEvent e = this.enterEvents.remove(event.agentId);
 //		if ((e != null) && e.linkId.equals(event.linkId)) {
 //			double timediff = event.time - e.time;
@@ -93,7 +93,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	}
 
 	@Override
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!

@@ -30,12 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.events.EventActivityEnd;
-import org.matsim.events.EventActivityStart;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventAgentWait2Link;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerActivityEndI;
 import org.matsim.events.handler.EventHandlerActivityStartI;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
@@ -237,7 +237,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
 	@Override
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		super.handleEvent(event);
 
 		// handle flows on outLinks
@@ -256,7 +256,7 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 	}
 
 	@Override
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		super.handleEvent(event);
 
 		// handle flows on inLinks
@@ -323,19 +323,19 @@ public class ControlInputImplSBNoise extends AbstractControlInputImpl implements
 		this.writer.close();
 	}
 
-	public void handleEvent(final EventAgentWait2Link event) {
+	public void handleEvent(final AgentWait2LinkEvent event) {
 		// TODO Auto-generated method stub
 	}
 
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		// TODO Auto-generated method stub
 	}
 
-	public void handleEvent(final EventActivityStart event) {
+	public void handleEvent(final ActStartEvent event) {
 		// TODO Auto-generated method stub
 	}
 
-	public void handleEvent(final EventActivityEnd event) {
+	public void handleEvent(final ActEndEvent event) {
 		// TODO Auto-generated method stub
 	}
 

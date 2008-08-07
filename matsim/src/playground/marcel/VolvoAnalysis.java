@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentDeparture;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -99,7 +99,7 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		return (int) seconds / (60 * 60 * 24 / TIMESTEPS);
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		Link link = event.link;
 		int hour = getTimestep(event.time);
 		if (link == null) {
@@ -118,7 +118,7 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		this.depTimes.put(event.agentId, Double.valueOf(event.time));
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Double depTime = this.depTimes.put(event.agentId, Double.valueOf(-1.0));
 		int hour = getTimestep(event.time);
 		if (depTime == null)
@@ -141,7 +141,7 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		}
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		Double depTime = this.depTimes.put(event.agentId, Double.valueOf(-1.0));
 		int hour = getTimestep(event.time);
 		if (depTime == null)
@@ -164,7 +164,7 @@ public class VolvoAnalysis implements EventHandlerLinkEnterI,
 		}
 	}
 
-	public void handleEvent(EventAgentDeparture event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		Link link = event.link;
 		int hour = getTimestep(event.time);
 		if (link == null) {

@@ -20,7 +20,7 @@
 
 package playground.david;
 
-import org.matsim.events.EventAgentStuck;
+import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
@@ -41,7 +41,7 @@ class StuckAndAbortCounter implements EventHandlerAgentStuckI
 {
 
 	public int stuckvehs = 0;
-	public void handleEvent(final EventAgentStuck event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		this.stuckvehs++;
 	}
 

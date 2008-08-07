@@ -23,9 +23,9 @@ package org.matsim.trafficmonitoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -54,7 +54,7 @@ EventHandlerAgentArrivalI {
 		events.addHandler(instance);
 	}
 
-	public void handleEvent(final EventLinkEnter event) {
+	public void handleEvent(final LinkEnterEnter event) {
 		this.enterEvents.put(event.agentId, Double.valueOf(event.time));
 	}
 
@@ -63,14 +63,14 @@ EventHandlerAgentArrivalI {
 		this.travelTimes.clear();
 	}
 
-	public void handleEvent(final EventLinkLeave event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		Double startTime = this.enterEvents.get(event.agentId);
 		if (startTime != null) {
 			this.travelTimes.put(event.linkId, event.time - startTime.doubleValue());
 		}
 	}
 
-	public void handleEvent(final EventAgentArrival event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.enterEvents.remove(event.agentId);
 	}
 

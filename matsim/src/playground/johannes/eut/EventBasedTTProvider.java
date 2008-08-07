@@ -9,9 +9,9 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventLinkEnter;
-import org.matsim.events.EventLinkLeave;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.LinkEnterEnter;
+import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
@@ -68,14 +68,14 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 	// instance methods
 	// =====================================================================
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
 		this.enterEvents.put(key, event.time);
 
 	}
 
-	public void handleEvent(EventLinkLeave event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.linkId,
 				event.agentId);
 		Double t1 = this.enterEvents.remove(key);
@@ -90,7 +90,7 @@ public class EventBasedTTProvider implements TravelTimeI, EventHandlerLinkEnterI
 		}
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		/*
 		 * Arrival event does not count as travel time!
 		 */

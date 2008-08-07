@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventActivityStart.java
+ * ActStartEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,13 +26,13 @@ import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventActivityStart extends ActEvent {
+public class ActStartEvent extends ActEvent {
 
-	public EventActivityStart(double time, String agentId, Person agent, Link link, Act act) {
+	public ActStartEvent(double time, String agentId, Person agent, Link link, Act act) {
 		super(time, agentId, agent, link, act);
 	}
 
-	public EventActivityStart(double time, String agentId, String linkId, int actId, String acttype) {
+	public ActStartEvent(double time, String agentId, String linkId, int actId, String acttype) {
 		super(time, agentId, linkId, actId, acttype);
 	}
 

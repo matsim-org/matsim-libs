@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventAgentWait2Link.java
+ * AgentStuckEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,27 +26,27 @@ import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class EventAgentWait2Link extends AgentEvent {
+public class AgentStuckEvent extends AgentEvent {
 
-	public EventAgentWait2Link(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
+	public AgentStuckEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
 		super(time, agentId, legId, linkId, agent, leg, link);
 	}
 
-	public EventAgentWait2Link(double time, String aId, int legId, String linkId) {
-		super(time, aId, legId, linkId);
+	public AgentStuckEvent(double time, String agentId, int legId, String linkId) {
+		super(time, agentId, legId, linkId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(4));
-		impl.addAttribute("","","type", "", "wait2link");
+		//impl.addAttribute("","","Flag", "", Integer.toString(3));
+		impl.addAttribute("","","type", "", "stuckAndAbort");
 		return impl;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "4\twait2link";
+		return asString() + "3\tstuckAndAbort";
 	}
 
 }

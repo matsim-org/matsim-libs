@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.events.AgentEvent;
-import org.matsim.events.EventAgentArrival;
-import org.matsim.events.EventAgentStuck;
-import org.matsim.events.EventLinkEnter;
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.LinkEnterEnter;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
@@ -101,7 +101,7 @@ public class LegDistance implements EventHandlerLinkEnterI,
 		this(300, network);
 	}
 
-	public void handleEvent(EventLinkEnter event) {
+	public void handleEvent(LinkEnterEnter event) {
 		String linkId = event.linkId;
 		Link l = this.network.getLink(linkId);
 		String agentId = event.agentId;
@@ -118,11 +118,11 @@ public class LegDistance implements EventHandlerLinkEnterI,
 		this.distances.put(agentId, distance);
 	}
 
-	public void handleEvent(EventAgentArrival event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		handleEventIntern(event);
 	}
 
-	public void handleEvent(EventAgentStuck event) {
+	public void handleEvent(AgentStuckEvent event) {
 		handleEventIntern(event);
 	}
 

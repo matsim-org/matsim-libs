@@ -63,35 +63,35 @@ public class EventsReaderTXTv1 {
 
 		switch (flag) {
 			case 2:
-				data = new EventLinkLeave(time, agentId, legNumber, linkId);
+				data = new LinkLeaveEvent(time, agentId, legNumber, linkId);
 				break;
 			case 5:
-				data = new EventLinkEnter(time, agentId, legNumber, linkId);
+				data = new LinkEnterEnter(time, agentId, legNumber, linkId);
 				break;
 			case 3:
-				data = new EventAgentStuck(time, agentId, legNumber, linkId);
+				data = new AgentStuckEvent(time, agentId, legNumber, linkId);
 				break;
 			case 4:
-				data = new EventAgentWait2Link(time, agentId, legNumber, linkId);
+				data = new AgentWait2LinkEvent(time, agentId, legNumber, linkId);
 				break;
 			case 6:
-				data = new EventAgentDeparture(time, agentId, legNumber, linkId);
+				data = new AgentDepartureEvent(time, agentId, legNumber, linkId);
 				break;
 			case 0:
-				data = new EventAgentArrival(time, agentId, legNumber, linkId);
+				data = new AgentArrivalEvent(time, agentId, legNumber, linkId);
 				break;
 			case 7:
 				if ("".equals(acttype) && desc != null) {
-					data = new EventActivityStart(time, agentId, linkId, activity, desc.replace("actstart ", ""));
+					data = new ActStartEvent(time, agentId, linkId, activity, desc.replace("actstart ", ""));
 				} else {
-					data = new EventActivityStart(time, agentId, linkId, activity, acttype);
+					data = new ActStartEvent(time, agentId, linkId, activity, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && desc != null) {
-					data = new EventActivityEnd(time, agentId, linkId, activity, desc.replace("actend ", ""));
+					data = new ActEndEvent(time, agentId, linkId, activity, desc.replace("actend ", ""));
 				} else {
-					data = new EventActivityEnd(time, agentId, linkId, activity, acttype);
+					data = new ActEndEvent(time, agentId, linkId, activity, acttype);
 				}
 				break;
 		}
