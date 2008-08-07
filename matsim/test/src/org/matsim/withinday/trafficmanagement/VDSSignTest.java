@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -324,7 +325,7 @@ public class VDSSignTest extends TestCase {
 
 		//the next tests depend on the values returned by Gbl.random.nextDouble()
 		//we have to set the random seed now
-		Gbl.random.setSeed(4711);
+		MatsimRandom.random.setSeed(4711);
 		sign.setControler(new ConstantControler(0.5));
 		//now the sign should show the alternative route for the period of messageHoldTime
 		//with the set random seed

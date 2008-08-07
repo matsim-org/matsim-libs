@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
@@ -65,7 +65,7 @@ public class BDIAgent {
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
 		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
 		this.decisionMaker = new DecisionMaker(analyzers);
-		this.isBDIAgent = Gbl.random.nextDouble() <= 0.9;
+		this.isBDIAgent = MatsimRandom.random.nextDouble() <= 0.9;
 		
 	}
 

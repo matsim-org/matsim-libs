@@ -34,6 +34,7 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
@@ -95,7 +96,7 @@ public class MentalMap {
 			Activity myActivity = null;
 			// If there is already knowledge in the initial plans file, use it
 			if(this.knowledge.getActivities(myAct.getType()).size()>0){
-				myActivity=this.knowledge.getActivities(myAct.getType()).get(Gbl.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
+				myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 				myAct.setFacility(myActivity.getFacility());
 				this.knowledge.addActivity(myActivity);
 //				learnActsActivities(myAct,myActivity);
@@ -110,7 +111,7 @@ public class MentalMap {
 			// Assign a random activity (a facility) on the link to the act
 			// thus giving it in effect a street address
 			while(myActivity==null){
-				int k = Gbl.random.nextInt(facs.length);
+				int k = MatsimRandom.random.nextInt(facs.length);
 				Facility f = (Facility) facs[k];
 				myActivity = f.getActivity(myAct.getType());
 				if(myActivity!=null){

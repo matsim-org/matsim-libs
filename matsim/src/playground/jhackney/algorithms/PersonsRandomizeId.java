@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public class PersonsRandomizeId {
 
@@ -39,12 +39,12 @@ public class PersonsRandomizeId {
 
 	private ArrayList<Integer> makeNewIds(int numPers2, int minId, int maxId) {
 		// TODO Auto-generated method stub
-		int offset=Gbl.random.nextInt(maxId);
+		int offset=MatsimRandom.random.nextInt(maxId);
 		ArrayList<Integer> newIds=new ArrayList<Integer>();
 		for (int i = minId + offset; i<maxId+offset; i++){
 			newIds.add(i);
 		}
-		java.util.Collections.shuffle(newIds, Gbl.random);
+		java.util.Collections.shuffle(newIds, MatsimRandom.random);
 		return newIds;
 	}
 

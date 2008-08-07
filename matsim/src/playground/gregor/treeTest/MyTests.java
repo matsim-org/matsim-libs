@@ -23,7 +23,7 @@ package playground.gregor.treeTest;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public class MyTests {
 
@@ -46,7 +46,7 @@ public class MyTests {
 		
 //		log.info("simulating " + LOOKUPS + " lookups");
 		for (int i = 0; i < LOOKUPS; i++) {
-			 value = Gbl.random.nextDouble();
+			 value = MatsimRandom.random.nextDouble();
 			start = System.currentTimeMillis();
 			double tmp = value;
 			stop = System.currentTimeMillis();
@@ -106,9 +106,9 @@ public class MyTests {
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < 3600*24;) {
 			
-			dbl = Gbl.random.nextDouble();
+			dbl = MatsimRandom.random.nextDouble();
 			map.put(i, dbl);
-			i += Gbl.random.nextInt(3600);
+			i += MatsimRandom.random.nextInt(3600);
 		}
 		long stop = System.currentTimeMillis();
 //		log.info("tree built-up took:" + (stop-start) + " ms. Tree size is:" + map.size() );
@@ -117,7 +117,7 @@ public class MyTests {
 		long time = 0;
 //		log.info("simulating " + LOOKUPS + " lookups");
 		for (int i = 0; i < LOOKUPS; i++) {
-			int query = Gbl.random.nextInt(20);
+			int query = MatsimRandom.random.nextInt(20);
 			start = System.currentTimeMillis();
 			Double value = (Double) map.floorEntry(query).getValue();
 			stop = System.currentTimeMillis();

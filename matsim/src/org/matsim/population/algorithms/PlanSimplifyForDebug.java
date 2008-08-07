@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -148,7 +148,7 @@ public class PlanSimplifyForDebug extends PersonAlgorithm {
 			return;
 
 		Act act = (Act) plan.getActsLegs().get(0);
-		int time = 6 * 3600 + (int) (Gbl.random.nextDouble() * 3600 * 3); // random
+		int time = 6 * 3600 + (int) (MatsimRandom.random.nextDouble() * 3600 * 3); // random
 																			// time
 																			// between
 																			// 6am

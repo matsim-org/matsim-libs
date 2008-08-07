@@ -44,6 +44,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
@@ -100,7 +101,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 		boolean changed = false;
 
 //		Pick a type of facility to replace in this plan according to config settings
-		double rand = Gbl.random.nextDouble();
+		double rand = MatsimRandom.random.nextDouble();
 
 		// TODO JH generalize to any length of array of "facility types" for the future
 		// in which there can be any number of facility/activity types
@@ -137,7 +138,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
+			Act newAct = (Act)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -147,7 +148,7 @@ public class PersonSNSecLocRandomReRoute  implements PlanAlgorithmI{
 //			Pick a random ACTIVITY of this type from knowledge
 
 			List<Activity> actList = k.getActivities(factype);
-			Facility fFromKnowledge = actList.get(Gbl.random.nextInt( actList.size())).getFacility();
+			Facility fFromKnowledge = actList.get(MatsimRandom.random.nextInt( actList.size())).getFacility();
 
 //			And replace the activity in the chain with it (only changes the facility)
 

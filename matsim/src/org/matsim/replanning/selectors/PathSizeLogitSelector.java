@@ -27,6 +27,7 @@ import java.util.List;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -69,7 +70,7 @@ public class PathSizeLogitSelector implements PlanSelectorI {
 		calcPSLWeights(person.getPlans(), wc);
 
 		// choose a random number over interval [0,sumWeights[
-		double selnum = wc.sumWeights*Gbl.random.nextDouble();
+		double selnum = wc.sumWeights*MatsimRandom.random.nextDouble();
 		int idx = 0;
 		for (Plan plan : person.getPlans()) {
 			selnum -= wc.weights[idx];

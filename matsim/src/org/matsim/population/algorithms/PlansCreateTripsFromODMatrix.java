@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.Person;
@@ -80,10 +81,10 @@ public class PlansCreateTripsFromODMatrix {
 						Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 						int endTime = -1;
 
-						double rnd = Gbl.random.nextDouble();
+						double rnd = MatsimRandom.random.nextDouble();
 						for (int i = 0, max = this.timeDistribution.size(); i < max && endTime == -1; i++) {
 							if (rnd <= this.timeDistribution.get(i)) {
-								endTime = i*this.timeBinSize + Gbl.random.nextInt(this.timeBinSize);
+								endTime = i*this.timeBinSize + MatsimRandom.random.nextInt(this.timeBinSize);
 							}
 						}
 

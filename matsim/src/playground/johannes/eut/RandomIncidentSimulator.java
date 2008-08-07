@@ -32,7 +32,7 @@ import java.util.List;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
@@ -101,8 +101,8 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 
 			List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>(links.size() * 2);
 			for (Link link : this.links) {
-				Gbl.random.nextDouble();
-				if ((Gbl.random.nextDouble() < this.incidentProba)
+				MatsimRandom.random.nextDouble();
+				if ((MatsimRandom.random.nextDouble() < this.incidentProba)
 						&& (iteration >= this.startIteration)) {
 
 					NetworkChangeEvent e1 = new NetworkChangeEvent(0);

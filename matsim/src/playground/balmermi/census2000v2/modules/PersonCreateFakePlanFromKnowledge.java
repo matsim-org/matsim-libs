@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
@@ -95,7 +96,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 			else {
 				// home act end time = [6am-8am]
 				double start_time = 0.0;
-				double end_time = 6*3600 + (Gbl.random.nextInt(2*3600));
+				double end_time = 6*3600 + (MatsimRandom.random.nextInt(2*3600));
 				double sum_dur = end_time;
 				int leg_cnt = 0;
 				Act act = p.createAct(home.getType(),home.getFacility().getCenter().getX(),home.getFacility().getCenter().getY(),null,start_time,end_time,end_time,true);
@@ -106,7 +107,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 				if (work!=null) {
 					// work act dur = [7h-8h]
 					start_time = end_time;
-					end_time = end_time + 7*3600 + (Gbl.random.nextInt(1*3600));
+					end_time = end_time + 7*3600 + (MatsimRandom.random.nextInt(1*3600));
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(work.getType(),work.getFacility().getCenter().getX(),work.getFacility().getCenter().getY(),null,start_time,end_time,(end_time-start_time),true);
 					act.setFacility(work.getFacility());
@@ -117,7 +118,7 @@ public class PersonCreateFakePlanFromKnowledge extends PersonAlgorithm {
 				if (educ!=null) {
 					// educ act dur = [4h-6h]
 					start_time = end_time;
-					end_time = end_time + 4*3600 + (Gbl.random.nextInt(2*3600));
+					end_time = end_time + 4*3600 + (MatsimRandom.random.nextInt(2*3600));
 					sum_dur = sum_dur + (end_time-start_time);
 					act = p.createAct(educ.getType(),educ.getFacility().getCenter().getX(),educ.getFacility().getCenter().getY(),null,start_time,end_time,(end_time-start_time),true);
 					act.setFacility(educ.getFacility());

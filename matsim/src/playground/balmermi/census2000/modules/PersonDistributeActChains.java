@@ -23,6 +23,7 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -184,7 +185,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 		DISTR[7][13]=0;
 		DISTR[7][14]=0;
 		DISTR[7][15]=0;
-		Gbl.random.nextDouble();
+		MatsimRandom.random.nextDouble();
 		System.out.println("    done.");
 	}
 
@@ -194,7 +195,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 
 	private final void setChain(Person p, int bitcode) {
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
-		int index = Gbl.random.nextInt(chains.size());
+		int index = MatsimRandom.random.nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
 		Plan plan =  p.createPlan(true);
 		int time_sum = 0;
@@ -250,7 +251,7 @@ public class PersonDistributeActChains extends PersonAlgorithm implements PlanAl
 		else if (age < 66) { row = 4; }
 		else { row = 6; }
 		if (employed) { row++; }
-		double r = Gbl.random.nextDouble();
+		double r = MatsimRandom.random.nextDouble();
 		double dist_sum = 0.0;
 		for (int j=0; j<cols; j++) {
 			dist_sum += DISTR[row][j];

@@ -21,6 +21,7 @@
 package playground.balmermi.census2000.models;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 
 public class ModelLicenseOwnership {
@@ -119,7 +120,7 @@ public class ModelLicenseOwnership {
 		utilities[0] = this.calcYesUtility();
 		utilities[1] = this.calcNoUtility();
 		double license_prob = this.calcLogitProbability(utilities[0],utilities);
-		double r = Gbl.random.nextDouble();
+		double r = MatsimRandom.random.nextDouble();
 		if (r < license_prob) { return true; }
 		else { return false; }
 	}

@@ -22,7 +22,7 @@ package playground.ciarif.modechoice_old;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -88,7 +88,7 @@ public class ModeChoiceAlgorithm extends PersonAlgorithm {
 				}
 
 
-			double r = Gbl.random.nextDouble();
+			double r = MatsimRandom.random.nextDouble();
 			int index = 0;
 			sumOfProbabilities = alternativeProbability[index];
 			// Pick the right transportation mean for the person according to the logit probability
@@ -187,7 +187,7 @@ public class ModeChoiceAlgorithm extends PersonAlgorithm {
 		}
 
 		if (p.getLicense().equals("yes")){
-			double r1 = Gbl.random.nextDouble();
+			double r1 = MatsimRandom.random.nextDouble();
 			if (r1 < 0.34 ) {
 				return 0;
 			}
@@ -324,7 +324,7 @@ public int detectTourMainActivity2 (Person person){
 		 */
 		public double computeUtility(Person p) {
 			double T_DIST = calcDist(p);
-			double r2 = Gbl.random.nextDouble();
+			double r2 = MatsimRandom.random.nextDouble();
 
 			if (r2 <0.44){
 				return B_Const_b * 1 + B_Dist_b * T_DIST;
@@ -392,7 +392,7 @@ public int detectTourMainActivity2 (Person person){
 		public double computeUtility(Person p) {
 			double SEASON_T = getTravelcards(p);
 			double T_DIST = calcDist(p);
-			double r4 = Gbl.random.nextDouble();
+			double r4 = MatsimRandom.random.nextDouble();
 
 			if ( r4 < 0.92) {
 				return B_Dist_pt * T_DIST + B_Season_pt * SEASON_T ;
@@ -445,7 +445,7 @@ public int detectTourMainActivity2 (Person person){
 		 */
 		public double computeUtility(Person p) {
 			double T_DIST = calcDist(p);
-			double r3 = Gbl.random.nextDouble();
+			double r3 = MatsimRandom.random.nextDouble();
 
 			if (r3 <0.44){
 				return B_Const_b * 1 + B_Dist_b * T_DIST;
@@ -507,7 +507,7 @@ public int detectTourMainActivity2 (Person person){
 			double T_DIST = calcDist(p);
 			double SEASON_T = getTravelcards(p);
 			double AGE_SQ = getAge2 (p);
-			double r4 = Gbl.random.nextDouble();
+			double r4 = MatsimRandom.random.nextDouble();
 
 			if ( r4 < 0.92) {
 				return B_Dist_pt * T_DIST + B_Season_pt * SEASON_T + B_Age_sq * AGE_SQ;
@@ -562,7 +562,7 @@ public int detectTourMainActivity2 (Person person){
 		 */
 		public double computeUtility(Person p) {
 			double T_DIST = calcDist(p);
-			double r4 = Gbl.random.nextDouble();
+			double r4 = MatsimRandom.random.nextDouble();
 
 			if (r4 <0.44){
 				return B_Const_b * 1 + B_Dist_b * T_DIST;
@@ -627,7 +627,7 @@ public int detectTourMainActivity2 (Person person){
 			double T_DIST = calcDist(p);
 			double SEASON_T = getTravelcards(p);
 			double AGE_SQ = getAge2 (p);
-			double r4 = Gbl.random.nextDouble();
+			double r4 = MatsimRandom.random.nextDouble();
 			/*int T2 = ;
 			int T3 = ;
 			int T4 = ;

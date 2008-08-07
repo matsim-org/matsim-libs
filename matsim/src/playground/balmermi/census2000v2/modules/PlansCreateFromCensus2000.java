@@ -36,6 +36,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
@@ -140,7 +141,7 @@ public class PlansCreateFromCensus2000 {
 						Activity a = f.getActivity(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
-					Activity act = acts.get(Gbl.random.nextInt(acts.size()));
+					Activity act = acts.get(MatsimRandom.random.nextInt(acts.size()));
 					if (act == null) { Gbl.errorMsg("That should not happen!"); }
 					return act;
 				}
@@ -161,7 +162,7 @@ public class PlansCreateFromCensus2000 {
 				Activity a = f.getActivity(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
-			Activity act = acts.get(Gbl.random.nextInt(acts.size()));
+			Activity act = acts.get(MatsimRandom.random.nextInt(acts.size()));
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
 			return act;
 		}
@@ -205,7 +206,7 @@ public class PlansCreateFromCensus2000 {
 			if (!acts.isEmpty()) {
 				List<Activity> acts_weighted = new ArrayList<Activity>();
 				for (Activity a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
-				Activity act = acts_weighted.get(Gbl.random.nextInt(acts_weighted.size()));
+				Activity act = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
 				if (act == null) { Gbl.errorMsg("That should not happen!"); }
 				p.getKnowledge().addActivity(act); // set activity in given zone
 			}
@@ -227,7 +228,7 @@ public class PlansCreateFromCensus2000 {
 							Activity a = f.getActivity(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
-						Activity act = acts.get(Gbl.random.nextInt(acts.size()));
+						Activity act = acts.get(MatsimRandom.random.nextInt(acts.size()));
 						if (act == null) { Gbl.errorMsg("That should not happen!"); }
 						p.getKnowledge().addActivity(act); // set activity in expanded given zone
 					}
@@ -374,7 +375,7 @@ public class PlansCreateFromCensus2000 {
 			}
 		}
 		log.trace("        pid="+p.getId()+", jobnr="+job+", acts_weighted size="+acts_weighted.size());
-		Activity act_choosen = acts_weighted.get(Gbl.random.nextInt(acts_weighted.size()));
+		Activity act_choosen = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
 		p.getKnowledge().addActivity(act_choosen);
 	}
 	

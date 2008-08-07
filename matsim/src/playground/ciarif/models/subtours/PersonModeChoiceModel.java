@@ -32,6 +32,7 @@ import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -140,13 +141,13 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 //			boolean has_bike = true;
 			boolean has_bike = false;
-			if (Gbl.random.nextDouble() < 0.54) { has_bike = true; }			
+			if (MatsimRandom.random.nextDouble() < 0.54) { has_bike = true; }			
 
 			////////////////////////////////////////////////////////////////////////////////
 			// TODO [balmermi]: Check for antoher probability
 //			boolean ride_possible = true;
 			boolean ride_possible = false;
-			double rd2 = Gbl.random.nextDouble ();
+			double rd2 = MatsimRandom.random.nextDouble ();
 			if (plan.getPerson().hasLicense()) {}
 			else {
 				if (rd2 < 0.54) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
@@ -158,7 +159,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			// TODO [balmermi]: Check for antoher probability
 			//boolean pt = true;			
 			boolean pt = false; // Should be substituted with actual access to pt;
-			double rd3 = Gbl.random.nextDouble (); 
+			double rd3 = MatsimRandom.random.nextDouble (); 
 			if (plan.getPerson().getCarAvail().equals("always")) {
 				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
 				System.out.println("pt = " + pt );
@@ -201,7 +202,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 			
 			Layer muni_layer = Gbl.getWorld().getLayer(Municipalities.MUNICIPALITY);
 			ArrayList<Location> locs = muni_layer.getNearestLocations(sub.getStart_coord());
-			Location loc = locs.get(Gbl.random.nextInt(locs.size()));
+			Location loc = locs.get(MatsimRandom.random.nextInt(locs.size()));
 			Municipality m = municipalities.getMunicipality(new Integer(loc.getId().toString()));
 			int udeg = m.getRegType();
 			//System.out.println ("udeg");

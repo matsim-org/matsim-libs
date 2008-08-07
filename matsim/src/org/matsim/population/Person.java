@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public class Person extends BasicPersonImpl<Plan>{
 
@@ -70,7 +70,7 @@ public class Person extends BasicPersonImpl<Plan>{
 		if (this.plans.size() == 0) {
 			return null;
 		}
-		int index = (int)(Gbl.random.nextDouble()*this.plans.size());
+		int index = (int)(MatsimRandom.random.nextDouble()*this.plans.size());
 		return this.plans.get(index);
 	}
 
@@ -89,7 +89,7 @@ public class Person extends BasicPersonImpl<Plan>{
 		}
 		if (cntUnscored > 0) {
 			// select one of the unscored plans
-			int idxUnscored = Gbl.random.nextInt(cntUnscored);
+			int idxUnscored = MatsimRandom.random.nextInt(cntUnscored);
 			cntUnscored = 0;
 			for (Plan plan : this.plans) {
 				if (plan.hasUndefinedScore()) {

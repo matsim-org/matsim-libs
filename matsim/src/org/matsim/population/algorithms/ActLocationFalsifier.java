@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -60,8 +60,8 @@ public class ActLocationFalsifier extends PersonAlgorithm implements PlanAlgorit
 		while (actIter.hasNext()) {
 			Act act = (Act) actIter.next();
 			Coord coord = act.getCoord();
-			coord.setXY(coord.getX() + (Gbl.random.nextDouble() - 0.5) *  this.totalDistance,
-					coord.getY() + (Gbl.random.nextDouble() - 0.5) * this.totalDistance);
+			coord.setXY(coord.getX() + (MatsimRandom.random.nextDouble() - 0.5) *  this.totalDistance,
+					coord.getY() + (MatsimRandom.random.nextDouble() - 0.5) * this.totalDistance);
 			act.setLink(null);
 		}
 		Iterator<Leg> legIter = plan.getIteratorLeg();

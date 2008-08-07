@@ -22,7 +22,7 @@ package playground.balmermi.census2000.modules;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -43,7 +43,7 @@ public class PersonVaryTimes extends PersonAlgorithm implements PlanAlgorithmI {
 
 	public PersonVaryTimes() {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		Gbl.random.nextInt();
+		MatsimRandom.random.nextInt();
 		System.out.println("    done.");
 	}
 
@@ -59,12 +59,12 @@ public class PersonVaryTimes extends PersonAlgorithm implements PlanAlgorithmI {
 	public void run(Person person) {
 		ArrayList<Object> acts_legs = person.getSelectedPlan().getActsLegs();
 
-		double bias = Gbl.random.nextInt(3600)-1800.0; // [-1800,1800[
+		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
 
 		// draw a new random number until the new end time >= 0.0
 		double first_end_time = ((Act)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) {
-			bias = Gbl.random.nextInt(3600)-1800.0;
+			bias = MatsimRandom.random.nextInt(3600)-1800.0;
 		}
 		
 		for (int i=0; i<acts_legs.size(); i++) {

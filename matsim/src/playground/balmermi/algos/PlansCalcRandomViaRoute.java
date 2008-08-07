@@ -22,7 +22,7 @@ package playground.balmermi.algos;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -175,14 +175,14 @@ public class PlansCalcRandomViaRoute extends PersonAlgorithm implements PlanAlgo
 		double y = 0.5*(startNode.getCoord().getY() + endNode.getCoord().getY());
 		double dist = endNode.getCoord().calcDistance(startNode.getCoord());
 		if (dist < 1000.0) { dist = 1000.0; } 
-		x = x + (Gbl.random.nextDouble()-0.5)*dist;
-		y = y + (Gbl.random.nextDouble()-0.5)*dist;
+		x = x + (MatsimRandom.random.nextDouble()-0.5)*dist;
+		y = y + (MatsimRandom.random.nextDouble()-0.5)*dist;
 		CoordImpl coord = new CoordImpl(x,y);
 		Node viaNode = this.network.getNearestNode(coord);
 		while ((viaNode == startNode) || (viaNode == endNode)) {
 			dist = dist + 1000.0;
-			x = x + (Gbl.random.nextDouble()-0.5)*dist;
-			y = y + (Gbl.random.nextDouble()-0.5)*dist;
+			x = x + (MatsimRandom.random.nextDouble()-0.5)*dist;
+			y = y + (MatsimRandom.random.nextDouble()-0.5)*dist;
 			coord = new CoordImpl(x,y);
 			viaNode = this.network.getNearestNode(coord);
 		}

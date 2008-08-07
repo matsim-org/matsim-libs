@@ -21,6 +21,7 @@
 package org.matsim.replanning.selectors;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -64,7 +65,7 @@ public class ExpBetaPlanChanger implements PlanSelectorI {
 		// (so far, this is >1 if otherScore>currentScore, and <=1 otherwise)
 		// (beta is the slope (strength) of the operation: large beta means strong reaction)
 
-		if (Gbl.random.nextDouble() < 0.01*weight ) { // as of now, 0.01 is hardcoded (proba to change when both
+		if (MatsimRandom.random.nextDouble() < 0.01*weight ) { // as of now, 0.01 is hardcoded (proba to change when both
 			                                           // scores are the same)
 			return otherPlan;
 		}

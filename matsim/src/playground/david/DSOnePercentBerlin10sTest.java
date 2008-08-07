@@ -26,6 +26,7 @@ import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.GenerateRealPlans;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -62,7 +63,7 @@ public class DSOnePercentBerlin10sTest {
 		String netFileName = "../MatsimJ-Testing/testdata/studies/WIP/wip_net.xml";
 		String popFileName = "../MatsimJ-Testing/testdata/studies/WIP/kutter001car5.debug.router_wip.plans.xml.gz";
 
-		Gbl.random.setSeed(7411L);
+		MatsimRandom.random.setSeed(7411L);
 
 		World world = Gbl.getWorld();
 		// this needs to be done before reading the network

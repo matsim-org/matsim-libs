@@ -23,7 +23,7 @@ package org.matsim.socialnetworks.interactions;
 import java.util.List;
 
 import org.matsim.facilities.Activity;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
@@ -59,7 +59,7 @@ public class PersonExchangeKnowledge {
 		//from Person 2's knowledge and add it to Person 1's
 		List<Activity> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
-			Activity activity2=act2List.get(Gbl.random.nextInt( act2List.size()));
+			Activity activity2=act2List.get(MatsimRandom.random.nextInt( act2List.size()));
 			k1.getMentalMap().addActivity(activity2);
 		}
 
@@ -67,7 +67,7 @@ public class PersonExchangeKnowledge {
 		if(p2.getKnowledge().getEgoNet().knows(p1)){
 			List<Activity> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
-				Activity activity1=act1List.get(Gbl.random.nextInt( act1List.size()));
+				Activity activity1=act1List.get(MatsimRandom.random.nextInt( act1List.size()));
 				k2.getMentalMap().addActivity(activity1);
 			}
 		}

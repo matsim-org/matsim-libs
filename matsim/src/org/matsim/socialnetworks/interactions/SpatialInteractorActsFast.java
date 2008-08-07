@@ -34,6 +34,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -233,7 +234,7 @@ public class SpatialInteractorActsFast {
 				while(vIt2.hasNext()){
 					Person p2= vIt2.next();
 
-					if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+					if(MatsimRandom.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
 						if (p1.getKnowledge().getEgoNet().knows(p2)) {
@@ -288,8 +289,8 @@ public class SpatialInteractorActsFast {
 			while(vIt1.hasNext()){
 				Person p1= vIt1.next();
 
-				Person p2 = visitors.get(Gbl.random.nextInt(visitors.size()));
-				if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+				Person p2 = visitors.get(MatsimRandom.random.nextInt(visitors.size()));
+				if(MatsimRandom.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 					// If they know each other, probability is 1.0 that the relationship is reinforced
 					if (p1.getKnowledge().getEgoNet().knows(p2)) {
@@ -298,7 +299,7 @@ public class SpatialInteractorActsFast {
 					} else {
 						// If the two do not already know each other,
 
-						if(Gbl.random.nextDouble() < pBecomeFriends){
+						if(MatsimRandom.random.nextDouble() < pBecomeFriends){
 							net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //							System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 						}
@@ -357,8 +358,8 @@ public class SpatialInteractorActsFast {
 					}
 				}
 				if(others.size()>0){
-					Person p2=others.get(Gbl.random.nextInt(others.size()));
-					if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+					Person p2=others.get(MatsimRandom.random.nextInt(others.size()));
+					if(MatsimRandom.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 						// If they know each other, probability is 1.0 that the relationship is reinforced
 						if (p1.getKnowledge().getEgoNet().knows(p2)) {
@@ -367,7 +368,7 @@ public class SpatialInteractorActsFast {
 						} else {
 							// If the two do not already know each other,
 
-							if(Gbl.random.nextDouble() < pBecomeFriends){
+							if(MatsimRandom.random.nextDouble() < pBecomeFriends){
 								net.makeSocialContact(p1,p2,iteration,"new_"+myActivity.getType());
 //								System.out.println("Person "+p1.getId()+" and Person "+ p2.getId()+" meet at "+myActivity.getFacility().getId()+" for activity "+myActivity.getType());
 							}
@@ -443,7 +444,7 @@ public class SpatialInteractorActsFast {
 							Act act2 = (Act) act2It.next();
 							if(CompareActs.overlapTimePlaceType(act1,act2)&& !p1.equals(p2)){
 								//agents encoutner and may befriend
-								if(Gbl.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
+								if(MatsimRandom.random.nextDouble() <rndEncounterProbability.get(myActivity.getType())){
 
 									// If they know each other, probability is 1.0 that the relationship is reinforced
 									if (p1.getKnowledge().getEgoNet().knows(p2)) {

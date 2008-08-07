@@ -26,6 +26,7 @@ import java.util.Comparator;
 import org.apache.log4j.Logger;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
@@ -189,7 +190,7 @@ public class QueueNode {
 		int auxCounter = 0;
 		// randomize based on capacity
 		while (auxCounter < inLinksCounter) {
-			double rndNum = Gbl.random.nextDouble() * inLinksCapSum;
+			double rndNum = MatsimRandom.random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
 				QueueLink link = this.tempLinks[i];

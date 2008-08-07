@@ -23,7 +23,7 @@ package org.matsim.withinday.beliefs;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelTimeI;
@@ -62,7 +62,7 @@ public class AgentLinkcostPercpetion implements TravelTimeI {
 		}
 		this.histProvider = histProvider;
 		this.reactProvider = reactProvider;
-		this.random = Gbl.random;
+		this.random = MatsimRandom.random;
 		init();
 	}
 

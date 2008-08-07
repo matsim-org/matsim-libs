@@ -23,7 +23,7 @@ package org.matsim.utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
@@ -63,8 +63,8 @@ public abstract class WorldUtils {
 		if ((min != null) && (!(min.equals(zone.getMax())))) {
 			// we know min and max of the zone-area, choose randomly in this area
 			Coord max = zone.getMax();
-			double x = min.getX() + Gbl.random.nextDouble()*(max.getX() - min.getX());
-			double y = min.getY() + Gbl.random.nextDouble()*(max.getY() - min.getY());
+			double x = min.getX() + MatsimRandom.random.nextDouble()*(max.getX() - min.getX());
+			double y = min.getY() + MatsimRandom.random.nextDouble()*(max.getY() - min.getY());
 			return new CoordImpl(x, y);
 		}
 
@@ -96,8 +96,8 @@ public abstract class WorldUtils {
 			// by choosing a random polar coordinate, the densitiy of points in the center area should
 			// be higher than in the area far away from the center, which is plausible for the distribution
 			// of people in a rural area with a town as a center somewhere
-			double angle = Gbl.random.nextDouble()*2*Math.PI;
-			double radius = Gbl.random.nextDouble()*shortestDistance;
+			double angle = MatsimRandom.random.nextDouble()*2*Math.PI;
+			double radius = MatsimRandom.random.nextDouble()*shortestDistance;
 			x = center.getX() + radius * Math.cos(angle);
 			y = center.getY() + radius * Math.sin(angle);
 		} else {

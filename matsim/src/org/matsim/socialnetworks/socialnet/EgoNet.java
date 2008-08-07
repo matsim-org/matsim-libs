@@ -23,7 +23,7 @@ package org.matsim.socialnetworks.socialnet;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 
 /*
@@ -88,7 +88,7 @@ public class EgoNet {
 	int size = egoLinks.size();
 	if( size == 0 )
 	    return null;
-	SocialNetEdge edge = egoLinks.get( Gbl.random.nextInt(size));
+	SocialNetEdge edge = egoLinks.get( MatsimRandom.random.nextInt(size));
 	if( edge.getPersonFrom().equals(me) )
 	    return edge.getPersonTo();
 	return edge.getPersonFrom();

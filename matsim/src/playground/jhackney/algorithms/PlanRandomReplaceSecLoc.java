@@ -46,6 +46,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
@@ -103,7 +104,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 		boolean changed = false;
 
 //		Pick a type of facility to replace in this plan according to config settings
-		double rand = Gbl.random.nextDouble();
+		double rand = MatsimRandom.random.nextDouble();
 
 		if (rand < cum_p_factype[0]) {
 			factype = factypes[0];
@@ -134,7 +135,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
-			Act newAct = (Act)(actsOfFacType.get(Gbl.random.nextInt(actsOfFacType.size())));
+			Act newAct = (Act)(actsOfFacType.get(MatsimRandom.random.nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
@@ -145,7 +146,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithmI{
 
 			Facilities facs = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 //			Id facId=new Id(Gbl.random.nextInt(facs.getFacilities().size()));
-			int facId=Gbl.random.nextInt(facs.getFacilities(factype).size());
+			int facId=MatsimRandom.random.nextInt(facs.getFacilities(factype).size());
 			Facility f= (Facility) facs.getFacilities(factype).values().toArray()[facId];
 			
 //			Facility f = facs.getFacilities().get(new Id(Gbl.random.nextInt(facs.getFacilities().size())));

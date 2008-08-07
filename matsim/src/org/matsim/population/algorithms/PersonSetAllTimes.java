@@ -20,7 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -74,7 +74,7 @@ public class PersonSetAllTimes extends PersonAlgorithm {
 
 				if (j == 0) {
 					int endtime = EARLIEST_ENDTIME +
-												Gbl.random.nextInt(LATEST_ENDTIME -
+												MatsimRandom.random.nextInt(LATEST_ENDTIME -
 																					 EARLIEST_ENDTIME + 1);
 					act.setEndTime(endtime);
 					act.setStartTime(Time.UNDEFINED_TIME);

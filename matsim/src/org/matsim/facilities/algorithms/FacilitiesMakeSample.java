@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public class FacilitiesMakeSample {
 
@@ -43,7 +43,7 @@ public class FacilitiesMakeSample {
 		Iterator<Id> fid_it = facilities.getFacilities().keySet().iterator();
 		while (fid_it.hasNext()) {
 			Id fid = fid_it.next();
-			double rnd = Gbl.random.nextDouble();
+			double rnd = MatsimRandom.random.nextDouble();
 			if (rnd>pct) {
 				fid_set.add(fid);
 			}

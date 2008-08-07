@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -157,7 +157,7 @@ public class PersonSetActChains extends PersonAlgorithm {
 			}
 		}
 
-		double rd = Gbl.random.nextDouble();
+		double rd = MatsimRandom.random.nextDouble();
 		int index;
 		for (index=0; index<probsum.length; index++) {
 			if (probsum[index] > rd) {

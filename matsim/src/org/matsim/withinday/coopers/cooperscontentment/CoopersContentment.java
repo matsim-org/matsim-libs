@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.coopers.cooperscontentment;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.withinday.contentment.AgentContentmentI;
 
 
@@ -41,7 +41,7 @@ public class CoopersContentment implements AgentContentmentI {
 	 * @see org.matsim.withinday.contentment.AgentContentmentI#getContentment()
 	 */
 	public double getContentment() {
-		return Gbl.random.nextDouble();
+		return MatsimRandom.random.nextDouble();
 	}
 
 }

@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -123,7 +124,7 @@ public class PersonModeChoiceModel extends PersonAlgorithm implements PlanAlgori
 
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 			boolean has_bike = true;
-			if (Gbl.random.nextDouble() < 0.44) { has_bike = false; }
+			if (MatsimRandom.random.nextDouble() < 0.44) { has_bike = false; }
 
 			// setting parameters
 			model.setAge(person.getAge());

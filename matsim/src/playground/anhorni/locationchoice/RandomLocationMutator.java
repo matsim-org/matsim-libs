@@ -2,7 +2,7 @@ package playground.anhorni.locationchoice;
 
 import java.util.ArrayList;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -39,7 +39,7 @@ public class RandomLocationMutator extends LocationMutator {
 			if (act.getType().startsWith(type)) {
 				
 				final Facility facility=(Facility)exchange_facilities.toArray()[
-				           Gbl.random.nextInt(exchange_facilities.size()-1)];
+				           MatsimRandom.random.nextInt(exchange_facilities.size()-1)];
 				// plans: link, coords
 				// facilities: coords
 				// => use coords

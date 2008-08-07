@@ -25,6 +25,7 @@ import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -46,7 +47,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		String eventsFileName = getOutputDirectory() + "events.txt";
 		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
-		Gbl.random.setSeed(7411L);
+		MatsimRandom.random.setSeed(7411L);
 
 		World world = Gbl.createWorld();
 		// this needs to be done before reading the network

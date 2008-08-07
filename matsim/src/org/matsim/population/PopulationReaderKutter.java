@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
@@ -189,7 +190,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			String id = Long.toString(this.idCnt);
 			this.idCnt++;
 			this.cnt++;
-			int age = this.pgMinAge[this.pg_] + (int)Math.round(Gbl.random.nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
+			int age = this.pgMinAge[this.pg_] + (int)Math.round(MatsimRandom.random.nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
 			Person p = new Person(new IdImpl(id));
 			p.setSex(this.pgSex[this.pg_]);
 			p.setAge(age);
@@ -259,30 +260,30 @@ public class PopulationReaderKutter implements PopulationReader {
 				long duration; // this is the duration of the first (home) activity, and equals to the end-time of the first act
 
 				if (activity.equals("home")) {
-					duration = Math.round(7.5*3600 + Gbl.random.nextDouble()*2*3600); // 07:30 - 09:30
+					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
 				} else if (activity.equals("edu")) {
-					duration = Math.round(7.5*3600 + Gbl.random.nextDouble()*2*3600); // 07:30 - 09:30
+					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
 				} else if (activity.equals("uni")) {
-					duration = Math.round(8.5*3600 + Gbl.random.nextDouble()*2*3600); // 08:30 - 10:30
+					duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:30 - 10:30
 				} else if (activity.equals("work1")) {
-					duration = Math.round(7.5*3600 + Gbl.random.nextDouble()*1*3600); // 07:30 - 08:30
+					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*1*3600); // 07:30 - 08:30
 				} else if (activity.equals("work2")) {
-					duration = Math.round(7.5*3600 + Gbl.random.nextDouble()*2*3600); // 07:30 - 09:30
+					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
 				} else if (activity.equals("work3")) {
-					duration = Math.round(7.5*3600 + Gbl.random.nextDouble()*2.5*3600); // 07:30 - 10:00
+					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2.5*3600); // 07:30 - 10:00
 				} else if (activity.equals("shop1")) {
-					duration = Math.round(8.5*3600 + Gbl.random.nextDouble()*3*3600); // 08:30 - 11:30
+					duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*3*3600); // 08:30 - 11:30
 				} else if (activity.equals("shop2")) {
-					duration = Math.round(9*3600 + Gbl.random.nextDouble()*2*3600); // 09:00 - 11:00
+					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
 				} else if (activity.equals("home2")) {
-					duration = Math.round(9*3600 + Gbl.random.nextDouble()*2*3600); // 09:00 - 11:00
+					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
 				} else if (activity.equals("leisure1")) {
-					duration = Math.round(9*3600 + Gbl.random.nextDouble()*3*3600); // 09:00 - 12:00
+					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*3*3600); // 09:00 - 12:00
 				} else if (activity.equals("leisure2")) {
-					duration = Math.round(8*3600 + Gbl.random.nextDouble()*2*3600); // 08:00 - 10:00
+					duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
 				} else {
 					// well, this case should never happen, but just to be sure
-					duration = Math.round(8*3600 + Gbl.random.nextDouble()*2*3600); // 08:00 - 10:00
+					duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
 				}
 
 

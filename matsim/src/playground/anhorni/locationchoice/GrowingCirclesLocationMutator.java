@@ -30,6 +30,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -234,7 +235,7 @@ public class GrowingCirclesLocationMutator extends PersonAlgorithm implements Pl
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
 
-		final int r = Gbl.random.nextInt(dist_sum[fs.size()-1]);
+		final int r = MatsimRandom.random.nextInt(dist_sum[fs.size()-1]);
 
 		i=-1;
 		f_it = fs.iterator();

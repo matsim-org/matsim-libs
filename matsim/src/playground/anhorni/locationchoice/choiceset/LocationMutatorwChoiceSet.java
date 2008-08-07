@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -88,7 +88,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		if (choiceSet.size()>1) {
 			final Facility facility=(Facility)choiceSet.toArray()[
-           			           Gbl.random.nextInt(choiceSet.size()-1)];
+           			           MatsimRandom.random.nextInt(choiceSet.size()-1)];
 			
 			// facility needs to be set!!!
 			

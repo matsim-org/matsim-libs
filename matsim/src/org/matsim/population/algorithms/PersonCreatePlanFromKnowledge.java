@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -58,18 +58,18 @@ public class PersonCreatePlanFromKnowledge extends PersonAlgorithm {
 
 		try {
 			// first act end time = [7am.9am]
-			int time = 7*3600 + (Gbl.random.nextInt(2*3600));
+			int time = 7*3600 + (MatsimRandom.random.nextInt(2*3600));
 
 			// first act (= home)
 			p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,time,time,false);
 			p.createLeg("car",time,0.0,time);
 
-			int nof_acts = 1 + Gbl.random.nextInt(3);
+			int nof_acts = 1 + MatsimRandom.random.nextInt(3);
 			int dur = 12*3600/nof_acts;
 
 			// in between acts
 			for (int i=0; i<nof_acts; i++) {
-				int act_index = Gbl.random.nextInt(acts.size());
+				int act_index = MatsimRandom.random.nextInt(acts.size());
 				Activity act = acts.get(act_index);
 				Facility f = act.getFacility();
 				p.createAct(act.getType(),f.getCenter().getX(),f.getCenter().getY(),f.getLink(),time,(time+dur),dur,false);

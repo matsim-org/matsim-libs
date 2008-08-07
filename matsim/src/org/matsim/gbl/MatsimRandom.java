@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesRandomizeHectareCoordinates.java
+ * MatsimRandom.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,25 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities.algorithms;
+package org.matsim.gbl;
 
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.utils.geometry.Coord;
+import java.util.Random;
 
-public class FacilitiesRandomizeHectareCoordinates {
+public class MatsimRandom {
 
-	public void run(Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
-		for (Facility f : facilities.getFacilities().values()) {
-			Coord coord = f.getCenter();
-			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.random.nextInt(99));
-			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.random.nextInt(99));
-		}
-
-		System.out.println("    done.");
-	}
+	// the global random number generator
+	// the seed is set by the config package (see matsim.gbl.Config)
+	public static final Random random = new Random(MatsimRandom.DEFAULT_RANDOM_SEED);
+	static final long DEFAULT_RANDOM_SEED = 4711;
 
 }

@@ -24,7 +24,7 @@ package playground.ciarif.modechoice_old ;
 
 import java.util.ArrayList;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -49,7 +49,7 @@ public class ModeAlgo extends PersonAlgorithm{
 	@Override
 	public void run(Person person) {
 		
-		double rd = Gbl.random.nextDouble();
+		double rd = MatsimRandom.random.nextDouble();
 		Plan plan = person.getSelectedPlan();
 		ArrayList<Object> acts_legs = plan.getActsLegs();
 

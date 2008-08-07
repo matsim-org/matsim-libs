@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -156,7 +157,7 @@ public class StrategyManager {
 	 * @return the chosen strategy
 	 */
 	private PlanStrategy chooseStrategy() {
-		double rnd = Gbl.random.nextDouble() * this.totalWeights;
+		double rnd = MatsimRandom.random.nextDouble() * this.totalWeights;
 
 		double sum = 0.0;
 		for (int i = 0, max = this.weights.size(); i < max; i++) {

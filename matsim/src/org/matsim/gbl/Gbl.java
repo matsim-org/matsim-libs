@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Random;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -67,18 +66,12 @@ import org.xml.sax.SAXException;
 
 public abstract class Gbl {
 
-	private static final long DEFAULT_RANDOM_SEED = 4711;
-
 	private static Config config = null;
 	private static World world = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// project global random number generator
 	//////////////////////////////////////////////////////////////////////
-
-	// the global random number generator
-	// the seed is set by the config package (see matsim.gbl.Config)
-	public static final Random random = new Random(DEFAULT_RANDOM_SEED);
 
 	private static final Logger log = Logger.getLogger(Gbl.class);
 
@@ -113,7 +106,7 @@ public abstract class Gbl {
 			reader.readFile(args[0], args[1]);
 		}
 
-		Gbl.random.setSeed(Gbl.config.global().getRandomSeed());
+		MatsimRandom.random.setSeed(Gbl.config.global().getRandomSeed());
 
 		return Gbl.config;
 	}
@@ -154,7 +147,7 @@ public abstract class Gbl {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
 		Gbl.world = null;
-		Gbl.random.setSeed(DEFAULT_RANDOM_SEED);
+		MatsimRandom.random.setSeed(MatsimRandom.DEFAULT_RANDOM_SEED);
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
 	}
 

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -113,7 +114,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 	private void generateTrips(final NetworkLayer network, final ArrayList<Node>[][] cells) {
 
-		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
+		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
 
 		// Take a random cell and determine the cells that are givenFromToDistance
 		// away from it
@@ -147,7 +148,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 				fromIt = fromNodes.iterator();
 			}
 			Node fromNode = fromIt.next();
-			Collections.shuffle(toNodes, Gbl.random);
+			Collections.shuffle(toNodes, MatsimRandom.random);
 			Iterator<Node> toIt = toNodes.iterator();
 			Node toNode = null;
 			while (toNode == null) {
@@ -191,11 +192,11 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			int fromCellRow = 0;
 			int fromCellColumn = 0;
 			while (fromNodes.isEmpty() == true) {
-				fromCellRow = (int) (Gbl.random.nextDouble() * (cells.length));
-				fromCellColumn = (int) (Gbl.random.nextDouble() * (cells[0].length));
+				fromCellRow = (int) (MatsimRandom.random.nextDouble() * (cells.length));
+				fromCellColumn = (int) (MatsimRandom.random.nextDouble() * (cells[0].length));
 				fromNodes = cells[fromCellRow][fromCellColumn];
 			}
-			int fromNodeIndex = (int) (Gbl.random.nextDouble() * (fromNodes.size()));
+			int fromNodeIndex = (int) (MatsimRandom.random.nextDouble() * (fromNodes.size()));
 			fromNode = fromNodes.get(fromNodeIndex);
 			ArrayList<Node> toNodes = getToNodes(fromCellRow, fromCellColumn,
 					cells);
@@ -229,12 +230,12 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			return false;
 		}
 		Link fromLink = fromNode.getInLinks().values().iterator().next();
-		int startTime = (int) (Gbl.random.nextDouble() * 60*60*24);
+		int startTime = (int) (MatsimRandom.random.nextDouble() * 60*60*24);
 		try {
 			plan.createAct("w", -1, -1, fromLink, startTime, 0, 0, false);
 			plan.createLeg("car", null, null, null);
 			Link toLink = toNode.getInLinks().values().iterator().next();
-			int endTime = (int) (Gbl.random.nextDouble() * 60*60*2);
+			int endTime = (int) (MatsimRandom.random.nextDouble() * 60*60*2);
 			plan.createAct("w", -1, -1, toLink, startTime + endTime, 0, 0, false);
 		} catch (Exception e) {
 			e.printStackTrace();

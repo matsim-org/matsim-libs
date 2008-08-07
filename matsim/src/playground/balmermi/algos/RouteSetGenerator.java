@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -164,7 +165,7 @@ public class RouteSetGenerator {
 		// Remove randomly some routes until it contains k-1 elements
 		// TODO [balmermi]: Inform Gianluca
 //		while (k-1 < routes.size()) { routes.remove((int)Math.random()*routes.size()); }
-		while (k-1 < routes.size()) { routes.remove(Gbl.random.nextInt(routes.size())); }
+		while (k-1 < routes.size()) { routes.remove(MatsimRandom.random.nextInt(routes.size())); }
 		// add the least cost path at the beginning of the route
 		routes.addFirst(route);
 		System.out.println("--- done. ---");

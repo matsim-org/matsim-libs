@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -221,12 +221,12 @@ public class VDSSign {
 				int zeros = 0;
 				//computing randomized sequence of binary guidance message
 				while ((ones + zeros) < this.controlEvents) {
-					if ((input > Gbl.random.nextDouble()) && (ones < numberOfOnes)) {
+					if ((input > MatsimRandom.random.nextDouble()) && (ones < numberOfOnes)) {
 						this.currentRouteSet.add((ones + zeros), this.mainRoute);
 						ones++;
 						log.trace("1, i.e. main route");
 					}
-					else if ((input < Gbl.random.nextDouble()) && (zeros < numberOfZeros)) {
+					else if ((input < MatsimRandom.random.nextDouble()) && (zeros < numberOfZeros)) {
 						this.currentRouteSet.add((ones + zeros), this.alternativeRoute);
 						zeros++;
 						log.trace("0, i.e. alternative route");
@@ -251,7 +251,7 @@ public class VDSSign {
 	 */
 	public Route requestRoute() {
 		double time = SimulationTimer.getTime();
-		double trust = Gbl.random.nextDouble();
+		double trust = MatsimRandom.random.nextDouble();
 		if (time > this.nextUpdate) {
 			throw new RuntimeException(
 					"Current system time: "

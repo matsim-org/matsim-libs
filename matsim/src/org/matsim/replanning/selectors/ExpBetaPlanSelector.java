@@ -22,6 +22,7 @@ package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -64,7 +65,7 @@ public class ExpBetaPlanSelector implements PlanSelectorI {
 		}
 
 		// choose a random number over interval [0,sumWeights[
-		double selnum = sumWeights*Gbl.random.nextDouble();
+		double selnum = sumWeights*MatsimRandom.random.nextDouble();
 		idx = 0;
 		for (Plan plan : person.getPlans()) {
 			selnum -= weights[idx];

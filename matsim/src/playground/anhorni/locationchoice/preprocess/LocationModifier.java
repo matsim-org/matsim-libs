@@ -9,6 +9,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -105,7 +106,7 @@ public class LocationModifier extends Modifier {
 				if (act.getType().startsWith(type)) {
 
 					Facility facility=exchange_facilities.get(
-							Gbl.random.nextInt(exchange_facilities.size()-1));
+							MatsimRandom.random.nextInt(exchange_facilities.size()-1));
 
 					act.setFacility(facility);
 					act.setLink(facility.getLink());

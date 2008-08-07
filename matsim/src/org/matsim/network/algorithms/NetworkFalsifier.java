@@ -20,7 +20,7 @@
 
 package org.matsim.network.algorithms;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -45,8 +45,8 @@ public class NetworkFalsifier {
 		double maxDistance = this.distance * 2.0;
 		for (Node node : network.getNodes().values()) {
 			CoordImpl coord = node.getCoord();
-			coord.setXY(coord.getX() + (Gbl.random.nextDouble() - 0.5) *  maxDistance,
-					coord.getY() + (Gbl.random.nextDouble() - 0.5) * maxDistance);
+			coord.setXY(coord.getX() + (MatsimRandom.random.nextDouble() - 0.5) *  maxDistance,
+					coord.getY() + (MatsimRandom.random.nextDouble() - 0.5) * maxDistance);
 		}
 
 		for (Link link : network.getLinks().values()) {

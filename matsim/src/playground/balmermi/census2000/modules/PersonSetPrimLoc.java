@@ -29,6 +29,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.population.Act;
@@ -164,7 +165,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 				System.out.println("      Therefore added a neighbor zone id=" + zones.get(0).getId());
 			}
 
-			Zone z = zones.get(Gbl.random.nextInt(zones.size()));
+			Zone z = zones.get(MatsimRandom.random.nextInt(zones.size()));
 			if (f.getActivity(WORK) != null) {
 				ArrayList<Facility> facs = this.zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<Facility>(); }
@@ -209,7 +210,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			int val = (int) from_loc_entries.get(i).getValue();
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
-		int r = Gbl.random.nextInt(dist_sum[n-1]);
+		int r = MatsimRandom.random.nextInt(dist_sum[n-1]);
 		for (int i=0; i<n; i++) {
 			if (r < dist_sum[i]) {
 				return (Zone)from_loc_entries.get(i).getToLocation();
@@ -237,7 +238,7 @@ public class PersonSetPrimLoc extends PersonAlgorithm implements PlanAlgorithmI 
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}
-		int r = Gbl.random.nextInt(dist_sum[n-1]);
+		int r = MatsimRandom.random.nextInt(dist_sum[n-1]);
 		for (int i=0; i<n; i++) {
 			if (r < dist_sum[i]) {
 				return facs.get(i);

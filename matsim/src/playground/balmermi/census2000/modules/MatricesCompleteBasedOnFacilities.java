@@ -28,6 +28,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.utils.collections.QuadTree;
@@ -97,7 +98,7 @@ public class MatricesCompleteBasedOnFacilities {
 		this.facilities = facilities;
 		this.layer = layer;
 		this.initMaps();
-		Gbl.random.nextInt();
+		MatsimRandom.random.nextInt();
 		this.buildWorkFacQuadTree();
 		this.buildEducFacQuadTree();
 		System.out.println("    done.");

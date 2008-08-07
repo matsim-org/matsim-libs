@@ -20,7 +20,7 @@
 
 package playground.lnicolas.routing.costcalculators;
 
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.router.util.TravelCostI;
@@ -63,15 +63,15 @@ public class PeakTravTimeCalc implements TravelCostI, TravelTimeI, TravelMinCost
 		this.amplFactor = new double[maxId - this.minLinkId + 2];
 		this.travTimeFactor = new double[maxId - this.minLinkId + 2];
 
-		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
+		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" in the first draw...
 
 		// add some small random value to each link delta
 		for (Link link : network.getLinks().values()) {
 			int index = Integer.parseInt(link.getId().toString()) - this.minLinkId;
 
-			this.amplFactor[index] = (Gbl.random.nextDouble() * 0.1) + 1;
-			this.travTimeDelta[index] = (int)(Gbl.random.nextDouble() * 5);
-			this.travTimeFactor[index] = Gbl.random.nextDouble() + 1;
+			this.amplFactor[index] = (MatsimRandom.random.nextDouble() * 0.1) + 1;
+			this.travTimeDelta[index] = (int)(MatsimRandom.random.nextDouble() * 5);
+			this.travTimeFactor[index] = MatsimRandom.random.nextDouble() + 1;
 		}
 
 		// Init trafficLoad

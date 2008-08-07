@@ -73,6 +73,7 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -631,8 +632,8 @@ public class Controler {
 	}
 
 	private void resetRandomNumbers(final int iteration) {
-		Gbl.random.setSeed(this.config.global().getRandomSeed() + iteration);
-		Gbl.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
+		MatsimRandom.random.setSeed(this.config.global().getRandomSeed() + iteration);
+		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 	}
 
 	/*default*/ void enableEventsWriter() {

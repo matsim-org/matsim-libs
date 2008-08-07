@@ -23,6 +23,7 @@ package playground.ciarif.models.subtours;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -66,7 +67,7 @@ public abstract class ModelModeChoice {
 		this.pt= false;
 		this.prev_mode = -2.0; //(because -1 means the subtour is starting from home)
 		//this.home_coord.setXY(-1.0,-1.0);
-		Gbl.random.nextDouble();
+		MatsimRandom.random.nextDouble();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -181,7 +182,7 @@ public abstract class ModelModeChoice {
 		utils[3] = this.calcBikeUtil();		
 		utils[4] = this.calcWalkUtil();
 		double [] probs = this.calcLogitProbability(utils);
-		double r = Gbl.random.nextDouble();
+		double r = MatsimRandom.random.nextDouble();
 
 		double prob_sum = 0.0;
 		for (int i=0; i<probs.length; i++) {

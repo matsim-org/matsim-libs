@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.world.Layer;
@@ -93,7 +94,7 @@ public class WorldBottom2TopCompletion {
 				log.warn("[completeFacZoneMapping()] No Zone found for "+ down_f);
 			}
 			else {
-				Zone zone = zones.get(Gbl.random.nextInt(zones.size()));
+				Zone zone = zones.get(MatsimRandom.random.nextInt(zones.size()));
 				down_f.addUpMapping(zone);
 				zone.addDownMapping(down_f);
 			}

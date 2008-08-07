@@ -37,6 +37,7 @@ import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.FacilitiesProductionKTI.KTIYear;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public class FacilitiesAllActivitiesFTE {
 
@@ -184,7 +185,7 @@ public class FacilitiesAllActivitiesFTE {
 				Object[] tempFacilitiesIds = tempFacilities.keySet().toArray();
 				while (numSectorFTE > 0) {
 					// choose a random temp facility
-					tempFacilityId = (String) tempFacilitiesIds[Gbl.random.nextInt(tempFacilitiesIds.length)];
+					tempFacilityId = (String) tempFacilitiesIds[MatsimRandom.random.nextInt(tempFacilitiesIds.length)];
 					// determine the size range
 					sizeRange = Integer.parseInt(tempFacilityId.substring(tempFacilityId.length() - 1));
 					// put in fixed additional number of FTEs, but consider upper limit, and remaining numSectorFTEs

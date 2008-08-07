@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
@@ -99,7 +100,7 @@ public class WorldFacilityZoneMapping {
 					log.warn("      no zone for f_id="+f.getId()+". assigning nearest zone_id="+nearest_loc.getId()+" with dist(f->z)="+min_dist);
 				}
 				else {
-					Location z = locs.get(Gbl.random.nextInt(locs.size()));
+					Location z = locs.get(MatsimRandom.random.nextInt(locs.size()));
 					world.addMapping(z,f);
 				}
 			}

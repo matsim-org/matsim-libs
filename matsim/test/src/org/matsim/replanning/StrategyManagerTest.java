@@ -21,7 +21,7 @@
 package org.matsim.replanning;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -40,7 +40,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		Gbl.random.setSeed(4711);
+		MatsimRandom.random.setSeed(4711);
 
 		Population population = new Population(Population.NO_STREAMING);
 		try {

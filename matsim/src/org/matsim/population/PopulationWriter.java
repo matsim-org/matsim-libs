@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
@@ -131,7 +132,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithmI {
 
 	public final void writePerson(final Person p) {
 		//	 write only the defined fraction
-		if (Gbl.random.nextDouble() >= this.write_person_percentage) {
+		if (MatsimRandom.random.nextDouble() >= this.write_person_percentage) {
 			return;
 		}
 		try {

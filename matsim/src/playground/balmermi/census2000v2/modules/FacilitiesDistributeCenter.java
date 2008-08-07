@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.geometry.Coord;
 
 public class FacilitiesDistributeCenter {
@@ -41,7 +42,7 @@ public class FacilitiesDistributeCenter {
 	public FacilitiesDistributeCenter() {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
-		Gbl.random.nextDouble();
+		MatsimRandom.random.nextDouble();
 		log.info("    done.");
 	}
 
@@ -61,8 +62,8 @@ public class FacilitiesDistributeCenter {
 			Coord c = f.getCenter();
 			if (c.getX()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
 			if (c.getY()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
-			c.setX(c.getX()+Gbl.random.nextDouble()*100.0);
-			c.setY(c.getY()+Gbl.random.nextDouble()*100.0);
+			c.setX(c.getX()+MatsimRandom.random.nextDouble()*100.0);
+			c.setY(c.getY()+MatsimRandom.random.nextDouble()*100.0);
 		}
 
 		log.info("      # facilities = " + facilities.getFacilities().size());

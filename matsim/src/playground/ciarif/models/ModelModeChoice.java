@@ -23,6 +23,7 @@ package playground.ciarif.models;
 import java.util.TreeSet;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 
 public abstract class ModelModeChoice {
 	
@@ -56,7 +57,7 @@ public abstract class ModelModeChoice {
 		this.tickets = -1.0;
 		this.purpose = -1;
 		this.bike = false;
-		Gbl.random.nextDouble();
+		MatsimRandom.random.nextDouble();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -147,7 +148,7 @@ public abstract class ModelModeChoice {
 		utils[3] = this.calcPublicUtil();		
 		utils[4] = this.calcCarRideUtil();
 		double [] probs = this.calcLogitProbability(utils);
-		double r = Gbl.random.nextDouble();
+		double r = MatsimRandom.random.nextDouble();
 
 		double prob_sum = 0.0;
 		for (int i=0; i<probs.length; i++) {
