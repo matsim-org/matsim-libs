@@ -69,6 +69,7 @@ public class PlanFilter {
 		final Plans population = new Plans(Plans.NO_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
+		population.printPlansCount();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		System.out.println("smallRadius\tbigRadius\t#linksSmall\t#linksBig\t#peopleSmall\t#peopleLeavingBig");
@@ -120,8 +121,8 @@ public class PlanFilter {
 		System.out.println("RUN: generateSubset");
 
 		final Coord center = new Coord(683518.0, 246836.0); // Bellevue, Zrh
-		double smallRadius = 5000;
-		double bigRadius = 15000;
+		double smallRadius = 7000;
+		double bigRadius = 14000;
 
 		final Config config = Gbl.createConfig(args);
 		final World world = Gbl.createWorld();
@@ -136,6 +137,7 @@ public class PlanFilter {
 		final Plans population = new Plans(Plans.NO_STREAMING);
 		PlansReaderI plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
+		population.printPlansCount();
 
 		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
 		final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
@@ -170,9 +172,9 @@ public class PlanFilter {
 						link.getOrigId(), link.getType());
 			}
 		}
-		new NetworkWriter(subnet, "ivtch-osm-zrh15km-network.xml").write();
+		new NetworkWriter(subnet, "ivtch-osm_zrh14km.xml").write();
 
-		final PlansWriter plansWriter = new PlansWriter(population, "plans-z15kmCut.xml", "v4");
+		final PlansWriter plansWriter = new PlansWriter(population, "plans_miv_zrh7km_cut14km_transitincl_10pct.xml", "v4");
 		plansWriter.writeStartPlans();
 		final CutTrips cutAlgo = new CutTrips(plansWriter, bigAOI);
 		final PersonIntersectAreaFilter insideFilter = new PersonIntersectAreaFilter(cutAlgo, smallAOI);
