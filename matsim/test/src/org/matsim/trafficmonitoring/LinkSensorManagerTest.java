@@ -26,7 +26,7 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

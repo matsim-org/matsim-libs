@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.mobsim.queuesim;
 
-package org.matsim.mobsim;
+import org.matsim.network.Link;
+import org.matsim.network.Node;
 
-import org.matsim.gbl.Gbl;
 
-public abstract class Simulation {
+/**
+ * @author dgrether
+ *
+ */
+public final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
 
 	/**
-	 * Number of agents that have not yet reached their final activity location
+	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueLink(org.matsim.network.Link, org.matsim.mobsim.queuesim.QueueNetwork)
 	 */
-	private static int living = 0;
-
-	/**
-	 * Number of agents that got stuck in a traffic jam and where removed from the simulation to solve a possible deadlock
-	 */
-	private static int lost = 0;
-
-	private static double stuckTime = Double.MAX_VALUE;
-
-	public static void reset() {
-		setLiving(0);
-		resetLost();
-		setStuckTime(Gbl.getConfig().simulation().getStuckTime());
+	public QueueLink newQueueLink(Link link, QueueNetwork queueNetwork, QueueNode toQueueNode) {
+		return new QueueLink(link, queueNetwork, toQueueNode);
 	}
 
-	public static final double getStuckTime() {return stuckTime;	}
-	private static final void setStuckTime(final double stuckTime) { Simulation.stuckTime = stuckTime; }
+	/**
+	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.queuesim.QueueNetwork)
+	 */
+	public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
+		return new QueueNode(node, queueNetwork);
+	}
 
-	public static final int getLiving() {return living;	}
-	public static final void setLiving(final int count) {living = count;}
-	public static final boolean isLiving() {return living > 0;	}
-	public static final int getLost() {return lost;	}
-	public static final void incLost() {lost++;}
-	public static final void incLost(final int count) {lost += count;}
-	private static final void resetLost() { lost = 0; }
-
-	public static final void incLiving() {living++;}
-	public static final void incLiving(final int count) {living += count;}
-	public static final void decLiving() {living--;}
-	public static final void decLiving(final int count) {living -= count;}
 }

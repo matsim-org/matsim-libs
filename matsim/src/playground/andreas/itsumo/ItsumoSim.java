@@ -28,7 +28,7 @@ import java.util.Date;
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.ExternalMobsim;
+import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;

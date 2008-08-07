@@ -42,7 +42,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.netvis.streaming.SimStateWriterI;

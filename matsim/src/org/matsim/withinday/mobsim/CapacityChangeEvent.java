@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.mobsim;
 
-import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueLink;
 
 
 /**

@@ -24,9 +24,9 @@ import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueSimulation;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Population;

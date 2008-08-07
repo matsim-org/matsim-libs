@@ -18,13 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 import java.util.Collection;
 
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNet;
-import org.matsim.mobsim.QueueLink.AgentOnLink;
+import org.matsim.mobsim.queuesim.QueueLink.AgentOnLink;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 

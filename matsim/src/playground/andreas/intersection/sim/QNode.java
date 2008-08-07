@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetwork;
-import org.matsim.mobsim.QueueNode;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;

@@ -27,9 +27,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetwork;
-import org.matsim.mobsim.QueueNode;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.utils.vis.otfvis.interfaces.OTFServerRemote;

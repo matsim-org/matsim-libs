@@ -20,10 +20,10 @@
 
 package playground.gregor.withinday_evac.mobsim;
 
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetworkFactory;
-import org.matsim.mobsim.QueueNetwork;
-import org.matsim.mobsim.QueueNode;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetworkFactory;
+import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 

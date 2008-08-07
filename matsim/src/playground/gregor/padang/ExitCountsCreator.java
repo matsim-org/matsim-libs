@@ -37,7 +37,7 @@ import org.matsim.counts.CountsWriter;
 import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.handler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataQuad;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;

@@ -24,7 +24,7 @@ import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

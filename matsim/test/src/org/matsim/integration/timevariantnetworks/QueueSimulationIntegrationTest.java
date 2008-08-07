@@ -30,7 +30,7 @@ import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkFactory;

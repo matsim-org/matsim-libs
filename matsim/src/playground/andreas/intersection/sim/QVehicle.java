@@ -1,7 +1,7 @@
 package playground.andreas.intersection.sim;
 
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 
 @SuppressWarnings("serial")

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.deqsim;
+package org.matsim.mobsim.cppdeqsim;
 
 
 import org.matsim.controler.Controler;

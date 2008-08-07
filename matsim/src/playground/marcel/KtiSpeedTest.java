@@ -22,13 +22,13 @@ package playground.marcel;
 
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.config.Config;
-import org.matsim.deqsim.EventsReaderDEQv1;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;

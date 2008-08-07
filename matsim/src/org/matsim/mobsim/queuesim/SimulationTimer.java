@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 public class SimulationTimer {
 	static private double simStartTime = 24*3600;

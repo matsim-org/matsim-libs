@@ -27,7 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.SimulationTimer;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;

@@ -25,9 +25,9 @@ package playground.gregor.withinday_evac.mobsim;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.mobsim.QueueNetwork;
-import org.matsim.mobsim.QueueNode;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Node;
 
 

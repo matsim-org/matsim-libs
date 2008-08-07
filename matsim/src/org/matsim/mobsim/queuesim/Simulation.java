@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PadangEventConverter.java
+ * Simulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.david.otfvis;
+package org.matsim.mobsim.queuesim;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.world.World;
 
+public abstract class Simulation {
 
-public class PadangEventConverter {
-	public static void main(String[] args) {
-		if ( args.length==0 )
-			args = new String[] {"./test/dstrippgen/myconfig.xml"};
+	/**
+	 * Number of agents that have not yet reached their final activity location
+	 */
+	private static int living = 0;
 
-		Gbl.createConfig(args);
-		Gbl.startMeasurement();
-		World world = Gbl.createWorld();
+	/**
+	 * Number of agents that got stuck in a traffic jam and where removed from the simulation to solve a possible deadlock
+	 */
+	private static int lost = 0;
 
-		String netFileName = Gbl.getConfig().getParam("network","inputNetworkFile");
-		netFileName = "../../tmp/studies/padang/evacuation_net.xml";
-		NetworkLayer net = new NetworkLayer();
-		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		QueueNetwork qnet = new QueueNetwork(net);
+	private static double stuckTime = Double.MAX_VALUE;
 
-
-		String eventFile = Gbl.getConfig().getParam("events","outputFile");
-		eventFile = "../../tmp/studies/padang/0.events.txt.gz";
-		OTFEvent2MVI test = new OTFEvent2MVI(qnet, eventFile, "../../tmp/studies/padang/ds_fromEvent.vis", 10);
-		test.convert();
+	public static void reset() {
+		setLiving(0);
+		resetLost();
+		setStuckTime(Gbl.getConfig().simulation().getStuckTime());
 	}
+
+	public static final double getStuckTime() {return stuckTime;	}
+	private static final void setStuckTime(final double stuckTime) { Simulation.stuckTime = stuckTime; }
+
+	public static final int getLiving() {return living;	}
+	public static final void setLiving(final int count) {living = count;}
+	public static final boolean isLiving() {return living > 0;	}
+	public static final int getLost() {return lost;	}
+	public static final void incLost() {lost++;}
+	public static final void incLost(final int count) {lost += count;}
+	private static final void resetLost() { lost = 0; }
+
+	public static final void incLiving() {living++;}
+	public static final void incLiving(final int count) {living += count;}
+	public static final void decLiving() {living--;}
+	public static final void decLiving(final int count) {living -= count;}
 }

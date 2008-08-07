@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.mobsim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;

@@ -21,7 +21,7 @@
 package org.matsim.withinday.contentment;
 
 import org.apache.log4j.Logger;
-import org.matsim.mobsim.SimulationTimer;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.mobsim.queuesim;
 
-package org.matsim.mobsim;
+import org.matsim.network.Link;
+import org.matsim.network.Node;
 
-import java.io.Serializable;
-import java.util.Comparator;
 
 /**
- * @author dstrippgen
+ * @author dgrether
  *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
  */
-public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
-		Serializable {
+public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> {
 
-	private static final long serialVersionUID = 1L;
 
-	public int compare(final Vehicle veh1, final Vehicle veh2) {
-		if (veh1.getDepartureTime_s() > veh2.getDepartureTime_s())
-			return 1;
-		if (veh1.getDepartureTime_s() < veh2.getDepartureTime_s())
-			return -1;
+	public QN newQueueNode(Node node, QueueNetwork queueNetwork);
 
-		// Both depart at the same time -> let the one with the larger id be first
-		if (veh1.getID() < veh2.getID())
-			return 1;
-		if (veh1.getID() > veh2.getID())
-			return -1;
-		return 0;
-	}
+	public QL newQueueLink(Link link, QueueNetwork queueNetwork, QN queueNode);
+
 }

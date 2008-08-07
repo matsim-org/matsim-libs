@@ -26,7 +26,7 @@ package playground.yu.volCount;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;

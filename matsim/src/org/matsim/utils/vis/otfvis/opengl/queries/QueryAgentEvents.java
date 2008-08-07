@@ -33,7 +33,7 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.BasicEventHandlerI;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;

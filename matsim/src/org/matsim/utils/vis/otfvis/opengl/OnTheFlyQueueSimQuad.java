@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;

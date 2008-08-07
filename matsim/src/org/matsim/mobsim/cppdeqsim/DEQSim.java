@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.deqsim;
+package org.matsim.mobsim.cppdeqsim;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -35,7 +35,7 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.config.Module;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.ExternalMobsim;
+import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;

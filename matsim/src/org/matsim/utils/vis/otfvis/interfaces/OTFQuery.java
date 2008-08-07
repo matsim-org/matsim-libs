@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.interfaces;
 import java.io.Serializable;
 
 import org.matsim.events.Events;
-import org.matsim.mobsim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 

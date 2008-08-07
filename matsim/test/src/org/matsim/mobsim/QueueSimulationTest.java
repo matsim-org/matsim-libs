@@ -32,6 +32,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandlerLinkEnterI;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;

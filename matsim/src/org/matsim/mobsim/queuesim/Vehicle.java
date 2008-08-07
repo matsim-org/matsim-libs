@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 import java.io.File;
 import java.io.IOException;

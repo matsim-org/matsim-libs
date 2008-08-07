@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.mobsim.QueueLink;
-import org.matsim.mobsim.QueueNetwork;
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 

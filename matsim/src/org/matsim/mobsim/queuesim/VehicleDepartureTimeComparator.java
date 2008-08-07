@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
+ * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.mobsim;
 
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+package org.matsim.mobsim.queuesim;
 
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * @author dgrether
+ * @author dstrippgen
  *
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
  */
-public final class DefaultQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
+public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
+		Serializable {
 
-	/**
-	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueLink(org.matsim.network.Link, org.matsim.mobsim.QueueNetwork)
-	 */
-	public QueueLink newQueueLink(Link link, QueueNetwork queueNetwork, QueueNode toQueueNode) {
-		return new QueueLink(link, queueNetwork, toQueueNode);
+	private static final long serialVersionUID = 1L;
+
+	public int compare(final Vehicle veh1, final Vehicle veh2) {
+		if (veh1.getDepartureTime_s() > veh2.getDepartureTime_s())
+			return 1;
+		if (veh1.getDepartureTime_s() < veh2.getDepartureTime_s())
+			return -1;
+
+		// Both depart at the same time -> let the one with the larger id be first
+		if (veh1.getID() < veh2.getID())
+			return 1;
+		if (veh1.getID() > veh2.getID())
+			return -1;
+		return 0;
 	}
-
-	/**
-	 * @see org.matsim.mobsim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.QueueNetwork)
-	 */
-	public QueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
-		return new QueueNode(node, queueNetwork);
-	}
-
 }

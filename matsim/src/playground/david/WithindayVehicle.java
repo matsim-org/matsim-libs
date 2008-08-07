@@ -22,7 +22,7 @@ package playground.david;
 
 import java.io.Serializable;
 
-import org.matsim.mobsim.Vehicle;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 

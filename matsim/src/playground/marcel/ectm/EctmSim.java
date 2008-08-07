@@ -31,7 +31,7 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.ExternalMobsim;
+import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.ExeRunner;
 

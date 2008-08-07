@@ -22,7 +22,7 @@ package org.matsim.withinday;
 
 import java.util.ArrayList;
 
-import org.matsim.mobsim.SimulationTimer;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
@@ -45,7 +45,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getCurrentLeg()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getCurrentLeg()
 	 */
 	@Override
 	public Leg getCurrentLeg() {
@@ -53,7 +53,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getDestinationLink()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getDestinationLink()
 	 */
 	@Override
 	public Link getDestinationLink() {
@@ -74,7 +74,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getDepartureTime_s()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getDepartureTime_s()
 	 */
 	@Override
 	public double getDepartureTime_s() {
@@ -91,7 +91,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getCurrentLegNumber()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getCurrentLegNumber()
 	 */
 	@Override
 	public int getCurrentLegNumber() {
@@ -99,7 +99,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getDriver()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getDriver()
 	 */
 	@Override
 	public Person getDriver() {
@@ -107,7 +107,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getID()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getID()
 	 */
 	@Override
 	public int getID() {
@@ -115,7 +115,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getLane()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getLane()
 	 */
 	@Override
 	public int getLane() {
@@ -123,7 +123,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getLastMovedTime()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getLastMovedTime()
 	 */
 	@Override
 	public double getLastMovedTime() {
@@ -131,7 +131,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getPosInLink_m()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getPosInLink_m()
 	 */
 	@Override
 	public double getPosInLink_m() {
@@ -139,7 +139,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#getSpeed()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#getSpeed()
 	 */
 	@Override
 	public double getSpeed() {
@@ -147,7 +147,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#incCurrentNode()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#incCurrentNode()
 	 */
 	@Override
 	public void incCurrentNode() {
@@ -155,7 +155,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#initVeh()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#initVeh()
 	 */
 	@Override
 	public boolean initVeh() {
@@ -163,7 +163,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.Vehicle#leaveActivity()
+	 * @see org.matsim.mobsim.queuesim.Vehicle#leaveActivity()
 	 */
 	@Override
 	public void leaveActivity(final double now) {

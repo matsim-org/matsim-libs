@@ -33,7 +33,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;

@@ -21,7 +21,7 @@
 package playground.jhackney.deprecated;
 
 import org.matsim.events.Events;
-import org.matsim.mobsim.Simulation;
+import org.matsim.mobsim.queuesim.Simulation;
 import org.matsim.population.Population;
 
 

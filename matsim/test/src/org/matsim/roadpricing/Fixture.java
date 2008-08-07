@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;

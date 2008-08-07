@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueSimulation;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;

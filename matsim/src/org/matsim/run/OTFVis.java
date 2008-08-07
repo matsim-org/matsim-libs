@@ -27,7 +27,7 @@ import org.matsim.config.MatsimConfigReader;
 import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.QueueNetwork;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
