@@ -17,15 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.counts.algorithms;
+package org.matsim.counts;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.counts.CountSimComparison;
-
-
 /**
+ * This class provides methods to aggregate the errors
+ * and the bias of a CountSimComparison instances list
+ * to hourly based mean values.
+ * 
  * @author dgrether
  *
  */

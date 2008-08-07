@@ -22,7 +22,6 @@ package org.matsim.counts.algorithms.graphs;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jfree.chart.ChartFactory;
@@ -37,6 +36,7 @@ import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.matsim.counts.ComparisionErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 
 public class BiasErrorGraph extends CountsGraph {
@@ -51,49 +51,15 @@ public class BiasErrorGraph extends CountsGraph {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
-		// init with same value. Shorter stat.?
-		// Possibly not all links have values for all hours.
-		double[] meanRelError = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-		int[] nbrRelErr = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		double[] meanAbsError = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-		int[] nbrAbsErr = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		double[] meanAbsBias = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-		int[] nbrAbsBias = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		errorStats.calculateErrorStats(this.ccl_);
+		
+		double[] meanRelError = errorStats.getMeanRelError();
+		double[] meanAbsError = errorStats.getMeanAbsError();
+		double[] meanAbsBias = errorStats.getMeanAbsBias();
 
-		Iterator<CountSimComparison> l_it = this.ccl_.iterator();
-		while (l_it.hasNext()) {
-			CountSimComparison cc = l_it.next();
-			int hour = cc.getHour() - 1;
-			meanRelError[hour] += Math.abs(cc.calculateRelativeError());
-			nbrRelErr[hour]++;
-
-			meanAbsError[hour] += Math.abs(cc.getSimulationValue() - cc.getCountValue());
-			nbrAbsErr[hour]++;
-
-			meanAbsBias[hour] += cc.getSimulationValue() - cc.getCountValue();
-			nbrAbsBias[hour]++;
-		}// while
 
 		for (int h = 0; h < 24; h++) {
-			if (nbrRelErr[h] > 0) {
-				meanRelError[h] /= nbrRelErr[h];
-			} else {
-				meanRelError[h] = 1000.0;
-			}
-			if (nbrAbsErr[h] > 0) {
-				meanAbsError[h] /= nbrAbsErr[h];
-			} else {
-				meanAbsError[h] = 1.0;
-			}
-			if (nbrAbsBias[h] > 0) {
-				meanAbsBias[h] /= nbrAbsBias[h];
-			} else {
-				meanAbsBias[h] = 1.0;
-			}
-
 			dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
 			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
 			dataset1.addValue(meanAbsBias[h], "Mean abs bias", Integer.toString(h + 1));
