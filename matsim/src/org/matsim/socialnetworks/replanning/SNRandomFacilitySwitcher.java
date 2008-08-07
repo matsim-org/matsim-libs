@@ -21,7 +21,7 @@
 package org.matsim.socialnetworks.replanning;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.router.util.TravelTimeI;

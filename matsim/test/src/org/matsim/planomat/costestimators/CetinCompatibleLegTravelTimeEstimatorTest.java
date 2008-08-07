@@ -27,7 +27,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 

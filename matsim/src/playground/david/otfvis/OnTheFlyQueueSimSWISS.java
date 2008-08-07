@@ -27,7 +27,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 

@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 
 /**
  * An IntradayStrategy encapsulates the behavioral model for

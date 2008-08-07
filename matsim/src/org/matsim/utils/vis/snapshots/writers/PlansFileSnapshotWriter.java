@@ -21,11 +21,11 @@
 package org.matsim.utils.vis.snapshots.writers;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -67,7 +67,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 
 	/**
 	 * Writes the position infos as plans to a file using
-	 * {@link org.matsim.plans.PlansWriter}
+	 * {@link org.matsim.population.PlansWriter}
 	 */
 	private void writePlans() {
 		PlansWriter pw = new PlansWriter(this.plans, this.filename, this.version);

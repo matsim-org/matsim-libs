@@ -25,11 +25,11 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.XY2Links;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
+import org.matsim.population.PlansWriter;
+import org.matsim.population.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 

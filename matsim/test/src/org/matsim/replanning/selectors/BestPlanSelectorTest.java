@@ -22,8 +22,8 @@ package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
  * Test for {@link BestPlanSelector}.

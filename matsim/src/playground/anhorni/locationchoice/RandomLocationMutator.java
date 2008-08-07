@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
 
 
 public class RandomLocationMutator extends LocationMutator {

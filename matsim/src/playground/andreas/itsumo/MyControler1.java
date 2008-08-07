@@ -30,11 +30,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.Route;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.Route;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 

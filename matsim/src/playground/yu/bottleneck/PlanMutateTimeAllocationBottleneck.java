@@ -21,14 +21,14 @@
 package playground.yu.bottleneck;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.misc.Time;
 
 /**
- * it's a modified copy of org.matsim.plans.algorithms.PlanMutateTimeAllocation
+ * it's a modified copy of org.matsim.population.algorithms.PlanMutateTimeAllocation
  * @author yu
  *
  */

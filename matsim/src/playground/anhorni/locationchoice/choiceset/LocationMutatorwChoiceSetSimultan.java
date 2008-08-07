@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
+import org.matsim.population.Act;
 import org.matsim.utils.geometry.CoordI;
 
 public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet {

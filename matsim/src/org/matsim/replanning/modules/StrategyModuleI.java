@@ -20,7 +20,7 @@
 
 package org.matsim.replanning.modules;
 
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 
 /**
  * A module which modifies a single plan.

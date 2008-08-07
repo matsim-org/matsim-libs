@@ -24,8 +24,8 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plans;
+import org.matsim.population.Leg;
+import org.matsim.population.Plans;
 
 public class DestinationDependentColorizer implements PostProcessorI {
 

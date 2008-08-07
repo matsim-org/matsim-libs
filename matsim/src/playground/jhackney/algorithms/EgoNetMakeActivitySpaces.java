@@ -22,11 +22,11 @@ package playground.jhackney.algorithms;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonCalcActivitySpace;
-import org.matsim.plans.algorithms.PersonDrawActivtiySpaces;
-import org.matsim.plans.algorithms.PersonWriteActivitySpaceTable;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonCalcActivitySpace;
+import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
+import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 

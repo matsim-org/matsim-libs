@@ -29,9 +29,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
 import org.matsim.utils.geometry.CoordI;
 
@@ -106,7 +106,7 @@ public class SocialNetwork {
 	}
 
 	/**
-	 * Generates a Bernoulli (Erdös/Renyi) network with link
+	 * Generates a Bernoulli (Erdï¿½s/Renyi) network with link
 	 * probability modified by the distance between alters
 	 *
 	 * 
@@ -242,7 +242,7 @@ public class SocialNetwork {
 	}
 
 	/**
-	 * Generates a classical (Erdös/Renyi) undirected random graph of degree kbar
+	 * Generates a classical (Erdï¿½s/Renyi) undirected random graph of degree kbar
 	 * @author jhackney
 	 * 
 	 */

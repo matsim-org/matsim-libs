@@ -6,9 +6,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Route;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -42,7 +42,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	 * TODO [an] No other transport means are implemented, yet.
 	 * 
 	 * (non-Javadoc)
-	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.plans.Leg, org.matsim.plans.Act, org.matsim.plans.Act, double)
+	 * @see org.matsim.router.PlansCalcRoute#handleCarLeg(org.matsim.population.Leg, org.matsim.population.Act, org.matsim.population.Act, double)
 	 */
 	@Override
 	protected double handleCarLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {

@@ -33,11 +33,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlan.Type;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Route;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * @author yu

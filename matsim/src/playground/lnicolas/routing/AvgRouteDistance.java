@@ -22,10 +22,10 @@ package playground.lnicolas.routing;
 
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.network.Node;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Route;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class AvgRouteDistance extends PersonAlgorithm {
 

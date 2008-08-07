@@ -30,11 +30,11 @@ import java.util.Random;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PlansScenarioCut;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
+import org.matsim.population.algorithms.PlansScenarioCut;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 

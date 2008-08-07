@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.router.util.TravelCostI;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;

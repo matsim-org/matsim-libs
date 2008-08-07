@@ -25,9 +25,9 @@ package playground.johannes.mobsim;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
 
 /**

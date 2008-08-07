@@ -25,10 +25,10 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 

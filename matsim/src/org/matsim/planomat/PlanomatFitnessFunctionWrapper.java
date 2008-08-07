@@ -24,10 +24,10 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Route;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
+import org.matsim.population.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.world.Location;
 

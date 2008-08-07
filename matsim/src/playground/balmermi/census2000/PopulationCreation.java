@@ -28,8 +28,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 

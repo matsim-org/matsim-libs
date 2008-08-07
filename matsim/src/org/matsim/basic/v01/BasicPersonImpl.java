@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.plans.Knowledge;
+import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.CustomizableImpl;
 
 // TODO [balmermi]: need discussion about 'extends CustomizableImpl'

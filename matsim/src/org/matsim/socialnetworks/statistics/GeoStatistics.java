@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.facilities.Facility;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.Location;

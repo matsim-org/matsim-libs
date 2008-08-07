@@ -22,8 +22,8 @@ package org.matsim.roadpricing;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plans;
+import org.matsim.population.Leg;
+import org.matsim.population.Plans;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;

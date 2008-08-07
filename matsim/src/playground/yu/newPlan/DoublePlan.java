@@ -20,8 +20,8 @@
 
 package playground.yu.newPlan;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
@@ -46,7 +46,7 @@ public class DoublePlan extends NewPlan {
 	/**
 	 * writes an old Person and also new Persons in new plansfile.
 	 * 
-	 * @see org.matsim.plans.algorithms.PersonAlgorithm#run(org.matsim.plans.Person)
+	 * @see org.matsim.population.algorithms.PersonAlgorithm#run(org.matsim.population.Person)
 	 */
 	@Override
 	public void run(Person person) {

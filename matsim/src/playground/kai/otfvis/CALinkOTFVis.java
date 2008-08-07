@@ -23,7 +23,7 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
@@ -430,7 +430,7 @@ public class CALinkOTFVis extends Thread {
 			super(address, res);
 			this.DELAYSIM = 20;
 
-			verbot = createButton("†-Verbot ist AUS", "vb", null, "toggle †berholverbot");
+			verbot = createButton("ï¿½-Verbot ist AUS", "vb", null, "toggle ï¿½berholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
 			verbot.setBorderPainted(true);
 			verbot.setMargin(new Insets(10, 10, 10, 10));
@@ -442,7 +442,7 @@ public class CALinkOTFVis extends Thread {
 		protected boolean onAction(String command) {
 			if(command.equals("vb")) {
 				CALink.ueberholverbot = !CALink.ueberholverbot;
-				verbot.setText(CALink.ueberholverbot ? "†-Verbot ist AN" :"†-Verbot ist AUS");
+				verbot.setText(CALink.ueberholverbot ? "ï¿½-Verbot ist AN" :"ï¿½-Verbot ist AUS");
 			}
 			return false; // return id command was handeled
 		}

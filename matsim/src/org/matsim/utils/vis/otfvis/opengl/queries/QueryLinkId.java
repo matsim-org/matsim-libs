@@ -30,7 +30,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.Link;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Executor;
 import org.matsim.utils.collections.QuadTree.Rect;

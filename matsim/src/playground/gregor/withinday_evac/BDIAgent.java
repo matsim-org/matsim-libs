@@ -28,7 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.BlockedLinksAnalyzer;

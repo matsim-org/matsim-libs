@@ -21,7 +21,7 @@
 package org.matsim.replanning.modules;
 
 import org.matsim.controler.Controler;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for 

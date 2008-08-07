@@ -24,8 +24,8 @@
 package playground.johannes.eut;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.PlansCalcRoute;
 

@@ -22,7 +22,7 @@ package org.matsim.withinday.routeprovider;
 
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 
 
 /**

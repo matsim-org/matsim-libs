@@ -28,8 +28,8 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 

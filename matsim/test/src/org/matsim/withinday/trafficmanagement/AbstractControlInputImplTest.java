@@ -25,7 +25,7 @@ import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
 
 

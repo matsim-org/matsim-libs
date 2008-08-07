@@ -37,9 +37,9 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.xml.sax.SAXException;
 

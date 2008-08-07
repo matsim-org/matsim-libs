@@ -30,7 +30,7 @@ import org.matsim.events.EventAgentStuck;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.world.Location;
 
 public class MyRecentEventsBasedEstimator

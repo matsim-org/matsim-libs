@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.Simulation;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 
 public class DummyMobSim extends Simulation {

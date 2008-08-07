@@ -34,7 +34,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 
 import playground.balmermi.algos.RouteSetGenerator;
 

@@ -21,8 +21,8 @@
 package org.matsim.replanning.selectors;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
  * Changes to another plan if that plan is better.  Probability to change depends on score difference.

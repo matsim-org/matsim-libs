@@ -28,7 +28,7 @@ import java.util.List;
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

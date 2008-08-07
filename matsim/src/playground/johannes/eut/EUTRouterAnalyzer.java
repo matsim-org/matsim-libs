@@ -41,8 +41,8 @@ import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.plans.Person;
-import org.matsim.plans.Route;
+import org.matsim.population.Person;
+import org.matsim.population.Route;
 import org.matsim.utils.io.IOUtils;
 
 /**

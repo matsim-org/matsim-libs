@@ -30,9 +30,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicPlanImpl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 
 public class ActChainDistributionWriter {
 

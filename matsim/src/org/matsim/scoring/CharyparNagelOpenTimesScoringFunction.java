@@ -26,8 +26,8 @@ import java.util.TreeSet;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Plan;
 import org.matsim.utils.misc.Time;
 
 /**

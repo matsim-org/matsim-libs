@@ -20,7 +20,7 @@
 
 package playground.marcel;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.TimeAllocationMutator;

@@ -29,10 +29,10 @@ import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 

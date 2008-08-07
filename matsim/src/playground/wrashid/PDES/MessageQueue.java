@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 public class MessageQueue {
 	//TreeMap<String, Message> queue = new TreeMap<String, Message>();

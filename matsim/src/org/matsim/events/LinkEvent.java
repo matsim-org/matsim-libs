@@ -22,8 +22,8 @@ package org.matsim.events;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.xml.sax.helpers.AttributesImpl;
 
 public abstract class LinkEvent extends BasicEvent {

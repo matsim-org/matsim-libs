@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type

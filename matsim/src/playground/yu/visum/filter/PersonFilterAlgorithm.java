@@ -1,7 +1,7 @@
 package playground.yu.visum.filter;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * @author yu

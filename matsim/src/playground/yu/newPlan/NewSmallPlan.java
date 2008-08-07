@@ -20,9 +20,9 @@
 
 package playground.yu.newPlan;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonAlgorithmI;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type

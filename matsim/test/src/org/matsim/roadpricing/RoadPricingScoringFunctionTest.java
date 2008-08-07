@@ -24,7 +24,7 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;

@@ -20,8 +20,8 @@
 
 package org.matsim.replanning.selectors;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
  * Selects the plan with the best score from the existing plans of the person.

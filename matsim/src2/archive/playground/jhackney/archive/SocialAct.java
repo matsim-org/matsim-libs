@@ -25,8 +25,8 @@ import java.util.Vector;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
 
 /**
  * SocialAct is an object encompassing an activity type, a

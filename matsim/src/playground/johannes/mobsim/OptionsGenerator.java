@@ -25,7 +25,7 @@ package playground.johannes.mobsim;
 
 import java.util.List;
 
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 
 /**
  * @author illenberger

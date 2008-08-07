@@ -24,8 +24,8 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
 
 /**
  * test of NewAgentPtPlan

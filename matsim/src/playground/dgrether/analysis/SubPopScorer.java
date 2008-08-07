@@ -29,11 +29,11 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PlanCollectFromAlgorithm;
-import org.matsim.plans.filters.RouteLinkFilter;
-import org.matsim.plans.filters.SelectedPlanFilter;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
+import org.matsim.population.filters.RouteLinkFilter;
+import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 

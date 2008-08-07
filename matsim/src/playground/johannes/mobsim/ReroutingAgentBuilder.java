@@ -23,7 +23,7 @@
  */
 package playground.johannes.mobsim;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 
 /**

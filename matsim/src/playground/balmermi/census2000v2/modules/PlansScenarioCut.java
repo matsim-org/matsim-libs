@@ -26,10 +26,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.utils.geometry.CoordI;
 
 import playground.balmermi.census2000v2.data.CAtts;

@@ -32,9 +32,9 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
@@ -46,7 +46,7 @@ import org.matsim.utils.io.IOUtils;
  * <li>average of the score of the best plan of each agent</li>
  * <li>average of the average score of all plans of each agent</li>
  * </ul>
- * Plans with {@linkplain org.matsim.plans.Plan#isUndefinedScore(double) undefined scores}
+ * Plans with {@linkplain org.matsim.population.Plan#isUndefinedScore(double) undefined scores}
  * are not included in the statistics. The calculated values are written to a file, each iteration on
  * a separate line.
  *

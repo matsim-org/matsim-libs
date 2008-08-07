@@ -21,7 +21,7 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 

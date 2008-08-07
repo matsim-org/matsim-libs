@@ -35,6 +35,6 @@
  * forget to call {@link org.matsim.scoring.EventsToScore#finish()} after
  * processing all events.
  *
- * @see org.matsim.plans.algorithms.PlanAverageScore
+ * @see org.matsim.population.algorithms.PlanAverageScore
  */
 package org.matsim.scoring;

@@ -20,8 +20,8 @@
 
 package org.matsim.scoring;
 
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score

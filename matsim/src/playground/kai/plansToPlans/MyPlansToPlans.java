@@ -26,10 +26,10 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
+import org.matsim.population.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
@@ -61,7 +61,7 @@ public class MyPlansToPlans {
 		final Plans plans = new Plans(Plans.USE_STREAMING);
 		final PlansReaderI plansReader = new MatsimPlansReader(plans);
 		final PlansWriter plansWriter = new PlansWriter(plans);
-//		plans.addAlgorithm(new org.matsim.plans.algorithms.XY2Links(network));
+//		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

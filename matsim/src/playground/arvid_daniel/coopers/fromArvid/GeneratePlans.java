@@ -26,11 +26,11 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -70,7 +70,7 @@ public class GeneratePlans {
 			Act actEnd = new Act("h", 0,0, destLink, arrivalTime, arrivalTime + 3*3600, 3*3600, false);
 
 			Leg leg = new Leg(0, "car", "00","00","00");
-			org.matsim.plans.Route route = dijkstra.calcLeastCostPath(startLink.getToNode(), destLink.getFromNode(), endTime);
+			org.matsim.population.Route route = dijkstra.calcLeastCostPath(startLink.getToNode(), destLink.getFromNode(), endTime);
 			if (route == null) throw new RuntimeException("No route found from node 2 to 22");
 			leg.setRoute(route);
 

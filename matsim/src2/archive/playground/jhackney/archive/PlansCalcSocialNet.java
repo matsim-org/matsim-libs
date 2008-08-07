@@ -22,10 +22,10 @@ package playground.jhackney.deprecated;
 
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
-import org.matsim.plans.algorithms.PlansAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PlansAlgorithm;
 
 public class PlansCalcSocialNet extends PlansAlgorithm implements
 		PersonAlgorithmI {

@@ -26,9 +26,9 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.stats.algorithms.BasicPlanStats;
 import org.matsim.stats.algorithms.PlanScoreTrajectory;
 import org.matsim.stats.algorithms.PlanStatsI;

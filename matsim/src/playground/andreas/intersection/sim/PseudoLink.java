@@ -17,7 +17,7 @@ import org.matsim.mobsim.Vehicle;
 import org.matsim.mobsim.VehicleDepartureTimeComparator;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Leg;
+import org.matsim.population.Leg;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 

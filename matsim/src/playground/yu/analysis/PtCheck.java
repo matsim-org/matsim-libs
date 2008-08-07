@@ -23,9 +23,9 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 
 /**

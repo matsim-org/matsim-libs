@@ -21,7 +21,7 @@
 package org.matsim.router.util;
 
 import org.matsim.network.Node;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 
 public interface LeastCostPathCalculator {
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double starttime);

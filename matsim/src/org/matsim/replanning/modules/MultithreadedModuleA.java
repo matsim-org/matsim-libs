@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 
 /**
  * An abstract strategy module for running multiple plan algorithms in parallel.

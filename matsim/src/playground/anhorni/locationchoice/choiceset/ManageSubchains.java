@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Vector;
 
 //import org.apache.log4j.Logger;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 
 public class ManageSubchains {
 	

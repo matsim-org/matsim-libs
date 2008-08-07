@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 public class MessageQueue {
 	//TreeMap<String, Message> queue = new TreeMap<String, Message>();

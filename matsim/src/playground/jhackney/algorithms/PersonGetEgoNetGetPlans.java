@@ -3,8 +3,8 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 public class PersonGetEgoNetGetPlans {

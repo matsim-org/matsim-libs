@@ -38,7 +38,7 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;

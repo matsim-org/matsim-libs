@@ -26,7 +26,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;

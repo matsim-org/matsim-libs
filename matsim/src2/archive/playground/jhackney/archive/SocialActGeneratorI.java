@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.interactions;
 
 import java.util.Collection;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 public interface SocialActGeneratorI {
 

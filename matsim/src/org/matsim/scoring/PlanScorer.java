@@ -20,8 +20,8 @@
 
 package org.matsim.scoring;
 
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
 
 
 
@@ -43,7 +43,7 @@ public class PlanScorer {
 
 	public double getScore(final Plan plan) {
 		ScoringFunction function = this.factory.getNewScoringFunction(plan);
-	  org.matsim.plans.Leg leg;
+	  org.matsim.population.Leg leg;
 		for (int i = 1; i < plan.getActsLegs().size(); i++) {
 			if (i % 2 != 0) {
 				leg = (Leg) plan.getActsLegs().get(i);

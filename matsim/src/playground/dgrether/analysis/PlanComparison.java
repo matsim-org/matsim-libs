@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.Set;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.plans.Act;
+import org.matsim.population.Act;
 /**
  * This Class provides a data object to compare to iterations. It
  * is needed to save some memory while running the PlanComparator. 

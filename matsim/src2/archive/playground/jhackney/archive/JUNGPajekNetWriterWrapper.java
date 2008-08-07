@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 
 import playground.jhackney.module.socialnet.SocialNetEdge;
 import playground.jhackney.module.socialnet.SocialNetwork;

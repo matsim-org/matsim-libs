@@ -28,8 +28,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Knowledge;
-import org.matsim.plans.Person;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
 
 /**
  * This class returns an ArrayList of the facilities of a certain type that a

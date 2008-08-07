@@ -2,9 +2,9 @@ package playground.yu.visum.filter;
 
 import java.util.List;
 
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 public class ActTypeFilter extends PersonFilterA {
 	private boolean result = false;

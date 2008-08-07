@@ -27,14 +27,14 @@ import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.ActivitySpace;
-import org.matsim.plans.ActivitySpaceBean;
-import org.matsim.plans.ActivitySpaceCassini;
-import org.matsim.plans.ActivitySpaceEllipse;
-import org.matsim.plans.ActivitySpaceSuperEllipse;
-import org.matsim.plans.Knowledge;
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.ActivitySpace;
+import org.matsim.population.ActivitySpaceBean;
+import org.matsim.population.ActivitySpaceCassini;
+import org.matsim.population.ActivitySpaceEllipse;
+import org.matsim.population.ActivitySpaceSuperEllipse;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.geometry.CoordI;
 
 public class PersonDrawActivitySpace extends PersonAlgorithm {

@@ -8,7 +8,7 @@
  * <br>
  * The code for the actual work these classes do should not be within this
  * package, but in other packages (e.g. {@link org.matsim.analysis},
- * {@link org.matsim.plans.algorithms}, ...). In this package are really only
+ * {@link org.matsim.population.algorithms}, ...). In this package are really only
  * classes with main-methods that offer some functionality to the outside by
  * using code from other packages.
  */

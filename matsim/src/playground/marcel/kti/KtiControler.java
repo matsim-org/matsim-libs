@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.controler.Controler;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCostI;

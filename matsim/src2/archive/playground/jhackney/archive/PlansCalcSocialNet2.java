@@ -21,10 +21,10 @@
 package playground.jhackney.deprecated;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
-import org.matsim.plans.algorithms.PlansAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonAlgorithmI;
+import org.matsim.population.algorithms.PlansAlgorithm;
 
 import playground.jhackney.io.PajekWriter1;
 import playground.jhackney.socialnet.SocialNetwork;

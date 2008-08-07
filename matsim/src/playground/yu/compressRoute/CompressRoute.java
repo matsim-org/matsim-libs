@@ -31,11 +31,11 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import org.matsim.network.Link;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * this Class counts and writes the amount of "new" filtered links as well as
@@ -75,7 +75,7 @@ public class CompressRoute extends PersonAlgorithm {
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
 	 *
-	 * @see org.matsim.plans.algorithms.PersonAlgorithm#run(org.matsim.plans.Person)
+	 * @see org.matsim.population.algorithms.PersonAlgorithm#run(org.matsim.population.Person)
 	 */
 	@Override
 	public void run(final Person person) {

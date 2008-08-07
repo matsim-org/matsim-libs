@@ -22,16 +22,16 @@ package org.matsim.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
-import org.matsim.plans.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
 /**
- * Wraps the {@link org.matsim.plans.algorithms.PlanMutateTimeAllocation}-
+ * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link StrategyModuleI} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser
- * @see org.matsim.plans.algorithms.PlanMutateTimeAllocation
+ * @see org.matsim.population.algorithms.PlanMutateTimeAllocation
  */
 public class TimeAllocationMutator extends MultithreadedModuleA {
 

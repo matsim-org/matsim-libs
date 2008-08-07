@@ -1,8 +1,8 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 
 /**
  * Write a new plans-file(.xml), while reading an old plans-file(.xml). eine

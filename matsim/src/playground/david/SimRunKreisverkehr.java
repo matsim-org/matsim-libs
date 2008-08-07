@@ -28,9 +28,9 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 

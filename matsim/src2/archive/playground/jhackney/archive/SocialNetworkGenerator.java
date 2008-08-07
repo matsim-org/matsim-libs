@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 import playground.jhackney.socialnet.SocialNetwork;
 

@@ -22,7 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.world.Location;
 

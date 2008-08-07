@@ -26,9 +26,9 @@ package playground.johannes.eut;
 import org.apache.log4j.Logger;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
  * @author illenberger

@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
 import org.matsim.withinday.mobsim.OccupiedVehicle;
 
 /**

@@ -27,7 +27,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 import playground.anhorni.locationchoice.choiceset.LocationMutatorwChoiceSetSimultan;

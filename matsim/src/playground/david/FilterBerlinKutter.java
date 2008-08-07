@@ -30,13 +30,13 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.plans.Leg;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Leg;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.World;
 
 class FilterPersons extends PersonAlgorithm{

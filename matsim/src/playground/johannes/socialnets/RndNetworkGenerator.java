@@ -34,9 +34,9 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 

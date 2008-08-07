@@ -20,7 +20,7 @@
 
 package org.matsim.socialnetworks.socialnet;
 
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 public class SocialNetEdge {
 

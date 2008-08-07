@@ -32,8 +32,8 @@ import org.matsim.events.handler.EventHandlerAgentArrivalI;
 import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 
 /**
  * Calculates continuously the score of the selected plans of a given population

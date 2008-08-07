@@ -28,8 +28,8 @@ import org.matsim.mobsim.QueueNode;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 
 import playground.gregor.withinday_evac.BDIAgent;
 import playground.gregor.withinday_evac.communication.InformationExchanger;

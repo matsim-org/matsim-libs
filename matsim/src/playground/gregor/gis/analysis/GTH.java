@@ -21,7 +21,7 @@
 package playground.gregor.gis.analysis;
 
 import org.matsim.network.Link;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.spatialschema.geometry.geometry.Circle;
 

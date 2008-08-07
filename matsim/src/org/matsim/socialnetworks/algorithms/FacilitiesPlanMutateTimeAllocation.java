@@ -23,10 +23,10 @@ package org.matsim.socialnetworks.algorithms;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.utils.misc.Time;
 

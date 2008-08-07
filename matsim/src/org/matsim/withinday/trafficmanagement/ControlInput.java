@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 
 /**
  * @author dgrether

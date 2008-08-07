@@ -28,18 +28,18 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Act;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really 
- * writes out modified plans. It does <em>not</em> test that {@link org.matsim.plans.algorithms.XY2Links}
+ * writes out modified plans. It does <em>not</em> test that {@link org.matsim.population.algorithms.XY2Links}
  * works correctly, e.g. that it assigns the right links.
  *
  * @author mrieser

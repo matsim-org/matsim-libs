@@ -2,7 +2,7 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.handler.EventHandlerAgentArrivalI;
-import org.matsim.plans.Act;
+import org.matsim.population.Act;
 
 public class CompareActsEvents implements EventHandlerAgentArrivalI {
 

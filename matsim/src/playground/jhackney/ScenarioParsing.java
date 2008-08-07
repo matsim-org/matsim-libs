@@ -21,9 +21,9 @@
 package playground.jhackney;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;

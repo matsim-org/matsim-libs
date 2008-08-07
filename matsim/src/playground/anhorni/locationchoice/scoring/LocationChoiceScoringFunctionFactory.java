@@ -20,7 +20,7 @@
 
 package playground.anhorni.locationchoice.scoring;
 
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 

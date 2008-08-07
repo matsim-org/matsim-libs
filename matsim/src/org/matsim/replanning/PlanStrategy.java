@@ -23,8 +23,8 @@ package org.matsim.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.replanning.modules.StrategyModuleI;
 import org.matsim.replanning.selectors.PlanSelectorI;
 

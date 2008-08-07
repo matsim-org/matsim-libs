@@ -6,9 +6,9 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.EventAgentArrival;
 import org.matsim.events.EventAgentDeparture;
 import org.matsim.network.Link;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
 
 public class StartingLegMessage extends EventMessage {
 

@@ -22,7 +22,7 @@ package playground.dgrether.roadpricing;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 

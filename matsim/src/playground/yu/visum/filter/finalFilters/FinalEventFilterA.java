@@ -12,7 +12,7 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 import playground.yu.visum.filter.EventFilterA;
 import playground.yu.visum.writer.UserDefAtt;

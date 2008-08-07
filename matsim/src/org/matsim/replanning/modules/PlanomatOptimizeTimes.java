@@ -22,7 +22,7 @@ package org.matsim.replanning.modules;
 
 import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 
 /**
  * This class is just a multithreading wrapper for instances of the

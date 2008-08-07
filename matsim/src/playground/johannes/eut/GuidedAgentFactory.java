@@ -32,7 +32,7 @@ import java.util.Set;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 import org.matsim.router.util.TravelTimeI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;

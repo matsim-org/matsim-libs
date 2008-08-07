@@ -34,14 +34,14 @@ import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.PlansWriterHandler;
-import org.matsim.plans.Route;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
+import org.matsim.population.PlansWriterHandler;
+import org.matsim.population.Route;
 import org.matsim.utils.misc.ExeRunner;
 
 public class ExternalMobsim {

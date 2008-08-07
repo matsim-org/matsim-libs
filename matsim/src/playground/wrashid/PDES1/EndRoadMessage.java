@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.network.Link;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
 
 public class EndRoadMessage extends EventMessage {
 // TODO: This is not a normal Event message, perhaps I should redesign it and put it somewhere else

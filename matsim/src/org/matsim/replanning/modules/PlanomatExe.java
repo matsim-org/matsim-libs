@@ -23,10 +23,10 @@ package org.matsim.replanning.modules;
 import org.matsim.config.Module;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
+import org.matsim.population.PlansWriter;
 
 public class PlanomatExe extends ExternalModule {
 

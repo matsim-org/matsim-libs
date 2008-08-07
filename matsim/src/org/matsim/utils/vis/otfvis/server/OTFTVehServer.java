@@ -34,7 +34,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;

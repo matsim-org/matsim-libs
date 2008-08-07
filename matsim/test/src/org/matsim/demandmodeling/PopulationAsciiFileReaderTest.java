@@ -22,10 +22,10 @@ package org.matsim.demandmodeling;
 import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;

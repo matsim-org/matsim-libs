@@ -22,8 +22,8 @@ package playground.balmermi.mz;
 
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansWriter;
 
 public class MZ2Plans {
 

@@ -28,11 +28,11 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Leg;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
+import org.matsim.population.Leg;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
 import org.matsim.utils.io.IOUtils;
 
 /**

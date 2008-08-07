@@ -38,7 +38,7 @@ import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -89,7 +89,7 @@ public class PtcheckControler2 extends Controler {
 				ptRateWriter = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
 				ptRateWriter
-						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[€/m]\ttoll_paid[€]\tNumber of Drawees\tavg. tolled triplength\n");
+						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[ï¿½/m]\ttoll_paid[ï¿½]\tNumber of Drawees\tavg. tolled triplength\n");
 				ptRateWriter.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

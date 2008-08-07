@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Plan;
 import org.matsim.utils.geometry.CoordinateTransformationI;
 import org.matsim.utils.vis.kml.Document;
 import org.matsim.utils.vis.kml.Folder;

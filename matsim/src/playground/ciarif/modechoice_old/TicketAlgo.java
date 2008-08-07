@@ -23,8 +23,8 @@ package playground.ciarif.modechoice_old;
 
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.algorithms.PersonAlgorithm;
+import org.matsim.population.Person;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class TicketAlgo extends PersonAlgorithm {
 

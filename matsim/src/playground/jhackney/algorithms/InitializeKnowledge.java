@@ -3,10 +3,10 @@ package playground.jhackney.algorithms;
 import java.util.Iterator;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Knowledge;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 import org.matsim.socialnetworks.io.ActivityActReader;
 
 public class InitializeKnowledge {

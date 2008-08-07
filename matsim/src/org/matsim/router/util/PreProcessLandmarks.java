@@ -63,7 +63,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param costFunction
 	 * @param travelZone The area within which the landmarks should lie. If you know the
 	 * plans before routing, you could invoke
-	 * {@link org.matsim.plans.algorithms.FromToSummary} as a preprocess and
+	 * {@link org.matsim.population.algorithms.FromToSummary} as a preprocess and
 	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
 	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 */
@@ -76,7 +76,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param costFunction
 	 * @param travelZone The area within which the landmarks should lie. If you know the
 	 * plans before routing, you could invoke
-	 * {@link org.matsim.plans.algorithms.FromToSummary} as a preprocess and
+	 * {@link org.matsim.population.algorithms.FromToSummary} as a preprocess and
 	 * pass the travel zone to this constructor. Narrowing the zone where the landmarks should
 	 * be put normally improves the routing speed of {@link org.matsim.router.AStarLandmarks}.
 	 * @param landmarkCount

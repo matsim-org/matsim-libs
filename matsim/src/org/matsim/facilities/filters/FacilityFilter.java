@@ -22,7 +22,7 @@ package org.matsim.facilities.filters;
 
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
-import org.matsim.plans.filters.FilterI;
+import org.matsim.population.filters.FilterI;
 
 /**
  * @author meisterk

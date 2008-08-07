@@ -1,6 +1,6 @@
 package org.matsim.socialnetworks.scoring;
 
-import org.matsim.plans.Plan;
+import org.matsim.population.Plan;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScoringFunction;
 import org.matsim.scoring.ScoringFunction;

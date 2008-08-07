@@ -10,7 +10,7 @@
  * <li>Replanning</li>
  * </ul>
  * These three parts are repeated in a loop and build the iterations. By default, <em>Scoring</em> and <em>Replanning</em>
- * refers to {@link org.matsim.plans plans}, but it could as well be done for facilities, traffic lights, etc.<br>
+ * refers to {@link org.matsim.population plans}, but it could as well be done for facilities, traffic lights, etc.<br>
  *
  * The Controler offers several <em>extension points</em>, where additional functionality can be plugged in.
  * These extension points are realized with <em>Events</em> and <em>Listeners</em>:

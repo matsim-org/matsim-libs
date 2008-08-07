@@ -21,10 +21,10 @@
 package playground.ciarif;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.PlansWriter;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
+import org.matsim.population.PlansWriter;
 import org.matsim.world.MatsimWorldReader;
 
 import playground.balmermi.census2000.data.Households;

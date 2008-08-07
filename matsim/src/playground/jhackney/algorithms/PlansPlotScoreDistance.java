@@ -1,12 +1,12 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.plans.algorithms.PersonAlgorithmI;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.charts.XYScatterChart;
 
 public class PlansPlotScoreDistance extends PersonAlgorithm implements PersonAlgorithmI{

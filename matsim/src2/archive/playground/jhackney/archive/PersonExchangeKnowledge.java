@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Knowledge;
-import org.matsim.plans.Person;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
 
 import playground.jhackney.socialnet.SocialNetEdge;
 import playground.jhackney.socialnet.SocialNetwork;

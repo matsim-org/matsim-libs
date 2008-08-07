@@ -3,7 +3,7 @@ package playground.anhorni.locationchoice.choiceset;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.plans.Act;
+import org.matsim.population.Act;
 import org.matsim.utils.geometry.CoordI;
 
 public class SubChain {

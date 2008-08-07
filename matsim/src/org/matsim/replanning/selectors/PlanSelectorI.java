@@ -20,8 +20,8 @@
 
 package org.matsim.replanning.selectors;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 
 /**
  * select a plan of a person

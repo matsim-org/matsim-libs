@@ -21,7 +21,7 @@
 package playground.jhackney.events;
 
 import org.matsim.events.Events;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 public class EventGenerator {
     Events events=null;

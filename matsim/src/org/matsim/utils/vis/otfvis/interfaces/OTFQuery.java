@@ -24,7 +24,7 @@ import java.io.Serializable;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
 public interface OTFQuery extends Serializable{

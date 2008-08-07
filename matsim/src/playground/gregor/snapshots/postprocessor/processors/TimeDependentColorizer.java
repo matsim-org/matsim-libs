@@ -20,7 +20,7 @@
 
 package playground.gregor.snapshots.postprocessor.processors;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 public class TimeDependentColorizer implements PostProcessorI{
 

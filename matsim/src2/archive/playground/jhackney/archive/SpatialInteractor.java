@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 

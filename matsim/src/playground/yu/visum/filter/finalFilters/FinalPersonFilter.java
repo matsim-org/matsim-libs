@@ -1,6 +1,6 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 import playground.yu.visum.filter.PersonFilterA;
 

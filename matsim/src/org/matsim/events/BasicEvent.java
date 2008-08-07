@@ -20,7 +20,7 @@
 
 package org.matsim.events;
 
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 

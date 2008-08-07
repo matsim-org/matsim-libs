@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import java.util.ArrayList;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 import playground.jhackney.socialnet.SocialNetwork;
 

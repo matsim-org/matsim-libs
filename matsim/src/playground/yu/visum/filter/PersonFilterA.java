@@ -3,7 +3,7 @@
  */
 package playground.yu.visum.filter;
 
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 /**
  * This class must be subclassed, the subclass usually provides implementations

@@ -55,7 +55,7 @@ public class AllTests {
 		suite.addTest(org.matsim.mobsim.AllTests.suite());
 		suite.addTest(org.matsim.network.AllTests.suite());
 		suite.addTest(org.matsim.planomat.AllTests.suite());
-		suite.addTest(org.matsim.plans.AllTests.suite());
+		suite.addTest(org.matsim.population.AllTests.suite());
 		suite.addTest(org.matsim.replanning.AllTests.suite());
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
 		suite.addTest(org.matsim.router.AllTests.suite());

@@ -7,13 +7,13 @@ import java.util.List;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.Vehicle;
-import org.matsim.plans.Plan;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plan;
+import org.matsim.population.Plans;
 
 public class QuerySpinneNOW extends QuerySpinne {
 
 	/* (non-Javadoc)
-	 * @see org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne#getPersons(org.matsim.plans.Plans)
+	 * @see org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne#getPersons(org.matsim.population.Plans)
 	 */
 	@Override
 	protected List<Plan> getPersons(Plans plans, QueueNetworkLayer net) {

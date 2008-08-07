@@ -38,7 +38,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
 import org.matsim.trafficlights.data.SignalSystemConfiguration;

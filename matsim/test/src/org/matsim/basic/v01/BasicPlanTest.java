@@ -21,10 +21,10 @@
 package org.matsim.basic.v01;
 
 import org.apache.log4j.Logger;
-import org.matsim.plans.Act;
-import org.matsim.plans.Leg;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 

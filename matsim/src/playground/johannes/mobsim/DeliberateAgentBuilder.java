@@ -26,7 +26,7 @@ package playground.johannes.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 
 /**
  * A builder class that builds {@link DeliberateAgent} instances by decorating

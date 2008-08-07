@@ -26,8 +26,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 
 public class PlansWriteCustomAttributes {
 

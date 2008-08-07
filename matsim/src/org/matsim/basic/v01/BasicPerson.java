@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.matsim.plans.Knowledge;
+import org.matsim.population.Knowledge;
 
 /**
 *

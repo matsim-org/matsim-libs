@@ -25,11 +25,11 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.MatsimPlansReader;
-import org.matsim.plans.Plans;
-import org.matsim.plans.PlansReaderI;
-import org.matsim.plans.PlansWriter;
-import org.matsim.plans.algorithms.PersonDrawActivtiySpaces;
+import org.matsim.population.MatsimPlansReader;
+import org.matsim.population.Plans;
+import org.matsim.population.PlansReaderI;
+import org.matsim.population.PlansWriter;
+import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 

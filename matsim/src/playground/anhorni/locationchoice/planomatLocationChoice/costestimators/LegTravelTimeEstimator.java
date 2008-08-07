@@ -21,7 +21,7 @@
 package playground.anhorni.locationchoice.planomatLocationChoice.costestimators;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.world.Location;
 
 /**

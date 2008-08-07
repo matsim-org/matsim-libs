@@ -32,7 +32,7 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.charts.XYLineChart;
 
 /**

@@ -31,7 +31,7 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 
 /**
  * @author dgrether

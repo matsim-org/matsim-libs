@@ -22,7 +22,7 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.plans.Plans;
+import org.matsim.population.Plans;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

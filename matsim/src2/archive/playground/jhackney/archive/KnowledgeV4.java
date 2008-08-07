@@ -28,11 +28,11 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.ActivitySpace;
-import org.matsim.plans.ActivitySpaceBean;
-import org.matsim.plans.ActivitySpaceCassini;
-import org.matsim.plans.ActivitySpaceEllipse;
-import org.matsim.plans.ActivitySpaceSuperEllipse;
+import org.matsim.population.ActivitySpace;
+import org.matsim.population.ActivitySpaceBean;
+import org.matsim.population.ActivitySpaceCassini;
+import org.matsim.population.ActivitySpaceEllipse;
+import org.matsim.population.ActivitySpaceSuperEllipse;
 
 import playground.jhackney.socialnet.EgoNet;
 import playground.jhackney.mentalmap.MentalMap;

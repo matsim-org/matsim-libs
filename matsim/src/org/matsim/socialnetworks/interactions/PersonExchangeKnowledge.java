@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Knowledge;
-import org.matsim.plans.Person;
+import org.matsim.population.Act;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 

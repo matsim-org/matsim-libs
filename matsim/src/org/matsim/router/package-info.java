@@ -1,5 +1,5 @@
 /**
- * Contains different routing algorithms and {@linkplain org.matsim.plans.algorithms.PlanAlgorithmI PlanAlgorithms}
+ * Contains different routing algorithms and {@linkplain org.matsim.population.algorithms.PlanAlgorithmI PlanAlgorithms}
  * to use the routing algorithms on plans.
  * <br>
  * The routing algorithms, responsible for finding the least-cost-path between two nodes in the network, all
@@ -15,7 +15,7 @@
  * <br>
  * Nearly in all cases, the routes of all legs of a plan should be calculated. Thus, for the most commonly used
  * routing algorithms, there are wrapper classes that wrap the routing algorithm into a
- * {@link org.matsim.plans.algorithms.PlanAlgorithmI} for easy usage (e.g.
+ * {@link org.matsim.population.algorithms.PlanAlgorithmI} for easy usage (e.g.
  * {@link org.matsim.router.PlansCalcRouteDijkstra} and {@link org.matsim.router.PlansCalcRouteLandmarks}).
  * <br>
  * Note that the routing algorithms are generally seen as <b>not thread-safe</b>! If threads are used, one

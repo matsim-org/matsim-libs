@@ -27,10 +27,10 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.plans.Person;
-import org.matsim.plans.Plan;
-import org.matsim.plans.algorithms.PersonAlgorithm;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Municipality;

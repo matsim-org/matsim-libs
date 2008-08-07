@@ -37,7 +37,7 @@ import org.matsim.events.handler.EventHandlerLinkLeaveI;
 import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.Link;
-import org.matsim.plans.Route;
+import org.matsim.population.Route;
 import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.ControlInput;

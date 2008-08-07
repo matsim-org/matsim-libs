@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.jhackney.deprecated;
 
-import org.matsim.plans.Plans;
-import org.matsim.plans.algorithms.PlanAlgorithmI;
+import org.matsim.population.Plans;
+import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
 import playground.jhackney.algorithms.SNSecLocShortest;

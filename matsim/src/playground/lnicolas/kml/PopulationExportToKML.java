@@ -26,9 +26,9 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.plans.Act;
-import org.matsim.plans.Person;
-import org.matsim.plans.Plans;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plans;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;

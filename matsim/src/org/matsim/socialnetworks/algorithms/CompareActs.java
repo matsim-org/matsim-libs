@@ -1,6 +1,6 @@
 package org.matsim.socialnetworks.algorithms;
 
-import org.matsim.plans.Act;
+import org.matsim.population.Act;
 
 public class CompareActs {
 

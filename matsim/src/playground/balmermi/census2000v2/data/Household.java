@@ -26,7 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
-import org.matsim.plans.Person;
+import org.matsim.population.Person;
 
 import playground.balmermi.census2000.data.Municipality;
 
