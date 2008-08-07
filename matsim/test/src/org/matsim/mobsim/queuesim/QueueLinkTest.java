@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;

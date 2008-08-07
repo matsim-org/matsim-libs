@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.mobsim;
+package org.matsim.mobsim.queuesim;
 
 import java.util.HashMap;
 import java.util.Map;
