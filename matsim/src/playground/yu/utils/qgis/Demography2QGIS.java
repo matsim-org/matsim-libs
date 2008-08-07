@@ -36,8 +36,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -48,7 +48,7 @@ import org.matsim.utils.io.IOUtils;
  * 
  */
 public class Demography2QGIS {
-	private Plans plans;
+	private Population plans;
 	private String header = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
 			+ "planTravelTime;planTravelDistance;numberOfTrips";
@@ -75,7 +75,7 @@ public class Demography2QGIS {
 	}
 
 	private void init(String networkPath) {
-		this.plans = new Plans(false);
+		this.plans = new Population(false);
 
 		System.out.println("  reading the network...");
 		this.network = (NetworkLayer) Gbl.getWorld().createLayer(
@@ -85,7 +85,7 @@ public class Demography2QGIS {
 
 	private void readFiles(String plansfilePath) {
 		System.out.println("  reading file " + plansfilePath);
-		PlansReaderI plansReader0 = new MatsimPlansReader(this.plans);
+		PopulationReader plansReader0 = new MatsimPlansReader(this.plans);
 		plansReader0.readFile(plansfilePath);
 	}
 

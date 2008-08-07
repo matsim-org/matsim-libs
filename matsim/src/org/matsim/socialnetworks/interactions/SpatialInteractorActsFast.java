@@ -37,7 +37,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
@@ -81,7 +81,7 @@ public class SpatialInteractorActsFast {
 	 * @param rndEncounterProb
 	 * @param iteration
 	 */
-	public void interact(Plans plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration) {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
@@ -136,7 +136,7 @@ public class SpatialInteractorActsFast {
 	 * @param plans
 	 * @return
 	 */
-	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Plans plans){
+	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Population plans){
 		System.out.println("Making a new activity map for spatial interactions");
 		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();

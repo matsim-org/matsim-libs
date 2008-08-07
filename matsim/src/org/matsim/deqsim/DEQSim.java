@@ -41,7 +41,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 
@@ -62,7 +62,7 @@ public class DEQSim extends ExternalMobsim {
 
 	private IterationStopWatch stopwatch = null;
 
-	public DEQSim(final Plans population, final Events events) {
+	public DEQSim(final Population population, final Events events) {
 		super(population, events);
 	}
 

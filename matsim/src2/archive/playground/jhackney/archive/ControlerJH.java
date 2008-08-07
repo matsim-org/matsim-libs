@@ -60,9 +60,9 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.replanning.StrategyManager;
@@ -98,7 +98,7 @@ public class Controler {
 	protected static final String DIRECTORY_ITERS = "ITERS";
 
 	protected final Events events = new Events();
-	protected Plans population = null;
+	protected Population population = null;
 
 	protected PlanStatsManager statsManager = null;
 
@@ -348,7 +348,7 @@ public class Controler {
 			printNote("", "dumping all agents' plans...");
 			this.stopwatch.beginOperation("dump all plans");
 			String outversion = this.config.plans().getOutputVersion();
-			PlansWriter plansWriter = new PlansWriter(this.population, getIterationFilename(Controler.FILENAME_PLANS), outversion);
+			PopulationWriter plansWriter = new PopulationWriter(this.population, getIterationFilename(Controler.FILENAME_PLANS), outversion);
 			plansWriter.setUseCompression(true);
 			plansWriter.write();
 			this.stopwatch.endOperation("dump all plans");
@@ -480,11 +480,11 @@ public class Controler {
 		}
 	}
 
-	protected Plans loadPopulation() {
-		Plans population = new Plans(Plans.NO_STREAMING);
+	protected Population loadPopulation() {
+		Population population = new Population(Population.NO_STREAMING);
 
 		printNote("", "  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(this.config.plans().getInputFile());
 		population.printPlansCount();
 		printNote("", "  done");
@@ -579,7 +579,7 @@ public class Controler {
 
 				printNote("", "  writing plans xml file... ");
 				// write the plans into the default output-directory
-				PlansWriter plansWriter = new PlansWriter(this.population, getOutputFilename("output_plans.xml.gz"),
+				PopulationWriter plansWriter = new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
 						this.config.plans().getOutputVersion());
 				plansWriter.write();
 				printNote("", "  done");
@@ -729,7 +729,7 @@ public class Controler {
 		return Controler.iteration;
 	}
 
-	public final Plans getPopulation() {
+	public final Population getPopulation() {
 		return this.population;
 	}
 

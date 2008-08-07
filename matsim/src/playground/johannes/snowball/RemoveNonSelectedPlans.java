@@ -32,8 +32,8 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlansScenarioCut;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -54,7 +54,7 @@ public class RemoveNonSelectedPlans {
 		Random rnd = new Random(Gbl.getConfig().global().getRandomSeed());
 		
 		System.out.println("Loading persons...");
-		Plans plans = data.getPopulation();
+		Population plans = data.getPopulation();
 		
 		System.out.println("Removing non seleceted plans...");
 		for(Person p : plans) {
@@ -92,11 +92,11 @@ public class RemoveNonSelectedPlans {
 		System.out.println("Removed "+(size-plans.getPersons().size())+" persons. size = " + plans.getPersons().size());
 		System.out.println("Writing plans...");
 		
-		PlansWriter writer = new PlansWriter(plans);
+		PopulationWriter writer = new PopulationWriter(plans);
 		writer.write();
 	}
 
-	private static CoordI getMean(Plans plans) {
+	private static CoordI getMean(Population plans) {
 		double sumX = 0;
 		double sumY = 0;
 		for(Person p : plans) {

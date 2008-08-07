@@ -28,7 +28,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.world.Zone;
@@ -52,7 +52,7 @@ public class PlansCreateTripsFromODMatrix {
 		this.timeBinSize = (24*3600) / timeDistribution.size();
 	}
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

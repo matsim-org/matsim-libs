@@ -33,7 +33,7 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -99,10 +99,10 @@ public class MyControler1 extends Controler {
 	}
 
 	@Override
-	protected Plans loadPopulation() {
+	protected Population loadPopulation() {
 
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		log.info("  generating plans... ");
 
@@ -305,7 +305,7 @@ public class MyControler1 extends Controler {
 		}
 	}
 
-	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Plans population){
+	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Population population){
 		Person p = new Person(new IdImpl(ii));
 		Plan plan = new Plan(p);
 		try {

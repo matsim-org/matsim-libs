@@ -36,13 +36,13 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 public class TRBAnalysis implements EventHandlerAgentDepartureI, EventHandlerAgentArrivalI {
 
 	final private Config config;
-	final private Plans population;
+	final private Population population;
 	final private double[][] sumTravelTimes = new double[3][12 * 30 + 1];
 	final private int[][] cntTravelTimes = new int[sumTravelTimes.length][sumTravelTimes[0].length];
 	final private HashMap<String, Double> agentDepartures = new HashMap<String, Double>();

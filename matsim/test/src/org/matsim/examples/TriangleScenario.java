@@ -28,8 +28,8 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
@@ -83,9 +83,9 @@ public abstract class TriangleScenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(Plans plans) {
+	public static final void writePlans(Population plans) {
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 	}

@@ -23,7 +23,7 @@ package playground.jhackney.algorithms;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
@@ -48,7 +48,7 @@ public class EgoNetMakeActivitySpaces {
 		Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		Plans plans = Scenario.readPlans();
+		Population plans = Scenario.readPlans();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
 		new SocialNetwork(plans);
@@ -109,7 +109,7 @@ public class EgoNetMakeActivitySpaces {
 //		new PersonsRandomizeId(plans);
 		Person ego=plans.getPerson("21924270");
 
-		Plans socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
+		Population socialPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
 //		// make the set of plans to use as EgoNet
 		socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
 //		plans.addAlgorithm(new PersonCalcActivitySpace("leisure"));

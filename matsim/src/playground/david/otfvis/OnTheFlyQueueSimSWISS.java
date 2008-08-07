@@ -27,7 +27,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
@@ -41,7 +41,7 @@ public class OnTheFlyQueueSimSWISS {
 	public static void main(String[] args) {
 		QueueSimulation sim;
 		NetworkLayer net;
-		Plans population;
+		Population population;
 		Events events;
 
 		String netFileName = "../../tmp/network.xml.gz";
@@ -59,7 +59,7 @@ public class OnTheFlyQueueSimSWISS {
 
 		Gbl.printElapsedTime();
 
-		population = new Plans();
+		population = new Population();
 
 		events = new Events();
 

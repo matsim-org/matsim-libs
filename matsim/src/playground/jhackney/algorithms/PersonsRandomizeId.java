@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.gbl.Gbl;
 
 public class PersonsRandomizeId {
 
-	public PersonsRandomizeId(Plans plans){
+	public PersonsRandomizeId(Population plans){
 			
 		int minId=14141414;
 		int maxId=0;

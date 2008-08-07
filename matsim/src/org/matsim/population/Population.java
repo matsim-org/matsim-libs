@@ -42,7 +42,7 @@ import org.matsim.utils.misc.Counter;
  *   (i.e. PlansHandlerImplXXX to PopulationHandlerImplXXX, and so on).
  *   Therefore everybody must agree with that!
  */
-public class Plans extends BasicPopulationImpl<Person> implements Iterable<Person> {
+public class Population extends BasicPopulationImpl<Person> implements Iterable<Person> {
 
 	public static final boolean USE_STREAMING = true;
 	public static final boolean NO_STREAMING = false;
@@ -58,17 +58,17 @@ public class Plans extends BasicPopulationImpl<Person> implements Iterable<Perso
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithmI> personAlgos = new ArrayList<PersonAlgorithmI>();
 
-	private static final Logger log = Logger.getLogger(Plans.class);
+	private static final Logger log = Logger.getLogger(Population.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Plans() {
+	public Population() {
 		this(!Gbl.getConfig().plans().switchOffPlansStreaming());
 	}
 
-	public Plans(final boolean isStreaming) {
+	public Population(final boolean isStreaming) {
 		this.isStreaming = isStreaming;
 	}
 

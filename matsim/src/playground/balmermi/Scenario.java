@@ -36,8 +36,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -134,9 +134,9 @@ public abstract class Scenario {
 		return Matrices.getSingleton();
 	}
 	
-	public static final Plans readPlans() {
+	public static final Population readPlans() {
 		System.out.println("  reding plans xml file... ");
-		Plans plans = new Plans();
+		Population plans = new Population();
 		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
@@ -146,9 +146,9 @@ public abstract class Scenario {
 	// write output
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(Plans plans) {
+	public static final void writePlans(Population plans) {
 		System.out.println("  writing plans xml file... ");
-		new PlansWriter(plans).write();
+		new PopulationWriter(plans).write();
 		System.out.println("  done.");
 	}
 

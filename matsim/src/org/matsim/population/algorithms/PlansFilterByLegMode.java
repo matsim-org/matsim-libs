@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
@@ -64,7 +64,7 @@ public class PlansFilterByLegMode {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Plans plans) {
+	public void run(Population plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		String never = "never";

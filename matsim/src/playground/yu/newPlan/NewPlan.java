@@ -24,8 +24,8 @@
 package playground.yu.newPlan;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
@@ -33,18 +33,18 @@ import org.matsim.population.algorithms.PersonAlgorithm;
  * 
  */
 public abstract class NewPlan extends PersonAlgorithm {
-	protected PlansWriter pw;
+	protected PopulationWriter pw;
 	protected NetworkLayer net;
 
-	public NewPlan(Plans plans) {
-		pw = new PlansWriter(plans);
+	public NewPlan(Population plans) {
+		pw = new PopulationWriter(plans);
 		pw.writeStartPlans();
 	}
 
 	/**
 	 * 
 	 */
-	public NewPlan(NetworkLayer network, Plans plans) {
+	public NewPlan(NetworkLayer network, Population plans) {
 		this(plans);
 		net = network;
 	}

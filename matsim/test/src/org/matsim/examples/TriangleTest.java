@@ -32,8 +32,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
@@ -157,7 +157,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println();
 
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(false);
+		Population plans = new Population(false);
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
@@ -199,7 +199,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println();
 
 		System.out.println("  writing plans xml file... ");
-		new PlansWriter(plans).write();
+		new PopulationWriter(plans).write();
 		System.out.println("  done.");
 
 		System.out.println("  writing network xml file... ");

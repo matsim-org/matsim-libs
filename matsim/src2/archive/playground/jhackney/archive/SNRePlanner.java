@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.jhackney.deprecated;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 
@@ -28,7 +28,7 @@ import playground.jhackney.algorithms.SNSecLocRandom;
 
 public class SNRePlanner  extends MultithreadedModuleA{
 	
-    public SNRePlanner(Plans plans) {
+    public SNRePlanner(Population plans) {
     	super();
 //    	this.estimator = estimator;
     //

@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import org.matsim.facilities.Facility;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.Location;
@@ -28,14 +28,14 @@ public class GeoStatistics {
 	 * @author jhackney
 	 */
 	Graph gg;
-	Plans plans;
+	Population plans;
 	SocialNetwork snet;
 	HashMap<Location, Vertex> locVertex = new HashMap<Location, Vertex>();
 	HashMap<Vertex, Location> vertexLoc = new HashMap<Vertex,Location>();
 	HashMap<Edge, Double> edgeStrength = new HashMap<Edge,Double>();
 //	Collection<Location> locations;
 
-	public GeoStatistics(Plans plans, SocialNetwork snet) {
+	public GeoStatistics(Population plans, SocialNetwork snet) {
 
 		this.plans=plans;
 		this.snet=snet;

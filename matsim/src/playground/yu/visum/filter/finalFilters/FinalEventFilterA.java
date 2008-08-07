@@ -12,7 +12,7 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.yu.visum.filter.EventFilterA;
 import playground.yu.visum.writer.UserDefAtt;
@@ -25,7 +25,7 @@ import playground.yu.visum.writer.UserDefAtt;
  */
 public abstract class FinalEventFilterA extends EventFilterA {
 	/*-----------------------MEMBER VARIABLES---------------------*/
-	protected Plans plans;
+	protected Population plans;
 
 	protected NetworkLayer network;
 
@@ -46,7 +46,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 	 * @param network -
 	 *            the NetworkLayer, which will be created in test
 	 */
-	public FinalEventFilterA(Plans plans, NetworkLayer network) {
+	public FinalEventFilterA(Population plans, NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}

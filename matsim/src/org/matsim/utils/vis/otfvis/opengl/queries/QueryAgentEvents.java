@@ -36,7 +36,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -87,7 +87,7 @@ public class QueryAgentEvents implements OTFQuery {
 	private MyEventsHandler handler = null;
 
 	
-	public void query(QueueNetworkLayer net, Plans plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentID);
 			events.addHandler(handler);

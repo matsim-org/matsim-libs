@@ -27,9 +27,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
@@ -54,8 +54,8 @@ public class PlansRunAlgorithm {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Plans plans = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		final Population plans = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
@@ -75,7 +75,7 @@ public class PlansRunAlgorithm {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 

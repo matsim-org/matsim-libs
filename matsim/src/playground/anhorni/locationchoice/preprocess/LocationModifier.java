@@ -14,7 +14,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -29,7 +29,7 @@ public class LocationModifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(Plans plans, NetworkLayer network, Facilities  facilities) {
+	public LocationModifier(Population plans, NetworkLayer network, Facilities  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}

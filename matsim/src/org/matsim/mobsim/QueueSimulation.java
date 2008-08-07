@@ -39,7 +39,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.VisConfig;
@@ -58,7 +58,7 @@ public class QueueSimulation {
 	protected static final int INFO_PERIOD = 3600;
 
 	private final Config config;
-	protected final Plans plans;
+	protected final Population plans;
 	protected QueueNetworkLayer network;
 	protected NetworkLayer networkLayer;
 
@@ -83,7 +83,7 @@ public class QueueSimulation {
 
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
-	public QueueSimulation(final NetworkLayer network, final Plans plans, final Events events) {
+	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());

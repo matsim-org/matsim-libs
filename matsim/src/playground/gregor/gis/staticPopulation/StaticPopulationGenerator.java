@@ -36,8 +36,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.gis.ShapeFileReader;
 
@@ -69,7 +69,7 @@ public class StaticPopulationGenerator {
 
 	public void createPopulation() {
 		int id = 0;
-		final Plans population = new Plans();
+		final Population population = new Population();
 		int inhabitants_all = 0;
 		int lost = 0;
 		for (final Feature zone : this.zones) {
@@ -118,7 +118,7 @@ public class StaticPopulationGenerator {
 			
 		}
 		System.err.println("inh:" + inhabitants_all + " agents:" + id + " lost:" + lost);
-		new PlansWriter(population,"padang_plans_v20080618.xml.gz", "v4").write();
+		new PopulationWriter(population,"padang_plans_v20080618.xml.gz", "v4").write();
 		
 	}
 	

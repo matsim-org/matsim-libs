@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansReaderMatsimV1.java
+ * PlansReaderMatsimV0.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -32,96 +33,86 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * A reader for plans files of MATSim according to <code>plans_v1.dtd</code>.
- * 
+ * A reader for plans files of MATSim according to <code>plans_v0.dtd</code>.
+ *
  * @author mrieser
  * @author balmermi
  */
-public class PlansReaderMatsimV1 extends MatsimXmlParser implements
-		PlansReaderI {
+public class PopulationReaderMatsimV0 extends MatsimXmlParser implements PopulationReader {
 
-	private final static String PLANS = "plans";
+	protected final static String PLANS = "plans";
+	protected final static String DEMAND = "demand";
+	protected final static String SEGMENT = "segment";
+	protected final static String MODEL = "model";
+	protected final static String PARAM = "param";
+	protected final static String PERSON = "person";
+	protected final static String PLAN = "plan";
+	protected final static String ACT = "act";
+	protected final static String LEG = "leg";
+	protected final static String ROUTE = "route";
 
-	private final static String PERSON = "person";
-
-	private final static String PLAN = "plan";
-
-	private final static String ACT = "act";
-
-	private final static String LEG = "leg";
-
-	private final static String ROUTE = "route";
-
-	private final Plans plans;
-
+	private final Population plans;
 	private Person currperson = null;
-
 	private Plan currplan = null;
-
 	private Leg currleg = null;
-
 	private Route currroute = null;
 
-	public PlansReaderMatsimV1(final Plans plans) {
+	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
+
+	public PopulationReaderMatsimV0(final Population plans) {
 		this.plans = plans;
 	}
 
 	@Override
-	public void startTag(final String name, final Attributes atts,
-			final Stack<String> context) {
-		if (PLANS.equals(name)) {
-			startPlans(atts);
-		}
-		else if (PERSON.equals(name)) {
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+		if (PERSON.equals(name)) {
 			startPerson(atts);
-		}
-		else if (PLAN.equals(name)) {
+		} else if (PLAN.equals(name)) {
 			startPlan(atts);
-		}
-		else if (ACT.equals(name)) {
+		} else if (ACT.equals(name)) {
 			startAct(atts);
-		}
-		else if (LEG.equals(name)) {
+		} else if (LEG.equals(name)) {
 			startLeg(atts);
-		}
-		else if (ROUTE.equals(name)) {
+		} else if (ROUTE.equals(name)) {
 			startRoute(atts);
-		}
-		else {
+		} else if (DEMAND.equals(name)) {
+			log.info("The tag <demand> is not supported");
+		} else if (SEGMENT.equals(name) || MODEL.equals(name) || (PARAM.equals(name) || PLANS.equals(name))) {
+			/* segment, model, param:
+			 * 		these are all inside <demand>, as we ignore that one, these are of no relevance
+			 * plans:
+			 * 		nothing to do for that one
+			 */
+		} else {
 			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 
 	@Override
-	public void endTag(final String name, final String content,
-			final Stack<String> context) {
+	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			try {
 				this.plans.addPerson(this.currperson);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				Gbl.errorMsg(e);
 			}
 			this.currperson = null;
-		}
-		else if (PLAN.equals(name)) {
-			this.currplan.getActsLegs().trimToSize();
+		} else if (PLAN.equals(name)) {
 			this.currplan = null;
-		}
-		else if (LEG.equals(name)) {
+		} else if (LEG.equals(name)) {
 			this.currleg = null;
-		}
-		else if (ROUTE.equals(name)) {
+		} else if (ROUTE.equals(name)) {
 			this.currroute.setRoute(content);
 			this.currroute = null;
 		}
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)},
-	 * but handles all possible exceptions on its own.
-	 * 
-	 * @param filename
-	 *          The name of the file to parse.
+	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
+	 * possible exceptions on its own.
+	 *
+	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
 		try {
@@ -135,17 +126,8 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements
 		}
 	}
 
-	private void startPlans(final Attributes atts) {
-		this.plans.setName(atts.getValue("name"));
-	}
-
 	private void startPerson(final Attributes atts) {
 		this.currperson = new Person(new IdImpl(atts.getValue("id")));
-		this.currperson.setSex(atts.getValue("sex"));
-		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
-		this.currperson.setLicence(atts.getValue("license"));
-		this.currperson.setCarAvail(atts.getValue("car_avail"));
-		this.currperson.setEmployed(atts.getValue("employed"));
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -158,8 +140,7 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements
 			selected = false;
 		}
 		else {
-			throw new NumberFormatException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.currplan = this.currperson.createPlan(selected);
 
@@ -172,28 +153,31 @@ public class PlansReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
+		if (atts.getValue("zone") != null) {
+			log.info("The attribute 'zone' of <act> will be ignored");
+		}
 		try {
-			this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
-					atts.getValue("y100"), atts.getValue("link"), atts
-							.getValue("start_time"), atts.getValue("end_time"), atts
-							.getValue("dur"), null);
-		} catch (Exception e) {
+			 this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
+					 atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
+		}
+		catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
 	}
 
 	private void startLeg(final Attributes atts) {
 		try {
-			this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"), atts.getValue("trav_time"),
-					atts.getValue("arr_time"));
-		} catch (Exception e) {
+			this.currleg =
+				 this.currplan.createLeg(atts.getValue("mode"),atts.getValue("dep_time"),atts.getValue("trav_time"),
+																 atts.getValue("arr_time"));
+		}
+		catch (Exception e) {
 			Gbl.errorMsg(e);
 		}
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts
-				.getValue("trav_time"));
+		this.currroute = this.currleg.createRoute(null, null);
 	}
 
 }

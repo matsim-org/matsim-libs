@@ -45,7 +45,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 
@@ -62,8 +62,8 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		EventHandlerAgentStuckI,
 		EventHandlerLinkEnterI {
 
-	private final Plans realplans = new Plans(Plans.NO_STREAMING);
-	private Plans oldplans = null;
+	private final Population realplans = new Population(Population.NO_STREAMING);
+	private Population oldplans = null;
 	private NetworkLayer network = null;
 
 	// routes = TreeMap<agent-id, route-nodes = ArrayList<nodes>>
@@ -73,7 +73,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 		super();
 	}
 
-	public GenerateRealPlans(final Plans plans) {
+	public GenerateRealPlans(final Population plans) {
 		super();
 		this.oldplans = plans;
 	}
@@ -298,7 +298,7 @@ public class GenerateRealPlans implements EventHandlerActivityStartI,
 	}
 
 
-	public Plans getPlans() {
+	public Population getPlans() {
 		return this.realplans;
 	}
 

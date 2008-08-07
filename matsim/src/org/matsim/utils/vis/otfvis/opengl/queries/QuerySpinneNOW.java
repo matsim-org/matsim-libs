@@ -8,7 +8,7 @@ import org.matsim.mobsim.QueueLink;
 import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class QuerySpinneNOW extends QuerySpinne {
 
@@ -16,7 +16,7 @@ public class QuerySpinneNOW extends QuerySpinne {
 	 * @see org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne#getPersons(org.matsim.population.Plans)
 	 */
 	@Override
-	protected List<Plan> getPersons(Plans plans, QueueNetworkLayer net) {
+	protected List<Plan> getPersons(Population plans, QueueNetworkLayer net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<Vehicle> vehs = link.getAllVehicles();

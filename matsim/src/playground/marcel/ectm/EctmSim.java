@@ -32,7 +32,7 @@ import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.ExternalMobsim;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.ExeRunner;
 
 public class EctmSim extends ExternalMobsim {
@@ -44,7 +44,7 @@ public class EctmSim extends ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(EctmSim.class);
 
-	public EctmSim(final Plans population, final Events events) {
+	public EctmSim(final Population population, final Events events) {
 		super(population, events);
 	}
 

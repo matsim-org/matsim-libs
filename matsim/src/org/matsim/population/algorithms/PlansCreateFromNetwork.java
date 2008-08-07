@@ -25,7 +25,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class PlansCreateFromNetwork {
 
@@ -52,7 +52,7 @@ public class PlansCreateFromNetwork {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

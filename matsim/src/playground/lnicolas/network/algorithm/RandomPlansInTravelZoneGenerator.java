@@ -33,8 +33,8 @@ import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 
 public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 
@@ -71,7 +71,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		}
 		int roleIndex = network.requestNodeRole();
 
-		Plans plans = new Plans();
+		Population plans = new Population();
 		Person person = new Person(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 		try {
@@ -113,7 +113,7 @@ public class RandomPlansInTravelZoneGenerator extends NetworkAlgorithm {
 		System.out.println("Nodes in outer zone: " + nodes.size());
 		System.out.println("Number of from nodes: " + fromNodes.size());
 
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("Wrote plans to "
 				+ Gbl.getConfig().plans().getOutputFile());

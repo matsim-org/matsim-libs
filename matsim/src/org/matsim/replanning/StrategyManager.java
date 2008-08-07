@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -102,7 +102,7 @@ public class StrategyManager {
 	 * @param population
 	 * @param iteration the current iteration we're handling
 	 */
-	public void run(final Plans population, final int iteration) {
+	public void run(final Population population, final int iteration) {
 		handleChangeRequests(iteration);
 		run(population);
 	}
@@ -113,7 +113,7 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
-	public void run(final Plans population) {
+	public void run(final Population population) {
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.init();

@@ -35,7 +35,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.utils.io.IOUtils;
@@ -84,7 +84,7 @@ public class ScoreVariance extends PersonAlgorithm implements PlanAlgorithmI {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 
 		ScoreVariance sv = new ScoreVariance(outputFilename);
 		population.addAlgorithm(sv);

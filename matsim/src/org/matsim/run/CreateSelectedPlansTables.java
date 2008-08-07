@@ -31,8 +31,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -45,8 +45,8 @@ import org.matsim.utils.io.IOUtils;
  */
 public class CreateSelectedPlansTables {
 
-	private Plans plans0;
-	private Plans plans1;
+	private Population plans0;
+	private Population plans1;
 
 	private final String outfileTable="./output/analyseSelectedPlansTable.txt";
 	private final String outfileAverages="./output/analyseSelectedPlansTableAverages.txt";
@@ -97,8 +97,8 @@ public class CreateSelectedPlansTables {
 	}
 
 	private void init(final String networkPath) {
-		this.plans0=new Plans(false);
-		this.plans1=new Plans(false);
+		this.plans0=new Population(false);
+		this.plans1=new Population(false);
 
 		System.out.println("  reading the network...");
 		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
@@ -106,9 +106,9 @@ public class CreateSelectedPlansTables {
 
 	}
 
-	private void readPlansFile(final String plansfilePath, final Plans plans) {
+	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
-		final PlansReaderI plansReader = new MatsimPlansReader(plans);
+		final PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(plansfilePath);
 	}
 

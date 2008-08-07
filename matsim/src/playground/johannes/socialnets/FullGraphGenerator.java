@@ -39,7 +39,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 import org.xml.sax.SAXException;
 
@@ -90,7 +90,7 @@ private static final String PERSON_KEY = "person";
 		Gbl.getWorld().setNetworkLayer(network);
 		
 		System.out.println("Loading plans...");
-		Plans plans = loadPopulation("/Users/fearonni/vsp-cvs/studies/DA-Illenberger/data/berlin/plans/plans.sample0.1.xml");
+		Population plans = loadPopulation("/Users/fearonni/vsp-cvs/studies/DA-Illenberger/data/berlin/plans/plans.sample0.1.xml");
 		System.out.println("Creating graph...");
 		Graph g = createGraph(plans);
 		
@@ -106,8 +106,8 @@ private static final String PERSON_KEY = "person";
 		}
 	}
 
-	private static Plans loadPopulation(String file) {
-		Plans plans = new Plans();
+	private static Population loadPopulation(String file) {
+		Population plans = new Population();
 		MatsimPlansReader reader = new MatsimPlansReader(plans);
 		try {
 			reader.parse(file);
@@ -125,7 +125,7 @@ private static final String PERSON_KEY = "person";
 		return plans;
 	}
 	
-	private static UndirectedGraph createGraph(Plans plans) {
+	private static UndirectedGraph createGraph(Population plans) {
 		Random rnd = new Random(seed);
 		UndirectedSparseGraph g = new UndirectedSparseGraph();
 		

@@ -6,11 +6,11 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.ActivityActReader;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Plans plans){
+	public InitializeKnowledge(final Population plans){
 
 		ActivityActReader aar = null;
 

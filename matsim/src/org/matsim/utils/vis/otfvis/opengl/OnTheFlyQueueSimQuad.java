@@ -29,7 +29,7 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
@@ -78,7 +78,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSimQuad(NetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSimQuad(NetworkLayer net, Population plans, Events events) {
 		super(net, plans, events);
 
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
@@ -127,7 +127,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		MatsimPlansReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();

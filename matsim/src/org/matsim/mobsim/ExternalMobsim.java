@@ -38,9 +38,9 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
-import org.matsim.population.PlansWriterHandler;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterHandler;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.ExeRunner;
 
@@ -49,7 +49,7 @@ public class ExternalMobsim {
 	private static final String CONFIG_MODULE = "simulation";
 
 	protected Events events;
-	protected Plans population;
+	protected Population population;
 
 	protected String plansFileName = null;
 	protected String eventsFileName = null;
@@ -59,7 +59,7 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
-	public ExternalMobsim(final Plans population, final Events events) {
+	public ExternalMobsim(final Population population, final Events events) {
 		this.population = population;
 		this.events = events;
 		init();
@@ -125,8 +125,8 @@ public class ExternalMobsim {
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
 		String version = "v4";
-		PlansWriter plansWriter = new PlansWriter(new Plans(Plans.USE_STREAMING), iterationPlansFile, version);
-		PlansWriterHandler handler = plansWriter.getHandler();
+		PopulationWriter plansWriter = new PopulationWriter(new Population(Population.USE_STREAMING), iterationPlansFile, version);
+		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans();
 		BufferedWriter writer = plansWriter.getWriter();
 		for (Person person : this.population.getPersons().values()) {

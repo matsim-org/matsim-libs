@@ -28,8 +28,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
 import org.matsim.network.algorithms.NetworkSummary;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
 import org.matsim.population.algorithms.PlansCreateFromNetwork;
 import org.matsim.population.algorithms.PlansDefineKnowledge;
@@ -87,7 +87,7 @@ public class Mode_choice_main {
 		System.out.println();
 
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans();
+		Population plans = new Population();
 		System.out.println("  done.");
 
 		System.out.println("  running plans algorithms... ");
@@ -151,7 +151,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 

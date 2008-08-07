@@ -38,9 +38,9 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.world.MatsimWorldReader;
 
@@ -100,15 +100,15 @@ public class MyRuns {
 		// analyzeRoute();
 	}
 
-	protected static void writePlans(final Plans plans, final String outFilename) {
+	protected static void writePlans(final Population plans, final String outFilename) {
 		System.out.println("Writing plans to " + outFilename);
-		PlansWriter plansWriter = new PlansWriter(plans, outFilename,
+		PopulationWriter plansWriter = new PopulationWriter(plans, outFilename,
 				Gbl.getConfig().plans().getOutputVersion());
 		plansWriter.write();
 		System.out.println("done");
 	}
 
-	private static void exportPopulationToKML(final Plans plans, final String dir) {
+	private static void exportPopulationToKML(final Population plans, final String dir) {
 		System.out.println("Running export algorithm");
 		new PopulationExportToKML(dir).run(plans);
 		System.out.println("Done");
@@ -288,9 +288,9 @@ public class MyRuns {
 				+ Gbl.getConfig().network().getOutputFile());
 	}
 
-	protected static Plans readPlans() {
-		Plans plans = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+	protected static Population readPlans() {
+		Population plans = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		return plans;
 	}

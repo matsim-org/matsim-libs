@@ -21,7 +21,7 @@
 package org.matsim.population;
 
 
-public interface PlansReaderI {
+public interface PopulationReader {
 	
 	/**
 	 * read plans from the specified file.

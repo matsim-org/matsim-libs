@@ -45,7 +45,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -54,7 +54,7 @@ import org.matsim.utils.io.IOUtils;
  */
 public class TraversedRiskyLink implements StartupListener, ShutdownListener, IterationEndsListener {
 	
-	private Plans population;
+	private Population population;
 	
 	private Predicate personPredicate;
 	
@@ -66,7 +66,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private Collection<Person> persons = null;
 	
-	public TraversedRiskyLink(Plans population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
+	public TraversedRiskyLink(Population population, List<Link> riskyLinks, SummaryWriter summaryWriter) {
 		this.summaryWriter = summaryWriter;
 		this.population = population;
 		

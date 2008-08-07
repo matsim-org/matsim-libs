@@ -36,7 +36,7 @@ import org.matsim.network.Node;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.world.World;
 
 /**
@@ -47,7 +47,7 @@ public class AvoidOldNodes extends NewPlan {
 	private boolean nullRoute = false;
 	private Set<String> nodeIds;
 
-	public AvoidOldNodes(NetworkLayer network, Plans plans) {
+	public AvoidOldNodes(NetworkLayer network, Population plans) {
 		super(network, plans);
 		nodeIds = new HashSet<String>();
 	}
@@ -100,7 +100,7 @@ public class AvoidOldNodes extends NewPlan {
 				.getInputFile());
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		AvoidOldNodes aon = new AvoidOldNodes(network, population);
 		aon.addNode("100000");
 		aon.addLink("3000000");

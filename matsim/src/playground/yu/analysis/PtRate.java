@@ -32,7 +32,7 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 
 /**
@@ -44,7 +44,7 @@ import org.matsim.utils.charts.XYLineChart;
  */
 public class PtRate implements IterationEndsListener, ShutdownListener {
 	// -----------------------------MEMBER VARIABLES-----------------------
-	private final Plans population;
+	private final Population population;
 	private final PtCheck check;
 	private final int maxIters;
 	private final String BetaTraveling;
@@ -73,7 +73,7 @@ public class PtRate implements IterationEndsListener, ShutdownListener {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public PtRate(final Plans population, final String filename,
+	public PtRate(final Population population, final String filename,
 			final int maxIters, final String BetaTraveling,
 			final String BetaTravelingPt) throws FileNotFoundException,
 			IOException {

@@ -23,9 +23,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 
 
 
@@ -75,7 +75,7 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(Plans.USE_STREAMING);
+		Population plans = new Population(Population.USE_STREAMING);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");
 //		PlansCreateFromNetwork pcfn_algo = new PlansCreateFromNetwork(network,ns_algo);
@@ -84,8 +84,8 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("  done.");
 		
 //		PlansParser plansParser = new MatsimPlansReader(plans);
-		PlansWriter plansWriter = new PlansWriter(plans);
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
 		//plans.addAlgorithm (new ModeChoiceAlgorithm2 ());

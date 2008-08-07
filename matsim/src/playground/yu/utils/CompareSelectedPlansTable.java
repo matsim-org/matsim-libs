@@ -13,8 +13,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 
@@ -25,8 +25,8 @@ import org.matsim.utils.io.IOUtils;
  */
 public class CompareSelectedPlansTable {
 
-	private Plans plans0;
-	private Plans plans1;
+	private Population plans0;
+	private Population plans1;
 	private String header = "personid;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "score0;score1;s1-s0;relativScoreDiff;"
 			+ "plantraveltime0;plantraveltime1;t1-t0;"
@@ -57,8 +57,8 @@ public class CompareSelectedPlansTable {
 	}
 
 	private void init(String networkPath) {
-		this.plans0 = new Plans(false);
-		this.plans1 = new Plans(false);
+		this.plans0 = new Population(false);
+		this.plans1 = new Population(false);
 
 		System.out.println("  reading the network...");
 		this.network = (NetworkLayer) Gbl.getWorld().createLayer(
@@ -68,11 +68,11 @@ public class CompareSelectedPlansTable {
 
 	private void readFiles(String plansfilePath0, String plansfilePath1) {
 		System.out.println("  reading file " + plansfilePath0);
-		PlansReaderI plansReader0 = new MatsimPlansReader(this.plans0);
+		PopulationReader plansReader0 = new MatsimPlansReader(this.plans0);
 		plansReader0.readFile(plansfilePath0);
 
 		System.out.println("  reading file " + plansfilePath1);
-		PlansReaderI plansReader1 = new MatsimPlansReader(this.plans1);
+		PopulationReader plansReader1 = new MatsimPlansReader(this.plans1);
 		plansReader1.readFile(plansfilePath1);
 	}
 

@@ -31,8 +31,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 
 /**
@@ -48,7 +48,7 @@ public class PlanComparator {
 	/**
    * the object holding the population
    */
-	private Plans population;
+	private Population population;
 
 	/**
    * the data needed to compare the plans is stored here
@@ -144,11 +144,11 @@ public class PlanComparator {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected Plans loadPlansFile(String filename) {
-		Plans plans = new Plans(Plans.NO_STREAMING);
+	protected Population loadPlansFile(String filename) {
+		Population plans = new Population(Population.NO_STREAMING);
 
 		printNote("", "  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(filename);
 		plans.printPlansCount();
 		printNote("", "  done");

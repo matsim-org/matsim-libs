@@ -23,7 +23,7 @@ package playground.jhackney.deprecated;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetEdge;
 import playground.jhackney.socialnet.SocialNetwork;
@@ -31,7 +31,7 @@ import playground.jhackney.socialnet.SocialNetwork;
 public class WattsSocialNetwork extends SocialNetwork {
 //	private String linkRemovalCondition_;
 //	private String linkStrengthAlgorithm_;
-	public WattsSocialNetwork(Plans plans){
+	public WattsSocialNetwork(Population plans){
 		super(plans);
 		setupIter=2;
 		// TODO test the parameters and construct a Watts (1999) small world

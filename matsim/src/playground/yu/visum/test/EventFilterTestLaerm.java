@@ -28,7 +28,7 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.world.World;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
@@ -61,7 +61,7 @@ public class EventFilterTestLaerm {
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(Plans.USE_STREAMING);
+		Population plans = new Population(Population.USE_STREAMING);
 		System.out.println("  done.");
 		// events
 		System.out.println("  creating events object... ");

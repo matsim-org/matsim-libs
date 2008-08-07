@@ -25,7 +25,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * test of NewAgentPtPlan
@@ -43,7 +43,7 @@ public class NewPtPlansControler {
 				.getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);
 		population.addAlgorithm(nap);
 		new MatsimPlansReader(population).readFile(config.plans()

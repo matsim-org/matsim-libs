@@ -22,8 +22,8 @@ package playground.balmermi.mz;
 
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 
 public class MZ2Plans {
 
@@ -52,7 +52,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(false);
+		Population plans = new Population(false);
 		System.out.println("  done.");
 
 		System.out.println("  running plans modules... ");
@@ -66,7 +66,7 @@ public class MZ2Plans {
 		//////////////////////////////////////////////////////////////////////
 		
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 

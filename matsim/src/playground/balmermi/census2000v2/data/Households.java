@@ -33,7 +33,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.world.Layer;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -89,7 +89,7 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void parse(String infile, Plans plans) {
+	public final void parse(String infile, Population plans) {
 		Layer fl = Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		int line_cnt = 0;
 		try {

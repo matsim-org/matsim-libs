@@ -38,7 +38,7 @@ import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.Events;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcLinkAvgSpeed;
@@ -176,7 +176,7 @@ public class PtcheckControlerTest extends Controler {
 			Controler c = event.getControler();
 			Events es = c.getEvents();
 			NetworkLayer nl = c.getNetwork();
-			Plans ps = c.getPopulation();
+			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
 				orms = new OnRouteModalSplit(300, nl, ps);
 				es.addHandler(orms);

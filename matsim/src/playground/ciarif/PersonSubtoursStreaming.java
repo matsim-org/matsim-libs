@@ -22,9 +22,9 @@ package playground.ciarif;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 
 import playground.balmermi.census2000.data.Households;
@@ -63,9 +63,9 @@ public class PersonSubtoursStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Plans plans = new Plans(Plans.USE_STREAMING);
-		PlansWriter plansWriter = new PlansWriter(plans);
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		Population plans = new Population(Population.USE_STREAMING);
+		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

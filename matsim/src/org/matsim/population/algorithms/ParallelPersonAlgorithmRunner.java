@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
 /**
@@ -42,13 +42,13 @@ public abstract class ParallelPersonAlgorithmRunner {
 	/**
 	 * Handles each person of the given <code>population</code> with the specified <code>algorithm</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. Use this method only if the given
-	 * algorithm is thread-safe! Otherwise, use {@link #run(Plans, int, PersonAlgorithmProvider)}.
+	 * algorithm is thread-safe! Otherwise, use {@link #run(Population, int, PersonAlgorithmProvider)}.
 	 * 
 	 * @param population
 	 * @param numberOfThreads
 	 * @param algorithm
 	 */
-	public static void run(final Plans population, final int numberOfThreads, final PersonAlgorithm algorithm) {
+	public static void run(final Population population, final int numberOfThreads, final PersonAlgorithm algorithm) {
 		run(population, numberOfThreads, new PersonAlgorithmProvider() {
 			public PersonAlgorithm getPersonAlgorithm() {
 				return algorithm;
@@ -60,13 +60,13 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 * Handles each person of the given <code>population</code> with a PersonAlgorithm provided by <code>algoProvider</code>,
 	 * using up to <code>numberOfThreads</code> threads to speed things up. This method will request a new instance of the
 	 * PersonAlgorithm for each thread it allocates, thus enabling the parallel use of non-thread-safe algorithms.
-	 * For thread-safe algorithms, {@link #run(Plans, int, PersonAlgorithm)} may be an easier method to use.
+	 * For thread-safe algorithms, {@link #run(Population, int, PersonAlgorithm)} may be an easier method to use.
 	 * 
 	 * @param population
 	 * @param numberOfThreads
 	 * @param algoProvider
 	 */
-	public static void run(final Plans population, final int numberOfThreads, final PersonAlgorithmProvider algoProvider) {
+	public static void run(final Population population, final int numberOfThreads, final PersonAlgorithmProvider algoProvider) {
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		PersonAlgoThread[] algoThreads = new PersonAlgoThread[numOfThreads];
 		Thread[] threads = new Thread[numOfThreads];

@@ -23,7 +23,7 @@ package playground.jhackney.deprecated;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.population.algorithms.PlansAlgorithm;
 
@@ -39,7 +39,7 @@ public class PlansCalcSocialNet extends PlansAlgorithm implements
 	}
 
 	@Override
-	public void run(Plans plans) {
+	public void run(Population plans) {
 		// TODO lots: need to iterate as follows: build, remove, build, remove, ...
 		// Maybe put in a call to "build" in which the parameters for the
 		// construction algorithm are sorted out and in which the algorithm
@@ -144,7 +144,7 @@ public class PlansCalcSocialNet extends PlansAlgorithm implements
 
 	}
 
-	private void jGNSocialNetwork(Plans plans) {
+	private void jGNSocialNetwork(Population plans) {
 		// TODO test the parameters and construct a Jin Girvan Newman social
 		// network with a link probability between agents of pBernoulli and a
 		// probability of friend-of-friend interaction pFoF:
@@ -154,7 +154,7 @@ public class PlansCalcSocialNet extends PlansAlgorithm implements
 				+ ".jGNSocialNetwork is not written yet.");
 	}
 
-	private void wattsSocialNetwork(Plans plans) {
+	private void wattsSocialNetwork(Population plans) {
 		// TODO test the parameters and construct a Watts (1999) small world
 		// social
 		// network with a link probability between agents and average degree (?)
@@ -163,7 +163,7 @@ public class PlansCalcSocialNet extends PlansAlgorithm implements
 				+ ".wattsSocialNetwork is not written yet.");
 	}
 
-	private void randomSocialNetwork(Plans plans) {
+	private void randomSocialNetwork(Population plans) {
 		// TODO test the parameters and construct a random (bernoulli) social
 		// network with a link probability between agents of pBernoulli:
 		// Parameter pBernoulli, no distance consideration possible

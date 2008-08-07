@@ -51,9 +51,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.replanning.PlanStrategy;
@@ -97,7 +97,7 @@ public class SNGenerateNetwork {
     public static String SOCNET_OUT_DIR = null;
 
     protected final Events events = new Events();
-    protected Plans population = null;
+    protected Population population = null;
 
     private boolean running = false;
     private StrategyManager strategyManager = null;
@@ -548,7 +548,7 @@ public class SNGenerateNetwork {
 	if ((iteration % 10 == 0) || (iteration < 3)) {
 	    printNote("", "dumping all agents' plans...");
 	    String outversion = Gbl.getConfig().plans().getOutputVersion();
-	    PlansWriter plansWriter = new PlansWriter(this.population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
+	    PopulationWriter plansWriter = new PopulationWriter(this.population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
 	    plansWriter.setUseCompression(true);
 	    plansWriter.write();
 	    printNote("", "done dumping plans.");
@@ -682,11 +682,11 @@ public class SNGenerateNetwork {
 	return this.facilities;
     }
 
-    protected Plans loadPopulation() {
-	Plans population = new Plans(Plans.NO_STREAMING);
+    protected Population loadPopulation() {
+	Population population = new Population(Population.NO_STREAMING);
 
 	printNote("", "  reading plans xml file... ");
-	PlansReaderI plansReader = new MatsimPlansReader(population);
+	PopulationReader plansReader = new MatsimPlansReader(population);
 	plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 	population.printPlansCount();
 	printNote("", "  done");
@@ -771,7 +771,7 @@ public class SNGenerateNetwork {
 		}
 
 		printNote("", "  writing plans xml file... ");
-		PlansWriter plansWriter = new PlansWriter(this.population);
+		PopulationWriter plansWriter = new PopulationWriter(this.population);
 		plansWriter.write();
 		printNote("", "  done");
 		try {
@@ -930,7 +930,7 @@ public class SNGenerateNetwork {
 	return iteration;
     }
 
-    public final Plans getPopulation() {
+    public final Population getPopulation() {
 	return this.population;
     }
 
@@ -1049,7 +1049,7 @@ public class SNGenerateNetwork {
 	    System.out.println();
 	}
     }
-    void initializeKnowledge( Plans plans ){
+    void initializeKnowledge( Population plans ){
 	// Map agents' knowledge to their experience in the plan
 	for( Person person : plans.getPersons().values() ){
 //	    person.getKnowledge().map.setPlanActivities(person.getSelectedPlan());

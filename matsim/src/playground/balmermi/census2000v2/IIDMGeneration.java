@@ -26,8 +26,8 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.world.MatsimWorldReader;
@@ -109,7 +109,7 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reding plans xml file... ");
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		new MatsimPlansReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 
@@ -142,7 +142,7 @@ public class IIDMGeneration {
 		System.out.println("  done.");
 
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 

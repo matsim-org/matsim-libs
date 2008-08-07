@@ -29,7 +29,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class PlansActChainReduction {
 
@@ -47,7 +47,7 @@ public class PlansActChainReduction {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final TreeMap<String, ArrayList<Person>> calcChainFrequencies(final Plans plans) {
+	private final TreeMap<String, ArrayList<Person>> calcChainFrequencies(final Population plans) {
 		// TreeMap(String chain, ArrayList(Person person))
 		TreeMap<String, ArrayList<Person>> chains = new TreeMap<String, ArrayList<Person>>();
 		// fill up the chains TreeMap
@@ -103,7 +103,7 @@ public class PlansActChainReduction {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Plans plans) {
+	public void run(Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// TreeMap(String chain, ArrayList(Person person))

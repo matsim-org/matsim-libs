@@ -31,7 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 
@@ -81,7 +81,7 @@ public class CMCFScenarioGenerator {
 	
 //	private static final int iterations = 1;
 	
-	private Plans plans;
+	private Population plans;
 
 	private Config config;
 
@@ -157,7 +157,7 @@ public class CMCFScenarioGenerator {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = new Plans(false);
+		this.plans = new Population(false);
 		int firstHomeEndTime = 0;//6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = network.getLink(IdFactory.get(1));

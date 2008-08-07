@@ -28,7 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
@@ -67,7 +67,7 @@ public class AnalyzeActivitySpaces {
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
-		Plans plans = Scenario.readPlans();
+		Population plans = Scenario.readPlans();
 			//read in social network
 //		System.out.println(" Initializing the social network ...");
 //		SocialNetwork snet=new SocialNetwork(plans);

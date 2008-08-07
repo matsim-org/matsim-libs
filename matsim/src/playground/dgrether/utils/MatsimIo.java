@@ -31,9 +31,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.xml.sax.SAXException;
 
 
@@ -73,10 +73,10 @@ public class MatsimIo {
 	}
 	
 	
-	public static Plans loadPlans(String filename) {
-		Plans plans = new Plans(Plans.NO_STREAMING);
+	public static Population loadPlans(String filename) {
+		Population plans = new Population(Population.NO_STREAMING);
 		log.info("  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(filename);
 		plans.printPlansCount();
 		log.info("  done");
@@ -84,11 +84,11 @@ public class MatsimIo {
 	}
 	
 
-	public static void writePlans(Plans plans, String filename) {
+	public static void writePlans(Population plans, String filename) {
 		if (Gbl.getConfig() == null) {
 			Gbl.createConfig(null);
 		}
-		PlansWriter pwriter = new PlansWriter(plans, filename, "v4");
+		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4");
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
 		pwriter.write();	
 	}

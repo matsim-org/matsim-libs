@@ -34,7 +34,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.utils.io.IOUtils;
 
@@ -42,7 +42,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 	protected static final String CONFIG_MODULE = "itsumo";
 
-	public ItsumoSim(final Plans population, final Events events) {
+	public ItsumoSim(final Population population, final Events events) {
 		super(population, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +

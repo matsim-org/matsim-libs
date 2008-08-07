@@ -29,8 +29,8 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
@@ -83,7 +83,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSim2FILE(NetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSim2FILE(NetworkLayer net, Population plans, Events events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
@@ -122,9 +122,9 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		// Read plans file with special Reader Implementation
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

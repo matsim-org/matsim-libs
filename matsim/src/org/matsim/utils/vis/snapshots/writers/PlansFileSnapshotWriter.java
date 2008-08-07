@@ -24,8 +24,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -44,7 +44,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 
 	private double currenttime = -1;
 
-	private Plans plans = null;
+	private Population plans = null;
 
 	public PlansFileSnapshotWriter(String snapshotFilePrefix, String snapshotFileSuffix){
 		this.filePrefix = snapshotFilePrefix;
@@ -54,7 +54,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 	}
 
 	public void beginSnapshot(double time) {
-		this.plans = new Plans(Plans.NO_STREAMING);
+		this.plans = new Population(Population.NO_STREAMING);
 		this.filename = this.filePrefix + Time.writeTime(time, "-") + "." + this.fileSuffix;
 		this.currenttime = time;
 	}
@@ -67,10 +67,10 @@ public class PlansFileSnapshotWriter implements SnapshotWriterI {
 
 	/**
 	 * Writes the position infos as plans to a file using
-	 * {@link org.matsim.population.PlansWriter}
+	 * {@link org.matsim.population.PopulationWriter}
 	 */
 	private void writePlans() {
-		PlansWriter pw = new PlansWriter(this.plans, this.filename, this.version);
+		PopulationWriter pw = new PopulationWriter(this.plans, this.filename, this.version);
 		pw.write();
 	}
 

@@ -26,9 +26,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -65,9 +65,9 @@ public class GenerateDemand {
 		System.out.println("Reading facilities...done.");
 		
 		System.out.println("Setting up plans objects...");
-		Plans plans = new Plans(Plans.USE_STREAMING);
-		PlansWriter plansWriter = new PlansWriter(plans);
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		Population plans = new Population(Population.USE_STREAMING);
+		PopulationWriter plansWriter = new PopulationWriter(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");

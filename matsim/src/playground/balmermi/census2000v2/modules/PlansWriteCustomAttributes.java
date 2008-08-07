@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class PlansWriteCustomAttributes {
 
@@ -59,7 +59,7 @@ public class PlansWriteCustomAttributes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 		
 		Gbl.errorMsg("TODO: THIS DOES NOT WORK YET!");

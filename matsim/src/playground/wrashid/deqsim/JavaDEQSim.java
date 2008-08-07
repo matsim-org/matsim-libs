@@ -34,7 +34,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
@@ -44,10 +44,10 @@ import playground.wrashid.DES.utils.Timer;
 
 public class JavaDEQSim {
 
-	final Plans population;
+	final Population population;
 	final NetworkLayer network;
 	
-	public JavaDEQSim(final NetworkLayer network, final Plans population, final Events events) {
+	public JavaDEQSim(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
 		
 

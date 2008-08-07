@@ -32,8 +32,8 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.world.World;
 
@@ -82,9 +82,9 @@ public class DSOnePercentBerlin10sTest {
 		}
 		System.out.println("Overall network length = " + sum);
 
-		Plans population = new Plans() ;
+		Population population = new Population() ;
 		// Read plans file with special dtd version
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();
@@ -108,7 +108,7 @@ public class DSOnePercentBerlin10sTest {
 		//
 
 		PlanAverageScore average = new PlanAverageScore();
-		Plans realPop = realPlansGenerator.getPlans();
+		Population realPop = realPlansGenerator.getPlans();
 
 		// does not compile anymore??
 		//realPop.addAlgorithm(new PlanCalcScore());

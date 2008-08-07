@@ -38,7 +38,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
@@ -148,7 +148,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	public void calculate(int iteration, SocialNetwork snet, Plans plans) {
+	public void calculate(int iteration, SocialNetwork snet, Population plans) {
 		// First instantiate the JUNG-compatible graph structure
 		if (snet.isUNDIRECTED()) {
 			this.g = new UndirectedSparseGraph();
@@ -182,7 +182,7 @@ public class SocialNetworkStatistics {
 		runEdgeStatistics(iteration, plans);
 	}
 
-	private void runEdgeStatistics(int iter, Plans plans) {
+	private void runEdgeStatistics(int iter, Population plans) {
 		StatisticalMoments smDD = new StatisticalMoments();
 		StatisticalMoments smDur = new StatisticalMoments();
 		StatisticalMoments smNum = new StatisticalMoments();
@@ -224,7 +224,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	private Vector<Person> getEdgePersons(Edge e, Plans plans) {
+	private Vector<Person> getEdgePersons(Edge e, Population plans) {
 		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
 		Person p1 = plans.getPerson(v1.getUserDatum("personId").toString());
@@ -235,7 +235,7 @@ public class SocialNetworkStatistics {
 		return persons;
 	}
 
-	private double getDyadDistance(Edge myEdge, Plans plans) {
+	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		Person pFrom = plans.getPerson(vFrom.getUserDatum("personId").toString());
@@ -269,7 +269,7 @@ public class SocialNetworkStatistics {
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
-	private void runPersonStatistics(int iter, Plans plans, SocialNetwork snet) {
+	private void runPersonStatistics(int iter, Population plans, SocialNetwork snet) {
 
 		double clusteringRatio = 0.;
 		double clusterCoef = 0.;
@@ -419,7 +419,7 @@ public class SocialNetworkStatistics {
 	 * @param snet
 	 * @param plans
 	 */
-	void fillGraph(Graph g, SocialNetwork snet, Plans plans) {
+	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
 		Collection<Person> personList = plans.getPersons().values();
 		Vertex v;
 		Edge e;

@@ -29,7 +29,7 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.mobsim.Vehicle;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.gregor.withinday_evac.BDIAgent;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
@@ -50,7 +50,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 
 	public WithindayQueueSimulation(final NetworkLayer net,
-			final Plans plans, final Events events, final playground.gregor.withinday_evac.WithindayControler withindayControler) {
+			final Population plans, final Events events, final playground.gregor.withinday_evac.WithindayControler withindayControler) {
 		super(net, plans, events);
 		final QueueNetworkFactory< QueueNode, QueueLink> factory = new WithindayQueueNetworkFactory();
 		final QueueNetworkLayer qNet = new QueueNetworkLayer(net,factory);

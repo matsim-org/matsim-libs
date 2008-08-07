@@ -44,7 +44,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
@@ -65,7 +65,7 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	private final int[] ptDep, ptArr, ptOnRoute;
 	private final int[] otherDep, otherArr, otherStuck, otherOnRoute;
 	private final NetworkLayer network;
-	private final Plans plans;
+	private final Population plans;
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified
@@ -77,7 +77,7 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	 *            The number of time bins for this analysis.
 	 */
 	public OnRouteModalSplit(final int binSize, final int nofBins,
-			NetworkLayer network, Plans plans) {
+			NetworkLayer network, Population plans) {
 		super();
 		this.binSize = binSize;
 		this.dep = new int[nofBins + 1]; // +1 for all times out of our
@@ -109,11 +109,11 @@ public class OnRouteModalSplit implements EventHandlerAgentDepartureI,
 	 *            The size of a time bin in seconds.
 	 */
 	public OnRouteModalSplit(final int binSize, NetworkLayer network,
-			Plans plans) {
+			Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
-	public OnRouteModalSplit(NetworkLayer network, Plans plans) {
+	public OnRouteModalSplit(NetworkLayer network, Population plans) {
 		this(300, network, plans);
 	}
 

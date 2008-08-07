@@ -26,7 +26,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SocializingOpportunity;
 import org.matsim.socialnetworks.interactions.SpatialSocialOpportunityTracker;
@@ -61,7 +61,7 @@ public class SNConfig  {
 
 //	-------------------- end social network variables --------------------//    
 	
-	public static void snsetup(Plans plans){
+	public static void snsetup(Population plans){
 		
 		
 	System.out.println("----------Initialization of social network -------------------------------------");

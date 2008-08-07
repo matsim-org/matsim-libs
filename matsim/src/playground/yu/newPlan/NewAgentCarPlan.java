@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -44,7 +44,7 @@ public class NewAgentCarPlan extends NewPlan {
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentCarPlan(Plans plans) {
+	public NewAgentCarPlan(Population plans) {
 		super(plans);
 	}
 

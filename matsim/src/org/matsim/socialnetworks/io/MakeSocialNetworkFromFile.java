@@ -5,7 +5,7 @@ import java.io.FileReader;
 
 import org.apache.log4j.Logger;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
@@ -14,11 +14,11 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 public class MakeSocialNetworkFromFile {
 
-	private Plans plans;
+	private Population plans;
 	private SocialNetwork snet;
 	private final Logger log = Logger.getLogger(MakeSocialNetworkFromFile.class);
 
-	public MakeSocialNetworkFromFile(SocialNetwork snet, Plans plans){
+	public MakeSocialNetworkFromFile(SocialNetwork snet, Population plans){
 		// initialize a new SocialNetwork -- uses config params
 		this.plans=plans;
 		this.snet=snet;

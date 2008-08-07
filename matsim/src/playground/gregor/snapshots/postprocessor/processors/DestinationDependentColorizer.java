@@ -25,7 +25,7 @@ import java.util.HashMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Leg;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class DestinationDependentColorizer implements PostProcessorI {
 
@@ -33,9 +33,9 @@ public class DestinationDependentColorizer implements PostProcessorI {
 	
 	private static HashMap<Id,String> destNodeMapping = new HashMap<Id,String>();
 
-	private Plans plans;
+	private Population plans;
 	
-	public DestinationDependentColorizer(Plans plans){
+	public DestinationDependentColorizer(Population plans){
 		this.plans = plans;
 	}
 	

@@ -28,8 +28,8 @@ import java.util.Set;
 import org.matsim.config.Config;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
 /**
@@ -38,13 +38,13 @@ import org.matsim.population.algorithms.PlanSimplifyForDebug;
  */
 public class HwhPlansMaker extends PlanSimplifyForDebug {
 
-	protected PlansWriter pw;
+	protected PopulationWriter pw;
 	private Config config;
 
 	/**
 	 * @param network
 	 */
-	public HwhPlansMaker(NetworkLayer network, Config config, Plans plans) {
+	public HwhPlansMaker(NetworkLayer network, Config config, Population plans) {
 		super(network);
 		this.config = config;
 		for (int i = 0; i <= 24; i++) {
@@ -56,7 +56,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 		for (int i = 46; i <= 66; i++) {
 			loadActType(eduActs, i);
 		}
-		pw = new PlansWriter(plans);
+		pw = new PopulationWriter(plans);
 		pw.writeStartPlans();
 	}
 

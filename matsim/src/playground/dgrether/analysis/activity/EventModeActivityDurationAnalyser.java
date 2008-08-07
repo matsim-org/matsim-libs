@@ -40,7 +40,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.charts.BarChart;
 import org.matsim.utils.misc.Time;
 
@@ -88,7 +88,7 @@ public class EventModeActivityDurationAnalyser {
 //		config = Gbl.createConfig(null);
 		Gbl.getWorld().setNetworkLayer((NetworkLayer) net);
 
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		MatsimPlansReader plansParser = new MatsimPlansReader(plans);
 		plansParser.readFile(PLANSFILE);
 		
@@ -119,9 +119,9 @@ public class EventModeActivityDurationAnalyser {
 		int workActivityNonCarCount = 0;
 		double durTemp;
 
-		private Plans plans;
+		private Population plans;
 		
-		public ActivityDurationHandler(Plans plans) {
+		public ActivityDurationHandler(Population plans) {
 			this.plans = plans;
 		}
 

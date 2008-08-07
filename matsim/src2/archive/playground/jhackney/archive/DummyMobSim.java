@@ -22,14 +22,14 @@ package playground.jhackney.deprecated;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.Simulation;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 
 public class DummyMobSim extends Simulation {
-    protected Plans plans=null;
+    protected Population plans=null;
     protected Events events= null;
     
-	public DummyMobSim(final Plans plans, final Events events) {
+	public DummyMobSim(final Population plans, final Events events) {
 		super();
 //		setEvents(events);
 		this.events=events;

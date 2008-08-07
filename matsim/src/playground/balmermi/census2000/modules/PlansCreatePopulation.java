@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -52,7 +52,7 @@ public class PlansCreatePopulation {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		if (plans.getName() == null) {

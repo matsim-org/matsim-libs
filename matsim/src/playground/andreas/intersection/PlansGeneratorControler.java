@@ -30,7 +30,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 public class PlansGeneratorControler extends Controler {
@@ -48,16 +48,16 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Should be overwritten in case of artificial population */
 	@Override
-	protected Plans loadPopulation() {
+	protected Population loadPopulation() {
 		
 		return generate4wPersons();
 //		return generateSimplePlans();
 	}
 	
-	private Plans generate4wPersons(){
+	private Population generate4wPersons(){
 		
 		int numberOfPlans = 1;
-		Plans pop = new Plans(Plans.NO_STREAMING);
+		Population pop = new Population(Population.NO_STREAMING);
 		log.info("  generating plans... ");
 		
 		for (int i = 0; i < 314; i++) {
@@ -117,11 +117,11 @@ public class PlansGeneratorControler extends Controler {
 		return pop;		
 	}
 	
-	private Plans generateSimplePlans(){
+	private Population generateSimplePlans(){
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Plans pop = new Plans(Plans.NO_STREAMING);
+		Population pop = new Population(Population.NO_STREAMING);
 		log.info("  generating plans... ");
 		
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
@@ -155,7 +155,7 @@ public class PlansGeneratorControler extends Controler {
 	
 
 	/** Generates one Person a time */
-	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Plans population) {
+	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
 		Person p = new Person(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {

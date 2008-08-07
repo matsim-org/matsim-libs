@@ -39,7 +39,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -51,7 +51,7 @@ public class TripDurationHandler implements EventHandlerAgentDepartureI,
 		EventHandlerAgentArrivalI {
 	private final NetworkLayer network;
 
-	private final Plans plans;
+	private final Population plans;
 
 	private double travelTimes, carTravelTimes, ptTravelTimes,
 			otherTravelTimes;
@@ -65,7 +65,7 @@ public class TripDurationHandler implements EventHandlerAgentDepartureI,
 	 */
 	private final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
-	public TripDurationHandler(final NetworkLayer network, final Plans plans) {
+	public TripDurationHandler(final NetworkLayer network, final Population plans) {
 		this.network = network;
 		this.plans = plans;
 	}
@@ -152,7 +152,7 @@ public class TripDurationHandler implements EventHandlerAgentDepartureI,
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPlansReader(population).readFile(plansFilename);
 

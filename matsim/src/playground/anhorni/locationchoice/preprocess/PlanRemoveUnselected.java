@@ -10,9 +10,9 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.Counter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
@@ -20,7 +20,7 @@ import org.matsim.world.algorithms.WorldValidation;
 
 public class PlanRemoveUnselected {
 
-	private Plans plans=null;
+	private Population plans=null;
 	private NetworkLayer network=null;
 	private Facilities  facilities =null;
 	private String outputpath="";
@@ -94,15 +94,15 @@ public class PlanRemoveUnselected {
 		log.info("world checking done.");
 
 
-		this.plans=new Plans(false);
-		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
+		this.plans=new Population(false);
+		final PopulationReader plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 		log.info(this.plans.getPersons().size() + " persons");
 	}
 
 	private void writePlans() {
-		new PlansWriter(this.plans, this.outputpath , "v4", 1.0).write();
+		new PopulationWriter(this.plans, this.outputpath , "v4", 1.0).write();
 		log.info("plans written to: " + this.outputpath);
 	}
 

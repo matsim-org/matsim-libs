@@ -36,7 +36,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -80,7 +80,7 @@ public class PajekWriter {
 
 	}
 
-	public void write(ArrayList<SocialNetEdge> links, Plans plans, int iter) {
+	public void write(ArrayList<SocialNetEdge> links, Population plans, int iter) {
 		BufferedWriter pjnet = null;
 
 		// from config
@@ -156,7 +156,7 @@ public class PajekWriter {
 		}
 		//}
 	}
-	public void writeGeo(Plans plans, SocialNetwork snet, int iter) {
+	public void writeGeo(Population plans, SocialNetwork snet, int iter) {
 
 		GeoStatistics gstat = new GeoStatistics(plans, snet);
 		Graph g = gstat.makeJungGraph();

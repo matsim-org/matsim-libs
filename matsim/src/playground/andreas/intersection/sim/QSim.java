@@ -38,7 +38,7 @@ import org.matsim.mobsim.QueueNetworkLayer;
 import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.trafficlights.data.SignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalGroupDefinitionParser;
 import org.matsim.trafficlights.data.SignalSystemConfiguration;
@@ -67,7 +67,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 	protected boolean useOTF = true;
 	protected LegHistogram hist = null;
 
-	public QSim(Events events, Plans population, NetworkLayer network, String signalSystems, String groupDefinitions, boolean useOTF) {
+	public QSim(Events events, Population population, NetworkLayer network, String signalSystems, String groupDefinitions, boolean useOTF) {
 		super(network, population, events);
 
 		this.network = new QueueNetworkLayer(this.networkLayer, new TrafficLightQueueNetworkFactory());

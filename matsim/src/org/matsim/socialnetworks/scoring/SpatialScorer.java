@@ -32,7 +32,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -71,7 +71,7 @@ public class SpatialScorer {
 	 * @param iteration
 	 * 
 	 */
-	public void scoreActs(Plans plans, int iteration) {
+	public void scoreActs(Population plans, int iteration) {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
@@ -94,7 +94,7 @@ public class SpatialScorer {
 	 * @param plans
 	 * @return activityMap
 	 */
-	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Plans plans){
+	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
 //		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();

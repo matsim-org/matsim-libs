@@ -24,7 +24,7 @@ import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PersonTest extends MatsimTestCase {
@@ -189,7 +189,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetRandomUnscoredPlan() {
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans

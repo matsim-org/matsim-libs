@@ -38,7 +38,7 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.QueueNetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
@@ -85,12 +85,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
 
 	private final OTFNetHandler handler = null;
-	private transient Plans pop = null;
+	private transient Population pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetworkLayer network = null;
 	public transient Events events;
 
-	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Population population, Events events) throws RemoteException {
 		super(4019, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -100,7 +100,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFDataWriter.setServer(this);
 	}
 
-	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean noSSL) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetworkLayer network, Population population, Events events, boolean noSSL) throws RemoteException {
 		super(4019);
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -111,7 +111,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public static boolean useSSL = true;
 	
-	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Plans population, Events events, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String ReadableName, QueueNetworkLayer network, Population population, Events events, boolean useSSL) {
 		OnTheFlyServer result = null;
 		
 		OnTheFlyServer.useSSL = useSSL;

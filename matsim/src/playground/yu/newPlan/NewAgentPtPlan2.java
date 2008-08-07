@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -47,7 +47,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan2(final Plans plans) {
+	public NewAgentPtPlan2(final Population plans) {
 		super(plans);
 		this.copyPlans.clear();
 	}

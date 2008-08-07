@@ -27,7 +27,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandlerI;
@@ -61,7 +61,7 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	
-	private Plans plans;
+	private Population plans;
 	
 	private boolean isFirstLine = true;
 	
@@ -70,7 +70,7 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 	public PopulationAsciiFileReader(ZoneLayer zoneLayer) {
 		this.zoneLayer = zoneLayer;
 		this.tabFileParserConfig = new TabularFileParserConfig();
-		plans = new Plans(Plans.NO_STREAMING);
+		plans = new Population(Population.NO_STREAMING);
 	}
 
 	public void startRow(String[] row) throws IllegalArgumentException {
@@ -128,7 +128,7 @@ public class PopulationAsciiFileReader implements TabularFileHandlerI {
 	}
 	
 	
-	public Plans readFile(String filename) throws IOException {
+	public Population readFile(String filename) throws IOException {
 		log.warn("#######################################################################");
 		log.warn("This tool is not able to check the semantical correctness of data a better solution would be usage of xml.");
 		log.warn("The correctnes of the resulting plans file depends on the correct usage of the input format, that will not be checked by this tool, please take care");

@@ -38,7 +38,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
@@ -450,7 +450,7 @@ public class PlansCreateFromCensus2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 
 		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("plans DB is not empty!"); }

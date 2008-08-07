@@ -40,7 +40,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -71,7 +71,7 @@ public class QuerySpinne implements OTFQuery {
 		else  this.drivenLinks.put(driven, count + 1);
 	}
 
-	protected List<Plan> getPersons(Plans plans, QueueNetworkLayer net) {
+	protected List<Plan> getPersons(Population plans, QueueNetworkLayer net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 
 		for (Person person : plans.getPersons().values()) {
@@ -103,7 +103,7 @@ public class QuerySpinne implements OTFQuery {
 		return actPersons;
 	}
 	
-	public void query(QueueNetworkLayer net, Plans plans, Events events, OTFServerQuad quad) {
+	public void query(QueueNetworkLayer net, Population plans, Events events, OTFServerQuad quad) {
 		this.drivenLinks = new HashMap<Link,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();

@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
@@ -44,7 +44,7 @@ public class RandomSocialNetwork extends SocialNetwork {
 
     int numLinks;
     
-    public RandomSocialNetwork(Plans plans) {
+    public RandomSocialNetwork(Population plans) {
 	super(plans);
 	setupIter=1;
 	kbar = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetKbar());

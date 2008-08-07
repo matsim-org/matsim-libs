@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansWriterHandlerImplV0.java
+ * PlansWriterHandlerImplV4.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,22 +22,21 @@ package org.matsim.population;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
+public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	@SuppressWarnings("unused")
-	private static final int DEBUG_LEVEL = 0;
+	//private static final int DEBUG_LEVEL = 0;
 
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -49,8 +48,12 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Plans plans, final BufferedWriter out) throws IOException {
-		out.write("<plans>\n\n");
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+		out.write("<plans");
+		if (plans.getName() != null) {
+			out.write(" name=\"" + plans.getName() + "\"");
+		}
+		out.write(">\n\n");
 	}
 
 	public void endPlans(final BufferedWriter out) throws IOException {
@@ -64,6 +67,16 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");
+		if (person.getSex() != null)
+			out.write(" sex=\"" + person.getSex() + "\"");
+		if (person.getAge() != Integer.MIN_VALUE)
+			out.write(" age=\"" + person.getAge() + "\"");
+		if (person.getLicense() != null)
+			out.write(" license=\"" + person.getLicense() + "\"");
+		if (person.getCarAvail() != null)
+			out.write(" car_avail=\"" + person.getCarAvail() + "\"");
+		if (person.getEmployed() != null)
+			out.write(" employed=\"" + person.getEmployed() + "\"");
 		out.write(">\n");
 	}
 
@@ -76,6 +89,9 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException {
+		out.write("\t\t<travelcard");
+		out.write(" type=\"" + travelcard + "\"");
+		out.write(" />\n\n");
 	}
 
 	public void endTravelCard(final BufferedWriter out) throws IOException {
@@ -86,9 +102,14 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException {
+		out.write("\t\t<knowledge");
+		if (knowledge.getDesc() != null)
+			out.write(" desc=\"" + knowledge.getDesc() + "\"");
+		out.write(">\n");
 	}
 
 	public void endKnowledge(final BufferedWriter out) throws IOException {
+		out.write("\t\t</knowledge>\n\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -96,9 +117,27 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startActivitySpace(final ActivitySpace as, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t<activityspace");
+		if (as instanceof ActivitySpaceEllipse) {
+			out.write(" type=\"" + "ellipse" + "\"");
+		} else if (as instanceof ActivitySpaceCassini) {
+			out.write(" type=\"" + "cassini" + "\"");
+
+		}else if (as instanceof ActivitySpaceSuperEllipse) {
+			out.write(" type=\"" + "superellipse" + "\"");
+
+		}else if (as instanceof ActivitySpaceBean) {
+			out.write(" type=\"" + "bean" + "\"");
+
+		} else {
+			Gbl.errorMsg("[something is completely wrong!]");
+		}
+		out.write(" activity_type=\"" + as.getActType() + "\"");
+		out.write(">\n");
 	}
 
 	public void endActivitySpace(final BufferedWriter out) throws IOException {
+		out.write("\t\t\t</activityspace>\n\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -106,6 +145,10 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startParam(final String name, final String value, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<param");
+		out.write(" name=\"" + name + "\"");
+		out.write(" value=\"" + value + "\"");
+		out.write(" />\n");
 	}
 
 	public void endParam(final BufferedWriter out) throws IOException {
@@ -116,9 +159,13 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startActivity(final String act_type, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t<activity");
+		out.write(" type=\"" + act_type + "\"");
+		out.write(">\n");
 	}
 
 	public void endActivity(final BufferedWriter out) throws IOException {
+		out.write("\t\t\t</activity>\n\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -126,9 +173,14 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<location");
+//		out.write(" type=\"" + facility.getLayer().getType() + "\"");
+		out.write(" id=\"" + facility.getId() + "\"");
+		out.write(">\n");
 	}
 
 	public void endLocation(final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t</location>\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -136,6 +188,11 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startCapacity(final Activity activtiy, final BufferedWriter out) throws IOException {
+		if (activtiy.getCapacity() != Integer.MAX_VALUE) {
+			out.write("\t\t\t\t\t<capacity");
+			out.write(" value=\"" + activtiy.getCapacity() + "\"");
+			out.write(" />\n");
+		}
 	}
 
 	public void endCapacity(final BufferedWriter out) throws IOException {
@@ -146,6 +203,11 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startOpentime(final Opentime opentime, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t\t<opentime");
+		out.write(" day=\"" + opentime.getDay() + "\"");
+		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
+		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
+		out.write(" />\n");
 	}
 
 	public void endOpentime(final BufferedWriter out) throws IOException {
@@ -157,12 +219,14 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 
 	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (!Double.isNaN(plan.getScore()))
+		if (!plan.hasUndefinedScore())
 			out.write(" score=\"" + plan.getScore() + "\"");
 		if (plan.isSelected())
 			out.write(" selected=\"" + "yes" + "\"");
 		else
 			out.write(" selected=\"" + "no" + "\"");
+		if ((plan.getType() != null) && (plan.getType() != Plan.Type.UNDEFINED))
+			out.write(" type=\"" + plan.getType() + "\"");
 		out.write(">\n");
 	}
 
@@ -177,22 +241,20 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 	public void startAct(final Act act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
-		if (act.getCoord() != null) {
-			out.write(" x100=\"" + act.getCoord().getX() + "\"");
-			out.write(" y100=\"" + act.getCoord().getY() + "\"");
-		}
 		if (act.getLink() != null)
 			out.write(" link=\"" + act.getLink().getId() + "\"");
-		if (act.getStartTime() != Integer.MIN_VALUE)
+		if (act.getFacility() != null)
+			out.write(" facility=\"" + act.getFacility().getId() + "\"");
+		if (act.getCoord() != null) {
+			out.write(" x=\"" + act.getCoord().getX() + "\" y=\"" + act.getCoord().getY() + "\"");
+		}
+		if (act.getStartTime() != Time.UNDEFINED_TIME)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act.getDur() != Integer.MIN_VALUE)
+		if (act.getDur() != Time.UNDEFINED_TIME)
 			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
-		if (act.getEndTime() != Integer.MIN_VALUE)
+		if (act.getEndTime() != Time.UNDEFINED_TIME)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
-		if (act.isPrimary())
-			out.write(" primary=\"" + "true" + "\"");
 		out.write(" />\n");
-//		Gbl.debugMsg(DEBUG_LEVEL,this.getClass(),"startRoute(...)","there's no 'zone' info at the moment!");
 	}
 
 	public void endAct(final BufferedWriter out) throws IOException {
@@ -207,11 +269,11 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 		if (leg.getNum() != Integer.MIN_VALUE)
 			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepTime() != Integer.MIN_VALUE)
+		if (leg.getDepTime() != Time.UNDEFINED_TIME)
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepTime()) + "\"");
-		if (leg.getTravTime() != Integer.MIN_VALUE)
+		if (leg.getTravTime() != Time.UNDEFINED_TIME)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravTime()) + "\"");
-		if (leg.getArrTime() != Integer.MIN_VALUE)
+		if (leg.getArrTime() != Time.UNDEFINED_TIME)
 			out.write(" arr_time=\"" + Time.writeTime(leg.getArrTime()) + "\"");
 		out.write(">\n");
 	}
@@ -226,12 +288,14 @@ public class PlansWriterHandlerImplV0 implements PlansWriterHandler {
 
 	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
+		if (!Double.isNaN(route.getDist()))
+			out.write(" dist=\"" + route.getDist() + "\"");
+		if (route.getTravTime() != Time.UNDEFINED_TIME)
+			out.write(" trav_time=\"" + Time.writeTime(route.getTravTime()) + "\"");
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		Iterator<Node> it = route.getRoute().iterator();
-		while (it.hasNext()) {
-			Node n = it.next();
+		for (Node n : route.getRoute()) {
 			out.write(n.getId() + " ");
 		}
 		out.write("\n");

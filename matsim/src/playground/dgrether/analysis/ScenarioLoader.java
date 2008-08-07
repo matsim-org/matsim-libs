@@ -26,8 +26,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
@@ -43,7 +43,7 @@ public class ScenarioLoader {
 
 	private NetworkLayer networkLayer;
 
-	private Plans plans;
+	private Population plans;
 
 
 	public ScenarioLoader(String config) {
@@ -53,11 +53,11 @@ public class ScenarioLoader {
 		this.plans = this.loadPopulation();
 	}
 
-	public void setPlans(Plans p) {
+	public void setPlans(Population p) {
 		this.plans = p;
 	}
 
-	public Plans getPlans() {
+	public Population getPlans() {
 		return this.plans;
 	}
 
@@ -69,10 +69,10 @@ public class ScenarioLoader {
 		return this.networkLayer;
 	}
 
-	private Plans loadPopulation() {
-		Plans population = new Plans(Plans.NO_STREAMING);
+	private Population loadPopulation() {
+		Population population = new Population(Population.NO_STREAMING);
 		printNote("", "  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		printNote("", "  done");

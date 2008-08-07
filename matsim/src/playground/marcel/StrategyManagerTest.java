@@ -20,7 +20,7 @@
 
 package playground.marcel;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.TimeAllocationMutator;
@@ -53,6 +53,6 @@ public class StrategyManagerTest {
 		manager.addStrategy(strategy3, 0.80);
 		
 		// run it
-		manager.run(new Plans(), 1);
+		manager.run(new Population(), 1);
 	}
 }

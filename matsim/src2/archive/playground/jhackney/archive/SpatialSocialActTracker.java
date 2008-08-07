@@ -31,7 +31,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class SpatialSocialActTracker implements SocialActGeneratorI {
 
@@ -47,7 +47,7 @@ public class SpatialSocialActTracker implements SocialActGeneratorI {
 	// Agents need to be able to find the socializing opportunity associated
 	//  with each of their Acts: person.map.dates gives the socializingopp's;
 
-	public Collection<SocialAct> generateValues(Plans plans) {
+	public Collection<SocialAct> generateValues(Population plans) {
 		HashMap<Activity, SocialAct> events = new HashMap<Activity, SocialAct>();
 		SocialAct event = null;
 
@@ -78,7 +78,7 @@ public class SpatialSocialActTracker implements SocialActGeneratorI {
 		return events.values();
 	}
 
-	public HashMap<Activity, SocialAct> generateMap(Plans plans) {
+	public HashMap<Activity, SocialAct> generateMap(Population plans) {
 		HashMap<Activity, SocialAct> events = new HashMap<Activity, SocialAct>();
 		SocialAct event = null;
 

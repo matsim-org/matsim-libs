@@ -24,9 +24,9 @@ import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 
 import playground.balmermi.census2000.data.Household;
 import playground.balmermi.census2000.data.Households;
@@ -50,10 +50,10 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		Plans plans = new Plans(Plans.USE_STREAMING);
-		PlansWriter plansWriter = new PlansWriter(plans);
+		Population plans = new Population(Population.USE_STREAMING);
+		PopulationWriter plansWriter = new PopulationWriter(plans);
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

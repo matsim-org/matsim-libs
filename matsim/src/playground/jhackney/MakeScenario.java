@@ -29,8 +29,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PersonRemoveReferences;
 import org.matsim.population.algorithms.PlansScenarioCut;
 import org.matsim.population.algorithms.XY2Links;
@@ -78,8 +78,8 @@ public class MakeScenario {
 //		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		Plans plans = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		Population plans = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 

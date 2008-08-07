@@ -29,8 +29,8 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
@@ -85,9 +85,9 @@ public class SimRunKreisverkehr {
 //		}
 //		System.exit(0);
 
-		Plans population = new MyPopulation();
+		Population population = new MyPopulation();
 		// Read plans file with special Reader Implementation
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events() ;

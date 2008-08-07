@@ -37,7 +37,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
@@ -70,7 +70,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
 
 		/* build plans */
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
@@ -157,7 +157,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
 
 		/* build plans */
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
@@ -233,7 +233,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
 
 		/* build plans */
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 
 		try {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
@@ -383,7 +383,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link6 = network.createLink("6", "6", "7", "100", "10", "60000", "9", null, null);
 
 		/* build plans */
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 
 		try {
 			// create a person with a car-leg from link1 to link5, but an incomplete route

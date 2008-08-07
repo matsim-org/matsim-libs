@@ -32,18 +32,18 @@ import java.util.TreeSet;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class ActChainDistributionWriter {
 
-	public static void run(Plans population, String filename) {
+	public static void run(Population population, String filename) {
 		TreeMap<String, Integer> actChainDistr = getActChainDistr(population);
 		String[] actTypes = getActTypes(population);
 		
 		writeActChainDistr(actChainDistr, actTypes, filename);
 	}
 	
-	public static void run(Plans population, Plans referencePopulation, String filename) {
+	public static void run(Population population, Population referencePopulation, String filename) {
 		TreeMap<String, Integer> actChainDistr = getActChainDistr(population);
 		TreeSet<String> referenceActChains = getReferenceActChains(referencePopulation);
 		removeActChainsNotInReferenceSet(actChainDistr, referenceActChains);
@@ -69,7 +69,7 @@ public class ActChainDistributionWriter {
 		}
 	}
 
-	private static TreeSet<String> getReferenceActChains(Plans population) {
+	private static TreeSet<String> getReferenceActChains(Population population) {
 		TreeSet<String> actChains = new TreeSet<String>();
 
 		for (Person person : population.getPersons().values()) {
@@ -138,7 +138,7 @@ public class ActChainDistributionWriter {
 		return acts;
 	}
 
-	private static String[] getActTypes(Plans population) {
+	private static String[] getActTypes(Population population) {
 		TreeSet<String> actTypes = new TreeSet<String>();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -152,7 +152,7 @@ public class ActChainDistributionWriter {
 		return actTypes.toArray(new String[0]);
 	}
 
-	private static TreeMap<String, Integer> getActChainDistr(Plans population) {
+	private static TreeMap<String, Integer> getActChainDistr(Population population) {
 		TreeMap<String, Integer> actChainDist = new TreeMap<String, Integer>();
 
 		for (Person person : population.getPersons().values()) {

@@ -35,8 +35,8 @@ import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
 
@@ -47,7 +47,7 @@ import org.matsim.utils.misc.Counter;
 
 public class PlansAnalyzer {
 
-	private Plans plans=null;
+	private Population plans=null;
 	private NetworkLayer network=null;
 	private Facilities  facilities =null;
 
@@ -95,8 +95,8 @@ public class PlansAnalyzer {
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
-		this.plans=new Plans(false);
-		final PlansReaderI plansReader = new MatsimPlansReader(this.plans);
+		this.plans=new Population(false);
+		final PopulationReader plansReader = new MatsimPlansReader(this.plans);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 			

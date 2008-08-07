@@ -54,9 +54,9 @@ import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ActLocationFalsifier;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
@@ -290,17 +290,17 @@ public class MyMonsterClass {
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 
 		Collection<Person> persons = population.getPersons().values();
 
 
-		PlansWriter writer = new PlansWriter(population,"./output/evacuationplans_zurich_navteq1.xml","v4");
+		PopulationWriter writer = new PopulationWriter(population,"./output/evacuationplans_zurich_navteq1.xml","v4");
 		writer.writeStartPlans();
 		for (Person person : persons){
 			Person nperson = new Person(person.getId());
@@ -557,10 +557,10 @@ int three=0;
 		world.setNetworkLayer(network);
 		System.out.println("done. ");
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plansFile);
 		population.printPlansCount();
 
@@ -577,7 +577,7 @@ int three=0;
 		System.out.println("done. ");
 
 		System.out.println("filtering persons ...");
-		PlansWriter writer = new PlansWriter(population,"testplans.xml","v4");
+		PopulationWriter writer = new PopulationWriter(population,"testplans.xml","v4");
 		writer.writeStartPlans();
 //		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInteresst);
 //		Collection<Person> persons = (Collection<Person>) population.getPersons().values();
@@ -620,19 +620,19 @@ int three=0;
 		System.out.println("done. ");
 
 
-		Plans population = new Plans(Plans.USE_STREAMING);
+		Population population = new Population(Population.USE_STREAMING);
 		PersonAlgorithmI algo = new PlansFilterActInArea(subNetwork,"w");
 		population.addAlgorithm(algo);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plans);
 		System.out.println("done. ");
 
 		population = ((PlansFilterActInArea)algo).getPlans();
 		population.printPlansCount();
 
-		PlansWriter writer = new PlansWriter(population,"./networks/evacuationplans_zurich_navteq.xml","v4");
+		PopulationWriter writer = new PopulationWriter(population,"./networks/evacuationplans_zurich_navteq.xml","v4");
 		writer.writeStartPlans();
 				Collection<Person> persons = population.getPersons().values();
 		for (Person person : persons){
@@ -658,10 +658,10 @@ int three=0;
 		System.out.println("done. ");
 
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(plans);
 		population.printPlansCount();
 
@@ -728,10 +728,10 @@ int three=0;
 		System.out.println("done. ");
 
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(in_plans);
 		population.printPlansCount();
 
@@ -751,7 +751,7 @@ int three=0;
 
 		new XY2Links(new_network).run(population);
 
-		PlansWriter writer = new PlansWriter(population,out_plans,"v4");
+		PopulationWriter writer = new PopulationWriter(population,out_plans,"v4");
 		writer.writeStartPlans();
 		Collection<Person> persons = population.getPersons().values();
 		for (Person person : persons){
@@ -896,14 +896,14 @@ int three=0;
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		System.out.println("reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 
-		PlansWriter writer = new PlansWriter(population,"./networks/padang_plans10p.xml","v4");
+		PopulationWriter writer = new PopulationWriter(population,"./networks/padang_plans10p.xml","v4");
 		writer.write();
 	}
 

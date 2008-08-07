@@ -29,7 +29,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * @author yu
@@ -40,7 +40,7 @@ public class NewIdPlan extends NewPlan {
 	/**
 	 * @param plans
 	 */
-	public NewIdPlan(final Plans plans) {
+	public NewIdPlan(final Population plans) {
 		super(plans);
 	}
 
@@ -61,7 +61,7 @@ public class NewIdPlan extends NewPlan {
 				.getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
 
-		Plans plans = new Plans();
+		Population plans = new Population();
 		NewIdPlan nip = new NewIdPlan(plans);
 		plans.addAlgorithm(nip);
 		new MatsimPlansReader(plans).readFile(config.plans().getInputFile());

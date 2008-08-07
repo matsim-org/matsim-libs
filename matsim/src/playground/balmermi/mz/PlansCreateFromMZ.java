@@ -38,7 +38,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 import org.matsim.utils.misc.Time;
@@ -92,7 +92,7 @@ public class PlansCreateFromMZ {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> createPlans(final Plans plans, final Map<Id,String> person_strings) throws Exception {
+	private final Set<Id> createPlans(final Population plans, final Map<Id,String> person_strings) throws Exception {
 		Set<Id> coord_err_pids = new HashSet<Id>();
 		
 		Set<Id> pids_dow = new HashSet<Id>();
@@ -249,7 +249,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void removePlans(final Plans plans, final Map<Id,String> person_strings, final Set<Id> ids) {
+	private final void removePlans(final Population plans, final Map<Id,String> person_strings, final Set<Id> ids) {
 		for (Id id : ids) {
 			Person p = plans.getPersons().remove(id);
 			if (p == null) { Gbl.errorMsg("pid="+id+": id not found in the plans DB!"); }
@@ -260,7 +260,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void setHomeLocations(final Plans plans, final Map<Id,String> person_strings) {
+	private final void setHomeLocations(final Population plans, final Map<Id,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			Act home = plan.getFirstActivity();
@@ -278,7 +278,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 	
-	private final Set<Id> identifyNonHomeBasedPlans(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyNonHomeBasedPlans(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -290,7 +290,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithTypeOther(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithTypeOther(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -305,7 +305,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansModeTypeUndef(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansModeTypeUndef(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -320,7 +320,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithRoundTrips(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithRoundTrips(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -339,7 +339,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void removingRoundTrips(final Plans plans, final Map<Id,String> person_strings) {
+	private final void removingRoundTrips(final Population plans, final Map<Id,String> person_strings) {
 		int cnt_sametypes = 0;
 		int cnt_difftypes = 0;
 		int cnt_p = 0;
@@ -410,7 +410,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansNegDistance(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansNegDistance(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -425,7 +425,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithNegCoords(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithNegCoords(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -440,7 +440,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansWithTooLongWalkTrips(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansWithTooLongWalkTrips(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -455,7 +455,7 @@ public class PlansCreateFromMZ {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifyPlansInconsistentTimes(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifyPlansInconsistentTimes(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -469,7 +469,7 @@ public class PlansCreateFromMZ {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> identifySingleActPlans(final Plans plans, final Map<Id,String> person_strings) {
+	private final Set<Id> identifySingleActPlans(final Population plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
@@ -482,7 +482,7 @@ public class PlansCreateFromMZ {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) throws Exception {
+	public void run(final Population plans) throws Exception {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 		
 		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }

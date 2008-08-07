@@ -54,9 +54,9 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.replanning.PlanStrategy;
@@ -104,7 +104,7 @@ public class SNReplanning  {
 	public static String SOCNET_OUT_DIR = null;
 
 	protected final Events events = new Events();
-	protected Plans population = null;
+	protected Population population = null;
 
 	private boolean running = false;
 	private StrategyManager strategyManager = null;
@@ -540,7 +540,7 @@ public class SNReplanning  {
 		if ((iteration % 10 == 0) || (iteration < 3)) {
 			printNote("", "dumping all agents' plans...");
 			String outversion = this.config.plans().getOutputVersion();
-			PlansWriter plansWriter = new PlansWriter(this.population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
+			PopulationWriter plansWriter = new PopulationWriter(this.population, getIterationFilename(FILENAME_PLANS, snIter), outversion);
 			plansWriter.setUseCompression(true);
 			plansWriter.write();
 			printNote("", "done dumping plans.");
@@ -644,11 +644,11 @@ public class SNReplanning  {
 		return this.facilities;
 	}
 
-	protected Plans loadPopulation() {
-		Plans population = new Plans(Plans.NO_STREAMING);
+	protected Population loadPopulation() {
+		Population population = new Population(Population.NO_STREAMING);
 
 		printNote("", "  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(this.config.plans().getInputFile());
 		population.printPlansCount();
 		printNote("", "  done");
@@ -810,7 +810,7 @@ public class SNReplanning  {
 
 				printNote("", "  writing plans xml file... ");
 				// write the plans into the default output-directory
-				PlansWriter plansWriter = new PlansWriter(this.population, getOutputFilename("output_plans.xml.gz"),
+				PopulationWriter plansWriter = new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
 						this.config.plans().getOutputVersion());
 				plansWriter.write();
 				printNote("", "  done");
@@ -984,7 +984,7 @@ public class SNReplanning  {
 		return iteration;
 	}
 
-	public final Plans getPopulation() {
+	public final Population getPopulation() {
 		return this.population;
 	}
 
@@ -1104,7 +1104,7 @@ public class SNReplanning  {
 			System.out.println();
 		}
 	}
-	void initializeKnowledge( Plans plans ){
+	void initializeKnowledge( Population plans ){
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

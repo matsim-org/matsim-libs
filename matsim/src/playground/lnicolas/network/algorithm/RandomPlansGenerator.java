@@ -33,8 +33,8 @@ import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.shared.Coord;
 
 public class RandomPlansGenerator extends NetworkAlgorithm {
@@ -46,7 +46,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 	private double minY;
 	private final double givenFromToDistance;
 	private final int tripCount;
-	private Plans plans;
+	private Population plans;
 
 	public RandomPlansGenerator(final double avgFromToDistance,
 			final int tripCount) {
@@ -117,7 +117,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 
 		// Take a random cell and determine the cells that are givenFromToDistance
 		// away from it
-		Plans plans = new Plans();
+		Population plans = new Population();
 		for (int i = 0; i < this.tripCount; i++) {
 			if (addPlan(cells, plans, i) == false) {
 				Gbl.errorMsg("No from-to node pairs found for distance "
@@ -125,7 +125,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 			}
 		}
 
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("Wrote plans to "
 				+ Gbl.getConfig().plans().getOutputFile());
@@ -140,7 +140,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		int i = 0;
 //		String statusString = "|----------+-----------|";
 //		System.out.println(statusString);
-		Plans plans = new Plans();
+		Population plans = new Population();
 
 		while (i < this.tripCount) {
 			if (fromIt.hasNext() == false) {
@@ -174,7 +174,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 //			}
 		}
 
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("Wrote plans to "
 				+ Gbl.getConfig().plans().getOutputFile());
@@ -182,7 +182,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		this.plans = plans;
 	}
 
-	private boolean addPlan(final ArrayList<Node>[][] cells, final Plans plans, final int id) {
+	private boolean addPlan(final ArrayList<Node>[][] cells, final Population plans, final int id) {
 		Node toNode = null;
 		Node fromNode = null;
 		int cnt = 0;
@@ -219,7 +219,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		return addPlan(plans, id, toNode, fromNode);
 	}
 
-	private boolean addPlan(final Plans plans, final int id, final Node toNode, final Node fromNode) {
+	private boolean addPlan(final Population plans, final int id, final Node toNode, final Node fromNode) {
 		Person person = new Person(new IdImpl(id));
 		Plan plan = person.createPlan(true);
 		try {
@@ -287,7 +287,7 @@ public class RandomPlansGenerator extends NetworkAlgorithm {
 		generateTrips(network);
 	}
 
-	public Plans getPlans() {
+	public Population getPlans() {
 		return this.plans;
 	}
 

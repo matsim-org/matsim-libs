@@ -28,13 +28,13 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.writer.WriterHandler;
 
-public interface PlansWriterHandler extends WriterHandler {
+public interface PopulationWriterHandler extends WriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Plans plans, final BufferedWriter out) throws IOException;
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException;
 
 	public void endPlans(final BufferedWriter out) throws IOException;
 

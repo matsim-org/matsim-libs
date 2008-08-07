@@ -5,7 +5,7 @@ import java.util.List;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -45,7 +45,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	 * @param network -
 	 *            contains useful information from network-file
 	 */
-	public AveTraTimeCal(Plans plans, NetworkLayer network) {
+	public AveTraTimeCal(Population plans, NetworkLayer network) {
 		super(plans, network);
 	}
 

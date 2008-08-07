@@ -28,9 +28,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
-import org.matsim.population.PlansWriterHandlerImplV4;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.Route;
 
 
@@ -45,7 +45,7 @@ public class Plansgenerator {
 	private static final String plansOut = "../matsimWithindayTesting/testdata/tests/withinday/newPlans.xml";
 
 
-	private Plans plans;
+	private Population plans;
 
 	private void init() {
 		Config config = Gbl.createConfig(null);
@@ -59,7 +59,7 @@ public class Plansgenerator {
 
 	private void createPlans() throws Exception {
 		init();
-		this.plans = new Plans(false);
+		this.plans = new Population(false);
 		int homeEndtime = 6 * 3600;
 		for (int i = 1; i <= 100; i++) {
 			Person p = new Person(new IdImpl(i));
@@ -91,8 +91,8 @@ public class Plansgenerator {
 		}
 
 
-		PlansWriter pwriter = new PlansWriter(this.plans);
-		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
+		PopulationWriter pwriter = new PopulationWriter(this.plans);
+		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
 		pwriter.write();
 
 

@@ -20,7 +20,7 @@
 
 package playground.jhackney.deprecated;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
@@ -64,7 +64,7 @@ public abstract class Interactor {
  * @param plans the list of people and their factivities
  * @param iteration the social network iteration
  */
-    public abstract void interact(Plans plans, int iteration);
+    public abstract void interact(Population plans, int iteration);
 /**
  * This is the old spatial interact which is called for each facility type in which
  * the agents are to have a chance to meet. Thus the weighting of the facility,
@@ -76,7 +76,7 @@ public abstract class Interactor {
  * @param facType
  * @param iteration
  */
-    public abstract void interact(Plans plans, String facType, int iteration);
+    public abstract void interact(Population plans, String facType, int iteration);
 /**
  * The current spatial interactor which uses a likelihood for interactions in
  * each facility type
@@ -86,6 +86,6 @@ public abstract class Interactor {
  * because this code doesn't care
  * @param iteration social network iteration
  */
-    public abstract void interact(Plans plans, String[] facTypes, double[] facWeights, int iteration);
+    public abstract void interact(Population plans, String[] facTypes, double[] facWeights, int iteration);
 
 }

@@ -41,7 +41,7 @@ import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
@@ -70,7 +70,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.addNetworkChangeEvent(change);
 
 		// create a population
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		Person person1 = createPersons(7*3600, link1, link3, 1).get(0);
 		Person person2 = createPersons(9*3600, link1, link3, 1).get(0);
 		plans.addPerson(person1);
@@ -123,7 +123,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		List<Person> persons1 = createPersons(0, link1, link3, personsPerWave);
 		for(Person p : persons1)
 			plans.addPerson(p);

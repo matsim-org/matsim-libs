@@ -32,7 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.ScoringFunction;
@@ -73,7 +73,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		Person person1 = null;
 		try {
 			person1 = new Person(new IdImpl(1));
@@ -148,7 +148,7 @@ public class ControlerTest extends MatsimTestCase {
 		Node node1 = network.createNode(new IdImpl(1), new Coord(0, 0));
 		Node node2 = network.createNode(new IdImpl(2), new Coord(100, 0));
 		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
@@ -191,7 +191,7 @@ public class ControlerTest extends MatsimTestCase {
 		network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		Person person1 = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
@@ -266,7 +266,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		Person person1 = null;
 		Act act1a = null;
 		Act act1b = null;

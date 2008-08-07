@@ -12,7 +12,7 @@ import org.matsim.events.EventLinkEnter;
 import org.matsim.events.EventLinkLeave;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -104,7 +104,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 * @param network -
 	 *            a NetworkLayer-object of the simulation
 	 */
-	public LinkAveCalA(Plans plans, NetworkLayer network) {
+	public LinkAveCalA(Population plans, NetworkLayer network) {
 		super(plans, network);
 	}
 

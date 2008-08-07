@@ -25,7 +25,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
@@ -55,7 +55,7 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 	public void testReadFile() throws IOException {
 		String f = this.getClassInputDirectory() + filename;
 		PopulationAsciiFileReader p = new PopulationAsciiFileReader(this.zoneLayer);
-		Plans plans = p.readFile(f);
+		Population plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
 		Person p1 = plans.getPerson(new IdImpl("1"));

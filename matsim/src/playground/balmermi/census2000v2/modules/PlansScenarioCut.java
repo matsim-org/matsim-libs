@@ -29,7 +29,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -67,7 +67,7 @@ public class PlansScenarioCut {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void run(Plans plans) {
+	public final void run(Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		Set<Id> removeids = new TreeSet<Id>();
 		Map<Id,Person> persons = plans.getPersons();

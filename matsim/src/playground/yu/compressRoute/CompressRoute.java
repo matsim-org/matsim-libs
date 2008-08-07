@@ -34,7 +34,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
@@ -60,7 +60,7 @@ public class CompressRoute extends PersonAlgorithm {
 	/** Counter of "new" filtered links */
 	private int newLinksNr;
 
-	public CompressRoute(Map<String, String> ssLinks, Plans plans, String fileName)
+	public CompressRoute(Map<String, String> ssLinks, Population plans, String fileName)
 			throws IOException {
 		this.ssLinks = ssLinks;
 		this.out = new DataOutputStream(new BufferedOutputStream(

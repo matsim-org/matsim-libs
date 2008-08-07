@@ -37,7 +37,7 @@ import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.xml.sax.SAXException;
@@ -94,7 +94,7 @@ public class ActivityDurationAnalyser {
 		}		
 		
 		for (String file : plansFiles) {
-			Plans plans = new Plans(Plans.NO_STREAMING);
+			Population plans = new Population(Population.NO_STREAMING);
 			MatsimPlansReader plansParser = new MatsimPlansReader(plans);
 			plansParser.readFile(file);	
 			ActivityDurationCounter adc = new ActivityDurationCounter();

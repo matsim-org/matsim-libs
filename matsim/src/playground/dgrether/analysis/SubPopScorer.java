@@ -30,7 +30,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
@@ -80,7 +80,7 @@ public class SubPopScorer {
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
-	private Set<Id> filterPlans(Plans plans) {
+	private Set<Id> filterPlans(Population plans) {
 		PlanCollectFromAlgorithm collector = new PlanCollectFromAlgorithm();
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (String id : this.linkIds) {

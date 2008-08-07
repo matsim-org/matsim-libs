@@ -83,8 +83,8 @@ import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEst
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -147,7 +147,7 @@ public class Controler {
 
 	protected final Events events = new Events();
 	protected NetworkLayer network = null;
-	protected Plans population = null;
+	protected Population population = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCostI travelCostCalculator = null;
@@ -226,7 +226,7 @@ public class Controler {
 		this(null, null, config);
 	}
 
-	public Controler(final Config config, final NetworkLayer network, final Plans population) {
+	public Controler(final Config config, final NetworkLayer network, final Population population) {
 		this(null, null, config);
 		this.network = network;
 		this.population = population;
@@ -328,7 +328,7 @@ public class Controler {
 				this.eventWriter.closefile();
 			}
 			// dump plans
-			new PlansWriter(this.population, getOutputFilename("output_plans.xml.gz"),
+			new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
 					this.config.plans().getOutputVersion()).write();
 			//dump network
 			new NetworkWriter(this.network, getOutputFilename("output_network.xml.gz")).write();
@@ -506,7 +506,7 @@ public class Controler {
 	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
 	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
 	 * it is recommended to pass a custom network and population using the special
-	 * {@link #Controler(Config, QueueNetworkLayer, Plans) Constructor}.
+	 * {@link #Controler(Config, QueueNetworkLayer, Population) Constructor}.
 	 *
 	 * @return The network to be used for the simulation.
 	 */
@@ -520,11 +520,11 @@ public class Controler {
 	 * <strong>It is highly recommended NOT to overwrite this method!</strong> This method should be private, but is
 	 * only protected at the moment because of backward-compatibility with the old Controler class. In general,
 	 * it is recommended to pass a custom network and population using the special
-	 * {@link #Controler(Config, QueueNetworkLayer, Plans) Constructor}.
+	 * {@link #Controler(Config, QueueNetworkLayer, Population) Constructor}.
 	 *
 	 * @return The population to be used for the simulation.
 	 */
-	protected Plans loadPopulation() {
+	protected Population loadPopulation() {
 		return this.scenarioData.getPopulation();
 	}
 
@@ -1066,7 +1066,7 @@ public class Controler {
 		return this.network;
 	}
 
-	public final Plans getPopulation() {
+	public final Population getPopulation() {
 		return this.population;
 	}
 

@@ -24,9 +24,9 @@ import org.matsim.config.Module;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 
 public class PlanomatExe extends ExternalModule {
 
@@ -54,15 +54,15 @@ public class PlanomatExe extends ExternalModule {
 	}
 
 	@Override
-	protected PlansWriter getPlansWriterHandler() {
+	protected PopulationWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + "/" + this.moduleId + ExternalInFileName;
 		String version = "v0";
-		return new PlansWriter(new Plans(Plans.USE_STREAMING), filename, version);
+		return new PopulationWriter(new Population(Population.USE_STREAMING), filename, version);
 	}
 
 	@Override
-	protected PlansReaderI getPlansReader(final Plans plans) {
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+	protected PopulationReader getPlansReader(final Population plans) {
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		return plansReader;
 	}
 

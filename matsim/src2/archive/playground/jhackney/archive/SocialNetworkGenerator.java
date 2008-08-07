@@ -22,14 +22,14 @@ package playground.jhackney.deprecated;
 
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
 public class SocialNetworkGenerator {
 	private static String sNAlgorithmName_;
 	
-	public SocialNetwork generateSocialNetwork(Plans plans) {
+	public SocialNetwork generateSocialNetwork(Population plans) {
 		SocialNetwork net;
 		// Check parameters and call the right algorithm (which implements
 		// SocialNetwork)

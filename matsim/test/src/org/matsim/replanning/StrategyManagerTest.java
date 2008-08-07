@@ -24,7 +24,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.replanning.selectors.PlanSelectorI;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
@@ -42,7 +42,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		Gbl.random.setSeed(4711);
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		try {
 			for (int i = 0; i < 1000; i++) {
 				Person person = new Person(new IdImpl(i));
@@ -130,7 +130,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testOptimisticBehavior() {
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans

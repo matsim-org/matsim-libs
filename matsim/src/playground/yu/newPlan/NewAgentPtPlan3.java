@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 
 /**
@@ -49,7 +49,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithmI {
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentPtPlan3(final Plans plans) {
+	public NewAgentPtPlan3(final Population plans) {
 		super(plans);
 		copyPlans.clear();
 	}

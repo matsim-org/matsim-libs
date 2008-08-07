@@ -13,8 +13,8 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
 public class CreatePlans {
@@ -25,7 +25,7 @@ public class CreatePlans {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO: am schluss alle meiste pfade in config.xml reintun...
-		Plans plans = new Plans(false);
+		Population plans = new Population(false);
 		Gbl.reset();
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/config.xml";
@@ -91,7 +91,7 @@ public class CreatePlans {
 
 
 
-		new PlansWriter(plans).write();
+		new PopulationWriter(plans).write();
 	}
 
 }

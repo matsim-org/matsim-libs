@@ -27,7 +27,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.PlansCalcRouteLandmarks;
@@ -56,7 +56,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 			toll.setType("distance");
 			toll.addLink("5");
 			toll.addLink("11");
-			Plans population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2();
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 			TravelCostI costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -111,7 +111,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 			toll.setType("cordon");
 			toll.addLink("5");
 			toll.addLink("11");
-			Plans population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2();
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 			TravelCostI costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
@@ -159,7 +159,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 *
 	 * @param population
 	 */
-	private void clearRoutes(final Plans population) {
+	private void clearRoutes(final Population population) {
 		for (Person person : population) {
 			for (Plan plan : person.getPlans()) {
 				for (LegIterator i = plan.getIteratorLeg(); i.hasNext(); ) {

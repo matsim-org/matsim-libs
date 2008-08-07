@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.population.algorithms.PlansAlgorithm;
 
@@ -91,7 +91,7 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm implements PersonAlgorit
          *         demand") re-running the assignment microsimulation).
          */
     @Override
-    public void run(Plans plans) {
+    public void run(Population plans) {
 
 	PajekWriter1 pjw = new PajekWriter1("C:/Documents and Settings/jhackney/My Documents/sandbox00/vsp-cvs/devel/matsim/matsimJ/output");
 	buildSocialNetwork(plans);
@@ -150,7 +150,7 @@ public class PlansCalcSocialNet2 extends PlansAlgorithm implements PersonAlgorit
 
     }
 
-    void buildSocialNetwork(Plans plans) {
+    void buildSocialNetwork(Population plans) {
 
 	System.out.print("building Social Network...");
 

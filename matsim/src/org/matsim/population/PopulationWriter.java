@@ -31,15 +31,15 @@ import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 
-public class PlansWriter extends Writer implements PersonAlgorithmI {
+public class PopulationWriter extends Writer implements PersonAlgorithmI {
 
 	private final double write_person_percentage;
 	private boolean fileOpened = false;
 
-	private PlansWriterHandler handler = null;
-	private final Plans population;
+	private PopulationWriterHandler handler = null;
+	private final Population population;
 
-	private final static Logger log = Logger.getLogger(PlansWriter.class);
+	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
@@ -49,7 +49,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 *
 	 * @param population the population to write to file
 	 */
-	public PlansWriter(final Plans population) {
+	public PopulationWriter(final Population population) {
 		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
 	}
 
@@ -63,7 +63,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public PlansWriter(final Plans population, final String filename, final String version) {
+	public PopulationWriter(final Population population, final String filename, final String version) {
 		this(population, filename, version, Gbl.getConfig().plans().getOutputSample());
 	}
 
@@ -78,7 +78,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	 * @param version specifies the file-format
 	 * @param percentage of persons to write to the plans file
 	 */
-	public PlansWriter(final Plans population, final String filename, final String version,
+	public PopulationWriter(final Population population, final String filename, final String version,
 			final double percentage) {
 		super();
 		this.population = population;
@@ -99,16 +99,16 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 	private void createHandler(final String version) {
 		if (version.equals("v4")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v4.dtd";
-			this.handler = new PlansWriterHandlerImplV4();
+			this.handler = new PopulationWriterHandlerImplV4();
 		} else if (version.equals("v0")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
-			this.handler = new PlansWriterHandlerImplV0();
+			this.handler = new PopulationWriterHandlerImplV0();
 		} else {
 			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
 	}
 
-	public final void setWriterHandler(final PlansWriterHandler handler) {
+	public final void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}
 
@@ -261,7 +261,7 @@ public class PlansWriter extends Writer implements PersonAlgorithmI {
 		}
 	}
 
-	public PlansWriterHandler getHandler() {
+	public PopulationWriterHandler getHandler() {
 		return this.handler;
 	}
 

@@ -20,7 +20,7 @@
 
 package playground.jhackney.deprecated;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
@@ -32,7 +32,7 @@ public class EmptySocialNetwork extends SocialNetwork{
 
     int numLinks;
 
-    public EmptySocialNetwork(Plans plans) {
+    public EmptySocialNetwork(Population plans) {
 	super(plans);
 	setupIter=1;
 

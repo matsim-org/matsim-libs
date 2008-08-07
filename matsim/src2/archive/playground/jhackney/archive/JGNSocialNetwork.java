@@ -22,7 +22,7 @@ package playground.jhackney.deprecated;
 
 import java.util.ArrayList;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.jhackney.socialnet.SocialNetwork;
 
@@ -31,7 +31,7 @@ public class JGNSocialNetwork extends SocialNetwork {
 
     private String linkStrengthAlgorithm_;
 
-    public JGNSocialNetwork(Plans plans) {
+    public JGNSocialNetwork(Population plans) {
 	super(plans);
 	setupIter=10;
 	// TODO test the parameters and construct a Jin Girvan Newman social

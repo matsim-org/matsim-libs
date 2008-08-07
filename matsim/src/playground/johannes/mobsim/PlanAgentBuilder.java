@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * A builder class that builds {@link PlanAgent} instances out of {@link Person}
@@ -48,7 +48,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 
 	private static final Logger log = Logger.getLogger(PlanAgentBuilder.class);
 	
-	private final Plans population;
+	private final Population population;
 	
 	// =======================================================
 	// constructor
@@ -61,7 +61,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 * @param population
 	 *            the population of persons.
 	 */
-	public PlanAgentBuilder(Plans population) {
+	public PlanAgentBuilder(Population population) {
 		this.population = population;
 	}
 

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -44,7 +44,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	public void testNumberOfThreads() {
 		loadConfig(null);
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);
@@ -62,7 +62,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	 */
 	public void testNofPersons() {
 		loadConfig(null);
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		try {
 			for (int i = 0; i < 100; i++) {
 				Person person = new Person(new IdImpl(i));

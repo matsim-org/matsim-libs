@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 public class PersonGetEgoNetGetPlans {
@@ -13,10 +13,10 @@ public PersonGetEgoNetGetPlans(){
 	super();
 }
 	
-	public Plans extract(Person ego, Plans plans) throws Exception{
+	public Population extract(Person ego, Population plans) throws Exception{
 		
 	
-		Plans socialPlans=new Plans();
+		Population socialPlans=new Population();
 		
 		socialPlans.addPerson(ego);
 		ArrayList<Person> alters = ego.getKnowledge().getEgoNet().getAlters();

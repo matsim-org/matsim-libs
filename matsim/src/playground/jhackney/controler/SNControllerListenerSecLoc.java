@@ -38,7 +38,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.algorithms.PersonSNSecLocRandomReRoute;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
@@ -268,7 +268,7 @@ public class SNControllerListenerSecLoc implements StartupListener, IterationSta
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Plans plans ) {
+	void initializeKnowledge(final Population plans ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

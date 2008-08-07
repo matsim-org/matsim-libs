@@ -22,8 +22,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.population.filters.ActLinkFilter;
@@ -49,12 +49,12 @@ public class CompareScenariosWestumfahrung {
 	public class CaseStudyResult {
 
 		private String name;
-		private Plans plans;
+		private Population plans;
 		private CalcLegTimes calcLegTimes;
 		private PlanAverageScore planAverageScore;
 		private CalcAverageTripLength calcAverageTripLength;
 
-		public CaseStudyResult(String name, Plans plans,
+		public CaseStudyResult(String name, Population plans,
 				CalcLegTimes calcLegTimes, PlanAverageScore planAverageScore,
 				CalcAverageTripLength calcAverageTripLength) {
 			super();
@@ -69,7 +69,7 @@ public class CompareScenariosWestumfahrung {
 			return name;
 		}
 
-		public Plans getRouteSwitchers() {
+		public Population getRouteSwitchers() {
 			return plans;
 		}
 
@@ -90,7 +90,7 @@ public class CompareScenariosWestumfahrung {
 
 	private static final Logger log = Logger.getLogger(ShopsOf2005ToFacilities.class);
 	
-	private Plans inputPlans = null;
+	private Population inputPlans = null;
 
 	// transit agents have ids > 1'000'000'000
 	private final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
@@ -320,7 +320,7 @@ public class CompareScenariosWestumfahrung {
 		for (Integer analysis : analysisNames.keySet()) {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
-		TreeMap<String, Plans> scenarioPlans = new TreeMap<String, Plans>();
+		TreeMap<String, Population> scenarioPlans = new TreeMap<String, Population>();
 		TreeMap<String, NetworkLayer> scenarioNetworks = new TreeMap<String, NetworkLayer>();
 
 		PersonIdRecorder personIdRecorder = null;
@@ -334,8 +334,8 @@ public class CompareScenariosWestumfahrung {
 			Gbl.getWorld().setNetworkLayer(network);
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
-			Plans plans = new Plans(false);
-			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			Population plans = new Population(false);
+			PopulationReader plansReader = new MatsimPlansReader(plans);
 			plansReader.readFile(plansInputFilenames.get(scenarioName));
 			plans.printPlansCount();
 
@@ -405,7 +405,7 @@ public class CompareScenariosWestumfahrung {
 				// choose right network
 				Gbl.getWorld().setNetworkLayer(scenarioNetworks.get(scenarioName));
 
-				Plans plansSubPop = new Plans(false);
+				Population plansSubPop = new Population(false);
 				switch(analysis.intValue()) {
 				case TRANSIT_AGENTS_ANALYSIS_NAME:
 					personIterator = transitAgentsIds.iterator();

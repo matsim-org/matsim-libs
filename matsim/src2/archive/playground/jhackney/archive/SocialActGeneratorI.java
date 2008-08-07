@@ -22,12 +22,12 @@ package org.matsim.socialnetworks.interactions;
 
 import java.util.Collection;
 
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public interface SocialActGeneratorI {
 
 	// A SocializingOpportunityGenerator generates SocializingOpportunity based on
 	// the persons and their plans (or knowledge, i.e. memories)
 	
-	Collection<SocialAct> generateValues( Plans plans );
+	Collection<SocialAct> generateValues( Population plans );
 }

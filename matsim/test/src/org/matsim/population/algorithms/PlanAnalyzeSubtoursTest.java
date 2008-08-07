@@ -30,15 +30,15 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
 public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
-	private Plans population = null;
+	private Population population = null;
 	private NetworkLayer network = null;
 	
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
@@ -57,8 +57,8 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
-		population = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		population = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");

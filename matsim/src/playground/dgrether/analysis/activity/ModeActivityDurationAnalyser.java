@@ -31,7 +31,7 @@ import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
 
 
@@ -71,7 +71,7 @@ public class ModeActivityDurationAnalyser {
 //		config = Gbl.createConfig(null);
 		Gbl.getWorld().setNetworkLayer((NetworkLayer) net);
 
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		MatsimPlansReader plansParser = new MatsimPlansReader(plans);
 		plansParser.readFile(PLANSFILE);
 		

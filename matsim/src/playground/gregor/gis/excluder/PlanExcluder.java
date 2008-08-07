@@ -33,8 +33,8 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
@@ -47,7 +47,7 @@ public class PlanExcluder {
 
 	private static final Logger log = Logger.getLogger(PlanExcluder.class);
 	private final NetworkLayer network;
-	private final Plans plans;
+	private final Population plans;
 	private final Collection<Polygon> ps;
 
 	
@@ -57,7 +57,7 @@ public class PlanExcluder {
 	
 	
 	
-	public PlanExcluder(NetworkLayer network, Plans population,
+	public PlanExcluder(NetworkLayer network, Population population,
 			Collection<Polygon> ps) {
 		this.network = network;
 		this.plans = population;
@@ -66,9 +66,9 @@ public class PlanExcluder {
 
 
 
-	public Plans run() {
+	public Population run() {
 		
-		Plans plans = new Plans();
+		Population plans = new Population();
 		for (Person person : this.plans.getPersons().values()) {
 			
 			CoordI c = person.getSelectedPlan().getFirstActivity().getCoord();
@@ -114,11 +114,11 @@ public class PlanExcluder {
 		Gbl.getWorld().setNetworkLayer(network);
 		
 		
-		final Plans population = new Plans();
+		final Population population = new Population();
 		new MatsimPlansReader(population).readFile(Gbl.getConfig().plans().getInputFile());
 		
-		Plans toSave = new PlanExcluder(network,population,ls).run();
-		new PlansWriter(toSave,"padang_plans_v20080618_reduced.xml.gz", "v4").write();
+		Population toSave = new PlanExcluder(network,population,ls).run();
+		new PopulationWriter(toSave,"padang_plans_v20080618_reduced.xml.gz", "v4").write();
 	}
 	
 	

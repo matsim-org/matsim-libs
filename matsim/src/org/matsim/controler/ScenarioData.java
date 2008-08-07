@@ -35,8 +35,8 @@ import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -64,7 +64,7 @@ public class ScenarioData {
 	private World world = null;
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
-	private Plans population = null;
+	private Population population = null;
 	
 	
 
@@ -158,16 +158,16 @@ public class ScenarioData {
 		return this.facilities;
 	}
 
-	public Plans getPopulation() {
+	public Population getPopulation() {
 		if (!this.populationLoaded) {
-			this.population = new Plans(Plans.NO_STREAMING);
+			this.population = new Population(Population.NO_STREAMING);
 			// make sure that world, facilities and network are loaded as well
 			getWorld();
 			getNetwork();
 			getFacilities();
 
 			log.info("loading population from " + this.populationFileName);
-			PlansReaderI plansReader = new MatsimPlansReader(this.population);
+			PopulationReader plansReader = new MatsimPlansReader(this.population);
 			plansReader.readFile(this.populationFileName);
 			this.population.printPlansCount();
 

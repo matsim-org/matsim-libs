@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 
 public class PlansScenarioCut {
@@ -57,7 +57,7 @@ public class PlansScenarioCut {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		System.out.println("running " + this.getClass().getName() + " module...");
 
 		TreeSet<Id> pid_set = new TreeSet<Id>(); // ids of persons to remove

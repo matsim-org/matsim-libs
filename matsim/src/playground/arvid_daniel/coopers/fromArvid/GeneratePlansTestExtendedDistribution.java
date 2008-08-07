@@ -31,8 +31,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 
 public class GeneratePlansTestExtendedDistribution {
@@ -44,7 +44,7 @@ public class GeneratePlansTestExtendedDistribution {
 	 * @param net
 	 */
 
-	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
+	public static void createCOOPERSSpecificVehicles(Population plans2, NetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
 //		Link startLink1 = net.getLinks().get("7829");
 //		Link startLink2 = net.getLinks().get("8453");
@@ -194,7 +194,7 @@ public class GeneratePlansTestExtendedDistribution {
 			}
 		}
 
-		PlansWriter plansWriter = new PlansWriter(plans2, "../studies/arvidDaniel/input/testExtended/plansDistribution.xml", "v4");
+		PopulationWriter plansWriter = new PopulationWriter(plans2, "../studies/arvidDaniel/input/testExtended/plansDistribution.xml", "v4");
 //		plansWriter.setUseCompression(true);
 		plansWriter.write();
 	}
@@ -207,7 +207,7 @@ public class GeneratePlansTestExtendedDistribution {
 		new MatsimNetworkReader(network).readFile(networkFile);
 		Gbl.getWorld().setNetworkLayer(network);
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		// new MatsimPlansReader(population).readFile(plansFile);
 
 		GeneratePlansTestExtendedDistribution.createCOOPERSSpecificVehicles(population, network);

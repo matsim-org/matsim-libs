@@ -28,7 +28,7 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.World;
 
@@ -48,7 +48,7 @@ public class MyControler2 {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		new MatsimPlansReader(population).readFile(plansFilename);
 
 		Events events = new Events();

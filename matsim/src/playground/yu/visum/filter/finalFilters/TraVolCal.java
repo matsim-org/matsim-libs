@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.EventLinkEnter;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -68,7 +68,7 @@ public class TraVolCal extends FinalEventFilterA {
 	 * @param network -
 	 *            a NetworkLayer-object in the simulation
 	 */
-	public TraVolCal(final Plans plans, final NetworkLayer network) {
+	public TraVolCal(final Population plans, final NetworkLayer network) {
 		super(plans, network);
 	}
 

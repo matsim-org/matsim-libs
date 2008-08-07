@@ -39,8 +39,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -49,7 +49,7 @@ import org.matsim.utils.misc.Time;
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 	private NetworkLayer network = null;
-	private Plans population = null;
+	private Population population = null;
 	
 	public static final String TEST_PERSON_ID = "1";
 	public static final int TEST_PLAN_NR = 0;
@@ -82,8 +82,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
-		population = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		population = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");
@@ -281,7 +281,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		return tDepDelayCalc;
 	}
 
-	public Plans getPopulation() {
+	public Population getPopulation() {
 		return population;
 	}
 

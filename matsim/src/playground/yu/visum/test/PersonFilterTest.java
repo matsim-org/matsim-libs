@@ -4,8 +4,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 
 import playground.yu.visum.filter.ActTypeFilter;
 import playground.yu.visum.filter.DepTimeFilter;
@@ -33,7 +33,7 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(Plans.USE_STREAMING);
+		Population plans = new Population(Population.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");
@@ -50,7 +50,7 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 

@@ -37,7 +37,7 @@ import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -54,11 +54,11 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 	
 	private String personsFile;
 	
-	private Plans plans;
+	private Population plans;
 	
 	private Map<Person, List<Double>> samples;
 	
-	public CEAnalyzer(String personsFile, Plans plans, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
+	public CEAnalyzer(String personsFile, Population plans, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
 		this.personsFile = personsFile;
 		this.plans = plans;
 		this.stats = stats;
@@ -90,7 +90,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 		}
 	}
 
-	private void readPersons(String file, Plans plans) {
+	private void readPersons(String file, Population plans) {
 		persons = new LinkedList<Person>();
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(file);

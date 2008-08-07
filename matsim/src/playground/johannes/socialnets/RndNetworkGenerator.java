@@ -36,7 +36,7 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -78,7 +78,7 @@ public class RndNetworkGenerator {
 	private static final String ATTRIBUTES_KEY = "attr";
 
 	@SuppressWarnings("unchecked")
-	public static Graph createGraph(Plans plans) throws InterruptedException {
+	public static Graph createGraph(Population plans) throws InterruptedException {
 		logger.info("Generating social network...");
 		
 		UndirectedSparseGraph g = new UndirectedSparseGraph();
@@ -228,7 +228,7 @@ public class RndNetworkGenerator {
 		return g;
 	}
 	
-	private static CoordI getMean(Plans plans) {
+	private static CoordI getMean(Population plans) {
 		double sumX = 0;
 		double sumY = 0;
 		for(Person p : plans) {
@@ -399,7 +399,7 @@ public class RndNetworkGenerator {
 		mixingRadius = Integer.parseInt(config.getParam("randomGraphGenerator", "mixingRadius"));
 		numHeteroEdges = Integer.parseInt(config.getParam("randomGraphGenerator", "numHeteroEdges"));
 		kClustering = Double.parseDouble(config.getParam("randomGraphGenerator", "kClustering"));
-		Plans plans = data.getPopulation();
+		Population plans = data.getPopulation();
 		Graph g = createGraph(plans);
 		
 //		GraphMLFileHandler gmlHandler = new PersonGraphMLFileHandler();

@@ -24,7 +24,7 @@ import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * @author laemmel
@@ -33,13 +33,13 @@ import org.matsim.population.Plans;
 public class PlansFilterActInArea extends PersonAlgorithm {
 
 	private final NetworkLayer network;
-	private final Plans plans;
+	private final Population plans;
 	private String actType;
 
 	public PlansFilterActInArea(final NetworkLayer net, final String a){
 		this.network = net;
 		this.actType = a;
-		this.plans =  new Plans();
+		this.plans =  new Population();
 	}
 
 	public void setArea(final String a){
@@ -65,7 +65,7 @@ public class PlansFilterActInArea extends PersonAlgorithm {
 		}
 	}
 
-	public Plans getPlans(){
+	public Population getPlans(){
 		return this.plans;
 	}
 

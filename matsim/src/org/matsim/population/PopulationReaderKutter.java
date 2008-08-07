@@ -33,18 +33,18 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class PlansReaderKutter implements PlansReaderI {
+public class PopulationReaderKutter implements PopulationReader {
 
 	private final static double ANTEIL = 10; // (1/ANTEIL) of the kutter-data will be used; 1 = 100%, 2 = 50%, 10 = 10%
 
-	/*package*/ final Plans population;
+	/*package*/ final Population population;
 	private final PersonRowHandler rowHandler = new PersonRowHandler();
 	private final TabularFileParser parser = new TabularFileParser();
 	private final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
 	private long totalcnt = 0;
 	private double totalsum = 0.0;
 
-	public PlansReaderKutter(final Plans plans) {
+	public PopulationReaderKutter(final Population plans) {
 		this.population = plans;
 		this.parserConfig.setDelimiterRegex("\t");
 	}
@@ -344,7 +344,7 @@ public class PlansReaderKutter implements PlansReaderI {
 				this.currPerson = parsePerson();
 				parsePlan(row);
 				try {
-					PlansReaderKutter.this.population.addPerson(this.currPerson);
+					PopulationReaderKutter.this.population.addPerson(this.currPerson);
 				}
 				catch (Exception e) {
 					Gbl.errorMsg(e);

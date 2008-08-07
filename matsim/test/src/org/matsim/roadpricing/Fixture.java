@@ -30,7 +30,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
@@ -127,8 +127,8 @@ public class Fixture {
 	}
 
 	/** @return a population for network1 */
-	public static Plans createPopulation1() throws Exception {
-		Plans population = new Plans(Plans.NO_STREAMING);
+	public static Population createPopulation1() throws Exception {
+		Population population = new Population(Population.NO_STREAMING);
 
 		population.addPerson(Fixture.createPerson1( 1, "07:00"   , "0", "2 3 4 5", "4")); // toll in 1st time slot
 		population.addPerson(Fixture.createPerson1( 2, "11:00"   , "0", "2 3 4 5", "4")); // toll in 2nd time slot
@@ -145,8 +145,8 @@ public class Fixture {
 	}
 
 	/** @return a population for network2 */
-	public static Plans createPopulation2() throws Exception {
-		Plans population = new Plans(Plans.NO_STREAMING);
+	public static Population createPopulation2() throws Exception {
+		Population population = new Population(Population.NO_STREAMING);
 
 		population.addPerson(Fixture.createPerson2( 1, "07:00", "1", "7", "13"));
 
@@ -178,12 +178,12 @@ public class Fixture {
 		return person;
 	}
 
-	public static Plans createReferencePopulation1(final World world) {
+	public static Population createReferencePopulation1(final World world) {
 		// run mobsim once without toll and get score for network1/population1
 		try {
 			NetworkLayer network = createNetwork1();
 			world.setNetworkLayer(network);
-			Plans referencePopulation = Fixture.createPopulation1();
+			Population referencePopulation = Fixture.createPopulation1();
 			Events events = new Events();
 			EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());
 			events.addHandler(scoring);

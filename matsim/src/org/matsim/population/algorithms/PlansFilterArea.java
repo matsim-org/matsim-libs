@@ -27,7 +27,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.shared.Coord;
 
 /**
@@ -51,7 +51,7 @@ public class PlansFilterArea {
 		this.maxY = max.getY();
 	}
 
-	public void run(final Plans plans) {
+	public void run(final Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// first search all persons without plans

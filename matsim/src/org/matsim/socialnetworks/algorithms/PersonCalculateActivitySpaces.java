@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.geometry.CoordI;
 
@@ -36,7 +36,7 @@ public class PersonCalculateActivitySpaces {
 	 * @param ego
 	 * @return the average distance to all alters (a radius of a disk-shaped activity space)
 	 */
-	public double getPersonASD1(Plans plans, Person ego) {
+	public double getPersonASD1(Population plans, Person ego) {
 
 		double aSd = 0.;
 

@@ -71,9 +71,9 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
@@ -321,7 +321,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
+		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 
 		KML myKML;
 		Document myKMLDocument;
@@ -597,7 +597,7 @@ public class MyRuns {
 		System.out.println("performing vo to v4 plans conversion...");
 
 		NetworkLayer network = MyRuns.initWorldNetwork();
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
+		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 		MyRuns.writePopulation(matsimAgentPopulation);
 
 		System.out.println("performing vo to v4 plans conversion...DONE.");
@@ -627,7 +627,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
+		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		TravelTimeI tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
@@ -669,12 +669,12 @@ public class MyRuns {
 	}
 
 	// Gbl.getConfig().plans().getInputFile()
-	public static Plans initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PersonAlgorithmI> algos) {
+	public static Population initMatsimAgentPopulation(String inputFilename, boolean isStreaming, ArrayList<PersonAlgorithmI> algos) {
 
-		Plans population = null;
+		Population population = null;
 
 		System.out.println("  reading plans xml file... ");
-		population = new Plans(isStreaming);
+		population = new Population(isStreaming);
 
 		if (isStreaming) {
 			// add plans algos for streaming
@@ -684,7 +684,7 @@ public class MyRuns {
 				}
 			}
 		}
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(inputFilename);
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -692,7 +692,7 @@ public class MyRuns {
 		return population;
 	}
 
-	private static StrategyManager initStrategy(LegTravelTimeEstimator estimator, Plans matsimAgentPopulation) {
+	private static StrategyManager initStrategy(LegTravelTimeEstimator estimator, Population matsimAgentPopulation) {
 
 		StrategyManager strategyManager = new StrategyManager();
 		PlanStrategy simplePlanomatStrategy = new PlanStrategy(new RandomPlanSelector());
@@ -771,10 +771,10 @@ public class MyRuns {
 
 	}
 
-	private static void writePopulation(Plans population) {
+	private static void writePopulation(Population population) {
 
 		System.out.println("Writing plans file...");
-		PlansWriter plans_writer = new PlansWriter(population);
+		PopulationWriter plans_writer = new PopulationWriter(population);
 		plans_writer.write();
 		System.out.println("Writing plans file...DONE.");
 	}
@@ -794,7 +794,7 @@ public class MyRuns {
 		// - network
 		NetworkLayer network = MyRuns.initWorldNetwork();
 		// - population
-		Plans matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Plans.NO_STREAMING, null);
+		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
 		// - events
 		Events events = new Events();
 		TravelTimeI tTravelCalc = new TravelTimeCalculator(network);
@@ -1052,8 +1052,8 @@ public class MyRuns {
 		ArrayList<PersonAlgorithmI> plansAlgos = new ArrayList<PersonAlgorithmI>();
 		plansAlgos.add(pa);
 
-		Plans matsimAgentPopulation = new Plans(Plans.USE_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(matsimAgentPopulation);
+		Population matsimAgentPopulation = new Population(Population.USE_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(matsimAgentPopulation);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();

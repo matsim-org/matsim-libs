@@ -30,7 +30,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -43,7 +43,7 @@ public class GeneratePlans {
 	 * @param net
 	 */
 
-	public static void createCOOPERSSpecificVehicles(Plans plans2, NetworkLayer net) {
+	public static void createCOOPERSSpecificVehicles(Population plans2, NetworkLayer net) {
 		// Erzeuge einen strom von vehicles, die die autobahn runter wollen
 		Link startLink1 = net.getLinks().get("7829");
 		Link startLink2 = net.getLinks().get("8453");

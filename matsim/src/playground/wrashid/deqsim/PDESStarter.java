@@ -28,7 +28,7 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class PDESStarter {
 
@@ -54,7 +54,7 @@ public class PDESStarter {
 		// prepare data
 		ScenarioData data = new ScenarioData(config);
 		NetworkLayer network = data.getNetwork();
-		Plans population = data.getPopulation();
+		Population population = data.getPopulation();
 		Events events = new Events();
 		
 		// run simulation

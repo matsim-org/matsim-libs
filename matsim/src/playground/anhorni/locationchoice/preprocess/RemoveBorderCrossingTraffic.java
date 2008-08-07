@@ -9,13 +9,13 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class RemoveBorderCrossingTraffic extends Modifier {
 
 	private final static Logger log = Logger.getLogger(RemoveBorderCrossingTraffic.class);
 
-	public RemoveBorderCrossingTraffic(Plans plans, NetworkLayer network, Facilities  facilities){
+	public RemoveBorderCrossingTraffic(Population plans, NetworkLayer network, Facilities  facilities){
 		super(plans, network, facilities);
 	}
 

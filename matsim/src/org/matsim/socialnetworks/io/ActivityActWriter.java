@@ -13,7 +13,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * Writes the correspondence table between the facilities and the acts in the plans
@@ -53,7 +53,7 @@ public class ActivityActWriter {
 		}
 
 	}
-	public void write(int iter, Plans myPlans){
+	public void write(int iter, Population myPlans){
 //		System.out.println("AAW will write to"+out.toString());
 		Iterator<Person> pIt = myPlans.iterator();
 		while(pIt.hasNext()){

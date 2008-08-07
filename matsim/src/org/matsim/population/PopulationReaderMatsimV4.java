@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
  * @author mrieser
  * @author balmermi
  */
-public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI {
+public class PopulationReaderMatsimV4 extends MatsimXmlParser implements PopulationReader {
 
 	private final static String PLANS = "plans";
 	private final static String PERSON = "person";
@@ -71,11 +71,11 @@ public class PlansReaderMatsimV4 extends MatsimXmlParser implements PlansReaderI
 	private Leg currleg = null;
 	private Route currroute = null;
 
-	private final static Logger log = Logger.getLogger(PlansReaderMatsimV4.class);
+	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
 	private int warnPlanTypeCount = 0;
 
-	public PlansReaderMatsimV4(final BasicPopulation pop) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop) {
 		this.plans = pop;
 	}
 

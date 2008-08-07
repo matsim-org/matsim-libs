@@ -29,8 +29,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.world.World;
 
@@ -54,12 +54,12 @@ public class TransimsSnapshotFilePostProcessor {
 
 	private TransimsSnapshotFileWriter writer;
 
-	private Plans plans;
+	private Population plans;
 
 	private List<PostProcessorI> processors;
 	private FloodlineGenerator floodlineGenerator = null;
 
-	public TransimsSnapshotFilePostProcessor(Plans plans, final String tVehFile){
+	public TransimsSnapshotFilePostProcessor(Population plans, final String tVehFile){
 		this.plans = plans;
 		this.reader = new TransimsSnapshotFileReader(tVehFile);
 
@@ -162,8 +162,8 @@ public class TransimsSnapshotFilePostProcessor {
 		log.info("done.");
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		Population population = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");
 

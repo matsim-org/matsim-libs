@@ -29,7 +29,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 public class PlansDefineKnowledge {
 
@@ -41,7 +41,7 @@ public class PlansDefineKnowledge {
 		this.rand.nextInt();
 	}
 
-	public void run(Plans plans) {
+	public void run(Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// get home and other activities

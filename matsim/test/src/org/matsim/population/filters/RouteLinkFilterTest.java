@@ -27,7 +27,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithmI;
 import org.matsim.population.filters.RouteLinkFilter;
@@ -39,7 +39,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 	public void testRouteLinkFilter() {
 		loadConfig(null); // used to set the default dtd-location
-		Plans population = getTestPopulation(Gbl.createWorld());
+		Population population = getTestPopulation(Gbl.createWorld());
 
 		TestAlgorithm tester = new TestAlgorithm();
 
@@ -52,13 +52,13 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		assertEquals(2, linkFilter.getCount());
 	}
 
-	private Plans getTestPopulation(final
+	private Population getTestPopulation(final
 			World world) {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 
 		Person person;
 		Plan plan;

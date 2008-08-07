@@ -32,8 +32,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -77,11 +77,11 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Plans population = new Plans(Plans.NO_STREAMING);
+		final Population population = new Population(Population.NO_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");

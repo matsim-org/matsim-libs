@@ -43,7 +43,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -298,7 +298,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Plans plans ) {
+	void initializeKnowledge(final Population plans ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

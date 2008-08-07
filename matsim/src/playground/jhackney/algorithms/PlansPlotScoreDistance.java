@@ -4,7 +4,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 import org.matsim.utils.charts.XYScatterChart;
@@ -14,7 +14,7 @@ public class PlansPlotScoreDistance extends PersonAlgorithm implements PersonAlg
 	double[] score=null;
 	int i=0;
 
-	public PlansPlotScoreDistance(Plans plans) {
+	public PlansPlotScoreDistance(Population plans) {
 		super();
 		this.dist= new double[plans.getPersons().size()];
 		this.score= new double[plans.getPersons().size()];

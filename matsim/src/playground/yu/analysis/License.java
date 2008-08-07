@@ -28,7 +28,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.World;
 
@@ -78,7 +78,7 @@ public class License extends PersonAlgorithm {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 
 		License l = new License();
 		population.addAlgorithm(l);

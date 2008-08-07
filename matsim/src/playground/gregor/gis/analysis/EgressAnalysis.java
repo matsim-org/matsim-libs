@@ -47,8 +47,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.collections.QuadTree;
@@ -70,7 +70,7 @@ public class EgressAnalysis {
 	private FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private Plans population;
+	private Population population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
 	private NetworkLayer network;
@@ -85,7 +85,7 @@ public class EgressAnalysis {
 	private Map<Id, EgressNode> egressNodes;
 	
 	
-	public EgressAnalysis(FeatureSource features, Plans population,
+	public EgressAnalysis(FeatureSource features, Population population,
 			NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
@@ -257,8 +257,8 @@ public class EgressAnalysis {
 
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		Population population = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		log.info("done.");
 

@@ -28,8 +28,8 @@ import org.matsim.mobsim.SimulationTimer;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.World;
@@ -51,8 +51,8 @@ public class EquilTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		Population population = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

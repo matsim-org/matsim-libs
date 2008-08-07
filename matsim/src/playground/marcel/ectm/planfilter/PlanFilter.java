@@ -33,9 +33,9 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.shared.Coord;
@@ -66,8 +66,8 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Plans population = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		final Population population = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
@@ -134,8 +134,8 @@ public class PlanFilter {
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
-		final Plans population = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		final Population population = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
@@ -174,7 +174,7 @@ public class PlanFilter {
 		}
 		new NetworkWriter(subnet, "ivtch-osm_zrh14km.xml").write();
 
-		final PlansWriter plansWriter = new PlansWriter(population, "plans_miv_zrh7km_cut14km_transitincl_10pct.xml", "v4");
+		final PopulationWriter plansWriter = new PopulationWriter(population, "plans_miv_zrh7km_cut14km_transitincl_10pct.xml", "v4");
 		plansWriter.writeStartPlans();
 		final CutTrips cutAlgo = new CutTrips(plansWriter, bigAOI);
 		final PersonIntersectAreaFilter insideFilter = new PersonIntersectAreaFilter(cutAlgo, smallAOI);

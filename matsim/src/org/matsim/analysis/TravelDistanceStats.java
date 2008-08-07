@@ -36,7 +36,7 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
@@ -66,7 +66,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	final private static int INDEX_AVERAGE = 2;
 	final private static int INDEX_EXECUTED = 3;
 
-	final private Plans population;
+	final private Population population;
 	final private BufferedWriter out;
 
 	private final boolean createPNG;
@@ -84,7 +84,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public TravelDistanceStats(final Plans population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
+	public TravelDistanceStats(final Population population, final String filename, final boolean createPNG) throws FileNotFoundException, IOException {
 		this.population = population;
 		this.createPNG = createPNG;
 		this.out = IOUtils.getBufferedWriter(filename);

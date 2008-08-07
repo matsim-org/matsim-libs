@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.vis.kml.Document;
@@ -73,7 +73,7 @@ public class PopulationExportToKML {
 		this.KMLDirname = KMLDirname;
 	}
 
-	public void run(Plans population) {
+	public void run(Population population) {
 
 		for (int i = 0; i <= 15; i++) {
 			if (i > 10) {
@@ -162,7 +162,7 @@ public class PopulationExportToKML {
 
 	}
 
-	public void writePopulation(Plans population) throws IOException {
+	public void writePopulation(Population population) throws IOException {
 
 		int cnt = 0, skip = 1, age = 0, sizeClass = 0;
 

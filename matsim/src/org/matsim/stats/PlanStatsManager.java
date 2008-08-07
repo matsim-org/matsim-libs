@@ -28,7 +28,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.stats.algorithms.BasicPlanStats;
 import org.matsim.stats.algorithms.PlanScoreTrajectory;
 import org.matsim.stats.algorithms.PlanStatsI;
@@ -55,7 +55,7 @@ public class PlanStatsManager  {
 		this.iters = 1 + this.maxIteration - this.minIteration;
 	}
 
-	public void run(final Plans population, final int iteration){
+	public void run(final Population population, final int iteration){
 		for (Person pers : population.getPersons().values())
 			run(pers,iteration);
 	}
@@ -72,7 +72,7 @@ public class PlanStatsManager  {
 
 	}
 
-	public void print(final Plans population){
+	public void print(final Population population){
 		for (Person pers : population.getPersons().values())
 			print(pers);
 	}
@@ -86,7 +86,7 @@ public class PlanStatsManager  {
 		}
 	}
 
-	public void writeStats(final Plans population){
+	public void writeStats(final Population population){
 
 		StatsWriter wrt = new StatsWriter();
 		wrt.openFile(Gbl.getConfig().getParam(STATS_MODULE, STATS_FILE));

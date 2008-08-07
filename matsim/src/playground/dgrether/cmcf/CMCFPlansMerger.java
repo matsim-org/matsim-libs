@@ -26,7 +26,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.MatsimIo;
@@ -51,8 +51,8 @@ public class CMCFPlansMerger {
 	 */
 	public static void main(String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
-		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		Plans plans = MatsimIo.loadPlans(plansFile);
+		Population plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
+		Population plans = MatsimIo.loadPlans(plansFile);
 		
 		for (Person person : plansCmcf.getPersons().values()) {
 			String idstring = person.getId().toString();

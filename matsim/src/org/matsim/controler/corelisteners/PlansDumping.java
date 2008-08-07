@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.PopulationWriter;
 
 /**
  * {@link org.matsim.controler.listener.ControlerListener} that dumps the
@@ -44,7 +44,7 @@ public class PlansDumping implements BeforeMobsimListener {
 			controler.stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			String outversion = controler.getConfig().plans().getOutputVersion();
-			PlansWriter plansWriter = new PlansWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
+			PopulationWriter plansWriter = new PopulationWriter(controler.getPopulation(), Controler.getIterationFilename("plans.xml.gz"), outversion);
 			plansWriter.write();
 			log.info("finished plans dump.");
 			controler.stopwatch.endOperation("dump all plans");

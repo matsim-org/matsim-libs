@@ -36,14 +36,14 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimPlansReader extends MatsimXmlParser implements PlansReaderI {
+public class MatsimPlansReader extends MatsimXmlParser implements PopulationReader {
 
 	private final static String PLANS    = "plans.dtd"; // a special, inofficial case, handle it like plans_v0
 	private final static String PLANS_V0 = "plans_v0.dtd";
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
 
-	private final Plans plans;
+	private final Population plans;
 	private MatsimXmlParser delegate = null;
 
 	private static final Logger log = Logger.getLogger(MatsimPlansReader.class);
@@ -53,7 +53,7 @@ public class MatsimPlansReader extends MatsimXmlParser implements PlansReaderI {
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
 	 */
-	public MatsimPlansReader(final Plans plans) {
+	public MatsimPlansReader(final Population plans) {
 		this.plans = plans;
 	}
 
@@ -89,13 +89,13 @@ public class MatsimPlansReader extends MatsimXmlParser implements PlansReaderI {
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
-			this.delegate = new PlansReaderMatsimV4(this.plans);
+			this.delegate = new PopulationReaderMatsimV4(this.plans);
 			log.info("using plans_v4-reader.");
 		} else if (PLANS_V1.equals(doctype)) {
-			this.delegate = new PlansReaderMatsimV1(this.plans);
+			this.delegate = new PopulationReaderMatsimV1(this.plans);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
-			this.delegate = new PlansReaderMatsimV0(this.plans);
+			this.delegate = new PopulationReaderMatsimV0(this.plans);
 			log.info("using plans_v0-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

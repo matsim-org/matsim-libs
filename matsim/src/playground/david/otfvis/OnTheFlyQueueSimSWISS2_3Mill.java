@@ -28,8 +28,8 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
@@ -44,7 +44,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 	public static void main(String[] args) {
 		QueueSimulation sim;
 		NetworkLayer net;
-		Plans population;
+		Population population;
 		Events events;
 
 		String netFileName = "../../tmp/studies/ivtch/network.xml";
@@ -68,8 +68,8 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 
 		Gbl.printElapsedTime();
 
-		population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		population = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		events = new Events();

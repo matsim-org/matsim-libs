@@ -26,9 +26,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
@@ -45,7 +45,7 @@ public class RoutingTest extends MatsimTestCase {
 	private boolean initRan = false;
 	private long referenceChecksum = -1L;
 	private NetworkLayer network = null;
-	private Plans population = null;
+	private Population population = null;
 
 	/*package*/ static final Logger log = Logger.getLogger(RoutingTest.class);
 
@@ -117,7 +117,7 @@ public class RoutingTest extends MatsimTestCase {
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
 		calcRoute(provider, this.network, this.population);
-		PlansWriter plansWriter = new PlansWriter(this.population, outPlansName,
+		PopulationWriter plansWriter = new PopulationWriter(this.population, outPlansName,
 				config.plans().getOutputVersion());
 		plansWriter.write();
 		final long routerChecksum = CRCChecksum.getCRCFromGZFile(outPlansName);
@@ -139,9 +139,9 @@ public class RoutingTest extends MatsimTestCase {
 		this.initRan = true;
 	}
 
-	private Plans readPlans(final String inPlansName) {
-		Plans plans = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+	private Population readPlans(final String inPlansName) {
+		Population plans = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(inPlansName);
 		return plans;
 	}
@@ -154,7 +154,7 @@ public class RoutingTest extends MatsimTestCase {
 		return network;
 	}
 
-	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final Plans plans) {
+	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final Population plans) {
 
 		System.out.println("### calcRoute with router " + provider.getName());
 

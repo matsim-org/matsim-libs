@@ -7,14 +7,14 @@ import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
 public class FacilitiesV3Modifier extends Modifier {
 
 	private final static Logger log = Logger.getLogger(FacilitiesV3Modifier.class);
 
-	public FacilitiesV3Modifier(Plans plans, NetworkLayer network, Facilities  facilities){
+	public FacilitiesV3Modifier(Population plans, NetworkLayer network, Facilities  facilities){
 		super(plans, network, facilities);
 	}
 

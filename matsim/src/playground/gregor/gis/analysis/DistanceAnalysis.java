@@ -50,9 +50,9 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
@@ -81,7 +81,7 @@ public class DistanceAnalysis {
 	private FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private Plans population;
+	private Population population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
 	private NetworkLayer network;
@@ -98,7 +98,7 @@ public class DistanceAnalysis {
 
 
 
-	public DistanceAnalysis(FeatureSource features, Plans population, NetworkLayer network) throws Exception {
+	public DistanceAnalysis(FeatureSource features, Population population, NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -367,8 +367,8 @@ public class DistanceAnalysis {
 
 
 		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Plans population = new Plans();
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		Population population = new Population();
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");
 		log.info("done.");

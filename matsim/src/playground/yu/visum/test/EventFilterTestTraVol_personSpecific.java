@@ -29,8 +29,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.world.World;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
@@ -82,7 +82,7 @@ public class EventFilterTestTraVol_personSpecific {
 		System.out.println("  done.");
 		// plans
 		System.out.println("  creating plans object... ");
-		Plans plans = new Plans(Plans.USE_STREAMING);
+		Population plans = new Population(Population.USE_STREAMING);
 		System.out.println("  done.");
 
 		System.out.println("  setting plans algorithms... ");
@@ -98,7 +98,7 @@ public class EventFilterTestTraVol_personSpecific {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans file... ");
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

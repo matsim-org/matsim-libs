@@ -47,7 +47,7 @@ import org.matsim.population.Act;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordI;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
@@ -145,12 +145,12 @@ public class PlanScoreAnalysis {
 		netReader.readFile(NETWORK);
 		Gbl.getWorld().setNetworkLayer(net);
 
-		Plans plans = new Plans(false);
+		Population plans = new Population(false);
 		MatsimPlansReader reader = new MatsimPlansReader(plans);
 		reader.readFile(PLANS);
 
 
-		Plans plans2 = new Plans(false);
+		Population plans2 = new Population(false);
 		reader = new MatsimPlansReader(plans2);
 		reader.readFile(PLANS2);
 

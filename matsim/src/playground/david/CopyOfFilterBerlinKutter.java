@@ -31,8 +31,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.World;
 
@@ -70,7 +70,7 @@ class FilterPersonsNonCarMode extends PersonAlgorithm{
 }
 
 public class CopyOfFilterBerlinKutter {
-	public static Plans relevantPopulation;
+	public static Population relevantPopulation;
 	public static NetworkLayer network;
 
 	public static void main(String[] args) {
@@ -89,14 +89,14 @@ public class CopyOfFilterBerlinKutter {
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 
-		relevantPopulation = new Plans(false);
-		Plans population = new MyPopulation();
+		relevantPopulation = new Population(false);
+		Population population = new MyPopulation();
 		MatsimPlansReader plansReader = new MatsimPlansReader(population);
 		population.addAlgorithm(new FilterPersonsNonCarMode());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 		
-		PlansWriter plansWriter = new PlansWriter(relevantPopulation, outpopFileName, "v4");
+		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
 		plansWriter.write();
 	}
 

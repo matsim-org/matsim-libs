@@ -37,7 +37,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
@@ -50,7 +50,7 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 		EventHandlerAgentArrivalI, EventHandlerAgentStuckI {
 	private final NetworkLayer network;
 
-	private final Plans plans;
+	private final Population plans;
 
 	private final int binSize;
 
@@ -70,7 +70,7 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	 * 
 	 */
 	public TravelTimeModalSplit(final int binSize, final int nofBins,
-			final NetworkLayer network, final Plans plans) {
+			final NetworkLayer network, final Population plans) {
 		this.network = network;
 		this.plans = plans;
 		this.binSize = binSize;
@@ -83,11 +83,11 @@ public class TravelTimeModalSplit implements EventHandlerAgentDepartureI,
 	}
 
 	public TravelTimeModalSplit(final int binSize, final NetworkLayer network,
-			final Plans plans) {
+			final Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
-	public TravelTimeModalSplit(final NetworkLayer network, final Plans plans) {
+	public TravelTimeModalSplit(final NetworkLayer network, final Population plans) {
 		this(300, network, plans);
 	}
 

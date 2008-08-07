@@ -1,8 +1,8 @@
 package playground.yu.visum.filter.finalFilters;
 
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 
 /**
  * Write a new plans-file(.xml), while reading an old plans-file(.xml). eine
@@ -14,7 +14,7 @@ public class NewPlansWriter extends FinalPersonFilter {
 	/**
 	 * The underlying PlansWriter of this NewPlansWriter.
 	 */
-	private PlansWriter plansWriter;
+	private PopulationWriter plansWriter;
 
 	// ------------------------CONSTRUCTOR----------------------
 	/**
@@ -24,8 +24,8 @@ public class NewPlansWriter extends FinalPersonFilter {
 	 * @param plans -
 	 *            Parameter for constructor of PlansWriter.
 	 */
-	public NewPlansWriter(Plans plans) {
-		this.plansWriter = new PlansWriter(plans);
+	public NewPlansWriter(Population plans) {
+		this.plansWriter = new PopulationWriter(plans);
 	}
 
 	/**

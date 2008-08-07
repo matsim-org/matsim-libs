@@ -28,8 +28,8 @@ import org.matsim.mobsim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
@@ -83,7 +83,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		this.myOTFServer.updateStatus(time);
 	}
 
-	public OnTheFlyQueueSim(NetworkLayer net, Plans plans, Events events) {
+	public OnTheFlyQueueSim(NetworkLayer net, Population plans, Events events) {
 		super(net, plans, events);
 	}
 
@@ -123,9 +123,9 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		// Read plans file with special Reader Implementation
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();

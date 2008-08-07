@@ -25,8 +25,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
@@ -88,7 +88,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object...");
-		Plans plans = new Plans(Plans.NO_STREAMING);
+		Population plans = new Population(Population.NO_STREAMING);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 		
 		System.out.println("  writing plans xml file... ");
-		PlansWriter plans_writer = new PlansWriter(plans);
+		PopulationWriter plans_writer = new PopulationWriter(plans);
 		plans_writer.write();
 		System.out.println("  done.");
 

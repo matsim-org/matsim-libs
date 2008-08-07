@@ -30,9 +30,9 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.shared.Coord;
 
@@ -77,9 +77,9 @@ public class PersonFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, filtering and writing population... " + (new Date()));
-		Plans plans = new Plans(Plans.USE_STREAMING);
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
-		PlansWriter plansWriter = new PlansWriter(plans);
+		Population plans = new Population(Population.USE_STREAMING);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
+		PopulationWriter plansWriter = new PopulationWriter(plans);
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
 		filter.setAlternativeAOI(center,radius);
 		plans.addAlgorithm(filter);

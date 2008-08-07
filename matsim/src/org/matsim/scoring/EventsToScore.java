@@ -33,7 +33,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.events.handler.EventHandlerAgentStuckI;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * Calculates continuously the score of the selected plans of a given population
@@ -47,18 +47,18 @@ import org.matsim.population.Plans;
  */
 public class EventsToScore implements EventHandlerAgentArrivalI, EventHandlerAgentDepartureI, EventHandlerAgentStuckI {
 
-	private Plans population = null;
+	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
 	private final TreeMap<String, ScoringFunction> agentScorers = new TreeMap<String, ScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
 
-	public EventsToScore(final Plans population, final ScoringFunctionFactory factory) {
+	public EventsToScore(final Population population, final ScoringFunctionFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
 	}
 
-	public EventsToScore(final Plans population, final ScoringFunctionFactory factory, final double learningRate) {
+	public EventsToScore(final Population population, final ScoringFunctionFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;

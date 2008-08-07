@@ -21,7 +21,7 @@
 package playground.yu.newPlan;
 
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
@@ -39,7 +39,7 @@ public class DoublePlan extends NewPlan {
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public DoublePlan(Plans plans) {
+	public DoublePlan(Population plans) {
 		super(plans);
 	}
 

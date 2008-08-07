@@ -34,8 +34,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -89,12 +89,12 @@ public class AnalysisTest {
 		CalcAverageTripLength catl = null;
 
 		if (plansFilename != null) {
-			Plans plans = new Plans();
+			Population plans = new Population();
 
 			catl = new CalcAverageTripLength();
 			plans.addAlgorithm(catl);
 
-			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			PopulationReader plansReader = new MatsimPlansReader(plans);
 			plansReader.readFile(plansFilename);
 			plans.runAlgorithms();
 

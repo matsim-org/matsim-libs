@@ -22,7 +22,7 @@ package playground.yu.newPlan;
 
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithmI;
 
 /**
@@ -40,7 +40,7 @@ public class SelectedPlans extends NewPlan implements PersonAlgorithmI {
 	 * @param plans -
 	 *            a Plans Object, which derives from MATSim plansfile
 	 */
-	public SelectedPlans(Plans plans) {
+	public SelectedPlans(Population plans) {
 		super(plans);
 	}
 

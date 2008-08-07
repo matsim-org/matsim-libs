@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.matsim.utils.misc.Time;
 
-abstract class PlansWriterHandlerImplV20 implements PlansWriterHandler {
+abstract class PopulationWriterHandlerImplV20 implements PopulationWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -37,7 +37,7 @@ abstract class PlansWriterHandlerImplV20 implements PlansWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final Plans plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans");
 		if (plans.getName() != null)
 			out.write(" name=\"" + plans.getName() + "\"");

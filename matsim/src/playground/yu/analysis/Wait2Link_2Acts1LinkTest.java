@@ -41,7 +41,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
@@ -209,7 +209,7 @@ public class Wait2Link_2Acts1LinkTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
-		Plans population = new Plans();
+		Population population = new Population();
 
 		SameActLoc sal = new SameActLoc();
 		population.addAlgorithm(sal);

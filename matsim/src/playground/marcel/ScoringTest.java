@@ -26,7 +26,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.PlanScorer;
 
@@ -40,7 +40,7 @@ public class ScoringTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
-		Plans population = new Plans(Plans.NO_STREAMING);
+		Population population = new Population(Population.NO_STREAMING);
 		new MatsimPlansReader(population).readFile("../mystudies/scoringtest/plans.xml");
 
 		for (Person person : population.getPersons().values()) {

@@ -32,7 +32,7 @@ import org.matsim.events.handler.EventHandlerAgentDepartureI;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
 
@@ -49,14 +49,14 @@ public class CalcLegTimes implements EventHandlerAgentDepartureI, EventHandlerAg
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private Plans population = null;
+	private Population population = null;
 	private final TreeMap<String, Double> agentDepartures = new TreeMap<String, Double>();
 	private final TreeMap<String, Integer> agentLegs = new TreeMap<String, Integer>();
 	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
-	public CalcLegTimes(final Plans population) {
+	public CalcLegTimes(final Population population) {
 		this.population = population;
 	}
 

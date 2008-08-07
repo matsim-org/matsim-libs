@@ -22,14 +22,14 @@ package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
+import org.matsim.population.Population;
 import org.matsim.utils.misc.Counter;
 
 public abstract class PersonAlgorithm implements PersonAlgorithmI {
 
 	private final static Logger log = Logger.getLogger(PersonAlgorithm.class);
 
-	public final void run(final Plans plans) {
+	public final void run(final Population plans) {
 		log.info("running " + this.getClass().getName() + " algorithm...");
 		Counter counter = new Counter(" person # ");
 

@@ -29,8 +29,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.Person;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.misc.Counter;
@@ -67,7 +67,7 @@ public class KtiPtTester {
 		Gbl.printRoundTime();
 		readPtTimeMatrix("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx");
 		Gbl.printRoundTime();
-		Plans population = this.data.getPopulation();
+		Population population = this.data.getPopulation();
 		Gbl.printRoundTime();
 		SwissHaltestellen haltestellen = new SwissHaltestellen(this.data.getNetwork());
 		try {
@@ -90,7 +90,7 @@ public class KtiPtTester {
 		}
 		counter.printCounter();
 		Gbl.printRoundTime();
-		new PlansWriter(population, this.config.plans().getOutputFile(), this.config.plans().getOutputVersion()).write();
+		new PopulationWriter(population, this.config.plans().getOutputFile(), this.config.plans().getOutputVersion()).write();
 		Gbl.printRoundTime();
 	}
 

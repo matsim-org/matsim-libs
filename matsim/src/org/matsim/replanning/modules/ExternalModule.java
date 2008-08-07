@@ -37,10 +37,10 @@ import org.matsim.population.Leg;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
-import org.matsim.population.PlansWriterHandler;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterHandler;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
@@ -66,8 +66,8 @@ public class ExternalModule implements StrategyModuleI {
 
 	/** holds a personId and the reference to the person for reloading the plans later */
 	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
-	protected PlansWriter plansWriter = null;
-	private PlansWriterHandler handler = null;
+	protected PopulationWriter plansWriter = null;
+	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
 	protected Config extConfig;
 	protected String exePath = "";
@@ -88,10 +88,10 @@ public class ExternalModule implements StrategyModuleI {
 		this.writer = this.plansWriter.getWriter();
 	}
 
-	protected PlansWriter getPlansWriterHandler() {
+	protected PopulationWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + "/" + this.moduleId + ExternalInFileName;
 		String version = "v4";
-		return new PlansWriter(new Plans(Plans.USE_STREAMING), filename, version);
+		return new PopulationWriter(new Population(Population.USE_STREAMING), filename, version);
 	}
 
 	public void handlePlan(final Plan plan) {
@@ -179,8 +179,8 @@ public class ExternalModule implements StrategyModuleI {
 	}
 
 	private void reReadPlans() {
-		Plans plans = new Plans(Plans.NO_STREAMING);
-		PlansReaderI plansReader = getPlansReader(plans);
+		Population plans = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = getPlansReader(plans);
 		plans.addAlgorithm(new PersonCalcTimes());
 		plans.addAlgorithm(new UpdatePlansAlgo(this.persons));
 		plansReader.readFile(this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
@@ -188,8 +188,8 @@ public class ExternalModule implements StrategyModuleI {
 		plans.runAlgorithms();
 	}
 
-	protected PlansReaderI getPlansReader(final Plans plans) {
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+	protected PopulationReader getPlansReader(final Population plans) {
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 		return plansReader;
 	}
 

@@ -42,9 +42,9 @@ import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.MatsimPlansReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
-import org.matsim.population.PlansWriter;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.FromToSummary;
 import org.matsim.population.algorithms.PlansCalcTravelDistance;
 import org.matsim.router.AStarEuclidean;
@@ -90,7 +90,7 @@ public class MyRunsRouting extends MyRuns {
 
 		readNetwork();
 //		readFacilities();
-		Plans plans = readPlans();
+		Population plans = readPlans();
 		if (args.length > 2) {
 			if (args[2].equals("aStarLZE") || args[2].equals("aStarLZ")
 					|| args[2].equals("aStarLZ") || args[2].equals("aStarMF")) {
@@ -147,7 +147,7 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 	private static void calcRouteWithPlansPreprocessing(final String[] args,
-			final Plans plans) {
+			final Population plans) {
 
 		// long now = System.currentTimeMillis();
 		FromToSummary sum = createPlansFromToSummary(plans, false);
@@ -235,7 +235,7 @@ public class MyRunsRouting extends MyRuns {
 					+ preProcessTimer + " msecs in total)");
 		}
 
-		new PlansWriter(plans).write();
+		new PopulationWriter(plans).write();
 
 		System.out.println("  done.");
 	}
@@ -449,14 +449,14 @@ public class MyRunsRouting extends MyRuns {
 
 	}
 
-	private static Plans generateRandomPlans(final int tripCount) {
+	private static Population generateRandomPlans(final int tripCount) {
 
 		System.out.print("Generating " + tripCount + " random plans...");
 		System.out.flush();
 
 		ArrayList<Link> links = new ArrayList<Link>(network.getLinks().values());
-		Plans plans = new Plans();
-		PlansWriter plansWriter = new PlansWriter(plans);
+		Population plans = new Population();
+		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
 
 		try {
@@ -496,7 +496,7 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 	private static void printFromToAvgDistance() {
-		Plans plans = new Plans();
+		Population plans = new Population();
 
 		FromToSummary plansStatistics = createPlansFromToSummary(plans, false);
 		double maxDist = 0;
@@ -581,7 +581,7 @@ public class MyRunsRouting extends MyRuns {
 	// calcRoute
 	// ////////////////////////////////////////////////////////////////////
 
-	public static FromToSummary createPlansFromToSummary(Plans plans,
+	public static FromToSummary createPlansFromToSummary(Population plans,
 			final boolean doPrintSummary) {
 		System.out.println("RUN: createPlansFromToSummary");
 
@@ -596,7 +596,7 @@ public class MyRunsRouting extends MyRuns {
 		if (Gbl.getConfig().plans().switchOffPlansStreaming()) {
 			plans.runAlgorithms();
 		} else {
-			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			PopulationReader plansReader = new MatsimPlansReader(plans);
 			plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		}
 
@@ -623,8 +623,8 @@ public class MyRunsRouting extends MyRuns {
 					new TravelTimeCalculator(network), speedUpFactor);
 
 			System.out.println("  setting up plans objects...");
-			Plans plans = new Plans();
-			PlansReaderI plansReader = new MatsimPlansReader(plans);
+			Population plans = new Population();
+			PopulationReader plansReader = new MatsimPlansReader(plans);
 			System.out.println("  done.");
 
 			System.out.println("  running plans algorithm... ");
@@ -676,9 +676,9 @@ public class MyRunsRouting extends MyRuns {
 	}
 
 	public static void compareRoute(final String[] args) {
-		Plans plans = new Plans();
+		Population plans = new Population();
 
-		PlansReaderI plansReader = new MatsimPlansReader(plans);
+		PopulationReader plansReader = new MatsimPlansReader(plans);
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = getRoutingAlgo(args,
@@ -715,7 +715,7 @@ public class MyRunsRouting extends MyRuns {
 		routeCompare.printSummary();
 	}
 
-	public static void calcRoute(final String[] args, final Plans plans) {
+	public static void calcRoute(final String[] args, final Population plans) {
 
 		System.out.println("RUN: calcRoute");
 

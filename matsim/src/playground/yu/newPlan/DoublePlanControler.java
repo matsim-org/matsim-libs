@@ -25,8 +25,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPlansReader;
-import org.matsim.population.Plans;
-import org.matsim.population.PlansReaderI;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.world.World;
 
 /**
@@ -50,10 +50,10 @@ public class DoublePlanControler {
 				.getInputFile());
 		world.setNetworkLayer(network);
 
-		Plans population = new Plans();
+		Population population = new Population();
 		DoublePlan dp = new DoublePlan(population);
 		population.addAlgorithm(dp);
-		PlansReaderI plansReader = new MatsimPlansReader(population);
+		PopulationReader plansReader = new MatsimPlansReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.runAlgorithms();
 		dp.writeEndPlans();
