@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AgentUtilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration;
+package org.matsim.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
+import org.matsim.population.Person;
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
 
-public class AllTests {
+/**
+ * This event specifies that an agent has gained some utility (or disutility).
+ * Scoring functions should handle these Events and add the utilities specified
+ * by such events to the agents' score.
+ *
+ * @author mrieser
+ */
+public final class AgentUtilityEvent extends BasicEvent {
 
-	public static Test suite() {
+	public final double amount;
 
-		TestSuite suite = new TestSuite("Integration Tests for MATSim");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.integration.events.AllTests.suite());
-		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	public AgentUtilityEvent(final double time, final Person agent, final double amount) {
+		super(time, agent);
+		this.amount = amount;
+	}
+
+	public AgentUtilityEvent(final double time, final Id agentId, final double amount) {
+		super(time, agentId.toString());
+		this.amount = amount;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		AttributesImpl attr = new AttributesImpl();
+		attr.addAttribute("", "", "time", "", Double.toString(this.time));
+		attr.addAttribute("", "", "agent", "", this.agentId);
+		attr.addAttribute("", "", "type", "", "agentUtility");
+		attr.addAttribute("", "", "amount", "", Double.toString(this.amount));
+		return attr;
+	}
+
+	@Override
+	public String toString() {
+		return getTimeString(this.time) + this.agentId + "\t0\t\t0\t9\tagentUtility\t" + amount;
 	}
 
 }

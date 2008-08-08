@@ -23,6 +23,7 @@ package org.matsim.events;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.io.IOUtils;
 
@@ -94,8 +95,13 @@ public class EventsReaderTXTv1 {
 					data = new ActEndEvent(time, agentId, linkId, activity, acttype);
 				}
 				break;
+			case 9:
+				data = new AgentUtilityEvent(time, new IdImpl(agentId), Double.parseDouble(desc.replace("agentUtility\t", "")));
+				break;
+			default:
+				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");
 		}
-		if (data != null) events.processEvent(data);
+		events.processEvent(data);
 
 	}
 

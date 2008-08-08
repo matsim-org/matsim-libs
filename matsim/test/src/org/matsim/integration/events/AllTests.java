@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration;
+package org.matsim.integration.events;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,10 +27,9 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Integration Tests for MATSim");
+		TestSuite suite = new TestSuite("Integration Tests for MATSim simulation events");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.integration.events.AllTests.suite());
-		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
+		suite.addTestSuite(AgentUtilityEventIntegrationTest.class);
 		//$JUnit-END$
 		return suite;
 	}
