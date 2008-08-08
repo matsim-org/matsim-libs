@@ -64,7 +64,7 @@ public class PajekWriter {
 	public PajekWriter(String dir, Facilities facilities){
 		this.dir=dir;
 		File pjDir=new File(dir+"pajek/");
-		System.out.println("PajekWriter1 make dir "+dir + "pajek/");
+		log.info("PajekWriter1 make dir "+dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
 			Gbl.errorMsg("Cannot create directory "+dir+"pajek/");
 		}
@@ -73,10 +73,10 @@ public class PajekWriter {
 		fff.run(facilities);
 		this.minCoord = fff.getMinCoord();
 		this.maxCoord = fff.getMaxCoord();
-		System.out.println(" PW X_Max ="+this.maxCoord.getX());
-		System.out.println(" PW Y_Max ="+this.maxCoord.getY());
-		System.out.println(" PW X_Min ="+this.minCoord.getX());
-		System.out.println(" PW Y_Min ="+this.minCoord.getY());
+		log.info(" PW X_Max ="+this.maxCoord.getX());
+		log.info(" PW Y_Max ="+this.maxCoord.getY());
+		log.info(" PW X_Min ="+this.minCoord.getX());
+		log.info(" PW Y_Min ="+this.minCoord.getY());
 
 	}
 
@@ -150,7 +150,7 @@ public class PajekWriter {
 
 		try {
 			pjnet.close();
-			System.out.println(" Successfully closed pjnetfile "+pjnetfile);
+			log.info(" Successfully closed pjnetfile "+pjnetfile);
 		} catch (IOException ex2) {
 			ex2.printStackTrace();
 		}
@@ -226,7 +226,7 @@ public class PajekWriter {
 		}
 		try {
 			pjnet.close();
-			System.out.println(" Successfully closed pjnetfile "+pjnetfile);
+			log.info(" Successfully closed pjnetfile "+pjnetfile);
 		} catch (IOException ex2) {
 			ex2.printStackTrace();
 		}
@@ -283,9 +283,9 @@ public class PajekWriter {
 		}
 		try {
 			pjvec1.close();
-			System.out.println(" Successfully closed pjvecfile "+pjvec1file);
+			log.info(" Successfully closed pjvecfile "+pjvec1file);
 			pjvec2.close();
-			System.out.println(" Successfully closed pjvecfile "+pjvec2file);
+			log.info(" Successfully closed pjvecfile "+pjvec2file);
 		} catch (IOException ex2) {
 			ex2.printStackTrace();
 		}

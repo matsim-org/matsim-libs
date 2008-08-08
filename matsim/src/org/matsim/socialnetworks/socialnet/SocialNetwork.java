@@ -130,7 +130,7 @@ public class SocialNetwork {
 		double rmax=100000.;
 		double alpha=1.5;
 		double c=p0/(Math.pow(rmin,-alpha));
-		System.out.println(alpha+" "+c+" "+p0+" "+rmin);
+		log.info(alpha+" "+c+" "+p0+" "+rmin);
 		int i=0;
 		while(i<numLinks){
 //			for (int i = 0; i < numLinks; i++) {
@@ -143,7 +143,7 @@ public class SocialNetwork {
 
 			if(MatsimRandom.random.nextDouble()<pdist){
 				if(makeSocialContactNotify(person1, person2, 0, "random")==2){//new link made
-//					System.out.println("new link made dist "+distance+" "+pdist);
+//					log.info("new link made dist "+distance+" "+pdist);
 					i++;
 				}
 			}
@@ -267,7 +267,7 @@ public class SocialNetwork {
 			
 //			makeSocialContact( person1, person2, -1);
 			if(makeSocialContactNotify(person1, person2, 0, "random")==2){
-			System.out.println("new link made dist "+distance+" "+pdist);
+			log.info("new link made dist "+distance+" "+pdist);
 			i++;
 			}
 		}
@@ -669,7 +669,7 @@ public class SocialNetwork {
 //		log.info("Removing link "+ myLink.person1.getId()+myLink.person2.getId());
 		linksList.remove(myLink);
 		if(myLink.equals(null)){
-			System.out.println("DEBUG STOP");
+			log.info("DEBUG STOP");
 		}
 		myLink.getPersonFrom().getKnowledge().getEgoNet().removeEgoLink(myLink);
 

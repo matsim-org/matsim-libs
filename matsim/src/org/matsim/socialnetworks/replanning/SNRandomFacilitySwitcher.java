@@ -20,11 +20,13 @@
 
 package org.matsim.socialnetworks.replanning;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.socialnetworks.io.PajekWriter;
 /**
  * The social network replanning StrategyModule is not multi-threaded because each
  * agent could refer to and alter other agent objects in a random manner.
@@ -34,6 +36,7 @@ import org.matsim.router.util.TravelTime;
  */
 
 public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
+	private final static Logger log = Logger.getLogger(SNRandomFacilitySwitcher.class);
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
@@ -45,7 +48,7 @@ public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 	
     public SNRandomFacilitySwitcher(NetworkLayer network, TravelCost tcost, TravelTime ttime) {
 
-		System.out.println("initializing SNRandomFacilitySwitcher");
+		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;
     	this.tcost = tcost;
     	this.ttime = ttime;
