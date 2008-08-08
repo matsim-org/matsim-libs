@@ -136,12 +136,12 @@ public class MessageFactory {
 		}
 	}
 	
-	public static NullMessage getNullMessage(){
-		if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
+	synchronized public static NullMessage getNullMessage(){
+		//if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
 			return new NullMessage();
-		} else {
-			return nullMessageQueue.poll();
-		}
+		//} else {
+		//	return nullMessageQueue.poll();
+		//}
 	}
 	
 	

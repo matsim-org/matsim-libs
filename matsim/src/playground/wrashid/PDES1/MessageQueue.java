@@ -14,7 +14,7 @@ public class MessageQueue {
 	//private PriorityBlockingQueue<Message> queue1 = new PriorityBlockingQueue<Message>(10000);
 	// PriorityQueue is better for performance than PriorityBlockingQueue, but requires all methods of this class
 	// to be set synchronized
-	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>(10000);
+	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 	//private LinkedList<Message> addBuffer=new LinkedList<Message>();
 	//private LinkedList<Message> deleteBuffer=new LinkedList<Message>();
 	private volatile static int counter=0;
@@ -85,10 +85,11 @@ public class MessageQueue {
 		emptyBuffers();
 		
 		Message m = queue1.poll();
+		//Message m = queue1.removeLast();
 		if (m!=null){
-			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 			
 			
+			//System.out.println("event:" + counter);
 			if (arrivalTimeOfLastRemovedMessage>1000){	
 				//System.out.println(queue1.size());
 				//System.out.println("the time has come:" + 1000);
@@ -103,10 +104,10 @@ public class MessageQueue {
 			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
 		
 		
-			if (!(m instanceof NullMessage)){
+			//if (!(m instanceof NullMessage)){
 				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
-			}
-		
+			//}
+				arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		}
 		
 		

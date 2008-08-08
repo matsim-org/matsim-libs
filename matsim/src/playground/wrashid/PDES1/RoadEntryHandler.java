@@ -14,6 +14,7 @@ public class RoadEntryHandler {
 	private double test_timeOfLastScheduledMessage=0;
 	private volatile int test_wrongMessages=0;
 	private LinkedList<Message> test_scheduledMessages=new LinkedList<Message>();
+	private LinkedList<Message> test_arrivedMessages=new LinkedList<Message>();
 	
 	RoadEntryHandler(Road belongsToRoad){
 		this.belongsToRoad = belongsToRoad;
@@ -26,13 +27,14 @@ public class RoadEntryHandler {
 		assert(nm.sendingUnit==null || belongsToRoad.getLink().getFromNode().getInLinks().values().contains(((Road) nm.sendingUnit).getLink())): "wrong unit sent a message";
 		
 			synchronized (pendingMessagesFromRoads){
-				if (!pendingMessagesFromRoads.contains(nm.sendingUnit) && nm.sendingUnit!=null){
+				test_arrivedMessages.add(nm);
+				if (nm.sendingUnit!=null && !pendingMessagesFromRoads.contains(nm.sendingUnit)){
 					pendingMessagesFromRoads.add((Road)nm.sendingUnit);
 				}	
 				
 				
 				if (nm.messageArrivalTime<test_timeOfLastScheduledMessage){
-					System.out.println(++test_wrongMessages);
+					System.out.println(nm.debugString);
 				}
 				
 				if (numberOfIncomingRoads==1){
@@ -67,11 +69,13 @@ public class RoadEntryHandler {
 			erm.receivingUnit=belongsToRoad;
 			erm.messageArrivalTime=simTime;
 			messageQueue.add(erm);
+			test_arrivedMessages.add(erm);
 			
 			assert(erm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + erm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
 			processMessageQueue();
 		}
+		
 		
 		// send a null message to all other roads (going out of the same conjunction)
 		for (Link otherLinks:fromRoad.getLink().getToNode().getOutLinks().values()){
@@ -81,6 +85,7 @@ public class RoadEntryHandler {
 				nm.sendingUnit=fromRoad;
 				nm.receivingUnit=otherRoad;
 				nm.messageArrivalTime=simTime + fromRoad.inverseOutFlowCapacity - SimulationParameters.delta;
+				nm.debugString="after registerEnter Request";
 				assert(nm.messageArrivalTime>=0):"negative simTime...";
 				otherRoad.roadEntryHandler.registerNullMessage(nm);
 			}
@@ -117,7 +122,7 @@ public class RoadEntryHandler {
 				if (test_scheduledMessages.getLast().messageArrivalTime>m.messageArrivalTime){
 					System.out.println("current message: "+ m.messageArrivalTime);
 					for (int i=0;i<test_scheduledMessages.size();i++){
-						System.out.println(test_scheduledMessages.get(0).messageArrivalTime);
+						System.out.println(test_scheduledMessages.get(i).messageArrivalTime);
 					}
 					System.out.println("test_timeOfLastScheduledMessage:"+test_timeOfLastScheduledMessage);
 				}

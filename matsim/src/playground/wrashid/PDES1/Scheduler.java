@@ -154,10 +154,31 @@ public class Scheduler {
 			su.initialize();
 		}
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		// schedule a null message on all roads
+		// this initialization musst be done before starting the messageExecutors,
+		// because else a race condition occurs between the initial messages and their processing
+		// TODO: but perhaps it creates some problem, because there are no message executors at this time
+		// to schedule message into the right scheduler => or perpaps yes, because each road has an executor id assigned
+		for (Road road:Road.allRoads.values()){
+			NullMessage.initialNullMessage(road, 0);
+		}
+		
 		// empty all buffer queues
 		for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
 			threadMessageQueues[i-1].emptyBuffers();
 		}
+		
+		
+		
+		
 		
 		
 		// intitialize variables (precondition: message queue intialized and its buffer emptied)
@@ -181,10 +202,7 @@ public class Scheduler {
 		noOfAliveThreads=SimulationParameters.numberOfMessageExecutorThreads;
 		
 		
-		// schedule a null message on all roads
-		for (Road road:Road.allRoads.values()){
-			NullMessage.scheduleNullMessage(road, 0);
-		}
+		
 		
 		
 	}
