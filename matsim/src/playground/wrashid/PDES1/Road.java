@@ -103,8 +103,8 @@ public class Road extends SimUnit {
 		
 		
 		linkTravelTime= link.getLength()  / link.getFreespeed(SimulationParameters.linkCapacityPeriod);
-		if (linkTravelTime<0){
-			System.out.println("nooooooooooo");
+		if (linkTravelTime<1){
+			//System.out.println(linkTravelTime);
 		}
 		assert(link.getLength()>0);
 		assert(linkTravelTime>0);
