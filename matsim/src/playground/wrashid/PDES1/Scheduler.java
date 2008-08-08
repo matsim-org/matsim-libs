@@ -96,12 +96,9 @@ public class Scheduler {
 					}
 				}
 				if (!allEmpty){
-					//if (timeOfNextBarrier / hourlyLogTime > 1){
-					//	hourlyLogTime = timeOfNextBarrier + 3600;
-					//	System.out.print("Simulation at " + timeOfNextBarrier/3600 + "[h]; ");
-					//	System.out.println("s/r:"+timeOfNextBarrier/(System.currentTimeMillis()-simulationStart)*1000);
-						Gbl.printMemoryUsage();
-					//}
+	
+					//Gbl.printMemoryUsage();
+				
 					SimulationParameters.processEventBuffer();
 					Thread.currentThread().sleep(1000);
 				} else {

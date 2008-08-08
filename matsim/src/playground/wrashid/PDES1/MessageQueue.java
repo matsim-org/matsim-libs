@@ -92,7 +92,7 @@ public class MessageQueue {
 			//System.out.println("event:" + counter);
 			if (arrivalTimeOfLastRemovedMessage>1000){	
 				//System.out.println(queue1.size());
-				//System.out.println("the time has come:" + 1000);
+				System.out.println("the time has come:" + 1000);
 			}
 			
 			//if (queue1.size() % 1000 ==0){
@@ -104,9 +104,9 @@ public class MessageQueue {
 			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
 		
 		
-			//if (!(m instanceof NullMessage)){
+			if (!(m instanceof NullMessage)){
 				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
-			//}
+			}
 				arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 		}
 		
