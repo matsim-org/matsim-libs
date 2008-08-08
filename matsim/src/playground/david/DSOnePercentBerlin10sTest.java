@@ -63,7 +63,7 @@ public class DSOnePercentBerlin10sTest {
 		String netFileName = "../MatsimJ-Testing/testdata/studies/WIP/wip_net.xml";
 		String popFileName = "../MatsimJ-Testing/testdata/studies/WIP/kutter001car5.debug.router_wip.plans.xml.gz";
 
-		MatsimRandom.random.setSeed(7411L);
+		MatsimRandom.reset(7411L);
 
 		World world = Gbl.getWorld();
 		// this needs to be done before reading the network

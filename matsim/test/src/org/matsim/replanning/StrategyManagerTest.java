@@ -40,7 +40,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 */
 	public void testChangeRequests() {
 
-		MatsimRandom.random.setSeed(4711);
+		MatsimRandom.reset(4711);
 
 		Population population = new Population(Population.NO_STREAMING);
 		try {

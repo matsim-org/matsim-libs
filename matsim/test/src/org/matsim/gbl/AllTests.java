@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.gbl");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(MatsimRandomTest.class);
 		suite.addTestSuite(MatsimResourceTest.class);
 		//$JUnit-END$
 		return suite;

@@ -23,9 +23,7 @@ package org.matsim.utils.vis.otfvis.gui;
 import java.awt.Color;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.config.Module;
-import org.matsim.config.groups.GlobalConfigGroup;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 
 
@@ -47,7 +45,7 @@ public class OTFVisConfig extends Module {
 	public static final String BIG_TIME_STEP = "bigTimeStep";
 	public static final String TIME_STEP = "timeStep";
 
-	private  float agentSize = 100.f;
+	private  float agentSize = 300.f;
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Select";
@@ -59,12 +57,10 @@ public class OTFVisConfig extends Module {
 	private String queryType = "agentPlan";
 	private boolean multipleSelect = true;
 	private boolean showParking = false;
-	private Color backgroundColor = new Color(230, 230, 230, 0);
-	private Color networkColor = new Color(128, 128, 190, 200);
+	private Color backgroundColor = new Color(255, 255, 255, 0);
+	private Color networkColor = new Color(128, 128, 128, 200);
 	private float linkWidth = 30;
 	private boolean drawLinkIds = false;
-
-	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	@Override
 	public String getValue(final String key) {

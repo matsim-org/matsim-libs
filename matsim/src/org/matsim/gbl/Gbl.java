@@ -106,7 +106,7 @@ public abstract class Gbl {
 			reader.readFile(args[0], args[1]);
 		}
 
-		MatsimRandom.random.setSeed(Gbl.config.global().getRandomSeed());
+		MatsimRandom.reset(Gbl.config.global().getRandomSeed());
 
 		return Gbl.config;
 	}
@@ -147,7 +147,7 @@ public abstract class Gbl {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
 		Gbl.world = null;
-		MatsimRandom.random.setSeed(MatsimRandom.DEFAULT_RANDOM_SEED);
+		MatsimRandom.reset();
 		CharyparNagelScoringFunction.initialized = false; // TODO [MR] see todo-comment in BasicScoringFunction.java
 	}
 

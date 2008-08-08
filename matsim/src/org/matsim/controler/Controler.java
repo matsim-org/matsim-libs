@@ -86,8 +86,8 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.StrategyManager;
@@ -291,7 +291,7 @@ public class Controler {
 			this.stopwatch.setCurrentIteration(Controler.iteration);
 			this.stopwatch.beginOperation("iteration");
 			makeIterationPath(iteration);
-			resetRandomNumbers(iteration);
+			resetRandomNumbers();
 
 			fireControlerIterationStartsEvent(iteration);
 			if (iteration > firstIteration) {
@@ -301,7 +301,7 @@ public class Controler {
 			}
 			fireControlerBeforeMobsimEvent(iteration);
 			this.stopwatch.beginOperation("mobsim");
-			resetRandomNumbers(iteration);
+			resetRandomNumbers();
 			runMobSim();
 			this.stopwatch.endOperation("mobsim");
 			fireControlerAfterMobsimEvent(iteration);
@@ -631,8 +631,8 @@ public class Controler {
 		}
 	}
 
-	private void resetRandomNumbers(final int iteration) {
-		MatsimRandom.random.setSeed(this.config.global().getRandomSeed() + iteration);
+	private void resetRandomNumbers() {
+		MatsimRandom.reset(this.config.global().getRandomSeed() + iteration);
 		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
 	}
 

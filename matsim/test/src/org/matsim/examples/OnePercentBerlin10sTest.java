@@ -47,7 +47,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		String eventsFileName = getOutputDirectory() + "events.txt";
 		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
-		MatsimRandom.random.setSeed(7411L);
+		MatsimRandom.reset(7411L);
 
 		World world = Gbl.createWorld();
 		// this needs to be done before reading the network
