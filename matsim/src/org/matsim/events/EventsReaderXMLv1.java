@@ -25,7 +25,6 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -66,7 +65,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	}
 
 	private void startEvent(final Attributes atts) {
-		int time = Integer.parseInt(atts.getValue("time"));
+		double time = Double.parseDouble(atts.getValue("time"));
 		String vehId = atts.getValue("agent");
 		int legNumber = optionalParseInt(atts.getValue("leg"));
 		String linkId = atts.getValue("link");
@@ -75,6 +74,9 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		int nodeId = 0; //Integer.parseInt(atts.getValue("fromNode"));
 		int flag = getFlagFromName(atts.getValue("type"));
 		String desc = "";
+		if ("agentUtility".equals(atts.getValue("type"))) {
+			desc = atts.getValue("amount");
+		}
 		EventsReaderTXTv1.createEvent(this.events, time, vehId, legNumber, linkId, nodeId, flag, desc, activity, acttype);
 	}
 
@@ -108,38 +110,21 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		DEPARTURE("departure", 6),
 		ACTSTART("actstart", 7),
 		ACTEND("actend", 8),
+		AGENT_UTILITY("agentUtility", 9),
 		POSITION("position", 999);
 
 		public String name;
 		public int value;
-		Flags (final String name, final int value) {this.name = name; this.value = value;};
+		Flags (final String name, final int value) {this.name = name; this.value = value;}
 	}
 
 	private static int getFlagFromName(final String flagname) {
-		if (flagname.equals(Flags.ARRIVAL.name)) {
-			return Flags.ARRIVAL.value;
-		} else if (flagname.equals(Flags.DEPARTURE.name)) {
-			return Flags.DEPARTURE.value;
-		} else if (flagname.equals(Flags.ENTER_LINK.name)) {
-			return Flags.ENTER_LINK.value;
-		} else if (flagname.equals(Flags.LEAVE_LINK.name)) {
-			return Flags.LEAVE_LINK.value;
-		} else if (flagname.equals(Flags.POSITION.name)) {
-			return Flags.POSITION.value;
-		} else if (flagname.equals(Flags.STUCK.name)) {
-			return Flags.STUCK.value;
-		} else if (flagname.equals(Flags.WAIT_TO_LINK.name)) {
-			return Flags.WAIT_TO_LINK.value;
-		} else if (flagname.equals(Flags.ACTSTART.name)) {
-			return Flags.ACTSTART.value;
-		} else if (flagname.equals(Flags.ACTEND.name)) {
-			return Flags.ACTEND.value;
-		} else {
-			Gbl.errorMsg("flagname `" + flagname + "' is not known!");
-			return -1;
+		for (Flags flag : Flags.values()) {
+			if (flagname.equals(flag.name)) {
+				return flag.value;
+			}
 		}
+		throw new RuntimeException("flagname `" + flagname + "' is not known!");
 	}
-
-	//////////////////////////////////////////////////////////////////////
 
 }
