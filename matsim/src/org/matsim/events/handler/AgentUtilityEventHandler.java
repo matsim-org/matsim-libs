@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AgentUtilityEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,21 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.scoring;
+package org.matsim.events.handler;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.events.AgentUtilityEvent;
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.scoring");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(CharyparNagelScoringFunctionTest.class);
-		suite.addTestSuite(CharyparNagelOpenTimesScoringFunctionTest.class);
-		suite.addTestSuite(EventsToScoreTest.class);
-		//$JUnit-END$
-		return suite;
-	}
-
+public interface AgentUtilityEventHandler extends EventHandler {
+	public void handleEvent (AgentUtilityEvent event);
 }

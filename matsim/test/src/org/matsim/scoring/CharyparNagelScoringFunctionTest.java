@@ -31,7 +31,6 @@ import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
@@ -40,14 +39,14 @@ import org.matsim.testcases.MatsimTestCase;
  *  Generating complete all-day activity plans with genetic algorithms,<br>
  *  Transportation, 32 (4) 369–397.</p>
  * </blockquote>
- * 
+ *
  * @author mrieser
  */
-public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
+public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 	/** Specifies how exact the calculated scores have to be when compared against the test-values */
 	private static final double epsilon = 1e-10;
-	
+
 	private Config config = null;
 	private NetworkLayer network = null;
 	private Person person = null;
@@ -105,6 +104,11 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		}
 	}
 
+	@Override
+	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
+		return new CharyparNagelScoringFunction(somePlan);
+	}
+
 	private double calcScore() {
 		CharyparNagelScoringFunction.initialized = false;
 		CharyparNagelScoringFunction testee = new CharyparNagelScoringFunction(this.plan);
@@ -123,7 +127,7 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 	/**
 	 * The reference implementation to calculate the zero utility duration, the duration of
 	 * an activity at which its utility is zero.
-	 * 
+	 *
 	 * @param typicalDuration_h The typical duration of the activity in hours
 	 * @param priority
 	 * @return the duration (in hours) at which the activity has a utility of 0.
@@ -131,7 +135,7 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 	private double getZeroUtilDuration_h(final double typicalDuration_h, final double priority) {
 		return typicalDuration_h * Math.exp(-10.0 / typicalDuration_h / priority);
 	}
-	
+
 	/**
 	 * Test the calculation of the zero-utility-duration.
 	 */
@@ -193,11 +197,11 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		double perf = +6.0;
 		this.config.charyparNagelScoring().setPerforming(perf);
 		double initialScore = calcScore();
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early and has to wait
 		double score = calcScore();
-		
+
 		// check the difference between 8.5 and 8.0 hours of performing an activity
 		assertEquals(perf * 8.0 * Math.log(8.5 / 8.0), initialScore - score, epsilon);
 	}
@@ -209,15 +213,15 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		double perf = +6.0;
 		this.config.charyparNagelScoring().setPerforming(perf);
 		double initialScore = calcScore();
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long
 		double score = calcScore();
-		
+
 		// check the difference between 8.5 and 7.5 hours of performing an activity
 		assertEquals(perf * 8.0 * Math.log(8.5 / 7.5), initialScore - score, epsilon);
 	}
-	
+
 	/**
 	 * Test the performing part of the scoring function when an activity has OpeningTime and ClosingTime set.
 	 */
@@ -226,19 +230,19 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
 		this.config.charyparNagelScoring().setPerforming(perf);
 		double initialScore = calcScore();
-	
+
 		// test1: agents has to wait before and after
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 		double score = calcScore();
-		
+
 		// check the difference between 8.5 and 7.0 hours of performing an activity
 		assertEquals(perf * 8.0 * Math.log(8.5 / 7.0), initialScore - score, epsilon);
-		
+
 		// test 2: agents has to wait all the time, because work place opens later
-		
+
 		wParams.setOpeningTime(20*3600.0);
 		wParams.setClosingTime(21*3600.0);
 
@@ -246,53 +250,53 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
 
 		// test 3: agents has to wait all the time, because work place opened earlier
-		
+
 		wParams.setOpeningTime(1*3600.0);
 		wParams.setClosingTime(2*3600.0);
-		
+
 		// only the home-activity should add to the score
 		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
 	}
-		
+
 	/**
 	 * Test the waiting part of the scoring function.
 	 */
 	public void testWaitingTime() {
 		double waiting = -10.0;
 		this.config.charyparNagelScoring().setWaiting(waiting);
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
-		
+
 		// the agent spends 1.5h waiting at the work place
 		assertEquals(waiting * 1.5, calcScore(), epsilon);
 	}
-	
+
 	/**
 	 * Test the scoring function in regards to early departures.
 	 */
 	public void testEarlyDeparture() {
 		double disutility = -10.0;
 		this.config.charyparNagelScoring().setEarlyDeparture(disutility);
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setEarliestEndTime(16.75 * 3600.0); // require the agent to work until 16:45
-		
+
 		// the agent left 45mins too early
 		assertEquals(disutility * 0.75, calcScore(), epsilon);
 	}
-	
+
 	/**
 	 * Test the scoring function in regards to early departures.
 	 */
 	public void testMinimumDuration() {
 		double disutility = -10.0;
 		this.config.charyparNagelScoring().setEarlyDeparture(disutility);
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setMinimalDuration(10 * 3600.0); // require the agent to be 10 hours at work
-		
+
 		// the agent left 1.5h too early
 		assertEquals(disutility * 1.5, calcScore(), epsilon);
 	}
@@ -303,14 +307,14 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 	public void testLateArrival() {
 		double disutility = -10.0;
 		this.config.charyparNagelScoring().setLateArrival(disutility);
-		
+
 		ActivityParams wParams = this.config.charyparNagelScoring().getActivityParams("w");
 		wParams.setLatestStartTime(7 * 3600.0); // agent should start at 7 o'clock
-		
+
 		// the agent arrived 30mins late
 		assertEquals(disutility * 0.5, calcScore(), epsilon);
 	}
-	
+
 	/**
 	 * Test that the stuck penalty is correctly computed. It should be the worst (dis)utility the agent
 	 * could gain.
@@ -331,13 +335,13 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
 		testee.getScore();
-		
+
 		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), epsilon); // stuck penalty + 30min travelling
 
 		// test 2 where traveling has the biggest impact
 		this.config.charyparNagelScoring().setLateArrival(-3.0);
 		this.config.charyparNagelScoring().setTraveling(-6.0);
-		
+
 		CharyparNagelScoringFunction.initialized = false;
 		testee = new CharyparNagelScoringFunction(this.plan);
 		testee.endActivity(07*3600);
@@ -349,10 +353,10 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
 		testee.getScore();
-		
+
 		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), epsilon); // stuck penalty + 30min travelling
 	}
-	
+
 	public void testDistanceCost() {
 		this.config.charyparNagelScoring().setDistanceCost(0.01);
 		assertEquals(-0.45, calcScore(), epsilon);
@@ -364,7 +368,7 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 	public void testDifferentFirstLastAct() {
 		// change the last act to something different than the first act
 		((Act) this.plan.getActsLegs().get(4)).setType("h2");
-		
+
 		CharyparNagelScoringConfigGroup.ActivityParams params = new CharyparNagelScoringConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
 		this.config.charyparNagelScoring().addActivityParams(params);

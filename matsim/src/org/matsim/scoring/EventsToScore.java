@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,9 +28,11 @@ import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.AgentUtilityEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -45,7 +47,7 @@ import org.matsim.population.Population;
  *
  * @author mrieser
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -65,28 +67,24 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		this.learningRate = learningRate;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentDepartureI#handleEvent(org.matsim.demandmodeling.events.EventAgentDeparture)
-	 */
 	public void handleEvent(final AgentDepartureEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.startLeg(event.time, event.leg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentArrivalI#handleEvent(org.matsim.demandmodeling.events.EventAgentArrival)
-	 */
 	public void handleEvent(final AgentArrivalEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.endLeg(event.time);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.events.handler.EventHandlerAgentStuckI#handleEvent(org.matsim.demandmodeling.events.EventAgentStuck)
-	 */
 	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.agentStuck(event.time);
+	}
+
+	public void handleEvent(final AgentUtilityEvent event) {
+		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		sf.addUtility(event.amount);
 	}
 
 	/**
@@ -137,9 +135,6 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 		return sf.getScore();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.events.handler.EventHandlerI#reset(int)
-	 */
 	public void reset(final int iteration) {
 		this.agentScorers.clear();
 		this.scoreCount = 0;
