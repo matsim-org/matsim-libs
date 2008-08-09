@@ -29,13 +29,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
@@ -185,7 +186,7 @@ public class Events {
 					if (dat == null) {
 						dat = new HandlerData(eventClass, method);
 						this.handlerData.add(dat);
-					};
+					}
 					dat.handlerList.add(handler);
 				}
 			}
@@ -257,6 +258,9 @@ public class Events {
 			return true;
 		} else if (klass == AgentWait2LinkEvent.class) {
 			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
+			return true;
+		} else if (klass == AgentUtilityEvent.class) {
+			((AgentUtilityEventHandler)handler).handleEvent((AgentUtilityEvent)ev);
 			return true;
 		}
 		return false;
