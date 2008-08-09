@@ -355,6 +355,10 @@ public class AppraisalScorer implements ScoringFunction {
 		// we do not use this "event" at the moment
 	}
 
+	public void addUtility(final double utility) {
+		// not used at the moment
+	}
+
 	public void startLeg(final double time, final Leg leg) {
 		if (this.index % 2 == 0) {
 			// it seems we were not informed about activities

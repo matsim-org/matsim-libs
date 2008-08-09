@@ -124,11 +124,15 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		this.score += getStuckPenalty();
 	}
 
+	public void addUtility(final double amount) {
+		this.score += amount;
+	}
+
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
 		}
-		
+
 		// reduce score by penalty from capacity restraints
 		Iterator<Penalty> pen_it = this.penalty.iterator();
 		while (pen_it.hasNext()){
@@ -195,7 +199,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	}
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
-	
+
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
@@ -274,7 +278,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 
 			utilPerf *= act.getFacility().getAttrFactor();
-			
+
 			double utilWait = marginalUtilityOfWaiting * duration;
 			score += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -297,7 +301,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		if (minimalDuration >= 0 && duration < minimalDuration) {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
-		
+
 		// used arrival and departure time because of parking cap restr. before act actually starts
 		if (act.getType().startsWith("s")){
 			this.penalty.add(new Penalty(arrivalTime, departureTime, act.getFacility(), score));

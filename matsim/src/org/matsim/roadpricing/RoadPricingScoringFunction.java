@@ -54,6 +54,10 @@ public class RoadPricingScoringFunction implements ScoringFunction {
 		this.scoringFunction.agentStuck(time);
 	}
 
+	public void addUtility(final double amount) {
+		this.scoringFunction.addUtility(amount);
+	}
+
 	public void endActivity(final double time) {
 		this.scoringFunction.endActivity(time);
 	}

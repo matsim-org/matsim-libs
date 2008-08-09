@@ -20,6 +20,7 @@
 
 package org.matsim.scoring;
 
+import org.matsim.events.AgentUtilityEvent;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 
@@ -84,6 +85,15 @@ public interface ScoringFunction {
 	 * simulation.
 	 */
 	public void agentStuck(final double time);
+
+	/**
+	 * Adds the specified amount of utility to the agent's score. This is mostly
+	 * used for handling {@link AgentUtilityEvent}s, allowing other parts of the
+	 * code to influence an agent's score.
+	 *
+	 * @param amount amount to be added to the agent's score
+	 */
+	public void addUtility(final double amount);
 
 	/**
 	 * Tells the scoring function that no more information will be given to it

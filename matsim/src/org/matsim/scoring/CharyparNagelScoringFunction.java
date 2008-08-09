@@ -157,6 +157,10 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		this.score += getStuckPenalty();
 	}
 
+	public void addUtility(final double amount) {
+		this.score += amount;
+	}
+
 	public void finish() {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
@@ -222,7 +226,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
 
-		double score = 0.0;
+		double tmpScore = 0.0;
 
 		/* Calculate the times the agent actually performs the
 		 * activity.  The facility must be open for the agent to
@@ -252,7 +256,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		 * assume O <= C
 		 * assume A <= D
 		 */
-		
+
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
@@ -277,14 +281,14 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			score += marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
-			score += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
@@ -294,29 +298,29 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 			double utilWait = marginalUtilityOfWaiting * duration;
-			score += Math.max(0, Math.max(utilPerf, utilWait));
+			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			score += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
-			score += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			score += marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
 		if (minimalDuration >= 0 && duration < minimalDuration) {
-			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
-		return score;
+		return tmpScore;
 	}
 
 	protected double[] getOpeningInterval(Act act) {
@@ -328,7 +332,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 		double openingTime = params.getOpeningTime();
 		double closingTime = params.getClosingTime();
-		
+
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
@@ -338,7 +342,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	}
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double score = 0.0;
+		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
@@ -359,15 +363,15 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		}
 
 		if ("car".equals(leg.getMode())) {
-			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
 		} else if ("pt".equals(leg.getMode())) {
-			score += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
 		} else {
 			// use the same values as for "car"
-			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
 		}
 
-		return score;
+		return tmpScore;
 	}
 
 	private static double getStuckPenalty() {

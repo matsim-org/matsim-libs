@@ -50,7 +50,7 @@ public class SocializingScoringFunction implements ScoringFunction{
 	private double friendFoeRatio=0.;
 	private double nFriends=0;
 	private double timeWithFriends=0;
-	
+
 	private SocNetConfigGroup socnetConfig = Gbl.getConfig().socnetmodule();
 
 	private double betaFriendFoe = Double.parseDouble(socnetConfig.getBeta1());
@@ -72,7 +72,7 @@ public class SocializingScoringFunction implements ScoringFunction{
 
 	/**
 	 * Totals the act scores, including socializing during acts, for the entire plan
-	 * 
+	 *
 	 * @see org.matsim.scoring.ScoringFunction#finish()
 	 */
 	public void finish() {
@@ -98,6 +98,10 @@ public class SocializingScoringFunction implements ScoringFunction{
 
 	public void agentStuck(final double time) {
 		this.scoringFunction.agentStuck(time);
+	}
+
+	public void addUtility(final double amount) {
+		this.scoringFunction.addUtility(amount);
 	}
 
 	public void endActivity(final double time) {
