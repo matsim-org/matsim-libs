@@ -33,13 +33,14 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
 import org.matsim.utils.NetworkUtils;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 class LandmarkerPieSlices extends NetworkAlgorithm {
 
 	private Node[] landmarks;
 
-	private CoordImpl center = null;
+	private Coord center = null;
 
 	private int roleIndex;
 
@@ -60,12 +61,12 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		if (this.travelZone.getHeight() == 0 || this.travelZone.getWidth() == 0) {
 			nodes = network.getNodes().values();
 		} else {
-			nodes = getNodesInTravelZone(network, this.travelZone);
+			nodes = getNodesInTravelZone(network);
 		}
 		run(nodes, network.requestNodeRole());
 	}
 
-	private Set<Node> getNodesInTravelZone(final NetworkLayer network, final Rectangle2D.Double travelZone) {
+	private Set<Node> getNodesInTravelZone(final NetworkLayer network) {
 		double minX = travelZone.getX();
 		double maxX = travelZone.getWidth() + minX;
 		double minY = travelZone.getY();
@@ -285,7 +286,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		}
 	}
 
-	public CoordImpl getCenter(final Collection<? extends Node> nodes) {
+	public Coord getCenter(final Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];
@@ -334,7 +335,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 	/**
 	 * @return the middle
 	 */
-	public CoordImpl getMiddle() {
+	public Coord getMiddle() {
 		return this.center;
 	}
 

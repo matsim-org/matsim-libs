@@ -29,7 +29,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.ResizableArray;
 
 public class Node extends BasicNodeImpl implements Comparable<Node> {
@@ -72,12 +71,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	protected Node(final Id id, final Coord coord, final String type) {
 		super(id, coord);
 		this.type = type == null ? null : type.intern();
-	}
-
-	/** @deprecated please use the other Constructor which takes a Coord-object instead of x and y */
-	@Deprecated
-	protected Node(final Id id, final String x, final String y, final String type) {
-		this(id, new CoordImpl(x, y), type);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -177,11 +170,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	public final String getType() {
 		return this.type;
-	}
-
-	@Override
-	public CoordImpl getCoord() {
-		return (CoordImpl) this.coord;
 	}
 
 	public final Map<Id, ? extends Link> getIncidentLinks() {

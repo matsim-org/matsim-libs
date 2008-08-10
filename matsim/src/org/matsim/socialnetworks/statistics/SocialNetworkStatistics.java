@@ -43,7 +43,7 @@ import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 
 import cern.colt.list.DoubleArrayList;
@@ -239,11 +239,11 @@ public class SocialNetworkStatistics {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
 		Person pFrom = plans.getPerson(vFrom.getUserDatum("personId").toString());
-		CoordImpl fromCoord = (CoordImpl) ((Act) pFrom.getSelectedPlan().getActsLegs().get(
+		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getActsLegs().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
 		Person pTo = plans.getPerson(vTo.getUserDatum("personId").toString());
-		CoordImpl toCoord = (CoordImpl) ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
+		Coord toCoord = ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
 		.getCoord();
 		dist = fromCoord.calcDistance(toCoord);
 		return dist;

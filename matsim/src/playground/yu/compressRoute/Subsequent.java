@@ -34,7 +34,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
@@ -78,7 +78,7 @@ public class Subsequent extends MatsimXmlWriter {
 
 	/**
 	 * calculates the "default next" linkId of the current link with respect to
-	 * geometry und Capacity (depending on BETA) and writes the result in
+	 * geometry and Capacity (depending on BETA) and writes the result in
 	 * ssLinks.
 	 */
 	public void compute() {
@@ -97,11 +97,11 @@ public class Subsequent extends MatsimXmlWriter {
 			if (outNodes.size() > 1) {
 
 				for (Node out : outNodes) {
-					CoordImpl cFrom = from.getCoord();
-					CoordImpl cTo = to.getCoord();
+					Coord cFrom = from.getCoord();
+					Coord cTo = to.getCoord();
 					double xTo = cTo.getX();
 					double yTo = cTo.getY();
-					CoordImpl cOut = out.getCoord();
+					Coord cOut = out.getCoord();
 					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut
 							.getX()
 							- xTo)
@@ -112,8 +112,7 @@ public class Subsequent extends MatsimXmlWriter {
 						deltaTheta += 2.0 * Math.PI;
 					while (deltaTheta > Math.PI)
 						deltaTheta -= 2.0 * Math.PI;
-					absDeltaThetas.put(out.getId().toString(), Math
-							.abs(deltaTheta));
+					absDeltaThetas.put(out.getId().toString(), Math.abs(deltaTheta));
 				}
 				this.ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
 						.toString());

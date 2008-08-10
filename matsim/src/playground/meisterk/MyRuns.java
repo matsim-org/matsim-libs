@@ -38,17 +38,12 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
@@ -63,7 +58,6 @@ import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
@@ -74,7 +68,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
@@ -180,7 +173,7 @@ public class MyRuns {
 
 		String actType = "s13";
 		String shopId = "";
-		
+
 		System.out.println("Reading facilities...");
 		Facilities facilityLayer = new Facilities();
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
@@ -197,23 +190,23 @@ public class MyRuns {
 		// tta -> wkday
 		TreeSet<Opentime> opentimes = null;
 		TreeMap<String, TreeSet<Opentime>> closestShopOpentimes = new TreeMap<String, TreeSet<Opentime>>();
-		
+
 		for (Facility f : facilityLayer.getFacilities().values()) {
 
 //			Activity shopActivity = f.getActivity("shop");
 //			if (shopActivity == null) {
 //				shopActivity = f.createActivity("shop");
-//				
+//
 //				if (f.getId().toString().startsWith("Denner")) {
 //					shopId = "Denner____8050_Zürich_REGENSBERGSTR. 309";
 //				} else if (f.getId().toString().startsWith("Migros")) {
 //					shopId = "Migros__Zürich-Affoltern-ZH_Migros Zürich_8046_Zürich_Jonas-Furrerstrasse 21";
 //				}
-//				
+//
 //				closestShopOpentimes = ((Facility) facilityLayer.getLocation(shopId)).getActivity("shop").getOpentimes();
 //				shopActivity.setOpentimes(closestShopOpentimes);
 //			}
-			
+
 			for (Activity a : f.getActivities().values()) {
 
 				if (!a.getType().equals("home") && !a.getType().startsWith("B01")) {
@@ -222,7 +215,7 @@ public class MyRuns {
 						opentimes = a.getOpentimes("wed");
 					}
 					if (opentimes == null) {
-						
+
 //						if (f.getId().toString().startsWith("Pick")) {
 //							// for the missing pickpay opentimes, use a random pickpay shop
 //							// let's use the one close to my home :-)
@@ -232,7 +225,7 @@ public class MyRuns {
 //							// let's use the one close to my home :-)
 //							shopId = "Coop_CC_Wehntalerstrasse_Coop Zürich_8046_Zürich_Wehntalerstrasse 549";
 //						}
-//						
+//
 //						Activity shopsOf2005ShopAct = ((Facility) facilityLayer.getLocation(shopId)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 //						if (shopsOf2005ShopAct != null) {
 //							closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
@@ -240,7 +233,7 @@ public class MyRuns {
 //						a.setOpentimes(closestShopOpentimes);
 						wednesdayLessActivityTypes.add(f.getId() + "_" + a.getType());
 					}
-				}	
+				}
 			}
 
 		}
@@ -555,13 +548,13 @@ public class MyRuns {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.utils.geometry.CoordImpl fromNodeWorldCoord = fromNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl fromNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		Coord fromNodeWorldCoord = fromNode.getCoord();
+		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.utils.geometry.CoordImpl toNodeWorldCoord = toNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl toNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		Coord toNodeWorldCoord = toNode.getCoord();
+		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
 		linkPlacemark = new Placemark(
@@ -1039,7 +1032,7 @@ public class MyRuns {
 
 	/**
 	 * Used this routine for MeisterEtAl_Heureka_2008 paper,
-	 * plot of number of deps, arrs by activity type to visualize 
+	 * plot of number of deps, arrs by activity type to visualize
 	 * the time distribution from microcensus.
 	 */
 	public static void analyseInitialTimes() {
@@ -1107,6 +1100,6 @@ public class MyRuns {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 	}
 }

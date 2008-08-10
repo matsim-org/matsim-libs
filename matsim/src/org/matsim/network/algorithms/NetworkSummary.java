@@ -23,6 +23,7 @@ package org.matsim.network.algorithms;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
@@ -90,11 +91,11 @@ public class NetworkSummary {
 		return this.network_capacity;
 	}
 
-	public final CoordImpl getMinCoord() {
+	public final Coord getMinCoord() {
 		return new CoordImpl(this.minX, this.minY);
 	}
 
-	public final CoordImpl getMaxCoord() {
+	public final Coord getMaxCoord() {
 		return new CoordImpl(this.maxX, this.maxY);
 	}
 }

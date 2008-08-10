@@ -88,8 +88,8 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationReaderKutter;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
-import org.matsim.population.algorithms.ActLocationFalsifier;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ActLocationFalsifier;
 import org.matsim.population.algorithms.PersonFilterSelectedPlan;
 import org.matsim.population.algorithms.PersonRemoveCertainActs;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
@@ -489,8 +489,8 @@ public class MyRuns {
 		plans.printPlansCount();
 		System.out.println("  done.");
 
-		final CoordImpl minCoord = summary.getMinCoord();
-		final CoordImpl maxCoord = summary.getMaxCoord();
+		final Coord minCoord = summary.getMinCoord();
+		final Coord maxCoord = summary.getMaxCoord();
 		new PlansFilterArea(minCoord, maxCoord).run(plans);
 
 		System.out.println("  writing plans...");
@@ -855,28 +855,27 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
-		final Population plans = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final Population population = new Population(Population.NO_STREAMING);
+		final PopulationReader plansReader = new MatsimPopulationReader(population);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 		preprocess.run(network);
-		plans.addAlgorithm(new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc));
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		population.printPlansCount();
 		System.out.println("  done.");
 
 		System.out.println("  processing plans..." + (new Date()));
-		plans.runAlgorithms();
+		new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc).run(population);
 		System.out.println("  done. " + (new Date()));
 
 		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		final PopulationWriter plansWriter = new PopulationWriter(population);
 		plansWriter.write();
 		System.out.println("  done.");
 
@@ -1193,7 +1192,6 @@ public class MyRuns {
 		System.out.println("  done. " + (new Date()));
 
 		System.out.println("  writing plans...");
-		population.runAlgorithms();
 		final PopulationWriter plansWriter = new PopulationWriter(population);
 		plansWriter.write();
 		System.out.println("  done.");
@@ -1241,8 +1239,7 @@ public class MyRuns {
 		System.out.println("  calculating score... " + (new Date()));
 		final PlanAverageScore average = new PlanAverageScore();
 		calcscore.finish();
-		population.addAlgorithm(average);
-		population.runAlgorithms();
+		average.run(population);
 		System.out.println("    average score = " + average.getAverage());
 		System.out.println("  done."  + (new Date()));
 
@@ -1254,8 +1251,6 @@ public class MyRuns {
 		System.out.println("RUN: calcScoreFromEvents_new finished.");
 		System.out.println();
 	}
-
-
 
 	//////////////////////////////////////////////////////////////////////
 	// convertNetwork

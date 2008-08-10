@@ -402,7 +402,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	public Node getNearestNode(final CoordImpl coord) {
+	public Node getNearestNode(final Coord coord) {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY());
 	}
 
@@ -413,7 +413,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	public Collection<Node> getNearestNodes(final CoordImpl coord, final double distance) {
+	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
 
@@ -606,8 +606,5 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 		}
 		return index;
 	}
-
-
-
 
 }

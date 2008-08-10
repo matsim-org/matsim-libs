@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 
 public class NetworkAdaptLength {
 
@@ -54,8 +54,8 @@ public class NetworkAdaptLength {
 		Iterator<? extends Link> l_it = network.getLinks().values().iterator();
 		while (l_it.hasNext()) {
 			Link l = l_it.next();
-			CoordImpl fc = l.getFromNode().getCoord();
-			CoordImpl tc   = l.getToNode().getCoord();
+			Coord fc = l.getFromNode().getCoord();
+			Coord tc   = l.getToNode().getCoord();
 			double length = l.getLength();
 
 			double dist = fc.calcDistance(tc);

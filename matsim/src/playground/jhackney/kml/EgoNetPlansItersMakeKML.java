@@ -455,7 +455,7 @@ public class EgoNetPlansItersMakeKML {
 
 		if(!planFolder.containsFeature(es.getId())){
 			planFolder.addFeature(es);
-		}	
+		}
 
 
 		// make the activity spaces
@@ -504,7 +504,7 @@ public class EgoNetPlansItersMakeKML {
 					}
 					oldPoint=pointOut;
 				}
-			}	
+			}
 		}
 	}
 
@@ -528,9 +528,9 @@ public class EgoNetPlansItersMakeKML {
 				Feature.DEFAULT_REGION,
 				timeStamp);
 
-		Coord coordFrom = trafo.transform((CoordImpl)((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
-		Coord coordTo = trafo.transform((CoordImpl)((Act)ai.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Act)ai.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
 		socialLink.setGeometry(new LineString(pointFrom, pointTo));
 		folder.addFeature(socialLink);
@@ -556,9 +556,9 @@ public class EgoNetPlansItersMakeKML {
 				Feature.DEFAULT_REGION,
 				timeStamp);
 
-		Coord coordFrom = trafo.transform((CoordImpl)((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
-		Coord coordTo = trafo.transform((CoordImpl)((Act)ego.getSelectedPlan().getActsLegs().get(0)).getCoord());
+		Coord coordTo = trafo.transform(((Act)ego.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
 		socialLink.setGeometry(new LineString(pointFrom, pointTo));
 		folder.addFeature(socialLink);
@@ -589,7 +589,7 @@ public class EgoNetPlansItersMakeKML {
 
 		if(!planFolder.containsFeature(as.getId())){
 			planFolder.addFeature(as);
-		}	
+		}
 
 
 		// make the activity spaces
@@ -648,7 +648,7 @@ public class EgoNetPlansItersMakeKML {
 				}
 				oldPoint=pointOut;
 			}
-		}	
+		}
 	}
 
 	private static void makeActivitySpaceKML_Poly(Person myPerson, int i,
@@ -694,7 +694,7 @@ public class EgoNetPlansItersMakeKML {
 				boundaryOut.add(pointOut);
 //				boundaryIn.add(pointIn);
 			}
-		}		
+		}
 
 		// define the polygon feature
 
@@ -893,13 +893,13 @@ public class EgoNetPlansItersMakeKML {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.utils.geometry.CoordImpl fromNodeWorldCoord = fromNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl fromNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		Coord fromNodeWorldCoord = fromNode.getCoord();
+		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.utils.geometry.CoordImpl toNodeWorldCoord = toNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl toNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		Coord toNodeWorldCoord = toNode.getCoord();
+		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
 		linkPlacemark = new Placemark(
@@ -922,13 +922,13 @@ public class EgoNetPlansItersMakeKML {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.utils.geometry.CoordImpl fromNodeWorldCoord = fromNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl fromNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		Coord fromNodeWorldCoord = fromNode.getCoord();
+		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.utils.geometry.CoordImpl toNodeWorldCoord = toNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl toNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		Coord toNodeWorldCoord = toNode.getCoord();
+		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
 		linkPlacemark = new Placemark(

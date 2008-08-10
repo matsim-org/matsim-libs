@@ -32,15 +32,15 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.writer.MatsimXmlWriter;
 
 /**
  * (like Subsequent) calculates the "default next" linkId of a current link in
  * MATSim networkfile with respect to Capacity (i.e. BEAT=1) and Geometry
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class SubsequentCapacity extends MatsimXmlWriter {
 
@@ -65,7 +65,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void compute() {
 		Map<String, Double> caps = new TreeMap<String, Double>();
@@ -128,7 +128,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	/**
 	 * Calculates the "default next" LinkId with respect to Geometry i.e.
 	 * angles, if there is 2 outLinks with the same Capacity
-	 * 
+	 *
 	 * @param l -
 	 *            the current link
 	 * @param nextLinksIds -
@@ -142,8 +142,8 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		Node to = l.getToNode();
 		Node from = l.getFromNode();
 
-		CoordImpl cFrom = from.getCoord();
-		CoordImpl cTo = to.getCoord();
+		Coord cFrom = from.getCoord();
+		Coord cTo = to.getCoord();
 		double xTo = cTo.getX();
 		double yTo = cTo.getY();
 		double crtLinkTheta = Math
@@ -153,8 +153,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 			resultLinkId = nextLinksIds.get(0);
 		else if (nextLinksIds.size() > 1) {
 			for (String nextLinkId : nextLinksIds) {
-				CoordImpl cNextTo = outLinksMap.get(nextLinkId).getToNode()
-						.getCoord();
+				Coord cNextTo = outLinksMap.get(nextLinkId).getToNode().getCoord();
 				double outLinkTheta = Math.atan2(cNextTo.getY() - yTo, cNextTo
 						.getX()
 						- xTo);
@@ -180,7 +179,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 	/**
 	 * see also: org.matsim.playground.yu.Subsequent
-	 * 
+	 *
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -194,7 +193,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 	/**
 	 * see also: org.matsim.playground.yu.Subsequent
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	private void write() throws IOException {

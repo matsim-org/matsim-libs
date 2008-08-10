@@ -42,7 +42,6 @@ import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.GeoStatistics;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 
@@ -112,7 +111,7 @@ public class PajekWriter {
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}
-				CoordImpl xy = (CoordImpl) ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy = ((Act) p.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjnet.write(iperson + " \"" + p.getId() + "\" "+x +" "+y+"\r\n");
@@ -132,8 +131,8 @@ public class PajekWriter {
 				Person printPerson1 = printLink.person1;
 				Person printPerson2 = printLink.person2;
 
-				CoordImpl xy1 = (CoordImpl) ((Act) printPerson1.getSelectedPlan().getActsLegs().get(0)).getCoord();
-				CoordImpl xy2 = (CoordImpl) ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy1 = ((Act) printPerson1.getSelectedPlan().getActsLegs().get(0)).getCoord();
+				Coord xy2 = ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				double dist = xy1.calcDistance(xy2);
 
 				pjnet.write(" " + this.pajekIndex.get(printPerson1.getId()) + " "+ this.pajekIndex.get(printPerson2.getId())+" "+dist+" "+age+"\r\n");
@@ -193,7 +192,7 @@ public class PajekWriter {
 				Vertex v = iVert.next();
 				Zone zone = (Zone) vertLoc.get(v);
 
-				CoordImpl xy = (CoordImpl) zone.getCenter();
+				Coord xy = zone.getCenter();
 				double x=(xy.getX()-this.minCoord.getX())/(this.maxCoord.getX()-this.minCoord.getX());
 				double y=(xy.getY()-this.minCoord.getY())/(this.maxCoord.getY()-this.minCoord.getY());
 				pjnet.write(vertexcounter + " \"" + zone.getId() + "\" "+x +" "+y+"\r\n");
@@ -243,7 +242,7 @@ public class PajekWriter {
 		String pjvec2file = this.dir+"pajek/testGeoDegPop"+iter+".vec";
 		log.info("PajekWriter1 Geofilename "+pjvec2file);
 
-		
+
 		try {
 
 			pjvec1 = new BufferedWriter(new FileWriter(pjvec1file));
@@ -258,7 +257,7 @@ public class PajekWriter {
 		}
 
 		try {
-			//Writes a *.vec file with the population of each geo-zone 
+			//Writes a *.vec file with the population of each geo-zone
 			log.info("##### Write Geoaggregated Population Vector");
 			log.info(" *Vertices " + numVertices + " \n");
 			pjvec1.write("*Vertices " + numVertices+"\r\n");
@@ -266,7 +265,7 @@ public class PajekWriter {
 			log.info("##### Write Geoaggregated Degree/Population Vector");
 			log.info(" *Vertices " + numVertices + " \n");
 			pjvec2.write("*Vertices " + numVertices+"\r\n");
-			
+
 			Iterator<Vertex> iVert = g.getVertices().iterator();
 			while (iVert.hasNext()) {
 				Vertex v = iVert.next();

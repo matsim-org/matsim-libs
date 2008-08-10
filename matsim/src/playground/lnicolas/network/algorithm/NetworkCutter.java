@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * @author lnicolas
@@ -72,7 +72,7 @@ public class NetworkCutter extends NetworkAlgorithm {
 
 	private void markNodes(NetworkLayer network, int roleIndex) {
 		for (Node n : network.getNodes().values()) {
-			CoordImpl c = n.getCoord();
+			Coord c = n.getCoord();
 			NetworkCutterRole r = getRole(n, roleIndex);
 
 			if (c.getX() < leftX

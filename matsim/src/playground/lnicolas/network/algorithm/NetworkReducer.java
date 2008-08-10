@@ -30,11 +30,12 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class NetworkReducer extends NetworkAlgorithm {
 
-	CoordImpl startCoord = null;
+	Coord startCoord = null;
 
 	int nOfLinks = -1;
 
@@ -118,7 +119,7 @@ public class NetworkReducer extends NetworkAlgorithm {
 			NetworkReducerRole r = getRole(n, roleIndex);
 
 			if (r.isInResultingNetwork() == true) {
-				CoordImpl c = n.getCoord();
+				Coord c = n.getCoord();
 				if (c.getX() < minX) {
 					minX = c.getX();
 				}

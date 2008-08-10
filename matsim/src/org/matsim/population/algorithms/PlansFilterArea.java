@@ -28,7 +28,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.geometry.Coord;
 
 /**
  * Filters out plans from persons where none of the act's locations are within
@@ -43,7 +43,7 @@ public class PlansFilterArea {
 	private final double minY;
 	private final double maxY;
 
-	public PlansFilterArea(final CoordImpl min, final CoordImpl max) {
+	public PlansFilterArea(final Coord min, final Coord max) {
 		super();
 		this.minX = min.getX();
 		this.maxX = max.getX();

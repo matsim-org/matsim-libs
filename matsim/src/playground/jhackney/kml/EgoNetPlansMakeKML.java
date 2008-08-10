@@ -40,8 +40,22 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
+import org.matsim.utils.vis.kml.ColorStyle;
+import org.matsim.utils.vis.kml.Document;
+import org.matsim.utils.vis.kml.Feature;
+import org.matsim.utils.vis.kml.Folder;
+import org.matsim.utils.vis.kml.Icon;
+import org.matsim.utils.vis.kml.IconStyle;
+import org.matsim.utils.vis.kml.KML;
+import org.matsim.utils.vis.kml.KMLWriter;
+import org.matsim.utils.vis.kml.LabelStyle;
+import org.matsim.utils.vis.kml.LineString;
+import org.matsim.utils.vis.kml.LineStyle;
+import org.matsim.utils.vis.kml.LookAt;
+import org.matsim.utils.vis.kml.Placemark;
+import org.matsim.utils.vis.kml.Point;
+import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.fields.Color;
-import org.matsim.utils.vis.kml.*;
 
 public class EgoNetPlansMakeKML {
 
@@ -73,12 +87,12 @@ public class EgoNetPlansMakeKML {
 	public static void setUp(Config config, NetworkLayer network) {
 		EgoNetPlansMakeKML.config=config;
 		if(config.getModule(KML21_MODULE)==null) return;
-		
+
 		System.out.println("    Set up...");
 
 		trafo = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
-	
+
 		mainKMLFilename =
 			config.getParam(KML21_MODULE, CONFIG_OUTPUT_DIRECTORY) +
 			SEP +
@@ -138,7 +152,7 @@ public class EgoNetPlansMakeKML {
 	public static void generateStyles() {
 
 		if(config.getModule(KML21_MODULE)==null) return;
-		
+
 		System.out.println("    generating styles...");
 
 //		agentLinkStyle = new Style("agentLinkStyle");
@@ -244,7 +258,7 @@ public class EgoNetPlansMakeKML {
 	public static void loadData(Person myPerson){
 
 		if(config.getModule(KML21_MODULE)==null) return;
-		
+
 		System.out.println("    loading Plan data. Processing EgoNet ...");
 
 		// load Data into KML folders for myPerson
@@ -308,7 +322,7 @@ public class EgoNetPlansMakeKML {
 		Act act0 = (Act) actLegIter.nextAct();
 		makeActKML(myPerson, act0, agentFolder, agentLinkStyle);
 		while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-			
+
 				Leg leg = (Leg) actLegIter.nextLeg();
 
 				Link[] routeLinks = (leg).getRoute().getLinkRoute();
@@ -578,13 +592,13 @@ public class EgoNetPlansMakeKML {
 		Placemark linkPlacemark = null;
 
 		Node fromNode = link.getFromNode();
-		org.matsim.utils.geometry.CoordImpl fromNodeWorldCoord = fromNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl fromNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
+		Coord fromNodeWorldCoord = fromNode.getCoord();
+		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
 
 		Node toNode = link.getToNode();
-		org.matsim.utils.geometry.CoordImpl toNodeWorldCoord = toNode.getCoord();
-		org.matsim.utils.geometry.CoordImpl toNodeGeometryCoord = (CoordImpl) trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
+		Coord toNodeWorldCoord = toNode.getCoord();
+		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
 		linkPlacemark = new Placemark(
