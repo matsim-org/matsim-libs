@@ -20,11 +20,7 @@
 
 package org.matsim.population;
 
-import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
-import org.matsim.population.Population;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PersonTest extends MatsimTestCase {
@@ -102,7 +98,7 @@ public class PersonTest extends MatsimTestCase {
 		plan5.setScore(18.0);
 		Plan plan6 = new Plan(person);
 		plan6.setScore(21.0);
-		
+
 		plan1.setType(Plan.Type.CAR);
 		plan2.setType(Plan.Type.PT);
 		plan3.setType(Plan.Type.CAR);
