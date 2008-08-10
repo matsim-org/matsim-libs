@@ -49,7 +49,6 @@ import org.matsim.utils.vis.netvis.renderers.LinkSetRendererCOOPERSVehiclesOnly;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererLanes;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererRoutes;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererStuck;
-import org.matsim.utils.vis.netvis.renderers.LinkSetRendererTRANSIMS;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererVolumes;
 import org.matsim.utils.vis.netvis.renderers.NodeSetRenderer;
 import org.matsim.utils.vis.netvis.renderers.RendererA;
@@ -79,25 +78,24 @@ public class NetVis {
     protected NetVis(GeneralConfig generalConfig, VisConfig visConfig,
             String filePrefix) {
 
-        // 1. create network
+    	// 1. create network
 
-        System.out.println("loading network file");
+    	System.out.println("loading network file");
 
-        NetworkLayer networkLayer = new NetworkLayer();
-        new MatsimNetworkReader(networkLayer).readFile(generalConfig.getNetFileName());
+    	NetworkLayer networkLayer = new NetworkLayer();
+    	new MatsimNetworkReader(networkLayer).readFile(generalConfig.getNetFileName());
 
-        System.out.println("composing network");
+    	System.out.println("composing network");
 
-        DisplayNet network = new DisplayNet(networkLayer);
+    	DisplayNet network = new DisplayNet(networkLayer);
 
-        System.out.println("starting visualizer");
+    	System.out.println("starting visualizer");
 
-        // 2. create renderers and (if required) a reader
-        RendererA linkSetRenderer = null;
+    	// 2. create renderers and (if required) a reader
+    	RendererA linkSetRenderer = null;
     	String rendererName = generalConfig.get("LinkSetRenderer");
 
     	if (rendererName == null) linkSetRenderer = new LinkSetRenderer(visConfig, network);
-    	else if (rendererName.equals("LinkSetRendererTRANSIMS")) linkSetRenderer = new LinkSetRendererTRANSIMS(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererVolumes")) linkSetRenderer = new LinkSetRendererVolumes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererLanes")) linkSetRenderer = new LinkSetRendererLanes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererStuck")) linkSetRenderer = new LinkSetRendererStuck(visConfig, network);
@@ -105,46 +103,46 @@ public class NetVis {
     	else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) linkSetRenderer = new LinkSetRendererCOOPERSVehiclesOnly(visConfig, network);
     	else linkSetRenderer = new LinkSetRenderer(visConfig, network);
 
-       RendererA backgroundRenderer = new BackgroundRenderer(visConfig);
-        NodeSetRenderer nodeSetRenderer = new NodeSetRenderer(visConfig,network);
+    	RendererA backgroundRenderer = new BackgroundRenderer(visConfig);
+    	NodeSetRenderer nodeSetRenderer = new NodeSetRenderer(visConfig,network);
 
-        final RendererA mainRenderer = new LabelRenderer(visConfig, network);
-        mainRenderer.append(linkSetRenderer);
-        linkSetRenderer.append(nodeSetRenderer);
-        nodeSetRenderer.append(backgroundRenderer);
+    	final RendererA mainRenderer = new LabelRenderer(visConfig, network);
+    	mainRenderer.append(linkSetRenderer);
+    	linkSetRenderer.append(nodeSetRenderer);
+    	nodeSetRenderer.append(backgroundRenderer);
 
-       DisplayNetStateReader reader = openNetVisReader(network, filePrefix);
+    	DisplayNetStateReader reader = openNetVisReader(network, filePrefix);
 
-        // ----- 1. create frame -----
+    	// ----- 1. create frame -----
 
-        vizFrame = new JFrame(filePrefix != null ? filePrefix : "");
-        vizFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JFrame.setDefaultLookAndFeelDecorated(true);
+    	vizFrame = new JFrame(filePrefix != null ? filePrefix : "");
+    	vizFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	JFrame.setDefaultLookAndFeelDecorated(true);
 
-        // ----- 2. create control bar -----
+    	// ----- 2. create control bar -----
 
-        buttonComponent = new ControlToolbar(this, network, reader, visConfig);
-        vizFrame.getContentPane().add(buttonComponent, BorderLayout.NORTH);
+    	buttonComponent = new ControlToolbar(this, network, reader, visConfig);
+    	vizFrame.getContentPane().add(buttonComponent, BorderLayout.NORTH);
 
-        if (rendererName != null) {
-        	if (rendererName.equals("LinkSetRendererVolumes")) ((LinkSetRendererVolumes)linkSetRenderer).setControlToolbar(buttonComponent);
-        	else if (rendererName.equals("LinkSetRendererLanes")) ((LinkSetRendererLanes)linkSetRenderer).setControlToolbar(buttonComponent);
-        	else if (rendererName.equals("LinkSetRendererStuck")) ((LinkSetRendererStuck)linkSetRenderer).setControlToolbar(buttonComponent);
-        	else if (rendererName.equals("LinkSetRendererRoutes")) ((LinkSetRendererRoutes)linkSetRenderer).setControlToolbar(buttonComponent);
-        	else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) ((LinkSetRendererCOOPERSVehiclesOnly)linkSetRenderer).setControlToolbar(buttonComponent);
-        }
+    	if (rendererName != null) {
+    		if (rendererName.equals("LinkSetRendererVolumes")) ((LinkSetRendererVolumes)linkSetRenderer).setControlToolbar(buttonComponent);
+    		else if (rendererName.equals("LinkSetRendererLanes")) ((LinkSetRendererLanes)linkSetRenderer).setControlToolbar(buttonComponent);
+    		else if (rendererName.equals("LinkSetRendererStuck")) ((LinkSetRendererStuck)linkSetRenderer).setControlToolbar(buttonComponent);
+    		else if (rendererName.equals("LinkSetRendererRoutes")) ((LinkSetRendererRoutes)linkSetRenderer).setControlToolbar(buttonComponent);
+    		else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) ((LinkSetRendererCOOPERSVehiclesOnly)linkSetRenderer).setControlToolbar(buttonComponent);
+    	}
 
-        // 4. ----- create component serving as drawing area -----
+    	// 4. ----- create component serving as drawing area -----
 
-        networkComponent = new NetJComponent(network, mainRenderer, visConfig);
-        mainRenderer.setTargetComponent(networkComponent);
-        networkScrollPane = new NetVisScrollPane(networkComponent);
-        // networkScrollPane.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
-        vizFrame.getContentPane().add(networkScrollPane, BorderLayout.CENTER);
-        VisMouseHandler handi = new VisMouseHandler();
-        networkScrollPane.addMouseMotionListener(handi);
-        networkScrollPane.addMouseListener(handi);
-        networkScrollPane.getViewport().addChangeListener(handi);
+    	networkComponent = new NetJComponent(network, mainRenderer, visConfig);
+    	mainRenderer.setTargetComponent(networkComponent);
+    	networkScrollPane = new NetVisScrollPane(networkComponent);
+    	// networkScrollPane.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
+    	vizFrame.getContentPane().add(networkScrollPane, BorderLayout.CENTER);
+    	VisMouseHandler handi = new VisMouseHandler();
+    	networkScrollPane.addMouseMotionListener(handi);
+    	networkScrollPane.addMouseListener(handi);
+    	networkScrollPane.getViewport().addChangeListener(handi);
     }
 
     protected NetVis(String generalConfigFile, String visConfigFile,
