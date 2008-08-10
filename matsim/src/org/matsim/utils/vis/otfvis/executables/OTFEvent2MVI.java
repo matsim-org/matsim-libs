@@ -65,6 +65,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 
 	public static void main(String[] args) {
 
+		// FIXME hard-coded file names
 		if ( args.length==0 )
 			args = new String[] {"../../tmp/studies/berlin-wip/config_ds.xml"};
 
