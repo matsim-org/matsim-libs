@@ -32,15 +32,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.misc.Counter;
 
 /**
- * root class of the population description (plans file)
- *
- * @todo well... 'plans' is a really ugly word for that. it should be
- *   'population' because it is the description of the population. inside each
- *   person there are the infos of the plans (also called the demand) a person
- *   has. At one point this 'plans' should be changed, which then means also
- *   the dtd must change and all the other things which are dependent on that
- *   (i.e. PlansHandlerImplXXX to PopulationHandlerImplXXX, and so on).
- *   Therefore everybody must agree with that!
+ * Root class of the population description (previously also called "plans file")
  */
 public class Population extends BasicPopulationImpl<Person> implements Iterable<Person> {
 
@@ -127,12 +119,12 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 			for (int i=0; i<this.personAlgos.size(); i++) {
 				PersonAlgorithm algo = this.personAlgos.get(i);
 				log.info("running algorithm " + algo.getClass().getName());
-				Counter counter = new Counter(" person # ");
+				Counter cntr = new Counter(" person # ");
 				for (Person person : this.persons.values()) {
-					counter.incCounter();
+					cntr.incCounter();
 					algo.run(person);
 				}
-				counter.incCounter();
+				cntr.incCounter();
 				log.info("done running algorithm.");
 			}
 		} else {
