@@ -574,7 +574,6 @@ public class QueueLink {
 
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
-			veh.setSpeed(speed);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, queueEnd,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
@@ -616,7 +615,6 @@ public class QueueLink {
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
-			veh.setSpeed(speed);
 			int lane = 1 + (veh.getID() % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, distanceOnLink,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());

@@ -91,14 +91,6 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	}
 
 	/**
-	 * @see org.matsim.mobsim.queuesim.Vehicle#getCurrentLegNumber()
-	 */
-	@Override
-	public int getCurrentLegNumber() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
-
-	/**
 	 * @see org.matsim.mobsim.queuesim.Vehicle#getDriver()
 	 */
 	@Override
@@ -135,14 +127,6 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public double getPosInLink_m() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
-
-	/**
-	 * @see org.matsim.mobsim.queuesim.Vehicle#getSpeed()
-	 */
-	@Override
-	public double getSpeed() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 

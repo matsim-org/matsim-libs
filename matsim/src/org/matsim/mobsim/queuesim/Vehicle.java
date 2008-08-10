@@ -43,7 +43,6 @@ public class Vehicle implements DrawableAgentI {
 	protected String driverId;
 	private int currentNodeIndex;
 	private int nextActivity = 0;
-	private double speed = 0.0;
 	private double currentDepartureTime = 0;
 	private double lastMovedTime = 0;
 
@@ -57,13 +56,6 @@ public class Vehicle implements DrawableAgentI {
 	private final static Logger log = Logger.getLogger(Vehicle.class);
 
 	private final int id = globalID++; // TODO change to IdI instead of int
-
-	/**
-	 * @return zero-based leg number.
-	 */
-	public int getCurrentLegNumber() {
-		return ((this.nextActivity - 2)/ 2);
-	}
 
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
@@ -219,20 +211,6 @@ public class Vehicle implements DrawableAgentI {
 		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driverId
 				+ ", on link " + this.currentLink.getId() + ", routeindex: " + this.currentNodeIndex
 				+ ", next activity#: " + this.nextActivity;
-	}
-
-	/**
-	 * @return Returns the speed.
-	 */
-	public double getSpeed() {
-		return this.speed;
-	}
-
-	/**
-	 * @param speed The speed to set.
-	 */
-	public void setSpeed(final double speed) {
-		this.speed = speed;
 	}
 
 	/**

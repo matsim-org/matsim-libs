@@ -405,7 +405,6 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
-			veh.setSpeed(speed);
 
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), queueEnd,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
@@ -447,7 +446,6 @@ public class PseudoLink implements Comparable<PseudoLink>{
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
-			veh.setSpeed(speed);
 			int lane = this.lane;
 			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), distanceOnLink,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
