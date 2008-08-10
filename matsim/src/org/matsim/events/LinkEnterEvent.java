@@ -27,12 +27,12 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class LinkEnterEvent extends LinkEvent {
 
-	public LinkEnterEvent(final double time, final String agentId, final int legNumber, final String linkId, final Person agent, final Link link) {
-		super(time, agentId, linkId, agent, legNumber, link);
+	public LinkEnterEvent(final double time, final Person agent, final Link link, final int legNumber) {
+		super(time, agent, link, legNumber);
 	}
 
-	public LinkEnterEvent(final double time, final String agentId, final int legNumber, final String linkId) {
-		super(time, agentId, legNumber, linkId);
+	public LinkEnterEvent(final double time, final String agentId, final String linkId, final int legNumber) {
+		super(time, agentId, linkId, legNumber);
 	}
 
 	@Override

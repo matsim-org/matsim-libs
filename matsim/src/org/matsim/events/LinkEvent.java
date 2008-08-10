@@ -35,14 +35,14 @@ public abstract class LinkEvent extends BasicEvent {
 	 */
 	public int legId;
 
-	LinkEvent(final double time, final String agentId, final String linkId, final Person agent, final int legNumber, final Link link) {
-		super(time, agentId, agent);
+	LinkEvent(final double time, final Person agent, final Link link, final int legNumber) {
+		super(time, agent);
 		this.legId = legNumber;
-		this.linkId = linkId;
 		this.link = link;
+		this.linkId = link.getId().toString();
 	}
 
-	LinkEvent(final double time, final String agentId, final int legNumber, final String linkId) {
+	LinkEvent(final double time, final String agentId, final String linkId, final int legNumber) {
 		super(time, agentId);
 		this.legId = legNumber;
 		this.linkId = linkId;

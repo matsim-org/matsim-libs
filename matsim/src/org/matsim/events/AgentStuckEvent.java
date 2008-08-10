@@ -28,12 +28,12 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class AgentStuckEvent extends AgentEvent {
 
-	public AgentStuckEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
-		super(time, agentId, legId, linkId, agent, leg, link);
+	public AgentStuckEvent(double time, Person agent, Link link, Leg leg) {
+		super(time, agent, link, leg);
 	}
 
-	public AgentStuckEvent(double time, String agentId, int legId, String linkId) {
-		super(time, agentId, legId, linkId);
+	public AgentStuckEvent(double time, String agentId, String linkId, int legId) {
+		super(time, agentId, linkId, legId);
 	}
 
 	@Override

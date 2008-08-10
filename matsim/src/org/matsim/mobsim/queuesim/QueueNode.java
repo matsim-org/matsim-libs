@@ -66,7 +66,7 @@ public class QueueNode {
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
-		 * the nodes are sorted to avoid indeterministic simulations. dg[april08] 
+		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
 		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
 			public int compare(final QueueLink o1, final QueueLink o2) {
@@ -115,9 +115,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getId().toString(), 
-									veh.getCurrentLegNumber(), currentLink.getId().toString(), 
-									veh.getDriver(), veh.getCurrentLeg(), currentLink));
+							new AgentStuckEvent(now, veh.getDriver(), currentLink, veh.getCurrentLeg()));
 				}
 				else {
 					currentQueueLink.popFirstFromBuffer();
@@ -135,7 +133,7 @@ public class QueueNode {
 		Simulation.incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-						+ " currentLegNumber=" + veh.getCurrentLegNumber()
+						+ " currentLegNumber=" + veh.getCurrentLeg().getNum()
 						+ " currentLink=" + currentLink.getId().toString()
 						+ ". The agent is removed from the simulation.");
 		return true;

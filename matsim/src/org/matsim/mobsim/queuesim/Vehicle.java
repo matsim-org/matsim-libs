@@ -291,7 +291,7 @@ public class Vehicle implements DrawableAgentI {
 	 */
 	protected void leaveActivity(final double now) {
 		Act act = (Act)this.actslegs.get(this.nextActivity - 2);
-		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.driverId, this.driver, this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.driver, this.currentLink, act));
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class Vehicle implements DrawableAgentI {
 	 protected void reachActivity(final double now, QueueLink currentQueueLink) {
 		Act act = (Act)this.actslegs.get(this.nextActivity);
 		// no actStartEvent for first act.
-		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.driverId, this.driver, this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.driver, this.currentLink, act));
 		// 	 this is the starting point for our vehicle, so put it in the queue
 		if (!initNextLeg()) {
 			Simulation.decLiving();

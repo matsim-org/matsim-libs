@@ -31,15 +31,15 @@ public class QLink extends QueueLink {
 
 	private ArrayList<PseudoLink> pseudoLinksList = new ArrayList<PseudoLink>();
 	private ArrayList<PseudoLink> nodePseudoLinksList;
-	
+
 
 	/** FreeLinkTravelTime */
 	private double freeSpeedTT;
 	private double effectiveCelleSize;
-	
+
 	public QLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		super(l, queueNetwork, toNode);
-		
+
 		this.effectiveCelleSize = queueNetwork.getNetworkLayer().getEffectiveCellSize();
 
 		this.freeSpeedTT = this.getLink().getLength() / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
@@ -64,7 +64,7 @@ public class QLink extends QueueLink {
 	/** Adds a vehicle to the parkingQueue */
 	public void addVehicle2ParkingQueue(QVehicle veh) {
 		this.originalLink.addVehicle2ParkingQueue(veh);
-	}	
+	}
 
 	@Override
 	public void addParking(Vehicle veh) {
@@ -92,39 +92,39 @@ public class QLink extends QueueLink {
 
 	@Override
 	public void add(final Vehicle veh) {
-		
+
 		double now = SimulationTimer.getTime();
 		activateLink();
 		veh.setCurrentLink(this.getLink());
 		this.originalLink.addVehicle((QVehicle)veh);
-				
+
 //		veh.setDepartureTime_s((int) (now + this.originalLink.getFreeSpeedTravelTime()));
 		QSim.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getId().toString(),	veh.getCurrentLegNumber(),
-						this.getLink().getId().toString(), veh.getDriver(), this.getLink()));
+				new LinkEnterEvent(now, veh.getDriver(),
+						this.getLink(), veh.getCurrentLeg().getNum()));
 	}
 
-	public List<PseudoLink> getNodePseudoLinks(){		
+	public List<PseudoLink> getNodePseudoLinks(){
 		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
 			return this.pseudoLinksList;
 		} else {
 			return this.nodePseudoLinksList;
 		}
 	}
-	
-	public List<PseudoLink> getNodePseudoLinks(List<Link> destLinks){		
-		
+
+	public List<PseudoLink> getNodePseudoLinks(List<Link> destLinks){
+
 		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
 			return this.pseudoLinksList;
 		}
-		
+
 		List<PseudoLink> returnPseudoLinkList = new ArrayList<PseudoLink>();
 		for (PseudoLink pseudoLink : this.nodePseudoLinksList) {
 			for (Link destLink : destLinks) {
 				if(pseudoLink.getDestLinks().contains(destLink)){
 					returnPseudoLinkList.add(pseudoLink);
 				}
-			}			
+			}
 		}
 		return returnPseudoLinkList;
 	}
@@ -132,7 +132,7 @@ public class QLink extends QueueLink {
 	public void reconfigure(TrafficLightsManager trafficLightsManager) {
 
 		boolean firstNodeLinkInitialized = false;
-		
+
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 		for (SignalLane signalLane : trafficLightsManager.getFromLanes(this.getLink().getId())) {
@@ -212,51 +212,51 @@ public class QLink extends QueueLink {
 
 		resortPseudoLinks();
 	}
-	
+
 	private void resortPseudoLinks(){
 		this.nodePseudoLinksList = new ArrayList<PseudoLink>();
 
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			if (pseudoLink.getMeterFromLinkEnd() == 0){
-				this.nodePseudoLinksList.add(pseudoLink);								
+				this.nodePseudoLinksList.add(pseudoLink);
 			}
 		}
-		
+
 		Collections.sort(this.pseudoLinksList);
-		
+
 //		for (PseudoLink pseudoLink : nodePseudoLinksList){
 //			this.pseudoLinksList.remove(pseudoLink);
 //		}
 	}
-	
+
 	private void addUTurn(){
-		
+
 		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
-			
+
 			if((outLink.getToNode().equals(this.getLink().getFromNode()))){
-				
+
 				PseudoLink tempPseudoLink = null;
 				for (PseudoLink pseudoLink : this.pseudoLinksList) {
-					
+
 					if( tempPseudoLink == null || (pseudoLink.lane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
 						tempPseudoLink = pseudoLink;
-					}	
-										
+					}
+
 				}
-				
+
 				tempPseudoLink.addDestLink(outLink);
-				this.originalLink.addDestLink(outLink);	
-				
+				this.originalLink.addDestLink(outLink);
+
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	private void findLayout(){
-		
+
 		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
-		
+
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			int lane = 1;
 			for (Link link : result.values()) {
@@ -266,21 +266,21 @@ public class QLink extends QueueLink {
 				} else {
 					lane++;
 				}
-			}			
-		}		
+			}
+		}
 	}
-	
+
 	@Override
 	public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
 		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
 		if ("queue".equals(snapshotStyle)) {
-			getVehiclePositionsQueue(positions);			
+			getVehiclePositionsQueue(positions);
 		} else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
 		}
 		return positions;
 	}
-	
+
 	/**
 	 * Calculates the positions of all vehicles on this link according to the
 	 * queue-logic: Vehicles are placed on the link according to the ratio between
@@ -293,10 +293,10 @@ public class QLink extends QueueLink {
 	 */
 	@Override
 	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
-		
+
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			pseudoLink.getVehPositions(positions);
-		}		
-		
+		}
+
 	}
 }

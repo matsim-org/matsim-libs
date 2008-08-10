@@ -28,8 +28,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class ActEndEvent extends ActEvent {
 
-	public ActEndEvent(double time, String agentId, Person agent, Link link, Act act) {
-		super(time, agentId, agent, link, act);
+	public ActEndEvent(double time, Person agent, Link link, Act act) {
+		super(time, agent, link, act);
 	}
 
 	public ActEndEvent(double time, String agentId, String linkId, int actId, String acttype) {
@@ -39,7 +39,6 @@ public class ActEndEvent extends ActEvent {
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(8));
 		impl.addAttribute("","","type", "", "actend");
 		return impl;
 	}

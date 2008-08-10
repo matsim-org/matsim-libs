@@ -28,12 +28,12 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class AgentWait2LinkEvent extends AgentEvent {
 
-	public AgentWait2LinkEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
-		super(time, agentId, legId, linkId, agent, leg, link);
+	public AgentWait2LinkEvent(double time, Person agent, Link link, Leg leg) {
+		super(time, agent, link, leg);
 	}
 
-	public AgentWait2LinkEvent(double time, String aId, int legId, String linkId) {
-		super(time, aId, legId, linkId);
+	public AgentWait2LinkEvent(double time, String agentId, String linkId, int legId) {
+		super(time, agentId, linkId, legId);
 	}
 
 	@Override

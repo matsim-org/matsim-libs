@@ -34,8 +34,8 @@ abstract class ActEvent extends BasicEvent {
 	public transient Link link;
 	public transient Act act;
 
-	ActEvent(final double time, final String agentId, final Person agent, final Link link, final Act act) {
-		super(time, agentId,agent);
+	ActEvent(final double time, final Person agent, final Link link, final Act act) {
+		super(time, agent);
 		this.act = act;
 		this.link = link;
 		this.linkId = link.getId().toString();

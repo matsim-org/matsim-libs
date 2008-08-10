@@ -71,13 +71,12 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		String linkId = atts.getValue("link");
 		int activity = optionalParseInt(atts.getValue("activity"));
 		String acttype = atts.getValue("act_type");
-		int nodeId = 0; //Integer.parseInt(atts.getValue("fromNode"));
 		int flag = getFlagFromName(atts.getValue("type"));
 		String desc = "";
 		if ("agentUtility".equals(atts.getValue("type"))) {
 			desc = atts.getValue("amount");
 		}
-		EventsReaderTXTv1.createEvent(this.events, time, vehId, legNumber, linkId, nodeId, flag, desc, activity, acttype);
+		EventsReaderTXTv1.createEvent(this.events, time, vehId, legNumber, linkId, flag, desc, activity, acttype);
 	}
 
 	/**

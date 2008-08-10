@@ -28,18 +28,17 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class AgentArrivalEvent extends AgentEvent {
 
-	public AgentArrivalEvent(double time, String agentId, int legId, String linkId, Person agent, Leg leg, Link link) {
-		super(time, agentId, legId, linkId, agent, leg, link);
+	public AgentArrivalEvent(double time, Person agent, Link link, Leg leg) {
+		super(time, agent, link, leg);
 	}
 
-	public AgentArrivalEvent(double time, String agentId, int legId, String linkId) {
-		super(time, agentId, legId, linkId);
+	public AgentArrivalEvent(double time, String agentId, String linkId, int legId) {
+		super(time, agentId, linkId, legId);
 	}
 
 	@Override
 	public Attributes getAttributes() {
 		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(0));
 		impl.addAttribute("","","type", "", "arrival");
 		return impl;
 	}

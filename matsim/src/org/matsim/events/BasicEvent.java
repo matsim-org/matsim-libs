@@ -39,10 +39,6 @@ public abstract class BasicEvent {
 		this.agentId = agent.getId().toString();
 	}
 
-	BasicEvent(final double time, final String agentId, final Person agent) {
-		this(time, agent);
-	}
-
 	BasicEvent(final double time, final String agentId) {
 		this.time = time;
 		this.agentId = agentId;

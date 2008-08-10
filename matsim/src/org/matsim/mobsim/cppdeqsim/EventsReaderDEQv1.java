@@ -158,19 +158,19 @@ public class EventsReaderDEQv1 {
 
 		switch (flag) {
 			case 2:
-				event = new LinkLeaveEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new LinkLeaveEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
 				break;
 			case 5:
-				event = new LinkEnterEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new LinkEnterEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
 				break;
 			case 4:
-				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentWait2LinkEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
 				break;
 			case 6:
-				event = new AgentDepartureEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentDepartureEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
 				break;
 			case 0:
-				event = new AgentArrivalEvent(time, Integer.toString(agentID), legNumber, Integer.toString(linkID));
+				event = new AgentArrivalEvent(time, Integer.toString(agentID), Integer.toString(linkID), legNumber);
 				break;
 		}
 		return event;

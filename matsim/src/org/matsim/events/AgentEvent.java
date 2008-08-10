@@ -27,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public abstract class AgentEvent extends BasicEvent {
 
-	//includes data about the agent and agent internalss like legnumber, etc
+	//includes data about the agent and agent internals like legnumber, etc
 	public int legId;
 	public transient Leg leg;
 
@@ -35,15 +35,15 @@ public abstract class AgentEvent extends BasicEvent {
 	public transient Link link;
 
 
-	AgentEvent(final double time, final String agentId, final int legId,  final String linkId, final Person agent, final Leg leg, final Link link) {
-		super(time, agentId, agent);
-		this.legId = legId;
+	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
+		super(time, agent);
 		this.leg = leg;
-		this.linkId = linkId;
+		this.legId = leg.getNum();
 		this.link = link;
+		this.linkId = link.getId().toString();
 	}
 
-	AgentEvent(final double time, final String agentId, final int legId, final String linkId) {
+	AgentEvent(final double time, final String agentId, final String linkId, final int legId) {
 		super(time, agentId);
 		this.legId = legId;
 		this.linkId = linkId;

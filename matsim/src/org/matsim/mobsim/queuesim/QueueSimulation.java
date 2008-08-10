@@ -257,9 +257,7 @@ public class QueueSimulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Vehicle veh : teleportationList) {
-			new AgentStuckEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
-					veh.getCurrentLink().getId().toString(), veh.getDriver(),
-					veh.getCurrentLeg(), veh.getCurrentLink());
+			new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg());
 		}
 		teleportationList.clear();
 
@@ -353,8 +351,8 @@ public class QueueSimulation {
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getId().toString(), veh.getCurrentLegNumber(),
-						veh.getCurrentLink().getId().toString(), veh.getDriver(), veh.getCurrentLeg(), veh.getCurrentLink()));
+				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver(),
+						veh.getCurrentLink(), veh.getCurrentLeg()));
 	  			veh.reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 
 	  		} else break;

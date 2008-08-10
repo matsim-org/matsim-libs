@@ -66,8 +66,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 		
 		// this gives a delay of 36s
-		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, 0, LINK_ID);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, 0, LINK_ID);
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, LINK_ID, 0);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, LINK_ID, 0);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -77,8 +77,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		assertEquals(depDelay, 36.0);
 		
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, 0, LINK_ID);
-		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, 0, LINK_ID);
+		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, LINK_ID, 0);
+		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, LINK_ID, 0);
 		
 		for (BasicEvent event : new BasicEvent[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
