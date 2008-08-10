@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -27,7 +27,6 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -41,11 +40,6 @@ import org.matsim.utils.CRCChecksum;
 import org.matsim.world.World;
 
 public class RoutingTest extends MatsimTestCase {
-
-	private boolean initRan = false;
-	private long referenceChecksum = -1L;
-	private NetworkLayer network = null;
-	private Population population = null;
 
 	/*package*/ static final Logger log = Logger.getLogger(RoutingTest.class);
 
@@ -112,68 +106,42 @@ public class RoutingTest extends MatsimTestCase {
 
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
-		init(config, Gbl.createWorld());
+		World world = Gbl.createWorld();
+
+		NetworkLayer network = (NetworkLayer) world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+
+		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
+		Population population = new Population(Population.NO_STREAMING);
+		new MatsimPopulationReader(population).readFile(inPlansName);
+		population.printPlansCount();
+		long referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
+		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
 
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
-		calcRoute(provider, this.network, this.population);
-		PopulationWriter plansWriter = new PopulationWriter(this.population, outPlansName,
+		calcRoute(provider, network, population);
+		PopulationWriter plansWriter = new PopulationWriter(population, outPlansName,
 				config.plans().getOutputVersion());
 		plansWriter.write();
 		final long routerChecksum = CRCChecksum.getCRCFromGZFile(outPlansName);
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
-		assertEquals(this.referenceChecksum, routerChecksum);
-		System.out.println();
+		assertEquals(referenceChecksum, routerChecksum);
 	}
 
-	private void init(final Config config, final World world) {
-		if (this.initRan) return;
-
-		this.network = readNetwork(config.network().getInputFile(), world);
-		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		this.population = readPlans(inPlansName);
-		this.referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
-		System.out.println("Reference checksum = " + this.referenceChecksum + " file: " + inPlansName);
-		System.out.println();
-
-		this.initRan = true;
-	}
-
-	private Population readPlans(final String inPlansName) {
-		Population plans = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(inPlansName);
-		return plans;
-	}
-
-	private NetworkLayer readNetwork(final String filename, final World world) {
-		System.out.println("  reading the network...");
-		NetworkLayer network = (NetworkLayer) world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(filename);
-		System.out.println("  done.");
-		return network;
-	}
-
-	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final Population plans) {
-
-		System.out.println("### calcRoute with router " + provider.getName());
+	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final Population population) {
+		log.info("### calcRoute with router " + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
 		PlansCalcRoute router = null;
 		router = new PlansCalcRoute(routingAlgo, routingAlgo);
-		plans.addAlgorithm(router);
 		long now = System.currentTimeMillis();
-		plans.printPlansCount();
-		if (!plans.isStreaming()) {
-			now = System.currentTimeMillis();
-			plans.runAlgorithms();
-		}
-		plans.clearAlgorithms();
+		router.run(population);
 
-		System.out.println("Elapsed time for routing using " +
-				routingAlgo.getClass().getName() + ":\n" +
+		log.info("Elapsed time for routing using " +
+				routingAlgo.getClass().getName() + ": " +
 				Gbl.printTimeDiff(System.currentTimeMillis(), now));
 
 		if (routingAlgo instanceof Dijkstra) {
