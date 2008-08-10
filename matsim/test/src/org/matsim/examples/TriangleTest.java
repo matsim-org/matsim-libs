@@ -189,9 +189,7 @@ public class TriangleTest extends MatsimTestCase {
 		System.out.println();
 
 		System.out.println("  running plans algorithms... ");
-		plans.clearAlgorithms();
-		plans.addAlgorithm(new PersonCreatePlanFromKnowledge());
-		plans.runAlgorithms();
+		new PersonCreatePlanFromKnowledge().run(plans);
 		System.out.println("  done.");
 
 		System.out.println();
