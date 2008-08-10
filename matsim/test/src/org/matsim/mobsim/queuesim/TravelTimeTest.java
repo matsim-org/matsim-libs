@@ -26,12 +26,11 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -43,17 +42,23 @@ public class TravelTimeTest extends MatsimTestCase implements
 
   private Map<Id, Map<Id, Double>> agentTravelTimes;
 
+  @Override
+  protected void tearDown() throws Exception {
+  	this.agentTravelTimes = null;
+  	super.tearDown();
+  }
+
 	public void testEquilOneAgent() {
 		this.agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
 		Config conf = loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans1.xml";
 
 		conf.plans().setInputFile(popFileName);
-		
+
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
-		
+
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));
@@ -71,11 +76,11 @@ public class TravelTimeTest extends MatsimTestCase implements
 		String popFileName = "test/scenarios/equil/plans2.xml";
 
 		conf.plans().setInputFile(popFileName);
-		
+
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
-		
+
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(new IdImpl("1"));

@@ -25,20 +25,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsSimRealPerHourGraphTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsSimRealPerHourGraphTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testCreateChart() {
-		CountsSimRealPerHourGraph eg = new CountsSimRealPerHourGraph(this.fixture.ceateCountSimCompList(), 1, "testCreateChart");
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		CountsSimRealPerHourGraph eg = new CountsSimRealPerHourGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 }

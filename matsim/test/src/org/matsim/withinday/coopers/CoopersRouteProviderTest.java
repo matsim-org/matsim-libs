@@ -53,13 +53,18 @@ public class CoopersRouteProviderTest extends TestCase {
 
 	private Route route2;
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.network = this.loadNetwork(networkFile);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		this.network = null;
+		this.route1 = null;
+		this.route2 = null;
+		super.tearDown();
 	}
 
 	private NetworkLayer loadNetwork(final String filename) {

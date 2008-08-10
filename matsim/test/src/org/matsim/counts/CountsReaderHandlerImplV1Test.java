@@ -25,18 +25,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 
-	private AttributeFactory attributeFactory = null;
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.attributeFactory = new AttributeFactory();
-	}
-
 	public void testSECounts() {
+		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.startTag("counts", this.attributeFactory.createCountsAttributes(), null);
+		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
 
 		assertEquals("Counts attribute setting failed", "testName", counts.getName());
 		assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
@@ -45,21 +38,23 @@ public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 	}
 
 	public void testSECount() {
+		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
 
-		reader.startTag("counts", this.attributeFactory.createCountsAttributes(), null);
-		reader.startTag("count", this.attributeFactory.createCountAttributes(), null);
+		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
+		reader.startTag("count", attributeFactory.createCountAttributes(), null);
 
 		assertEquals("Count attribute setting failed", "testNr", counts.getCount(new IdImpl(1)).getCsId());
 	}
 
 	public void testSEVolume() {
+		AttributeFactory attributeFactory = new AttributeFactory();
 		final Counts counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.startTag("counts", this.attributeFactory.createCountsAttributes(), null);
-		reader.startTag("count", this.attributeFactory.createCountAttributes(), null);
-		reader.startTag("volume", this.attributeFactory.createVolumeAttributes(), null);
+		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
+		reader.startTag("count", attributeFactory.createCountAttributes(), null);
+		reader.startTag("volume", attributeFactory.createVolumeAttributes(), null);
 
 		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(new IdImpl(1)).getVolume(1).getValue(), EPSILON);
 	}

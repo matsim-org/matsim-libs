@@ -27,21 +27,12 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsComparisonAlgorithmTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testCompare() {
-		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.run(this.fixture.counts);
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		CountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.run(fixture.counts);
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 
@@ -54,9 +45,12 @@ public class CountsComparisonAlgorithmTest extends MatsimTestCase {
 	}
 
 	public void testDistanceFilter() {
-		CountsComparisonAlgorithm cca = this.fixture.getCCA();
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		CountsComparisonAlgorithm cca = fixture.getCCA();
 		cca.setDistanceFilter(Double.valueOf(0.5), "1");
-		cca.run(this.fixture.counts);
+		cca.run(fixture.counts);
 
 		List<CountSimComparison> csc_list = cca.getComparison();
 		assertEquals("Distance filter not working", 0, csc_list.size());

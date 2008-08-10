@@ -25,7 +25,7 @@ import java.io.File;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.geometry.transformations.IdentityTransformation;
 
 /**
  * Tests if some graphs are created.
@@ -33,26 +33,16 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
  */
 public class CountsKMLWriterTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsKMLWriterTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testKMLCreation() {
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
 
-		CountsComparisonAlgorithm cca=this.fixture.getCCA();
-		cca.run(this.fixture.counts);
-		
+		CountsComparisonAlgorithm cca=fixture.getCCA();
+		cca.run(fixture.counts);
+
 		String filename = this.getOutputDirectory() + "countscompare.kmz";
 		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-				cca.getComparison(), this.fixture.getNetwork(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84 ));
+				cca.getComparison(), fixture.getNetwork(), new IdentityTransformation());
 		kmlWriter.setIterationNumber(0);
 		kmlWriter.writeFile(filename);
 

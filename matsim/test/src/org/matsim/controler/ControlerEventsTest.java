@@ -38,25 +38,28 @@ import org.matsim.utils.io.IOUtils;
  */
 public class ControlerEventsTest extends MatsimTestCase {
 
-	private String configfile = null;
-	private Config config = null;
-
-	private List<Integer> calledStartupListener = new ArrayList<Integer>(3);
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.configfile = getClassInputDirectory() + "config.xml";
-		this.config = loadConfig(this.configfile);
-	}
+	private List<Integer> calledStartupListener = null;
 
 	void addCalledStartupListenerNumber(int i) {
 		this.calledStartupListener.add(i);
 	}
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.calledStartupListener = new ArrayList<Integer>(3);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		this.calledStartupListener = null;
+	}
 
 	public void testCoreListenerExecutionOrder() {
-		Controler controler = new Controler(this.config);
+		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+
+		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
@@ -72,7 +75,9 @@ public class ControlerEventsTest extends MatsimTestCase {
 	}
 
 	public void testEvents() {
-		Controler controler = new Controler(this.config);
+		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+
+		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
@@ -97,7 +102,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 		// prepare remove test
 		Gbl.reset();
-		controler = new Controler(this.config);
+		controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		listener = new ControlerEventsTestListener(1, this);
 		// we know from the code above, that "add" works
@@ -106,7 +111,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		controler.removeControlerListener(listener);
 
 		// clear directory to run with same config again...
-		String outPath = this.config.controler().getOutputDirectory();
+		String outPath = config.controler().getOutputDirectory();
 		File outDir = new File(outPath);
 		IOUtils.deleteDirectory(outDir);
 

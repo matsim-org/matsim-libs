@@ -25,20 +25,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsLoadCurveGraphTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsLoadCurveGraphTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testCreateChart() {
-		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(this.fixture.ceateCountSimCompList(), 1, "testCreateChart");
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 }

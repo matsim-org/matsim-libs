@@ -32,41 +32,32 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class OutputDelegateTest extends MatsimTestCase {
 
-	private CountsSimRealPerHourGraph sg = null;
-	private CountsFixture fixture = null;
+	public void testOutPutAll() {
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
 
-	public OutputDelegateTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-
+		CountsSimRealPerHourGraph sg = null;
 		List<CountSimComparison> countSimCompList=new Vector<CountSimComparison>();
 		for (int i=0; i<24; i++) {
 			countSimCompList.add(new CountSimComparisonImpl(new IdImpl(i+1), 1, 1.0, 1.0));
-		}//for
-		this.sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
-	}
+		}
+		sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
 
-	public void testOutPutAll() {
-		new File(this.getOutputDirectory() + "graphs").mkdir();
-		new File(this.getOutputDirectory() + "graphs/pdf").mkdir();
-		new File(this.getOutputDirectory() + "graphs/png").mkdir();
-		OutputDelegate outputDelegate=new OutputDelegate(this.getOutputDirectory() + "graphs/");
+		new File(getOutputDirectory() + "graphs").mkdir();
+		new File(getOutputDirectory() + "graphs/pdf").mkdir();
+		new File(getOutputDirectory() + "graphs/png").mkdir();
+		OutputDelegate outputDelegate=new OutputDelegate(getOutputDirectory() + "graphs/");
 		outputDelegate.addSection(new Section("testOutPutAll"));
-		assertNotNull("No graph was created", this.sg.createChart(0));
-		outputDelegate.addCountsGraph(this.sg);
+		assertNotNull("No graph was created", sg.createChart(0));
+		outputDelegate.addCountsGraph(sg);
 		outputDelegate.outPutAll(true, true);
 
-		String filename = this.getOutputDirectory() + "graphs/pdf/" + this.sg.getFilename() +".pdf";
+		String filename = getOutputDirectory() + "graphs/pdf/" + sg.getFilename() +".pdf";
 		File fPdf = new File(filename);
 		assertTrue("The pdf output file " + filename + " doesn't exist", fPdf.exists());
 		assertTrue("The pdf output file " + filename + " is empty", fPdf.length()>0.0);
 
-		filename = this.getOutputDirectory() + "graphs/png/" + this.sg.getFilename() +".png";
+		filename = getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
 		File fPng = new File(filename);
 		assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
 		assertTrue("The png output file " + filename + " is empty", fPng.length()>0.0);

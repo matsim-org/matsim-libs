@@ -20,6 +20,7 @@
 
 package org.matsim.examples;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
@@ -48,22 +49,8 @@ import org.matsim.world.algorithms.WorldValidation;
 
 public class TriangleTest extends MatsimTestCase {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private Config config = null;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public TriangleTest() {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// setup
-	//////////////////////////////////////////////////////////////////////
+	private final static Logger log = Logger.getLogger(TriangleTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
@@ -72,39 +59,45 @@ public class TriangleTest extends MatsimTestCase {
 		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
 	private final void compareOutputWorld() {
-		System.out.println("  comparing input and output world file... ");
+		log.info("  comparing input and output world file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.world().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(this.config.world().getOutputFile());
 		assertEquals("different world files", checksum_ref, checksum_run);
-		System.out.println("  done.");
+		log.info("  done.");
 	}
 
 	private final void checkEnrichedOutputFacilities() {
-		System.out.println("  checksum check of enriched output facilities... ");
+		log.info("  checksum check of enriched output facilities... ");
 		long checksum_facilities = CRCChecksum.getCRCFromFile(this.config.facilities().getOutputFile());
 		assertEquals("different facilities files", TriangleScenario.CHECKSUM_FACILITIES_ENRICHED,checksum_facilities);
-		System.out.println("  done.");
+		log.info("  done.");
 	}
 
 	private final void compareOutputNetwork() {
-		System.out.println("  comparing input and output network file... ");
+		log.info("  comparing input and output network file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.network().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(this.config.network().getOutputFile());
 		assertEquals("different network files", checksum_ref, checksum_run);
-		System.out.println("  done.");
+		log.info("  done.");
 	}
 
 	private final void compareOutputPlans() {
-		System.out.println("  comparing reference and output plans file... ");
+		log.info("  comparing reference and output plans file... ");
 		long checksum_ref = CRCChecksum.getCRCFromGZFile(getInputDirectory() + "plans.xml.gz");
 		long checksum_run = CRCChecksum.getCRCFromGZFile(this.config.plans().getOutputFile());
 		assertEquals("different plans files", checksum_ref, checksum_run);
-		System.out.println("  done.");
+		log.info("  done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -113,114 +106,110 @@ public class TriangleTest extends MatsimTestCase {
 
 	public void testInitDemand() {
 
-		System.out.println("running testParserWriter1()...");
+		log.info("running testParserWriter1()...");
 
 		final World world = Gbl.createWorld();
 
-		System.out.println("  reading world xml file... ");
+		log.info("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  reading facilites xml file as a layer of the world...");
+		log.info("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  reading network xml file... ");
+		log.info("  reading network xml file... ");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("1. VALIDATE AND COMPLETE THE WORLD");
-		System.out.println();
+		log.info("\n");
+		log.info("1. VALIDATE AND COMPLETE THE WORLD");
+		log.info("\n");
 
-		System.out.println("  running world modules... ");
+		log.info("  running world modules... ");
 		new WorldCheck().run(world);
 		new WorldBottom2TopCompletion().run(world);
 		new WorldValidation().run(world);
 		new WorldCheck().run(world);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("2. SUMMARY INFORMATION OF THE NETWORK");
-		System.out.println();
+		log.info("\n");
+		log.info("2. SUMMARY INFORMATION OF THE NETWORK");
+		log.info("\n");
 
-		System.out.println("  running network modules... ");
+		log.info("  running network modules... ");
 		NetworkSummary ns_algo = new NetworkSummary();
 		ns_algo.run(network);
 		new NetworkCalcTopoType().run(network);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
-		System.out.println();
+		log.info("\n");
+		log.info("3. CREATING A POPULATION BASED ON THE NETWORK");
+		log.info("\n");
 
-		System.out.println("  creating plans object... ");
+		log.info("  creating plans object... ");
 		Population plans = new Population(false);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  running plans modules... ");
+		log.info("  running plans modules... ");
 		new PlansCreateFromNetwork(network,ns_algo,2.0).run(plans);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("DEPRECATED: 4. aggregation of facilities! THAT DOES NOT EXIST ANYMORE!");
-		System.out.println();
+		log.info("\n");
+		log.info("4. DEFINE CAPACITIES AND OPENTIMES FOR THE FACILITIES BASED ON THE POPULATION");
+		log.info("\n");
 
-		System.out.println();
-		System.out.println("5. DEFINE CAPACITIES AND OPENTIMES FOR THE FACILITIES BASED ON THE POPULATION");
-		System.out.println();
-
-		System.out.println("  running facilities algorithms... ");
+		log.info("  running facilities algorithms... ");
 		new FacilitiesDefineCapAndOpentime(plans.getPersons().size()).run(facilities);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("6. DEFINE SOME KNOWLEDGE FOR THE POPULATION");
-		System.out.println();
+		log.info("\n");
+		log.info("5. DEFINE SOME KNOWLEDGE FOR THE POPULATION");
+		log.info("\n");
 
-		System.out.println("  running plans algorithms... ");
+		log.info("  running plans algorithms... ");
 		new PlansDefineKnowledge(facilities).run(plans);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("7. CREATE AN INITIAL DAYPLAN FOR EACH PERSON ACCORDING TO THEIR KNOWLEDGE");
-		System.out.println();
+		log.info("\n");
+		log.info("6. CREATE AN INITIAL DAYPLAN FOR EACH PERSON ACCORDING TO THEIR KNOWLEDGE");
+		log.info("\n");
 
-		System.out.println("  running plans algorithms... ");
+		log.info("  running plans algorithms... ");
 		new PersonCreatePlanFromKnowledge().run(plans);
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println();
-		System.out.println("8. WRITING DOWN ALL DATA");
-		System.out.println();
+		log.info("\n");
+		log.info("7. WRITING DOWN ALL DATA");
+		log.info("\n");
 
-		System.out.println("  writing plans xml file... ");
+		log.info("  writing plans xml file... ");
 		new PopulationWriter(plans).write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing network xml file... ");
+		log.info("  writing network xml file... ");
 		new NetworkWriter(network).write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing facilities xml file... ");
+		log.info("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing world xml file... ");
+		log.info("  writing world xml file... ");
 		new WorldWriter(world).write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing config xml file... ");
+		log.info("  writing config xml file... ");
 		new ConfigWriter(this.config).write();
-		System.out.println("  done.");
+		log.info("  done.");
 
 		this.compareOutputPlans();
 		this.compareOutputNetwork();
 		this.checkEnrichedOutputFacilities();
 		this.compareOutputWorld();
 
-		System.out.println("done.");
+		log.info("done.");
 	}
 }

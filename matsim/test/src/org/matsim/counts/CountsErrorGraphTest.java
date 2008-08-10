@@ -25,20 +25,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsErrorGraphTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsErrorGraphTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testCreateChart() {
-		BoxPlotErrorGraph eg = new BoxPlotErrorGraph(this.fixture.ceateCountSimCompList(), 1, "testCreateChart", "testCreateChart");
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		BoxPlotErrorGraph eg = new BoxPlotErrorGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart", "testCreateChart");
 		assertNotNull("No graph is created", eg.createChart(0));
 	}
 }

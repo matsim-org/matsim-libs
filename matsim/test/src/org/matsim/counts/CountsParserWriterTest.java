@@ -23,7 +23,6 @@ package org.matsim.counts;
 import java.io.File;
 import java.util.Iterator;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -31,32 +30,22 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class CountsParserWriterTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsParserWriterTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testParserWriter() {
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
 
 		// PARSER:-----------------------------------------------
 		// Creation and parsing done in fixture_
 
 		// test if required fields of schema are filled out:
 		// Counts:
-		assertNotNull(this.fixture.counts.getCounts());
-		assertTrue(this.fixture.counts.getYear()>2000);
-		assertNotNull(this.fixture.counts.getLayer());
-		assertNotNull(this.fixture.counts.getName());
+		assertNotNull(fixture.counts.getCounts());
+		assertTrue(fixture.counts.getYear()>2000);
+		assertNotNull(fixture.counts.getLayer());
+		assertNotNull(fixture.counts.getName());
 
 		// Count & Volume
-		Iterator<Count> c_it = this.fixture.counts.getCounts().values().iterator();
+		Iterator<Count> c_it = fixture.counts.getCounts().values().iterator();
 		while (c_it.hasNext()) {
 			Count c = c_it.next();
 			assertNotNull(c.getLocId());
@@ -74,7 +63,7 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// check if xml file not empty
 
 		String filename = this.getOutputDirectory() + "output_counts.xml";
-		CountsWriter counts_writer = new CountsWriter(this.fixture.counts, filename);
+		CountsWriter counts_writer = new CountsWriter(fixture.counts, filename);
 		counts_writer.write();
 		File f = new File(filename);
 		assertTrue(f.length() > 0.0);

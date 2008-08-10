@@ -17,18 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.mobsim.queuesim;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -37,15 +33,10 @@ import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author dgrether
- *
  */
 public class QueueLinkTest extends MatsimTestCase {
 
 	private NetworkLayer network;
-
-	private Node node1;
-
-	private Node node2;
 
 	private Link link;
 
@@ -58,14 +49,23 @@ public class QueueLinkTest extends MatsimTestCase {
 		super.setUp();
 		this.network = new NetworkLayer();
 		this.network.setCapacityPeriod(1.0);
-		this.node1 = this.network.createNode("1", "0", "0", null);
-		this.node2 = this.network.createNode("2", "1", "0", null);
+		this.network.createNode("1", "0", "0", null);
+		this.network.createNode("2", "1", "0", null);
 		this.link = this.network.createLink("1", "1", "2", "1", "1",
 				"1", "1", null, null);
 		super.loadConfig(null);
 		this.queueNetwork = new QueueNetwork(this.network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		this.network = null;
+		this.link = null;
+		this.queueNetwork = null;
+		this.qlink = null;
+		super.tearDown();
 	}
 
 	public void testInit() {
@@ -129,7 +129,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 
-		new QueueSimulation(this.network, null, new Events());
+		new QueueSimulation(network, null, new Events());
 		Vehicle v1 = new Vehicle();
 		Person p = new Person(new IdImpl("1"));
 		Plan plan = p.createPlan(true);

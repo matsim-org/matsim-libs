@@ -74,6 +74,17 @@ public class WithindayAgentTest extends TestCase {
 		this.createRoutes();
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.agentRoute = null;
+		this.leg = null;
+		this.network = null;
+		this.plan = null;
+		this.route1 = null;
+		this.route2 = null;
+		super.tearDown();
+	}
+
 	private NetworkLayer loadNetwork(final String filename) {
 		Gbl.reset();
 		NetworkLayer network = new NetworkLayer();

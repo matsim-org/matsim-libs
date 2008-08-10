@@ -22,8 +22,6 @@ package org.matsim.facilities;
 
 import org.matsim.config.Config;
 import org.matsim.examples.TriangleScenario;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.facilities.algorithms.FacilitiesSummary;
@@ -37,22 +35,7 @@ import org.matsim.world.algorithms.WorldValidation;
 
 public class FacilitiesParserWriterTest extends MatsimTestCase {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private Config config = null;
-	
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public FacilitiesParserWriterTest() {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// setup
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	protected void setUp() throws Exception {
@@ -61,9 +44,11 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
+	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
 
 	private final void runModules(final Facilities facilities, final World world) {
 		System.out.println("  running facilities modules... ");
@@ -79,7 +64,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}
-	
+
 	private final void compareOutputFacilities() {
 		System.out.println("  comparing input and output facilities file... ");
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
@@ -102,7 +87,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		assertEquals(TriangleScenario.CHECKSUM_WORLD_EMPTY,checksum_world);
 		System.out.println("  done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// tests
 	//////////////////////////////////////////////////////////////////////
@@ -111,7 +96,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter1()...");
 
 		final World world = new World();
-		
+
 		System.out.println("  reading facilites xml file independent of the world...");
 		Facilities facilities = new Facilities();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
@@ -125,7 +110,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.compareOutputFacilities();
 		this.checkEmptyOutputWorld();
-		
+
 		System.out.println("done.");
 	}
 
@@ -135,7 +120,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter2()...");
 
 		final World world = new World();
-		
+
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
@@ -149,7 +134,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.compareOutputFacilities();
 		this.checkEmptyOutputWorld();
-		
+
 		System.out.println("done.");
 	}
 
@@ -181,7 +166,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.compareOutputFacilities();
 		this.compareOutputWorld();
-		
+
 		System.out.println("done.");
 	}
 
@@ -191,7 +176,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("running testParserWriter4()...");
 
 		final World world = new World();
-		
+
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
@@ -214,7 +199,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.compareOutputFacilities();
 		this.compareOutputWorld();
-		
+
 		System.out.println("done.");
 	}
 }

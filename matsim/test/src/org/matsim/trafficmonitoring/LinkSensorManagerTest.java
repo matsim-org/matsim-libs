@@ -46,6 +46,13 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 		this.config = loadConfig(getInputDirectory() + "config.xml");
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		this.manager = null;
+		super.tearDown();
+	}
+
 	public void testSensorManagement() {
 		Controler controler = new Controler(this.config);
 		controler.setCreateGraphs(false);

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.demandmodeling;
 
 import java.io.IOException;
@@ -30,31 +31,21 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;
 
-
 /**
  * @author dgrether
- *
  */
 public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 
 	private static final String filename = "asciipopulation.txt";
-	
-	private ZoneLayer zoneLayer;
-	
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		World world = new World();
-		this.zoneLayer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "noUseForAName");
-	  this.zoneLayer.createZone("1", "3", "3", "1", "1", "6", "6", "25", "name");
-	  this.zoneLayer.createZone("2", "3", "3", "1", "1", "6", "6", "25", "name");
-	}
-	
+
 	public void testReadFile() throws IOException {
+		World world = new World();
+		ZoneLayer zoneLayer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "noUseForAName");
+	  zoneLayer.createZone("1", "3", "3", "1", "1", "6", "6", "25", "name");
+	  zoneLayer.createZone("2", "3", "3", "1", "1", "6", "6", "25", "name");
+
 		String f = this.getClassInputDirectory() + filename;
-		PopulationAsciiFileReader p = new PopulationAsciiFileReader(this.zoneLayer);
+		PopulationAsciiFileReader p = new PopulationAsciiFileReader(zoneLayer);
 		Population plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
@@ -83,9 +74,5 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		assertEquals("h", a21.getType());
 		assertEquals("work", a22.getType());
 	}
-	
-	
-	
-	
 
 }

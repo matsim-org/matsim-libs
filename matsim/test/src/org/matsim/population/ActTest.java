@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.population;
 
-import org.matsim.population.Act;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
@@ -31,28 +30,17 @@ import org.matsim.utils.misc.Time;
  */
 public class ActTest extends MatsimTestCase {
 
-	private Act testee;
-	
-	/**
-	 * @see org.matsim.testcases.MatsimTestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		testee = new Act("h", 0.0, 0.0, null, 0.0, 0.0, 0.0, false);
-		
-	}
-	
-	
 	public void testCalculateDuration() {
+		Act testee = new Act("h", 0.0, 0.0, null, 0.0, 0.0, 0.0, false);
+
 		assertNotNull(testee);
-		assertEquals(0.0, testee.calculateDuration());
+		assertEquals(0.0, testee.calculateDuration(), EPSILON);
 		testee.setEndTime(5.5 * 3600.0);
-		assertEquals(5.5 * 3600.0, testee.calculateDuration());
+		assertEquals(5.5 * 3600.0, testee.calculateDuration(), EPSILON);
 		testee.setStartTime(Time.UNDEFINED_TIME);
-		assertEquals(5.5 * 3600.0, testee.calculateDuration());
+		assertEquals(5.5 * 3600.0, testee.calculateDuration(), EPSILON);
 		testee.setEndTime(Time.UNDEFINED_TIME);
-		assertEquals(0.0, testee.calculateDuration());
+		assertEquals(0.0, testee.calculateDuration(), EPSILON);
 		testee.setDur(Time.UNDEFINED_TIME);
 		Exception e = null;
 		try {
@@ -62,9 +50,9 @@ public class ActTest extends MatsimTestCase {
 		}
 		assertNotNull(e);
 		testee.setStartTime(17 * 3600.0);
-		assertEquals(7 * 3600.0, testee.calculateDuration());
+		assertEquals(7 * 3600.0, testee.calculateDuration(), EPSILON);
 	}
-	
-	
+
+
 
 }

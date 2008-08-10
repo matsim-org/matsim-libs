@@ -105,6 +105,15 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 	}
 
 	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		this.network = null;
+		this.person = null;
+		this.plan = null;
+		super.tearDown();
+	}
+
+	@Override
 	protected ScoringFunction getScoringFunctionInstance(final Plan somePlan) {
 		return new CharyparNagelScoringFunction(somePlan);
 	}

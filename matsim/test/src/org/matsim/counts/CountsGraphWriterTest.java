@@ -34,22 +34,12 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class CountsGraphWriterTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsGraphWriterTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testGraphCreation() {
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
 
-		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.run(this.fixture.counts);
+		CountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.run(fixture.counts);
 
 		CountsGraphWriter cgw = new CountsGraphWriter(this.getOutputDirectory(), cca.getComparison(),1, true, true);
 		cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));

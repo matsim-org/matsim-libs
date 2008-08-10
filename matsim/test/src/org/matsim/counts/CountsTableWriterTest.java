@@ -30,21 +30,12 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CountsTableWriterTest extends MatsimTestCase {
 
-	private CountsFixture fixture = null;
-
-	public CountsTableWriterTest() {
-		this.fixture = new CountsFixture();
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.fixture.setUp();
-	}
-
 	public void testTableCreation() {
-		CountsComparisonAlgorithm cca = this.fixture.getCCA();
-		cca.run(this.fixture.counts);
+		CountsFixture fixture = new CountsFixture();
+		fixture.setUp();
+
+		CountsComparisonAlgorithm cca = fixture.getCCA();
+		cca.run(fixture.counts);
 
 		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
 		ctw.writeFile(this.getOutputDirectory() + "/countTable.txt");

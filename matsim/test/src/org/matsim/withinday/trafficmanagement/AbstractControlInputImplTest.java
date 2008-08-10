@@ -28,17 +28,11 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
  */
 public class AbstractControlInputImplTest extends MatsimTestCase {
 
-	private static final String networkPath = "./test/input/org/matsim/withinday/trafficmanagement/AbstractControlInputImplTest/testAbstractControlInputImpl/network.xml";
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -48,7 +42,7 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 	public void testAbstractControlInputImpl() {
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
-		parser.readFile(networkPath);
+		parser.readFile(getInputDirectory() + "network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
 
 		Route route1 = new Route();
