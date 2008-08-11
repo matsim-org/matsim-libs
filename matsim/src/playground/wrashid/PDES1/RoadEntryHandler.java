@@ -20,7 +20,8 @@ public class RoadEntryHandler {
 	
 	// the road entry handler receives the road request too late for a start leg, because it schedules
 	// new messages before the start of the next leg.
-	// The nextStarLegTime variable can be used to be sure, that no out of sync message behaviour occurs
+	// The staringLegMessages variable is used to be sure, that no out of sync message behaviour occurs
+	// (processQueue waits until the next startingLegMessage is processed before any later events are scheduled)
 	public PriorityBlockingQueue<Message>  staringLegMessages=new PriorityBlockingQueue<Message>();
 	
 	RoadEntryHandler(Road belongsToRoad){

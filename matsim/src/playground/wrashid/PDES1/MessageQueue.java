@@ -104,7 +104,8 @@ public class MessageQueue {
 			}
 			
 			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
-		
+			
+			System.out.println("arrivalTimeOfLastRemovedMessage:"+arrivalTimeOfLastRemovedMessage);
 		
 			if (!(m instanceof NullMessage)){
 				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
