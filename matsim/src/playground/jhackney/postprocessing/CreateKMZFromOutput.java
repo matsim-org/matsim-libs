@@ -59,6 +59,15 @@ public class CreateKMZFromOutput {
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
+		
+//		Write out the KML for the EgoNet of a chosen agent
+		System.out.println("  Initializing the KML output");
+
+		EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
+		EgoNetPlansItersMakeKML.generateStyles();
+
+		System.out.println("... done");
+		
 		for(int i=0; i<501; i+=50){
 //			config.socnetmodule().setInitIter(Integer.toString(i));
 			config.socnetmodule().setInitIter(Integer.toString(0));
@@ -130,13 +139,7 @@ public class CreateKMZFromOutput {
 
 //			Person ego=plans.getPerson("21924270");
 
-//			Write out the KML for the EgoNet of a chosen agent
-			System.out.println("  Initializing the KML output");
 
-			EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
-			EgoNetPlansItersMakeKML.generateStyles();
-
-			System.out.println("... done");
 
 //			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 			Person testP=plans.getPerson("21924270");//1pct
