@@ -41,7 +41,7 @@ public class StartingLegMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.START_LEG)){
-			event=new AgentDepartureEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
+			event=new AgentDepartureEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getLegIndex()-1,vehicle.getCurrentLink().getId().toString());
 		}
 		
 		//SimulationParameters.events.processEvent(event);

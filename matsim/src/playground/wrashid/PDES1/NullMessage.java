@@ -18,8 +18,16 @@ public class NullMessage extends SelfhandleMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		// send a null message to all roads ahead
+		// send a null message to all roads ahead, only if the current road is
+		// empty (has no cars on it)
+		
 		Road currentRoad = (Road) receivingUnit;
+		
+		if (currentRoad.isRoadEmpty()){
+			return;
+		}
+		
+		
 		for (Link outLink:currentRoad.getLink().getToNode().getOutLinks().values()){
 			assert(messageArrivalTime>=0);
 			Road outRoad=Road.allRoads.get(outLink.getId().toString());

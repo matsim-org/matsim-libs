@@ -33,7 +33,7 @@ public class MessageQueue {
 		// This assertion was removed, because of concurrent access this might be violated
 	
 		if (!(m instanceof NullMessage)){
-			System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
+			//System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
 		}
 		
 		
@@ -74,10 +74,7 @@ public class MessageQueue {
 	synchronized public Message getNextMessage() {
 		counter++;
 
-		if (counter % 10000000==0){
-			System.out.println("event:" + counter);
-			System.out.println(arrivalTimeOfLastRemovedMessage);
-		}
+		
 		
 		
 		//System.out.println(arrivalTimeOfLastRemovedMessage);
@@ -87,6 +84,11 @@ public class MessageQueue {
 		Message m = queue1.poll();
 		//Message m = queue1.removeLast();
 		if (m!=null){
+			
+			if (counter % 10000000==0){
+				System.out.println("event:" + counter);
+				System.out.println(arrivalTimeOfLastRemovedMessage);
+			}
 			
 			
 			//System.out.println("event:" + counter);

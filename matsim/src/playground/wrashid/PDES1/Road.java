@@ -97,6 +97,8 @@ public class Road extends SimUnit {
 		// send a null message to all other nodes at the beginning of the simulation
 		// this is important for the whole process to start
 		
+	
+		
 		
 		roadEntryHandler = new RoadEntryHandler(this);
 		
@@ -415,6 +417,14 @@ public class Road extends SimUnit {
 	
 	public void incrementPromisedToEnterRoad(){
 		noOfCarsPromisedToEnterRoad++;
+	}
+	
+	// only use this for look ahead purpose
+	public boolean isRoadEmpty(){
+		if (carsOnTheRoad.size()==0){
+			return false;
+		} 
+		return true;
 	}
 
 	public Link getLink() {

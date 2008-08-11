@@ -57,6 +57,10 @@ public class RoadEntryHandler {
 		
 		assert(fromRoad==belongsToRoad || belongsToRoad.getLink().getFromNode().getInLinks().values().contains(fromRoad.getLink())): "wrong unit sent a message";
 		
+		if (fromRoad==belongsToRoad){
+			System.out.println("sdfsdff");
+		}
+		
 		synchronized (pendingMessagesFromRoads){
 			if (!pendingMessagesFromRoads.contains(fromRoad) && fromRoad!=belongsToRoad){
 				pendingMessagesFromRoads.add(fromRoad);
@@ -71,6 +75,11 @@ public class RoadEntryHandler {
 			messageQueue.add(erm);
 			test_arrivedMessages.add(erm);
 			
+			if (erm.messageArrivalTime<test_timeOfLastScheduledMessage){
+				System.out.println();
+			}
+			
+			
 			assert(erm.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + erm.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
 			processMessageQueue();
@@ -78,16 +87,18 @@ public class RoadEntryHandler {
 		
 		
 		// send a null message to all other roads (going out of the same conjunction)
-		for (Link otherLinks:fromRoad.getLink().getToNode().getOutLinks().values()){
-			Road otherRoad=Road.allRoads.get(otherLinks.getId().toString());
-			if (otherRoad!=belongsToRoad){
-				NullMessage nm=MessageFactory.getNullMessage();
-				nm.sendingUnit=fromRoad;
-				nm.receivingUnit=otherRoad;
-				nm.messageArrivalTime=simTime + fromRoad.inverseOutFlowCapacity - SimulationParameters.delta;
-				nm.debugString="after registerEnter Request";
-				assert(nm.messageArrivalTime>=0):"negative simTime...";
-				otherRoad.roadEntryHandler.registerNullMessage(nm);
+		if (fromRoad!=belongsToRoad){
+			for (Link otherLinks:fromRoad.getLink().getToNode().getOutLinks().values()){
+				Road otherRoad=Road.allRoads.get(otherLinks.getId().toString());
+				if (otherRoad!=belongsToRoad){
+					NullMessage nm=MessageFactory.getNullMessage();
+					nm.sendingUnit=fromRoad;
+					nm.receivingUnit=otherRoad;
+					nm.messageArrivalTime=simTime + fromRoad.inverseOutFlowCapacity - SimulationParameters.delta;
+					nm.debugString="after registerEnter Request";
+					assert(nm.messageArrivalTime>=0):"negative simTime...";
+					otherRoad.roadEntryHandler.registerNullMessage(nm);
+				}
 			}
 		}
 	}
@@ -109,7 +120,7 @@ public class RoadEntryHandler {
 			}
 			
 			if (hasNoMoreMessagesFromSameSource){
-				assert(pendingMessagesFromRoads.contains(m.sendingUnit));
+				assert(pendingMessagesFromRoads.contains(m.sendingUnit) || m.sendingUnit==belongsToRoad);
 				pendingMessagesFromRoads.remove(m.sendingUnit);
 			}
 			
