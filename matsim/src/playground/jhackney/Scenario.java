@@ -105,11 +105,13 @@ public abstract class Scenario {
 		
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
-		config.socnetmodule().setSocNetGraphAlgo("none");
+//		config.socnetmodule().setSocNetGraphAlgo("none");
+		config.socnetmodule().setSocNetGraphAlgo("read");
 		config.socnetmodule().setSocNetLinkRemovalP("0");
 		config.socnetmodule().setSocNetLinkRemovalAge("0");
 		config.socnetmodule().setDegSat("0");
 		config.socnetmodule().setEdgeType("UNDIRECTED");
+//		config.socnetmodule().setInitIter("0");
 		config.socnetmodule().setInitIter("0");
 		config.socnetmodule().setReadMentalMap("false");
 		
