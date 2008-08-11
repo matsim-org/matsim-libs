@@ -67,6 +67,7 @@ import org.matsim.utils.vis.kml.Point;
 import org.matsim.utils.vis.kml.PolyStyle;
 import org.matsim.utils.vis.kml.Polygon;
 import org.matsim.utils.vis.kml.Style;
+import org.matsim.utils.vis.kml.TimeSpan;
 import org.matsim.utils.vis.kml.TimeStamp;
 import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
@@ -106,6 +107,7 @@ public class EgoNetPlansItersMakeKML {
 	private static Person ego;
 	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
 	private static TimeStamp timeStamp;
+	private static TimeSpan timeSpan;
 	private static int nColors=13;//36
 	private static Person ai;
 
@@ -292,7 +294,8 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		timeStamp = new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0));
-
+		timeSpan = new TimeSpan(new GregorianCalendar(1970, 0, 1, iter, 0, 0),
+					new GregorianCalendar(1970, 0, 1, iter, 59, 59));
 
 		Style agentLinkStyle =null;
 		if(!myKMLDocument.containsStyle("agentLinkStyle"+alter.getId().toString())){
@@ -335,7 +338,7 @@ public class EgoNetPlansItersMakeKML {
 				Feature.DEFAULT_STYLE_URL,
 				true,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 		log.info("MAKING NEW KML PLAN FOLDER "+planFolder.getId()+" FOR AGENT "+agentFolder.getId());
 		agentFolder.addFeature(planFolder);
 
@@ -367,7 +370,7 @@ public class EgoNetPlansItersMakeKML {
 				Feature.DEFAULT_STYLE_URL,
 				false,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		if(!planFolder.containsFeature(facilitiesFolder.getId())){
 			planFolder.addFeature(facilitiesFolder);
@@ -415,7 +418,7 @@ public class EgoNetPlansItersMakeKML {
 					myStyle.getStyleUrl(),
 					true,
 					Feature.DEFAULT_REGION,
-					timeStamp);
+					timeSpan);
 			if(!facilitiesFolder.containsFeature(aFacility.getId())){
 				facilitiesFolder.addFeature(aFacility);
 			}
@@ -451,7 +454,7 @@ public class EgoNetPlansItersMakeKML {
 				egoSpaceStyle.getId(),
 				true,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		if(!planFolder.containsFeature(es.getId())){
 			planFolder.addFeature(es);
@@ -497,7 +500,7 @@ public class EgoNetPlansItersMakeKML {
 								egoSpaceStyle.getId(),
 								Feature.DEFAULT_VISIBILITY,
 								Feature.DEFAULT_REGION,
-								timeStamp);
+								timeSpan);
 
 						linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
 						es.addFeature(linkPlacemark);
@@ -526,7 +529,7 @@ public class EgoNetPlansItersMakeKML {
 				tangentialLinkStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
@@ -554,7 +557,7 @@ public class EgoNetPlansItersMakeKML {
 				socialLinkStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
 		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
@@ -585,7 +588,7 @@ public class EgoNetPlansItersMakeKML {
 				activitySpaceStyle.getId(),
 				true,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		if(!planFolder.containsFeature(as.getId())){
 			planFolder.addFeature(as);
@@ -641,7 +644,7 @@ public class EgoNetPlansItersMakeKML {
 							activitySpaceStyle.getId(),
 							Feature.DEFAULT_VISIBILITY,
 							Feature.DEFAULT_REGION,
-							timeStamp);
+							timeSpan);
 
 					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
 					as.addFeature(linkPlacemark);
@@ -707,7 +710,7 @@ public class EgoNetPlansItersMakeKML {
 				spaceStyle.getId(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		// make the polygon feature
 		Polygon polygon = new Polygon(true,true,Geometry.DEFAULT_ALTITUDE_MODE);
@@ -771,7 +774,7 @@ public class EgoNetPlansItersMakeKML {
 				styleUrl,
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 		if(!planFolder.containsFeature(pl.getId())){
 			planFolder.addFeature(pl);
 		}
@@ -940,7 +943,7 @@ public class EgoNetPlansItersMakeKML {
 				style.getStyleUrl(),
 				Feature.DEFAULT_VISIBILITY,
 				Feature.DEFAULT_REGION,
-				timeStamp);
+				timeSpan);
 
 		linkPlacemark.setGeometry(new LineString(fromPoint, toPoint));
 
