@@ -20,6 +20,7 @@
 
 package playground.gregor.gis.shapeFileProcessing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,9 +33,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.referencing.CRS;
 import org.matsim.network.Link;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -47,10 +52,10 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class NetworkToGraph {
-
-	private NetworkLayer network;
-	private CoordinateReferenceSystem crs;
-	private GeometryFactory geofac;
+	private final static String WGS84_UTM47S = "PROJCS[\"WGS_1984_UTM_Zone_47S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",10000000.0],PARAMETER[\"Central_Meridian\",99.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]";
+	private final NetworkLayer network;
+	private final CoordinateReferenceSystem crs;
+	private final GeometryFactory geofac;
 
 	public NetworkToGraph(NetworkLayer network, CoordinateReferenceSystem coordinateReferenceSystem) {
 		this.geofac = new GeometryFactory();
@@ -93,6 +98,7 @@ public class NetworkToGraph {
 
 	private LinearRing getLinearRing(Link link) {
 		double minWidth = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / GISToMatsimConverter.CAPACITY_COEF;
+		minWidth = Math.min(minWidth,20);
 //		minWidth = 10;
 		Coordinate zero = new Coordinate(0,0);
 		Coordinate  from = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()) ;
@@ -123,5 +129,14 @@ public class NetworkToGraph {
 
 
 	}
-
+	
+	public static void main(String [] args) throws FactoryException, FactoryRegistryException, SchemaException, IllegalAttributeException, IOException {
+		String netfile = "./networks/padang_net_v20080618.xml";
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netfile);
+		CoordinateReferenceSystem crs = CRS.parseWKT(WGS84_UTM47S);
+		Collection<Feature> ft = new NetworkToGraph(network,crs).generateFromNet();
+		ShapeFileWriter.writeGeometries(ft, "./padang/network_v20080618.shp");
+	}
+	
 }

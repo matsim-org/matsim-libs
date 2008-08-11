@@ -38,10 +38,10 @@ public class HerdAnalyzer implements Analyzer {
 	public HerdAnalyzer(final Beliefs beliefs) {
 		this.beliefs = beliefs;
 	}
-	public Action getAction(final double now) {
+	public Option getAction(final double now) {
 		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
 		if (ies == null) {
-			return new NextLinkAction(null,0);
+			return new NextLinkOption(null,0);
 		}
 		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
 		for (final InformationEntity ie : ies) {
@@ -66,7 +66,7 @@ public class HerdAnalyzer implements Analyzer {
 		}
 		
 		
-		return new NextLinkAction(link,1);
+		return new NextLinkOption(link,1);
 	}
 	
 	

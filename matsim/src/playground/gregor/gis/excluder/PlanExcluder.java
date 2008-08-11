@@ -69,21 +69,27 @@ public class PlanExcluder {
 	public Population run() {
 		
 		Population plans = new Population();
+		
 		for (Person person : this.plans.getPersons().values()) {
 			
 			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
 			Point p  = MGC.coord2Point(c);
 			
+			boolean include = true;
 			for (Polygon po : this.ps) {
-				if (!po.contains(p)) {
-					try {
-						plans.addPerson(person);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				if (po.contains(p)) {
+					include = false;
+					break;
 				}
 			}
-			
+			if (include) {
+				try {
+					plans.addPerson(person);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return plans;
@@ -94,7 +100,7 @@ public class PlanExcluder {
 	public static void main(String [] args) {
 		
 
-		final String links = "./padang/extract_population/excludes.shp";
+		final String links = "./output/analysis/excludes.shp";
 		final String config = "./configs/timeVariantEvac.xml";
 		
 		FeatureSource l = null;
@@ -117,8 +123,10 @@ public class PlanExcluder {
 		final Population population = new Population();
 		new MatsimPopulationReader(population).readFile(Gbl.getConfig().plans().getInputFile());
 		
+
 		Population toSave = new PlanExcluder(network,population,ls).run();
-		new PopulationWriter(toSave,"padang_plans_v20080618_reduced.xml.gz", "v4").write();
+		new PopulationWriter(toSave,"./output/analysis/padang_plans_v20080618_reduced.xml.gz", "v4").write();
+
 	}
 	
 	

@@ -22,41 +22,62 @@ package playground.gregor.snapshots.postprocessor.processors;
 
 import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.population.Leg;
-import org.matsim.population.Population;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
-public class DestinationDependentColorizer implements PostProcessorI {
+
+public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {
 
 	private final static int NUM_OF_COLOR_SLOTS = 256;
 	
-	private static HashMap<Id,String> destNodeMapping = new HashMap<Id,String>();
+	private final HashMap<String,String> destNodeMapping = new HashMap<String,String>();
 
-	private Population plans;
-	
-	public DestinationDependentColorizer(Population plans){
-		this.plans = plans;
-	}
+
+//	private final Population plans;
+//
+//	public DestinationDependentColorizer(Population plans){
+//		this.plans = plans;
+//	}
+
 	
 	public String[] processEvent(String[] event) {
-		Id id = new IdImpl(event[0]);
+		String id = event[0];
 		String color = getColor(id);
 		event[15] = color;
 		return event;
 	}
 
-	private String getColor(Id id) {
+	public String getColor(String id) {
 		if(!destNodeMapping.containsKey(id)){
-			addMapping(id);
+			return "0";
 		}
 		return destNodeMapping.get(id);
 	}
 
-	private synchronized void addMapping(Id id) {
-		Leg leg = ((Leg)this.plans.getPerson(id).getSelectedPlan().getActsLegs().get(1)); 
-		Id nodeId = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2).getId();
-		int mapping = Integer.parseInt(nodeId.toString()) % NUM_OF_COLOR_SLOTS; 
-		destNodeMapping.put(id,  Integer.toString(mapping));
+//	private synchronized void addMapping(Id id) {
+//		Leg leg = ((Leg)this.plans.getPerson(id).getSelectedPlan().getActsLegs().get(1)); 
+//		Id nodeId = leg.getRoute().getRoute().get(leg.getRoute().getRoute().size()-2).getId();
+//		int mapping = Integer.parseInt(nodeId.toString()) % NUM_OF_COLOR_SLOTS; 
+//		destNodeMapping.put(id,  Integer.toString(mapping));
+//	}
+
+//	public void handleEvent(EventAgentArrival event) {
+//		
+//		// TODO Auto-generated method stub
+//		
+//	}
+
+	public void handleEvent(LinkLeaveEvent event) {
+		if (event.linkId.contains("el")) {
+			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
+		}
+		
+		
+		
 	}
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

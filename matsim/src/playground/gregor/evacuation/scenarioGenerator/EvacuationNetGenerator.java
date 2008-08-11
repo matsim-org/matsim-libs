@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.padang;
+package playground.gregor.evacuation.scenarioGenerator;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,16 +29,12 @@ import org.matsim.basic.v01.Id;
 import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.world.World;
 
 public class EvacuationNetGenerator {
 
@@ -213,40 +209,39 @@ public class EvacuationNetGenerator {
 	
 	public static void main(final String [] args) {
 		
-		if (args.length != 1) {
+		if (args.length != 3) {
 			throw new RuntimeException("wrong number of arguments! Pleas run EvacuationAreaFileGenerator config.xml" );
-		} else {
-			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 		}
-
-		final World world = Gbl.createWorld();
-
-		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
-		final NetworkFactory fc = new NetworkFactory();
-		fc.setLinkPrototype(TimeVariantLinkImpl.class);
+		final String netfile = args[0];
+		final String evacnet = args[1];
+		final String evacareafile = args[2];
 		
-		final NetworkLayer network = new NetworkLayer(fc);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
+
+//		final World world = Gbl.createWorld();
+
+		log.info("loading network from " + netfile);
+		final NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netfile);
+//		world.setNetworkLayer(network);
+//		world.complete();
 		log.info("done.");
 
-		final String evacfile = "networks/padang_evacuationarea_v20080618.xml.gz";
+		
 		
 //		log.info("loading evacuationarea from " + Gbl.getConfig().evacuation().getEvacuationAreaFile());
-		log.info("loading evacuationarea from " + evacfile);
+		log.info("loading evacuationarea from " + evacareafile);
 		final HashMap<Id,EvacuationAreaLink> el = new HashMap<Id,EvacuationAreaLink>();
 		
 		try {
 //			new EvacuationAreaFileReader(el).readFile(Gbl.getConfig().evacuation().getEvacuationAreaFile());
-			new EvacuationAreaFileReader(el).readFile(evacfile);
+			new EvacuationAreaFileReader(el).readFile(evacareafile);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		log.info("done.");
 		new EvacuationNetGenerator().generateEvacuationNet(network, el);
 		
-		new NetworkWriter(network,"test_evac.xml").write();
+		new NetworkWriter(network,evacnet).write();
 
 	}
 }

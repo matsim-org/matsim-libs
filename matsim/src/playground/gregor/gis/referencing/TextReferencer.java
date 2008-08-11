@@ -148,7 +148,8 @@ public class TextReferencer {
 			h.location = ft;
 			this.households.put(id, h);
 			final Activity act = getActivity(activity,line,ft);
-			h.acts.add(act);
+			
+//			h.acts.add(act);
 			
 			final String location = line[6];
 			boolean addFt = true;
@@ -161,7 +162,7 @@ public class TextReferencer {
 
 			if (addFt) {
 				try {
-					final Feature ftN = this.ftHome.create(new Object [] {ft.getDefaultGeometry(),id,id,location}, "home locations");
+					final Feature ftN = this.ftHome.create(new Object [] {ft.getDefaultGeometry(),id,id,location,id}, "home locations");
 					revRef.add(ftN);
 				} catch (final IllegalAttributeException e) {
 					// TODO Auto-generated catch block
@@ -183,7 +184,7 @@ public class TextReferencer {
 		double start = 0;
 		double end = 0;
 		 try {
-			 String tmp1 = line[11];
+			 String tmp1 = line[12];
 			 tmp1 = tmp1.replace('.', ',');
 			 if (tmp1.contains(",")){
 				 final String [] splitted1 = tmp1.split(",");
@@ -194,7 +195,7 @@ public class TextReferencer {
 				 start = Double.parseDouble(tmp1) * 3600;
 			 }
 			 			 
-			 String tmp2 = line[12];
+			 String tmp2 = line[13];
 			 tmp2 = tmp2.replace('.', ',');
 			 if (tmp2.contains(",")){
 				 final String [] splitted2 = tmp2.split(",");
@@ -219,7 +220,7 @@ public class TextReferencer {
 
 
 		final TextFileReader tfr = new TextFileReader(this.unclassified);
-		final TextFileWriter rfw = new TextFileWriter("./padang/referencing/test.txt");
+		final TextFileWriter rfw = new TextFileWriter("./padang/referencing/missing_locations.txt");
 
 		String [] line = tfr.readLine();
 
@@ -244,10 +245,17 @@ public class TextReferencer {
 			
 			final String activity = line[4];
 			final String location = line[6].toLowerCase();
+			final String location2 = line[7].toLowerCase();
+//			System.out.println(location2);
+//			if (location2.equals("home or neighbourhood")){
+//				System.out.println(location2);
+//				
+//			}
+			
 			Feature ft = null;
 			if (activity.equals("home activity")){
 				ft = classifyAsHome(id,line);
-			} else if (isHomeRelated(location)) {
+			} else if (isHomeRelated(location)|| location2.equals("home or neighbourhood")) {
 				ft = classifyAsHome(id,line);
 			} else {
 				CaseNode resp = this.crn.getCase(location);
@@ -280,11 +288,11 @@ public class TextReferencer {
 		}
 		System.out.println(this.ids.size());
 		rfw.finish();
-//		try {
-//			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/classified.shp");
-//		} catch (final Exception e) {
-//			e.printStackTrace();
-//		} 
+		try {
+			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/survey.shp");
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} 
 
 	}
 
@@ -484,10 +492,11 @@ public class TextReferencer {
 		attrib[19] = AttributeTypeFactory.newAttributeType("QI1125", String.class);
 
 
-		final AttributeType[] homes = new AttributeType[4];
+		final AttributeType[] homes = new AttributeType[5];
 		homes[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
 		homes[1] = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		homes[2] = AttributeTypeFactory.newAttributeType("TIME", Integer.class);
+		homes[2] = AttributeTypeFactory.newAttributeType("STARTTIME", Integer.class);
+		homes[4] = AttributeTypeFactory.newAttributeType("ENDTIME", Integer.class);
 		homes[3] = AttributeTypeFactory.newAttributeType("NAME", String.class);
 
 		try {
@@ -527,12 +536,15 @@ public class TextReferencer {
 		final String referenced5 =  "./padang/referencing/referenced5.shp";
 		final String referenced6 =  "./padang/referencing/referenced6.shp";
 		final String referenced7 =  "./padang/referencing/referenced7.shp";
+		final String referenced8 =  "./padang/referencing/referenced8.shp";
+		final String referenced9 =  "./padang/referencing/referenced9.shp";
+		final String referenced10 =  "./padang/referencing/referenced10.shp";
 		final String own =  "./padang/referencing/own.shp";
 		final String zones =  "./padang/referencing/zones.shp";
 		final String zonesKel =  "./padang/referencing/zonesKel.shp";
 		final String homes = "./padang/referencing/homes.shp";
 
-		final String unclassified = "./padang/referencing/unclassified.txt";
+		final String unclassified = "./padang/referencing/input_workday.csv";
 
 
 		final ArrayList<FeatureSource> fts = new ArrayList<FeatureSource>();
@@ -543,6 +555,9 @@ public class TextReferencer {
 		fts.add(ShapeFileReader.readDataFile(referenced5));
 		fts.add(ShapeFileReader.readDataFile(referenced6));
 		fts.add(ShapeFileReader.readDataFile(referenced7));
+		fts.add(ShapeFileReader.readDataFile(referenced8));
+		fts.add(ShapeFileReader.readDataFile(referenced9));
+		fts.add(ShapeFileReader.readDataFile(referenced10));
 		final FeatureSource others = ShapeFileReader.readDataFile(own);
 		final FeatureSource zonesl = ShapeFileReader.readDataFile(zones);
 		final FeatureSource zoneslKel = ShapeFileReader.readDataFile(zonesKel);
@@ -568,41 +583,54 @@ public class TextReferencer {
 			this.classified.clear();
 
 			for (final Household h : this.households.values()) {
-				
+				Activity a = new Activity();
+				a.end = -1;
+				a.start = -1;
+				a.type = "home activity";
+				genAct(h.location.getDefaultGeometry(),h.id,a);
 				
 				for (final Activity act : h.acts) {
 					if (act.day.equals("last weekend day (Sa-Su)")) {
 						continue;
 					}
+					genAct(act.location.getDefaultGeometry(),h.id,act);
+//					try {
+//						final Geometry g = h.location.getDefaultGeometry();	
+//						final Coordinate transformed = MGC.coord2Coordinate(GT.transform(MGC.coordinate2Coord(g.getCoordinate())));
+//						this.classified.add(this.ftHome.create(new Object[] {this.geofac.createPoint(transformed),h.id,act.start/3600,act.type,act.end/3600}, "activity"));
+//					} catch (final IllegalAttributeException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 					
 					
-					if (act.type.equals("home activity")){
-							try {
-							final Geometry g = h.location.getDefaultGeometry();	
-							final Coordinate transformed = MGC.coord2Coordinate(GT.transform(MGC.coordinate2Coord(g.getCoordinate())));
-							this.classified.add(this.ftHome.create(new Object[] {this.geofac.createPoint(transformed),h.id,0,act.type}, "activity"));
-						} catch (final IllegalAttributeException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					}
-					if (act.start <= 3600*6 && act.end >= 3600*6){
-						genAct(act.location.getDefaultGeometry(),h.id,6,act.type);
-					} 
-					if (act.start <= 3600*9 && act.end >= 3600*9) {
-						genAct(act.location.getDefaultGeometry(),h.id,9,act.type);
-					}
-					if (act.start <= 3600*12 && act.end >= 3600*12) {
-						genAct(act.location.getDefaultGeometry(),h.id,12,act.type);
-					}
-					if (act.start <= 3600*15 && act.end >= 3600*15) {
-						genAct(act.location.getDefaultGeometry(),h.id,15,act.type);
-					}
-					if (act.start <= 3600*18 && act.end >= 3600*18) {
-						genAct(act.location.getDefaultGeometry(),h.id,18,act.type);
-					}
-					
+//					if (act.type.equals("home activity")){
+//							try {
+//							final Geometry g = h.location.getDefaultGeometry();	
+//							final Coordinate transformed = MGC.coord2Coordinate(GT.transform(MGC.coordinate2Coord(g.getCoordinate())));
+//							this.classified.add(this.ftHome.create(new Object[] {this.geofac.createPoint(transformed),h.id,0,act.type}, "activity"));
+//						} catch (final IllegalAttributeException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//						continue;
+//					}
+//					if (act.start <= 3600*6 && act.end >= 3600*6){
+//						genAct(act.location.getDefaultGeometry(),h.id,6,act.type);
+//					} 
+//					if (act.start <= 3600*9 && act.end >= 3600*9) {
+//						genAct(act.location.getDefaultGeometry(),h.id,9,act.type);
+//					}
+//					if (act.start <= 3600*12 && act.end >= 3600*12) {
+//						genAct(act.location.getDefaultGeometry(),h.id,12,act.type);
+//					}
+//					if (act.start <= 3600*15 && act.end >= 3600*15) {
+//						genAct(act.location.getDefaultGeometry(),h.id,15,act.type);
+//					}
+//					if (act.start <= 3600*18 && act.end >= 3600*18) {
+//						genAct(act.location.getDefaultGeometry(),h.id,18,act.type);
+//					}
+//					
 					
 				}
 				
@@ -619,7 +647,7 @@ public class TextReferencer {
 	}
 
 
-	private void genAct(final Geometry defaultGeometry, final int id, final int i, final String type) {
+	private void genAct(final Geometry defaultGeometry, final int id, Activity act) {
 	
 		final Coordinate coord = defaultGeometry.getCoordinate();
 		final double r1 = Math.random()*100 - 50;
@@ -633,7 +661,7 @@ public class TextReferencer {
 //		final Point p = this.geofac.createPoint(transformed);
 		final Point p = this.geofac.createPoint(coord);
 		try {
-			this.classified.add(this.ftHome.create(new Object[] {p,id,i,type}, "activity"));
+			this.classified.add(this.ftHome.create(new Object[] {p,id,act.start,act.type,act.end}, "activity"));
 		} catch (final IllegalAttributeException e) {
 			e.printStackTrace();
 		}

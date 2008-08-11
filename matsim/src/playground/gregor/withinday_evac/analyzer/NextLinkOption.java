@@ -22,12 +22,12 @@ package playground.gregor.withinday_evac.analyzer;
 
 import org.matsim.network.Link;
 
-public class NextLinkAction extends Action {
+public class NextLinkOption extends Option {
 
 	private final Link link;
 	
 
-	public NextLinkAction(final Link link, final double conf) {
+	public NextLinkOption(final Link link, final double conf) {
 		this.link = link;
 		this.conf = conf;
 	}

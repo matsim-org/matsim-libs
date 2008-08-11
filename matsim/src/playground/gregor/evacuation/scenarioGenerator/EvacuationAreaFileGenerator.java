@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.padang;
+package playground.gregor.evacuation.scenarioGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -49,6 +50,7 @@ import org.matsim.world.World;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -56,10 +58,11 @@ import com.vividsolutions.jts.geom.Polygon;
 public class EvacuationAreaFileGenerator {
 	
 	private static final Logger log = Logger.getLogger(EvacuationAreaFileGenerator.class);
-	private NetworkLayer network;
-	private Collection<Polygon> evacZone;
-	private HashMap<Id, EvacuationAreaLink> evacLinks;
-	private GeometryFactory geofac;
+	private final NetworkLayer network;
+	private final Collection<Polygon> evacZone;
+	private final HashMap<Id, EvacuationAreaLink> evacLinks;
+	private final GeometryFactory geofac;
+	private final HashSet<Link> safelinks = new HashSet<Link>();
 
 	public EvacuationAreaFileGenerator(NetworkLayer network,
 			Collection<Polygon> evacZone) {
@@ -82,6 +85,52 @@ public class EvacuationAreaFileGenerator {
 	
 	
 	
+	public EvacuationAreaFileGenerator(NetworkLayer network,
+			Collection<Polygon> evacZone, Collection<Polygon> safeZone, String evacFile) {
+		
+		this.network = network;
+		this.network.connect();
+		this.evacZone = evacZone;
+		this.evacLinks = new HashMap<Id, EvacuationAreaLink>();
+		this.geofac = new GeometryFactory();
+		findAdditionalSaveLinks(safeZone);
+		
+		findEvacuationLinks();
+		try {
+			new EvacuationAreaFileWriter(this.evacLinks).writeFile(evacFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
+	private void findAdditionalSaveLinks(Collection<Polygon> safeZone) {
+		for (Polygon p : safeZone) {
+			
+			Coordinate c = p.getCentroid().getCoordinate();
+			LinearRing r = (LinearRing) p.getBoundary();
+			double maxDist = r.getCoordinateN(0).distance(r.getCoordinateN(2));
+			Collection<Node> nodes = this.network.getNearestNodes((Coord) MGC.coordinate2Coord(c), maxDist);
+			for (Node node : nodes) {
+				for (Link l : node.getInLinks().values()) {
+					this.safelinks.add(l);
+				}
+				for (Link l : node.getOutLinks().values()) {
+					this.safelinks.add(l);
+				}
+				
+			}
+		}
+		
+	}
+
+
+
+
+
 	private void findEvacuationLinks() {
 		
 		for (Polygon p : this.evacZone) {
@@ -104,6 +153,10 @@ public class EvacuationAreaFileGenerator {
 	private void handleNodes(Collection<Node> nodes, Polygon p) {
 		for (Node node : nodes) {
 			for (Link l : node.getOutLinks().values()) {
+				if (this.safelinks.contains(l)) {
+					continue;
+				}
+				
 				if (this.evacLinks.containsKey(l.getId())) {
 					continue;
 				}
@@ -119,6 +172,10 @@ public class EvacuationAreaFileGenerator {
 			}
 			
 			for (Link l : node.getInLinks().values()) {
+				if (this.safelinks.contains(l)) {
+					continue;
+				}
+				
 				if (this.evacLinks.containsKey(l.getId())) {
 					continue;
 				}
@@ -154,6 +211,54 @@ public class EvacuationAreaFileGenerator {
 
 
 
+	
+	public static void main2(String [] args) {
+		if (args.length != 4) {
+			throw new RuntimeException("wrong number of arguements!");
+		}
+		String netin = args[0];
+		String evacarea = args[1];
+		String safearea = args[2];
+		String evacaraeafile = args[3];
+		
+		log.info("loading network from " + netin);
+		NetworkFactory fc = new NetworkFactory();
+		fc.setLinkPrototype(TimeVariantLinkImpl.class);
+		
+		NetworkLayer network = new NetworkLayer(fc);
+		new MatsimNetworkReader(network).readFile(netin);
+		log.info("done.");
+		
+		log.info("loading shape file from " + evacarea);
+		FeatureSource fz_5_10 = null;
+		try {
+			fz_5_10 = ShapeFileReader.readDataFile(evacarea);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		log.info("done");
+		
+		Collection<Polygon> evac_zone = new ArrayList<Polygon>();
+		readPolygons(evac_zone,fz_5_10);
+
+		log.info("loading shape file from " + safearea);
+		FeatureSource safe = null;
+		try {
+			safe = ShapeFileReader.readDataFile(safearea);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		log.info("done");
+		
+		Collection<Polygon> safe_zone = new ArrayList<Polygon>();
+		readPolygons(safe_zone,safe);
+		
+		
+		
+		new EvacuationAreaFileGenerator(network,evac_zone,safe_zone,evacaraeafile);
+		
+	}
+	
 
 	public static void main(String [] args) {
 		

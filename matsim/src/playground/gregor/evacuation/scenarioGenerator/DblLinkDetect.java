@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MessageAction.java
+ * DblLinkDetect.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,9 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.analyzer;
+package playground.gregor.evacuation.scenarioGenerator;
 
-public class MessageAction extends Option{
+import org.apache.log4j.Logger;
+import org.matsim.config.Config;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkFactory;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
+import org.matsim.network.TimeVariantLinkImpl;
+import org.matsim.network.algorithms.NetworkSegmentDoubleLinks;
+import org.matsim.world.World;
+
+
+
+public class DblLinkDetect {
+	private static final Logger log = Logger.getLogger(DblLinkDetect.class);
 	
+	
+	public static void main(final String [] args) {
+		
+		
+		final String file = "./networks/padang_net_v20080618.xml";
+		final Config conf = Gbl.createConfig(null);
+		final World world = Gbl.createWorld();
 
+	log.info("loading network.");
+	final NetworkFactory fc = new NetworkFactory();
+	fc.setLinkPrototype(TimeVariantLinkImpl.class);
+	
+	final NetworkLayer network = new NetworkLayer(fc);
+	new MatsimNetworkReader(network).readFile(file);
+	world.setNetworkLayer(network);
+	world.complete();
+	log.info("done.");
+	
+	new NetworkSegmentDoubleLinks().run(network);
+	
+	new NetworkWriter(network,"converted.xml").write();
+		
+	}
 }

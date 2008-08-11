@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DblLinkDetect.java
+ * OptionManager.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor;
+package playground.gregor.withinday_evac.analyzer;
 
-import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkFactory;
-import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
-import org.matsim.network.TimeVariantLinkImpl;
-import org.matsim.network.algorithms.NetworkSegmentDoubleLinks;
-import org.matsim.world.World;
+import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
+import org.matsim.network.Link;
 
-
-public class DblLinkDetect {
-	private static final Logger log = Logger.getLogger(DblLinkDetect.class);
+public class OptionManager {
 	
+	private final HashMap<Id,NextLinkOption> linkOptions = new HashMap<Id,NextLinkOption>();
 	
-	public static void main(final String [] args) {
-		
-		
-		final String file = "./networks/padang_net_v20080618.xml";
-		final Config conf = Gbl.createConfig(null);
-		final World world = Gbl.createWorld();
-
-	log.info("loading network.");
-	final NetworkFactory fc = new NetworkFactory();
-	fc.setLinkPrototype(TimeVariantLinkImpl.class);
+	public void addNextLinkOptions(NextLinkOption option) {
+		this.linkOptions.put(option.getNextLink().getId(), option);
+	}
 	
-	final NetworkLayer network = new NetworkLayer(fc);
-	new MatsimNetworkReader(network).readFile(file);
-	world.setNetworkLayer(network);
-	world.complete();
-	log.info("done.");
-	
-	new NetworkSegmentDoubleLinks().run(network);
-	
-	new NetworkWriter(network,"converted.xml").write();
+	public void updateNextLinkOption(Link link, double conf) {
 		
 	}
+	
+	public void reset() {
+		this.linkOptions.clear();
+	}
+	
+
 }

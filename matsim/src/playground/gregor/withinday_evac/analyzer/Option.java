@@ -20,9 +20,11 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
-public abstract class Action {
+public abstract class Option {
 
-	double conf;
+	protected double conf;
+		
+	
 	
 	public double getConfidence() {
 		return this.conf;

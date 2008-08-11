@@ -52,17 +52,17 @@ public class ReRouteAnalyzer implements Analyzer {
 		this.intentions = intentions;
 	}
 
-	public Action getAction(final double now) {
+	public Option getAction(final double now) {
 		
 		updateBlockedLinks();
 		
 		if (this.lastCurrent != null && this.beliefs.getCurrentLink().getId() == this.lastCurrent.getId()){
 			if (!blocked(this.lastNext)){
-				return new NextLinkAction(this.lastNext,1);	
+				return new NextLinkOption(this.lastNext,1);	
 			}
 		} else if (this.lastNext != null && this.beliefs.getCurrentLink().getId() == this.lastNext.getId()){
 			if (!blocked(this.linkRoute[this.linkCount])){
-				return new NextLinkAction(this.linkRoute[this.linkCount++],1);
+				return new NextLinkOption(this.linkRoute[this.linkCount++],1);
 			}
 		} 
 
@@ -73,7 +73,7 @@ public class ReRouteAnalyzer implements Analyzer {
 		this.linkCount = 0;
 		this.lastCurrent = this.beliefs.getCurrentLink();
 		this.lastNext = this.linkRoute[this.linkCount++];
-		return new NextLinkAction(this.lastNext,1);
+		return new NextLinkOption(this.lastNext,1);
 
 
 	}

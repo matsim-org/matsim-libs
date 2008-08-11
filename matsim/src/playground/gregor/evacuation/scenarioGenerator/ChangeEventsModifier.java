@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MessageAction.java
+ * ChangeEventsModifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,9 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.analyzer;
+package playground.gregor.evacuation.scenarioGenerator;
 
-public class MessageAction extends Option{
+public class ChangeEventsModifier {
 	
+	
+	public static void main(String [] args) {
+		
+		if (args.length != 4) {
+			throw new RuntimeException("Wrong number of arguments!");
+		}
+		
+		final String network = args[0];
+		final String changein = args[1];
+		final String changeout = args[2];
+		final String barriers = args[3];
+		
+		
+		
+	}
 
 }

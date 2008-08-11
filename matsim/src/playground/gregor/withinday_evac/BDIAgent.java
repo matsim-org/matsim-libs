@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
@@ -55,7 +54,7 @@ public class BDIAgent {
 	private final DecisionMaker decisionMaker;
 	private final Intentions intentions;
 
-	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
+	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer, boolean isBDI){
 		this.person = person;
 		this.vehicle = v;
 		this.vehicle.setAgent(this);
@@ -65,7 +64,8 @@ public class BDIAgent {
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
 		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
 		this.decisionMaker = new DecisionMaker(analyzers);
-		this.isBDIAgent = MatsimRandom.random.nextDouble() <= 0.9;
+		this.isBDIAgent = isBDI;
+
 		
 	}
 
@@ -93,7 +93,7 @@ public class BDIAgent {
 			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
 			infos.addInformationEntity(ie);
 		} else {
-			nextLink = this.decisionMaker.chooseNextLink(now);
+			nextLink = this.decisionMaker.chooseNextLink(now,nodeId);
 //			if (nextLink == null) { //if now guide then choose random link
 //				final Node n = this.vehicle.getCurrentNode();
 //				double prob_sum = n.getOutLinks().size() * Gbl.random.nextDouble(); 

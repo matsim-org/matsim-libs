@@ -25,13 +25,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.events.Events;
+import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.World;
 
 import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;
@@ -50,28 +48,39 @@ public class TransimsSnapshotFilePostProcessor {
 	private static final double MAX_HEIGHT = 2.0;
 	private static final double MIN_WALKABLE = 0.2;
 
-	private TransimsSnapshotFileReader reader;
+	private final TransimsSnapshotFileReader reader;
 
-	private TransimsSnapshotFileWriter writer;
+	private final TransimsSnapshotFileWriter writer;
 
-	private Population plans;
 
-	private List<PostProcessorI> processors;
-	private FloodlineGenerator floodlineGenerator = null;
+//	private final Plans plans;
 
-	public TransimsSnapshotFilePostProcessor(Population plans, final String tVehFile){
-		this.plans = plans;
+	private final List<PostProcessorI> processors;
+	private final FloodlineGenerator floodlineGenerator = null;
+
+
+	public TransimsSnapshotFilePostProcessor(String eventsfile, final String tVehFile){
+//		this.plans = plans;
 		this.reader = new TransimsSnapshotFileReader(tVehFile);
 
+		TimeDependentColorizer tdc = new TimeDependentColorizer();
+		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
+		
+		Events events = new Events();
+		events.addHandler(tdc);
+		events.addHandler(ddc);
+		new EventsReaderTXTv1(events).readFile(eventsfile);
+		
+		
 		String outfile = "./output/colorizedT.veh.txt"; 
 		this.writer = new TransimsSnapshotFileWriter(outfile);
 
 		this.processors = new ArrayList<PostProcessorI>();
-		addProcessor(new TimeDependentColorizer(this.plans));
-		addProcessor(new DestinationDependentColorizer(this.plans));
+		addProcessor(tdc);
+		addProcessor(ddc);
 		addProcessor(new EvacuationLinksTeleporter());
 
-		this.floodlineGenerator = new FloodlineGenerator("./networks/padang_flooding.txt.gz");
+//		this.floodlineGenerator = new FloodlineGenerator("./networks/padang_flooding.txt.gz");
 	}
 	
 
@@ -161,13 +170,17 @@ public class TransimsSnapshotFilePostProcessor {
 		world.complete();
 		log.info("done.");
 
-		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		Population population = new Population();
-		PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		log.info("done.");
 
-		TransimsSnapshotFilePostProcessor tpp = new TransimsSnapshotFilePostProcessor(population,tVehFile);
+//		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
+//		Plans population = new Plans();
+//		PlansReaderI plansReader = new MatsimPlansReader(population);
+//		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+//		log.info("done.");
+
+
+		String eventsfile = Gbl.getConfig().events().getInputFile();
+		
+		TransimsSnapshotFilePostProcessor tpp = new TransimsSnapshotFilePostProcessor(eventsfile,tVehFile);
 		tpp.run();
 	} 
 }

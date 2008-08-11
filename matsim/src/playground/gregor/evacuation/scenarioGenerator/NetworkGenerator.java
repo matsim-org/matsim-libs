@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.networkProcessing;
+package playground.gregor.evacuation.scenarioGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,9 +42,7 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -133,9 +131,15 @@ public class NetworkGenerator {
 	public static void main(final String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
 		
 		
-		final String nodes = "./padang/network_"+ VERSION + "/nodes.shp";
-		final String links = "./padang/network_" + VERSION + "/links.shp";
+		String nodes = "./padang/network_"+ VERSION + "/nodes.shp";
+		String links = "./padang/network_" + VERSION + "/links.shp";
+		String netfile = "./padang/network_" + VERSION + "/matsim_net.shp";
 		
+		if (args.length == 3) {
+			nodes = args[0];
+			links = args[1];
+			netfile = args[2];
+		}
 	
 		FeatureSource n = null;
 		try {
@@ -160,8 +164,8 @@ public class NetworkGenerator {
 		network.setCapacityPeriod(1);
 		new NetworkGenerator(pn, pl , network).constructNetwork();
 		
-		new NetworkWriter(network,"pdg_new.xml").write();
-		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n),"./padang/network_" + VERSION + "/matsim_net.shp" );
+		new NetworkWriter(network, netfile).write();
+//		ShapeFileWriter.writeGeometries(genFeatureCollection((Collection<Link>) network.getLinks().values(), n), );
 		
 	}
 

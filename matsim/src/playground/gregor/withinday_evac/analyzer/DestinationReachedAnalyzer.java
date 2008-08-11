@@ -33,9 +33,9 @@ public class DestinationReachedAnalyzer implements Analyzer {
 		this.intentions = intentions;
 	}
 	
-	public Action getAction(final double now) {
+	public Option getAction(final double now) {
 		if (this.beliefs.getCurrentLink().getToNode().getId() == this.intentions.getDestination().getId()) {
-			return new NextLinkAction(null,1);
+			return new NextLinkOption(null,1);
 		}
 
 		return null;
