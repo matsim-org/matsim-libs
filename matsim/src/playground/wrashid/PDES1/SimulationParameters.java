@@ -11,7 +11,7 @@ import playground.wrashid.PDES.util.ConcurrentList;
 public class SimulationParameters {
 	// EventHeap
 	
-	static long maxSimulationLength=50; //in s 
+	static long maxSimulationLength=100000; //in s 
 	public static long linkCapacityPeriod=0; // 
 	public static double gapTravelSpeed=15.0; // in m/s
 	public static double flowCapacityFactor=1.0;
