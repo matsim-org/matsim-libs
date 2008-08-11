@@ -94,8 +94,8 @@ public abstract class Scenario {
 		config.matrices().setInputFile(input_directory + "matrices.xml");
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
-		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
-//		config.plans().setInputFile("plans.xml.gz");
+//		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
+		config.plans().setInputFile("plans.xml.gz");
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
