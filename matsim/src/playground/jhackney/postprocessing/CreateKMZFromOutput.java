@@ -145,8 +145,6 @@ public class CreateKMZFromOutput {
 			Person testP=plans.getPerson("21924270");//1pct
 //			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 			EgoNetPlansItersMakeKML.loadData(testP,i);
-			EgoNetPlansItersMakeKML.write();
-
 			System.out.println(" ... done");
 
 
@@ -195,6 +193,7 @@ public class CreateKMZFromOutput {
 //			Scenario.writeConfig();
 
 		}
+		EgoNetPlansItersMakeKML.write();
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
 	}
