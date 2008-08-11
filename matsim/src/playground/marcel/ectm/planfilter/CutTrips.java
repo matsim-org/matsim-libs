@@ -138,7 +138,8 @@ public class CutTrips implements PersonAlgorithm {
 		 */
 
 		if (startInside && (firstOutsideLink == null)) {
-			// agent is never outside the area, nothing to do
+			// agent is never outside the area, so call the next algo and that's it
+			this.nextAlgorithm.run(person);
 			return;
 		}
 
