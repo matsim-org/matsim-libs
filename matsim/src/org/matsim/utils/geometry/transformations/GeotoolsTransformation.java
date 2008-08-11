@@ -20,9 +20,6 @@
 
 package org.matsim.utils.geometry.transformations;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.utils.geometry.Coord;
@@ -45,16 +42,7 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 
 	private MathTransform transform;
 
-	private final static Map<String, String> transformations = new HashMap<String, String>();
 
-	static {
-		transformations.put(TransformationFactory.WGS84,
-				"GEOGCS[\"WGS84\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]");
-		transformations.put(TransformationFactory.WGS84_UTM47S,
-				"PROJCS[\"WGS_1984_UTM_Zone_47S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",10000000.0],PARAMETER[\"Central_Meridian\",99.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]");
-		transformations.put(TransformationFactory.WGS84_UTM35S, // south-africa
-				"PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]");
-	}
 
 
 	/**
@@ -68,9 +56,9 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 	 *
 	 * @see <a href="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT specifications</a>
 	 */
-	public GeotoolsTransformation(String from, String to) {
-		CoordinateReferenceSystem sourceCRS = getCRS(from);
-		CoordinateReferenceSystem targetCRS = getCRS(to);
+	public GeotoolsTransformation(final String from, final String to) {
+		CoordinateReferenceSystem sourceCRS = MGC.getCRS(from);
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(to);
 
 		try {
 			this.transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
@@ -79,10 +67,10 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 		}
 	}
 
-	public Coord transform(Coord coord) {
+	public Coord transform(final Coord coord) {
 		Point p = null;
 		try {
-			p = (Point) JTS.transform(MGC.coord2Point(coord), transform);
+			p = (Point) JTS.transform(MGC.coord2Point(coord), this.transform);
 		} catch (MismatchedDimensionException e) {
 			throw new RuntimeException(e);
 		} catch (TransformException e) {
@@ -91,17 +79,6 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 		return MGC.point2Coord(p);
 	}
 
-	private CoordinateReferenceSystem getCRS(String crsString) {
-		String wkt_CRS = transformations.get(crsString);
-		if (wkt_CRS == null) {
-			wkt_CRS = crsString;
-		}
 
-		try {
-			return CRS.parseWKT(wkt_CRS);
-		} catch (FactoryException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
 
 }
