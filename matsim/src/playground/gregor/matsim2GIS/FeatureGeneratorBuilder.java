@@ -63,9 +63,9 @@ public class FeatureGeneratorBuilder {
 		}
 	}
 
-	public FeatureGenerator getFeatureGenerator() {
+	public FeatureGenerator createFeatureGenerator() {
 
-		WidthCalculator widthCalc = getWidthCalculator();
+		WidthCalculator widthCalc = createWidthCalculator();
 		FeatureGenerator ret;
 		Exception ex;
 		try {
@@ -85,7 +85,7 @@ public class FeatureGeneratorBuilder {
 				ex);
 	}
 
-	private WidthCalculator getWidthCalculator() {
+	private WidthCalculator createWidthCalculator() {
 		WidthCalculator ret;
 		Exception ex;
 		try {

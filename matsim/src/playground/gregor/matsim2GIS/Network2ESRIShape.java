@@ -27,8 +27,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public class Network2ESRIShape {
 	public Network2ESRIShape(final NetworkLayer network, final String filename, final FeatureGeneratorBuilder builder) {
 		this.network = network;
 		this.filename = filename;
-		this.featureGenerator = builder.getFeatureGenerator();
+		this.featureGenerator = builder.createFeatureGenerator();
 
 	}
 
@@ -83,19 +85,19 @@ public class Network2ESRIShape {
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
-		//		world.setNetworkLayer(network);
-		//		world.complete();
 		log.info("done.");
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-
 		new Network2ESRIShape(network,outputFileLs, builder).write();
+
+		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM35S");
 		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+		builder.setCoordinateReferenceSystem(crs);
 		new Network2ESRIShape(network,outputFileP, builder).write();
 
 	}
