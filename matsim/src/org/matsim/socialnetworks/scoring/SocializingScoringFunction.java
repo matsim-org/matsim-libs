@@ -46,7 +46,6 @@ public class SocializingScoringFunction implements ScoringFunction{
 	private final SpatialScorer spatialScorer;
 	private final String factype;
 
-//	private double toll = 0.0;
 	private double friendFoeRatio=0.;
 	private double nFriends=0;
 	private double timeWithFriends=0;
@@ -93,7 +92,7 @@ public class SocializingScoringFunction implements ScoringFunction{
 				this.timeWithFriends+=actStats.get(act).get(2);
 			}
 		}
-		log.info("Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
+//		log.info("Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
 	}
 
 	public void agentStuck(final double time) {
