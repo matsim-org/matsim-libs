@@ -36,7 +36,7 @@ public class FacilitiesFindScenarioMinMaxCoords {
 
 	public void run(Facilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-		System.out.println("  NOTE you could get these limits from world");
+//		System.out.println("  NOTE you could get these limits from world");
 
 		double min_x = Double.MAX_VALUE;
 		double min_y = Double.MAX_VALUE;
