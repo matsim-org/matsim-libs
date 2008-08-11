@@ -31,7 +31,7 @@ public class AllTests {
 		suite.addTestSuite(org.matsim.roadpricing.PlansCalcAreaTollRouteTest.class);
 		suite.addTestSuite(org.matsim.roadpricing.RoadPricingControlerTest.class);
 		suite.addTestSuite(org.matsim.roadpricing.RoadPricingIOTest.class);
-		suite.addTestSuite(org.matsim.roadpricing.RoadPricingScoringFunctionTest.class);
+		suite.addTestSuite(org.matsim.roadpricing.CalcPaidTollTest.class);
 		suite.addTestSuite(org.matsim.roadpricing.TollTravelCostCalculatorTest.class);
 		//$JUnit-END$
 		return suite;

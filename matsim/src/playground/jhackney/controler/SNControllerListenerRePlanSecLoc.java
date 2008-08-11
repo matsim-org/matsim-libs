@@ -27,13 +27,10 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.controler.corelisteners.PlansScoring;
-import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.events.StartupEvent;
-import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
@@ -44,9 +41,6 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
@@ -69,29 +63,29 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * plans are modified according to the new information within the iterations of the MobSim.
  * Thus the social network replanning occurs in parallel to the normal replanning and not
  * serial to it. <p>
- * 
+ *
  * Contrast this functionality to <a href= <a> playground/jhackney/controler/SNControllerListenerSecLoc.java</a>, which replans outside the
  * MobSim loop and generates new initial demand (100% of agents replan with social network
  * and a portion of the plans are optimized subsequently in MobSim).<p>
- * 
+ *
  * It is likely that neither implementation is right or wrong, but that different
  * experiments will use different Controllers: e.g. secondary location choice still needs
  * a route and/or departure time optimization either for the new secondary activities or
  * for the primary activities.<p>
- * 
+ *
  * The fraction of agents socially interacting is set in the config.xml variables,
  * "fract_s_interact" for spatial interactions, and "fract_ns_interact" for simulating
  * other interactions which occur/have occured outside the framework of the plans
  * under consideration.<p>
- * 
+ *
  * After these interactions occur, a percent of agents adapt their plans to their social
  * group. This is done in a PlanAlgorithm written to make the desired kind of changes
  * one wants to make to the plans as a result of social interactions. The PlanAlgorithm
  * must be added to the StrategyManager.<p>
- * 
+ *
  * Initialization of social networks can use the initial plans and/or
  * other algorithms to generate relationships.
- * 
+ *
  * @author jhackney
  *
  */
@@ -117,7 +111,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 	private SpatialScorer spatialScorer=null;
-	private EventsToScore scoring =null; 
+	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
 
@@ -175,7 +169,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-		
+
 		this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 
 		scoring.finish();
@@ -213,7 +207,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 				this.log.info(" ... done");
-				
+
 //				Write out the KML for the EgoNet of a chosen agent
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
@@ -229,7 +223,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 			}
 		}
 
-		if (event.getIteration() == this.controler.getLastIteration()){	
+		if (event.getIteration() == this.controler.getLastIteration()){
 
 			EgoNetPlansItersMakeKML.write();
 		}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RoadPricingScoringFunctionTest.java
+ * CalcPaidTollTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,6 +20,7 @@
 
 package org.matsim.roadpricing;
 
+import org.apache.log4j.Logger;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -28,14 +29,18 @@ import org.matsim.population.Population;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 /**
- * Tests {@link RoadPricingScoringFunction} that it correctly scores the executed plans, respecting eventual tolls.
+ * Tests that {@link CalcPaidToll} calculates the correct tolls
+ * and adds them to the scores of the executed plans.
  *
  * @author mrieser
  */
-public class RoadPricingScoringFunctionTest extends MatsimTestCase {
+public class CalcPaidTollTest extends MatsimTestCase {
+
+	static private final Logger log = Logger.getLogger(CalcPaidTollTest.class);
 
 	@Override
 	protected void setUp() throws Exception {
@@ -151,9 +156,9 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 	}
 
 	private void compareScores(final double scoreWithoutToll, final double scoreWithToll, final double expectedToll) {
-		System.out.println("score without toll: " + scoreWithoutToll);
-		System.out.println("score with toll:    " + scoreWithToll);
-		System.out.println("expected toll:      " + expectedToll);
+		log.info("score without toll: " + scoreWithoutToll);
+		log.info("score with toll:    " + scoreWithToll);
+		log.info("expected toll:      " + expectedToll);
 		assertEquals(expectedToll, scoreWithoutToll - scoreWithToll, 1e-8);
 	}
 
@@ -180,11 +185,13 @@ public class RoadPricingScoringFunctionTest extends MatsimTestCase {
 			Events events = new Events();
 			CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 			events.addHandler(paidToll);
-			EventsToScore scoring = new EventsToScore(population, new RoadPricingScoringFunctionFactory(paidToll, new CharyparNagelScoringFunctionFactory()));
+			EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
 			events.addHandler(scoring);
 
 			QueueSimulation sim = new QueueSimulation(network, population, events);
 			sim.run();
+
+			paidToll.sendUtilityEvents(Time.MIDNIGHT, events);
 
 			scoring.finish();
 		} catch (Exception e) {

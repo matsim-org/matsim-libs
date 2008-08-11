@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="distance" name="equil-net distance-toll for tests">
+
+	<description>A simple distance toll scheme for the equil-network.</description>
+
+	<links>
+		<link id="6" />
+		<link id="15" />
+	</links>
+
+	<!-- amount: [monetary unit] / [link length unit] -->
+	<cost start_time="06:00" end_time="10:00" amount="0.00020" />
+	<cost start_time="10:00" end_time="15:00" amount="0.00010" />
+	<cost start_time="15:00" end_time="19:00" amount="0.00020" />
+
+</roadpricing>

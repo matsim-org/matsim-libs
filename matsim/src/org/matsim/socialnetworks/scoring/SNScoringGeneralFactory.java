@@ -1,8 +1,6 @@
 package org.matsim.socialnetworks.scoring;
 
 import org.matsim.population.Plan;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingScoringFunction;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -24,6 +22,6 @@ public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 //		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
 		return new SocializingScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
 	}
-	
+
 
 }

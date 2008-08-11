@@ -21,12 +21,12 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.TravelCost;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,8 +49,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertFalse("BaseCase must not use roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
 		TravelCost travelCosts = controler.getTravelCostCalculator();
 		assertFalse("BaseCase must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
@@ -64,8 +62,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("Distance toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
 		TravelCost travelCosts = controler.getTravelCostCalculator();
 		assertTrue("Distance toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
@@ -79,8 +75,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("Cordon toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
 		TravelCost travelCosts = controler.getTravelCostCalculator();
 		assertTrue("Cordon toll must use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
@@ -94,8 +88,6 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.getRoutingAlgorithm();
 		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
-		ScoringFunctionFactory sff = controler.getScoringFunctionFactory();
-		assertTrue("Area toll must use the roadpricing-scoring function.", sff instanceof RoadPricingScoringFunctionFactory);
 		TravelCost travelCosts = controler.getTravelCostCalculator();
 		assertFalse("Area toll must not use TollTravelCostCalculator.", travelCosts instanceof TollTravelCostCalculator);
 	}
@@ -154,6 +146,30 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		}
 	}
 
+	/** Tests that paid tolls end up in the score. */
+	public void testTollScores() {
+		// first run basecase
+		Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(0);
+		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+		config.controler().setOutputDirectory(getOutputDirectory() + "/basecase/");
+		Controler controler1 = new Controler(config);
+		controler1.setCreateGraphs(false);
+		controler1.run();
+		double scoreBasecase = controler1.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScore();
+
+		// now run toll case
+		Gbl.reset();
+		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
+		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
+		Controler controler2 = new Controler(config);
+		controler2.setCreateGraphs(false);
+		controler2.run();
+		double scoreTollcase = controler2.getPopulation().getPerson(new IdImpl("1")).getPlans().get(0).getScore();
+
+		// there should be a score difference
+		assertEquals(3.0, scoreBasecase - scoreTollcase, EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
+	}
 
 	/** Just a simple Controler that does not run the mobsim, as we're not interested in that part here. */
 	private static class TestControler extends Controler {

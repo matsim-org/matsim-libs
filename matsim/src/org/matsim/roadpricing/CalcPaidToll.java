@@ -20,10 +20,14 @@
 
 package org.matsim.roadpricing;
 
+import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.events.AgentUtilityEvent;
 import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.BasicEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
@@ -80,6 +84,23 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 			link = (Link) this.network.getLocation(event.linkId);
 		}
 		this.handler.handleEvent(event, link);
+	}
+
+	/**
+	 * Sends {@link AgentUtilityEvent}s for all agents that must pay a toll.
+	 * This method should usually be called at the end before of an iteration.
+	 *
+	 * <strong>Important note: </strong>Do not call this method twice without
+	 * calling {@link #reset(int)} in between. Otherwise the toll-disutility
+	 * may be added twice to the agents' score!
+	 *
+	 * @param time the current time the generated events are associated with
+	 * @param events the {@link Events} collection, the generated events are sent to for processing
+	 */
+	public void sendUtilityEvents(final double time, final Events events) {
+		for (Map.Entry<String, AgentInfo> entries : this.agents.entrySet()) {
+			events.processEvent(new AgentUtilityEvent(time, new IdImpl(entries.getKey()), -entries.getValue().toll));
+		}
 	}
 
 	public void reset(final int iteration) {

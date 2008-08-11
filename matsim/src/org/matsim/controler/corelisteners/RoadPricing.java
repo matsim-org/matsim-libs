@@ -25,22 +25,24 @@ import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingScoringFunctionFactory;
 import org.matsim.roadpricing.TollTravelCostCalculator;
+import org.matsim.utils.misc.Time;
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.
  *
  * @author mrieser
  */
-public class RoadPricing implements StartupListener, IterationEndsListener {
+public class RoadPricing implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
 	private RoadPricingScheme scheme = null;
 	private CalcPaidToll tollCalc = null;
@@ -73,9 +75,6 @@ public class RoadPricing implements StartupListener, IterationEndsListener {
 		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.tollCalc);
 
-		// add the toll-score to the existing scoring function
-		controler.setScoringFunctionFactory(new RoadPricingScoringFunctionFactory(this.tollCalc, controler.getScoringFunctionFactory()));
-		log.debug("Loaded RoadPricingScoringFunctionFactory and set in controler");
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
 			// area-toll requires a regular TravelCost, no toll-specific one.
@@ -84,6 +83,11 @@ public class RoadPricing implements StartupListener, IterationEndsListener {
 
 		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.cattl);
+	}
+
+	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+		// evaluate the final tolls paid by the agents and add them to their scores
+		this.tollCalc.sendUtilityEvents(Time.MIDNIGHT, event.getControler().getEvents());
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
