@@ -91,7 +91,7 @@ public class Scheduler {
 			while (true){
 				boolean allEmpty=true;
 				for (int i=1;i<SimulationParameters.numberOfMessageExecutorThreads+1;i++){
-					if (!threadMessageQueues[i-1].isEmpty()){
+					if (!threadMessageQueues[i-1].isEmpty() && messageExecutors[i-1].isAlive){
 						allEmpty=false;
 					}
 				}

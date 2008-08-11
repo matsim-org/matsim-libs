@@ -17,9 +17,10 @@ public class MessageFactory {
 	
 	
 	public static void disposeNullMessage(NullMessage message){
-		if (nullMessageQueue.size()<SimulationParameters.maxQueueLength){
-			nullMessageQueue.add(message);
-		}
+		// uncomment this, as soon as problems with performance solved => This is a bottleneck at the moment...
+		//if (nullMessageQueue.size()<SimulationParameters.maxQueueLength){
+		//	nullMessageQueue.add(message);
+		//}
 	}
 	
 	public static void disposeEnterRequestMessage(EnterRequestMessage message){

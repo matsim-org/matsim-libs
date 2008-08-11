@@ -13,6 +13,7 @@ public class MessageExecutor extends Thread {
 	public Lock lock2=new ReentrantLock();
 	public Condition hasAcquiredLock=lock1.newCondition();
 	public Condition mayStart=lock2.newCondition();
+	public volatile boolean isAlive=true;
 	
 	private static ThreadLocal tId = new ThreadLocal();
 
@@ -64,7 +65,7 @@ public class MessageExecutor extends Thread {
 		//scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 		int barrierRound=0;
 		try{
-			while (getSimTime()<100000){
+			while (getSimTime()<SimulationParameters.maxSimulationLength){
 				// this is needed, because for the same street the lock should happen before the next road can do the lock
 				
 				//while (scheduler.queue.getCounter()%(this.id+1)!=0 && !scheduler.queue.isEmpty()){
@@ -156,6 +157,7 @@ public class MessageExecutor extends Thread {
 		scheduler.timer.endTimer();
 		scheduler.timer.printMeasuredTime("ThreadId-"+tId + ": ");
 		scheduler.decrementNoOfAliveThreads();
+		isAlive=false;
 	}
 
 	private void executeMessage(){
