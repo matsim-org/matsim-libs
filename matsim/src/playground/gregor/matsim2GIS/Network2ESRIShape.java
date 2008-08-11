@@ -73,7 +73,8 @@ public class Network2ESRIShape {
 
 	public static void main(final String [] args) {
 
-		String netfile = "./networks/padang_net_v20080618.xml";
+
+		String netfile = "./examples/equil/network.xml";
 		String outputFileLs = "./output/networkLs.shp";
 		String outputFileP = "./output/networkP.shp";
 		Gbl.createConfig(null);
@@ -92,8 +93,9 @@ public class Network2ESRIShape {
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 
 		new Network2ESRIShape(network,outputFileLs, builder).write();
-		builder.setWidthCoefficient(1);
+		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		new Network2ESRIShape(network,outputFileP, builder).write();
 
 	}
