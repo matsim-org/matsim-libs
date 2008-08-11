@@ -19,6 +19,8 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -214,10 +216,12 @@ public class AnalyzeScores {
 				Plan plan = p.getSelectedPlan();
 				ActIterator ait = plan.getIteratorAct();
 				double planscore=0;
+				Hashtable<Act,ArrayList<Double>> actStats = scorer.calculateTimeWindowActStats(plan);
 				while(ait.hasNext()){
 					Act act = (Act)ait.next();
 					if(act.getType().equals("leisure")){
-						double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
+//						double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
+						double nFriends=actStats.get(act).get(1);
 						planscore+=nFriends;
 					}
 				}
