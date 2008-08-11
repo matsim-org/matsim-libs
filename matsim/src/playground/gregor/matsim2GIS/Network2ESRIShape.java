@@ -74,7 +74,8 @@ public class Network2ESRIShape {
 	public static void main(final String [] args) {
 
 		String netfile = "./networks/padang_net_v20080618.xml";
-		String outputFile = "./output/network.shp";
+		String outputFileLs = "./output/networkLs.shp";
+		String outputFileP = "./output/networkP.shp";
 		Gbl.createConfig(null);
 		Gbl.getConfig().global().setCoordinateSystem("WGS84_UTM47S");
 
@@ -90,7 +91,10 @@ public class Network2ESRIShape {
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
 
-		new Network2ESRIShape(network,outputFile, builder).write();		
+		new Network2ESRIShape(network,outputFileLs, builder).write();
+		builder.setWidthCoefficient(1);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		new Network2ESRIShape(network,outputFileP, builder).write();
 
 	}
 
