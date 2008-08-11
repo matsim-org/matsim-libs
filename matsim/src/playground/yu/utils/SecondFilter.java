@@ -126,7 +126,7 @@ public class SecondFilter extends TableSplitter {
 
 	private static class PrimLine {
 		private final String origZoneNo, destZoneNo;
-		private final Date travelTime;
+		private final String travelTime;
 		private final int transfers;
 
 		public PrimLine(final String origZoneNo, final String destZoneNo,
@@ -135,7 +135,7 @@ public class SecondFilter extends TableSplitter {
 			this.origZoneNo = origZoneNo;
 			this.destZoneNo = destZoneNo;
 			// this.depTime = sdf.parse(depTime);
-			this.travelTime = sdf.parse(travelTime);
+			this.travelTime = travelTime;
 			this.transfers = Integer.parseInt(transfers);
 		}
 
@@ -155,7 +155,7 @@ public class SecondFilter extends TableSplitter {
 		/**
 		 * @return the travelTime
 		 */
-		public Date getTravelTime() {
+		public String getTravelTime() {
 			return travelTime;
 		}
 
@@ -203,7 +203,7 @@ public class SecondFilter extends TableSplitter {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String timeIntervalFileName = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\DepTimeIndex22.txt";
+		String timeIntervalFileName = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\DepTimeIndex22test.txt";
 		String attFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\";
 		String outputFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\output\\";
 		// to read time intervall file:
