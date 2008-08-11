@@ -216,20 +216,21 @@ public class AnalyzeScores {
 				Plan plan = p.getSelectedPlan();
 				ActIterator ait = plan.getIteratorAct();
 				double planscore=0;
+				double nFriends=0;
 				Hashtable<Act,ArrayList<Double>> actStats = scorer.calculateTimeWindowActStats(plan);
 				while(ait.hasNext()){
 					Act act = (Act)ait.next();
 					if(act.getType().equals("leisure")){
 //						double nFriends=scorer.calculateTimeWindowStats(plan).get(1);
-						double nFriends=actStats.get(act).get(1);
-						planscore+=nFriends;
+						nFriends+=actStats.get(act).get(1);
 					}
 				}
-				totaliterationscore+=Math.log(planscore+1);
+				planscore=100.*Math.log(nFriends+1);
+				totaliterationscore+=planscore;
 				numplans++;
 //				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
 			}
-			double avgscore=100.*totaliterationscore/((double) numplans);
+			double avgscore=totaliterationscore/((double) numplans);
 			System.out.println("##Result "+i+" "+avgscore);
 		}
 		System.out.println("TEST SUCCEEDED.");
