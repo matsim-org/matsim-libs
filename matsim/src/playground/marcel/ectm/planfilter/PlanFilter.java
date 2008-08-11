@@ -154,6 +154,7 @@ public class PlanFilter {
 		// generate sub-net
 		NetworkLayer subnet = new NetworkLayer();
 		subnet.setName("based on " + config.network().getInputFile());
+		subnet.setCapacityPeriod(network.getCapacityPeriod());
 		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
