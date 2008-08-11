@@ -69,8 +69,8 @@ public class CreateKMZFromOutput {
 		System.out.println("... done");
 		
 		for(int i=0; i<501; i+=50){
-//			config.socnetmodule().setInitIter(Integer.toString(i));
-			config.socnetmodule().setInitIter(Integer.toString(0));
+			config.socnetmodule().setInitIter(Integer.toString(i));
+//			config.socnetmodule().setInitIter(Integer.toString(0));
 			Population plans = Scenario.readPlans(i);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
