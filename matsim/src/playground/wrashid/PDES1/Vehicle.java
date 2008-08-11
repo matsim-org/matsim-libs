@@ -238,6 +238,7 @@ public class Vehicle extends SimUnit {
 		m.secondLock=this;
 		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
+		road.roadEntryHandler.staringLegMessages.add(m);
 	}
 
 	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {

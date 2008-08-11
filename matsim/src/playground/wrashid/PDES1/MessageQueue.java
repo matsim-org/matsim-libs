@@ -94,7 +94,7 @@ public class MessageQueue {
 			//System.out.println("event:" + counter);
 			if (arrivalTimeOfLastRemovedMessage>1000){	
 				//System.out.println(queue1.size());
-				System.out.println("the time has come:" + 1000);
+				//System.out.println("the time has come:" + 1000);
 			}
 			
 			//if (queue1.size() % 1000 ==0){

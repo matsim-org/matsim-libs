@@ -3,6 +3,8 @@ package playground.wrashid.PDES1;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.LinkedList;
+import java.util.concurrent.PriorityBlockingQueue;
+
 import org.matsim.network.Link;
 
 public class RoadEntryHandler {
@@ -15,6 +17,11 @@ public class RoadEntryHandler {
 	private volatile int test_wrongMessages=0;
 	private LinkedList<Message> test_scheduledMessages=new LinkedList<Message>();
 	private LinkedList<Message> test_arrivedMessages=new LinkedList<Message>();
+	
+	// the road entry handler receives the road request too late for a start leg, because it schedules
+	// new messages before the start of the next leg.
+	// The nextStarLegTime variable can be used to be sure, that no out of sync message behaviour occurs
+	public PriorityBlockingQueue<Message>  staringLegMessages=new PriorityBlockingQueue<Message>();
 	
 	RoadEntryHandler(Road belongsToRoad){
 		this.belongsToRoad = belongsToRoad;
@@ -105,6 +112,16 @@ public class RoadEntryHandler {
 	
 	private void processMessageQueue(){
 		while (pendingMessagesFromRoads.size()==this.numberOfIncomingRoads){
+			
+			// we can't process the queue further than the next starting leg message. We should wait on that message first
+			Message nextstartingLegMessage=staringLegMessages.peek();
+			if (nextstartingLegMessage!=null && nextstartingLegMessage.messageArrivalTime<messageQueue.peek().messageArrivalTime){
+				return;
+			}
+			
+			
+			
+			
 			// as long as all roads have messages on them, take the least message 
 			Message m=messageQueue.poll();
 			
