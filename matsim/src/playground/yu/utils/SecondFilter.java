@@ -199,13 +199,21 @@ public class SecondFilter extends TableSplitter {
 		}
 	}
 
+	public void closeWriter() {
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(final String[] args) {
 		String timeIntervalFileName = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\DepTimeIndex22test.txt";
 		String attFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\";
-		String outputFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\output\\";
+		String outputFilePath = "C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\Att22R24\\output222\\";
 		// to read time intervall file:
 		timeIntervalReader tir = readTimeInterval(timeIntervalFileName,
 				attFilePath, outputFilePath);
@@ -282,6 +290,8 @@ public class SecondFilter extends TableSplitter {
 							}
 						}
 				} while (line != null);
+				sf.closeReader();
+				sf.closeWriter();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ParseException e) {
