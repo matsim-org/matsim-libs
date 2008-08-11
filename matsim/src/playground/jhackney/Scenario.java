@@ -57,8 +57,8 @@ public abstract class Scenario {
 	//For TRB run analyses of 500 iterations
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB6/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB6/";
-	private static final String output_directory="output/Analyses/TRB6/";
-	private static final String input_directory="output/TRB6/";
+	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
+	private static final String input_directory="output/TRB6/";//AnalyzeScores
 	
 	
 	private static final Config config= Gbl.createConfig(null);;
@@ -95,7 +95,7 @@ public abstract class Scenario {
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 //		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
-		config.plans().setInputFile("plans.xml.gz");
+		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
 		config.plans().setOutputSample(1.0);
@@ -106,7 +106,7 @@ public abstract class Scenario {
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
 //		config.socnetmodule().setSocNetGraphAlgo("none");
-		config.socnetmodule().setSocNetGraphAlgo("read");
+		config.socnetmodule().setSocNetGraphAlgo("read");//AnalyzeScores
 		config.socnetmodule().setSocNetLinkRemovalP("0");
 		config.socnetmodule().setSocNetLinkRemovalAge("0");
 		config.socnetmodule().setDegSat("0");
