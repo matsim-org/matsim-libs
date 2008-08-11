@@ -138,6 +138,7 @@ public class PlanFilter {
 		PopulationReader plansReader = new MatsimPopulationReader(population);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
+		System.out.println("  finding AOI links");
 
 		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
 		final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
@@ -181,6 +182,7 @@ public class PlanFilter {
 		insideFilter.run(population);
 		plansWriter.writeEndPlans();
 
+		System.out.println("smallR \t bigR \t #linksSmall \t #linksBig \t #personsSmall");
 		System.out.println(smallRadius + "\t" + bigRadius + "\t" + smallAOI.size() + "\t" + bigAOI.size() + "\t" + insideFilter.getCount());
 
 		System.out.println("RUN: generateSubset finished");
