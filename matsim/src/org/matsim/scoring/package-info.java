@@ -35,6 +35,28 @@
  * forget to call {@link org.matsim.scoring.EventsToScore#finish()} after
  * processing all events.
  *
+ * <h3>Replacing / Extending the scoring function</h3>
+ * There are two possibilities one can think of on how to change the scoring
+ * function: One can either want to use a complete different scoring algorithm,
+ * or one might plan to use an existing scoring function, but add additional
+ * utility-terms to it (e.g. tolls paid, money paid for parking lots, ...).
+ * For the first case (use a complete different scoring algorithm), write your
+ * own scoring function and scoring function factory, and add it to the
+ * Controler with {@link org.matsim.controler.Controler#setScoringFunctionFactory(org.matsim.scoring.ScoringFunctionFactory)}.
+ * But if you only plan to add or subtract some utility amounts from agents'
+ * score, you can generate {@link org.matsim.events.AgentUtilityEvent}s.
+ * Scoring functions should listen for <code>AgentUtilityEvent</code>s and just
+ * add the utility amount specified in the event to the agent's score.
+ *
+ * As an example, the roadpricing-package makes use of <code>AgentUtilityEvent</code>s:
+ * An event-handler listens for agents entering and leaving links and thus
+ * calculates how much toll an agent pays. After the iteration, the event
+ * handler generates events itself: for each agent that must pay some toll, an
+ * <code>AgentUtilityEvent</code> is generated with the correct amount of toll.
+ * The scoring function receives those events and thus adds the paid tolls to
+ * the agents' score.
+ *
+ *
  * @see org.matsim.population.algorithms.PlanAverageScore
  */
 package org.matsim.scoring;
