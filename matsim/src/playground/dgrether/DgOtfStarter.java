@@ -49,7 +49,7 @@ public class DgOtfStarter {
 //		String file = "583/run583.it800.T.mvi";
 		
 		//toll case ersa
-//		String file = "585/run585.it800.T.mvi";
+		String file = "585/run585.it800.T.mvi";
 		
 		//base case stuck=false, no earlyDeparture
 //		String file = "596/it.500/500.T.mvi";
@@ -65,7 +65,7 @@ public class DgOtfStarter {
 //		String file = "608/it.100/100.events.mvi";
 		
 		//cmcf runs full activity chains no time first route cmcf
-		String file = "610/it.100/100.events.mvi";
+//		String file = "610/it.100/100.events.mvi";
 		//cmcf runs full activity chains no time no cmcf routes
 //		String file = "612/it.100/100.events.mvi";
 		
