@@ -18,6 +18,7 @@ public class MessageQueue {
 	//private LinkedList<Message> addBuffer=new LinkedList<Message>();
 	//private LinkedList<Message> deleteBuffer=new LinkedList<Message>();
 	private volatile static int counter=0;
+	private volatile static int incounter=0;
 	public double arrivalTimeOfLastRemovedMessage=0;
 	private Object bufferLock=new Object();
 	private LinkedList<Message>[] addMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
@@ -37,9 +38,10 @@ public class MessageQueue {
 		}
 		
 		
-		if (m.messageArrivalTime>2000){	
-			//System.out.println("m.messageArrivalTime:"+m.messageArrivalTime);
+		if (incounter % 10000 ==0){	
+			System.out.println("incounter:"+incounter);
 		}
+		incounter++;
 	}
 	
 	public MessageQueue(){
@@ -72,7 +74,7 @@ public class MessageQueue {
 	}
 
 	synchronized public Message getNextMessage() {
-		counter++;
+		
 
 		
 		
@@ -84,10 +86,11 @@ public class MessageQueue {
 		Message m = queue1.poll();
 		//Message m = queue1.removeLast();
 		if (m!=null){
-			
+			counter++;
 			if (counter % 10000==0){
 				System.out.println("event:" + counter);
 				System.out.println(arrivalTimeOfLastRemovedMessage);
+				System.out.println("MessageExecutor.getThreadId():"+MessageExecutor.getThreadId());
 			}
 			
 			
@@ -104,6 +107,10 @@ public class MessageQueue {
 			}
 			
 			assert(arrivalTimeOfLastRemovedMessage>=0):"simulation time cannot be negative";
+			
+			// this assertion does not need to be true: assume, a road with long incoming roads receiving all messages.
+			// already at the beginning of the simulation this can be wrong
+			// assert(m.messageArrivalTime>=arrivalTimeOfLastRemovedMessage):"something is wrong here...";
 			
 			//System.out.println("arrivalTimeOfLastRemovedMessage:"+arrivalTimeOfLastRemovedMessage);
 		

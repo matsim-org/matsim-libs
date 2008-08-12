@@ -28,8 +28,8 @@ public class StartingLegMessage extends EventMessage {
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			//road.enterRequest(vehicle);
 			
-			assert(road.roadEntryHandler.staringLegMessages.peek()==this);
-			road.roadEntryHandler.staringLegMessages.remove(this);
+			assert(road.roadEntryHandler.peekStaringLegMessages()==this);
+			road.roadEntryHandler.removeStaringLegMessages(this);
 			road.roadEntryHandler.registerEnterRequestMessage(road, vehicle, messageArrivalTime);
 		} else {
 			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the

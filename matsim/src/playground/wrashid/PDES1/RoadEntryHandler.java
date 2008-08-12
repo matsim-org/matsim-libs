@@ -1,11 +1,14 @@
 package playground.wrashid.PDES1;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.network.Link;
+
+import playground.wrashid.DES.utils.Timer;
 
 public class RoadEntryHandler {
 
@@ -14,19 +17,26 @@ public class RoadEntryHandler {
 	private LinkedList<Road> pendingMessagesFromRoads=new LinkedList<Road>();
 	private PriorityQueue<Message> messageQueue=new PriorityQueue<Message>();
 	private double test_timeOfLastScheduledMessage=0;
-	private volatile int test_wrongMessages=0;
-	private LinkedList<Message> test_scheduledMessages=new LinkedList<Message>();
-	private LinkedList<Message> test_arrivedMessages=new LinkedList<Message>();
+	//private volatile int test_wrongMessages=0;
+	//private LinkedList<Message> test_scheduledMessages=new LinkedList<Message>();
+	//private LinkedList<Message> test_arrivedMessages=new LinkedList<Message>();
+	private HashMap<Road,Integer> numberOfQueuedMessages=new HashMap<Road,Integer>();
 	
 	// the road entry handler receives the road request too late for a start leg, because it schedules
 	// new messages before the start of the next leg.
 	// The staringLegMessages variable is used to be sure, that no out of sync message behaviour occurs
 	// (processQueue waits until the next startingLegMessage is processed before any later events are scheduled)
-	public PriorityBlockingQueue<Message>  staringLegMessages=new PriorityBlockingQueue<Message>();
+	private PriorityQueue<Message>  staringLegMessages=new PriorityQueue<Message>();
 	
 	RoadEntryHandler(Road belongsToRoad){
 		this.belongsToRoad = belongsToRoad;
 		this.numberOfIncomingRoads = belongsToRoad.getLink().getFromNode().getInLinks().size();
+		
+		// initialize
+		for (Link inLinks:belongsToRoad.getLink().getFromNode().getInLinks().values()){
+			Road inRoad=Road.allRoads.get(inLinks.getId().toString());
+			numberOfQueuedMessages.put(inRoad, 0);
+		}
 	}
 	
 	public void registerNullMessage(NullMessage nm){
@@ -35,15 +45,15 @@ public class RoadEntryHandler {
 		assert(nm.sendingUnit==null || belongsToRoad.getLink().getFromNode().getInLinks().values().contains(((Road) nm.sendingUnit).getLink())): "wrong unit sent a message";
 		
 			synchronized (pendingMessagesFromRoads){
-				test_arrivedMessages.add(nm);
+				//test_arrivedMessages.add(nm);
 				if (nm.sendingUnit!=null && !pendingMessagesFromRoads.contains(nm.sendingUnit)){
 					pendingMessagesFromRoads.add((Road)nm.sendingUnit);
 				}	
 				
 				
-				if (nm.messageArrivalTime<test_timeOfLastScheduledMessage){
-					System.out.println(nm.debugString);
-				}
+				//if (nm.messageArrivalTime<test_timeOfLastScheduledMessage){
+				//	System.out.println(nm.debugString);
+				//}
 				
 				if (numberOfIncomingRoads==1){
 					//System.out.println("");
@@ -55,7 +65,11 @@ public class RoadEntryHandler {
 				
 				messageQueue.add(nm);
 				
-				processMessageQueue();
+				incrementNumberOfQueuedMessages((Road)nm.sendingUnit);
+				
+				
+				//processMessageQueue();
+
 			}
 		
 		
@@ -81,7 +95,8 @@ public class RoadEntryHandler {
 			erm.receivingUnit=belongsToRoad;
 			erm.messageArrivalTime=simTime;
 			messageQueue.add(erm);
-			test_arrivedMessages.add(erm);
+			incrementNumberOfQueuedMessages((Road)erm.sendingUnit);
+			//test_arrivedMessages.add(erm);
 			
 			if (erm.messageArrivalTime<test_timeOfLastScheduledMessage){
 				System.out.println();
@@ -115,8 +130,8 @@ public class RoadEntryHandler {
 		while (pendingMessagesFromRoads.size()==this.numberOfIncomingRoads){
 			
 			// we can't process the queue further than the next starting leg message. We should wait on that message first
-			Message nextstartingLegMessage=staringLegMessages.peek();
-			if (nextstartingLegMessage!=null && nextstartingLegMessage.messageArrivalTime<messageQueue.peek().messageArrivalTime){
+			Message nextStartingLegMessage=peekStaringLegMessages();
+			if (nextStartingLegMessage!=null && nextStartingLegMessage.messageArrivalTime<messageQueue.peek().messageArrivalTime){
 				return;
 			}
 			
@@ -125,7 +140,11 @@ public class RoadEntryHandler {
 			
 			// as long as all roads have messages on them, take the least message 
 			Message m=messageQueue.poll();
-			
+			decrementNumberOfQueuedMessages((Road)m.sendingUnit);
+			//Timer t=new Timer();
+			//t.startTimer();
+
+			/*
 			// if there is no other message with the same sendingUnit, remove the sendingUnit from pendingMessages from Road
 			boolean hasNoMoreMessagesFromSameSource=true;
 			Iterator<Message> iter=messageQueue.iterator();
@@ -136,8 +155,12 @@ public class RoadEntryHandler {
 					hasNoMoreMessagesFromSameSource=false;
 				}
 			}
+			*/
 			
-			if (hasNoMoreMessagesFromSameSource){
+			//t.endTimer();
+			//SimulationParameters.test_timer+=t.getMeasuredTime();
+			
+			if (getNumberOfQueueMessages((Road)m.sendingUnit)==0){
 				assert(pendingMessagesFromRoads.contains(m.sendingUnit) || m.sendingUnit==belongsToRoad);
 				pendingMessagesFromRoads.remove(m.sendingUnit);
 			}
@@ -146,6 +169,7 @@ public class RoadEntryHandler {
 			// TODO: enable this assertion again after some time (problem at the moment not found
 			assert(m.messageArrivalTime>=test_timeOfLastScheduledMessage): "new: " + m.messageArrivalTime + "; last: " + test_timeOfLastScheduledMessage;
 			
+			/*
 			if (!test_scheduledMessages.isEmpty()){
 
 				if (test_scheduledMessages.getLast().messageArrivalTime>m.messageArrivalTime){
@@ -157,16 +181,56 @@ public class RoadEntryHandler {
 				}
 				
 				// This problem can be solved perhaps by repairing the Message Factory
-				assert(test_scheduledMessages.getLast().messageArrivalTime<=m.messageArrivalTime):  "new: " + m.messageArrivalTime + "; last: " + test_scheduledMessages.getLast().messageArrivalTime;
+				//assert(test_scheduledMessages.getLast().messageArrivalTime<=m.messageArrivalTime):  "new: " + m.messageArrivalTime + "; last: " + test_scheduledMessages.getLast().messageArrivalTime;
 				
 				
 			}
+			*/
 			
 			//if (m.messageArrivalTime>=test_timeOfLastScheduledMessage){
 				test_timeOfLastScheduledMessage=m.messageArrivalTime;
 				belongsToRoad.scheduler.schedule(m);
-				test_scheduledMessages.addLast(m);
+				//test_scheduledMessages.addLast(m);
 			//}
+		}
+	}
+	
+	
+	private void incrementNumberOfQueuedMessages(Road fromRoad){
+		if (fromRoad!=null && fromRoad!=belongsToRoad){
+			numberOfQueuedMessages.put(fromRoad, numberOfQueuedMessages.get(fromRoad).intValue()+1);
+		}
+	}
+	
+	private void decrementNumberOfQueuedMessages(Road fromRoad){
+		if (fromRoad!=null && fromRoad!=belongsToRoad){
+			numberOfQueuedMessages.put(fromRoad, numberOfQueuedMessages.get(fromRoad).intValue()-1);
+		}	
+	}
+	
+	private int getNumberOfQueueMessages(Road fromRoad){
+		if (fromRoad!=null && fromRoad!=belongsToRoad){
+			return numberOfQueuedMessages.get(fromRoad);
+		} else {
+			return 0;
+		}
+	}
+	
+	public void addStaringLegMessages(Message m){
+		synchronized (staringLegMessages){
+			staringLegMessages.add(m);
+		}
+	}
+	
+	public Message peekStaringLegMessages(){
+		synchronized (staringLegMessages){
+			return staringLegMessages.peek();
+		}
+	}
+	
+	public void removeStaringLegMessages(Message m){
+		synchronized (staringLegMessages){
+			staringLegMessages.remove(m);
 		}
 	}
 	

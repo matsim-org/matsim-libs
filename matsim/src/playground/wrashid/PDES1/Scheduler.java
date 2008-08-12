@@ -121,6 +121,7 @@ public class Scheduler {
 		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
 		System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
 		System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
+		System.out.println("SimulationParameters.test_timer: "+ SimulationParameters.test_timer);
 	}
 	
 	

@@ -39,7 +39,7 @@ public class NullMessage extends SelfhandleMessage {
 			nm.debugString="null message handler";
 			
 			if (nm.messageArrivalTime<0){
-				//System.out.println();
+				System.out.println();
 			}
 			
 			
