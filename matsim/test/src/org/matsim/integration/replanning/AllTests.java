@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration;
+package org.matsim.integration.replanning;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,11 +27,10 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Integration Tests for MATSim");
+		TestSuite suite = new TestSuite("Integration Tests for MATSim Replanning");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.integration.events.AllTests.suite());
-		suite.addTest(org.matsim.integration.replanning.AllTests.suite());
-		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
+		suite.addTestSuite(DeterministicMultithreadedReplanningTest.class);
+		suite.addTestSuite(ResumableRunsTest.class);
 		//$JUnit-END$
 		return suite;
 	}
