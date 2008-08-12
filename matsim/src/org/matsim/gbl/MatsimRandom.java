@@ -22,6 +22,13 @@ package org.matsim.gbl;
 
 import java.util.Random;
 
+/**
+ * An abstract class, providing random numbers for MATSim. Also provides
+ * Random Number Generators (RNG) for use in threads, which should all
+ * use their own RNGs for deterministic behavior.
+ *
+ * @author mrieser
+ */
 public abstract class MatsimRandom {
 
 	private static final long DEFAULT_RANDOM_SEED = 4711;
@@ -55,7 +62,7 @@ public abstract class MatsimRandom {
 	 */
 	public static Random getLocalInstance() {
 		internalCounter++;
-		Random r = new Random(lastUsedSeed + internalCounter);
+		Random r = new Random(lastUsedSeed + internalCounter*23);
 		prepareRNG(r);
 		return r;
 	}
