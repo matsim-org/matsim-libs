@@ -31,11 +31,12 @@ import org.matsim.utils.geometry.CoordinateTransformation;
 public abstract class TransformationFactory {
 
 	public final static String WGS84 = "WGS84";
-	public final static String CH1903_LV03 = "CH1903_LV03";
-	public final static String GK4 = "GK4";
 	public final static String ATLANTIS = "Atlantis";
-	public final static String WGS84_UTM47S = "WGS84_UTM47S";
-	public final static String WGS84_UTM35S = "WGS84_UTM35S";
+	public final static String CH1903_LV03 = "CH1903_LV03"; // switzerland
+	public final static String GK4 = "GK4"; // berlin/germany, own implementation
+	public final static String WGS84_UTM47S = "WGS84_UTM47S"; // indonesia
+	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // south-africa
+	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
@@ -53,8 +54,6 @@ public abstract class TransformationFactory {
 			if (CH1903_LV03.equals(fromSystem)) return new CH1903LV03toWGS84();
 			if (GK4.equals(fromSystem)) return new GK4toWGS84();
 			if (ATLANTIS.equals(fromSystem)) return new AtlantisToWGS84();
-			// pass any other coord-system to Geotools:
-			return new GeotoolsTransformation(fromSystem, WGS84);
 		}
 		return new GeotoolsTransformation(fromSystem, toSystem);
 	}
