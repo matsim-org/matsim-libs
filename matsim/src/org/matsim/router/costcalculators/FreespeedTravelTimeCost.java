@@ -37,13 +37,13 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 	public FreespeedTravelTimeCost() {
 		// usually, the travel-utility should be negative (it's a disutility)
 		// but for the cost, the cost should be positive.
-		this.travelCostFactor = -Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling")) / 3600.0;
+		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
 
 		if (this.travelCostFactor < 0) {
-			Gbl.errorMsg("The travel cost in " + this.getClass().getName() + " must be > 1. " +
+			Gbl.errorMsg("The travel cost in " + this.getClass().getName() + " must be >= 0. " +
 					"Currently, it is " + this.travelCostFactor + ". Please adjust the parameter " +
 							"'traveling' in the module 'planCalcScore' in your config file to be" +
-							" lower or equal than -3600");
+							" lower or equal than 0");
 		}
 	}
 
