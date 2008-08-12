@@ -54,7 +54,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	public WithindayQueueSimulation(final NetworkLayer net,
 			final Population plans, final Events events, final playground.gregor.withinday_evac.WithindayControler withindayControler) {
 		super(net, plans, events);
-		rnd = new Random(1);
+		this.rnd = new Random(1);
 		final QueueNetworkFactory< QueueNode, QueueLink> factory = new WithindayQueueNetworkFactory();
 		final QueueNetwork qNet = new QueueNetwork(net,factory);
 		this.network = qNet;
@@ -80,7 +80,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	 */
 	private void createAgent(final Person person, final OccupiedVehicle veh) {
 		boolean isBDI = false;
-		if (rnd.nextDouble() <= 10) {
+		if (this.rnd.nextDouble() <= 0.9) {
 			isBDI = true;
 		}
 		new BDIAgent(person, veh, this.informationExchanger, this.network.getNetworkLayer(),isBDI);

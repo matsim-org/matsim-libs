@@ -23,6 +23,8 @@ package playground.gregor.withinday_evac;
 
 
 import org.matsim.controler.Controler;
+import org.matsim.controler.corelisteners.PlansDumping;
+import org.matsim.controler.corelisteners.PlansReplanning;
 import org.matsim.evacuation.EvacuationQSimControler;
 
 import playground.gregor.withinday_evac.mobsim.WithindayQueueSimulation;
@@ -31,7 +33,6 @@ public class WithindayControler extends EvacuationQSimControler {
 
 	public WithindayControler(final String[] args) {
 		super(args);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -42,6 +43,27 @@ public class WithindayControler extends EvacuationQSimControler {
 		final WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
 		//run the simulation
 		sim.run();
+	}
+
+	@Override
+	protected void loadCoreListeners() {
+		/* The order how the listeners are added is very important!
+		 * As dependencies between different listeners exist or listeners
+		 * may read and write to common variables, the order is important.
+		 * Example: The RoadPricing-Listener modifies the scoringFunctionFactory,
+		 * which in turn is used by the PlansScoring-Listener.
+		 * Note that the execution order is contrary to the order the listeners are added to the list.
+		 */
+
+		this.addCoreControlerListener(new CoreControlerListener());
+
+		// the default handling of plans
+		this.addCoreControlerListener(new AggregatedPlansScoring());
+
+
+
+		this.addCoreControlerListener(new PlansReplanning());
+		this.addCoreControlerListener(new PlansDumping());
 	}
 
 	public static void main(final String[] args) {
