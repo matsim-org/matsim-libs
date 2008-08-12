@@ -25,40 +25,25 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * @author david
- *
  */
-public class BasicPlanImpl implements /*Serializable, */BasicPlan {
-	
-	/* removed serialization because I think nobody uses it. If someone does,
-	 * please complain, otherwise I'll soon delete these lines permanently.
-	 * marcel/9jul2008
-	 * TODO [MR] delete code
-	 */
-//	private static final long serialVersionUID = 1L;
+public class BasicPlanImpl implements BasicPlan {
 
 	private final static Logger log = Logger.getLogger(BasicPlanImpl.class);
 
 	protected ArrayList<Object> actsLegs = new ArrayList<Object>();
 
 	private double score = UNDEF_SCORE;
-	
+
 	private Type type = null;
-	
+
 	private boolean isSelected;
-	
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#getScore()
-	 */
+
 	public final double getScore() {
 		return this.score;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#setScore(double)
-	 */
 	public final void setScore(final double score) {
 		if (Double.isInfinite(score)) {
 			log.warn("Infinite score is not supported! Score is not changed");
@@ -66,11 +51,11 @@ public class BasicPlanImpl implements /*Serializable, */BasicPlan {
 			this.score = score;
 		}
 	}
-	
+
 	public boolean isSelected() {
 		return isSelected;
 	}
-	
+
 	public void setSelected(boolean selected) {
 		this.isSelected = selected;
 	}
@@ -79,16 +64,12 @@ public class BasicPlanImpl implements /*Serializable, */BasicPlan {
 	public Type getType() {
 		return this.type;
 	}
-	
+
 
 	public void setType(Type type) {
 		this.type = type;
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#hasUndefinedScore()
-	 */
 	public final boolean hasUndefinedScore() {
 		return isUndefinedScore(this.getScore());
 	}
@@ -173,36 +154,24 @@ public class BasicPlanImpl implements /*Serializable, */BasicPlan {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#getIterator()
-	 */
 	public ActLegIterator getIterator() {
 		return new ActLegIterator();
 	}
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#getIteratorLeg()
-	 */
+
 	public LegIterator getIteratorLeg () {
 		return new LegIterator();
 	}
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#getIteratorAct()
-	 */
+
 	public ActIterator getIteratorAct () {
 		return new ActIterator();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#addLeg(org.matsim.basic.v01.BasicLeg)
-	 */
+
 	public void addLeg(final BasicLeg leg) {
 		if (this.actsLegs.size() %2 == 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert leg at non-leg position"));
 		this.actsLegs.add(leg);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPlan#addAct(org.matsim.basic.v01.BasicAct)
-	 */
 	public void addAct(final BasicAct act) {
 		if (this.actsLegs.size() %2 != 0 ) throw (new IndexOutOfBoundsException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
