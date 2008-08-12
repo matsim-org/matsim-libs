@@ -1167,7 +1167,11 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	/*default*/ class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
+	protected class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
+
+		public CoreControlerListener() {
+			// empty public constructor for protected class
+		}
 
 		public void notifyStartup(final StartupEvent event) {
 			final Controler c = event.getControler();
