@@ -71,6 +71,7 @@ public class MatsimNetworkReader extends MatsimXmlParser {
 	public void readFile(final String filename) {
 		try {
 			parse(filename);
+			network.connect();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
