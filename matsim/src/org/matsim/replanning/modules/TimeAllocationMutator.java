@@ -22,6 +22,7 @@ package org.matsim.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 
@@ -37,21 +38,21 @@ public class TimeAllocationMutator extends MultithreadedModuleA {
 
 	public final static String CONFIG_GROUP = "TimeAllocationMutator";
 	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
-	
+
 	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
 
 	private int mutationRange = 1800;
 
 	/**
-	 * Creates a new TimeAllocationMutator with a mutation range as defined in 
+	 * Creates a new TimeAllocationMutator with a mutation range as defined in
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange"),
-	 * or the default value of 1800 (seconds) if there is no value specified in 
+	 * or the default value of 1800 (seconds) if there is no value specified in
 	 * the configuration.
 	 */
 	public TimeAllocationMutator() {
 		String range = Gbl.getConfig().findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
 		if (range == null) {
-			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");			
+			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");
 		} else {
 			this.mutationRange = Integer.parseInt(range);
 			log.info("mutation range = " + this.mutationRange);
@@ -60,7 +61,7 @@ public class TimeAllocationMutator extends MultithreadedModuleA {
 
 	/**
 	 * Creates a new TimeAllocationMutator with the specified mutation range.
-	 * 
+	 *
 	 * @param mutationRange
 	 */
 	public TimeAllocationMutator(final int mutationRange) {
@@ -69,7 +70,7 @@ public class TimeAllocationMutator extends MultithreadedModuleA {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlanMutateTimeAllocation(mutationRange);
+		return new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
 	}
 
 }
