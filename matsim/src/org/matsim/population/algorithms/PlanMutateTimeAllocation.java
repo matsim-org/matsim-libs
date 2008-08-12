@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,6 +19,8 @@
  * *********************************************************************** */
 
 package org.matsim.population.algorithms;
+
+import java.util.Random;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
@@ -39,9 +41,15 @@ import org.matsim.utils.misc.Time;
 public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final int mutationRange;
+	private final Random random;
 
 	public PlanMutateTimeAllocation(final int mutationRange) {
+		this(mutationRange, MatsimRandom.random);
+	}
+
+	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
+		this.random = random;
 	}
 
 	public void run(final Plan plan) {
@@ -115,11 +123,11 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 	private double mutateTime(final double time) {
 		double t = time;
 		if (t != Time.UNDEFINED_TIME) {
-			t = t + (int)((MatsimRandom.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;
 		} else {
-			t = MatsimRandom.random.nextInt(24*3600);
+			t = this.random.nextInt(24*3600);
 		}
 		return t;
 	}
