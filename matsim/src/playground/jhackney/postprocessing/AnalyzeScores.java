@@ -228,7 +228,9 @@ public class AnalyzeScores {
 				}
 				friendscore=100.*Math.log(nFriends+1);
 				totaliterationfriendscore+=friendscore;
-				totaliterationscore+=plan.getScore();
+				if(!(plan.getScore()!=plan.getScore())){
+					totaliterationscore+=plan.getScore();
+				}
 				numplans++;
 //				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
 			}
@@ -240,18 +242,18 @@ public class AnalyzeScores {
 		System.out.println();
 	}
 
-		//////////////////////////////////////////////////////////////////////
-		// main
-		//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	// main
+	//////////////////////////////////////////////////////////////////////
 
-		public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 
-			Gbl.startMeasurement();
+		Gbl.startMeasurement();
 
-			run();
+		run();
 
-			Gbl.printElapsedTime();
-		}
-
+		Gbl.printElapsedTime();
 	}
+
+}
 
