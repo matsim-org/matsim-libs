@@ -204,18 +204,19 @@ public class AnalyzeScores {
 //			Scenario.writeWorld(Gbl.getWorld());
 //			Scenario.writeConfig();
 
+			double totaliterationfriendscore=0;
 			double totaliterationscore=0;
 			int numplans=0;
 			SpatialScorer scorer =new SpatialScorer();
 			scorer.scoreActs(plans, i);
 			//for each plan this is how it is calculated in the TRB runs, which is incorrect!!
-			Iterator planiter=plans.iterator();
+			Iterator<Person> planiter=plans.iterator();
 			while(planiter.hasNext()){
 				//
 				Person p = (Person) planiter.next();
 				Plan plan = p.getSelectedPlan();
 				ActIterator ait = plan.getIteratorAct();
-				double planscore=0;
+				double friendscore=0;
 				double nFriends=0;
 				Hashtable<Act,ArrayList<Double>> actStats = scorer.calculateTimeWindowActStats(plan);
 				while(ait.hasNext()){
@@ -225,13 +226,15 @@ public class AnalyzeScores {
 						nFriends+=actStats.get(act).get(1);
 					}
 				}
-				planscore=100.*Math.log(nFriends+1);
-				totaliterationscore+=planscore;
+				friendscore=100.*Math.log(nFriends+1);
+				totaliterationfriendscore+=friendscore;
+				totaliterationscore+=plan.getScore();
 				numplans++;
 //				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
 			}
+			double avgfriendscore=totaliterationfriendscore/((double) numplans);
 			double avgscore=totaliterationscore/((double) numplans);
-			System.out.println("##Result "+i+" "+avgscore);
+			System.out.println("##Result "+i+" "+avgfriendscore+" "+avgscore);
 		}
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
