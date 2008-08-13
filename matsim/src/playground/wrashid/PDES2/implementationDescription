@@ -19,4 +19,20 @@
 is just processed. Making more zones than threads/processors probably also leads to less waiting on locks? But on the other hand
 it leads to more border links (really?).
 
-- 
+- the look ahead increases in a certain way with many zones: normally there is a small look ahead for a big region (containing lots of potential events).
+  But with smaller zones, the proportion between lookahead and zones size becomes smaller, so that ???? Is this true?
+  
+- We can make lots of message queues (one for each zone). Each MessageExcutor can then just do TryLocks and if not successful,
+  just continue with the next zone.
+  
+- Simple divisions of zones at the beginning: Make them vertical. For example find out the x min and x max and then
+  make equi-distant zones e.g. 10. and then get started the MessageExecutors to process them.
+  
+ => find out, if y direction is better than x direction.
+
+- This approach will allow to progress empty zones quickly
+
+- There will always be messages in the system, because of the null messages. So we have to set a maximum time
+  for the simulation. As soon as the simulation is empty of real messages, the simulation will get ahead much
+  faster anyway.
+ 
