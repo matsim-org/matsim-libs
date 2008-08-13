@@ -18,21 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac;
+package playground.gregor.withinday_evac.controler;
 
 
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
 import org.matsim.evacuation.EvacuationQSimControler;
 
+import playground.gregor.withinday_evac.AggregatedPlansScoring;
 import playground.gregor.withinday_evac.mobsim.WithindayQueueSimulation;
 
 public class WithindayControler extends EvacuationQSimControler {
 
+	private final static Logger log = Logger.getLogger(WithindayControler.class);
+	
 	public WithindayControler(final String[] args) {
 		super(args);
+	}
+
+	@Override
+	protected void setup() {
+		super.setup();
+		log.info("adding additional guide agents...");
+		new GuideAgentsGenerator().generateGuides(this.population,this.network);
+		log.info("done.");
 	}
 
 	@Override

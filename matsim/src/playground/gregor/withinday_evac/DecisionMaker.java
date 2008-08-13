@@ -25,12 +25,12 @@ import java.util.HashMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 
-import playground.gregor.withinday_evac.analyzer.Option;
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.BlockedLinksAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowGuideAnalyzer;
 import playground.gregor.withinday_evac.analyzer.HerdAnalyzer;
 import playground.gregor.withinday_evac.analyzer.NextLinkOption;
+import playground.gregor.withinday_evac.analyzer.Option;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
 
 public class DecisionMaker {
@@ -41,16 +41,24 @@ public class DecisionMaker {
 		this.analyzers = analyzers;
 	}
 	
-	public Link chooseNextLink(final double now, Id nodeId) {
+	public Link chooseNextLink(final double now, final Id nodeId, final boolean isGuide) {
 		
 //		if (this.analyzers.get("DestinationReachedAnalyzer").getAction(now) != null) {
 //			System.out.println("DestinationReached");
 //			return null;
 //		}
+		if (isGuide) {
+			return nextLinkGuide(now, nodeId);
+		} else {
+			return nextLink(now,nodeId);
+		}
 		
 		
 		
-		
+
+	}
+
+	private Link nextLink(final double now, final Id nodeId) {
 		
 		final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
 		ba.update(now);
@@ -71,6 +79,17 @@ public class DecisionMaker {
 			ac = c.getAction(now);
 		}
 		
+		return ((NextLinkOption)ac).getNextLink();
+	}
+
+	private Link nextLinkGuide(final double now, final Id nodeId) {
+		final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
+		ba.update(now);
+		final FollowGuideAnalyzer a = (FollowGuideAnalyzer) this.analyzers.get("FollowGuideAnalyzer");
+		Option ac = a.getAction(now);
+		if (((NextLinkOption)ac).getNextLink() == null || ac.getConfidence() < 2 ) {
+			return null;			
+		}
 		return ((NextLinkOption)ac).getNextLink();
 	}
 	

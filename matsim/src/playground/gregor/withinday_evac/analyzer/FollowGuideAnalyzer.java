@@ -68,13 +68,13 @@ public class FollowGuideAnalyzer implements Analyzer {
 		}
 		
 		
-		return new NextLinkOption(link,1);
+		return new NextLinkOption(link,max_val);
 	}
 	
 	
 	
 	
-	private static class Counter {
+	private class Counter {
 		int value;
 		public Counter(final int i) {
 			this.value = i;

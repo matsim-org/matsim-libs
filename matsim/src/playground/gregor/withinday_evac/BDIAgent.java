@@ -50,11 +50,11 @@ public class BDIAgent {
 	private final OccupiedVehicle vehicle;
 	private final InformationExchanger informationExchanger;
 	private final Beliefs beliefs;
-	private final boolean isBDIAgent;
 	private final DecisionMaker decisionMaker;
 	private final Intentions intentions;
+	private boolean isGuide;
 
-	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer, boolean isBDI){
+	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
 		this.person = person;
 		this.vehicle = v;
 		this.vehicle.setAgent(this);
@@ -64,9 +64,11 @@ public class BDIAgent {
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
 		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
 		this.decisionMaker = new DecisionMaker(analyzers);
-		this.isBDIAgent = isBDI;
-
-		
+		if (person.getId().toString().contains("guide")) {
+			this.isGuide = true;
+		} else {
+			this.isGuide = false;
+		}
 	}
 
 	private HashMap<String, Analyzer> getAnalyzer(final NetworkLayer networkLayer) {
@@ -86,26 +88,40 @@ public class BDIAgent {
 		
 		updateBeliefs(infos.getInformation(now));
 		
-		Link nextLink;
-		if (!this.isBDIAgent) {//guides
+		Link nextLink = this.decisionMaker.chooseNextLink(now,nodeId,this.isGuide);
+
+		if (nextLink != null && this.isGuide) {
+			this.isGuide = false;
+		} 
+		if (this.isGuide && nextLink == null) {
 			nextLink = this.vehicle.chooseNextLink();
+		}
+		
+		if (this.isGuide) {
 			final Message msg = new FollowGuideMessage(nextLink);
 			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
-			infos.addInformationEntity(ie);
-		} else {
-			nextLink = this.decisionMaker.chooseNextLink(now,nodeId);
-//			if (nextLink == null) { //if now guide then choose random link
-//				final Node n = this.vehicle.getCurrentNode();
-//				double prob_sum = n.getOutLinks().size() * Gbl.random.nextDouble(); 
-//				for (final Link l : n.getOutLinks().values()) {
-//					if (--prob_sum <= 0) {
-//						nextLink = l;
-//						break;
-//					}
-//				}
-//			}
-			
+			infos.addInformationEntity(ie);			
 		}
+		
+//		if (!this.isBDIAgent) {//guides
+//			nextLink = this.vehicle.chooseNextLink();
+//			final Message msg = new FollowGuideMessage(nextLink);
+//			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
+//			infos.addInformationEntity(ie);
+//		} else {
+//			nextLink = this.decisionMaker.chooseNextLink(now,nodeId);
+////			if (nextLink == null) { //if now guide then choose random link
+////				final Node n = this.vehicle.getCurrentNode();
+////				double prob_sum = n.getOutLinks().size() * Gbl.random.nextDouble(); 
+////				for (final Link l : n.getOutLinks().values()) {
+////					if (--prob_sum <= 0) {
+////						nextLink = l;
+////						break;
+////					}
+////				}
+////			}
+//			
+//		}
 		
 		final Message msg = new NextLinkMessage(nextLink);
 		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
