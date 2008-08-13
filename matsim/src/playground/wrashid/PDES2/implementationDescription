@@ -36,3 +36,19 @@ it leads to more border links (really?).
   for the simulation. As soon as the simulation is empty of real messages, the simulation will get ahead much
   faster anyway.
  
+- THINK ABOUT IT:
+    - Do we really need the new infrastructure of PDES1 with the EnterRequestMessage etc. Because we could also do it without or not?
+    by directly 
+    
+    - does the inner road have an effect into the same junction, so that it could be processed to late or early? think about
+    that also when doing implementation, that we get that also right...
+    
+    - 
+
+
+- Problems:
+
+
+ 
+- TODO: 
+  
