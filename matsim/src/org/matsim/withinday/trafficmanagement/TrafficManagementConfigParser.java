@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -32,12 +33,6 @@ import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputSB;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplAll;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplDAccident;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplDistribution;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplSB;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplSBNoise;
-import org.matsim.withinday.trafficmanagement.controlinput.obsoletemodels.ControlInputImplStaticAddition;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.NoControl;
@@ -93,21 +88,10 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 //	private static final String PIDCONTROLER = "PIDControler";
 
-	private static final String CONTROLINPUTSIMPLESB = "ControlInputImplSB";
 
 	private static final String CONTROLINPUT1 = "ControlInputImpl1";
 
-	private static final String CONTROLINPUTSBNOISE = "ControlInputImplSBNoise";
-
-	private static final String CONTROLINPUTDISTRIBUTION = "ControlInputImplDistribution";
-
-	private static final String CONTROLINPUTDACCIDENT = "ControlInputImplDAccident";
-
-	private static final String CONTROLINPUTALL = "ControlInputImplAll";
-
 	private static final String CONTROLINPUTSB = "ControlInputSB";
-
-	private static final String CONTROLINPUTSTATICADDITION = "ControlInputImplStaticAddition";
 
 	private static final String CONTROLINPUTMB = "ControlInputMB";
 
@@ -127,6 +111,20 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private final static String SPREADSHEETFILE = "spreadsheetfile";
 
+	private final static String IGNOREDQUEUINGTIME = "ignoredQueuingTime";
+
+	private static final String DISTRIBUTIONCHECKACTIVATED = "distributionCheckActivated";
+
+	private static final String BACKGROUNDNOISECOMPENSATIONACTIVATED = "backgroundNoiseCompensationActivated";
+
+	private static final String INCIDENTDETECTEIONACTIVATED = "incidentDetectionActivated";
+
+	private static final String UPDATETIMEINOUTFLOW = "updateTimeInOutFlow";
+
+	private static final String RESETBOTTLENECKINTERVALL = "resetBottleNeckIntervall";
+
+	private static final String NUMBEROFEVENTSDETECTION = "numberOfEventsDetection";
+
 	private TrafficManagement trafficManagement;
 
 	private VDSSign vdsSign;
@@ -143,11 +141,14 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private VDSSignOutput vdsSignOutput;
 
+	private SimulationConfigGroup simulationConfig;
+
 
 	public TrafficManagementConfigParser(final NetworkLayer network,
-			final Events events) {
+			final Events events, SimulationConfigGroup simulationConfigGroup) {
 		this.network = network;
 		this.events = events;
+		this.simulationConfig = simulationConfigGroup;
 	}
 
 	@Override
@@ -178,6 +179,65 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (name.equalsIgnoreCase(OUTPUT)) {
 			this.vdsSignOutput = new VDSSignOutput();
 		}
+		else if (name.equalsIgnoreCase(IGNOREDQUEUINGTIME)) {
+			double time = Double.parseDouble(atts.getValue("sec"));
+			if (this.controlInput instanceof ControlInputSB) {
+				((ControlInputSB)this.controlInput).setIgnoredQueuingTime(time);
+			}
+			else if (this.controlInput instanceof ControlInputMB) {
+				((ControlInputMB)this.controlInput).setIgnoredQueuingTime(time);
+			}
+			else {
+				throw new IllegalArgumentException(name + " can not be used with set ControlInput class!");
+			}
+		}
+		else if (name.equalsIgnoreCase(DISTRIBUTIONCHECKACTIVATED)) {
+			boolean b = Boolean.parseBoolean(atts.getValue("value"));
+			if (this.controlInput instanceof ControlInputSB) {
+				((ControlInputSB)this.controlInput).setDistributionCheckActive(b);
+			}
+			else {
+				throw new IllegalArgumentException(name + " can not be used with set ControlInput class!");
+			}
+		}
+		else if (name.equalsIgnoreCase(BACKGROUNDNOISECOMPENSATIONACTIVATED)) {
+			boolean b = Boolean.parseBoolean(atts.getValue("value"));
+			if (this.controlInput instanceof ControlInputSB) {
+				((ControlInputSB)this.controlInput).setBackgroundnoiseCompensationActive(b);
+			}
+			else {
+				throw new IllegalArgumentException(name + " can not be used with set ControlInput class!");
+			}
+		}
+		else if (name.equalsIgnoreCase(INCIDENTDETECTEIONACTIVATED)) {
+			boolean b = Boolean.parseBoolean(atts.getValue("value"));
+			if (this.controlInput instanceof ControlInputSB) {
+				((ControlInputSB)this.controlInput).setIncidentDetectionActive(b);
+			}
+			else {
+				throw new IllegalArgumentException(name + " can not be used with set ControlInput class!");
+			}
+		}
+		else if (UPDATETIMEINOUTFLOW.equalsIgnoreCase(name)) {
+			double time = Double.parseDouble(atts.getValue("sec".intern()));
+			if (this.controlInput instanceof ControlInputMB) {
+				((ControlInputMB)this.controlInput).setUpdateTimeInOutFlow(time);
+			}
+		}
+		else if (RESETBOTTLENECKINTERVALL.equalsIgnoreCase(name)) {
+			double time = Double.parseDouble(atts.getValue("sec".intern()));
+			if (this.controlInput instanceof ControlInputMB) {
+				((ControlInputMB)this.controlInput).setResetBottleNeckIntervall(time);
+			}
+		}
+		else if (NUMBEROFEVENTSDETECTION.equalsIgnoreCase(name)) {
+			int events = Integer.parseInt(atts.getValue("value".intern()));
+			if (this.controlInput instanceof ControlInputMB) {
+				((ControlInputMB)this.controlInput).setNumberOfEventsDetection(events);
+			}
+
+		}
+
 	}
 	@Override
 	public void endTag(final String name, String content, final Stack<String> context) {
@@ -280,47 +340,14 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	}
 
 	private ControlInput createControlInput(final String content) {
-		if (content.trim().compareTo(CONTROLINPUTSIMPLESB) == 0) {
-			ControlInputImplSB controlInput = new ControlInputImplSB();
-			controlInput.setAccidents(this.trafficManagement.getAccidents());
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
-		else if (content.trim().compareTo(CONTROLINPUT1) == 0) {
+		if (content.trim().compareTo(CONTROLINPUT1) == 0) {
 			ControlInputImpl1 controlInput = new ControlInputImpl1();
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
-		else if (content.trim().compareTo(CONTROLINPUTDISTRIBUTION) == 0) {
-			ControlInputImplDistribution controlInput = new ControlInputImplDistribution();
-			controlInput.setAccidents(this.trafficManagement.getAccidents());
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
-		else if (content.trim().compareTo(CONTROLINPUTSBNOISE) == 0) {
-			ControlInputImplSBNoise controlInput = new ControlInputImplSBNoise();
-			controlInput.setAccidents(this.trafficManagement.getAccidents());
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
-		else if (content.trim().compareTo(CONTROLINPUTDACCIDENT) == 0) {
-			ControlInputImplDAccident controlInput = new ControlInputImplDAccident();
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
-		else if (content.trim().compareTo(CONTROLINPUTALL) == 0) {
-			ControlInputImplAll controlInput = new ControlInputImplAll();
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
 		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
-			ControlInputSB controlInput = new ControlInputSB();
+			ControlInputSB controlInput = new ControlInputSB(this.simulationConfig);
 			controlInput.setAccidents(this.trafficManagement.getAccidents());
-			this.events.addHandler(controlInput);
-			return controlInput;
-		}
-		else if (content.trim().compareTo(CONTROLINPUTSTATICADDITION) == 0) {
-			ControlInputImplStaticAddition controlInput = new ControlInputImplStaticAddition();
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
