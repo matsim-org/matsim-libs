@@ -1,0 +1,22 @@
+- the idea is basically the same as with PDES1, that we try to provide a lookahead.
+- But instead of doing it on road level, we do it on zone levels.
+
+
+- each road needs to be assigned to a zone (based on its location => two passes of road files needed)
+- a link can only belong to one zone at a time
+
+- At the beginning: Initialize Zones.
+     - This means: All roads which (potentially could) flow into different zones, must periodically schedule self/null messages.
+     - This enables each zone to start
+     
+- The message queue of a zone can only be processed, if
+              - a message has arrived from all incoming links to the zone
+              - and only those messages can be processed, with a time stamp smaller than the time stamp of the smallest message
+                from any incoming link
+                
+                
+- a zone can be assigned to any executor thread. This means there can be more zones than processes. Any zones, which can progress
+is just processed. Making more zones than threads/processors probably also leads to less waiting on locks? But on the other hand
+it leads to more border links (really?).
+
+- 

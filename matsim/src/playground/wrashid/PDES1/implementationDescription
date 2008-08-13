@@ -1,0 +1,3 @@
+- each link sends initially a null message to the next link to provide a look ahead to the next link.
+- also this approach seems quite secure, the main problem is, that because of lots of null messages the time
+  is progressing very slowly
