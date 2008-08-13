@@ -45,7 +45,9 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	private static final Id INVALID_ID = new IdImpl(Integer.MIN_VALUE);
 
 	/**
-	 * Maps leg numbers to subtour ids.
+	 * Stores the activity indices of the start activities of a subtour.
+	 * This information is sufficient to identify the subtour an activity belongs to,
+	 * as well as the activities that constitute a subtour.
 	 */
 	private TreeSet<Integer> subtours = null;
 
@@ -57,10 +59,12 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		super();
 	}
 
+	public TreeSet<Integer> getSubtours() {
+		return subtours;
+	}
+
 	public int getNumSubtours() {
-
 		return this.subtours.size();
-
 	}
 
 	public void run(Plan plan) {
