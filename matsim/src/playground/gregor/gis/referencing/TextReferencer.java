@@ -181,6 +181,7 @@ public class TextReferencer {
 		act.location = ft;
 		act.type = activity;
 		act.day = line[2];
+		act.mode = line[14];
 		double start = 0;
 		double end = 0;
 		 try {
@@ -492,12 +493,13 @@ public class TextReferencer {
 		attrib[19] = AttributeTypeFactory.newAttributeType("QI1125", String.class);
 
 
-		final AttributeType[] homes = new AttributeType[5];
+		final AttributeType[] homes = new AttributeType[6];
 		homes[0] = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.featureSource.getSchema().getDefaultGeometry().getCoordinateSystem());
 		homes[1] = AttributeTypeFactory.newAttributeType("ID", Integer.class);
 		homes[2] = AttributeTypeFactory.newAttributeType("STARTTIME", Integer.class);
 		homes[4] = AttributeTypeFactory.newAttributeType("ENDTIME", Integer.class);
 		homes[3] = AttributeTypeFactory.newAttributeType("NAME", String.class);
+		homes[5] = AttributeTypeFactory.newAttributeType("MODE", String.class);
 
 		try {
 //			this.ftPolygon = FeatureTypeFactory.newFeatureType(new AttributeType[] {polygon, id, from, to, width, area, length }, "linkShape");
@@ -520,6 +522,7 @@ public class TextReferencer {
 	
 	private static class Activity {
 		String type;
+		String mode;
 		Feature location;
 		double start;
 		double end;
@@ -544,7 +547,7 @@ public class TextReferencer {
 		final String zonesKel =  "./padang/referencing/zonesKel.shp";
 		final String homes = "./padang/referencing/homes.shp";
 
-		final String unclassified = "./padang/referencing/input_workday.csv";
+		final String unclassified = "./padang/referencing/input_weekend.csv";
 
 
 		final ArrayList<FeatureSource> fts = new ArrayList<FeatureSource>();
@@ -583,14 +586,15 @@ public class TextReferencer {
 			this.classified.clear();
 
 			for (final Household h : this.households.values()) {
-				Activity a = new Activity();
+				final Activity a = new Activity();
 				a.end = -1;
 				a.start = -1;
 				a.type = "home activity";
+				a.mode = "null";
 				genAct(h.location.getDefaultGeometry(),h.id,a);
 				
 				for (final Activity act : h.acts) {
-					if (act.day.equals("last weekend day (Sa-Su)")) {
+					if (!act.day.equals("last weekend day (Sa-Su)")) {
 						continue;
 					}
 					genAct(act.location.getDefaultGeometry(),h.id,act);
@@ -640,14 +644,14 @@ public class TextReferencer {
 			}
 		
 			try {
-			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/working-day.shp");
+			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/weekend.shp");
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} 
 	}
 
 
-	private void genAct(final Geometry defaultGeometry, final int id, Activity act) {
+	private void genAct(final Geometry defaultGeometry, final int id, final Activity act) {
 	
 		final Coordinate coord = defaultGeometry.getCoordinate();
 		final double r1 = Math.random()*100 - 50;
@@ -661,7 +665,7 @@ public class TextReferencer {
 //		final Point p = this.geofac.createPoint(transformed);
 		final Point p = this.geofac.createPoint(coord);
 		try {
-			this.classified.add(this.ftHome.create(new Object[] {p,id,act.start,act.type,act.end}, "activity"));
+			this.classified.add(this.ftHome.create(new Object[] {p,id,act.start,act.type,act.end,act.mode}, "activity"));
 		} catch (final IllegalAttributeException e) {
 			e.printStackTrace();
 		}
