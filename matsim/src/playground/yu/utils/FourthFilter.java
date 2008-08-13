@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package playground.yu.utils;
 
 import java.io.BufferedWriter;
@@ -39,9 +36,9 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * @author yu
- * 
+ *
  */
-public class FourthFilter extends TableSplitterodFileCreatorDeleteEmpty1 {
+public class FourthFilter extends TableSplitter {
 	private final BufferedWriter writer;
 
 	public FourthFilter(final String regex, final String attTableFilename,
@@ -54,8 +51,7 @@ public class FourthFilter extends TableSplitterodFileCreatorDeleteEmpty1 {
 		return line.startsWith("$P");
 	}
 
-	static class timeIntervalReader extends
-			TableSplitterodFileCreatorDeleteEmpty1 {
+	static class timeIntervalReader extends TableSplitter {
 		private final List<String> timeIntervalIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
