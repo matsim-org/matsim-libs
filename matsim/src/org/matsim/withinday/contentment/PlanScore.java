@@ -166,13 +166,9 @@ public class PlanScore implements AgentContentment {
 			}
 			planIdx++;
 		}
-		//TODO dg remove log
-		log.debug("getNextActivity: " + leg + " route: " + leg.getRoute().getRoute());
+		if (log.isTraceEnabled())
+			log.trace("getNextActivity: " + leg + " route: " + leg.getRoute().getRoute());
 		Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
-		//TODO dg remove if
-		if (nextAct == null) {
-			log.debug("next act null of leg: " + leg);
-		}
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 
 		double score = calcPlanScore(time + duration, leg.getArrTime(), nextActDuration, this.zeroUtilDuration[planIdx]);

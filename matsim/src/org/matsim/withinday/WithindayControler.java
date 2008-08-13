@@ -30,6 +30,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
@@ -37,10 +38,8 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.population.Person;
 import org.matsim.trafficmonitoring.LinkTravelTimeCounter;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.withinday.mobsim.OccupiedVehicle;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 import org.matsim.withinday.trafficmanagement.TrafficManagementConfigParser;
@@ -71,11 +70,20 @@ public class WithindayControler extends Controler {
 		this.addCoreControlerListener(new WithindayControlerListener());
 	}
 
+	public WithindayControler(String string) {
+		this(new String[] {string});
+	}
+
+	public WithindayControler(Config config) {
+		super(config);
+		this.addCoreControlerListener(new WithindayControlerListener());		
+	}
+
 	private void loadTrafficManagement() {
 	//initialize the traffic management
 		String trafficManagementConfig = this.config.withinday().getTrafficManagementConfiguration();
 		if (trafficManagementConfig != null) {
-			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events);
+			this.trafficManagementConfigurator = new TrafficManagementConfigParser(this.network, this.events, this.config.simulation());
 			try {
 				this.trafficManagementConfigurator.parse(trafficManagementConfig);
 			} catch (SAXException e) {
@@ -106,6 +114,10 @@ public class WithindayControler extends Controler {
 			}
 			this.trafficManagement  = this.trafficManagementConfigurator.getTrafficManagement();
 		}
+	}
+
+	public TrafficManagement getTrafficManagement() {
+		return this.trafficManagement;
 	}
 
 	@Override

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.events.AgentReplanEvent;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -100,9 +102,9 @@ public class WithindayAgent {
 	public void replan() {
 		//check if replanning is allowed
 		if (SimulationTimer.getTime() >= (this.replanningInterval + this.lastReplaningTimeStep)) {
-			/*if (log.isTraceEnabled()) {
+			if (log.isTraceEnabled()) {
 				log.trace("Agent " + this.person.getId() + " requested to replan...");
-			}*/
+			}
 			//let the agent look out of his window if he is able to do this
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
@@ -198,7 +200,7 @@ public class WithindayAgent {
     	if (log.isTraceEnabled()) {
 				log.trace("rerouting agent " + this.person.getId() + " with ...");
 				StringBuffer buffer = new StringBuffer();
-				for (Node n : newRoute.getRoute()) {
+				for (Node n : alternativeRoute.getRoute()) {
 					buffer.append(n.getId().toString());
 					buffer.append(" ");
 				}
@@ -206,6 +208,7 @@ public class WithindayAgent {
     	}
     	this.person.exchangeSelectedPlan(newPlan, false);
     	this.vehicle.exchangeActsLegs(newPlan.getActsLegs());
+    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.person.getId().toString(), alternativeRoute));
     }
 	}
 

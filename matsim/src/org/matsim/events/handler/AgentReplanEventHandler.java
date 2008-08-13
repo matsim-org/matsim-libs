@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlInputImpl1.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.events.handler;
 
-package org.matsim.withinday.trafficmanagement.controlinput;
+import org.matsim.events.AgentReplanEvent;
 
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.population.Route;
-import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
- * @author a.bergsten, d.zetterberg
+ * @author dgrether
  *
  */
-
-/*
- *
- * Measures the travel time difference between route 1 and 2 and returns that as
- * the control signal. ("Reactive control")
- */
-
-public class ControlInputImpl1 extends AbstractControlInputImpl implements
-		LinkLeaveEventHandler, LinkEnterEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
-
-
-	public ControlInputImpl1() {}
-
-	@Override
-	public double getPredictedNashTime(Route route) {
-		if (route.equals(this.mainRoute)) {
-			return this.lastTimeMainRoute;
-		}
-		return this.lastTimeAlternativeRoute;
-	}
-
-
-	@Override
-	public double getNashTime() {
-		super.getNashTime();
-		return this.timeDifference;
-	}
-
-	public void reset(int iteration) {}
-
-
-
+public interface AgentReplanEventHandler extends EventHandler {
+	
+	public void handleEvent (AgentReplanEvent event);
 }

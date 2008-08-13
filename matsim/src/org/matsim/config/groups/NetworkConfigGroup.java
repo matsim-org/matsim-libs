@@ -117,7 +117,7 @@ public class NetworkConfigGroup extends Module {
 		this.outputFile = outputFile;
 	}
 
-	private void setChangeEventInputFile(final String changeEventsInputFile) {
+	public void setChangeEventInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
 	public String getChangeEventsInputFile() {
@@ -131,7 +131,7 @@ public class NetworkConfigGroup extends Module {
 		return this.changeEventsOutputFile;
 	}
 
-	private void setTimeVariantNetwork(final boolean timeVariantNetwork) {
+	public void setTimeVariantNetwork(final boolean timeVariantNetwork) {
 		this.timeVariantNetwork = timeVariantNetwork;
 	}
 	public boolean isTimeVariantNetwork() {

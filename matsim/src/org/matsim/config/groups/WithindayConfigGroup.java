@@ -88,6 +88,12 @@ public class WithindayConfigGroup extends Module {
 	}
 	
 	
+	public void setTrafficManagementConfiguration(
+			String trafficManagementConfiguration) {
+		this.trafficManagementConfiguration = trafficManagementConfiguration;
+	}
+
+	
 	public List<Integer> getWithindayIterations() {
     return this.withindayIterations;
 	}

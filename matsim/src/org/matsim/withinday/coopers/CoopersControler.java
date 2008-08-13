@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.coopers;
 
+import org.matsim.config.Config;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -28,14 +29,22 @@ import org.matsim.withinday.WithindayControler;
  * @author dgrether
  */
 public class CoopersControler extends WithindayControler {
-
+	
 	public CoopersControler(final String[] args) {
 		super(args);
 		this.addControlerListener(new CoopersControlerListener());
 	}
 
-	public class CoopersControlerListener implements StartupListener {
+	public CoopersControler(String string) {
+		this(new String[]{string});
+	}
 
+	public CoopersControler(Config config) {
+		super(config);
+		this.addControlerListener(new CoopersControlerListener());
+	}
+
+	public class CoopersControlerListener implements StartupListener {
 		public void notifyStartup(StartupEvent e) {
 			CoopersControler.this.factory = new CoopersAgentLogicFactory(CoopersControler.this.network, CoopersControler.this.config.charyparNagelScoring(), CoopersControler.this.trafficManagement.getVDSSigns());
 		}

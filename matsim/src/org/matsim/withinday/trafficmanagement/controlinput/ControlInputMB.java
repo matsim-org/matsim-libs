@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -42,13 +39,13 @@ import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
-import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
  *
  * @author abergsten and dzetterberg
+ * @author dgrether
  */
 
 /*
@@ -72,23 +69,23 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	// User parameters:
 
-	private static final int NUMBEROFEVENTSDETECTION = 10;
+	private int numberofeventsdetection = 10;
 
-	private static final double IGNOREDQUEUINGTIME = 30; // seconds
+	private double ignoredQueuingTime = 30; // seconds
 
-	private double UPDATETIMEINOUTFLOW = 300;
+	private double updatetimeinoutflow = Double.NaN;
 
 	// private static final int NUMBEROFEVENTSINOUTFLOW = 20;
 
-	private static final double RESETBOTTLENECKINTERVALL = 1;
+	private double resetbottleneckintervall = 1;
+
+	//end of user parameters
 
 	private static final Logger log = Logger.getLogger(ControlInputMB.class);
 
 	private double predTTMainRoute;
 
 	private double predTTAlternativeRoute;
-
-	private ControlInputWriter writer;
 
 	private Map<String, Double> ttMeasured = new HashMap<String, Double>();
 
@@ -140,15 +137,11 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private List<Accident> accidents;
 
-	public ControlInputMB() {
-		super();
-		this.writer = new ControlInputWriter();
-	}
+	public ControlInputMB() {}
 
 	@Override
 	public void init() {
 		super.init();
-		this.writer.open();
 
 		// Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
 		// Main route
@@ -281,9 +274,9 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 				}
 			}
 		}
-		// this.bottleNecksAlt = null;
-		this.UPDATETIMEINOUTFLOW = getFreeSpeedRouteTravelTime(this.alternativeRoute);
-
+		if (this.updatetimeinoutflow == Double.NaN) {
+			this.updatetimeinoutflow = getFreeSpeedRouteTravelTime(this.mainRoute);
+		}
 	}
 
 	private double sumUpTTFreeSpeed(Node node, Route route) {
@@ -335,14 +328,14 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		// Stores [NUMBEROFFLOWEVENTS] last events and calculates flow for detection
 		// of capacity reduction
 		if (this.intraFlows.containsKey(event.linkId)) {
-			updateFlow(NUMBEROFEVENTSDETECTION, event);
+			updateFlow(this.numberofeventsdetection, event);
 		}
 		if (this.inLinksAlternativeRoute.contains(event.link)
 				|| this.outLinksAlternativeRoute.contains(event.link)
 				|| this.inLinksMainRoute.contains(event.link)
 				|| this.outLinksMainRoute.contains(event.link)) {
 			// updateFlow(NUMBEROFEVENTSINOUTFLOW, event);
-			updateFlow(this.UPDATETIMEINOUTFLOW, event);
+			updateFlow(this.updatetimeinoutflow, event);
 
 		}
 
@@ -398,11 +391,9 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
 		// Remove times older than flowUpdateTime
-		if (!list.isEmpty()) {
-			while ((list.getFirst() + flowUpdateTime) < event.time) {
+			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.time)) {
 				list.removeFirst();
 			}
-		}
 		// Add new values
 		list.addLast(event.time);
 
@@ -430,42 +421,21 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		}
 	}
 
-	public void reset(int iteration) {
-		// nothing need to be done here anymore cause everything is done in the
-		// finishIteration().
-	}
+	public void reset(int iteration) {	}
 
-	public void finishIteration() {
-		try {
-			this.writer.writeTravelTimesPerAgent(this.ttMeasuredMainRoute,
-					this.ttMeasuredAlternativeRoute);
-		} catch (IOException e) {
-			e.printStackTrace();
+	@Override
+	public double getPredictedNashTime(Route route) {
+		if (route.equals(this.mainRoute)) {
+			return this.predTTMainRoute;
 		}
-		this.writer.close();
+		else {
+			return this.predTTAlternativeRoute;
+		}
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
-		super.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
-		super.handleEvent(event);
-	}
-
 	public double getNashTime() {
-		try {
-			this.writer.writeAgentsOnLinks(this.numberOfAgents);
-			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
-					this.predTTMainRoute);
-			this.writer.writeTravelTimesAlternativeRoute(
-					this.lastTimeAlternativeRoute, this.predTTAlternativeRoute);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		super.getNashTime();
 		return getPredictedNashTime();
 
 	}
@@ -494,8 +464,8 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private double getPredictedTravelTime(final Route route, final Link bottleNeck) {
 
-		log.debug("");
-		log.debug("Sim time: " + SimulationTimer.getTime());
+		log.trace("");
+		log.trace("Sim time: " + SimulationTimer.getTime());
 		double predictedTT;
 		Link[] routeLinks = route.getLinkRoute();
 		boolean searchForBottleNecks = true;
@@ -509,22 +479,22 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		}
 
 		// boolean queueFound = true;
-		if (SimulationTimer.getTime() % RESETBOTTLENECKINTERVALL == 0) {
+		if (SimulationTimer.getTime() % this.resetbottleneckintervall == 0) {
 			bottleNeckList.clear();
 
 			for (int i = routeLinks.length - 1; i >= 0; i--) {
 				Link link = routeLinks[i];
 				String linkId = link.getId().toString();
 
-				if ((this.ttMeasured.get(linkId) > (this.ttFreeSpeeds.get(linkId) + IGNOREDQUEUINGTIME))
+				if ((this.ttMeasured.get(linkId) > (this.ttFreeSpeeds.get(linkId) + this.ignoredQueuingTime))
 						&& searchForBottleNecks) {
 					bottleNeckList.addFirst(link);
 					searchForBottleNecks = false;
 					// queueFound = true;
-					log.debug("Link " + linkId + " was detected as a bottleneck.");
+					log.trace("Link " + linkId + " was detected as a bottleneck.");
 				}
 				else if (this.ttMeasured.get(linkId) < this.ttFreeSpeeds.get(linkId)
-						+ IGNOREDQUEUINGTIME) {
+						+ this.ignoredQueuingTime) {
 					searchForBottleNecks = true;
 				}
 			}
@@ -572,7 +542,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 																												 */
 				bottleNeckList, lastBottleNeckFound)
 				+ ttAfterLastQueue; // the last link on the route
-		log.debug("Route: predicted tt = " + predictedTT);
+		log.trace("Route: predicted tt = " + predictedTT);
 
 		return predictedTT;
 	}
@@ -595,7 +565,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		double additionalAgentsOnRoute = 0;
 		int previousBottleNeckIndex;
 
-		log.debug("bottleNeckLink: " + bottleNeck.getId().toString());
+		log.trace("bottleNeckLink: " + bottleNeck.getId().toString());
 
 		// If it is the first queue on the route...
 		if (bottleNeckList.indexOf(bottleNeck) == 0) {
@@ -649,27 +619,27 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		}
 
 		additionalAgentsOnRoute = netFlowOnRoute * ttToThisRouteSegment;
-		log.debug("additionalAgentsInOutLinks: " + additionalAgentsInOutLinks
+		log.trace("additionalAgentsInOutLinks: " + additionalAgentsInOutLinks
 				+ ". additionalAgentsOnRoute: " + additionalAgentsOnRoute);
 		agentsAdditional = additionalAgentsOnRoute + additionalAgentsInOutLinks;
 
 		double agents_t0 = getAgents(routeSegment);
 		double agentsPredicted = agents_t0 + agentsAdditional;
-		log.debug("agents at t0:  " + agents_t0 + ". Simulated: "
+		log.trace("agents at t0:  " + agents_t0 + ". Simulated: "
 				+ agentsAdditional);
 
 		// Do the queuecheck
 		double ttFreeSpeedRS = getFreeSpeed(routeSegment);
 		double ttQueue = agentsPredicted / getIntraFlow(bottleNeck);
-		log.debug("RS ttFreeSpeed: " + ttFreeSpeedRS);
-		log.debug("RS ttQueue: " + ttQueue);
+		log.trace("RS ttFreeSpeed: " + ttFreeSpeedRS);
+		log.trace("RS ttQueue: " + ttQueue);
 		if (ttQueue > ttFreeSpeedRS) {
 			ttThisRouteSegment = ttQueue;
 		}
 		else {
 			ttThisRouteSegment = ttFreeSpeedRS;
 		}
-		log.debug(" This rs (bnlink: " + bottleNeck.getId().toString()
+		log.trace(" This rs (bnlink: " + bottleNeck.getId().toString()
 				+ ") + previous rs = " + ttThisRouteSegment + " + "
 				+ ttToThisRouteSegment);
 		return ttToThisRouteSegment + ttThisRouteSegment;
@@ -850,4 +820,25 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 	public void setAccidents(final List<Accident> accidents) {
 		this.accidents = accidents;
 	}
+
+	public void setIgnoredQueuingTime(double time) {
+		log.debug("Set ignored queing time to: " + time);
+		this.ignoredQueuingTime = time;
+	}
+
+	public void setUpdateTimeInOutFlow(double sec) {
+		this.updatetimeinoutflow = sec;
+		log.debug("Set update time in and outflow to: " + sec);
+	}
+
+	public void setResetBottleNeckIntervall(double time) {
+		this.resetbottleneckintervall = time;
+		log.debug("Set reset bottle neck intervall time to: " + this.resetbottleneckintervall);
+	}
+
+	public void setNumberOfEventsDetection(int events) {
+		this.numberofeventsdetection = events;
+		log.debug("Set number of events detection: " + this.numberofeventsdetection);
+	}
+
 }

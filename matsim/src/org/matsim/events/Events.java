@@ -33,6 +33,7 @@ import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentReplanEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
@@ -261,6 +262,10 @@ public class Events {
 			return true;
 		} else if (klass == AgentUtilityEvent.class) {
 			((AgentUtilityEventHandler)handler).handleEvent((AgentUtilityEvent)ev);
+			return true;
+		}
+		else if (klass == AgentReplanEvent.class) {
+			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
 			return true;
 		}
 		return false;

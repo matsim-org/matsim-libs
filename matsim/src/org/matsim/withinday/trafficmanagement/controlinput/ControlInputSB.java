@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,26 +29,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
+import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
-import org.matsim.withinday.trafficmanagement.AbstractControlInputImpl;
+import org.matsim.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
  *
  * @author abergsten and dzetterberg
+ * @author dgrether
  */
 
 /*
@@ -72,29 +70,30 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
 
 	// User parameters:
-	private static final boolean DISTRIBUTIONCHECKACTIVATED = false;
-
-	private static final boolean BACKGROUNDNOISECOMPENSATIONACTIVATED = false;
-
-	// private static final int NUMBEROFEVENTSINOUTFLOW = 20;
-
-	private double UPDATETIMEINOUTFLOW = 600;
-
-	private static final boolean INCIDENTDETECTIONACTIVATED = false;
-
-	private static final double IGNOREDQUEUINGTIME = 20; // seconds
 
 	private static final int NUMBEROFEVENTSDETECTION = 20;
 
 	private static final double RESETBOTTLENECKINTERVALL = 60;
 
+	// private static final int NUMBEROFEVENTSINOUTFLOW = 20;
+
+	private double UPDATETIMEINOUTFLOW = 600;
+
+
+	private boolean distributioncheckActive = false;
+
+	private boolean backgroundnoiseDetectionActive = false;
+
+	private boolean incidentDetectionActive = false;
+
+	private double ignoredQueuingTime = 20; // seconds
+
+	//end of user parameters
 	private static final Logger log = Logger.getLogger(ControlInputSB.class);
 
 	private double predTTMainRoute;
 
 	private double predTTAlternativeRoute;
-
-	private ControlInputWriter writer;
 
 	private Map<String, Double> ttMeasured = new HashMap<String, Double>();
 
@@ -146,16 +145,15 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 
 	private List<Accident> accidents;
 
-	public ControlInputSB() {
-		super();
-		this.writer = new ControlInputWriter();
+	private SimulationConfigGroup simulationConfig;
+
+	public ControlInputSB(SimulationConfigGroup simulationConfigGroup) {
+		this.simulationConfig = simulationConfigGroup;
 	}
 
 	@Override
 	public void init() {
 		super.init();
-		this.writer.open();
-
 		// Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
 		// Main route
 		Link[] linksMainRoute = this.mainRoute.getLinkRoute();
@@ -171,7 +169,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 			}
 
 			if (!this.capacities.containsKey(l.getId().toString())) {
-				double capacity = ((QueueLink) l).getSimulatedFlowCapacity()
+				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
 				this.capacities.put(l.getId().toString(), capacity);
 			}
@@ -235,7 +233,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 			}
 
 			if (!this.capacities.containsKey(l.getId().toString())) {
-				double capacity = ((QueueLink) l).getSimulatedFlowCapacity()
+				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
 				this.capacities.put(l.getId().toString(), capacity);
 			}
@@ -404,11 +402,9 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
 		// Remove times older than flowUpdateTime
-		if (!list.isEmpty()) {
-			while ((list.getFirst() + flowUpdateTime) < event.time) {
+			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.time)) {
 				list.removeFirst();
 			}
-		}
 		// Add new values
 		list.addLast(event.time);
 
@@ -436,44 +432,24 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		}
 	}
 
-	public void reset(int iteration) {
-		// nothing need to be done here anymore cause everything is done in the
-		// finishIteration().
-	}
+	public void reset(int iteration) {}
 
-	public void finishIteration() {
-		try {
-			this.writer.writeTravelTimesPerAgent(this.ttMeasuredMainRoute,
-					this.ttMeasuredAlternativeRoute);
-		} catch (IOException e) {
-			e.printStackTrace();
+
+	@Override
+	public double getPredictedNashTime(Route route) {
+		if (route.equals(this.mainRoute)) {
+			return this.predTTMainRoute;
 		}
-		this.writer.close();
+		else {
+			return this.predTTAlternativeRoute;
+		}
 	}
+
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
-		super.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
-		super.handleEvent(event);
-	}
-
 	public double getNashTime() {
-		try {
-			this.writer.writeAgentsOnLinks(this.numberOfAgents);
-			this.writer.writeTravelTimesMainRoute(this.lastTimeMainRoute,
-					this.predTTMainRoute);
-			this.writer.writeTravelTimesAlternativeRoute(
-					this.lastTimeAlternativeRoute, this.predTTAlternativeRoute);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		super.getNashTime();
 		return getPredictedNashTime();
-
 	}
 
 	// calculates the predictive time difference
@@ -506,17 +482,17 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 		int agentsToQueueAtBottleNeck = 0;
 		boolean guidanceObjectWillQueue = false;
 		Link currentBottleNeck = bottleNeck;
-		double currentBottleNeckCapacity;
-		double ttFreeSpeedBeforeBottleNeck;
+		double currentBottleNeckCapacity = 0;
+		double ttFreeSpeedBeforeBottleNeck = 0;
 
-		if (INCIDENTDETECTIONACTIVATED) {
+		if (this.incidentDetectionActive) {
 			currentBottleNeck = getDetectedBottleNeck(route);
 			currentBottleNeckCapacity = getIncidentCapacity(route);
 			for (int i = routeLinks.length - 1; i >= 0; i--) {
 				String linkId = routeLinks[i].getId().toString();
 
 				if (this.ttMeasured.get(linkId) > this.ttFreeSpeeds.get(linkId)
-						+ IGNOREDQUEUINGTIME) {
+						+ this.ignoredQueuingTime) {
 					currentBottleNeck = routeLinks[i];
 					setIncidentLink(currentBottleNeck, route);
 					currentBottleNeckCapacity = getFlow(currentBottleNeck);
@@ -534,10 +510,9 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 			}
 		}
 
-		else if (!INCIDENTDETECTIONACTIVATED) {
+		else if (!this.incidentDetectionActive) {
 			currentBottleNeck = bottleNeck;
-			currentBottleNeckCapacity = ((QueueLink) currentBottleNeck)
-					.getSimulatedFlowCapacity()
+			currentBottleNeckCapacity = currentBottleNeck.getFlowCapacity(SimulationTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
 					/ SimulationTimer.getSimTickTime();
 
 		}
@@ -557,7 +532,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 					.get(routeLinks[i].getId().toString());
 		}
 
-		if (DISTRIBUTIONCHECKACTIVATED) {
+		if (this.distributioncheckActive) {
 
 			for (int r = bottleNeckIndex; r >= 0; r--) {
 				Link link = routeLinks[r];
@@ -566,8 +541,8 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 
 				if ((linkAgents / currentBottleNeckCapacity) <= linkFreeSpeedTT) {
 					ttFreeSpeedPart += linkFreeSpeedTT;
-					log.debug("Distribution check: Link " + link.getId().toString()
-							+ " is added to freeSpeedPart.");
+//					log.debug("Distribution check: Link " + link.getId().toString()
+//							+ " is added to freeSpeedPart.");
 				}
 				else {
 					int agentsUpToLink = 0;
@@ -580,7 +555,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 						ttFreeSpeedBeforeBottleNeck = freeSpeedUpToLink;
 					}
 
-					if (BACKGROUNDNOISECOMPENSATIONACTIVATED) {
+					if (this.backgroundnoiseDetectionActive) {
 						agentsUpToLink += getAdditionalAgents(route, r);
 					}
 
@@ -602,18 +577,17 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 				}
 			}
 			if (guidanceObjectWillQueue) {
-				log.debug("The guidance object will queue with agents ahead.");
+//				log.debug("The guidance object will queue with agents ahead.");
 			}
 			else {
-				log
-						.debug("The guidance object will not queue at the bottleneck. No critical congested link was found.");
+//						.debug("The guidance object will not queue at the bottleneck. No critical congested link was found.");
 			}
 			// log.debug("Distribution check performed: " + agentsToQueueAtBottleNeck
 			// + " will queue at link " + criticalCongestedLink.getId().toString());
 		}
 
 		// Run without distribution check
-		else if (!DISTRIBUTIONCHECKACTIVATED) {
+		else if (!this.distributioncheckActive) {
 
 			// count agents on congested part of the route
 			ttFreeSpeedBeforeBottleNeck = 0;
@@ -623,18 +597,18 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 				ttFreeSpeedBeforeBottleNeck += this.ttFreeSpeeds.get(routeLinks[i]
 						.getId().toString());
 			}
-			if (BACKGROUNDNOISECOMPENSATIONACTIVATED) {
+			if (this.backgroundnoiseDetectionActive) {
 				agentsToQueueAtBottleNeck += getAdditionalAgents(route, bottleNeckIndex);
 			}
-			log.debug("Distribution check inactivated: " + agentsToQueueAtBottleNeck
-					+ " agents before bottle neck link "
-					+ currentBottleNeck.getId().toString());
+//			log.debug("Distribution check inactivated: " + agentsToQueueAtBottleNeck
+//					+ " agents before bottle neck link "
+//					+ currentBottleNeck.getId().toString());
 		}
 
 		predictedTT = (agentsToQueueAtBottleNeck / currentBottleNeckCapacity)
 				+ ttFreeSpeedPart;
 		// Check route criteria if distribution check is deactivated
-		if (!DISTRIBUTIONCHECKACTIVATED
+		if (!this.distributioncheckActive
 				&& !(agentsToQueueAtBottleNeck / currentBottleNeckCapacity > ttFreeSpeedBeforeBottleNeck)) {
 			predictedTT = getFreeSpeedRouteTravelTime(route);
 		}
@@ -776,4 +750,26 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 	public void setAccidents(final List<Accident> accidents) {
 		this.accidents = accidents;
 	}
+
+	public void setIgnoredQueuingTime(double time) {
+		log.debug("Set ignored queing time to: " + time);
+		this.ignoredQueuingTime = time;
+	}
+
+	public void setDistributionCheckActive(boolean b) {
+		log.debug("distribution check active: " + b);
+		this.distributioncheckActive = b;
+	}
+
+	public void setBackgroundnoiseCompensationActive(boolean b) {
+		log.debug("backgroun noise compensation active: " + b);
+		this.backgroundnoiseDetectionActive = b;
+	}
+
+	public void setIncidentDetectionActive(boolean b) {
+		log.debug("Incident detection active: " + b);
+		this.incidentDetectionActive = b;
+	}
+
+
 }

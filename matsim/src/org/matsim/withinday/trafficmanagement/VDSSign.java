@@ -362,6 +362,10 @@ public class VDSSign {
 		this.controlInput = controlInput;
 	}
 
+	public ControlInput getControlInput() {
+		return this.controlInput;
+	}
+
 	/**
 	 * @param controler
 	 *          the controler to set
