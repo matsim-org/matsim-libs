@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ import org.matsim.utils.io.IOUtils;
  * @author yu
  * 
  */
-public class FourthFilter extends TableSplitter {
+public class FourthFilter extends TableSplitterodFileCreatorDeleteEmpty1 {
 	private final BufferedWriter writer;
 
 	public FourthFilter(final String regex, final String attTableFilename,
@@ -53,7 +54,8 @@ public class FourthFilter extends TableSplitter {
 		return line.startsWith("$P");
 	}
 
-	static class timeIntervalReader extends TableSplitter {
+	static class timeIntervalReader extends
+			TableSplitterodFileCreatorDeleteEmpty1 {
 		private final List<String> timeIntervalIndexs = new ArrayList<String>();
 		private final List<String> minDepTimes = new ArrayList<String>();
 		private final List<String> maxDepTimes = new ArrayList<String>();
@@ -175,7 +177,7 @@ public class FourthFilter extends TableSplitter {
 		 * @param arg1
 		 *            SecoLine an object of SecoLine
 		 */
-		private final Map<Integer, SecoLine> secoLines = null;
+		private final Map<Integer, SecoLine> secoLines = new HashMap<Integer, SecoLine>();
 
 		public PrimLine(final String origZoneNo, final String destZoneNo,
 				final String travelTime, final String transfers)
@@ -218,25 +220,36 @@ public class FourthFilter extends TableSplitter {
 		}
 
 		public boolean samePrimLine(final PrimLine pl) {
-			return origZoneNo.equals(pl.getOrigZoneNo())
+			if (origZoneNo.equals(pl.getOrigZoneNo())
 					&& destZoneNo.equals(pl.getDestZoneNo())
-					&& transfers == pl.getTransfers()
-					&& travelTime.equals(pl.getTravelTime());
+					&& transfers == pl.getTransfers()) {
+				if (transfers == 0)
+					return travelTime.equals(pl.getTravelTime());
+				else if (transfers > 0){
+					if((origZoneNo.equals("100769"))&&(destZoneNo.equals("100471")))
+						System.out.println(origZoneNo+"\t"+destZoneNo+"\t"+travelTime);
+					return true;
+					}
+			} else {
+				return false;
+			}
+			return false;
 		}
 
 		public boolean sameSecoLines(final PrimLine pl) {
 			for (int i = 1; i <= transfers + 1; i++)
-				if (!secoLines.get(i * 2).sameSecoLine(
-						pl.getSecoLines().get(i * 2)))
-					return false;
+				if (!secoLines.isEmpty())
+					if (!secoLines.get(i * 2).sameSecoLine(
+							pl.getSecoLines().get(i * 2)))
+						return false;
 			return true;
 		}
 
 		public void addSecoLine(final String line) {
 			String[] secoLineArray = line.split(";");
-			secoLines.put(Integer.parseInt(secoLineArray[3]), new SecoLine(
-					secoLineArray[5], secoLineArray[6], secoLineArray[7]
-							.split(" ")[0]));
+			String busId = secoLineArray[7].split(" ")[0];
+			secoLines.put(new Integer(secoLineArray[3]), new SecoLine(
+					secoLineArray[5], secoLineArray[6], busId));
 		}
 	}
 
@@ -283,7 +296,7 @@ public class FourthFilter extends TableSplitter {
 				attFilePath, outputFilePath);
 		Set<PrimLine> pls = new HashSet<PrimLine>();
 		// to read input-.att-files and config min- and max departure time:
-		for (int i = 0; i <= tir.getCnt(); i++) {
+		for (int i = 0; i < tir.getCnt(); i++) {
 			pls.clear();
 			String attTableFilename, outputFilename;
 			Date minDepTime, maxDepTime;
@@ -382,8 +395,11 @@ public class FourthFilter extends TableSplitter {
 						} else if (currentPl != null)
 							if (currentPl.transfers > 0) {
 								String[] secoLines = ff.split(line);
-								if (Integer.parseInt(secoLines[3]) % 2 == 0)
-									currentPl.addSecoLine(line);
+								int pathLegIndex = Integer
+										.parseInt(secoLines[3]);
+								if (pathLegIndex > 0)
+									if (pathLegIndex % 2 == 0)
+										currentPl.addSecoLine(line);
 							}
 				} while (line != null);
 				ff.closeReader();
