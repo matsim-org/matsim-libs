@@ -62,7 +62,7 @@ public abstract class MatsimRandom {
 	 */
 	public static Random getLocalInstance() {
 		internalCounter++;
-		Random r = new Random(lastUsedSeed + internalCounter*23);
+		Random r = new Random(lastUsedSeed + internalCounter*23l);
 		prepareRNG(r);
 		return r;
 	}
