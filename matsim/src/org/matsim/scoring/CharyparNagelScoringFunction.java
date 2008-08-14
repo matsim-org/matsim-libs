@@ -198,6 +198,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static void init() {
 		if (initialized) return;
 
+		utilParams.clear();
 		CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
 		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
 		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
