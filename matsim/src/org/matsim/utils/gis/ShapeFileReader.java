@@ -36,7 +36,6 @@ import org.geotools.data.FeatureSource;
 public class ShapeFileReader {
 
 	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
-//	public static String WKT_WGS84 = "GEOGCS[\"WGS84\", DATUM[\"WGS84\", SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"degree\",0.017453292519943295], AXIS[\"Longitude\",EAST], AXIS[\"Latitude\",NORTH]]";
 
 	/**
 	 * Reads a shape file and returns a <code>FeatureSource</code> containing all features.
