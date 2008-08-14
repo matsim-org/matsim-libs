@@ -127,11 +127,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	protected ComparatorDijkstraCost comparator;
 
-	/**
-	 * A constant for the export to GDF (Guess file format) of the route.
-	 */
-	final static int exportedMarkedNodeSize = 1024;
-
 	boolean doGatherInformation = true;
 
 	double avgRouteLength = 0;
@@ -542,7 +537,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		public Node getPrevNode() {
 			return this.prev;
 		}
-	};
+	}
 
 	public static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
 
