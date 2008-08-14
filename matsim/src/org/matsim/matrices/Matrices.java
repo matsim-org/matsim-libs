@@ -51,6 +51,11 @@ public class Matrices {
 		return singleton;
 	}
 
+	public static void reset() {
+		Matrices.singleton = null;
+	}
+
+
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
@@ -99,4 +104,5 @@ public class Matrices {
 		return "[name=" + this.name + "]" +
 				"[nof_matrices=" + this.matrices.size() + "]";
 	}
+
 }
