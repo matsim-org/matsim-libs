@@ -69,7 +69,6 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.events.handler.EventHandler;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
@@ -411,10 +410,9 @@ public class Controler {
 			return null;
 		}
 		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
-
-			estimator = new MyRecentEventsBasedEstimator();
-			this.events.addHandler((EventHandler) estimator);
-
+			MyRecentEventsBasedEstimator tmp = new MyRecentEventsBasedEstimator();
+			this.events.addHandler(tmp);
+			estimator = tmp;
 		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
 			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);
 		} else if (estimatorName.equalsIgnoreCase("CharyparEtAlCompatibleLegTravelTimeEstimator")) {
@@ -424,7 +422,6 @@ public class Controler {
 		}
 		return estimator;
 	}
-
 
 	/**
 	 * Loads the configuration object with the correct settings.
