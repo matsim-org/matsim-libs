@@ -22,6 +22,7 @@ package org.matsim.withinday.trafficmanagement.controlinput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,10 +39,10 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
-import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
@@ -63,6 +64,9 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * bottleneck flow is used for predictions this many seconds. Then the accident
  * is forgotten and has to be detected again.
  *
+ * TODO if no accident detection is activated the model takes the first
+ * CapacityChangeEvent of the network as accident. The model
+ * will thus not be usable with real time dependent networks.
  */
 
 public class ControlInputSB extends AbstractControlInputImpl implements
@@ -143,7 +147,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 
 	private Double currentBNCapacityAlternativeRoute;
 
-	private List<Accident> accidents;
+	private Collection<NetworkChangeEvent> accidents;
 
 	private SimulationConfigGroup simulationConfig;
 
@@ -462,7 +466,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 					this.mainRouteNaturalBottleNeck);
 		}
 		else {
-			String accidentLinkId = this.accidents.get(0).getLinkId();
+			String accidentLinkId =  this.accidents.iterator().next().getLinks().iterator().next().getId().toString();
 			Link accidentLinkMainRoute = searchAccidentsOnRoutes(accidentLinkId);
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
 					accidentLinkMainRoute);
@@ -747,7 +751,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 				"The set Accident has to be on one of the routes if using this implementation of ControlInput!");
 	}
 
-	public void setAccidents(final List<Accident> accidents) {
+	public void setNetworkChangeEvents(final Collection<NetworkChangeEvent> accidents) {
 		this.accidents = accidents;
 	}
 

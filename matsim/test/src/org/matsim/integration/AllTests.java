@@ -30,6 +30,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Integration Tests for MATSim");
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.integration.events.AllTests.suite());
+		suite.addTest(org.matsim.integration.withinday.AllTests.suite());
 		suite.addTest(org.matsim.integration.replanning.AllTests.suite());
 		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
 		//$JUnit-END$

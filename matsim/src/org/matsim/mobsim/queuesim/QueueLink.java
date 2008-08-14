@@ -188,23 +188,6 @@ public class QueueLink {
 		}
 	}
 
-	/**
-	 * This method is deprecated and should be removed in future ...
-	 *
-	 * This method will scale the simulated flow capacity by the given factor, and
-	 * recalculate the timeCapCeil and Fraction attributes of QueueLink.
-	 * Furthermore it checks the storage Capacity of the link and change it if
-	 * needed.
-	 *
-	 * @param factor
-	 */
-	@Deprecated
-	public void scaleSimulatedFlowCapacity(final double factor) {
-		this.link.setCapacity(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * factor);
-		this.link.calcFlowCapacity();
-		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-	}
 
 
 	public void recalcTimeVariantAttributes(final double now) {

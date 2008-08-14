@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -41,6 +42,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
+import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
@@ -185,6 +187,9 @@ public class WithindayAgentTest extends TestCase {
 	 * {@link org.matsim.withinday.WithindayAgent#replan()}.
 	 */
 	public void testReplan() {
+		Events events = new Events();
+		WithindayQueueSimulation withindaySim = new WithindayQueueSimulation(this.network, null, events, null);
+		
 		WithindayAgent agent = createAgent(this.network.getLink(new IdImpl("2")), this.network.getLink(new IdImpl("7")));
 		agent.replan();
 		assertNotSame("The selected plan should be exchanged by a new one", this.plan, agent.getPerson().getSelectedPlan());

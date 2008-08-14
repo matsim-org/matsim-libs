@@ -34,11 +34,8 @@ public class TrafficManagement {
 
 	private List<VDSSign> signs;
 
-	private List<Accident> accidents;
-
 	public TrafficManagement() {
 		this.signs = new ArrayList<VDSSign>();
-		this.accidents = new ArrayList<Accident>();
 	}
 
 	public void addVDSSign(final VDSSign vdsSign) {
@@ -53,14 +50,6 @@ public class TrafficManagement {
 		for (VDSSign s : this.signs) {
 			s.calculateOutput(time);
 		}
-	}
-
-	public void addAccident(final Accident accident) {
-		this.accidents.add(accident);
-	}
-
-	public List<Accident> getAccidents() {
-		return this.accidents;
 	}
 
 	public void setupIteration(final int iteration) {

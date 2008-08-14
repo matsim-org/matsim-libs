@@ -22,24 +22,26 @@ package org.matsim.withinday.trafficmanagement.controlinput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
-import org.matsim.withinday.trafficmanagement.Accident;
+import org.matsim.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
@@ -60,7 +62,10 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * outlinks. Default is to update every 60 seconds. RESETBOTTLENECKINTERVALL The
  * bottleneck flow is used for predictions this many seconds. Then the accident
  * is forgotten and has to be detected again.
- *
+ * 
+ * TODO if no accident detection is activated the model takes the first
+ * CapacityChangeEvent of the network as accident. The model
+ * will thus not be usable with real time dependent networks.
  */
 
 public class ControlInputMB extends AbstractControlInputImpl implements
@@ -135,10 +140,14 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private Link currentBottleNeckAlternativeRoute;
 
-	private List<Accident> accidents;
+	private Collection<NetworkChangeEvent> accidents;
 
-	public ControlInputMB() {}
+	private SimulationConfigGroup simulationConfig;
 
+	public ControlInputMB(SimulationConfigGroup simulationConfigGroup) {
+		this.simulationConfig = simulationConfigGroup;
+	}
+	
 	@Override
 	public void init() {
 		super.init();
@@ -158,7 +167,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 			}
 
 			if (!this.capacities.containsKey(l.getId().toString())) {
-				double capacity = ((QueueLink) l).getSimulatedFlowCapacity()
+				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
 				this.capacities.put(l.getId().toString(), capacity);
 			}
@@ -222,7 +231,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 			}
 
 			if (!this.capacities.containsKey(l.getId().toString())) {
-				double capacity = ((QueueLink) l).getSimulatedFlowCapacity()
+				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
 				this.capacities.put(l.getId().toString(), capacity);
 			}
@@ -450,7 +459,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 					this.mainRouteNaturalBottleNeck);
 		}
 		else {
-			String accidentLinkId = this.accidents.get(0).getLinkId();
+			String accidentLinkId = this.accidents.iterator().next().getLinks().iterator().next().getId().toString();
 			Link accidentLinkMainRoute = searchAccidentsOnRoutes(accidentLinkId);
 			this.predTTMainRoute = getPredictedTravelTime(this.mainRoute,
 					accidentLinkMainRoute);
@@ -509,16 +518,14 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 		if (bottleNeckList.isEmpty()) {
 			double agentsOnRoute = getAgents(route);
-			double currentBottleNeckCapacity = ((QueueLink) bottleNeck)
-					.getSimulatedFlowCapacity();
+			double currentBottleNeckCapacity = bottleNeck.getFlowCapacity(SimulationTimer.getTime()) * this.simulationConfig.getFlowCapFactor()
+			/ SimulationTimer.getSimTickTime();
 			double ttQueue = agentsOnRoute / currentBottleNeckCapacity;
 			double ttFreeSpeed = getFreeSpeedRouteTravelTime(route);
 			if (ttQueue > ttFreeSpeed) {
 				return ttQueue;
 			}
-			else {
-				return ttFreeSpeed;
-			}
+			return ttFreeSpeed;
 		}
 
 		// Sum up free speed after the last queue (last route segment)
@@ -817,7 +824,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 				"The set Accident has to be on one of the routes if using this implementation of ControlInput!");
 	}
 
-	public void setAccidents(final List<Accident> accidents) {
+	public void setNetworkChangeEvents(final Collection<NetworkChangeEvent> accidents) {
 		this.accidents = accidents;
 	}
 

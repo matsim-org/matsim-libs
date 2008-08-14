@@ -81,13 +81,6 @@ public class QueueLinkTest extends MatsimTestCase {
 				.getToQueueNode());
 	}
 
-	public void testChangeSimulatedFlowCapacity() {
-		assertEquals(1.0, this.qlink.getSimulatedFlowCapacity(), EPSILON);
-		this.qlink.scaleSimulatedFlowCapacity(2.0);
-		assertEquals(2.0, this.qlink.getSimulatedFlowCapacity(), EPSILON);
-		this.qlink.scaleSimulatedFlowCapacity(0.5);
-		assertEquals(1.0, this.qlink.getSimulatedFlowCapacity(), EPSILON);
-	}
 
 	public void testAdd() {
 		Vehicle v = new Vehicle();

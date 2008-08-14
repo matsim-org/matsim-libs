@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CapacityChangeEvent.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,67 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.integration.withinday;
 
-package org.matsim.withinday.mobsim;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.testcases.TestDepth;
 
 
 /**
- * @author crommel
  * @author dgrether
  *
  */
-public class CapacityChangeEvent implements Comparable<CapacityChangeEvent> {
+public class AllTests {
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Test for org.matsim.integration.withinday");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(CoopersIntegrationTest.class);
 
-	private double time;
-
-	private QueueLink link;
-
-	private double capactiyScaleFactor;
-
-	public CapacityChangeEvent(final double time, final QueueLink link,
-			final double capacityFactor) {
-		this.time = time;
-		this.link = link;
-		this.capactiyScaleFactor = capacityFactor;
-	}
-
-	/**
-	 * Orders events by time
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(final CapacityChangeEvent other) {
-		if (this.time > other.time) {
-			return 1;
+		if (TestDepth.getDepth() == TestDepth.extended) {
+			suite.addTestSuite(CoopersBerlinIntegrationTest.class);
 		}
-		else if (this.time < other.time) {
-			return -1;
-		}
-		return 0;
-	}
-
-
-	/**
-	 * @return the time
-	 */
-	public double getTime() {
-		return this.time;
-	}
-
-
-	/**
-	 * @return the link
-	 */
-	public QueueLink getLink() {
-		return this.link;
-	}
-
-
-	/**
-	 * @return the capacity
-	 */
-	public double getCapacityScaleFactor() {
-		return this.capactiyScaleFactor;
+		//$JUnit-END$
+		return suite;
 	}
 }

@@ -20,11 +20,7 @@
 
 package org.matsim.withinday.mobsim;
 
-import java.util.PriorityQueue;
-
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.NetworkLayer;
@@ -32,7 +28,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayControler;
-import org.matsim.withinday.trafficmanagement.Accident;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
@@ -46,8 +41,6 @@ import org.matsim.withinday.trafficmanagement.TrafficManagement;
 public class WithindayQueueSimulation extends QueueSimulation {
 
 	private WithindayControler controler;
-
-	private PriorityQueue<CapacityChangeEvent> capacityEvents = new PriorityQueue<CapacityChangeEvent>();
 
 	private TrafficManagement trafficManagement;
 
@@ -89,36 +82,15 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	protected void beforeSimStep(final double time) {
 		super.beforeSimStep(time);
   	//check capacity change whishes for pending items
-		doCapacityChanges(time);
 		this.trafficManagement.updateBeforeSimStep(time);
 	}
 
 
 	public void setTrafficManagement(TrafficManagement trafficManagement) {
 		this.trafficManagement = trafficManagement;
-		for (Accident a : this.trafficManagement.getAccidents()) {
-			setAccident(a);
-		}
 	}
 
-	/**
-	 * Generating an accident (capacity reduction) on a certain link over a
-	 * certain time interval
-	 *
-	 * @param a
-	 */
-	public void setAccident(final Accident a) {
-		QueueLink accidentLink = this.network.getQueueLink(new IdImpl(a.getLinkId()));
-		this.capacityEvents.add(new CapacityChangeEvent(a.getStartTime(), accidentLink, a.getCapacityReductionFactor()));
-		this.capacityEvents.add(new CapacityChangeEvent(a.getEndTime(), accidentLink, 1/a.getCapacityReductionFactor()));
-	}
 
-	private void doCapacityChanges(final double time) {
-		while ((this.capacityEvents.size() != 0) && (this.capacityEvents.peek().getTime() < time)) {
-			CapacityChangeEvent event = this.capacityEvents.poll();
-			event.getLink().scaleSimulatedFlowCapacity(event.getCapacityScaleFactor());
-		}
-	}
 
 
 

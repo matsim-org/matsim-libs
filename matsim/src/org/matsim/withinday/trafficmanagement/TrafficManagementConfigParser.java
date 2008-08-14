@@ -97,16 +97,6 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private final static String CONTROLINPUT = "controlInput";
 
-	private final static String ACCIDENT = "accident";
-
-	private final static String LINKID = "linkId";
-
-	private final static String CAPACITYREDUCTIONFACTOR ="capacityReductionFactor";
-
-	private final static String STARTTIME = "startTime";
-
-	private final static String ENDTIME = "endTime";
-
 	private final static String OUTPUT = "output";
 
 	private final static String SPREADSHEETFILE = "spreadsheetfile";
@@ -135,8 +125,6 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ControlInput controlInput;
 
-	private Accident accident;
-
 	private Events events;
 
 	private VDSSignOutput vdsSignOutput;
@@ -161,9 +149,6 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (name.equalsIgnoreCase(MAINROUTE) || name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
 			this.currentRouteNodes = new ArrayList<Node>();
-		}
-		else if (name.equalsIgnoreCase(ACCIDENT)) {
-			this.accident = new Accident();
 		}
 		else if (name.equalsIgnoreCase(NODE)) {
 			String id = atts.getValue(ID);
@@ -305,22 +290,6 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		else if (name.equalsIgnoreCase(CONTROLINPUT)) {
 			this.controlInput.init();
 		}
-		else if (name.equalsIgnoreCase(LINKID)) {
-			this.accident.setLinkId(content);
-		}
-		else if (name.equalsIgnoreCase(CAPACITYREDUCTIONFACTOR)) {
-			this.accident.setCapacityReductionFactor(Double.parseDouble(content));
-		}
-		else if (name.equalsIgnoreCase(STARTTIME)) {
-			this.accident.setStartTime(content);
-		}
-		else if (name.equalsIgnoreCase(ENDTIME)) {
-			this.accident.setEndTime(content);
-		}
-		else if (name.equalsIgnoreCase(ACCIDENT)) {
-			this.trafficManagement.addAccident(this.accident);
-			this.accident = null;
-		}
 		else if (name.equalsIgnoreCase(SPREADSHEETFILE)) {
 			this.vdsSignOutput.setSpreadsheetFile(content);
 		}
@@ -347,13 +316,13 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (content.trim().compareTo(CONTROLINPUTSB) == 0) {
 			ControlInputSB controlInput = new ControlInputSB(this.simulationConfig);
-			controlInput.setAccidents(this.trafficManagement.getAccidents());
+			controlInput.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
 		else if (content.trim().compareTo(CONTROLINPUTMB) == 0) {
-			ControlInputMB controlInput = new ControlInputMB();
-			controlInput.setAccidents(this.trafficManagement.getAccidents());
+			ControlInputMB controlInput = new ControlInputMB(this.simulationConfig);
+			controlInput.setNetworkChangeEvents(this.network.getNetworkChangeEvents());
 			this.events.addHandler(controlInput);
 			return controlInput;
 		}
