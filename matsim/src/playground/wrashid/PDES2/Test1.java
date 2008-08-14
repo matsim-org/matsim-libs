@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
-import playground.wrashid.deqsim.PDESStarter1;
+import playground.wrashid.deqsim.PDESStarter2;
 import playground.wrashid.test.CppEventFileParser;
 
 public class Test1 extends TestCase {
@@ -18,7 +18,7 @@ public class Test1 extends TestCase {
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
-		PDESStarter1.main(args);
+		PDESStarter2.main(args);
 		//assertEquals(EventLog.compare(eventLog1,eventLog2),true);
 	}
 	
@@ -29,7 +29,7 @@ public class Test1 extends TestCase {
 		String[] args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
-		PDESStarter1.main(args);
+		PDESStarter2.main(args);
 		/*
 		args[0]= baseDir + "deq_events.txt";
 		CppEventFileParser.main(args);

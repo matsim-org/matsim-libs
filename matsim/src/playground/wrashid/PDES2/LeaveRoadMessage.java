@@ -8,7 +8,7 @@ public class LeaveRoadMessage extends EventMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		System.out.println("leave road message");
+		//System.out.println("leave road message");
 		Road road=(Road)this.receivingUnit;
 		road.leaveRoad(vehicle);
 	}

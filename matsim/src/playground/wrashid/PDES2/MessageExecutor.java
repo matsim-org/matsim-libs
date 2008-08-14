@@ -82,6 +82,8 @@ public class MessageExecutor extends Thread {
 						}
 						scheduler.zoneMessageQueues[i].lock.unlock();
 					}
+					//scheduler.zoneMessageQueues[i].printSize();
+					//System.out.println(threadId);
 				}
 				
 			}

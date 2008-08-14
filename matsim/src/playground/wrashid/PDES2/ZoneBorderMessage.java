@@ -18,39 +18,11 @@ public class ZoneBorderMessage extends SelfhandleMessage {
 
 	@Override
 	public void selfhandleMessage() {
-		// send a null message to all roads ahead, only if the current road is
-		// empty (has no cars on it)
-		
-		Road currentRoad = (Road) receivingUnit;
-		
-		if (currentRoad.isRoadEmpty()){
-			return;
-		}
-		
-		
-		for (Link outLink:currentRoad.getLink().getToNode().getOutLinks().values()){
-			assert(messageArrivalTime>=0);
-			Road outRoad=Road.allRoads.get(outLink.getId().toString());
-			
-			ZoneBorderMessage nm=MessageFactory.getNullMessage();
-			nm.sendingUnit=currentRoad;
-			nm.receivingUnit=outRoad;
-			nm.messageArrivalTime=messageArrivalTime+currentRoad.linkTravelTime-SimulationParameters.delta;
-			nm.debugString="null message handler";
-			
-			if (nm.messageArrivalTime<0){
-				System.out.println();
-			}
-			
-			
-			assert(nm.messageArrivalTime>=messageArrivalTime);
-			outRoad.roadEntryHandler.registerNullMessage(nm);
-		}
 		
 	}
 	
 	public static void initialNullMessage(Road receivingRoad, double simTime){
-		ZoneBorderMessage nm=MessageFactory.getNullMessage();
+		ZoneBorderMessage nm=MessageFactory.getZoneBorderMessage();
 		nm.sendingUnit=null;
 		nm.receivingUnit=receivingRoad;
 		nm.messageArrivalTime=simTime;
@@ -65,6 +37,6 @@ public class ZoneBorderMessage extends SelfhandleMessage {
 
 	@Override
 	public void recycleMessage() {
-		MessageFactory.disposeNullMessage(this);
+		MessageFactory.disposeZoneBorderMessage(this);
 	}
 }

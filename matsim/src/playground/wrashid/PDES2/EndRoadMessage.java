@@ -21,7 +21,7 @@ public class EndRoadMessage extends EventMessage {
 		// leave previous road
 		//Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 		//previousRoad.leaveRoad(vehicle);
-		System.out.println("end road message");
+		//System.out.println("end road message");
 		
 		
 		if (vehicle.getCurrentLinkRoute().length==vehicle.getLinkIndex()+1){

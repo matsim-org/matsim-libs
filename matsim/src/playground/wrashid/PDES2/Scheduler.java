@@ -33,43 +33,15 @@ public class Scheduler {
 	//volatile public double timeOfNextBarrier=0;
 	
 	public void schedule(Message m){
-			// TODO: find out the magic behind this number:
-			// if the +xy value is small, then it produces an error, else not.
-			// Problem: I need to keep this value small, because else there is no use
-			// of the buffer
-			// ERRRRRROR: It produces also an error for large +xy. => find out why
-			// the error will disappear, if we do not use the buffer. Find out why...
-			//if (timeOfNextBarrier>=m.messageArrivalTime){
-			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].putMessage(m);
-			//} else {
-			//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m);
-			//}
-		
-		/*
-		if (Thread.currentThread() instanceof MessageExecutor){
-			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m, MessageExecutor.getThreadId());
-		} else {
-			threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].addBuffer(m,1);
-		}
-		*/
 		zoneMessageQueues[((Road)m.receivingUnit).getZoneId()].putMessage(m);
-		
 	}
 	
 	public void unschedule(Message m){
-		//if (timeOfNextBarrier>=m.messageArrivalTime){
-		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
-		//} else {
-		//	threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].deleteBuffer(m);
-		//}
-		
-		
-		//threadMessageQueues[((Road)m.receivingUnit).getBelongsToMessageExecutorThreadId()-1].removeMessage(m);
-		zoneMessageQueues[((Road)m.receivingUnit).getZoneId()].deleteBuffer(m,MessageExecutor.getThreadId());
+		zoneMessageQueues[((Road)m.receivingUnit).getZoneId()].removeMessage(m);
 	}
 	
 	public Message getNextMessage(int threadId){
-		return zoneMessageQueues[threadId-1].getNextMessage();
+		return zoneMessageQueues[threadId].getNextMessage();
 	}
 	
 	
@@ -159,18 +131,10 @@ public class Scheduler {
 		
 		
 		// schedule a null message on all roads
-		// this initialization must be done before starting the messageExecutors,
-		// because else a race condition occurs between the initial messages and their processing
-		// TODO: but perhaps it creates some problem, because there are no message executors at this time
-		// to schedule message into the right scheduler => or perpaps yes, because each road has an executor id assigned
 		for (Road road:Road.allRoads.values()){
-			ZoneBorderMessage.initialNullMessage(road, 0);
+			road.scheduleInitialZoneBorderMessage();
 		}
 		
-		// empty all buffer queues
-		for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
-			zoneMessageQueues[i].emptyBuffers();
-		}
 		
 		
 		
@@ -216,13 +180,15 @@ public class Scheduler {
 			zoneMessageQueues[i]=new ZoneMessageQueue(i);	
 		}
 		
-		// init numberOfIncomingLinks
+		// initialize numberOfIncomingLinks and numberOfQueuedMessages
 		for (Road road:Road.allRoads.values()){
 			for (Link inLink: road.getLink().getFromNode().getInLinks().values()){
 				Road inRoad=Road.allRoads.get(inLink.getId().toString());
 				if (inRoad.getZoneId()!=road.getZoneId()){
 					if (!zoneMessageQueues[road.getZoneId()].tempIncomingLinks.contains(inLink)){
 						zoneMessageQueues[road.getZoneId()].tempIncomingLinks.add(inLink);
+						inRoad.isOutBorderRoad=true;
+						zoneMessageQueues[road.getZoneId()].numberOfQueuedMessages.put(inRoad, 0);
 					}
 				}
 			}

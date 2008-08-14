@@ -21,6 +21,7 @@ import org.matsim.population.Plan;
 
 public class Road extends SimUnit {
 	private int zoneId=0;
+	public boolean isOutBorderRoad=false;
 	public static HashMap<String, Road> allRoads;
 	private Link link;
 	private LinkedList<Double> gap; // see enterRequest for a detailed
@@ -512,5 +513,54 @@ public class Road extends SimUnit {
 		return (link.getFromNode().getCoord().getX()+link.getToNode().getCoord().getX())/2;
 	}
 
+	
+	
+	public void scheduleInitialZoneBorderMessage(){
+		scheduleZoneBorderMessage(linkTravelTime - SimulationParameters.delta);
+	}
+	
+	public void scheduleNextZoneBorderMessage(double currentTime){
+		double timeOfNextMessage=currentTime;
+		if (carsOnTheRoad.size()==0){
+			timeOfNextMessage+=linkTravelTime- SimulationParameters.delta;
+		} else {
+			timeOfNextMessage+=inverseOutFlowCapacity- SimulationParameters.delta;
+		}
+		
+		scheduleZoneBorderMessage(timeOfNextMessage);
+	}
+	
+	
+	
+	// TODO: this can be implemented more efficiently, by storing the effective outgoing
+	// links of this zone into a variable of this class
+	public void scheduleZoneBorderMessage(double nextMessageTime){	
+		//boolean test=false;
+		if (isOutBorderRoad){
+			//System.out.print(".");
+			for (Link outLink: getLink().getToNode().getOutLinks().values()){
+				Road outRoad=Road.allRoads.get(outLink.getId().toString());
+				if (getZoneId()!= outRoad.getZoneId()){
+					ZoneBorderMessage nm=MessageFactory.getZoneBorderMessage();
+					nm.sendingUnit=this;
+					nm.receivingUnit=outRoad;
+					nm.messageArrivalTime=nextMessageTime;
+					nm.isAcrossBorderMessage=true;
+					
+					scheduler.schedule(nm);
+					//test=true;
+				}
+			}
+			
+			TimerMessage tm=new TimerMessage();
+			tm.sendingUnit=this;
+			tm.receivingUnit=this;
+			tm.messageArrivalTime=nextMessageTime;
+			scheduler.schedule(tm);
+			//assert(test);
+		}
+		
+	}
+	
 	
 }

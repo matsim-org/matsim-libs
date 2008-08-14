@@ -16,7 +16,7 @@ public class MessageFactory {
 	private static ConcurrentLinkedQueue<EnterRequestMessage> enterRequestMessageQueue=new ConcurrentLinkedQueue<EnterRequestMessage>();
 	
 	
-	public static void disposeNullMessage(ZoneBorderMessage message){
+	public static void disposeZoneBorderMessage(ZoneBorderMessage message){
 		// uncomment this, as soon as problems with performance solved => This is a bottleneck at the moment...
 		//if (nullMessageQueue.size()<SimulationParameters.maxQueueLength){
 		//	nullMessageQueue.add(message);
@@ -137,7 +137,7 @@ public class MessageFactory {
 		}
 	}
 	
-	synchronized public static ZoneBorderMessage getNullMessage(){
+	synchronized public static ZoneBorderMessage getZoneBorderMessage(){
 		//if (nullMessageQueue.size()<SimulationParameters.minQueueLength){
 			return new ZoneBorderMessage();
 		//} else {
