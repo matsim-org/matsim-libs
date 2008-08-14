@@ -39,6 +39,8 @@ public class ZoneMessageQueue {
 		assert(!queue1.contains(m)):"inconsistency";
 		assert(m.messageArrivalTime>=0):"simulation time cannot be negative";
 		
+		assert(((Road)m.receivingUnit).getZoneId()==zoneId);
+		
 		
 		if (m.isAcrossBorderMessage){
 			incrementNumberOfQueuedMessages((Road)m.sendingUnit);

@@ -22,7 +22,7 @@ public class StartingLegMessage extends EventMessage {
 		
 		// attempt to enter street.
 		
-		System.out.println("starting leg message");
+		//System.out.println("starting leg message");
 		
 		if (vehicle.getCurrentLeg().getMode().equalsIgnoreCase("car")){
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());

@@ -180,6 +180,10 @@ public class Road extends SimUnit {
 			 //System.out.println();
 		 }
 		 
+		 
+		if (carsOnTheRoad.getFirst()!=vehicle){
+			System.out.println("");
+		}
 		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6
 	 	
 		
@@ -299,16 +303,16 @@ public class Road extends SimUnit {
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 		
 		// attention: do not use in multi thread solution (might return false result)
-		SimulationParameters.sumXCoordinate+=getXCoordinate();
-		SimulationParameters.noOfCars++;
+		//SimulationParameters.sumXCoordinate+=getXCoordinate();
+		//SimulationParameters.noOfCars++;
 		
-		if (getXCoordinate()>680237){
-			SimulationParameters.sumXCoordinateRight+=getXCoordinate();
-			SimulationParameters.noOfCarsRight++;
-		} else {
-			SimulationParameters.sumXCoordinateLeft+=getXCoordinate();
-			SimulationParameters.noOfCarsLeft++;
-		}
+		//if (getXCoordinate()>680237){
+		//	SimulationParameters.sumXCoordinateRight+=getXCoordinate();
+		//	SimulationParameters.noOfCarsRight++;
+		//} else {
+		//	SimulationParameters.sumXCoordinateLeft+=getXCoordinate();
+		//	SimulationParameters.noOfCarsLeft++;
+		//}
 		
 		
 		
@@ -535,6 +539,8 @@ public class Road extends SimUnit {
 	// TODO: this can be implemented more efficiently, by storing the effective outgoing
 	// links of this zone into a variable of this class
 	public void scheduleZoneBorderMessage(double nextMessageTime){	
+		
+		
 		//boolean test=false;
 		if (isOutBorderRoad){
 			//System.out.print(".");
@@ -548,6 +554,11 @@ public class Road extends SimUnit {
 					nm.isAcrossBorderMessage=true;
 					
 					scheduler.schedule(nm);
+					
+					if (getLink().getId().toString().equalsIgnoreCase("110909")){
+						System.out.println(110909);
+					}
+					
 					//test=true;
 				}
 			}

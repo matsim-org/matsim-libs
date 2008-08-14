@@ -25,6 +25,7 @@ public class RoadEntryHandler {
 			erm.messageArrivalTime=simTime;
 			if (fromRoad.getZoneId()!=belongsToRoad.getZoneId()){
 				erm.isAcrossBorderMessage=true;
+				System.out.println(fromRoad.getLink().getId() +" - " + belongsToRoad.getLink().getId() +" - " + vehicle.getOwnerPerson().getId());
 			}
 			
 			belongsToRoad.scheduler.schedule(erm);
