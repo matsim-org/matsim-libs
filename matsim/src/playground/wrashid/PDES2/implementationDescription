@@ -47,7 +47,8 @@ it leads to more border links (really?).
 
 - Problems:
     - assertion fails
-
+    - sogar bei nur einem messageExecutor und nur einer zone failt es.
+    - 
  
 - TODO: 
      - perhaps move arround the zone separators to achieve better lookahead propoerties? 
