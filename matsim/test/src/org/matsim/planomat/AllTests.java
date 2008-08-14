@@ -27,19 +27,15 @@ public class AllTests {
 
 	public static Test suite() {
 
-		System.out.println("Running org.matsim.planomat.AllTests.suite()...");
-
 		TestSuite testSuite = new TestSuite("Tests for org.matsim.planomat");
 
 		//$JUnit-BEGIN$
 		testSuite.addTest(org.matsim.planomat.costestimators.AllTests.suite());
 		testSuite.addTestSuite(PlanOptimizeTimesTest.class);
 		//$JUnit-END$
-		
-		System.out.println("Running org.matsim.planomat.AllTests.suite()...done.");
 
 		return testSuite;
-		
+
 	}
-	
+
 }

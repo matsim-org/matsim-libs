@@ -27,8 +27,6 @@ public class AllTests {
 
 	public static Test suite() {
 
-		System.out.println("Running org.matsim.planomat.costestimators.AllTests.suite()...");
-		
 		TestSuite testSuite = new TestSuite("Tests for org.matsim.planomat.costestimators");
 		//$JUnit-BEGIN$
 		testSuite.addTestSuite(DepartureDelayAverageCalculatorTest.class);
@@ -36,8 +34,6 @@ public class AllTests {
 		testSuite.addTestSuite(CetinCompatibleLegTravelTimeEstimatorTest.class);
 		testSuite.addTestSuite(CharyparEtAlCompatibleLegTravelTimeEstimatorTest.class);
 		//$JUnit-END$
-
-		System.out.println("Running org.matsim.planomat.costestimators.AllTests.suite()...done.");
 
 		return testSuite;
 	}
