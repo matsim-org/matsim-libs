@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficmanagement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/trafficmanagement.xsd">
+<!--  <accident>-->
+<!--    <linkId>-->
+<!--      14-->
+<!--    </linkId>-->
+<!--    <capacityReductionFactor>-->
+<!--      0.2-->
+<!--    </capacityReductionFactor>-->
+<!--    <startTime>-->
+<!--      07:00:00-->
+<!--    </startTime>-->
+<!--    <endTime>-->
+<!--      08:15:00-->
+<!--    </endTime>-->
+<!--  </accident>-->
+  <guidanceDevice>
+    <controlInput>
+      <!-- the order of the elements in controlInput should be fixed in the xsd because if
+      the order is changed the parser will not work correctly! -->
+      <controlInputClass>
+        ControlInputSB
+      </controlInputClass>
+      <mainRoute>
+      	<node id="2" />
+      	<node id="10" />
+      	<node id="11" />
+      	<node id="12" />
+      	<node id="13" />
+      	<node id="14" />
+      	<node id="3" />
+      </mainRoute>
+      <alternativeRoute>
+      	<node id="2" />
+      	<node id="20" />
+      	<node id="21" />
+      	<node id="3" />
+      </alternativeRoute>
+    </controlInput>
+    <feedbackControler>BangBangControler</feedbackControler>
+	  <messageHoldTime>
+	    1
+	  </messageHoldTime>
+	  <controlEvents>
+	    2
+	  </controlEvents>
+	  <nominalSplitting>
+	    0.5
+	  </nominalSplitting>
+    <deadZoneSystemOutput>
+  		0
+    </deadZoneSystemOutput>
+    <deadZoneSystemInput>
+      0
+    </deadZoneSystemInput>
+    <signLink>
+ 			1
+    </signLink>
+    <directionLink>
+ 				2
+    </directionLink>
+    <compliance>
+      1
+    </compliance>
+    <benefitControl>
+      false
+    </benefitControl>
+  </guidanceDevice>
+</trafficmanagement>

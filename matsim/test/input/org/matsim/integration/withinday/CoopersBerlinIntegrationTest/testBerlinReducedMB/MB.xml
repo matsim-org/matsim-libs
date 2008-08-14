@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficmanagement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/trafficmanagement.xsd">
+
+<!-- The real accident -->
+<!--<accident>-->
+<!--    <linkId>-->
+<!--      8425-->
+<!--    </linkId>-->
+<!--    <capacityReductionFactor>-->
+<!--      0.5-->
+<!--    </capacityReductionFactor>-->
+<!--    <startTime>-->
+<!--      16:20:00-->
+<!--    </startTime>-->
+<!--    <endTime>-->
+<!--      17:50:00-->
+<!--    </endTime>-->
+<!--  </accident>-->
+
+  <guidanceDevice>
+    <controlInput>
+      <!-- the order of the elements in controlInput should be fixed in the xsd because if
+      the order is changed the parser will not work correctly! -->
+      <controlInputClass>
+        ControlInputMB
+      </controlInputClass>
+			<ignoredQueuingTime sec="20" />
+			<resetBottleNeckIntervall sec="1800" />
+        	<numberOfEventsDetection value="20" />
+        <mainRoute>
+        <node id ="9346" />
+        <node id ="9350" />
+        <node id ="9375" />
+        <node id ="9379" />
+      </mainRoute>
+      <alternativeRoute>
+        <node id ="9346" />
+        <node id ="9348" />
+        <node id ="9349" />
+        <node id ="1942" />
+        <node id ="1944" />
+        <node id ="1946" />
+        <node id ="1948" />
+        <node id ="2055" />
+        <node id ="2039" />
+        <node id ="2054" />
+        <node id ="2061" />
+        <node id ="2060" />
+        <node id ="2064" />
+        <node id ="9379" />
+      </alternativeRoute>
+    </controlInput>
+    <feedbackControler>BangBangControler</feedbackControler>
+	  <messageHoldTime>
+	    1
+	  </messageHoldTime>
+	  <controlEvents>
+	    1
+	  </controlEvents>
+	  <nominalSplitting>
+	    0.5
+	  </nominalSplitting>
+    <deadZoneSystemOutput>
+  		0
+    </deadZoneSystemOutput>
+    <deadZoneSystemInput>
+      0
+    </deadZoneSystemInput>
+    <signLink>
+ 			8117
+    </signLink>
+    <directionLink>
+ 				8044
+    </directionLink>
+    <compliance>
+      0.8
+    </compliance>
+    <benefitControl>
+      false
+    </benefitControl>
+  </guidanceDevice>
+</trafficmanagement>

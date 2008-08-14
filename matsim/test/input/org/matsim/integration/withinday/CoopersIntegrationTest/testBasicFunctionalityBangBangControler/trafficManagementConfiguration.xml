@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficmanagement xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/trafficmanagement.xsd">
+<!-- <accident>-->
+<!--    <linkId>-->
+<!--      6-->
+<!--    </linkId>-->
+<!--    <capacityReductionFactor>-->
+<!--      0.1-->
+<!--    </capacityReductionFactor>-->
+<!--    <startTime>-->
+<!--      07:00:00-->
+<!--    </startTime>-->
+<!--    <endTime>-->
+<!--      08:15:00-->
+<!--    </endTime>-->
+<!--  </accident>-->
+  <guidanceDevice>
+    <controlInput>
+      <controlInputClass>
+        ControlInputSB
+      </controlInputClass>
+      <mainRoute>
+        <node id="3" />
+				<node id="6" />
+        <node id="7" />
+				<node id="12" />
+<!--        <node id="3" />
+        <node id="8" />
+        <node id="9" />
+        <node id="12" />-->
+	    </mainRoute>
+      <alternativeRoute>
+        <node id="3" />
+				<node id="8" />
+        <node id="9" />
+				<node id="12" />
+      </alternativeRoute>
+    </controlInput>
+    <feedbackControler>BangBangControler</feedbackControler>
+	  <messageHoldTime>
+	    1
+	  </messageHoldTime>
+	  <controlEvents>
+	    1
+	  </controlEvents>
+	  <nominalSplitting>
+	    0.5
+	  </nominalSplitting>
+    <deadZoneSystemOutput>
+  		0.0
+    </deadZoneSystemOutput>
+    <deadZoneSystemInput>
+      0 
+    </deadZoneSystemInput>
+    <signLink>
+ 			2
+    </signLink>
+    <directionLink>
+ 				20
+    </directionLink>
+    <compliance>
+      0.8
+    </compliance>
+    <benefitControl>
+      false
+    </benefitControl>
+  </guidanceDevice>
+</trafficmanagement>

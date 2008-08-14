@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+
+<config>
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="outputTimeFormat" value="HH:mm:ss" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+<!-- ====================================================================== -->
+	<module name="world"> 
+	</module>   
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="events">
+	</module>
+
+<!-- ====================================================================== -->
+	<module name="controler">
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="simulation">
+		<param name="startTime" value="05:00:00" />
+		<param name="endTime" value="09:30:00" />
+	</module>
+
+<!-- ====================================================================== -->
+	  <module name="withinday">
+	    <param name="withindayIteration" value="0" />
+	    <param name="replanningInterval" value="1" />
+			<param name="agentVisibilityRange" value="1" />
+	    <param name="contentThreshold" value="0" />
+	  </module>
+
+<!-- ====================================================================== -->
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+		<param name="lateArrival" value="-0" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+0" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		<!-- Activity indices (the numbers after the '_') go from 0 to n.  The ordering doesn't matter.  -->
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+		<param name="activityType_0"            value="w" />
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="BestScore" />
+	</module>
+
+<!-- ====================================================================== -->
+</config>

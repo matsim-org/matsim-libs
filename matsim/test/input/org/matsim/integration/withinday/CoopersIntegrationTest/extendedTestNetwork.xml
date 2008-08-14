@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network>
+
+	<nodes>
+  		<node id="0" x="-2050.0" y="0" />
+  		<node id="1" x="-2000.0" y="0" /> 
+  		<node id="2" x="0" y="0" /> 
+  		<node id="10" x="500" y="1000" />
+		<node id="11" x="530" y="1000" /> 
+		<node id="12" x="2500" y="1000" />
+  		<node id="13" x="4500" y="1000" /> 
+		<node id="14" x="4513.4" y="973.2" />
+  		<node id="20" x="500" y="-1000" /> 
+  		<node id="21" x="4500" y="-1000" /> 
+  		<node id="3" x="5000" y="0" /> 
+		<node id="4" x="7000" y="0" /> 
+		<node id="30" x="1460" y="1260" />
+		<node id="31" x="1500" y="1250" />
+		<node id="40" x="3500" y="1250" />
+		<node id="41" x="3540" y="1260" />
+		 
+	</nodes>
+  	
+  	<links capperiod="01:00:00">
+  		<link id="0" from="0" to="1" length="50" capacity="6000" freespeed="27.78" permlanes="1"  />
+  		<link id="1" from="1" to="2" length="2000" capacity="6000" freespeed="27.78" permlanes="1"  /> 
+   		<link id="10" from="2" to="10" length="1118" capacity="3000" freespeed="27.78" permlanes="1"  /> 
+   		<link id="11" from="10" to="11" length="30.00" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="12" from="11" to="12" length="1970" capacity="3000" freespeed="27.78" permlanes="1" />
+  		<link id="13" from="12" to="13" length="2000" capacity="3000" freespeed="27.78" permlanes="1" />
+  		<link id="14" from="13" to="14" length="30" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="15" from="14" to="3" length="1088" capacity="3000" freespeed="27.78" permlanes="1" /> 
+   		<link id="20" from="2" to="20" length="1118" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="21" from="20" to="21" length="4000" capacity="3000" freespeed="27.78" permlanes="1" />
+		<link id="22" from="21" to="3" length="1118" capacity="3000" freespeed="27.78" permlanes="1" /> 
+  		<link id="2" from="3" to="4" length="2000" capacity="6000" freespeed="27.78" permlanes="1" /> 
+  		<link id="30" from="30" to="31" length="41.23" capacity="1000" freespeed="27.78" permlanes="1" />
+  		<link id="31" from="31" to="12" length="1030.78" capacity="1000" freespeed="27.78" permlanes="1" />
+  		<link id="40" from="12" to="40" length="1030.78" capacity="1000" freespeed="27.78" permlanes="1" />
+  		<link id="41" from="40" to="41" length="41.23" capacity="1000" freespeed="27.78" permlanes="1" />
+  	</links>
+</network>
