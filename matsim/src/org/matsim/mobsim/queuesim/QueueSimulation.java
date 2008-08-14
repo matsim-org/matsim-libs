@@ -259,7 +259,7 @@ public class QueueSimulation {
 		for (Vehicle veh : teleportationList) {
 			new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg());
 		}
-		teleportationList.clear();
+		QueueSimulation.teleportationList.clear();
 
 		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
@@ -273,10 +273,11 @@ public class QueueSimulation {
 			}
 			this.netStateWriter = null;
 		}
+		QueueSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
 	protected void beforeSimStep(final double time) {
-		if (this.networkChangeEventsQueue != null && this.networkChangeEventsQueue.size() > 0){
+		if (this.networkChangeEventsQueue != null && this.networkChangeEventsQueue.size() > 0) {
 			handleNetworkChangeEvents(time);
 		}
 	}
