@@ -29,7 +29,7 @@ public class EvacuationConfigGroup  extends Module{
 	/**
 	 * name of the evacuation area file parameter in config
 	 */
-	private static String EVACUATION_AREA_FILE = "inputEvacuationAreaLinksFile";
+	private static final String EVACUATION_AREA_FILE = "inputEvacuationAreaLinksFile";
 
 	/**
 	 * file name of the evacutation area file
