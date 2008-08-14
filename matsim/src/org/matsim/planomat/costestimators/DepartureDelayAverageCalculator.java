@@ -33,7 +33,7 @@ import org.matsim.network.NetworkLayer;
 
 /**
  * Computes average departure delay on a link in a given time slot.
- * 
+ *
  * @author meisterk
  *
  */
@@ -74,10 +74,6 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	private class DepartureDelayRole {
 		private HashMap<Integer, Double> timeSum = null;
 		private HashMap<Integer, Integer> timeCnt = null;
-
-		public DepartureDelayRole() {
-			super();
-		}
 
 		private int getTimeSlotIndex(double time) {
 			int slice = (int)(time/DepartureDelayAverageCalculator.this.timeBinSize);
