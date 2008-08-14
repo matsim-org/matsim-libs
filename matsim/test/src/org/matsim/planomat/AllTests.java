@@ -33,6 +33,7 @@ public class AllTests {
 
 		//$JUnit-BEGIN$
 		testSuite.addTest(org.matsim.planomat.costestimators.AllTests.suite());
+		testSuite.addTestSuite(PlanOptimizeTimesTest.class);
 		//$JUnit-END$
 		
 		System.out.println("Running org.matsim.planomat.AllTests.suite()...done.");

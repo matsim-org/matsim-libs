@@ -66,7 +66,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
 
-		super();
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 
 	}
@@ -183,7 +182,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 	 * @param population the initial GA population that serves as breed for evolution
 	 * @return the fittest individual after evolution
 	 */
-	private static IChromosome evolveAndReturnFittest(final Genotype population) {
+	protected static IChromosome evolveAndReturnFittest(final Genotype population) {
 
 		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
 		double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
@@ -232,7 +231,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		return fittest;
 	}
 
-	private static double getAverageFitness(final Genotype population) {
+	protected static double getAverageFitness(final Genotype population) {
 
 		double averageFitness = 0;
 
@@ -254,7 +253,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
 	 * @param plan the plan that will be altered
 	 */
-	private static void writeChromosome2Plan(final IChromosome individual, final Plan plan, final LegTravelTimeEstimator estimator) {
+	protected static void writeChromosome2Plan(final IChromosome individual, final Plan plan, final LegTravelTimeEstimator estimator) {
 
 		Act activity = null;
 		Leg leg = null;

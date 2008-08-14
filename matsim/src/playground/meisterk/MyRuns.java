@@ -132,13 +132,11 @@ public class MyRuns {
 	public static void run() throws Exception {
 
 //		MyRuns.writeGUESSFile();
-//		MyRuns.planomatStandAloneDemo();
-//		MyRuns.testReplanningRate();
+		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();
-		MyRuns.facilityActivities();
 
 		System.out.println();
 
@@ -155,140 +153,6 @@ public class MyRuns {
 //		Gbl.createFacilities();
 
 		run();
-
-	}
-
-	private static void testReplanningRate() {
-
-		for (int iter=0; iter<=200; iter++) {
-//			System.out.println(iter + " : " + PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, 100, 0.1));
-			System.out.println(PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, 100, 0.1));
-
-			System.out.println(iter + " : " + PlanomatStrategyManagerConfigLoader.getDecayingModuleProbability(iter, 100, 0.1));
-		}
-
-	}
-
-	private static void facilityActivities() {
-
-		String actType = "s13";
-		String shopId = "";
-
-		System.out.println("Reading facilities...");
-		Facilities facilityLayer = new Facilities();
-		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
-		//facilities_reader.setValidating(false);
-		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
-		facilityLayer.printFacilitiesCount();
-		Gbl.getWorld().setFacilityLayer(facilityLayer);
-		System.out.println("Reading facilities...done.");
-
-		// does every facility activity have a wednesday opentime?
-		TreeSet<String> wednesdayLessActivityTypes = new TreeSet<String>();
-
-		// IGNORE HOME!!!
-		// tta -> wkday
-		TreeSet<Opentime> opentimes = null;
-		TreeMap<String, TreeSet<Opentime>> closestShopOpentimes = new TreeMap<String, TreeSet<Opentime>>();
-
-		for (Facility f : facilityLayer.getFacilities().values()) {
-
-//			Activity shopActivity = f.getActivity("shop");
-//			if (shopActivity == null) {
-//				shopActivity = f.createActivity("shop");
-//
-//				if (f.getId().toString().startsWith("Denner")) {
-//					shopId = "Denner____8050_Zürich_REGENSBERGSTR. 309";
-//				} else if (f.getId().toString().startsWith("Migros")) {
-//					shopId = "Migros__Zürich-Affoltern-ZH_Migros Zürich_8046_Zürich_Jonas-Furrerstrasse 21";
-//				}
-//
-//				closestShopOpentimes = ((Facility) facilityLayer.getLocation(shopId)).getActivity("shop").getOpentimes();
-//				shopActivity.setOpentimes(closestShopOpentimes);
-//			}
-
-			for (Activity a : f.getActivities().values()) {
-
-				if (!a.getType().equals("home") && !a.getType().startsWith("B01")) {
-					opentimes = a.getOpentimes("wkday");
-					if (opentimes == null) {
-						opentimes = a.getOpentimes("wed");
-					}
-					if (opentimes == null) {
-
-//						if (f.getId().toString().startsWith("Pick")) {
-//							// for the missing pickpay opentimes, use a random pickpay shop
-//							// let's use the one close to my home :-)
-//							shopId = "Pick Pay__Affoltern__8046_Zürich_In Böden 174";
-//						} else {
-//							// for the missing coop opentimes, use a random coop shop
-//							// let's use the one close to my home :-)
-//							shopId = "Coop_CC_Wehntalerstrasse_Coop Zürich_8046_Zürich_Wehntalerstrasse 549";
-//						}
-//
-//						Activity shopsOf2005ShopAct = ((Facility) facilityLayer.getLocation(shopId)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
-//						if (shopsOf2005ShopAct != null) {
-//							closestShopOpentimes = shopsOf2005ShopAct.getOpentimes();
-//						}
-//						a.setOpentimes(closestShopOpentimes);
-						wednesdayLessActivityTypes.add(f.getId() + "_" + a.getType());
-					}
-				}
-			}
-
-		}
-
-		System.out.println("Facility activity types without a wed or wkday opening interval: ");
-		System.out.println();
-		for (String str : wednesdayLessActivityTypes) {
-			System.out.println(str);
-		}
-		System.out.println();
-
-//		System.out.println("Writing facilities xml file... ");
-//		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilityLayer);
-//		facilities_writer.write();
-//		System.out.println("Writing facilities xml file...done.");
-
-//		boolean foundAct = false;
-
-//		Facility facility = ((Facility) facilityLayer.getLocation("10000017"));
-//		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
-//		String facilityActType = null;
-//		// first is opening time, second is closing time
-//		double[] openingInterval = new double[]{Double.MAX_VALUE, Double.MIN_VALUE};
-////		double openingTime = Double.MAX_VALUE;
-////		double closingTime = Double.MIN_VALUE;
-
-//		while (facilityActTypeIterator.hasNext() && !foundAct) {
-
-//		facilityActType = facilityActTypeIterator.next();
-//		System.out.println(facilityActType);
-//		if (actType.substring(0, 1).equals(facilityActType.substring(0, 1))) {
-//		foundAct = true;
-//		System.out.println("We'll use the following facility activity type: ");
-//		System.out.println("\t" + facilityActType);
-
-//		TreeSet<Opentime> opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
-//		System.out.println("We'll use wednesday's open times objects: ");
-//		for (Opentime opentime : opentimes) {
-//		System.out.println(opentime.toString());
-//		// ignoring lunch breaks with the following procedure
-//		openingInterval[0] = Math.min(openingInterval[0], opentime.getStartTime());
-//		openingInterval[1] = Math.max(openingInterval[1], opentime.getEndTime());
-//		}
-
-//		System.out.println("Final opening times: ");
-//		System.out.println("Open: " + Time.writeTime(openingInterval[0]));
-//		System.out.println("Close: " + Time.writeTime(openingInterval[1]));
-
-//		}
-
-//		}
-
-//		if (!foundAct) {
-//		Gbl.errorMsg("No suitable facility activity type found. Aborting...");
-//		}
 
 	}
 
@@ -585,18 +449,18 @@ public class MyRuns {
 
 	}
 
-	private static void convertPlansV0ToPlansV4() {
-
-		System.out.println("performing vo to v4 plans conversion...");
-
-		NetworkLayer network = MyRuns.initWorldNetwork();
-		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
-		MyRuns.writePopulation(matsimAgentPopulation);
-
-		System.out.println("performing vo to v4 plans conversion...DONE.");
-
-
-	}
+//	private static void convertPlansV0ToPlansV4() {
+//
+//		System.out.println("performing vo to v4 plans conversion...");
+//
+//		NetworkLayer network = MyRuns.initWorldNetwork();
+//		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
+//		MyRuns.writePopulation(matsimAgentPopulation);
+//
+//		System.out.println("performing vo to v4 plans conversion...DONE.");
+//
+//
+//	}
 
 	private static void planomatStandAloneDemo() {
 
