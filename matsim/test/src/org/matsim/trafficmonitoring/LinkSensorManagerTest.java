@@ -26,7 +26,6 @@ import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -70,7 +69,7 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if (event.getIteration() == 1) {
-			QueueSimulation.getEvents().addHandler(this.manager);
+			event.getControler().getEvents().addHandler(this.manager);
 		}
 	}
 
