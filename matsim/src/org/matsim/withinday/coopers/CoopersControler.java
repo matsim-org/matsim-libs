@@ -29,7 +29,7 @@ import org.matsim.withinday.WithindayControler;
  * @author dgrether
  */
 public class CoopersControler extends WithindayControler {
-	
+
 	public CoopersControler(final String[] args) {
 		super(args);
 		this.addControlerListener(new CoopersControlerListener());
@@ -54,7 +54,6 @@ public class CoopersControler extends WithindayControler {
 
 	public static void main(final String[] args) {
 		CoopersControler c = new CoopersControler(args);
-		c.setOverwriteFiles(true);
 		c.run();
 		// Visualize
 		String[] visargs = {"./output/ITERS/it.0/Snapshot"};
