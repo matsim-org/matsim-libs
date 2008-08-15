@@ -91,10 +91,18 @@ public class Scheduler {
 		
 		
 		
-		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
-		System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
-		System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
-		System.out.println("SimulationParameters.test_timer: "+ SimulationParameters.test_timer);
+		//System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
+		//System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
+		//System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
+		//System.out.println("SimulationParameters.test_timer: "+ SimulationParameters.test_timer);
+	
+		for (int i=0;i<SimulationParameters.numberOfZones;i++){
+			System.out.println(i+"-th zone incounter: "+zoneMessageQueues[i].incounter);
+		}
+		
+	
+	
+	
 	}
 	
 	

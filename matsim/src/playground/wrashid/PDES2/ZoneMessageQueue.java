@@ -21,8 +21,8 @@ public class ZoneMessageQueue {
 	
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 
-	private volatile static int counter=0;
-	private volatile static int incounter=0;
+	public int counter=0;
+	public int incounter=0;
 	public double arrivalTimeOfLastRemovedMessage=0;
 	private Object bufferLock=new Object();
 	private LinkedList<Message>[] addMessageBuffer=new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
@@ -76,7 +76,7 @@ public class ZoneMessageQueue {
 	}
 	
 
-	public static int getCounter() {
+	public int getCounter() {
 		return counter;
 	}
 

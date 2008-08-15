@@ -1,5 +1,6 @@
 package playground.wrashid.PDES2;
 
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,7 +58,8 @@ public class MessageExecutor extends Thread {
 		
 		
 		double arrivalTimeOfLastProcessedMessage=0;
-		
+		Random r=new Random();
+		int i=threadId;
 		//Message nullMessage=new NullMessage();
 		//nullMessage.firstLock=nullMessage; // TODO: remove this nonsense (just needed for assertion problem)
 		
@@ -72,8 +74,9 @@ public class MessageExecutor extends Thread {
 				if (scheduler.simulationTerminated){
 					break;
 				}
-				
-				for (int i=0;i<SimulationParameters.numberOfZones;i++){
+				/*
+				//for (int i=0;i<SimulationParameters.numberOfZones;i++){
+				int i=r.nextInt(SimulationParameters.numberOfZones);
 					if (scheduler.zoneMessageQueues[i].lock.tryLock()){
 						message=scheduler.getNextMessage(i);
 						while (message!=null){
@@ -84,7 +87,17 @@ public class MessageExecutor extends Thread {
 					}
 					//scheduler.zoneMessageQueues[i].printSize();
 					//System.out.println(threadId);
-				}
+				//}
+					*/
+				
+					message=scheduler.getNextMessage(i);
+					while (message!=null){
+						executeMessage();
+						message=scheduler.getNextMessage(i);
+					}
+					
+					
+					
 				
 			}
 		} catch (java.lang.NullPointerException npe){

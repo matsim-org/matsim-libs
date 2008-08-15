@@ -93,7 +93,7 @@ public class JavaPDEQSim2 {
 		}
 		
 		SimulationParameters.xZoneDistance=(SimulationParameters.maxXCoodrinate-SimulationParameters.minXCoodrinate)/SimulationParameters.numberOfZones;
-		
+
 		
 		for (int i=1;i<=SimulationParameters.numberOfZones;i++){
 			System.out.println(i+"-th boundry:" + i*SimulationParameters.xZoneDistance);

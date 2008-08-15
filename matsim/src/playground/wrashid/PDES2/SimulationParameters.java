@@ -62,7 +62,7 @@ public class SimulationParameters {
 	
 	// the number of zones, in which the network is divided
 	//public static final int numberOfZones=numberOfMessageExecutorThreads*2;
-	public static final int numberOfZones=numberOfMessageExecutorThreads*2;
+	public static final int numberOfZones=numberOfMessageExecutorThreads;
 	
 	public static double minXCoodrinate=Double.MAX_VALUE;
 	public static double maxXCoodrinate=Double.MIN_VALUE;
