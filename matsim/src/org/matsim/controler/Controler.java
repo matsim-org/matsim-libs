@@ -177,8 +177,15 @@ public class Controler {
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
 
-	/*package*/ static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = Logger.getLogger(Controler.class);
 
+	private final Thread shutdownHook = new Thread() {
+		@Override
+		public void run() {
+			shutdown(true);
+		}
+	};
+	
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -249,12 +256,7 @@ public class Controler {
 		}
 		Gbl.setConfig(this.config);
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				shutdown(true);
-			}
-		});
+		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
 
 	/**
@@ -341,7 +343,8 @@ public class Controler {
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
 			}
-
+			
+			Runtime.getRuntime().removeShutdownHook(shutdownHook);
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
