@@ -36,6 +36,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 		this.vehicle=vehicle;
 		messageId=getMessageCounterAndIncrement();
 		assert(this.vehicle!=null);
+		isAcrossBorderMessage=false;
 		reviveMessage();
 	}
 	

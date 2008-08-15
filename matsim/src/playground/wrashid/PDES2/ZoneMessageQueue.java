@@ -114,6 +114,8 @@ public class ZoneMessageQueue {
 
 	
 	private void incrementNumberOfQueuedMessages(Road fromRoad){
+		assert(fromRoad!=null);
+		assert(numberOfQueuedMessages.get(fromRoad)!=null);
 		numberOfQueuedMessages.put(fromRoad, numberOfQueuedMessages.get(fromRoad).intValue()+1);
 	}
 	
