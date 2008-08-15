@@ -13,6 +13,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 		super();
 		this.vehicle = vehicle;
 		this.scheduler=scheduler;
+		assert(this.vehicle!=null);
 	}
 	
 	public abstract void logEvent();
@@ -34,6 +35,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 		this.scheduler=scheduler;
 		this.vehicle=vehicle;
 		messageId=getMessageCounterAndIncrement();
+		assert(this.vehicle!=null);
 		reviveMessage();
 	}
 	

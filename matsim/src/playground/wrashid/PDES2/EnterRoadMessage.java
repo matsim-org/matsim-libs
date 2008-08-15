@@ -17,8 +17,13 @@ public class EnterRoadMessage extends EventMessage {
 		//System.out.println("enter road message");
 		// enter the road and find out the time for leaving the street
 		
+		
+		
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 		road.enterRoad(vehicle);
+		
+		//System.out.println("enter road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
+		
 	}
 	
 	public EnterRoadMessage(Scheduler scheduler,Vehicle vehicle) {

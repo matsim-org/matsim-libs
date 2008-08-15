@@ -11,6 +11,9 @@ public class LeaveRoadMessage extends EventMessage {
 		//System.out.println("leave road message");
 		Road road=(Road)this.receivingUnit;
 		road.leaveRoad(vehicle);
+		
+		//System.out.println("leave road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
+		
 	}
 
 	public LeaveRoadMessage(Scheduler scheduler,Vehicle vehicle) {

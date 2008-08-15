@@ -1,34 +1,45 @@
 package playground.wrashid.PDES2;
 
-public class EnterRequestMessage extends SelfhandleMessage {
-
-	Vehicle vehicle;
+public class EnterRequestMessage extends EventMessage {
 	
 	@Override
 	public void selfhandleMessage() {
 		
 		//System.out.println("enter Request message");
 		
+		
+		
 		Vehicle vehicle=this.vehicle;
 		Road toRoad=(Road) receivingUnit;
+		
+		
+		//System.out.println("enter request road: " + toRoad.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
+		//System.out.println(messageId);
 		
 		toRoad.enterRequest(vehicle);
 	}
 
-	@Override
-	public void printMessageLogString() {
-		// TODO Auto-generated method stub
-		
+	
+	
+	public EnterRequestMessage(Scheduler scheduler,Vehicle vehicle){
+		super(scheduler,vehicle);
+		eventType="";
+		logMessage=false;
+		assert(vehicle!=null);
+		assert(this.vehicle!=null);
 	}
 	
-	public EnterRequestMessage(Vehicle vehicle){
-		super();
-		this.vehicle=vehicle;
-	}
+
 
 	@Override
 	public void recycleMessage() {
 		MessageFactory.disposeEnterRequestMessage(this);
+	}
+
+	@Override
+	public void logEvent() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

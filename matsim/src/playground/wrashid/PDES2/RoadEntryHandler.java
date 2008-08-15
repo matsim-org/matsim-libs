@@ -19,7 +19,7 @@ public class RoadEntryHandler {
 	}
 	
 	public void registerEnterRequestMessage(Road fromRoad, Vehicle vehicle, double simTime){
-			EnterRequestMessage erm=MessageFactory.getEnterRequestMessage(vehicle);
+			EnterRequestMessage erm=MessageFactory.getEnterRequestMessage(belongsToRoad.scheduler, vehicle);
 			erm.sendingUnit = fromRoad;
 			erm.receivingUnit=belongsToRoad;
 			erm.messageArrivalTime=simTime;
@@ -27,6 +27,10 @@ public class RoadEntryHandler {
 				erm.isAcrossBorderMessage=true;
 				System.out.println(fromRoad.getLink().getId() +" - " + belongsToRoad.getLink().getId() +" - " + vehicle.getOwnerPerson().getId());
 			}
+			
+			//erm.vehicle=vehicle;
+			//System.out.println("register enter request road: " + belongsToRoad.getLink().getId() + "; vehicle: " + erm.vehicle.getOwnerPerson().getId());
+			//System.out.println(erm.messageId);
 			
 			belongsToRoad.scheduler.schedule(erm);
 		

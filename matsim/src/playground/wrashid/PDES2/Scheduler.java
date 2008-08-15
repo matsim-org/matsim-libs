@@ -62,13 +62,13 @@ public class Scheduler {
 			
 			
 			while (true){
-				boolean allEmpty=true;
-				for (int i=0;i<SimulationParameters.numberOfZones;i++){
-					if (!zoneMessageQueues[i].isEmpty()){
-						allEmpty=false;
+				boolean allDead=true;
+				for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
+					if (messageExecutors[i].isAlive){
+						allDead=false;
 					}
 				}
-				if (!allEmpty){
+				if (!allDead){
 	
 					//Gbl.printMemoryUsage();
 				

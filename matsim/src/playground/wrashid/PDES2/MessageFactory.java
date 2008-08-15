@@ -146,11 +146,14 @@ public class MessageFactory {
 	}
 	
 	
-	public static EnterRequestMessage getEnterRequestMessage(Vehicle vehicle){
+	public static EnterRequestMessage getEnterRequestMessage(Scheduler scheduler,Vehicle vehicle){
 		if (enterRequestMessageQueue.size()<SimulationParameters.minQueueLength){
-			return new EnterRequestMessage(vehicle);
+			return new EnterRequestMessage(scheduler, vehicle);
 		} else {
-			return enterRequestMessageQueue.poll();
+			EnterRequestMessage message=enterRequestMessageQueue.poll();
+			message.resetMessage(scheduler, vehicle);
+			assert(message.vehicle!=null);
+			return message;
 		}
 	}
 	

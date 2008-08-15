@@ -48,7 +48,8 @@ it leads to more border links (really?).
 - Problems:
     - assertion fails
     - sogar bei nur einem messageExecutor und nur einer zone failt es.
-    - 
+    - => vehicle hat zwei mal enter request für next road (after problem road gemacht), deshalb
+      kommt das problem, weil das auto nicht mehr auf der road ist...
  
 - TODO: 
      - perhaps move arround the zone separators to achieve better lookahead propoerties? 
