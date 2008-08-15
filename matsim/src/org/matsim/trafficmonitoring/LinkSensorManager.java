@@ -28,7 +28,7 @@ import org.matsim.events.handler.LinkLeaveEventHandler;
 
 
 /**
- * This class can be used as EventHandler of the demandmodeling.events.Event.class.
+ * This class can be used as EventHandler of the org.matsim.events.Event.class.
  * If added there as Handler it counts the traffic on each link which was set in the
  * appropriate method of this class.
  *
