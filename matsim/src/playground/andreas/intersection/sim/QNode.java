@@ -75,6 +75,8 @@ public class QNode extends QueueNode{
 		} else {
 
 			//Node is NOT traffic light controlled
+			
+			// TODO Get Code from QueueNode's move
 
 			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
 				Link link = iter.next();
