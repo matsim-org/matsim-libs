@@ -41,6 +41,7 @@ public class Scheduler {
 	}
 	
 	public Message getNextMessage(int threadId){
+		
 		return zoneMessageQueues[threadId].getNextMessage();
 	}
 	

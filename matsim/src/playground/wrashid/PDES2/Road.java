@@ -504,12 +504,14 @@ public class Road extends SimUnit {
 	public void initializeZoneIdEquiXDistance() {
 		int zId=0;
 		double xCoordinate=getXCoordinate();
-		for (int i=1;i<=SimulationParameters.numberOfZones;i++){
-			if (xCoordinate<=SimulationParameters.minXCoodrinate+i*SimulationParameters.xZoneDistance){
-				zoneId=i-1;
-				break;
+		for (int i=0;i<SimulationParameters.numberOfZones-1;i++){
+			zoneId=i;
+			if (xCoordinate<SimulationParameters.zoneBorderLines[i]){
+				return;
 			}
 		}
+		zoneId=SimulationParameters.numberOfZones-1;
+		return;
 	}
 	
 

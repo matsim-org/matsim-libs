@@ -47,6 +47,9 @@ public class ZoneMessageQueue {
 			if (!messagesArrivedFromRoads.contains(m.sendingUnit)){
 				messagesArrivedFromRoads.add((Road)m.sendingUnit);
 			}
+			if (!(m instanceof ZoneBorderMessage)){
+				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);
+			}
 		}
 		
 		queue1.add(m);
@@ -101,7 +104,7 @@ public class ZoneMessageQueue {
 			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
 			return m;
 		}
-
+		//System.out.println(incounter);
 		
 		return null;
 	}

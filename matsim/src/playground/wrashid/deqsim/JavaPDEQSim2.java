@@ -71,13 +71,19 @@ public class JavaPDEQSim2 {
 		//System.out.println("JavaDEQSim.run");
 		Timer t=new Timer();
 		t.startTimer();
+		double bucketBoundries[]=new double[SimulationParameters.numberOfZoneBuckets-1];
+		int bucketCount[]=new int[SimulationParameters.numberOfZoneBuckets];
 		
 		
 		Scheduler scheduler=new Scheduler();
+		
+		
+		
+		// initialize network (roads)
 		Road.allRoads=new HashMap<String,Road>();
 
 		
-		// initialize network (roads)
+		
 		Road road=null;
 		for (Link link: network.getLinks().values()){
 			road= new Road(scheduler,link);
@@ -92,12 +98,83 @@ public class JavaPDEQSim2 {
 			Road.allRoads.put(link.getId().toString(), road);
 		}
 		
-		SimulationParameters.xZoneDistance=(SimulationParameters.maxXCoodrinate-SimulationParameters.minXCoodrinate)/SimulationParameters.numberOfZones;
-
 		
-		for (int i=1;i<=SimulationParameters.numberOfZones;i++){
-			System.out.println(i+"-th boundry:" + i*SimulationParameters.xZoneDistance);
+		
+		
+		//
+		
+		
+		
+		double bucketDistance=(SimulationParameters.maxXCoodrinate-SimulationParameters.minXCoodrinate)/SimulationParameters.numberOfZoneBuckets;
+		for (int i=0;i<SimulationParameters.numberOfZoneBuckets-1;i++){
+			bucketBoundries[i]=(i+1)*bucketDistance;
 		}
+		
+		
+		// initialize vehicles
+		Vehicle vehicle=null;
+		for (Person person : this.population.getPersons().values()) {
+			vehicle =new Vehicle(scheduler,person);
+			
+			
+			// TODO: we could make this more precise (e.g. take all act links or also path links)
+			Plan plan = person.getSelectedPlan(); 
+			ArrayList<Object> actsLegs = plan.getActsLegs();
+			// assumption, an action is followed by a let always
+			// and a plan starts with a action
+			Act act=null;
+			for (int i=0;i<actsLegs.size();i++){
+				
+				if (actsLegs.get(i) instanceof Act){
+					act=(Act) actsLegs.get(i);
+					//System.out.print(".");
+					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
+				}
+				//System.out.println();
+			}
+			
+			//System.out.println(act.getLink().getFromNode().getCoord().getX());
+			
+		}
+		
+		double sumOfBuckets=0;
+		
+		for (int i=0;i<SimulationParameters.numberOfZoneBuckets-1;i++){
+			sumOfBuckets+=bucketCount[i];
+			//System.out.println(bucketCount[i]);
+		}
+		double maxEventsPerBucket=sumOfBuckets/SimulationParameters.numberOfZones;
+		
+		
+		
+		// Equi Event zones
+		//TODO: review this code..
+		// there is a slight difference in size of buckets assigned, which could be improved
+		
+		double tmpBucketCount=0;
+		int bucketCounter=0;
+		for (int i=0;i<SimulationParameters.numberOfZones-1;i++){
+			tmpBucketCount=0;
+			while (tmpBucketCount<maxEventsPerBucket){
+				tmpBucketCount+=bucketCount[bucketCounter];
+				bucketCounter++;
+			}
+			SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter];
+			System.out.println(i+"-th boundry:" + SimulationParameters.zoneBorderLines[i]);
+		}
+		
+		
+		
+		
+		
+		 // Equi-Distant zones
+		/*
+		SimulationParameters.xZoneDistance=(SimulationParameters.maxXCoodrinate-SimulationParameters.minXCoodrinate)/SimulationParameters.numberOfZones;
+		for (int i=0;i<SimulationParameters.numberOfZones-1;i++){
+			SimulationParameters.zoneBorderLines[i]=(i+1)*SimulationParameters.xZoneDistance;
+			System.out.println(i+"-th boundry:" + SimulationParameters.zoneBorderLines[i]);
+		}
+		*/
 		
 		
 		// assign a zone to each road
@@ -112,13 +189,7 @@ public class JavaPDEQSim2 {
 		
 		
 		
-		// initialize vehicles
 		
-		
-		Vehicle vehicle=null;
-		for (Person person : this.population.getPersons().values()) {
-			vehicle =new Vehicle(scheduler,person);
-		}
 		
 		
 
@@ -138,5 +209,19 @@ public class JavaPDEQSim2 {
 		//	SimulationParameters.eventOutputLog.get(i).print();
 		//}
 		
+	}
+	
+	public int getZone(double xCoordinate, double bucketBoundries[]) {
+		int zoneId=0;
+		for (int i=0;i<SimulationParameters.numberOfZoneBuckets-1;i++){
+			zoneId=i;
+			if (xCoordinate<bucketBoundries[i]){
+				//System.out.println(zoneId);
+				return zoneId;
+			}
+		}
+		zoneId=SimulationParameters.numberOfZoneBuckets-1;
+		//System.out.println(zoneId);
+		return zoneId;
 	}
 }
