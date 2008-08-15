@@ -41,9 +41,12 @@ public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
 			return -1;
 
 		// Both depart at the same time -> let the one with the larger id be first
-		if (veh1.getID() < veh2.getID())
+		int veh1id = Integer.valueOf(veh1.getID().toString());
+		int veh2id = Integer.valueOf(veh2.getID().toString());
+		
+		if (veh1id < veh2id)
 			return 1;
-		if (veh1.getID() > veh2.getID())
+		if (veh1id > veh2id)
 			return -1;
 		return 0;
 	}

@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.network.Link;
@@ -55,8 +57,11 @@ public class Vehicle implements DrawableAgentI {
 
 	private final static Logger log = Logger.getLogger(Vehicle.class);
 
-	private final int id = globalID++; // TODO change to IdI instead of int
+	private final Id id = new IdImpl(globalID++); 
 
+	public Vehicle() {}
+	
+	
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
 	}
@@ -173,7 +178,7 @@ public class Vehicle implements DrawableAgentI {
 		return true;
 	}
 
-	public boolean initVeh() {
+	 protected boolean initVeh() {
 		this.nextActivity = 0;
 		Act firstAct = (Act) this.actslegs.get(0);
 
@@ -202,7 +207,7 @@ public class Vehicle implements DrawableAgentI {
 	/**
 	 * @return Returns the iD.
 	 */
-	public int getID() {
+	public Id getID() {
 		return this.id;
 	}
 

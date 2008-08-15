@@ -22,6 +22,7 @@ package org.matsim.withinday;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -102,7 +103,7 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 * @see org.matsim.mobsim.queuesim.Vehicle#getID()
 	 */
 	@Override
-	public int getID() {
+	public Id getID() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 
@@ -135,14 +136,6 @@ public class WithindayAgentTestOccupiedVehicle extends OccupiedVehicle {
 	 */
 	@Override
 	public void incCurrentNode() {
-		throw new UnsupportedOperationException("This method should not be used for this test!");
-	}
-
-	/**
-	 * @see org.matsim.mobsim.queuesim.Vehicle#initVeh()
-	 */
-	@Override
-	public boolean initVeh() {
 		throw new UnsupportedOperationException("This method should not be used for this test!");
 	}
 

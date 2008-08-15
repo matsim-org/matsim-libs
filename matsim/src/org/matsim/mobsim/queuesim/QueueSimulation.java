@@ -120,9 +120,12 @@ public class QueueSimulation {
 				veh = this.vehiclePrototype.newInstance();
 				veh.setActLegs(p.getSelectedPlan().getActsLegs());
 				veh.setDriver(p);
+				
 				if (veh.initVeh()) {
-					initVehicle(veh);
+					addVehicleToLink(veh);
 				}
+				
+				
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -135,7 +138,7 @@ public class QueueSimulation {
 		this.vehiclePrototype = proto;
 	}
 
-	protected void initVehicle(final Vehicle veh) {
+	protected void addVehicleToLink(final Vehicle veh) {
 		Link link = veh.getCurrentLink();
 		QueueLink qlink = this.network.getQueueLink(link.getId());
 		qlink.addParking(veh);

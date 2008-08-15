@@ -67,8 +67,8 @@ public class WithindayQueueSimulation extends QueueSimulation {
 	
 	
 	@Override
-	protected void initVehicle(final Vehicle veh) {
-		super.initVehicle(veh);
+	protected void addVehicleToLink(final Vehicle veh) {
+		super.addVehicleToLink(veh);
 		createAgent(veh.getDriver(), (OccupiedVehicle)veh);
 	}
 	
