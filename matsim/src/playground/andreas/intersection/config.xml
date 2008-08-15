@@ -3,7 +3,7 @@
 	[
 <!--		<!ENTITY INPUTBASE    "./examples/equil">-->
 		<!ENTITY INPUTBASE    "./src/playground/andreas/intersection">
-		<!ENTITY OUTPUTBASE   "./output">
+		<!ENTITY OUTPUTBASE   "./output/plans">
 	]
 >
 
@@ -11,12 +11,14 @@
 
 	<module name="network">
 <!--		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_4a.xml.gz" />-->
-		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_2a_alt.xml.gz" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_4a_test.xml" />
+		<!--<param name="inputNetworkFile" value="&INPUTBASE;/test/data/net_2a_twoways.xml.gz" />-->
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_2a_2500.xml.gz" />
+		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_test_random.xml" />
+		<!--<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_2a_twoways.xml.gz" />-->
 <!--		<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_160ue.xml.gz" />-->
 		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
 		<param name="outputVersion" value="v4" />
@@ -25,7 +27,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="simulation">
@@ -35,7 +37,7 @@
 		<param name="endTime" value="00:00:00" />
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
- 		<param name = "snapshotFormat"	value = "netvis"/>  
+ 		<param name = "snapshotFormat"	value = "otfvis"/>  
 		<param name = "snapshotStyle"	value = "queue"/>
 	</module>
 

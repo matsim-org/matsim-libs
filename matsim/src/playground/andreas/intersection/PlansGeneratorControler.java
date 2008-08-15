@@ -174,10 +174,7 @@ public class PlansGeneratorControler extends Controler {
 
 	public static void main(final String[] args) {
 
-		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
-		
-		String netFileName = "src/playground/andreas/intersection/test/data/net_4a_test.xml";
-		config.network().setInputFile(netFileName);
+		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/test/data/fourways/config.xml" });
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
 		controler.setOverwriteFiles(true);
