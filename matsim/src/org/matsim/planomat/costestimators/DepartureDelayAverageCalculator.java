@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -27,7 +27,6 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -57,14 +56,15 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		this.resetDepartureDelays();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get the departure delay estimation for a given departure time HERE
-	//////////////////////////////////////////////////////////////////////
-
+	/**
+	 * get the departure delay estimation for a given departure time HERE
+	 *
+	 * @param link
+	 * @param departureTime
+	 * @return departure delay estimation
+	 */
 	public double getLinkDepartureDelay(Link link, double departureTime) {
-
 		return this.getDepartureDelayRole(link).getDepartureDelay(departureTime);
-
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -72,47 +72,34 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	//////////////////////////////////////////////////////////////////////
 
 	private class DepartureDelayRole {
-		private HashMap<Integer, Double> timeSum = null;
-		private HashMap<Integer, Integer> timeCnt = null;
+		private double[] timeSum = null;
+		private int[] timeCnt = null;
 
 		private int getTimeSlotIndex(double time) {
 			int slice = (int)(time/DepartureDelayAverageCalculator.this.timeBinSize);
+			if (slice >= timeSum.length) {
+				slice = timeSum.length - 1;
+			}
 			return slice;
 		}
 
 		public void addDepartureDelay(double departureTime, double departureDelay) {
-			Integer index = Integer.valueOf(getTimeSlotIndex(departureTime));
-			Double sum = this.timeSum.get(index);
-			Integer cnt = this.timeCnt.get(index);
-			if (null == sum) {
-				sum = Double.valueOf(departureDelay);
-				cnt = Integer.valueOf(1);
-			} else {
-				sum += departureDelay;
-				cnt = Integer.valueOf(cnt.intValue() + 1);
-			}
-			this.timeSum.put(index, sum);
-			this.timeCnt.put(index, cnt);
+			int index = getTimeSlotIndex(departureTime);
+			this.timeSum[index] += departureDelay;
+			this.timeCnt[index]++;
 		}
 
 		public double getDepartureDelay(double time) {
-
 			double departureDelay = 0.0;
 
-			Integer index = Integer.valueOf(getTimeSlotIndex(time));
-			Double sum = this.timeSum.get(index);
-
-			if (sum != null) {
-
-				Integer cnt = this.timeCnt.get(index);
-				if (cnt != null) {
-					double cnt2 = cnt.doubleValue();
-					departureDelay = sum.doubleValue() / cnt2;
+			int index = getTimeSlotIndex(time);
+			double sum = this.timeSum[index];
+			if (sum > 0.0) {
+				int cnt = this.timeCnt[index];
+				if (cnt > 0) {
+					departureDelay = sum / cnt;
 				}
-
 			}
-			// else
-			// return 0.0 if there were no departures in this time range
 
 			return departureDelay;
 
@@ -120,8 +107,8 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 
 		public void resetDepartureDelays() {
 			int nofSlots = ((27*3600)/DepartureDelayAverageCalculator.this.timeBinSize);	// default number of slots
-			this.timeSum = new HashMap<Integer, Double>(nofSlots);
-			this.timeCnt = new HashMap<Integer, Integer>(nofSlots);
+			this.timeSum = new double[nofSlots];
+			this.timeCnt = new int[nofSlots];
 		}
 
 	}
@@ -150,7 +137,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		if (departureTime != null) {
 			double departureDelay = event.time - departureTime.intValue();
 			if (departureDelay < 0) {
-				Gbl.errorMsg("");
+				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
 			Link link = event.link;
 			if (null == link) link = (Link)this.network.getLocation(event.linkId);
