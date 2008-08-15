@@ -10,9 +10,9 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for org.matsim.network");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(CompareQSimQueueSim.class);
-		suite.addTestSuite(TravelTimeTest4a.class);
-		suite.addTestSuite(CalculateAngleTest4a.class);
-		suite.addTestSuite(TravelTimeTest2a.class);
+		suite.addTestSuite(TravelTimeTestFourWay.class);
+		suite.addTestSuite(CalculateAngleTest.class);
+		suite.addTestSuite(TravelTimeTestOneWay.class);
 //		suite.addTest(org.matsim.network.algorithms.AllTests.suite());
 		//$JUnit-END$
 		return suite;

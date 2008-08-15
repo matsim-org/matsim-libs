@@ -2,7 +2,6 @@ package playground.andreas.intersection.test;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.config.Config;
@@ -12,9 +11,9 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -22,9 +21,9 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.matsim.utils.io.IOUtils;
 
 import playground.andreas.intersection.sim.QSim;
 
@@ -32,16 +31,16 @@ import playground.andreas.intersection.sim.QSim;
  * @author aneumann
  *
  */
-public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler{
-	
+public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler {
+
 	BufferedWriter writer = null;
-	
-	public void testTrafficLightIntersection2arms_w_TrafficLight(){
-  		  		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+  
+	public void testTrafficLightIntersection4arms() {
 		
-		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+		Config conf = loadConfig("src/playground/andreas/intersection/test/data/fourways/config.xml");
+		
+		String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
+		String groupDefinitions = "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -49,29 +48,21 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		
 		try {		
-			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
+			this.writer = IOUtils.getBufferedWriter("temp.txt.gz", true);
 			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
-//			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-			this.writer.flush();
-			this.writer.close();
 
-
-			this.writer = new BufferedWriter(new FileWriter(new File("queuesim_events.txt")));
-
-			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();
 			
-			assertEquals(CRCChecksum.getCRCFromFile("qsim_events.txt"),	CRCChecksum.getCRCFromFile("queuesim_events.txt"));
+			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("src/playground/andreas/intersection/test/data/fourways/reference.txt.gz"));
 			
-			new File("qsim_events.txt").delete();
-			new File("queuesim_events.txt").delete();
+			new File("temp.txt.gz").delete();
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}	
 		
-  	}  	
+	}
 
 	public void handleEvent(LinkEnterEvent event) {
 		try {
@@ -90,12 +81,10 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 			e.printStackTrace();
 		}
 	}
-
-	
 	
 	public void reset(int iteration) {
 	}
-
+	
 	public void handleEvent(ActEndEvent event) {
 		try {
 			this.writer.write(event.toString());
@@ -145,4 +134,5 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		}
 		
 	}
+
 }

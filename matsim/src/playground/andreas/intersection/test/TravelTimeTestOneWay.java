@@ -27,7 +27,7 @@ import playground.andreas.intersection.sim.QSim;
  * @author aneumann
  *
  */
-public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler {
+public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	MeasurePoint beginningOfLink2 = null;	
 
@@ -35,15 +35,15 @@ public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHa
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   		
-  		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
-		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
-		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
+  		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+//		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
+//		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
 				
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_2a.xml";
-		String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_2a.xml";
+		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
 
-		conf.plans().setInputFile(popFileName);
-		conf.network().setInputFile(netFileName);
+//		conf.plans().setInputFile(popFileName);
+//		conf.network().setInputFile(netFileName);
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -119,15 +119,15 @@ public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHa
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight(){
   		  		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
-		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
-		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
+		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+//		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
+//		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
 		
-		String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_2a.xml";
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/signalGroupDefinition_2a.xml";
+		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
+		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
 
-		conf.plans().setInputFile(popFileName);
-		conf.network().setInputFile(netFileName);
+//		conf.plans().setInputFile(popFileName);
+//		conf.network().setInputFile(netFileName);
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -157,7 +157,7 @@ public class TravelTimeTest2a extends MatsimTestCase implements	LinkLeaveEventHa
 		if (event.linkId.equalsIgnoreCase("2")) {
 			
 			if (this.beginningOfLink2 == null){				
-				this.beginningOfLink2 = new MeasurePoint(event.time + TravelTimeTest2a.timeToWaitBeforeMeasure);
+				this.beginningOfLink2 = new MeasurePoint(event.time + TravelTimeTestOneWay.timeToWaitBeforeMeasure);
 			}
 			
 			this.beginningOfLink2.numberOfVehPassed_++;

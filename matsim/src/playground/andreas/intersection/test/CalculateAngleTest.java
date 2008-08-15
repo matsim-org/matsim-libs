@@ -10,13 +10,11 @@ import playground.andreas.intersection.tl.CalculateAngle;
  * @author aneumann
  *
  */
-public class CalculateAngleTest4a extends MatsimTestCase {
+public class CalculateAngleTest extends MatsimTestCase {
     
 	public void testCalculateAngle() {
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/config.xml");
-		String netFileName = "src/playground/andreas/intersection/test/data/net_angletest.xml.gz";
-		conf.network().setInputFile(netFileName);
+		Config conf = loadConfig("src/playground/andreas/intersection/test/data/angletest/config.xml");
 		ScenarioData data = new ScenarioData(conf);
 		
 		assertEquals("Has to be 'null', since there is no other way back but Link 11.",
@@ -37,9 +35,6 @@ public class CalculateAngleTest4a extends MatsimTestCase {
 		assertEquals(" ",
 				data.getNetwork().getLink("5"), CalculateAngle.getLeftLane(data.getNetwork().getLink("3")));
 				
-	}	
-
-//	public void reset(int iteration) {
-//	}
-
+	}
+	
 }

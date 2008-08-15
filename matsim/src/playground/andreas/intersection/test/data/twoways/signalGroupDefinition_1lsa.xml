@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<signalGroups
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalGroupDefinition.xsd">
+
+  <signalGroup id="100">
+	<fromLane id="1" >
+    	<link refId="1" />
+    </fromLane>
+    <toLane id="2">
+    	<link refId="2" />
+    </toLane>    
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
+  </signalGroup>  
+	
+	<signalGroup id="200">
+	<fromLane id="3" >
+    	<link refId="1" />
+    </fromLane>
+    <toLane id="4">
+    	<link refId="3" />
+    </toLane>    
+    <turnIfRed>false</turnIfRed>
+    <passingClearingTime>2</passingClearingTime>
+  </signalGroup>  
+</signalGroups>
+
