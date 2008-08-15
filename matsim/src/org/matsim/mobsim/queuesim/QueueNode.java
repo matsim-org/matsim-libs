@@ -176,7 +176,7 @@ public class QueueNode {
 			if (!link.bufferIsEmpty()) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
-				inLinksCapSum += link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				inLinksCapSum += link.getLink().getCapacity(now);
 			}
 		}
 
@@ -194,11 +194,11 @@ public class QueueNode {
 				QueueLink link = this.tempLinks[i];
 				if (link == null)
 					continue;
-				selCap += link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+				selCap += link.getLink().getCapacity(now);
 				if (selCap >= rndNum) {
 					this.auxLinks[auxCounter] = link;
 					auxCounter++;
-					inLinksCapSum -= link.getLink().getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+					inLinksCapSum -= link.getLink().getCapacity(now);
 					this.tempLinks[i] = null;
 					break;
 				}
