@@ -33,7 +33,7 @@ public class ZoneMessageQueue {
 	public LinkedList<Link> tempIncomingLinks=new LinkedList<Link>();
 	public LinkedList<Road> messagesArrivedFromRoads=new LinkedList<Road>(); //TODO: use some more efficient data structure than linked lists
 	public HashMap<Road,Integer> numberOfQueuedMessages=new HashMap<Road,Integer>();
-	
+	private Message tmpLastRemovedMessage=null;
 	
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
@@ -88,11 +88,11 @@ public class ZoneMessageQueue {
 	}
 
 	synchronized public Message getNextMessage() {
-
+		Message m=null;
 		//System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() + " - " + numberOfIncomingLinks);
 		if (messagesArrivedFromRoads.size()==numberOfIncomingLinks){
 			//System.out.println("getNextMessage()");
-			Message m = queue1.poll();
+			m = queue1.poll();
 			
 			if (m.isAcrossBorderMessage){
 				decrementNumberOfQueuedMessages((Road)m.sendingUnit);
@@ -102,9 +102,18 @@ public class ZoneMessageQueue {
 			}
 			
 			arrivalTimeOfLastRemovedMessage=m.messageArrivalTime;
+			tmpLastRemovedMessage=m;
 			return m;
 		}
-		//System.out.println(incounter);
+		if (incounter % 100000==0){
+			//System.out.println(incounter);
+			//System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() + " - " + numberOfIncomingLinks);
+			System.out.println(zoneId + " - " + arrivalTimeOfLastRemovedMessage);
+			//if (tmpLastRemovedMessage!=null){
+			//	System.out.println(((Road)tmpLastRemovedMessage.sendingUnit).getLink().getLength());
+			//}
+		}
+		
 		
 		return null;
 	}

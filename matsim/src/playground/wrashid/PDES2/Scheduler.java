@@ -198,6 +198,7 @@ public class Scheduler {
 						zoneMessageQueues[road.getZoneId()].tempIncomingLinks.add(inLink);
 						inRoad.isOutBorderRoad=true;
 						zoneMessageQueues[road.getZoneId()].numberOfQueuedMessages.put(inRoad, 0);
+						//System.out.println(inRoad.getLink().getLength());
 					}
 				}
 			}
