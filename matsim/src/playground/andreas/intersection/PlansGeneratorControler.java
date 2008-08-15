@@ -27,6 +27,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -61,55 +62,55 @@ public class PlansGeneratorControler extends Controler {
 		log.info("  generating plans... ");
 		
 		for (int i = 0; i < 314; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("200"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("9"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 948; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("201"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("7"), pop);
 			numberOfPlans++;
 		}
 		
 		for (int i = 0; i < 196; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("202"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("5"), pop);
 			numberOfPlans++;
 		}
 		
 		for (int i = 0; i < 56; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("210"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("3"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 192; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("211"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("9"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 185; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("212"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("7"), pop);
 			numberOfPlans++;
 		}
 		
 		for (int i = 0; i < 170; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("220"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("5"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 799; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("221"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("3"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 147; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("222"), this.network.getLink("9"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("9"), pop);
 			numberOfPlans++;
 		}
 		
 		for (int i = 0; i < 150; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("230"), this.network.getLink("7"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("7"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 166; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("231"), this.network.getLink("5"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("5"), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 341; i++) {
-			generatePerson(numberOfPlans, this.network.getLink("232"), this.network.getLink("3"), pop);
+			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("3"), pop);
 			numberOfPlans++;
 		}
 		
@@ -159,7 +160,7 @@ public class PlansGeneratorControler extends Controler {
 		Person p = new Person(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60., Time.UNDEFINED_TIME, true);
+			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createLeg("car", null, null, null);
 			plan.createAct("h", 200., 200., toLink, 8 * 60 * 60, 0., 0., true);
 

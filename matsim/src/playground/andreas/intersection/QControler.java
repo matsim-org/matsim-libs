@@ -37,12 +37,15 @@ public class QControler extends Controler {
 	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QControler.class);
 	
-	final String signalSystems = "./src/playground/andreas/intersection/test/data/signalSystemConfig_4a_test.xml";
-	final String groupDefinitions= "./src/playground/andreas/intersection/test/data/signalGroupDefinition_4a_test.xml";
+	final String signalSystems;
+	final String groupDefinitions;
+	
 	final static boolean useOTF = false;
 
-	public QControler(final Config config) {
+	public QControler(final Config config, String signalSystems, String groupDefinitions) {
 		super(config);
+		this.signalSystems = signalSystems;
+		this.groupDefinitions = groupDefinitions;
 	}
 
 	@Override
@@ -93,13 +96,26 @@ public class QControler extends Controler {
 
 		Config config;
 
-		if (args.length == 0) {
-			config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
-		} else {
-			config = Gbl.createConfig(args);
-		}
+//		if (args.length == 0) {
+//			config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
+//		} else {
+//			config = Gbl.createConfig(args);
+//		}
 
-		final QControler controler = new QControler(config);
+		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
+		final String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
+		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
+
+//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
+//		final String signalSystems = "./src/playground/andreas/intersection/test/data/twoways/signalSystemConfig_2lsa.xml";
+//		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/twoways/signalGroupDefinition_2lsa.xml";
+
+//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/oneways/config.xml"});
+//		final String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
+//		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+
+		
+		final QControler controler = new QControler(config, signalSystems, groupDefinitions);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEvents(true);
 //		controler.setTraveltimeBinSize(30*60);
