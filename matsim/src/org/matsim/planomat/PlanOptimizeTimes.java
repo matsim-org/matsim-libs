@@ -20,8 +20,6 @@
 
 package org.matsim.planomat;
 
-import java.util.List;
-
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
@@ -37,6 +35,7 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.basic.v01.BasicPlan.Type;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
@@ -78,10 +77,28 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			
 			// distinguish for optimization tools
 			String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
-			if (optiToolboxName.equals("jgap")) {
+			if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-				Genotype initialGAPopulation = PlanOptimizeTimes.initJGAP(plan, this.legTravelTimeEstimator);
-				IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
+				org.jgap.Configuration jgapConfiguration = PlanOptimizeTimes.initJGAPConfiguration();
+				IChromosome sampleChromosome = PlanOptimizeTimes.initSampleChromosome(plan, jgapConfiguration);
+				try {
+					jgapConfiguration.setSampleChromosome(sampleChromosome);
+				} catch (InvalidConfigurationException e1) {
+					e1.printStackTrace();
+				}
+				ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
+				PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, this.legTravelTimeEstimator );
+				Genotype population = null;
+				try {
+					jgapConfiguration.setFitnessFunction( fitnessFunction );
+					population = Genotype.randomInitialGenotype( jgapConfiguration );
+				} catch (InvalidConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+//				IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
+				population.evolve( Gbl.getConfig().planomat().getJgapMaxGenerations() );
+				IChromosome fittest = population.getFittestChromosome();
 				PlanOptimizeTimes.writeChromosome2Plan(fittest, plan, this.legTravelTimeEstimator);
 
 			}
@@ -93,22 +110,51 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		}
 	}
 
-	/**
-	 * Configure JGAP for our purposes and generate the initial GA population.
-	 *
-	 * @param plan The encoding depends on the number of activities, this is why we pass the plan to the configuration
-	 * @param estimator
-	 * @return the initial population of GA individuals ready for evolution
-	 */
-	private static Genotype initJGAP(final Plan plan, final LegTravelTimeEstimator estimator) {
-
-		Genotype jgapGAPopulation = null;
-
-		int popSize = Gbl.getConfig().planomat().getPopSize();
-		// put all the parameters in the config file later
-		double planLength = 24.0 * 3600;
-
+	protected static org.jgap.Configuration initJGAPConfiguration() {
+		
 		Configuration jgapConfiguration = new Configuration();
+
+		try {
+			// the following settings are copied from org.jgap.DefaultConfiguration
+			// TODO configuration shouldnt be inited for every plan, but once
+			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
+			Configuration.reset();
+			
+			// use random seed from config file to initialize JGAP random number generator
+			// use fixed random seed in order to reproduce test results as well as
+			// to have deterministic behavior of the simulation system
+			StockRandomGenerator rng = new StockRandomGenerator();
+			rng.setSeed( Gbl.getConfig().global().getRandomSeed() );
+			jgapConfiguration.setRandomGenerator(rng);
+
+			jgapConfiguration.setEventManager(new EventManager());
+			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 0.95d);
+			//		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 1 - (1 / popSize));
+			bestChromsSelector.setDoubletteChromosomesAllowed(false);
+			jgapConfiguration.addNaturalSelector(bestChromsSelector, true);
+			//jgapConfiguration.setMinimumPopSizePercent(0);
+			jgapConfiguration.setKeepPopulationSizeConstant(true);
+			jgapConfiguration.setFitnessEvaluator(new DefaultFitnessEvaluator());
+			jgapConfiguration.setChromosomePool(new ChromosomePool());
+			jgapConfiguration.addGeneticOperator(new CrossoverOperator(jgapConfiguration));
+			// Different than org.jgap.DefaultConfiguration: use mutation rate which adapts to chromosome size
+			jgapConfiguration.addGeneticOperator(new MutationOperator(jgapConfiguration));
+
+			// elitist selection (DeJong, 1975)
+			jgapConfiguration.setPreservFittestIndividual(true);
+			jgapConfiguration.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return jgapConfiguration;
+		
+	}
+	
+	protected static IChromosome initSampleChromosome(final Plan plan, final org.jgap.Configuration jgapConfiguration) {
+
+		double planLength = 24.0 * 3600;
 
 		// analyze / modify plan for our purposes:
 		// 1, how many activities do we have?
@@ -128,124 +174,100 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		// first and last activity are assumed to be the same
 		numActs -= 1;
 
-		// set up JGAP
+		//   use ordinary DoubleGene encoding with simple crossover and random mutation, later maybe use a mutator dependent on var mut prob
+		//   genes: 1 for start time, one for time allocation of each activity except the last one, makes nAct double genes in the range between 0 and 24
+		Gene[] sampleGenes = null;
 		try {
-			// the following settings are copied from org.jgap.DefaultCOnfiguration
-			// TODO configuration shouldnt be inited for every plan, but once
-			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
-			Configuration.reset();
-			jgapConfiguration.setRandomGenerator(new StockRandomGenerator());
-			jgapConfiguration.setEventManager(new EventManager());
-			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 0.95d);
-//			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 1 - (1 / popSize));
-			bestChromsSelector.setDoubletteChromosomesAllowed(false);
-			jgapConfiguration.addNaturalSelector(bestChromsSelector, true);
-			//jgapConfiguration.setMinimumPopSizePercent(0);
-			jgapConfiguration.setKeepPopulationSizeConstant(true);
-			jgapConfiguration.setFitnessEvaluator(new DefaultFitnessEvaluator());
-			jgapConfiguration.setChromosomePool(new ChromosomePool());
-			jgapConfiguration.addGeneticOperator(new CrossoverOperator(jgapConfiguration));
-			// Different than org.jgap.DefaultConfiguration: use mutation rate which adapts to chromosome size
-			jgapConfiguration.addGeneticOperator(new MutationOperator(jgapConfiguration));
-
-			//   use ordinary DoubleGene encoding with simple crossover and random mutation, later maybe use a mutator dependent on var mut prob
-			//   genes: 1 for start time, one for time allocation of each activity except the last one, makes nAct double genes in the range between 0 and 24
-			Gene[] sampleGenes = new Gene[numActs];
+			sampleGenes = new Gene[numActs];
 			sampleGenes[0] = new DoubleGene(jgapConfiguration, 0.0, planLength);
 			for (int ii=1; ii < sampleGenes.length; ii++) {
 				sampleGenes[ii] = new DoubleGene(jgapConfiguration, 0.0, planLength);
 			}
-
-			IChromosome sampleChromosome = new Chromosome(jgapConfiguration, sampleGenes);
-			jgapConfiguration.setSampleChromosome( sampleChromosome );
-
-			// initialize scoring function
-			ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
-
-			PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, estimator );
-			jgapConfiguration.setFitnessFunction( fitnessFunction );
-
-			// elitist selection (DeJong, 1975)
-			jgapConfiguration.setPreservFittestIndividual(true);
-			jgapConfiguration.setPopulationSize( popSize );
-			jgapGAPopulation = Genotype.randomInitialGenotype( jgapConfiguration );
-
 		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return jgapGAPopulation;
-
+		
+		IChromosome sampleChromosome = null;
+		try {
+			sampleChromosome = new Chromosome(jgapConfiguration, sampleGenes);
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return sampleChromosome;
+		
 	}
-
+	
 	/**
 	 * @param population the initial GA population that serves as breed for evolution
 	 * @return the fittest individual after evolution
 	 */
-	protected static IChromosome evolveAndReturnFittest(final Genotype population) {
+//	protected static IChromosome evolveAndReturnFittest(final Genotype population) {
+//
+//		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
+//		double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
+////		System.out.println(minDiff);
+//
+//		IChromosome fittest = null;
+//		double avg = 0, max = 0, oldmax = 0;
+//		boolean cancelEvolution = false;
+//		int generation = 0;
+//
+//		int maxNumGenerations = Gbl.getConfig().planomat().getJgapMaxGenerations();
+//		int percentEvolution = maxNumGenerations / 10;
+//
+//		while (cancelEvolution == false) {
+//
+//			population.evolve();
+//
+//			fittest = population.getFittestChromosome();
+//
+//			if (generation == 0) {
+//				oldmax = fittest.getFitnessValue();
+//			} else if ((generation > 0) && (generation % percentEvolution == 0)) {
+//				max = fittest.getFitnessValue();
+//				if (Gbl.getConfig().planomat().isBeVerbose()) {
+//					avg = PlanOptimizeTimes.getAverageFitness(population);
+//					System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
+//				}
+//				if ((max - oldmax) < minDiff) {
+//					cancelEvolution = true;
+//				}
+//				oldmax = max;
+//			}
+//
+//			generation++;
+//			if (generation == maxNumGenerations) {
+//				cancelEvolution = true;
+//			}
+//
+//		}
+//
+//		fittest = population.getFittestChromosome();
+//		if (Gbl.getConfig().planomat().isBeVerbose()) {
+//			double fitness = fittest.getFitnessValue();
+//			System.out.println("Currently fittest Chromosome has fitness " + fitness);
+//		}
+//		return fittest;
+//	}
 
-		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
-		double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
-//		System.out.println(minDiff);
-
-		IChromosome fittest = null;
-		double avg = 0, max = 0, oldmax = 0;
-		boolean cancelEvolution = false;
-		int generation = 0;
-
-		int maxNumGenerations = Gbl.getConfig().planomat().getJgapMaxGenerations();
-		int percentEvolution = maxNumGenerations / 10;
-
-		while (cancelEvolution == false) {
-
-			population.evolve();
-
-			fittest = population.getFittestChromosome();
-
-			if (generation == 0) {
-				oldmax = fittest.getFitnessValue();
-			} else if ((generation > 0) && (generation % percentEvolution == 0)) {
-				max = fittest.getFitnessValue();
-				if (Gbl.getConfig().planomat().isBeVerbose()) {
-					avg = PlanOptimizeTimes.getAverageFitness(population);
-					System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
-				}
-				if ((max - oldmax) < minDiff) {
-					cancelEvolution = true;
-				}
-				oldmax = max;
-			}
-
-			generation++;
-			if (generation == maxNumGenerations) {
-				cancelEvolution = true;
-			}
-
-		}
-
-		fittest = population.getFittestChromosome();
-		if (Gbl.getConfig().planomat().isBeVerbose()) {
-			double fitness = fittest.getFitnessValue();
-			System.out.println("Currently fittest Chromosome has fitness " + fitness);
-		}
-		return fittest;
-	}
-
-	protected static double getAverageFitness(final Genotype population) {
-
-		double averageFitness = 0;
-
-		List<Chromosome> chromosomes = population.getPopulation().getChromosomes();
-
-		for (Chromosome c : chromosomes) {
-			averageFitness += c.getFitnessValue();
-		}
-
-		averageFitness = averageFitness / chromosomes.size();
-
-		return averageFitness;
-
-	}
+//	protected static double getAverageFitness(final Genotype population) {
+//
+//		double averageFitness = 0;
+//
+//		List<Chromosome> chromosomes = population.getPopulation().getChromosomes();
+//
+//		for (Chromosome c : chromosomes) {
+//			averageFitness += c.getFitnessValue();
+//		}
+//
+//		averageFitness = averageFitness / chromosomes.size();
+//
+//		return averageFitness;
+//
+//	}
 
 	/**
 	 * Writes a JGAP chromosome back to matsim plan object.

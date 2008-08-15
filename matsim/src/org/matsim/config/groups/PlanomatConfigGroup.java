@@ -11,32 +11,46 @@ public class PlanomatConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "planomat";
 
-	public static final String SCORING_FUNCTION = "scoringFunction";
-	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
-//	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
-	public static final String JGAP_MAX_GENERATIONS = "jgapMaxGenerations";
 	public static final String OPTIMIZATION_TOOLBOX = "optimizationToolbox";
-	public static final String INDIFFERENCE = "indifference";
-	public static final String POPSIZE = "populationSize";
-	public static final String BE_VERBOSE = "beVerbose";
-
+	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
+	public static final String DEFAULT_OPTIMIZATION_TOOLBOX = PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP;
+	private String optimizationToolbox;
+	
+	public static final String SCORING_FUNCTION = "scoringFunction";
 	public static final String CHARYPAR_NAGEL_SCORING_FUNCTION = "CharyparNagel";
 	public static final String CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION = "CharyparNagelOpenTimes";
-	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
+	public static final ScoringFunctionFactory DEFAULT_SCORING_FUNCTION = new CharyparNagelScoringFunctionFactory();
+	private ScoringFunctionFactory scoringFunctionFactory;
+	
+	public static final String POPSIZE = "populationSize";
+	public static final int DEFAULT_POPSIZE = 10; 
+	private int popSize;
 
-	private ScoringFunctionFactory scoringFunctionFactory = null;
+	public static final String JGAP_MAX_GENERATIONS = "jgapMaxGenerations";
+	public static final int DEFAULT_JGAP_MAX_GENERATIONS = 100;
+	private int jgapMaxGenerations;
+	
+	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
+//	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
+	public static final String INDIFFERENCE = "indifference";
+	public static final String BE_VERBOSE = "beVerbose";
+	
 	private String legTravelTimeEstimatorName = null;
 //	private String linkTravelTimeEstimatorName = null;
-	private int jgapMaxGenerations = -1;
-	private String optimizationToolbox = null;
 	private double indifference = -1.0;
-	private int popSize = -1;
 	private boolean beVerbose = false;
 
 	private final static Logger log = Logger.getLogger(PlanomatConfigGroup.class);
 
 	public PlanomatConfigGroup() {
 		super(PlanomatConfigGroup.GROUP_NAME);
+		
+		// set defaults
+		this.optimizationToolbox = PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX;
+		this.scoringFunctionFactory = PlanomatConfigGroup.DEFAULT_SCORING_FUNCTION;
+		this.popSize = PlanomatConfigGroup.DEFAULT_POPSIZE;
+		this.jgapMaxGenerations = PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS;
+		
 	}
 
 	@Override
@@ -66,7 +80,17 @@ public class PlanomatConfigGroup extends Module {
 		} else if (INDIFFERENCE.equals(param_name)) {
 			this.setIndifference(Double.parseDouble(value));
 		} else if (POPSIZE.equals(param_name)) {
-			this.setPopSize(Integer.parseInt(value));
+			int popSize = 0;
+			try {
+				popSize = Integer.parseInt(value);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (popSize <= 0) {
+				Gbl.errorMsg("JGAP Population size must be a non-null positive integer.");
+			}
+			this.setPopSize(popSize);
 		} else if (BE_VERBOSE.equals(param_name)) {
 			this.setBeVerbose(Boolean.parseBoolean(value));
 		}

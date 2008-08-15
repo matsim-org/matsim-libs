@@ -51,38 +51,13 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanOptimizeTimesTest.class);
 
-	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
+	private NetworkLayer network = null;
+	private Population population = null;
 
 	protected void setUp() throws Exception {
+
 		super.setUp();
-		super.loadConfig(PlanOptimizeTimesTest.CONFIGFILE);
-	}
-
-	public void testRun() {
-		fail("Not yet implemented");
-	}
-
-	public void testEvolveAndReturnFittest() {
-		fail("Not yet implemented");
-	}
-
-	public void testGetAverageFitness() {
-		fail("Not yet implemented");
-	}
-
-	public void testWriteChromosome2Plan() {
-
-		// writeChromosome2Plan() has 3 arguments:
-		Plan testPlan = null;
-		IChromosome testChromosome = null;
-		LegTravelTimeEstimator ltte = null;
-		
-		// init test Plan
-		final String TEST_PERSON_ID = "100";
-		final int TEST_PLAN_NR = 0;
-
-		NetworkLayer network = null;
-		Population population = null;
+		super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		log.info("Reading network xml file...");
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
@@ -95,6 +70,89 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");
+
+	}
+
+	public void testRun() {
+		
+		// init LegTravelTimeEstimator
+		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
+		LegTravelTimeEstimator ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc);
+		
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+		
+		// init test Plan
+		final String TEST_PERSON_ID = "100";
+		final int TEST_PLAN_NR = 0;
+
+		// first person
+		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		// only plan of that person
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		
+		// actual test
+		testee.run(testPlan);
+
+		// write out the test person and the modified plan into a file
+		Population outputPopulation = new Population();
+		try {
+			outputPopulation.addPerson(testPerson);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("Writing plans file...");
+		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
+		plans_writer.write();
+		System.out.println("Writing plans file...DONE.");
+
+		// actual test: compare checksums of the files
+		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
+		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		log.info("Expected checksum: " + Long.toString(expectedChecksum));
+		log.info("Actual checksum: " + Long.toString(actualChecksum));
+		assertEquals(expectedChecksum, actualChecksum);
+
+	}
+
+	public void testInitSampleChromosome() {
+		
+		// init test Plan
+		final String TEST_PERSON_ID = "100";
+		final int TEST_PLAN_NR = 0;
+
+		// first person
+		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		// only plan of that person
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		
+		Configuration jgapConfiguration = new Configuration();
+		
+		IChromosome testChromosome = PlanOptimizeTimes.initSampleChromosome(testPlan, jgapConfiguration);
+		assertEquals(2, testChromosome.getGenes().length);
+		
+	}
+	
+//	public void testEvolveAndReturnFittest() {
+//		fail("Not yet implemented");
+//	}
+//
+//	public void testGetAverageFitness() {
+//		fail("Not yet implemented");
+//	}
+
+	public void testWriteChromosome2Plan() {
+
+		// writeChromosome2Plan() has 3 arguments:
+		Plan testPlan = null;
+		IChromosome testChromosome = null;
+		LegTravelTimeEstimator ltte = null;
+		
+		// init test Plan
+		final String TEST_PERSON_ID = "100";
+		final int TEST_PLAN_NR = 0;
 
 		// first person
 		Person testPerson = population.getPerson(TEST_PERSON_ID);

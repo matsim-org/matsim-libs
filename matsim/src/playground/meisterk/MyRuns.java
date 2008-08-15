@@ -132,7 +132,6 @@ public class MyRuns {
 	public static void run() throws Exception {
 
 //		MyRuns.writeGUESSFile();
-		MyRuns.planomatStandAloneDemo();
 //		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
@@ -462,47 +461,6 @@ public class MyRuns {
 //
 //	}
 
-	private static void planomatStandAloneDemo() {
-
-		System.out.println("Running planomatDemo()...");
-		System.out.println();
-
-		System.out.println("  Processing config parameters...");
-		System.out.println();
-
-		// optimization method
-		String optimizationToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
-
-		if (optimizationToolboxName.equals("jgap")) {
-			System.out.println("    Using JGAP optimization toolbox.");
-		} else {
-			Gbl.errorMsg("    Unknown optimization toolbox identifier \"" + optimizationToolboxName + "\". Check parameter optimizationToolbox in module planomat.");
-		}
-		System.out.println("  Processing config parameters...DONE.");
-
-		// initialize scenario with events from a given events file
-		// - network
-		NetworkLayer network = MyRuns.initWorldNetwork();
-		// - population
-		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
-		// - events
-		Events events = new Events();
-		TravelTime tTravelCalc = MyRuns.initTravelTimeIForPlanomat(network);
-		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
-		events.printEventHandlers();
-		MyRuns.readEvents(events, network);
-
-		// init matsim & run
-		StrategyManager strategyManager = initStrategy(ltte, matsimAgentPopulation);
-		strategyManager.run(matsimAgentPopulation);
-
-		MyRuns.writePopulation(matsimAgentPopulation);
-
-		System.out.println();
-		System.out.println("planomatDemo() done.");
-
-	}
-
 	public static NetworkLayer initWorldNetwork() {
 
 		NetworkLayer network = null;
@@ -547,36 +505,6 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		return population;
-	}
-
-	private static StrategyManager initStrategy(LegTravelTimeEstimator estimator, Population matsimAgentPopulation) {
-
-		StrategyManager strategyManager = new StrategyManager();
-		PlanStrategy simplePlanomatStrategy = new PlanStrategy(new RandomPlanSelector());
-		StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(estimator/*, matsimAgentPopulation*/);
-		simplePlanomatStrategy.addStrategyModule(planomatStrategyModule);
-		strategyManager.addStrategy(simplePlanomatStrategy, 1.0);
-
-		System.out.println("  done.");
-
-		return strategyManager;
-	}
-
-	private static TravelTime initTravelTimeIForPlanomat(NetworkLayer network) {
-
-		TravelTime linkTravelTimeEstimator = null;
-
-//		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
-//		if (travelTimeIName.equalsIgnoreCase("org.matsim.demandmodeling.events.algorithms.TravelTimeCalculator")) {
-//			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
-//		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.playground.meisterk.planomat.LinearInterpolatingTTCalculator")) {
-//			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
-//		} else {
-//			Gbl.errorMsg("Invalid name of implementation of TravelTime: " + travelTimeIName);
-//		}
-
-		return linkTravelTimeEstimator;
-
 	}
 
 	private static LegTravelTimeEstimator createLegTravelTimeEstimator(Events events, NetworkLayer network, TravelTime linkTravelTimeEstimator) {

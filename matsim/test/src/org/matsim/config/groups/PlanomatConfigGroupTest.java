@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PlanomatConfigGroupTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,18 +20,25 @@
 
 package org.matsim.config.groups;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.gbl.Gbl;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+public class PlanomatConfigGroupTest extends MatsimTestCase {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.config.groups");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(PlanomatConfigGroupTest.class);
-		suite.addTestSuite(StrategyConfigGroupTest.class);
-		//$JUnit-END$
-		return suite;
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	public void testPlanomatConfigGroup() {
+		
+		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
+		
+		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
+		assertEquals( CharyparNagelScoringFunctionFactory.class, Gbl.getConfig().planomat().getScoringFunctionFactory().getClass() );
+		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
+		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
+		
 	}
 
 }
