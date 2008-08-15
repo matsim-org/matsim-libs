@@ -20,11 +20,11 @@
 
 package org.matsim.utils.charts;
 
-import java.awt.Container;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.matsim.testcases.MatsimTestCase;
 
@@ -37,25 +37,19 @@ public class XYLineChartTest extends MatsimTestCase {
 
 	/**
 	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
+	 * @throws IOException possible exception when reading the image for validation
 	 */
-	public void testXYLineChartDemo() {
-		String imagefile = getOutputDirectory() + "xylinechart.png";
+	public void testXYLineChartDemo() throws IOException {
+		String imageFilename = getOutputDirectory() + "xylinechart.png";
 		Demo demo = new Demo();
-		demo.createXYLineChart(imagefile);
+		demo.createXYLineChart(imageFilename);
 
-		assertTrue(new File(imagefile).exists());
+		File imagefile = new File(imageFilename);
+		assertTrue(imagefile.exists());
 
-		Image image = Toolkit.getDefaultToolkit().getImage(imagefile);
-		// make sure the image is really loaded.
-    MediaTracker mediaTracker = new MediaTracker(new Container());
-    mediaTracker.addImage(image, 0);
-    try {
-			mediaTracker.waitForID(0);
-			assertEquals(800, image.getWidth(null));
-			assertEquals(600, image.getHeight(null));
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+		BufferedImage image = ImageIO.read(imagefile);
+		assertEquals(800, image.getWidth(null));
+		assertEquals(600, image.getHeight(null));
 	}
 
 }

@@ -21,13 +21,15 @@
 package org.matsim.gbl;
 
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 
@@ -110,6 +112,11 @@ public abstract class MatsimResource {
 		if (url == null) {
 			return null;
 		}
-		return Toolkit.getDefaultToolkit().getImage(url);
+		try {
+			return ImageIO.read(url);
+		} catch (IOException e) {
+			log.error("Could not load requested image", e);
+			return null;
+		}
 	}
 }

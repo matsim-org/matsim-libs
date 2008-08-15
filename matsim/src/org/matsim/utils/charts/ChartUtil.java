@@ -21,9 +21,7 @@
 package org.matsim.utils.charts;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.io.File;
 import java.io.IOException;
 
@@ -77,16 +75,8 @@ public abstract class ChartUtil {
 	 */
 	public void addMatsimLogo() {
 		Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
-		// make sure the image is really loaded. See JavaDoc for ImageTitle.
-    MediaTracker mediaTracker = new MediaTracker(new Container());
-    mediaTracker.addImage(image, 0);
-    try {
-			mediaTracker.waitForID(0);
-			Title subtitle = new ImageTitle(image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
-			this.chart.addSubtitle(subtitle);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Title subtitle = new ImageTitle(image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
+		this.chart.addSubtitle(subtitle);
 	}
 
 	/**
