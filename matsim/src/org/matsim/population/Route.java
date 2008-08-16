@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,7 +22,6 @@ package org.matsim.population;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.gbl.Gbl;
@@ -31,9 +30,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
-
-//	private static final long serialVersionUID = -3615114784178389239L;
+public class Route extends BasicRouteImpl<Node> {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -214,51 +211,11 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 		if (toIndex == -1) {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
-		List<Node> nodeList = this.route.subList(fromIndex, toIndex + 1);
 		Route ret = new Route();
-		ret.route = new ArrayList<Node>(nodeList);
+		ret.route = new ArrayList<Node>(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
 
-  /////////////////////////////////////////////////////////////////
-	// I/O methods
-  /////////////////////////////////////////////////////////////////
-
-	/* seems the code below is nowhere really used, so I commented it out. Additionally,
-	 * I think it doesn't work correctly, as it serializes the route manually, but the route
-	 * is not declared transient, so it would be serialized anyway, and now twice!
-	 * If nobody needs this code, I will delete it soon.   marcel/7jul2008
-	 * TODO [MR] delete code
-	 */
-/*
-	private void readObject(final ObjectInputStream s)
-	  throws IOException, ClassNotFoundException
-	{
-		// the `standard' fields.
-		s.defaultReadObject();
-
-		System.out.println("read route from stream. " + (this.route == null ? "null" : "" + this.route.size()));
-		// the `route'.
-		int size = s.readInt();
-		this.route = new ArrayList<Node>(size);
-		for (int i = 0; i < size; i++) {
-			NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-			Node node = network.getNode((String)s.readObject());
-			this.route.add(node);
-		}
-	}
-
-	private void writeObject(final ObjectOutputStream s) throws IOException {
-	    // The standard non-transient fields.
-		System.out.println("write route to stream.");
-	  s.defaultWriteObject();
-	  s.writeInt(this.route.size());
-	  for (int i = 0; i < this.route.size(); i++) {
-		  Node node = this.route.get(i);
-		  s.writeObject(node.getId().toString());
-		}
-	}
-*/
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
