@@ -75,8 +75,6 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
-
-
 abstract class OGLSceneLayerImpl implements SceneLayer{
 	private final List<OTFGLDrawable> items = new ArrayList<OTFGLDrawable>();
 
@@ -89,17 +87,12 @@ abstract class OGLSceneLayerImpl implements SceneLayer{
 	}
 
 	public void finish() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void init(SceneGraph graph) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -303,7 +296,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	protected static volatile GLContext motherContext = null;
 
-	
+
 	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		GLCapabilities caps = new GLCapabilities();
@@ -372,26 +365,26 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		final double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
 		final double pixelsizeStreet = 5;
 		Rectangle2D test = new InfoText("0000000").getBounds();
-		
+
 		CoordImpl size  = mouseMan.getPixelsize();
 		if(size.getX()*pixelsizeStreet < cellWidth && size.getX()*pixelsizeStreet < cellWidth) {
-			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>();
+			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
 			// Query linkIds
 			Rect rect = mouseMan.getBounds();
 			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX + clientQ.offsetEast, rect.minY + clientQ.offsetNorth, rect.maxX - rect.minX, rect.maxY - rect.minY);
 			QueryLinkId linkIdQuery = (QueryLinkId)clientQ.doQuery(new QueryLinkId(dest));
 			double xRaster = test.getWidth(), yRaster = test.getHeight();
-			
+
 			for( CoordImpl coord : linkIdQuery.linkIds.keySet()) {
 				// draw linkId
 				float east = (float)coord.getX() -(float)getQuad().offsetEast;
 				float north = (float)coord.getY() - (float)getQuad().offsetNorth;
-				
+
 				float textX = (float) (((int)(east / xRaster) +1)*xRaster);
 				float textY = north -(float)(north % yRaster) +80;
 				CoordImpl text = new CoordImpl(textX,textY);
 				int i = 1;
-				
+
 				while (xymap.get(text) != null) {
 					text = new CoordImpl(textX,  i* (float)yRaster + textY);
 					if(xymap.get(text) == null) break;
@@ -403,8 +396,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 //					if(xymap.get(text) == null) break;
 					i++;
 				}
-				xymap.put(text, new Boolean(true));
-				
+				xymap.put(text, Boolean.TRUE);
+
 				InfoText.showTextOnce(linkIdQuery.linkIds.get(coord), (float)text.getX(), (float)text.getY(), 1.f);
 				gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 				gl.glLineWidth(2);
@@ -417,7 +410,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 
 	}
-	
+
 	synchronized public void display(GLAutoDrawable drawable) {
 //		Gbl.startMeasurement();
 		this.gl = drawable.getGL();
@@ -439,7 +432,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if ( this.actGraph != null) this.actGraph.draw();
 
 		if(queryHandler != null) queryHandler.drawQueries(this);
-		
+
 //		if(background != null) {
 //			background.onDraw(gl);
 //		}
@@ -469,7 +462,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		this.gl.glDisable(GL.GL_BLEND);
 
-		
+
 		InfoText.drawInfoTexts(drawable);
 
 		this.mouseMan.drawElements(this.gl);
@@ -557,7 +550,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 
 		//lastTime = Time.writeTime(time, ':');
-		
+
 		// do something like
 		// getTimeStep from somewhere
 		// check: is there a cached version for timestep
@@ -592,7 +585,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 		// Todo put drawing to displyLists here and in
 		// display(gl) we only display the two lists
-		
+
 		if(queryHandler != null) queryHandler.updateQueries();
         //this.isValid = false;
 		redraw();
@@ -648,7 +641,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 		return t;
 	}
-	
+
 	public void clearCache() {
 		if (clientQ != null) clientQ.clearCache();
 	}
