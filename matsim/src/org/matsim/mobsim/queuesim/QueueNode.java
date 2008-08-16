@@ -37,45 +37,37 @@ public class QueueNode {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
 
-	private boolean cacheIsInvalid = true;
+	private final QueueLink[] inLinks;
+	private final QueueLink[] tempLinks;
+	private final QueueLink[] auxLinks;
 
-	private QueueLink[] inLinksArrayCache = null;
-
-	private QueueLink[] tempLinks = null;
-
-	private QueueLink[] auxLinks = null;
+	protected final QueueNetwork queueNetwork;
 
 	private boolean active = false;
 
 	private Node node;
 
-	public QueueNetwork queueNetwork;
-
 	public QueueNode(Node n, QueueNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
-	}
 
-	private void buildCache() {
-		this.inLinksArrayCache = new QueueLink[this.node.getInLinks().values()
-				.size()];
+		this.inLinks = new QueueLink[this.node.getInLinks().values().size()];
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(
+			this.inLinks[i] = this.queueNetwork.getLinks().get(
 					l.getId());
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
+		Arrays.sort(this.inLinks, new Comparator<QueueLink>() {
 			public int compare(final QueueLink o1, final QueueLink o2) {
 				return o1.getLink().getId().compareTo(o2.getLink().getId());
 			}
 		});
 		this.tempLinks = new QueueLink[this.node.getInLinks().values().size()];
 		this.auxLinks = new QueueLink[this.node.getInLinks().values().size()];
-		this.cacheIsInvalid = false;
 	}
 
 	public Node getNode() {
@@ -88,13 +80,10 @@ public class QueueNode {
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
 		Link nextLink = veh.chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
-		QueueLink currentQueueLink = this.queueNetwork
-				.getQueueLink(currentLink.getId());
+		QueueLink currentQueueLink = this.queueNetwork.getQueueLink(currentLink.getId());
 		// veh has to move over node
 		if (nextLink != null) {
-
-		QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink
-				.getId());
+			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
 
 			if (nextQueueLink.hasSpace()) {
 				currentQueueLink.popFirstFromBuffer();
@@ -116,8 +105,7 @@ public class QueueNode {
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEvent(now, veh.getDriver(), currentLink, veh.getCurrentLeg()));
-				}
-				else {
+				} else {
 					currentQueueLink.popFirstFromBuffer();
 					veh.incCurrentNode();
 					nextQueueLink.add(veh);
@@ -143,6 +131,10 @@ public class QueueNode {
 		this.active = true;
 	}
 
+	final public boolean isActive() {
+		return this.active;
+	}
+
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -165,14 +157,10 @@ public class QueueNode {
 			return;
 		}
 
-		if (this.cacheIsInvalid) {
-			buildCache();
-		}
-
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
-		for (QueueLink link : this.inLinksArrayCache) {
+		for (QueueLink link : this.inLinks) {
 			if (!link.bufferIsEmpty()) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
