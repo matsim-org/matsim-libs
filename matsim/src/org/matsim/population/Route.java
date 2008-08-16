@@ -191,10 +191,28 @@ public class Route extends BasicRouteImpl<Node> /*implements Serializable*/ {
 	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route!
 	 */
 	public Route getSubRoute(final Node fromNode, final Node toNode) {
-		int fromIndex = this.route.indexOf(fromNode);
-		int toIndex = this.route.indexOf(toNode);
-		if ((fromIndex == -1) || (toIndex == -1)) {
-			throw new IllegalArgumentException("Cann't create subroute cause fromNode or toNode is not in the original Route");
+		int fromIndex = -1;
+		int toIndex = -1;
+		int max = this.route.size();
+		for (int i = 0; i < max; i++) {
+			Node node = this.route.get(i);
+			if (node.equals(fromNode)) {
+				fromIndex = i;
+				break;
+			}
+		}
+		if (fromIndex == -1) {
+			throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+		}
+		for (int i = fromIndex; i < max; i++) {
+			Node node = this.route.get(i);
+			if (node.equals(toNode)) {
+				toIndex = i;
+				break;
+			}
+		}
+		if (toIndex == -1) {
+			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
 		List<Node> nodeList = this.route.subList(fromIndex, toIndex + 1);
 		Route ret = new Route();
