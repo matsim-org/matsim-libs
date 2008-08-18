@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AggregatedPlansScoring.java
+ * SelectedPlansScoring.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,6 +20,7 @@
 
 package playground.gregor.withinday_evac;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -44,30 +45,34 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
-public class AggregatedPlansScoring implements StartupListener, ScoringListener, IterationStartsListener,
-AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler, LinkEnterEventHandler {
+public class SelectedPlansScoring implements StartupListener, ScoringListener, IterationStartsListener,
+AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler, LinkEnterEventHandler{
 
-
+	
 	protected Population population;
 	private ScoringFunctionFactory sfFactory;
-	private final HashMap<String,String> egressMappings = new HashMap<String,String>();
 	protected final double learningRate;
+	private final NetworkLayer network;
+	HashMap<Id,ArrayList<String>> mappings = new HashMap<Id, ArrayList<String>>();
 	protected final TreeMap<String, ScoringFunction> agentScorers = new TreeMap<String, ScoringFunction>();
-	private final TreeMap<String, String> agentMappings = new TreeMap<String, String>();
-	private final TreeMap<String, GroupScore> gs = new TreeMap<String, GroupScore>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
-
-	public AggregatedPlansScoring() {
+	private double stuckPenalty;
+	
+	public SelectedPlansScoring() {
+		this.network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		this.learningRate = Gbl.getConfig().charyparNagelScoring().getLearningRate();	
-		initEgressMappings();
 	}
 
+	
 
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
@@ -76,122 +81,65 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 		event.getControler().getEvents().addHandler(this);
 	}
 
+
 	public void notifyScoring(final ScoringEvent event) {
 		finish();
 	}
-
+	
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.agentMappings.clear();
-		this.gs.clear();
+		this.mappings.clear();
 		reset(event.getIteration());
+		this.stuckPenalty = 0;
 	}
 
-	/**
-	 * Finishes the calculation of the plans' scores and assigns the new scores
-	 * to the plans.
-	 */
+
 	public void finish() {
 		
+	
 		for (final Map.Entry<String, ScoringFunction> entry : this.agentScorers.entrySet()) {
-			final String agentId = entry.getKey();
 			final ScoringFunction sf = entry.getValue();
 			sf.finish();
-			final double score = sf.getScore();
 			
-			final String mapping = this.agentMappings.get(agentId);
-			GroupScore g = this.gs.get(mapping);
-			if (g == null) {
-				g = new GroupScore();
-				this.gs.put(mapping, g);
-			}
-			g.nagents++;
-			g.scoreSum += score;
-			this.scoreSum += score;
+			this.scoreSum += sf.getScore();
 			this.scoreCount++;
 		}
+		
+
+		
+		for (Map.Entry<Id, ArrayList<String>> entry : this.mappings.entrySet()) {
+			ArrayList<String> list = entry.getValue();
+			String guideId = null;
+			int count = 0;
+			double scoreSum = this.stuckPenalty;
+			for (String id : list) {
+				if (guideId == null && id.contains("guide")){
+					guideId = id;
+					continue;
+				}
+				count++;
+				ScoringFunction sf = this.agentScorers.get(id);
+				
+				scoreSum += sf.getScore();
+				
+				final Plan plan = this.population.getPerson(id).getSelectedPlan();
+				plan.setScore(sf.getScore());
+				
+			}
 			
-		for (final Map.Entry<String, ScoringFunction> entry : this.agentScorers.entrySet()) {			
-			final String agentId = entry.getKey();
-			final String mapping = this.agentMappings.get(agentId);
-			
-			final GroupScore g = this.gs.get(mapping);
-			final GroupScore nullG = this.gs.get("stuckAndAbord"); 
-			final double score = (g.scoreSum + nullG.scoreSum ) / (g.nagents + nullG.nagents);
-			final Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+			final Plan plan = this.population.getPerson(guideId).getSelectedPlan();
 			final double oldScore = plan.getScore();
 			if (Double.isNaN(oldScore)) {
-				plan.setScore(score);
+				plan.setScore(scoreSum);
 			} else {
-				plan.setScore(this.learningRate * score + (1-this.learningRate) * oldScore);
+				plan.setScore(this.learningRate * scoreSum + (1-this.learningRate) * oldScore);
 			}
+//			if (Double.isNaN(oldScore)) {
+//				plan.setScore(this.scoreSum/this.scoreCount);
+//			} else {
+//				plan.setScore(this.learningRate * this.scoreSum/this.scoreCount + (1-this.learningRate) * oldScore);
+//			}
 		}
 	}
-
-
-
-	private void initEgressMappings() {
-		this.egressMappings.put("el63", "el63");
-		this.egressMappings.put("el14", "el63");
-		this.egressMappings.put("el87", "el63");
-		this.egressMappings.put("el13", "el63");
-		this.egressMappings.put("el61", "el63");
-
-		this.egressMappings.put("el48", "el48");
-		this.egressMappings.put("el30", "el48");
-		this.egressMappings.put("el48", "el48");
-		this.egressMappings.put("el3", "el48");
-		this.egressMappings.put("el38", "el48");
-		this.egressMappings.put("el6", "el48");
-		this.egressMappings.put("el10", "el48");
-		this.egressMappings.put("el71", "el48");
-		this.egressMappings.put("el69", "el48");
-
-		this.egressMappings.put("el33", "el33");
-		this.egressMappings.put("el24", "el33");
-
-		this.egressMappings.put("el65", "el65");
-		this.egressMappings.put("el77", "el65");
-		this.egressMappings.put("el26", "el65");
-		this.egressMappings.put("el64", "el65");
-
-		this.egressMappings.put("el21", "el21");
-		this.egressMappings.put("el58", "el21");
-
-		this.egressMappings.put("el89", "el89");
-		this.egressMappings.put("el12", "el89");
-
-		this.egressMappings.put("el18", "el18");
-		this.egressMappings.put("el17", "el18");
-		this.egressMappings.put("el47", "el18");
-		this.egressMappings.put("el86", "el18");
-
-		this.egressMappings.put("el2", "el2");
-		this.egressMappings.put("el39", "el2");
-
-		this.egressMappings.put("el76", "el76");
-		this.egressMappings.put("el4", "el76");
-		this.egressMappings.put("el11", "el76");
-		this.egressMappings.put("el5", "el76");
-		this.egressMappings.put("el7", "el76");
-		this.egressMappings.put("el59", "el76");
-		this.egressMappings.put("el36", "el76");
-		this.egressMappings.put("el80", "el76");
-
-		this.egressMappings.put("el29", "el8");
-
-		this.egressMappings.put("el22", "el88");
-		this.egressMappings.put("el43", "el88");
-
-		this.egressMappings.put("el45", "el50");
-		this.egressMappings.put("el19", "el50");
-		this.egressMappings.put("el84", "el84");
-		this.egressMappings.put("el75", "el84");
-		this.egressMappings.put("el53", "el84");
-
-
-
-	}
-
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
@@ -204,30 +152,29 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 		sf.endLeg(event.time);
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
-		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.agentStuck(event.time);
-		this.agentMappings.put(event.agentId, "stuckAndAbord");
-	}
-
 	public void handleEvent(final AgentUtilityEvent event) {
 		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.addUtility(event.amount);
 	}
 
-
+	public void handleEvent(final AgentStuckEvent event) {
+		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
+		sf.agentStuck(event.time);
+		this.stuckPenalty += -144.0;
+	}
+	
 
 	public void handleEvent(final LinkEnterEvent event) {
 		final String linkId = event.linkId;
-		if (linkId.contains("el")) {
-			String mapping = this.egressMappings.get(linkId);
-			if (mapping == null) {
-				mapping = linkId;
-			}
-			this.agentMappings.put(event.agentId, mapping);
+		Link link = this.network.getLink(linkId);
+		Node node = link.getFromNode();
+		ArrayList<String> list = this.mappings.get(node.getId());
+		if (list == null) {
+			list = new ArrayList<String>();
+			this.mappings.put(node.getId(), list);
 		}
-		
-		
+		String agentId = event.agentId;
+		list.add(agentId);
 	}
 	
 	/**
@@ -277,10 +224,5 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 			this.agentScorers.put(agentId, sf);
 		}
 		return sf;
-	}
-	
-	private static class GroupScore {
-		int nagents = 0;
-		double scoreSum = 0;
 	}
 }

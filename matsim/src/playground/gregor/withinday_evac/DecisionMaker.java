@@ -28,10 +28,8 @@ import org.matsim.network.Link;
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.BlockedLinksAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowGuideAnalyzer;
-import playground.gregor.withinday_evac.analyzer.HerdAnalyzer;
 import playground.gregor.withinday_evac.analyzer.NextLinkOption;
 import playground.gregor.withinday_evac.analyzer.Option;
-import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
 
 public class DecisionMaker {
 
@@ -60,23 +58,27 @@ public class DecisionMaker {
 
 	private Link nextLink(final double now, final Id nodeId) {
 		
-		final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
-		ba.update(now);
+//		final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
+//		ba.update(now);
 			
 		
 		final FollowGuideAnalyzer a = (FollowGuideAnalyzer) this.analyzers.get("FollowGuideAnalyzer");
 		Option ac = a.getAction(now);
 		
+//		if (((NextLinkOption)ac).getNextLink() == null) {
+//			final HerdAnalyzer b = (HerdAnalyzer) this.analyzers.get("HerdAnalyzer");
+//			ac = b.getAction(now);
+//		} 
+//		
+//		
+//		
+//		if (((NextLinkOption)ac).getNextLink() == null || ba.isLinkBlocked(((NextLinkOption)ac).getNextLink())) {
+//			final ReRouteAnalyzer c = (ReRouteAnalyzer) this.analyzers.get("ReRouteAnalyzer");
+//			ac = c.getAction(now);
+//		}
+		
 		if (((NextLinkOption)ac).getNextLink() == null) {
-			final HerdAnalyzer b = (HerdAnalyzer) this.analyzers.get("HerdAnalyzer");
-			ac = b.getAction(now);
-		} 
-		
-		
-		
-		if (((NextLinkOption)ac).getNextLink() == null || ba.isLinkBlocked(((NextLinkOption)ac).getNextLink())) {
-			final ReRouteAnalyzer c = (ReRouteAnalyzer) this.analyzers.get("ReRouteAnalyzer");
-			ac = c.getAction(now);
+			throw new RuntimeException("this should not happen!!!");
 		}
 		
 		return ((NextLinkOption)ac).getNextLink();
@@ -93,23 +95,6 @@ public class DecisionMaker {
 		return ((NextLinkOption)ac).getNextLink();
 	}
 	
-	
-//	private static class Option {
-//		private final double activation;
-//		private final Link link;
-//		public Option(Link link, double activation) {
-//			this.link = link;
-//			this.activation = activation;
-//		}
-//		
-//		public Link getLink() {
-//			return this.link;
-//		}
-//		
-//		public double getActivation(){
-//			return this.activation;
-//		}
-//	}
 
 
 }

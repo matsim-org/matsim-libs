@@ -40,7 +40,6 @@ import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
 import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.Message;
-import playground.gregor.withinday_evac.communication.NextLinkMessage;
 import playground.gregor.withinday_evac.mobsim.OccupiedVehicle;
 
 
@@ -99,33 +98,17 @@ public class BDIAgent {
 		
 		if (this.isGuide) {
 			final Message msg = new FollowGuideMessage(nextLink);
-			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
+//			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
+			final InformationEntity ie = new InformationEntity(30*3600,now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
 			infos.addInformationEntity(ie);			
 		}
+
 		
-//		if (!this.isBDIAgent) {//guides
-//			nextLink = this.vehicle.chooseNextLink();
-//			final Message msg = new FollowGuideMessage(nextLink);
-//			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
-//			infos.addInformationEntity(ie);
-//		} else {
-//			nextLink = this.decisionMaker.chooseNextLink(now,nodeId);
-////			if (nextLink == null) { //if now guide then choose random link
-////				final Node n = this.vehicle.getCurrentNode();
-////				double prob_sum = n.getOutLinks().size() * Gbl.random.nextDouble(); 
-////				for (final Link l : n.getOutLinks().values()) {
-////					if (--prob_sum <= 0) {
-////						nextLink = l;
-////						break;
-////					}
-////				}
-////			}
-//			
-//		}
+		//no herding
+//		final Message msg = new NextLinkMessage(nextLink);
+//		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
+//		infos.addInformationEntity(ie);
 		
-		final Message msg = new NextLinkMessage(nextLink);
-		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
-		infos.addInformationEntity(ie);
 		return nextLink;
 		
 	}

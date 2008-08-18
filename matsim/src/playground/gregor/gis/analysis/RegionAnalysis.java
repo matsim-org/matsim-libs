@@ -78,7 +78,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	private final NetworkLayer network;
 	
 	
-	public RegionAnalysis(CoordinateReferenceSystem targetCRS, String shapefile, String eventsfile, NetworkLayer network) {
+	public RegionAnalysis(final CoordinateReferenceSystem targetCRS, final String shapefile, final String eventsfile, final NetworkLayer network) {
 		
 		this.network = network;
 		initColorMap();
@@ -211,7 +211,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 	
 	
-	private String getColor(String color) {
+	private String getColor(final String color) {
 		if (this.colorMap.get(color) != null) {
 			return this.colorMap.get(color);
 		}
@@ -219,8 +219,11 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		String id = event.agentId;
+		if (id.contains("guide")) {
+			return;
+		}
 		String lID = event.linkId;
 		Link l = this.network.getLink(lID);
 		Point p = this.geofac.createPoint(MGC.coord2Coordinate(l.getCenter()));
@@ -231,12 +234,12 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 	
 	
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void main(String [] args) throws FactoryException {
+	public static void main(final String [] args) throws FactoryException {
 //		String district_shape_file;
 		
 		final String shapefile = "./padang/region.shp";

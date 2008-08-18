@@ -135,7 +135,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "./output/ITERS/it.20/20.movie.mvi";
+		final String filename =  "./output/ITERS/it.100/100.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
@@ -172,7 +172,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(150.f);
 		
-		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
+		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, true);
 		
 //		new OnTheFlyClientFilePadang()
 		client.run();
