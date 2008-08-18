@@ -35,6 +35,8 @@ public class BlockedLinksAnalyzer implements Analyzer {
 	private final Beliefs beliefs;
 	
 	private final HashSet<Link> blockedLinks = new HashSet<Link>();
+
+	private double coef;
 	
 	public BlockedLinksAnalyzer(final Beliefs beliefs) {
 		this.beliefs = beliefs;
@@ -54,5 +56,12 @@ public class BlockedLinksAnalyzer implements Analyzer {
 
 	public boolean isLinkBlocked(final Link link) {
 		return this.blockedLinks.contains(link);
+	}
+
+	
+
+	public void setCoefficient(final double coef) {
+		this.coef = coef;
+		
 	}
 }

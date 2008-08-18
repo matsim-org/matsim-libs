@@ -45,6 +45,7 @@ public class ReRouteAnalyzer implements Analyzer {
 	private Link [] linkRoute;
 	private final Intentions intentions;
 	private HashSet<Link> blockedLinks;
+	private double coef = 1;
 
 	public ReRouteAnalyzer(final Beliefs beliefs, final NetworkLayer network, final Intentions intentions) {
 		this.network = network;
@@ -62,7 +63,7 @@ public class ReRouteAnalyzer implements Analyzer {
 			}
 		} else if (this.lastNext != null && this.beliefs.getCurrentLink().getId() == this.lastNext.getId()){
 			if (!blocked(this.linkRoute[this.linkCount])){
-				return new NextLinkOption(this.linkRoute[this.linkCount++],1);
+				return new NextLinkOption(this.linkRoute[this.linkCount++],1*this.coef);
 			}
 		} 
 
@@ -73,7 +74,7 @@ public class ReRouteAnalyzer implements Analyzer {
 		this.linkCount = 0;
 		this.lastCurrent = this.beliefs.getCurrentLink();
 		this.lastNext = this.linkRoute[this.linkCount++];
-		return new NextLinkOption(this.lastNext,1);
+		return new NextLinkOption(this.lastNext,1*this.coef);
 
 
 	}
@@ -92,6 +93,11 @@ public class ReRouteAnalyzer implements Analyzer {
 		for (final InformationEntity ie : ies) {
 			this.blockedLinks.add(((LinkBlockedMessage)ie.getMsg()).getLink());
 		}
+		
+	}
+
+	public void setCoefficient(final double coef) {
+		this.coef  = coef;
 		
 	}
 	

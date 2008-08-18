@@ -128,16 +128,16 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 			
 			final Plan plan = this.population.getPerson(guideId).getSelectedPlan();
 			final double oldScore = plan.getScore();
-			if (Double.isNaN(oldScore)) {
-				plan.setScore(scoreSum);
-			} else {
-				plan.setScore(this.learningRate * scoreSum + (1-this.learningRate) * oldScore);
-			}
 //			if (Double.isNaN(oldScore)) {
-//				plan.setScore(this.scoreSum/this.scoreCount);
+//				plan.setScore(scoreSum);
 //			} else {
-//				plan.setScore(this.learningRate * this.scoreSum/this.scoreCount + (1-this.learningRate) * oldScore);
+//				plan.setScore(this.learningRate * scoreSum + (1-this.learningRate) * oldScore);
 //			}
+			if (Double.isNaN(oldScore)) {
+				plan.setScore(this.scoreSum + scoreSum);
+			} else {
+				plan.setScore(this.learningRate * (this.scoreSum + scoreSum) + (1-this.learningRate) * oldScore);
+			}
 		}
 	}
 

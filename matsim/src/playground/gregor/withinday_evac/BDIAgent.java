@@ -30,16 +30,15 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 
 import playground.gregor.withinday_evac.analyzer.Analyzer;
-import playground.gregor.withinday_evac.analyzer.BlockedLinksAnalyzer;
-import playground.gregor.withinday_evac.analyzer.DestinationReachedAnalyzer;
-import playground.gregor.withinday_evac.analyzer.FollowGuideAnalyzer;
-import playground.gregor.withinday_evac.analyzer.HerdAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
 import playground.gregor.withinday_evac.communication.FollowGuideMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
 import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.Message;
+import playground.gregor.withinday_evac.communication.NextLinkMessage;
 import playground.gregor.withinday_evac.mobsim.OccupiedVehicle;
 
 
@@ -72,12 +71,12 @@ public class BDIAgent {
 
 	private HashMap<String, Analyzer> getAnalyzer(final NetworkLayer networkLayer) {
 		final HashMap<String,Analyzer> analyzers = new HashMap<String,Analyzer>();
-		analyzers.put("FollowGuideAnalyzer", new FollowGuideAnalyzer(this.beliefs));
-		analyzers.put("HerdAnalyzer", new HerdAnalyzer(this.beliefs));
-		analyzers.put("BlockedLinksAnalyzer", new BlockedLinksAnalyzer(this.beliefs));
+//		analyzers.put("FollowGuideAnalyzer", new FollowGuideAnalyzer(this.beliefs));
+		analyzers.put("HerdAnalyzer", new FollowHerdAnalyzer(this.beliefs));
+		analyzers.put("FollowPlanAnalyzer", new FollowPlanAnalyzer(this.beliefs,this.person.getSelectedPlan()));
+//		analyzers.put("BlockedLinksAnalyzer", new BlockedLinksAnalyzer(this.beliefs));
 		analyzers.put("ReRouteAnalyzer", new ReRouteAnalyzer(this.beliefs,networkLayer,this.intentions));
-		analyzers.put("DestinationReachedAnalyzer", new DestinationReachedAnalyzer(this.beliefs,this.intentions));
-		// TODO Auto-generated method stub
+//		analyzers.put("DestinationReachedAnalyzer", new DestinationReachedAnalyzer(this.beliefs,this.intentions));
 		return analyzers;
 	}
 
@@ -104,10 +103,10 @@ public class BDIAgent {
 		}
 
 		
-		//no herding
-//		final Message msg = new NextLinkMessage(nextLink);
-//		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
-//		infos.addInformationEntity(ie);
+
+		final Message msg = new NextLinkMessage(nextLink);
+		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
+		infos.addInformationEntity(ie);
 		
 		return nextLink;
 		

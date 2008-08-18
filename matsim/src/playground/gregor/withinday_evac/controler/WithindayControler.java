@@ -26,9 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
+import org.matsim.controler.corelisteners.PlansScoring;
 import org.matsim.evacuation.EvacuationQSimControler;
 
-import playground.gregor.withinday_evac.SelectedPlansScoring;
+import playground.gregor.withinday_evac.PlanGenerator;
 import playground.gregor.withinday_evac.mobsim.WithindayQueueSimulation;
 
 public class WithindayControler extends EvacuationQSimControler {
@@ -43,7 +44,7 @@ public class WithindayControler extends EvacuationQSimControler {
 	protected void setup() {
 		super.setup();
 		log.info("adding additional guide agents...");
-		new RoadSignAgentsGenerator().generateGuides(this.population,this.network);
+//		new RoadSignAgentsGenerator().generateGuides(this.population,this.network);
 		log.info("done.");
 	}
 
@@ -69,9 +70,12 @@ public class WithindayControler extends EvacuationQSimControler {
 
 		this.addCoreControlerListener(new CoreControlerListener());
 
+		this.addCoreControlerListener(new PlanGenerator());
+		
 		// the default handling of plans
 //		this.addCoreControlerListener(new AggregatedPlansScoring());
-		this.addCoreControlerListener(new SelectedPlansScoring());
+//		this.addCoreControlerListener(new SelectedPlansScoring());
+		this.addCoreControlerListener(new PlansScoring());
 
 
 		this.addCoreControlerListener(new PlansReplanning());

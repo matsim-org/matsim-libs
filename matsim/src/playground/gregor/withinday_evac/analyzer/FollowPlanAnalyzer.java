@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FollowNextLinkAnalyzer.java
+ * FollowPlanAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,68 +20,62 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.HashSet;
 
 import org.matsim.network.Link;
+import org.matsim.population.Plan;
 
 import playground.gregor.withinday_evac.Beliefs;
-import playground.gregor.withinday_evac.communication.InformationEntity;
-import playground.gregor.withinday_evac.communication.NextLinkMessage;
-import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
 
-public class HerdAnalyzer implements Analyzer {
+public class FollowPlanAnalyzer implements Analyzer {
 
 	private final Beliefs beliefs;
+	private final Link[] links;
+	private final HashSet<Link> linksSet = new HashSet<Link>();
+	double coef = 1;
+	private final Link startLink;
+	private final Link destLink;
 
-	public HerdAnalyzer(final Beliefs beliefs) {
+	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan) {
 		this.beliefs = beliefs;
+		this.links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
+		this.startLink = plan.getFirstActivity().getLink();
+		this.destLink = plan.getNextActivity(plan.getNextLeg(plan.getFirstActivity())).getLink(); 
+		initLinkHashSet();
 	}
+
+	private void initLinkHashSet() {
+		for (Link link : this.links) {
+			this.linksSet.add(link);
+		}
+	}
+
 	public Option getAction(final double now) {
-		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
-		if (ies == null) {
-			return new NextLinkOption(null,0);
-		}
-		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
-		for (final InformationEntity ie : ies) {
-			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
-			final Counter c = counts.get(m.getLink().getId());
-			if (c != null) {
-				c.value++;
-				
-			} else {
-				counts.put(m.getLink(), new Counter(1));
-			}
-			
+		Link link = this.beliefs.getCurrentLink();
+		if (link == this.startLink) {
+			return new NextLinkOption(this.links[0],1 * this.coef);
 		}
 		
-		int max_val = 0;
-		Link link = null;
-		for (final Entry<Link, Counter> e : counts.entrySet()) {
-			if (e.getValue().value > max_val) {
-				max_val = e.getValue().value;
-				link = e.getKey();
+		
+		if (!this.linksSet.contains(link)) {
+			this.linksSet.clear();
+			return null;
+		}
+		for (int i = 0; i < this.links.length; i++) {
+			if (this.links[i] == link) {
+				if (i > this.links.length-2){
+					return new NextLinkOption(this.destLink,1 * this.coef);
+				}
+				return new NextLinkOption(this.links[i+1],1 * this.coef); 
 			}
 		}
+		throw new RuntimeException("this should not happen!!");
+	}
+
+	public void setCoefficient(final double coef) {
+		this.coef = coef;
 		
-		
-		return new NextLinkOption(link,1);
 	}
 	
-	
-	
-	
-	private static class Counter {
-		int value;
-		public Counter(final int i) {
-			this.value = i;
-		}
-		
-		@Override
-		public String toString(){
-			return this.value + "";
-		}
-		
-	}
+
 }

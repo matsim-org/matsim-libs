@@ -29,4 +29,8 @@ public abstract class Option {
 	public double getConfidence() {
 		return this.conf;
 	}
+	
+	public void setConfidence(final double conf) {
+		this.conf = conf;
+	}
 }

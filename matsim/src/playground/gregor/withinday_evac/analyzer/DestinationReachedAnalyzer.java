@@ -27,6 +27,7 @@ public class DestinationReachedAnalyzer implements Analyzer {
 
 	private final Beliefs beliefs;
 	private final Intentions intentions;
+	private double coef;
 
 	public DestinationReachedAnalyzer(final Beliefs beliefs, final Intentions intentions) {
 		this.beliefs = beliefs;
@@ -39,6 +40,10 @@ public class DestinationReachedAnalyzer implements Analyzer {
 		}
 
 		return null;
+	}
+
+	public void setCoefficient(final double coef) {
+		this.coef = coef;
 	}
 
 }

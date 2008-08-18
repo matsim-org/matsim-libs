@@ -20,16 +20,21 @@
 
 package playground.gregor.withinday_evac;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.BlockedLinksAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowGuideAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
 import playground.gregor.withinday_evac.analyzer.NextLinkOption;
 import playground.gregor.withinday_evac.analyzer.Option;
+import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
 
 public class DecisionMaker {
 
@@ -38,50 +43,92 @@ public class DecisionMaker {
 	public DecisionMaker(final HashMap<String, Analyzer> analyzers) {
 		this.analyzers = analyzers;
 	}
-	
+
 	public Link chooseNextLink(final double now, final Id nodeId, final boolean isGuide) {
-		
-//		if (this.analyzers.get("DestinationReachedAnalyzer").getAction(now) != null) {
-//			System.out.println("DestinationReached");
-//			return null;
-//		}
+
+		//		if (this.analyzers.get("DestinationReachedAnalyzer").getAction(now) != null) {
+		//			System.out.println("DestinationReached");
+		//			return null;
+		//		}
 		if (isGuide) {
 			return nextLinkGuide(now, nodeId);
 		} else {
 			return nextLink(now,nodeId);
 		}
-		
-		
-		
+
+
+
 
 	}
 
 	private Link nextLink(final double now, final Id nodeId) {
+
+		ArrayList<NextLinkOption> options = getOptions(now);
+        NextLinkOption o = drawOption(options);
+		return o.getNextLink();		
+
+	}
+
+	private NextLinkOption drawOption(final ArrayList<NextLinkOption> options) {
 		
-//		final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
-//		ba.update(now);
-			
-		
-		final FollowGuideAnalyzer a = (FollowGuideAnalyzer) this.analyzers.get("FollowGuideAnalyzer");
-		Option ac = a.getAction(now);
-		
-//		if (((NextLinkOption)ac).getNextLink() == null) {
-//			final HerdAnalyzer b = (HerdAnalyzer) this.analyzers.get("HerdAnalyzer");
-//			ac = b.getAction(now);
-//		} 
-//		
-//		
-//		
-//		if (((NextLinkOption)ac).getNextLink() == null || ba.isLinkBlocked(((NextLinkOption)ac).getNextLink())) {
-//			final ReRouteAnalyzer c = (ReRouteAnalyzer) this.analyzers.get("ReRouteAnalyzer");
-//			ac = c.getAction(now);
-//		}
-		
-		if (((NextLinkOption)ac).getNextLink() == null) {
-			throw new RuntimeException("this should not happen!!!");
+		double expSum = 0;
+		for (NextLinkOption o : options) {
+			o.setConfidence(Math.exp(o.getConfidence()));
+			expSum += o.getConfidence();
 		}
 		
-		return ((NextLinkOption)ac).getNextLink();
+		double selnum = expSum*MatsimRandom.random.nextDouble();
+		for (NextLinkOption o : options) {
+			selnum -= o.getConfidence();
+			if (selnum <= 0) {
+				return o;
+			}
+		}		
+		return null;
+	}
+
+	private ArrayList<NextLinkOption> getOptions(final double now) {
+		ArrayList<NextLinkOption> options = new ArrayList<NextLinkOption>();
+		//			final BlockedLinksAnalyzer ba = ((BlockedLinksAnalyzer)this.analyzers.get("BlockedLinksAnalyzer"));
+		//			ba.update(now);
+
+
+		//			final FollowGuideAnalyzer a = (FollowGuideAnalyzer) this.analyzers.get("FollowGuideAnalyzer");
+		//			Option ac = a.getAction(now);
+
+		//			if (((NextLinkOption)ac).getNextLink() == null) {
+		final FollowHerdAnalyzer b = (FollowHerdAnalyzer) this.analyzers.get("HerdAnalyzer");
+		ArrayList<NextLinkOption> os = b.getActions(now);  
+		if (os != null) {
+			options.addAll(os);
+		}
+		//			} 
+		//			
+		final FollowPlanAnalyzer c = (FollowPlanAnalyzer) this.analyzers.get("FollowPlanAnalyzer");
+		NextLinkOption o = (NextLinkOption) c.getAction(now);
+		if (o != null) {
+			options.add(o);
+		}
+
+
+		if (options.size() == 0) {
+			final ReRouteAnalyzer d = (ReRouteAnalyzer) this.analyzers.get("ReRouteAnalyzer");
+			options.add((NextLinkOption) d.getAction(now));
+		}
+
+		//			if (((NextLinkOption)ac).getNextLink() == null || ba.isLinkBlocked(((NextLinkOption)ac).getNextLink())) {
+		//				final ReRouteAnalyzer c = (ReRouteAnalyzer) this.analyzers.get("ReRouteAnalyzer");
+		//				ac = c.getAction(now);
+		//			}
+		//			
+		//			if (((NextLinkOption)ac).getNextLink() == null) {
+		//				throw new RuntimeException("this should not happen!!!");
+		//			}
+		//			
+		//			return ((NextLinkOption)ac).getNextLink();
+
+
+		return options;
 	}
 
 	private Link nextLinkGuide(final double now, final Id nodeId) {
@@ -94,7 +141,7 @@ public class DecisionMaker {
 		}
 		return ((NextLinkOption)ac).getNextLink();
 	}
-	
+
 
 
 }
