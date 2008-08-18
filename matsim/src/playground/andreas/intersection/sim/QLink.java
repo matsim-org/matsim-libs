@@ -131,6 +131,16 @@ public class QLink extends QueueLink {
 
 	public void reconfigure(TrafficLightsManager trafficLightsManager) {
 
+		if (this.getLink().getLength() < 60){
+			try {
+				throw new Exception("Link is signalized by traffic light with a default signal lane length of 45m, but total links length is less than 60m.\n" + 
+									"Minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}		
+		
 		boolean firstNodeLinkInitialized = false;
 
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
@@ -168,11 +178,16 @@ public class QLink extends QueueLink {
 				// Now we have the original link and one extension pseudo Link
 				// therefore add additional extension links for the rest of the outLinks
 
-				// Check, if the new extension link is in proximity of an old one's staring point
+				// Check, if the new extension link is not in proximity of an old one's staring point
 				if (signalLane.getLength() - this.originalLink.getMeterFromLinkEnd() > 15.0){
-					// It is not
+					// It is
 
-					System.err.println("Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one");
+					try {
+						throw new Exception("Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 					// Insert new one...
 					// Fix Pointer...
@@ -182,7 +197,7 @@ public class QLink extends QueueLink {
 					// Adjust SC, SQ...
 
 				}else{
-					// It is
+					// It is not
 					// New NodePseudoLink will start at originalLink
 
 					newNodePseudoLink = new PseudoLink(this, false);
