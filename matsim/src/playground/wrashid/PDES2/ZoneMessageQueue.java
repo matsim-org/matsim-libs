@@ -21,7 +21,7 @@ public class ZoneMessageQueue {
 	// and then only until the first ZoneBorderMessage or EnterRequestMessage
 
 	private int zoneId = 0;
-	public double simTime=0;
+	public double simTime = 0;
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 
 	public int counter = 0;
@@ -36,16 +36,18 @@ public class ZoneMessageQueue {
 
 	public int numberOfIncomingLinks = 0;
 	public LinkedList<Link> tempIncomingLinks = new LinkedList<Link>();
-	public HashMap<Road, Integer> messagesArrivedFromRoads = new HashMap<Road, Integer>(); // TODO:
-																							// use
-																							// some
-																							// more
-																							// efficient
-																							// data
-																							// structure
-																							// than
-																							// linked
-																							// lists
+	// public HashMap<Road, Integer> messagesArrivedFromRoads = new
+	// HashMap<Road, Integer>(); // TODO:
+	// use
+	// some
+	// more
+	// efficient
+	// data
+	// structure
+	// than
+	// linked
+	// lists
+	private int messagesArrivedFromRoads;
 	public HashMap<Road, Integer> numberOfQueuedMessages = new HashMap<Road, Integer>();
 	private Message tmpLastRemovedMessage = null;
 	private final Integer zero = new Integer(0);
@@ -58,17 +60,21 @@ public class ZoneMessageQueue {
 
 		synchronized (lock) {
 			if (m.isAcrossBorderMessage) {
-				incrementNumberOfQueuedMessages((Road) m.sendingUnit);
-				if (!messagesArrivedFromRoads.containsKey(m.sendingUnit)) {
-					messagesArrivedFromRoads.put((Road) m.sendingUnit, zero);
+				
+				
+				if (incrementNumberOfQueuedMessages((Road) m.sendingUnit)==1) {
+					// if new message arrived for an incoming road
+					//messagesArrivedFromRoads.put((Road) m.sendingUnit, zero);
+					messagesArrivedFromRoads++;
 				}
 				if (!(m instanceof ZoneBorderMessage)) {
-					//System.out.println(m + " - " + m.messageArrivalTime + " - "
-					//		+ arrivalTimeOfLastRemovedMessage);
+					// System.out.println(m + " - " + m.messageArrivalTime + " -
+					// "
+					// + arrivalTimeOfLastRemovedMessage);
 				}
 			}
 		}
-		
+
 		try {
 			buffer.add(m, MessageExecutor.getThreadId());
 		} catch (Exception e) {
@@ -113,39 +119,36 @@ public class ZoneMessageQueue {
 	}
 
 	synchronized public Message getNextMessage() {
-		
+
 		Message m = null;
 		// System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() +
 		// " - " + numberOfIncomingLinks);
-		if (messagesArrivedFromRoads.size() == numberOfIncomingLinks) {
+		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
 			emptyBuffer();
 			// System.out.println("getNextMessage()");
 			m = queue1.poll();
-			
-			if (m==null){
+
+			if (m == null) {
 				System.out.println();
 			}
-			
-			//if (queue1.isEmpty() || m.isAcrossBorderMessage){
-				
-			//	m = queue1.peek();
-			//}
-			
-			
+
+			// if (queue1.isEmpty() || m.isAcrossBorderMessage){
+
+			// m = queue1.peek();
+			// }
+
 			if (m.isAcrossBorderMessage) {
-				synchronized(lock){
-					decrementNumberOfQueuedMessages((Road) m.sendingUnit);
-					if (getNumberOfQueueMessages((Road) m.sendingUnit) == 0) {
-						messagesArrivedFromRoads.remove((Road) m.sendingUnit);
+				synchronized (lock) {
+					if (decrementNumberOfQueuedMessages((Road) m.sendingUnit) == 0) {
+						messagesArrivedFromRoads--;
 					}
 				}
 			}
-			
+
 			// queue1.remove();
-			
 
 			arrivalTimeOfLastRemovedMessage = m.messageArrivalTime;
-			simTime=m.messageArrivalTime;
+			simTime = m.messageArrivalTime;
 			tmpLastRemovedMessage = m;
 			return m;
 		}
@@ -168,16 +171,18 @@ public class ZoneMessageQueue {
 		return false;
 	}
 
-	private void incrementNumberOfQueuedMessages(Road fromRoad) {
+	private int incrementNumberOfQueuedMessages(Road fromRoad) {
 		assert (fromRoad != null);
 		assert (numberOfQueuedMessages.get(fromRoad) != null);
-		numberOfQueuedMessages.put(fromRoad, numberOfQueuedMessages.get(
-				fromRoad).intValue() + 1);
+		int result=numberOfQueuedMessages.get(fromRoad).intValue() + 1;
+		numberOfQueuedMessages.put(fromRoad, result);
+		return result;
 	}
 
-	private void decrementNumberOfQueuedMessages(Road fromRoad) {
-		numberOfQueuedMessages.put(fromRoad, numberOfQueuedMessages.get(
-				fromRoad).intValue() - 1);
+	private int decrementNumberOfQueuedMessages(Road fromRoad) {
+		int result=numberOfQueuedMessages.get(fromRoad).intValue() - 1;
+		numberOfQueuedMessages.put(fromRoad, result);
+		return result;
 	}
 
 	private int getNumberOfQueueMessages(Road fromRoad) {
