@@ -447,10 +447,6 @@ public class PlansCreateFromCensus2000 {
 		this.chooseEducFacility(p,entries);
 	}
 	
-	private final void addCAtts(final Person p, final String[] entries) {
-		p.getCustomAttributes().put(CAtts.P_HMAT,entries[CAtts.I_HMAT]);
-	}
-	
 	//////////////////////////////////////////////////////////////////////
 	// run method
 	//////////////////////////////////////////////////////////////////////
@@ -483,7 +479,6 @@ public class PlansCreateFromCensus2000 {
 				if (hh == null) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hhnr+" does not exist!"); }
 
 				Id pid = new IdImpl(entries[5]);
-				Person p = null;
 				int wkat = Integer.parseInt(entries[CAtts.I_WKAT]);
 				int gem2 = Integer.parseInt(entries[CAtts.I_GEM2]);
 				int partnr = Integer.parseInt(entries[CAtts.I_PARTNR]);
@@ -499,7 +494,7 @@ public class PlansCreateFromCensus2000 {
 				// 3     id    id      2/person   person is part of w and z. current line reflects w
 				// 4     id    id      2/person   person is part of w and z. current line reflects z
 				if ((wkat == 1) && (gem2 == -9) && (partnr == -9)) {
-					p = plans.getPerson(pid);
+					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new Person(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -509,7 +504,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat);
 				}
 				else if ((wkat == 3) && (gem2 == -7) && (partnr == -7)) {
-					p = plans.getPerson(pid);
+					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new Person(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -519,7 +514,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat);
 				}
 				else if ((wkat == 4) && (gem2 == -7) && (partnr == -7)) {
-					p = plans.getPerson(pid);
+					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new Person(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
@@ -529,7 +524,7 @@ public class PlansCreateFromCensus2000 {
 					this.addDemographics(p,entries,wkat);
 				}
 				else if ((wkat == 3) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					p = plans.getPerson(new IdImpl(partnr));
+					Person p = plans.getPerson(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new Person(pid);
@@ -548,7 +543,7 @@ public class PlansCreateFromCensus2000 {
 					}
 				}
 				else if ((wkat == 4) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					p = plans.getPerson(new IdImpl(partnr));
+					Person p = plans.getPerson(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new Person(pid);
@@ -567,9 +562,6 @@ public class PlansCreateFromCensus2000 {
 					}
 				}
 				else { Gbl.errorMsg(e_head+"not allowed!"); }
-				
-				// add additional custon attributes
-				this.addCAtts(p,entries);
 
 				// progress report
 				if (line_cnt % 100000 == 0) {
