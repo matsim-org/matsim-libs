@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 
-import playground.wrashid.PDES.util.ConcurrentListSPSC;
+import playground.wrashid.PDES.util.ConcurrentListMPSC;
 
 public class SimulationParameters {
 	// EventHeap
@@ -79,7 +79,11 @@ public class SimulationParameters {
 	}
 	
 	public static void bufferEvent(BasicEvent event){
-		eventBuffer.add(event);
+		bufferEvent(event,MessageExecutor.getThreadId());
+	}
+	
+	private static void bufferEvent(BasicEvent event, int producerId){
+		eventBuffer.add(event, producerId);
 	}
 	
 	public static void processEventBuffer(){
@@ -98,7 +102,7 @@ public class SimulationParameters {
 	public static double noOfCarsLeft=0;
 	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
-	public static ConcurrentListSPSC<BasicEvent> eventBuffer=new ConcurrentListSPSC<BasicEvent>(); 
+	public static ConcurrentListMPSC<BasicEvent> eventBuffer=new ConcurrentListMPSC<BasicEvent>(SimulationParameters.numberOfMessageExecutorThreads); 
 	
 	
 	
