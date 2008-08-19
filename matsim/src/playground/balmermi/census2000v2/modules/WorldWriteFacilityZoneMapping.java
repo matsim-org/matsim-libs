@@ -79,7 +79,9 @@ public class WorldWriteFacilityZoneMapping {
 				else if (f.getUpMapping().size() != 1) {
 					Gbl.errorMsg("f_id="+f.getId()+": There must be exactly one zone mapping!");
 				}
-				out.write(f.getId()+"\t"+f.getUpMapping().firstKey()+"\n");
+				else {
+					out.write(f.getId()+"\t"+f.getUpMapping().firstKey()+"\n");
+				}
 			}
 			out.close();
 			fw.close();
