@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DestinationReachedAnalyzer.java
+ * ChooseRandomLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,30 +20,39 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
+import org.matsim.gbl.MatsimRandom;
+import org.matsim.network.Link;
+
 import playground.gregor.withinday_evac.Beliefs;
-import playground.gregor.withinday_evac.Intentions;
 
-public class DestinationReachedAnalyzer implements Analyzer {
+public class ChooseRandomLinkAnalyzer implements Analyzer {
 
-	private final Beliefs beliefs;
-	private final Intentions intentions;
 	private double coef;
-
-	public DestinationReachedAnalyzer(final Beliefs beliefs, final Intentions intentions) {
+	private final Beliefs beliefs;
+	public ChooseRandomLinkAnalyzer(final Beliefs beliefs) {
 		this.beliefs = beliefs;
-		this.intentions = intentions;
 	}
 	
+	
+	
 	public NextLinkOption getAction(final double now) {
-		if (this.beliefs.getCurrentLink().getToNode().getId() == this.intentions.getDestination().getId()) {
-			return new NextLinkOption(null,1);
+		Link link = this.beliefs.getCurrentLink();
+		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.random.nextDouble();
+		for (Link l : link.getToNode().getOutLinks().values()) {
+			selnum -= 1.0;
+			if (selnum <= 0) {
+				return new NextLinkOption(l,1 * this.coef);
+			}
+			
+			
 		}
-
+		
 		return null;
 	}
-
+	
 	public void setCoefficient(final double coef) {
 		this.coef = coef;
+		
 	}
 
 }

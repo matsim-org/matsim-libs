@@ -50,7 +50,7 @@ public class FollowPlanAnalyzer implements Analyzer {
 		}
 	}
 
-	public Option getAction(final double now) {
+	public NextLinkOption getAction(final double now) {
 		Link link = this.beliefs.getCurrentLink();
 		if (link == this.startLink) {
 			return new NextLinkOption(this.links[0],1 * this.coef);

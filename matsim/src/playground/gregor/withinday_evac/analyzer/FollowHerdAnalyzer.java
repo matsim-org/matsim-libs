@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 
 import playground.gregor.withinday_evac.Beliefs;
@@ -40,15 +41,56 @@ public class FollowHerdAnalyzer implements Analyzer {
 		this.beliefs = beliefs;
 		this.coef = 1;
 	}
-//	public Option getAction(final double now) {
+	public NextLinkOption getAction(final double now) {
+		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
+		if (ies == null) {
+			return null;
+		}
+		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
+		for (final InformationEntity ie : ies) {
+			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
+			final Counter c = counts.get(m.getLink());
+			if (c != null) {
+				c.value += 1.0;
+				
+			} else {
+				counts.put(m.getLink(), new Counter(1));
+			}
+			
+		}
+		
+
+		double weightSum = 0;
+		for (final Entry<Link, Counter> e : counts.entrySet()) {
+			e.getValue().value = Math.exp(e.getValue().value);
+			weightSum += e.getValue().value; 
+		}
+		
+		double selNum = weightSum * MatsimRandom.random.nextDouble();
+		for (final Entry<Link, Counter> e : counts.entrySet()) {
+			selNum -= e.getValue().value;
+			if (selNum <= 0) {
+				return new NextLinkOption(e.getKey(),1 * this.coef);
+			}
+		}
+				
+		
+		
+		return null;
+	}
+	
+	public ArrayList<NextLinkOption> getActions(final double now) {
+		throw new RuntimeException("remove this method from class!!!! don't use this anymore!!!!");
 //		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
 //		if (ies == null) {
-//			return new NextLinkOption(null,0);
+//			return null;
 //		}
 //		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
+//		int allCount = 0;
 //		for (final InformationEntity ie : ies) {
 //			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
 //			final Counter c = counts.get(m.getLink());
+//			allCount++;
 //			if (c != null) {
 //				c.value++;
 //				
@@ -58,52 +100,19 @@ public class FollowHerdAnalyzer implements Analyzer {
 //			
 //		}
 //		
-//		int max_val = 0;
-//		Link link = null;
-//		for (final Entry<Link, Counter> e : counts.entrySet()) {
-//			if (e.getValue().value > max_val) {
-//				max_val = e.getValue().value;
-//				link = e.getKey();
-//			}
+//		ArrayList<NextLinkOption> ret = new ArrayList<NextLinkOption>();
+//		for (Entry<Link, Counter> e : counts.entrySet()) {
+//			ret.add(new NextLinkOption(e.getKey(),this.coef * e.getValue().value / allCount));
 //		}
 //		
-//		
-//		return new NextLinkOption(link,1);
-//	}
-	
-	public ArrayList<NextLinkOption> getActions(final double now) {
-		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
-		if (ies == null) {
-			return null;
-		}
-		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
-		int allCount = 0;
-		for (final InformationEntity ie : ies) {
-			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
-			final Counter c = counts.get(m.getLink());
-			allCount++;
-			if (c != null) {
-				c.value++;
-				
-			} else {
-				counts.put(m.getLink(), new Counter(1));
-			}
-			
-		}
-		
-		ArrayList<NextLinkOption> ret = new ArrayList<NextLinkOption>();
-		for (Entry<Link, Counter> e : counts.entrySet()) {
-			ret.add(new NextLinkOption(e.getKey(),this.coef * e.getValue().value / allCount));
-		}
-		
-		return ret;
+//		return ret;
 	}
 	
 	
 	
 	private static class Counter {
-		int value;
-		public Counter(final int i) {
+		double value;
+		public Counter(final double i) {
 			this.value = i;
 		}
 		

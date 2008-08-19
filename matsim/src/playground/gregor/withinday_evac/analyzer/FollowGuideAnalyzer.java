@@ -40,7 +40,7 @@ public class FollowGuideAnalyzer implements Analyzer {
 		this.beliefs = beliefs;
 	}
 	
-	public Option getAction(final double now) {
+	public NextLinkOption getAction(final double now) {
 		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.FOLLOW_ME);
 		if (ies == null) {
 			return new NextLinkOption(null,0);

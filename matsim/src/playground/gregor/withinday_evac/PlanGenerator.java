@@ -22,6 +22,7 @@ package playground.gregor.withinday_evac;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -64,42 +65,55 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+		int count = 0;
 		for (Entry<String,ArrayList<String>> e : this.traces.entrySet()) {
 			Person pers = this.population.getPerson(e.getKey());
 			Plan plan = pers.getSelectedPlan();
 			Link[] links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
 			ArrayList<String> strLinks = e.getValue();
 			if (strLinks.size() < links.length) {
-				addNewPlan(pers,strLinks);
-				return;
+				if (addNewPlan(pers,strLinks)) count++;
+				continue;
 			}
 			
 			for (int i = 0; i < links.length; i++) {
 				if (!links[i].getId().toString().equals(strLinks.get(i))) {
-					addNewPlan(pers,strLinks);
+					if (addNewPlan(pers,strLinks)) count++;
+					break;
 				}
 			}
 		}
-
+System.out.println(count);
 	}
 
 
-	private void addNewPlan(final Person pers, final ArrayList<String> strLinks) {
+	private boolean addNewPlan(final Person pers, final ArrayList<String> strLinks) {
+		HashSet<String> added = new HashSet<String>();
+		for (String linkId : strLinks) {
+			if (added.contains(linkId)){
+				return false;
+			}
+			added.add(linkId);
+		}
+		
+		
 		pers.removeWorstPlans(this.maxPlans-1);
 		Plan plan = pers.copySelectedPlan();
 		Act actA = plan.getFirstActivity();
 		Leg leg = plan.getNextLeg(actA);
-
+		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		for (String linkId : strLinks) {
+
 			nodes.add(this.network.getLink(linkId).getFromNode());
 		}
 		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
 		Route route = new Route();
 		route.setRoute(nodes);
+		route.getDist();
 		leg.setRoute(route);
 		plan.setScore(Plan.UNDEF_SCORE);
-		
+		return true;
 	}
 
 	public void reset(final int iteration) {

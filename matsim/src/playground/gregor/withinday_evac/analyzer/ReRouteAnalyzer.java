@@ -53,7 +53,7 @@ public class ReRouteAnalyzer implements Analyzer {
 		this.intentions = intentions;
 	}
 
-	public Option getAction(final double now) {
+	public NextLinkOption getAction(final double now) {
 		
 		updateBlockedLinks();
 		

@@ -23,4 +23,6 @@ package playground.gregor.withinday_evac.analyzer;
 public interface Analyzer {
 
 	public void setCoefficient(double coef);
+	
+	public NextLinkOption getAction(final double now);
 }

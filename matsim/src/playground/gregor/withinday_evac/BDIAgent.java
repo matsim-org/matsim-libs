@@ -30,6 +30,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 
 import playground.gregor.withinday_evac.analyzer.Analyzer;
+import playground.gregor.withinday_evac.analyzer.ChooseRandomLinkAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
@@ -48,9 +49,10 @@ public class BDIAgent {
 	private final OccupiedVehicle vehicle;
 	private final InformationExchanger informationExchanger;
 	private final Beliefs beliefs;
-	private final DecisionMaker decisionMaker;
+//	private final DecisionMaker decisionMaker;
 	private final Intentions intentions;
 	private boolean isGuide;
+	private final DecisionTree decisionTree;
 
 	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
 		this.person = person;
@@ -60,8 +62,10 @@ public class BDIAgent {
 		this.beliefs = new Beliefs();
 		this.intentions = new Intentions();
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
-		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
-		this.decisionMaker = new DecisionMaker(analyzers);
+//		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
+//		this.decisionMaker = new DecisionMaker(analyzers);
+		this.decisionTree = new DecisionTree(this.beliefs,this.person.getSelectedPlan(),this.intentions,networkLayer);
+		
 		if (person.getId().toString().contains("guide")) {
 			this.isGuide = true;
 		} else {
@@ -72,11 +76,18 @@ public class BDIAgent {
 	private HashMap<String, Analyzer> getAnalyzer(final NetworkLayer networkLayer) {
 		final HashMap<String,Analyzer> analyzers = new HashMap<String,Analyzer>();
 //		analyzers.put("FollowGuideAnalyzer", new FollowGuideAnalyzer(this.beliefs));
-		analyzers.put("HerdAnalyzer", new FollowHerdAnalyzer(this.beliefs));
-		analyzers.put("FollowPlanAnalyzer", new FollowPlanAnalyzer(this.beliefs,this.person.getSelectedPlan()));
+		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
+		fha.setCoefficient(1.5);
+		analyzers.put("HerdAnalyzer", fha);
+		FollowPlanAnalyzer ana = new FollowPlanAnalyzer(this.beliefs,this.person.getSelectedPlan());
+		ana.setCoefficient(3);
+		analyzers.put("FollowPlanAnalyzer", ana);
 //		analyzers.put("BlockedLinksAnalyzer", new BlockedLinksAnalyzer(this.beliefs));
 		analyzers.put("ReRouteAnalyzer", new ReRouteAnalyzer(this.beliefs,networkLayer,this.intentions));
 //		analyzers.put("DestinationReachedAnalyzer", new DestinationReachedAnalyzer(this.beliefs,this.intentions));
+		ChooseRandomLinkAnalyzer crl = new ChooseRandomLinkAnalyzer(this.beliefs);
+		crl.setCoefficient(1);
+		analyzers.put("ChooseRandomLinkAnalyzer", crl);
 		return analyzers;
 	}
 
@@ -86,8 +97,9 @@ public class BDIAgent {
 		
 		updateBeliefs(infos.getInformation(now));
 		
-		Link nextLink = this.decisionMaker.chooseNextLink(now,nodeId,this.isGuide);
-
+//		Link nextLink = this.decisionMaker.chooseNextLink(now,nodeId,this.isGuide);
+		Link nextLink = this.decisionTree.getNextLink(now);
+		
 		if (nextLink != null && this.isGuide) {
 			this.isGuide = false;
 		} 

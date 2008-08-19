@@ -64,4 +64,9 @@ public class BlockedLinksAnalyzer implements Analyzer {
 		this.coef = coef;
 		
 	}
+
+	public NextLinkOption getAction(final double now) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
