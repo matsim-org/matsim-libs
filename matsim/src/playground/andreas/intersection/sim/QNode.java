@@ -1,9 +1,11 @@
 package playground.andreas.intersection.sim;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
@@ -18,6 +20,15 @@ import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 public class QNode extends QueueNode{
 
 	private SignalSystemControlerImpl myNodeTrafficLightControler;
+	
+
+	private boolean cacheIsInvalid = true;
+
+	private QLink[] inLinksArrayCache = null;
+
+	private QLink[] tempLinks = null;
+
+	private QLink[] auxLinks = null;
 	
 	public QNode(Node n, QueueNetwork queueNetwork) {
 		super(n,  queueNetwork);
@@ -75,16 +86,45 @@ public class QNode extends QueueNode{
 		} else {
 
 			//Node is NOT traffic light controlled
+
+			if (this.cacheIsInvalid) {
+				buildCache();
+			}
 			
-			// TODO Get Code from QueueNode's move
+			int inLinksCounter = 0;
+			double inLinksCapSum = 0.0;
+			// Check all incoming links for buffered agents
+			for (QLink link : this.inLinksArrayCache) {
+				if (!link.bufferIsEmpty()) {
+					this.tempLinks[inLinksCounter] = link;
+					inLinksCounter++;
+					inLinksCapSum += link.getLink().getCapacity(now);
+				}
+			}
 
-			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
-				Link link = iter.next();
-				
-				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
-				
-
-				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
+			int auxCounter = 0;
+			// randomize based on capacity
+			while (auxCounter < inLinksCounter) {
+				double rndNum = MatsimRandom.random.nextDouble() * inLinksCapSum;
+				double selCap = 0.0;
+				for (int i = 0; i < inLinksCounter; i++) {
+					QLink link = this.tempLinks[i];
+					if (link == null)
+						continue;
+					selCap += link.getLink().getCapacity(now);
+					if (selCap >= rndNum) {
+						this.auxLinks[auxCounter] = link;
+						auxCounter++;
+						inLinksCapSum -= link.getLink().getCapacity(now);
+						this.tempLinks[i] = null;
+						break;
+					}
+				}
+			}
+			
+			for (int i = 0; i < auxCounter; i++) {
+				QLink qlink = this.auxLinks[i];
+				for (PseudoLink pseudoLink : qlink.getNodePseudoLinks()) {
 					
 					pseudoLink.setThisTimeStepIsGreen(true);
 					
@@ -96,7 +136,27 @@ public class QNode extends QueueNode{
 					}
 				}
 			}
-
+			
+			
+//			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
+//				Link link = iter.next();
+//				
+//				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
+//				
+//
+//				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
+//					
+//					pseudoLink.setThisTimeStepIsGreen(true);
+//					
+//					while (!pseudoLink.flowQueueIsEmpty()) {
+//						Vehicle veh = pseudoLink.getFirstFromBuffer();
+//						if (!moveVehicleOverNode(veh, pseudoLink)) {
+//							break;
+//						}
+//					}
+//				}
+//			}
+//
 		}
 
 	}
@@ -120,6 +180,28 @@ public class QNode extends QueueNode{
 		}
 
 		return true;
+	}
+	
+	private void buildCache() {
+		this.inLinksArrayCache = new QLink[this.getNode().getInLinks().values()
+				.size()];
+		int i = 0;
+		for (Link l : this.getNode().getInLinks().values()) {
+			this.inLinksArrayCache[i] = (QLink)this.queueNetwork.getLinks().get(
+					l.getId());
+			i++;
+		}
+		/* As the order of nodes has an influence on the simulation results,
+		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
+		 */
+		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
+			public int compare(final QueueLink o1, final QueueLink o2) {
+				return o1.getLink().getId().compareTo(o2.getLink().getId());
+			}
+		});
+		this.tempLinks = new QLink[this.getNode().getInLinks().values().size()];
+		this.auxLinks = new QLink[this.getNode().getInLinks().values().size()];
+		this.cacheIsInvalid = false;
 	}
 
 }

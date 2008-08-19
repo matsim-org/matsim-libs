@@ -84,7 +84,12 @@ public class QLink extends QueueLink {
 		}
 		return true ;
 	}
-
+	
+	@Override
+	protected boolean bufferIsEmpty() {
+		return this.originalLink.flowQueueIsEmpty();
+	}
+	
 	@Override
 	public boolean hasSpace() {
 		return this.originalLink.hasSpace();
