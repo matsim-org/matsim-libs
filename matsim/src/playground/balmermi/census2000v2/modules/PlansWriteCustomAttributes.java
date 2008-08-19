@@ -25,7 +25,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -48,7 +47,6 @@ public class PlansWriteCustomAttributes {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.outfile = outfile;
 		log.info("    done.");
-		Gbl.errorMsg("TODO: THIS DOES NOT WORK YET!");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -60,11 +58,7 @@ public class PlansWriteCustomAttributes {
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(final Population plans) {
-		log.info("    running " + this.getClass().getName() + " algorithm...");
-		
-		Gbl.errorMsg("TODO: THIS DOES NOT WORK YET!");
-
-		int cols = plans.getPersons().values().iterator().next().getCustomAttributes().size();
+		log.info("    running " + this.getClass().getName() + " module...");
 		
 		try {
 			FileWriter fw = new FileWriter(outfile);
@@ -75,7 +69,6 @@ public class PlansWriteCustomAttributes {
 			out.flush();
 			for (Person p : plans.getPersons().values()) {
 				out.write(p.getId().toString());
-				if (p.getCustomAttributes().size() != cols) { Gbl.errorMsg("pid="+p.getId()+": THAT SCHOULD NOT HAPPEN!"); }
 				for (Object o : p.getCustomAttributes().values()) { out.write("\t"+o.toString()); }
 				out.write("\n");
 			}

@@ -72,11 +72,16 @@ public class PopulationAddCustomAttributes {
 
 				// ZGDE  GEBAEUDE_ID  HHNR  PERSON_ID  PARTNR  HMAT
 				// 1     2            3     5          12      26
-				Person p = pop.getPerson(entries[CAtts.I_PERSON_ID]);
-				if (p == null) { Gbl.errorMsg("person id="+entries[CAtts.I_PERSON_ID]+" not found!"); }
+				Person p1 = pop.getPerson(entries[CAtts.I_PERSON_ID]);
+				Person p2 = pop.getPerson(entries[CAtts.I_PARTNR]);
+				Person p = null;
+				if ((p1 == null) && (p2 != null)) { p = p2; }
+				else if ((p1 != null) && (p2 == null)) { p = p1; }
+				else { Gbl.errorMsg("person id="+entries[CAtts.I_PERSON_ID]+": Something is Wrong!"); }
 				
-				Person pp = pop.getPerson(entries[CAtts.I_PARTNR]);
-				if (pp != null) { Gbl.errorMsg("partner id="+entries[CAtts.I_PERSON_ID]+" exists!"); }
+				if (p.getCustomAttributes().put(CAtts.P_HMAT,entries[CAtts.I_HMAT]) != null) {
+					Gbl.errorMsg("line "+line_cnt+", pid="+p.getId()+": person does already have '"+CAtts.P_HMAT+"' assigned!");
+				}
 				
 				// progress report
 				if (line_cnt % 100000 == 0) { log.info("      Line " + line_cnt); }
