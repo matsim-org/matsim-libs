@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleDepartureTimeComparator.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.mobsim.queuesim;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
+
 /**
- * @author dstrippgen
+ * @author dgrether
  *
- * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
- * according to their departure time
  */
-public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
-		Serializable {
+public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgent> {
 
-	private static final long serialVersionUID = 1L;
-
-	public VehicleDepartureTimeComparator() {
-		
-	}
+	public PersonAgentDepartureTimeComparator() {	}
 	
-	public int compare(final Vehicle veh1, final Vehicle veh2) {
-		if (veh1.getDepartureTime_s() > veh2.getDepartureTime_s())
+	
+	public int compare(PersonAgent pa1, PersonAgent pa2) {		
+		if (pa1.getDepartureTime() > pa2.getDepartureTime())
 			return 1;
-		if (veh1.getDepartureTime_s() < veh2.getDepartureTime_s())
+		if (pa1.getDepartureTime() < pa2.getDepartureTime())
 			return -1;
 
 		// Both depart at the same time -> let the one with the larger id be first
-		int veh1id = Integer.valueOf(veh1.getID().toString());
-		int veh2id = Integer.valueOf(veh2.getID().toString());
+		//TODO this is only due to backwards compatibility: normally the id of the PersonAgent
+		//should be used for comparison, however this will need a full change of 
+		//all checksum reference files 
+		int veh1id = Integer.valueOf(pa1.getVehicle().getID().toString());
+		int veh2id = Integer.valueOf(pa2.getVehicle().getID().toString());
 		
 		if (veh1id < veh2id)
 			return 1;
@@ -54,4 +50,6 @@ public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
 			return -1;
 		return 0;
 	}
+
+	
 }

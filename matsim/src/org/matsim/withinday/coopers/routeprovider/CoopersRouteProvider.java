@@ -64,6 +64,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 	 */
 	public boolean providesRoute(final Link currentLink, final Route subRoute) {
 		for (VDSSign s : this.signs) {
+			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLink.getId());
 			if (s.getSignLink().equals(currentLink)) {
 				if (containsLink(subRoute, s.getDirectionLinks())) {
 					this.currentRoute = s.requestRoute();

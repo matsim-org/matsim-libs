@@ -206,10 +206,10 @@ public class QueueLink {
 
 	private void processVehicleArrival(final double now, final Vehicle veh) {
 		QueueSimulation.getEvents().processEvent(
-				new AgentArrivalEvent(now, veh.getDriver(),
+				new AgentArrivalEvent(now, veh.getDriver().getPerson(),
 						this.link, veh.getCurrentLeg()));
 		// Need to inform the veh that it now reached its destination.
-		veh.reachActivity(now, this);
+		veh.getDriver().reachActivity(now, this);
 	}
 
 	/**
@@ -227,11 +227,11 @@ public class QueueLink {
 			}
 
 			// Need to inform the veh that it now leaves its activity.
-			veh.leaveActivity(now);
+			veh.getDriver().leaveActivity(now);
 
 			// Generate departure event
 			QueueSimulation.getEvents().processEvent(
-					new AgentDepartureEvent(now, veh.getDriver(), this.link, veh.getCurrentLeg()));
+					new AgentDepartureEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg()));
 
 			/*
 			 * A.) we have an unknown leg mode (aka != "car").
@@ -277,7 +277,7 @@ public class QueueLink {
 			}
 			addToBuffer(veh, now);
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver(), this.link, veh.getCurrentLeg()));
+					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg()));
 		}
 	}
 
@@ -296,7 +296,7 @@ public class QueueLink {
 				return;
 			}
 			// Check if veh has reached destination:
-			if (veh.getDestinationLink().getId() == this.link.getId()) {
+			if (veh.getDriver().getDestinationLink().getId() == this.link.getId()) {
 				processVehicleArrival(now, veh);
 
 				// remove _after_ processing the arrival to keep link active
@@ -390,11 +390,11 @@ public class QueueLink {
 		double now = SimulationTimer.getTime();
 
 		activateLink();
-		veh.setCurrentLink(this.link);
+		veh.getDriver().setCurrentLink(this.link);
 		this.vehQueue.add(veh);
 		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(now)));
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver(),
+				new LinkEnterEvent(now, veh.getDriver().getPerson(),
 						this.link, veh.getCurrentLeg().getNum()));
 	}
 
@@ -422,7 +422,7 @@ public class QueueLink {
 			v2.setLastMovedTime(now);
 		}
 
-		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver(), this.link, veh.getCurrentLeg().getNum()));
+		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg().getNum()));
 
 		return veh;
 	}
@@ -558,8 +558,8 @@ public class QueueLink {
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
 
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, queueEnd,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, queueEnd,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 			cnt++;
 			queueEnd -= vehLen;
@@ -599,8 +599,8 @@ public class QueueLink {
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
 			int lane = 1 + (Integer.valueOf(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link, distanceOnLink,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, distanceOnLink,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
@@ -612,9 +612,9 @@ public class QueueLink {
 		 */
 		int lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
 		for (Vehicle veh : this.waitingList) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 		}
 
@@ -625,9 +625,9 @@ public class QueueLink {
 		 */
 		lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
 		for (Vehicle veh : this.parkingList) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 		}
 	}
@@ -656,7 +656,7 @@ public class QueueLink {
 				int lane = 1 + Integer.valueOf(veh.getID().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
-				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
@@ -667,7 +667,7 @@ public class QueueLink {
 				int lane = 1 + Integer.valueOf(veh.getID().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
-				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
@@ -683,7 +683,7 @@ public class QueueLink {
 			double cellSize = Math.min(7.5, this.link.getLength() / cnt);
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 			for (Vehicle veh : this.waitingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
@@ -699,7 +699,7 @@ public class QueueLink {
 			double cellSize = this.link.getLength() / cnt;
 			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
 			for (Vehicle veh : this.parkingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.link,
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
 						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 				distFromFromNode -= cellSize;
@@ -712,7 +712,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.parkingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg()));
+					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
 		}
 		Simulation.decLiving(this.parkingList.size());
 		Simulation.incLost(this.parkingList.size());
@@ -720,7 +720,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg()));
+					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
 		}
 		Simulation.decLiving(this.waitingList.size());
 		Simulation.incLost(this.waitingList.size());
@@ -728,7 +728,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg()));
+					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
 		Simulation.incLost(this.vehQueue.size());
@@ -736,7 +736,7 @@ public class QueueLink {
 
 		for (Vehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg()));
+					new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
 		}
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
@@ -781,15 +781,15 @@ public class QueueLink {
 	// search for vehicleId..
 	public Vehicle getVehicle(final Id id) {
 		for (Vehicle veh : this.vehQueue) {
-			if (veh.getDriver().getId().equals(id))
+			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
 		}
 		for (Vehicle veh : this.buffer) {
-			if (veh.getDriver().getId().equals(id))
+			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
 		}
 		for (Vehicle veh : this.parkingList) {
-			if (veh.getDriver().getId().equals(id))
+			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
 		}
 		return null;

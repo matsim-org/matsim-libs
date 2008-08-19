@@ -46,10 +46,10 @@ public class DgOtfStarter {
 //		String file = "560/500.T.mvi";
 		
 		//base case ersa 
-//		String file = "583/run583.it800.T.mvi";
+		String file = "583/run583.it800.T.mvi";
 		
 		//toll case ersa
-		String file = "585/run585.it800.T.mvi";
+//		String file = "585/run585.it800.T.mvi";
 		
 		//base case stuck=false, no earlyDeparture
 //		String file = "596/it.500/500.T.mvi";
@@ -69,11 +69,12 @@ public class DgOtfStarter {
 		//cmcf runs full activity chains no time no cmcf routes
 //		String file = "612/it.100/100.events.mvi";
 		
+		String filename = base + file;
 		
-		
+		//unit test for coopers withinday:
+//		String filename = "/Volumes/data/work/svnWorkspace/matsim/test/output/org/matsim/integration/withinday/CoopersBerlinIntegrationTest/testBerlinReducedSB/ITERS/it.0/0.otfvis.mvi";
 
 		
-		String filename = base + file;
 		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);

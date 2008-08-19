@@ -31,7 +31,9 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -42,7 +44,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
-import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
@@ -51,7 +52,9 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControle
  * @author dgrether
  */
 public class WithindayAgentTest extends TestCase {
-
+	
+	private static final Logger log = Logger.getLogger(WithindayAgentTest.class);
+	
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
 	private NetworkLayer network;
@@ -158,11 +161,6 @@ public class WithindayAgentTest extends TestCase {
 		}
 		p.setSelectedPlan(this.plan);
 		this.leg.setRoute(this.agentRoute);
-		//create the vehicle
-		WithindayAgentTestOccupiedVehicle v = new WithindayAgentTestOccupiedVehicle(
-				this.leg, this.network.getLink("2"), this.network
-						.getLink("7"), this.plan.getActsLegs());
-
 	  //create the agentlogicfactory with
 		//...the vdssigns
 		List<VDSSign> signs = new LinkedList<VDSSign>();
@@ -177,9 +175,28 @@ public class WithindayAgentTest extends TestCase {
 		scoringFunctionConfig.addParam("activityTypicalDuration_1", "01:00");
 		CoopersAgentLogicFactory factory = new CoopersAgentLogicFactory(
 				this.network, scoringFunctionConfig, signs);
+		//create the vehicle
+//		WithindayAgentTestOccupiedVehicle v = new WithindayAgentTestOccupiedVehicle(
+//				this.leg, this.network.getLink("2"), this.network
+//						.getLink("7"), this.plan.getActsLegs());
+//		
+		Vehicle v = new Vehicle();
+		
 		//create the agent
 		int sightDistance = 1;
-		return new WithindayAgent(p, v, sightDistance, factory);
+		
+		WithindayAgent pa = new WithindayAgent(p, sightDistance, factory);
+		pa.setVehicle(v);
+		v.setDriver(pa);
+		pa.initialize();
+		pa.setCurrentLink(this.network.getLink("2"));
+		
+		
+//		v.init();
+//		v.setCurrentLink(this.network.getLink("2"));
+
+//		WithindayAgent agent = new WithindayAgent(p, v, sightDistance, factory);
+	  return pa;
 	}
 
 	/**
@@ -188,7 +205,7 @@ public class WithindayAgentTest extends TestCase {
 	 */
 	public void testReplan() {
 		Events events = new Events();
-		WithindayQueueSimulation withindaySim = new WithindayQueueSimulation(this.network, null, events, null);
+		QueueSimulation withindaySim = new QueueSimulation(this.network, null, events);
 		
 		WithindayAgent agent = createAgent(this.network.getLink(new IdImpl("2")), this.network.getLink(new IdImpl("7")));
 		agent.replan();
@@ -205,8 +222,7 @@ public class WithindayAgentTest extends TestCase {
 		ArrayList<Node> newLegsRoute = agent.getVehicle().getCurrentLeg().getRoute().getRoute();
 		assertTrue("the agent's new route should have the same size as the old one", newLegsRoute.size() == this.agentRoute.getRoute().size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(1));
-		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));
-
+		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));		
 		//enlarge scenario
 		ArrayList<Node> list = this.agentRoute.getRoute();
 		list.add(0, this.network.getNode("2"));

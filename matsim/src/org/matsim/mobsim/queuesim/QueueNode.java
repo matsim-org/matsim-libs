@@ -86,7 +86,7 @@ public class QueueNode {
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
-		Link nextLink = veh.chooseNextLink();
+		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
 		QueueLink currentQueueLink = this.queueNetwork
 				.getQueueLink(currentLink.getId());
@@ -98,7 +98,7 @@ public class QueueNode {
 
 			if (nextQueueLink.hasSpace()) {
 				currentQueueLink.popFirstFromBuffer();
-				veh.incCurrentNode();
+				veh.getDriver().incCurrentNode();
 				nextQueueLink.add(veh);
 				return true;
 			}
@@ -115,11 +115,11 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver(), currentLink, veh.getCurrentLeg()));
+							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getCurrentLeg()));
 				}
 				else {
 					currentQueueLink.popFirstFromBuffer();
-					veh.incCurrentNode();
+					veh.getDriver().incCurrentNode();
 					nextQueueLink.add(veh);
 					return true;
 				}
@@ -132,7 +132,7 @@ public class QueueNode {
 		Simulation.decLiving();
 		Simulation.incLost();
 		log.error(
-				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
+				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
 						+ " currentLegNumber=" + veh.getCurrentLeg().getNum()
 						+ " currentLink=" + currentLink.getId().toString()
 						+ ". The agent is removed from the simulation.");

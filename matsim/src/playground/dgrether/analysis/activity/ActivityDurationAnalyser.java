@@ -19,14 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.activity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -38,11 +35,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.xml.sax.SAXException;
-
-import playground.dgrether.roadpricing.RoadPricingUtilities;
 
 
 /**
@@ -57,9 +50,16 @@ public class ActivityDurationAnalyser {
 	
 	private static final String network = studybase + "network/ivtch-osm.xml";		
 	
-	private static final String plansfile1 = runsbase + "run583/run583.it800.plans.xml.gz";
+	//ersa runs plans files
+//	private static final String plansfile1 = runsbase + "run583/run583.it800.plans.xml.gz";
+//	
+//	private static final String plansfile2 = runsbase + "run585/run585.it800.plans.xml.gz";
 	
-	private static final String plansfile2 = runsbase + "run585/run585.it800.plans.xml.gz";
+	//early departure studies plan files
+	private static final String plansfile1 = runsbase + "run495/it.500/500.plans.xml.gz";
+	
+	private static final String plansfile2 = runsbase + "run499/it.500/500.plans.xml.gz";
+	
 	
 	private static final String[] plansFiles = {plansfile1, plansfile2}; //
 	
@@ -72,27 +72,30 @@ public class ActivityDurationAnalyser {
 	private RoadPricingScheme roadPricingScheme;
 	
 	public ActivityDurationAnalyser() {
+		//reading network
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader reader = new MatsimNetworkReader(net);
 		reader.readFile(network);
-
+		//set config
 		config = Gbl.createConfig(new String[] {configfile});
 //		config = Gbl.createConfig(null);
-		Gbl.getWorld().setNetworkLayer((NetworkLayer) net);
+		Gbl.getWorld().setNetworkLayer(net);
 
 		
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
-		try {
-			tollReader.parse(roadpricingfile);
-			roadPricingScheme = tollReader.getScheme();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
+		//reading road pricing scheme for filtering
+//		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
+//		try {
+//			tollReader.parse(roadpricingfile);
+//			roadPricingScheme = tollReader.getScheme();
+//		} catch (SAXException e) {
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}		
 		
+		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
 			Population plans = new Population(Population.NO_STREAMING);
 			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);
@@ -100,9 +103,9 @@ public class ActivityDurationAnalyser {
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
 			for (Person person : plans) {
-				if (!RoadPricingUtilities.hasActInTollArea(person.getSelectedPlan(), this.roadPricingScheme)){
-					continue;
-				}
+//				if (!RoadPricingUtilities.hasActInTollArea(person.getSelectedPlan(), this.roadPricingScheme)){
+//					continue;
+//				}
       	adc.handlePlan(person.getSelectedPlan());
       }
 			
@@ -157,10 +160,16 @@ public class ActivityDurationAnalyser {
 		
 	}
 
+	/**
+	 * 
+	 * @author dgrether
+	 *
+	 */
 	private class ActivityDurationCounter  {
 
 		private Map<String, List<Act>> typeActivityMap; 
 		private Map<String, List<Act>> simpleTypeActivityMap; 
+		
 		ActivityDurationCounter() {
 			typeActivityMap = new HashMap<String, List<Act>>();
 			simpleTypeActivityMap = new HashMap<String, List<Act>>();
@@ -186,11 +195,9 @@ public class ActivityDurationAnalyser {
 			}
 		}
 		
-		
 		public Map<String, List<Act>> getTypeActivityMap() {
 			return this.typeActivityMap;
 		}
-
 		
 		public Map<String, List<Act>> getSimpleTypeActivityMap() {
 			return simpleTypeActivityMap;

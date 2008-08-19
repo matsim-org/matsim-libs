@@ -25,6 +25,8 @@ import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
@@ -40,13 +42,10 @@ import playground.gregor.withinday_evac.communication.InformationExchanger;
 import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.Message;
 import playground.gregor.withinday_evac.communication.NextLinkMessage;
-import playground.gregor.withinday_evac.mobsim.OccupiedVehicle;
 
 
-public class BDIAgent {
+public class BDIAgent extends PersonAgent {
 
-	private final Person person;
-	private final OccupiedVehicle vehicle;
 	private final InformationExchanger informationExchanger;
 	private final Beliefs beliefs;
 //	private final DecisionMaker decisionMaker;
@@ -54,17 +53,15 @@ public class BDIAgent {
 	private boolean isGuide;
 	private final DecisionTree decisionTree;
 
-	public BDIAgent(final Person person, final OccupiedVehicle v, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
-		this.person = person;
-		this.vehicle = v;
-		this.vehicle.setAgent(this);
+	public BDIAgent(final Person person, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
+		super(person);
 		this.informationExchanger = informationExchanger;
 		this.beliefs = new Beliefs();
 		this.intentions = new Intentions();
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
 //		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
 //		this.decisionMaker = new DecisionMaker(analyzers);
-		this.decisionTree = new DecisionTree(this.beliefs,this.person.getSelectedPlan(),this.intentions,networkLayer);
+		this.decisionTree = new DecisionTree(this.beliefs,this.getPerson().getSelectedPlan(),this.intentions,networkLayer);
 		
 		if (person.getId().toString().contains("guide")) {
 			this.isGuide = true;
@@ -73,13 +70,18 @@ public class BDIAgent {
 		}
 	}
 
+	@Override
+	public Link chooseNextLink() {
+		return this.replan(SimulationTimer.getTime(), this.getCurrentLink().getToNode().getId());
+	}
+	
 	private HashMap<String, Analyzer> getAnalyzer(final NetworkLayer networkLayer) {
 		final HashMap<String,Analyzer> analyzers = new HashMap<String,Analyzer>();
 //		analyzers.put("FollowGuideAnalyzer", new FollowGuideAnalyzer(this.beliefs));
 		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
 		fha.setCoefficient(1.5);
 		analyzers.put("HerdAnalyzer", fha);
-		FollowPlanAnalyzer ana = new FollowPlanAnalyzer(this.beliefs,this.person.getSelectedPlan());
+		FollowPlanAnalyzer ana = new FollowPlanAnalyzer(this.beliefs,this.getPerson().getSelectedPlan());
 		ana.setCoefficient(3);
 		analyzers.put("FollowPlanAnalyzer", ana);
 //		analyzers.put("BlockedLinksAnalyzer", new BlockedLinksAnalyzer(this.beliefs));
@@ -91,7 +93,7 @@ public class BDIAgent {
 		return analyzers;
 	}
 
-	public Link replan(final double now, final Id nodeId) {
+	private Link replan(final double now, final Id nodeId) {
 		
 		final InformationStorage infos = this.informationExchanger.getInformationStorage(nodeId);
 		
@@ -104,7 +106,7 @@ public class BDIAgent {
 			this.isGuide = false;
 		} 
 		if (this.isGuide && nextLink == null) {
-			nextLink = this.vehicle.chooseNextLink();
+			nextLink = this.chooseNextLink();
 		}
 		
 		if (this.isGuide) {
@@ -128,7 +130,7 @@ public class BDIAgent {
 	
 	private void updateBeliefs(final Collection<InformationEntity> information) {
 		this.beliefs.update(information);
-		this.beliefs.setCurrentLink(this.vehicle.getCurrentLink());
+		this.beliefs.setCurrentLink(this.getCurrentLink());
 		
 	}
 }

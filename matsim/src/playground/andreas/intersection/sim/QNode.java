@@ -105,14 +105,14 @@ public class QNode extends QueueNode{
 	 * @param pseudoLink */
 	public boolean moveVehicleOverNode(final Vehicle veh, PseudoLink pseudoLink) {
 		// veh has to move over node
-		Link nextLink = ((QVehicle)veh).chooseNextLink();
+		Link nextLink = veh.getDriver().chooseNextLink();
 		
 		if (nextLink != null) {
 			QLink nextQLink = (QLink) this.queueNetwork.getQueueLink(nextLink.getId());
 		
 			if (nextQLink.hasSpace()) {
 				pseudoLink.pollFirstFromBuffer();
-				veh.incCurrentNode();
+				veh.getDriver().incCurrentNode();
 				nextQLink.add(veh);
 				return true;
 			}

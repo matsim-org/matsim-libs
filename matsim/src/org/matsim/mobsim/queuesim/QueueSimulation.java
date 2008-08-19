@@ -83,6 +83,8 @@ public class QueueSimulation {
 
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
+	private AgentFactory agentFactory;
+	
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -92,6 +94,7 @@ public class QueueSimulation {
 
 		this.network = new QueueNetwork(network);
 		this.networkLayer = network;
+		this.agentFactory = new AgentFactory();
 	}
 
 	public final void run() {
@@ -115,17 +118,18 @@ public class QueueSimulation {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		for (Person p : this.plans.getPersons().values()) {
+			PersonAgent agent = this.agentFactory.createPersonAgent(p);
+			
 			Vehicle veh;
 			try {
 				veh = this.vehiclePrototype.newInstance();
-				veh.setActLegs(p.getSelectedPlan().getActsLegs());
-				veh.setDriver(p);
+				//not needed in new agent class
+				veh.setDriver(agent);
+				agent.setVehicle(veh);
 				
-				if (veh.initVeh()) {
+				if (agent.initialize()) {
 					addVehicleToLink(veh);
 				}
-				
-				
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -138,6 +142,7 @@ public class QueueSimulation {
 		this.vehiclePrototype = proto;
 	}
 
+	//TODO remove this method when agent representation is completely implemented
 	protected void addVehicleToLink(final Vehicle veh) {
 		Link link = veh.getCurrentLink();
 		QueueLink qlink = this.network.getQueueLink(link.getId());
@@ -260,7 +265,7 @@ public class QueueSimulation {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Vehicle veh : teleportationList) {
-			new AgentStuckEvent(now, veh.getDriver(), veh.getCurrentLink(), veh.getCurrentLeg());
+			new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg());
 		}
 		QueueSimulation.teleportationList.clear();
 
@@ -345,7 +350,7 @@ public class QueueSimulation {
 
 	public static final void handleUnknownLegMode(final Vehicle veh) {
 		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravTime());
-		veh.setCurrentLink(veh.getDestinationLink());
+		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
 	}
 
@@ -355,9 +360,9 @@ public class QueueSimulation {
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 
-				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver(),
+				getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
 						veh.getCurrentLink(), veh.getCurrentLeg()));
-	  			veh.reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
+	  			veh.getDriver().reachActivity(now, this.network.getQueueLink(veh.getCurrentLink().getId()));
 
 	  		} else break;
   		}
@@ -378,6 +383,10 @@ public class QueueSimulation {
 
 	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
+	}
+	
+	public void setAgentFactory(AgentFactory fac) {
+		this.agentFactory = fac;
 	}
 
 }

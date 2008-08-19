@@ -20,7 +20,7 @@ public class QuerySpinneNOW extends QuerySpinne {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<Vehicle> vehs = link.getAllVehicles();
-		for( Vehicle veh : vehs) actPersons.add(veh.getDriver().getSelectedPlan());
+		for( Vehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
 		return actPersons;
 	}

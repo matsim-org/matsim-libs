@@ -45,14 +45,14 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 	/** The list of <code>QVehicles</code> that have not yet reached the end of the link according
 	 * to the <code>freeSpeedTravelTime</code> of the <code>PseudoLink</code> */
-	private Queue<QVehicle> storageQueue = new LinkedList<QVehicle>();
+	private Queue<Vehicle> storageQueue = new LinkedList<Vehicle>();
 
 	/** Maximum number of vehicle to be stored on the link simultanously **/
 	private double storageCapacity = Double.NaN;
 
 	/** Buffer responsible for limiting the flow capacity, flowQueue is holding all vehicles
 	 *  that are ready to cross the outgoing intersection **/
-	private Queue<QVehicle> flowQueue = new LinkedList<QVehicle>();
+	private Queue<Vehicle> flowQueue = new LinkedList<Vehicle>();
 
 	/** The number of vehicles able to leave the flowQueue in one time step (usually 1 sec). */
 	private double flowCapacity = Double.NaN;
@@ -62,13 +62,13 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 	/** parking queue includes all vehicles that do not have yet reached their
 	 * start time, but will start at this link at some time */
-	private final PriorityQueue<QVehicle> parkingQueue = new PriorityQueue<QVehicle>(30,
+	private final PriorityQueue<Vehicle> parkingQueue = new PriorityQueue<Vehicle>(30,
 			new VehicleDepartureTimeComparator());
 
 	/** All vehicles from parkingQueue move to the waitingList as soon as their time
 	 * has come. They are then filled into the storageQueue, depending on free space
 	 * in the storageQueue */
-	private final Queue<QVehicle> parkToLinkQueue = new LinkedList<QVehicle>();
+	private final Queue<Vehicle> parkToLinkQueue = new LinkedList<Vehicle>();
 
 	// Helper
 	private double flowCapacityCeil = Double.NaN;
@@ -143,17 +143,17 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 	private void moveStorageQueueToFlowQueue(final double now) {
 
-		QVehicle veh;
+		Vehicle veh;
 		while ((veh = this.storageQueue.peek()) != null) {
 			if (Math.floor(veh.getDepartureTime_s()) > now) {
 				break;
 			}
 
-			if (veh.getDestinationLink().getId() == this.realLink.getLink().getId()) {
+			if (veh.getDriver().getDestinationLink().getId() == this.realLink.getLink().getId()) {
 
-				QSim.getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver(),
+				QSim.getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
 						this.realLink.getLink(), veh.getCurrentLeg()));
-				veh.reachActivity(now, this.realLink);
+				veh.getDriver().reachActivity(now, this.realLink);
 				this.storageQueue.poll();
 				continue;
 			}
@@ -191,7 +191,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		return ((this.flowQueue.size() < this.flowCapacityCeil) && ((this.flowCapacity >= 1.0) || (this.flowCapacityFractionalRest >= 1.0)));
 	}
 
-	private void addToFlowQueue(final QVehicle veh, final double now) {
+	private void addToFlowQueue(final Vehicle veh, final double now) {
 
 		if (this.maximumFlowCapacity >= 1.0) {
 			this.maximumFlowCapacity--;
@@ -219,8 +219,8 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		boolean moveOn = true;
 
 		while(moveOn && !this.flowQueue.isEmpty() && (this.toLinks.size() != 0)){
-			QVehicle veh = this.flowQueue.peek();
-			Link nextLink = veh.chooseNextLink();
+			Vehicle veh = this.flowQueue.peek();
+			Link nextLink = veh.getDriver().chooseNextLink();
 
 			if (nextLink != null) {
 				for (PseudoLink toLink : this.toLinks) {
@@ -245,7 +245,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		this.destLinks.add(destLink);
 	}
 
-	public void addVehicle(QVehicle vehicle){
+	public void addVehicle(Vehicle vehicle){
 		this.storageQueue.add(vehicle);
 
 //		if(this.amIOriginalLink && this.meterFromLinkEnd != 0){
@@ -280,7 +280,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	}
 
 	private void moveParkingQueueToParkToLinkQueue(final double now) {
-		QVehicle veh;
+		Vehicle veh;
 
 		while ((veh = this.parkingQueue.peek()) != null) {
 
@@ -288,9 +288,9 @@ public class PseudoLink implements Comparable<PseudoLink>{
 				break;
 			}
 
-			veh.leaveActivity(now);
+			veh.getDriver().leaveActivity(now);
 
-			QSim.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver(),
+			QSim.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver().getPerson(),
 					this.realLink.getLink(), veh.getCurrentLeg()));
 
 			Leg actLeg = veh.getCurrentLeg();
@@ -306,7 +306,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	/** Move as many waiting cars to the link as it is possible
 	 * @param now the current time */
 	private void moveParkToLinkQueueToFlowQueue(final double now) {
-		QVehicle veh;
+		Vehicle veh;
 
 		while ((veh = this.parkToLinkQueue.peek()) != null) {
 
@@ -316,29 +316,29 @@ public class PseudoLink implements Comparable<PseudoLink>{
 
 			addToFlowQueue(veh, now);
 
-			QSim.getEvents().processEvent(new AgentWait2LinkEvent(now, veh.getDriver(), this.realLink.getLink(), veh.getCurrentLeg()));
+			QSim.getEvents().processEvent(new AgentWait2LinkEvent(now, veh.getDriver().getPerson(), this.realLink.getLink(), veh.getCurrentLeg()));
 
 			this.parkToLinkQueue.poll(); // remove the just handled vehicle from parkToLinkQueue
 		}
 	}
 
-	public void addVehicle2ParkingQueue(QVehicle veh) {
+	public void addVehicle2ParkingQueue(Vehicle veh) {
 		this.parkingQueue.add(veh);
 	}
 
-	public Queue<QVehicle> getFlowQueue(){
+	public Queue<Vehicle> getFlowQueue(){
 		return this.flowQueue;
 	}
 
-	public Queue<QVehicle> getStorageQueue(){
+	public Queue<Vehicle> getStorageQueue(){
 		return this.storageQueue;
 	}
 
-	public Queue<QVehicle> getParkToLinkQueue(){
+	public Queue<Vehicle> getParkToLinkQueue(){
 		return this.parkToLinkQueue;
 	}
 
-	public Queue<QVehicle> getParkingQueue(){
+	public Queue<Vehicle> getParkingQueue(){
 		return this.parkingQueue;
 	}
 
@@ -366,15 +366,15 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		return this.flowQueue.isEmpty();
 	}
 
-	QVehicle getFirstFromBuffer() {
+	Vehicle getFirstFromBuffer() {
 		return this.flowQueue.peek();
 	}
 
-	QVehicle pollFirstFromBuffer() {
+	Vehicle pollFirstFromBuffer() {
 		double now = SimulationTimer.getTime();
-		QVehicle veh = this.flowQueue.poll();
+		Vehicle veh = this.flowQueue.poll();
 
-		QSim.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver(),
+		QSim.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(),
 						this.realLink.getLink(), veh.getCurrentLeg().getNum()));
 
 		return veh;
@@ -406,8 +406,8 @@ public class PseudoLink implements Comparable<PseudoLink>{
 			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), queueEnd,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(), queueEnd,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 			cnt++;
 			queueEnd -= vehLen;
@@ -447,8 +447,8 @@ public class PseudoLink implements Comparable<PseudoLink>{
 					+ (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
 			int lane = this.lane;
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(), distanceOnLink,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getVisualizerData());
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(), distanceOnLink,
+					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
@@ -462,9 +462,9 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		 */
 
 		for (Vehicle veh : this.parkToLinkQueue) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(),
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 		}
 
@@ -475,9 +475,9 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		 */
 		lane = this.lane; // place them next to the link
 		for (Vehicle veh : this.parkingQueue) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getId(), this.realLink.getLink(),
+			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getVisualizerData());
+					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 		}
 

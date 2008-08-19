@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithindayVehicle.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.withinday;
 
-package playground.david;
-
-import java.io.Serializable;
-
-import org.matsim.mobsim.queuesim.Vehicle;
-import org.matsim.network.Link;
-import org.matsim.utils.vis.netvis.DrawableAgentI;
+import org.matsim.config.groups.WithindayConfigGroup;
+import org.matsim.mobsim.queuesim.AgentFactory;
+import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.population.Person;
 
 
-public class WithindayVehicle extends Vehicle implements Serializable, DrawableAgentI {
+/**
+ * Factory for withinday replanning agents
+ * @author dgrether
+ *
+ */
+public class WithindayAgentFactory extends AgentFactory {
+	
+	
+	private WithindayConfigGroup withindayConfigGroup;
+	private WithindayAgentLogicFactory agentLogicFactory;
 
-	// private Agent agent; //hold Johannes agent representation
+	public WithindayAgentFactory(WithindayConfigGroup withindayConfig,
+			WithindayAgentLogicFactory agentLogicFactory) {
+		this.withindayConfigGroup = withindayConfig;
+		this.agentLogicFactory = agentLogicFactory;
+		
+	}
 
 	@Override
-	public Link chooseNextLink() {
-		// Give the agent the opportunity to replan, if applicable and
-		// Ask agent for next link
-		// I dont know if we can include this easily here?
-		return null;
+	public PersonAgent createPersonAgent(Person p) {
+		WithindayAgent agent = new WithindayAgent(p, this.withindayConfigGroup.getAgentVisibilityRange(), this.agentLogicFactory);
+		//set the agent's replanning interval
+		agent.setReplanningInterval(this.withindayConfigGroup.getReplanningInterval());
+		//set the contentment threshold
+		agent.setReplanningThreshold(this.withindayConfigGroup.getContentmentThreshold());
+		return agent;
 	}
+	
+	
 }

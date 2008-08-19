@@ -62,13 +62,13 @@ public class QLink extends QueueLink {
 	}
 
 	/** Adds a vehicle to the parkingQueue */
-	public void addVehicle2ParkingQueue(QVehicle veh) {
+	public void addVehicle2ParkingQueue(Vehicle veh) {
 		this.originalLink.addVehicle2ParkingQueue(veh);
 	}
 
 	@Override
 	public void addParking(Vehicle veh) {
-		this.originalLink.addVehicle2ParkingQueue((QVehicle)veh);
+		this.originalLink.addVehicle2ParkingQueue(veh);
 	}
 
 	public double getFreeSpeedTT() {
@@ -77,7 +77,7 @@ public class QLink extends QueueLink {
 
 	/** Called by QNetworkLayer */
 	@Override
-	public boolean moveLink(final double now) {
+	protected boolean moveLink(final double now) {
 
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			pseudoLink.movePseudoLink(now);
@@ -95,21 +95,19 @@ public class QLink extends QueueLink {
 
 		double now = SimulationTimer.getTime();
 		activateLink();
-		veh.setCurrentLink(this.getLink());
-		this.originalLink.addVehicle((QVehicle)veh);
+		veh.getDriver().setCurrentLink(this.getLink());
+		this.originalLink.addVehicle(veh);
 
-//		veh.setDepartureTime_s((int) (now + this.originalLink.getFreeSpeedTravelTime()));
 		QSim.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver(),
+				new LinkEnterEvent(now, veh.getDriver().getPerson(),
 						this.getLink(), veh.getCurrentLeg().getNum()));
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(){
 		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
 			return this.pseudoLinksList;
-		} else {
+		} 
 			return this.nodePseudoLinksList;
-		}
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(List<Link> destLinks){

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithindayQueueNetworkFactory.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,26 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.gregor.withinday_evac.mobsim;
 
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNetworkFactory;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.network.Link;
-import org.matsim.network.Node;
+import org.matsim.mobsim.queuesim.AgentFactory;
+import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.Person;
 
-public class WithindayQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink>{
+import playground.gregor.withinday_evac.BDIAgent;
+import playground.gregor.withinday_evac.communication.InformationExchanger;
 
-	public QueueLink newQueueLink(final Link link, final QueueNetwork queueNetwork,
-			final QueueNode toQueueNode) {
-		return new QueueLink(link, queueNetwork, toQueueNode);
+
+/**
+ * @author dgrether
+ *
+ */
+public class WithindayAgentFactory extends AgentFactory {
+
+	private InformationExchanger informationExchanger;
+	private NetworkLayer network;
+
+	public WithindayAgentFactory(InformationExchanger informationExchanger,
+			NetworkLayer networkLayer) {
+		this.informationExchanger = informationExchanger;
+		this.network = networkLayer;
 	}
 
-	public QueueNode newQueueNode(final Node node, final QueueNetwork queueNetwork) {
-		// TODO Auto-generated method stub
-		return  new WithindayQueueNode(node, queueNetwork);
+	@Override
+	public PersonAgent createPersonAgent(Person p) {
+		return new BDIAgent(p, this.informationExchanger, this.network);
 	}
+	
+	
+	
 
 }

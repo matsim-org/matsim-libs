@@ -59,11 +59,6 @@ public class WithindayControler extends Controler {
 
 	protected TrafficManagement trafficManagement;
 
-//	private double lastReplaningTimeStep;
-
-//	private PriorityQueue<WithindayAgent> replanningQueue;
-
-//	private int numberOfReplaningAgents;
 
 	public WithindayControler(final String[] args) {
 		super(args);

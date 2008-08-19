@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.AgentReplanEvent;
+import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -39,7 +40,6 @@ import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.withinday.beliefs.AgentBeliefs;
 import org.matsim.withinday.contentment.AgentContentment;
-import org.matsim.withinday.mobsim.OccupiedVehicle;
 import org.matsim.withinday.percepts.AgentPercepts;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
@@ -47,13 +47,13 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  * @author dgrether
  *
  */
-public class WithindayAgent {
+public class WithindayAgent extends PersonAgent {
 
 	private static final Logger log = Logger.getLogger(WithindayAgent.class);
 
-	private Person person;
+//	private Person person;
 
-	private OccupiedVehicle vehicle;
+//	private OccupiedVehicle vehicle;
 
 	private AgentBeliefs beliefs;
 
@@ -73,12 +73,14 @@ public class WithindayAgent {
 
 	private List<AgentPercepts> percepts;
 
-	public WithindayAgent(final Person person, final OccupiedVehicle v, final int sightDistance, final WithindayAgentLogicFactory factory) {
-		this.person = person;
-		this.vehicle = v;
+	public WithindayAgent(final Person person, final int sightDistance, final WithindayAgentLogicFactory factory) {
+		super(person);
+//		this.person = person;
+//		this.vehicle = v;
+//		this.setVehicle(v);
 		this.lastReplaningTimeStep = 0.0d;
 	//place the agent in the vehicle
-		this.vehicle.setAgent(this);
+//		this.getVehicle().setDriver(this);
 	//set the agents desire generation module
 		this.desireGenerationFunction = factory.createRouteProvider();
 	//set agent's contentment
@@ -94,7 +96,7 @@ public class WithindayAgent {
 
 	private void revisePercepts() {
 		for (AgentPercepts p : this.percepts) {
-			p.updatedPercepts(this.vehicle.getCurrentNode());
+			p.updatedPercepts(this.getCurrentLink().getToNode());
 		}
 	}
 
@@ -103,25 +105,25 @@ public class WithindayAgent {
 		//check if replanning is allowed
 		if (SimulationTimer.getTime() >= (this.replanningInterval + this.lastReplaningTimeStep)) {
 			if (log.isTraceEnabled()) {
-				log.trace("Agent " + this.person.getId() + " requested to replan...");
+				log.trace("Agent " + this.getPerson().getId() + " requested to replan...");
 			}
 			//let the agent look out of his window if he is able to do this
 			this.revisePercepts();
 			double replanningNeed = this.getReplanningNeed();
 			if (replanningNeed >= this.replanningThreshold) {
-				Link currentLink = this.vehicle.getCurrentLink();
+				Link currentLink = this.getCurrentLink();
 				Node currentToNode = currentLink.getToNode();
-				Node currentDestinationNode = this.vehicle.getDestinationLink().getFromNode();
+				Node currentDestinationNode = this.getDestinationLink().getFromNode();
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-					Route subRoute = this.vehicle.getCurrentRoute().getSubRoute(currentToNode, currentDestinationNode);
+					Route subRoute = this.getCurrentLeg().getRoute().getSubRoute(currentToNode, currentDestinationNode);
 					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
 						this.reroute();
 					}
-					/*else if (log.isTraceEnabled()) {
+					else if (log.isTraceEnabled()) {
 						log.trace("...but his desireGenerationFunction doesn't generate an appropriate option.");
-					}*/
+					}
 				}
 			}
 			else if (log.isTraceEnabled()) {
@@ -135,17 +137,17 @@ public class WithindayAgent {
 			log.trace("");
 			log.trace("Starting agent's rerouting...");
 			log.trace("agent nr.: " + this.getPerson().getId());
-			log.trace("agentposition link: " + this.vehicle.getCurrentLink());
+			log.trace("agentposition link: " + this.getCurrentLink());
 			int hours = (int)SimulationTimer.getTime() / 3600;
 			int min = (int) ((SimulationTimer.getTime() - (hours * 60)) / 60);
 			log.trace("time: " + hours + ":" + min);
 		}
-		Link currentLink = this.vehicle.getCurrentLink();
-		Act nextAct = this.person.getSelectedPlan().getNextActivity(this.vehicle.getCurrentLeg());
+		Link currentLink = this.getCurrentLink();
+		Act nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
 		Route alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
-		Plan oldPlan = this.person.getSelectedPlan();
-		Leg currentLeg = this.vehicle.getCurrentLeg();
+		Plan oldPlan = this.getPerson().getSelectedPlan();
+		Leg currentLeg = this.getCurrentLeg();
 
 		//create Route of already passed Nodes
 		//TODO use Route.getSubroute method
@@ -162,7 +164,7 @@ public class WithindayAgent {
 		}
 		alreadyPassedNodes.setRoute(passedNodesList);
 		//create new plan
-		Plan newPlan = new Plan(this.person);
+		Plan newPlan = new Plan(this.getPerson());
 		newPlan.copyPlan(oldPlan);
 		//put new route into the new plan
 		//first determine index of current leg in the plan
@@ -198,7 +200,7 @@ public class WithindayAgent {
     if (/*newScore > currentScore*/ true) {
     	//TODO dg remove
     	if (log.isTraceEnabled()) {
-				log.trace("rerouting agent " + this.person.getId() + " with ...");
+				log.trace("rerouting agent " + this.getPerson().getId() + " with ...");
 				StringBuffer buffer = new StringBuffer();
 				for (Node n : alternativeRoute.getRoute()) {
 					buffer.append(n.getId().toString());
@@ -206,9 +208,10 @@ public class WithindayAgent {
 				}
 	    	log.trace("  new route: " + newRoute + " nodes: " + buffer.toString());
     	}
-    	this.person.exchangeSelectedPlan(newPlan, false);
-    	this.vehicle.exchangeActsLegs(newPlan.getActsLegs());
-    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.person.getId().toString(), alternativeRoute));
+    	this.getPerson().exchangeSelectedPlan(newPlan, false);
+    	this.exchangeCurrentLeg(currentLegIndex, newLeg);
+  
+    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId().toString(), alternativeRoute));
     }
 	}
 
@@ -240,24 +243,36 @@ public class WithindayAgent {
 	 *         <tt>false</tt> otherwise.
 	 */
 	public boolean isEnRoute() {
-		if (this.vehicle.getDepartureTime_s() > SimulationTimer.getTime()) {
+		if (this.getVehicle().getDepartureTime_s() > SimulationTimer.getTime()) {
 			//TODO remove if exception never thrown (dg oct2007)
 			throw new RuntimeException("This should never happen in the new implementation!");
 		}
 		return true;
 	}
-	/**
-	 * @return the vehicle
-	 */
-	public OccupiedVehicle getVehicle() {
-		return this.vehicle;
+	
+	@Override
+	public Link chooseNextLink() {
+		this.replan();
+//		this.cachedNextLink = null;
+		Link l = super.chooseNextLink();
+		if (log.isTraceEnabled())
+			log.trace("vehicle : " + this.getPerson().getId() + " next choosen link:" + l.getId().toString());
+		return l;
 	}
-	/**
-	 * @return the person
-	 */
-	public Person getPerson() {
-		return this.person;
+
+
+	public void exchangeCurrentLeg(int currentLegIndex, Leg newLeg) {
+		this.cachedNextLink = null;
+		this.setCurrentLeg(newLeg);
 	}
+	
+//	/**
+//	 * @return the vehicle
+//	 */
+//	public OccupiedVehicle getVehicle() {
+//		return this.vehicle;
+//	}
+
 
 	public void setAgentContentment(final AgentContentment contentment) {
 		this.contentment = contentment;
@@ -292,5 +307,6 @@ public class WithindayAgent {
 	public void setReplanningThreshold(final double replanningThreshold) {
 		this.replanningThreshold = replanningThreshold;
 	}
+	
 
 }

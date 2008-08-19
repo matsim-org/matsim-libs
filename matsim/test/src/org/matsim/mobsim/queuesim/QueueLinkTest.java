@@ -86,7 +86,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Vehicle v = new Vehicle();
 
 		Person p = new Person(new IdImpl("1"));
-		v.setDriver(p);
+		v.setDriver(new PersonAgent(p));
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
 		//and testing other classes is not the purpose of this test
@@ -136,13 +136,20 @@ public class QueueLinkTest extends MatsimTestCase {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		v1.setDriver(p);
-		v1.setActLegs(p.getPlans().get(0).getActsLegs());
-		v1.initVeh();
+		PersonAgent pa1 = new PersonAgent(p);
+		v1.setDriver(pa1);
+//		v1.setActLegs(p.getPlans().get(0).getActsLegs());
+//		v1.initVeh();
+		pa1.setVehicle(v1);
+		pa1.initialize();
+		
 		Vehicle v2 = new Vehicle();
-		v2.setDriver(p);
-		v2.setActLegs(p.getPlans().get(0).getActsLegs());
-		v2.initVeh();
+		PersonAgent pa2 = new PersonAgent(p);
+		v2.setDriver(pa2);
+//		v2.setActLegs(p.getPlans().get(0).getActsLegs());
+//		v2.initVeh();
+		pa2.setVehicle(v2);
+		pa2.initialize();
 
 		// start test
 		assertTrue(this.qlink.bufferIsEmpty());

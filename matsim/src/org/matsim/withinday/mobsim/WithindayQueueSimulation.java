@@ -22,19 +22,15 @@ package org.matsim.withinday.mobsim;
 
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.withinday.WithindayAgent;
+import org.matsim.withinday.WithindayAgentFactory;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 /**
- * This extension of the QueueSimulation is used for withinday replanning. It contains functionality
- * to trigger the replanning of the WithindayAgents and provides methods to set an accident, i.e. a
- * capacity change of a link.
- *
+ * This extension of the QueueSimulation is used for withinday replanning. 
+ * 
  * @author dgrether
  *
  */
@@ -48,29 +44,8 @@ public class WithindayQueueSimulation extends QueueSimulation {
 			final Population plans, final Events events, final WithindayControler controler) {
 		super(net, plans, events);
 		this.controler = controler;
-		this.setVehiclePrototye(OccupiedVehicle.class);
+		super.setAgentFactory(new WithindayAgentFactory(controler.getConfig().withinday(), this.controler.getAgentLogicFactory()));
 	}
-
-	@Override
-	protected void addVehicleToLink(final Vehicle veh) {
-		super.addVehicleToLink(veh);
-		createAgent(veh.getDriver(), (OccupiedVehicle)veh);
-	}
-
-	/**
-	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
-	 * the game theory plans) modules.
-	 * @param person
-	 * @param veh
-	 */
-	private void createAgent(final Person person, final OccupiedVehicle veh) {
-		WithindayAgent agent = new WithindayAgent(person, veh, controler.getConfig().withinday().getAgentVisibilityRange(), this.controler.getAgentLogicFactory());
-		//set the agent's replanning interval
-		agent.setReplanningInterval(controler.getConfig().withinday().getReplanningInterval());
-		//set the contentment threshold
-		agent.setReplanningThreshold(controler.getConfig().withinday().getContentmentThreshold());
-	}
-
 
 	@Override
 	protected void prepareSim() {

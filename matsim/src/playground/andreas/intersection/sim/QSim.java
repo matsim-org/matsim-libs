@@ -75,7 +75,7 @@ public class QSim extends QueueSimulation { //OnTheFlyQueueSim
 		this.groupDefinitions = groupDefinitions;
 		this.useOTF = useOTF;
 
-		this.setVehiclePrototye(QVehicle.class);
+//		this.setVehiclePrototye(QVehicle.class);
 	}
 
 	private void readSignalSystemControler(){

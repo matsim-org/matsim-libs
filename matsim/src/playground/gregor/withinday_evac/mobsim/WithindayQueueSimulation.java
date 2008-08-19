@@ -23,17 +23,11 @@ package playground.gregor.withinday_evac.mobsim;
 import java.util.Random;
 
 import org.matsim.events.Events;
-import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNetworkFactory;
-import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
 import org.matsim.population.Population;
 
-import playground.gregor.withinday_evac.BDIAgent;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
 
 /**
@@ -55,33 +49,15 @@ public class WithindayQueueSimulation extends QueueSimulation {
 			final Population plans, final Events events, final playground.gregor.withinday_evac.controler.WithindayControler withindayControler) {
 		super(net, plans, events);
 		this.rnd = new Random(1);
-		final QueueNetworkFactory< QueueNode, QueueLink> factory = new WithindayQueueNetworkFactory();
-		final QueueNetwork qNet = new QueueNetwork(net,factory);
+		final QueueNetwork qNet = new QueueNetwork(net);
 		this.network = qNet;
 		this.controler = withindayControler;
-		this.setVehiclePrototye(OccupiedVehicle.class);
 		this.informationExchanger = new InformationExchanger(net);
+		super.setAgentFactory(new WithindayAgentFactory(informationExchanger, this.network.getNetworkLayer()));
 		
 	}
 	
 	
-	
-	@Override
-	protected void addVehicleToLink(final Vehicle veh) {
-		super.addVehicleToLink(veh);
-		createAgent(veh.getDriver(), (OccupiedVehicle)veh);
-	}
-	
-	/**
-	 * Is currently used to create the WithindayAgent objects with the default belief and desire (intentions are still fixed by
-	 * the game theory plans) modules.
-	 * @param person
-	 * @param veh
-	 */
-	private void createAgent(final Person person, final OccupiedVehicle veh) {
-		new BDIAgent(person, veh, this.informationExchanger, this.network.getNetworkLayer());
-	}
-
 
 
 

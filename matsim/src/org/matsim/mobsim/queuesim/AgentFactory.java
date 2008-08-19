@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithindayQueueNode.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.mobsim.queuesim;
 
-package playground.gregor.withinday_evac.mobsim;
-
-
-
+import org.matsim.population.Person;
 
 
-import org.apache.log4j.Logger;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.Vehicle;
-import org.matsim.network.Node;
+/**
+ * @author dgrether
+ *
+ */
+public class AgentFactory {
 
-
-public class WithindayQueueNode extends QueueNode {
-	private static final Logger log = Logger.getLogger(WithindayQueueNode.class);
 	
-	public WithindayQueueNode(final Node n, final QueueNetwork queueNetwork) {
-		super(n, queueNetwork);
+	public PersonAgent createPersonAgent(Person p) {
+		PersonAgent agent = new PersonAgent(p);
+		return agent;
 	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// Queue related movement code
-	// ////////////////////////////////////////////////////////////////////
-	@Override
-	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
-		((OccupiedVehicle)veh).setNextLink(now,this.getNode().getId());
-		
-		return super.moveVehicleOverNode(veh, now);
-
-	}
+	
+	
 }

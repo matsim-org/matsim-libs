@@ -64,7 +64,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 			QueueLink link = net.getQueueLink(act.getLinkId());
 			Collection<Vehicle> vehs = link.getAllVehicles();
 			for (Vehicle info : vehs) {
-				if (info.getDriver().getId().toString().compareTo(this.agentID) == 0) {
+				if (info.getDriver().getPerson().getId().toString().compareTo(this.agentID) == 0) {
 					// we found the little nutty, now lets reason about the lngth of ist activity
 					double departure = info.getDepartureTime_s();
 					double diff =  departure - info.getLastMovedTime();
