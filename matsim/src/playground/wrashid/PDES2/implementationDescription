@@ -57,13 +57,15 @@ Splitting the map:
 
 
 - Problems:
-    
+    - it is possible, that in ZoneMessageQueue.getNextMessage the message queue is empty, even though
+      the condition, that there are enough messages to process the queue condition is fullfilled
+       => this leads to a null pointer exception there...
     
  
  
 - TODO: 
      - performance verbessern
-        
+        - getSimtime consumes arround 15+% of the CPU time
         - road.scheduleZoneBorderMessage => iterator verbessern...
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
      

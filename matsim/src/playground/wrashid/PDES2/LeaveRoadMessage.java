@@ -10,6 +10,7 @@ public class LeaveRoadMessage extends EventMessage {
 	public void selfhandleMessage() {
 		//System.out.println("leave road message");
 		Road road=(Road)this.receivingUnit;
+		road.simTime=messageArrivalTime;
 		road.leaveRoad(vehicle);
 		
 		//System.out.println("leave road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());

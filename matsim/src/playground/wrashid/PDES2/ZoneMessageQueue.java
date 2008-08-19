@@ -122,6 +122,10 @@ public class ZoneMessageQueue {
 			// System.out.println("getNextMessage()");
 			m = queue1.poll();
 			
+			if (m==null){
+				System.out.println();
+			}
+			
 			//if (queue1.isEmpty() || m.isAcrossBorderMessage){
 				
 			//	m = queue1.peek();

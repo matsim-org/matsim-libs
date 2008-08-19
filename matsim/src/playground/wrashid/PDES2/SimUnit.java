@@ -35,13 +35,13 @@ public abstract class SimUnit {
 	
 	// Message m can be a new message, 
 	// and its fields do not need to be initialized.
-	public void setTimer(double timeOut, Message m){
-		
-		m.setMessageArrivalTime(MessageExecutor.getSimTime()+timeOut);
-		m.sendingUnit=this;
-		m.receivingUnit=this;
-		scheduler.schedule(m);
-	}
+	//public void setTimer(double timeOut, Message m){
+	//	
+	//	m.setMessageArrivalTime(MessageExecutor.getSimTime()+timeOut);
+	//	m.sendingUnit=this;
+	//	m.receivingUnit=this;
+	//	scheduler.schedule(m);
+	//}
 	
 	
 	// initializationMethod

@@ -20,6 +20,7 @@ public class EnterRoadMessage extends EventMessage {
 		
 		
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+		road.simTime=messageArrivalTime;
 		road.enterRoad(vehicle);
 		
 		//System.out.println("enter road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
