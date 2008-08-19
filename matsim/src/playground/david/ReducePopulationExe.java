@@ -93,11 +93,11 @@ public class ReducePopulationExe {
 	 */
 	public static void main(String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
-		String netFileName = "/TU Berlin/tmp/studies/ivtch/network.xml";
-		String outnetFileName = "/TU Berlin/tmp/studies/ivtch/network_redu.xml";
+		String netFileName = "/TU Berlin/tmp/studies/ivtch/ivtch-osm.xml";
+		String outnetFileName = "/TU Berlin/tmp/studies/ivtch/ivtch_red.xml";
 
-		String popFileName = "/TU Berlin/tmp/studies/ivtch/plans100p.xml";
-		String outpopFileName = "/TU Berlin/tmp/studies/ivtch/plans10p.xml";
+		String popFileName = "/TU Berlin/tmp/studies/ivtch/plans100p.xml.gz";
+		String outpopFileName = "/TU Berlin/tmp/studies/ivtch/plans50p.xml";
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
@@ -109,21 +109,23 @@ public class ReducePopulationExe {
 		world.setNetworkLayer(network);
 
 		relevantPopulation = new Population(false);
-		Population population = new MyPopulation();
+		Population population = new Population(true);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
-		population.addAlgorithm(new FilterPersons2(10));
+		population.addAlgorithm(new FilterPersons2(2));
 		plansReader.readFile(popFileName);
 
-		System.out.println("read # persions: " );
-		population.printPlansCount();
+		System.out.println("read # persons: " );
+		relevantPopulation.printPlansCount();
 		population.runAlgorithms();
 		
+		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
+		plansWriter.write();
 		
 		Events events = new Events();
 		EventHH eventhh = new EventHH();
 		
 		events.addHandler(eventhh);
-		QueueSimulation queueSim = new QueueSimulation(network, population, events);
+		QueueSimulation queueSim = new QueueSimulation(network, relevantPopulation, events);
 
 		queueSim.run();
 	
@@ -134,8 +136,6 @@ public class ReducePopulationExe {
 		
 		new NetworkWriter(network, outnetFileName).write();
 		
-		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
-		plansWriter.write();
 	}
 
 }
