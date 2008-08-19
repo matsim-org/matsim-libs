@@ -152,7 +152,7 @@ public class JavaPDEQSim2 {
 		}
 		// because later, many bucket may get more than 'maxEventsPerBucket', we can get into the problem
 		// that there is not enough for the last few processors
-		double maxEventsPerBucket=sumOfBuckets;
+		double maxEventsPerBucket=sumOfBuckets/(SimulationParameters.numberOfZones);
 		System.out.println("sumOfBuckets="+sumOfBuckets);
 		
 		
