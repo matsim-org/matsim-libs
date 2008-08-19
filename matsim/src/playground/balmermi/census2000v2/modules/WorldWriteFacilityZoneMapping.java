@@ -23,9 +23,12 @@ package playground.balmermi.census2000v2.modules;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.world.Location;
 import org.matsim.world.World;
@@ -67,7 +70,15 @@ public class WorldWriteFacilityZoneMapping {
 			out.write("f_id\tz_id\n");
 			out.flush();
 			for (Location f : world.getLayer(Facilities.LAYER_TYPE).getLocations().values()) {
-				if (f.getUpMapping().size() != 1) { Gbl.errorMsg("f_id"+f.getId()+": There must be exactly one zone mapping!"); }
+				if (f.getUpMapping().size() == 0) {
+					Collection<Activity> acts = ((Facility)f).getActivities().values();
+					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }
+					else if (!acts.iterator().next().getType().equals("tta")) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen either!"); }
+					else { log.info("f_id="+f.getId()+" has no zone mapping (outside CH, act_type='tta')"); }
+				}
+				else if (f.getUpMapping().size() != 1) {
+					Gbl.errorMsg("f_id="+f.getId()+": There must be exactly one zone mapping!");
+				}
 				out.write(f.getId()+"\t"+f.getUpMapping().firstKey()+"\n");
 			}
 			out.close();
