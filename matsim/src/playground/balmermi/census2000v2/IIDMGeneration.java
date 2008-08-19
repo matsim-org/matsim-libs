@@ -28,8 +28,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
@@ -37,8 +35,6 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
-import playground.balmermi.census2000v2.modules.PersonCreateFakePlanFromKnowledge;
-import playground.balmermi.census2000v2.modules.PlansScenarioCut;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
@@ -126,14 +122,15 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 		
-		// ch.cut.640000.200000.740000.310000.xml
-		Coord min = new CoordImpl(640000.0,200000.0);
-		Coord max = new CoordImpl(740000.0,310000.0);
+//		// Test Demand for Timo Smiezek
+//		// ch.cut.640000.200000.740000.310000.xml
+//		Coord min = new CoordImpl(640000.0,200000.0);
+//		Coord max = new CoordImpl(740000.0,310000.0);
 
-		System.out.println("  running person modules... ");
-		new PersonCreateFakePlanFromKnowledge().run(plans);
-		new PlansScenarioCut(min,max).run(plans);
-		System.out.println("  done.");
+//		System.out.println("  running person modules... ");
+//		new PersonCreateFakePlanFromKnowledge().run(plans);
+//		new PlansScenarioCut(min,max).run(plans);
+//		System.out.println("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
