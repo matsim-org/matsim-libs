@@ -38,6 +38,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( CharyparNagelScoringFunctionFactory.class, Gbl.getConfig().planomat().getScoringFunctionFactory().getClass() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
+		assertEquals( PlanomatConfigGroup.DEFAULT_TRAVEL_BEHAVIOR, Gbl.getConfig().planomat().getTravelBehavior() );
 		
 	}
 

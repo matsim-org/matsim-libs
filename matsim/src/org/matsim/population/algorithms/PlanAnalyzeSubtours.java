@@ -42,7 +42,8 @@ import org.matsim.population.Plan;
  */
 public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
-	private static final Id INVALID_ID = new IdImpl(Integer.MIN_VALUE);
+	public static final int UNDEFINED = Integer.MIN_VALUE;
+	private static final Id INVALID_ID = new IdImpl(PlanAnalyzeSubtours.UNDEFINED);
 
 	/**
 	 * Stores the activity indices of the start activities of a subtour.
@@ -50,9 +51,11 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 * as well as the activities that constitute a subtour.
 	 */
 	private TreeSet<Integer> subtours = null;
+	private int[] subtourIndexation = null;
 
 	private ArrayList<Id> locationIds = null;
-
+	private int currentSubtourIndex;
+	
 	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
 
 	public PlanAnalyzeSubtours() {
@@ -78,8 +81,14 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 			}
 		}
 
+		this.currentSubtourIndex = 0;
+		
 		this.subtours = new TreeSet<Integer>();
-
+		this.subtourIndexation = new int[locationIds.size() - 1];
+		for (int ii = 0; ii < this.subtourIndexation.length; ii++) {
+			this.subtourIndexation[ii] = PlanAnalyzeSubtours.UNDEFINED;
+		}
+		
 		this.extractSubtours(0, locationIds.size() - 1);
 
 	}
@@ -99,6 +108,12 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 				// two consecutive equal locations do NOT constitute a tour
 				if ((ii - lastLinkIndex) > 1) {
 					subtours.add(lastLinkIndex);
+					for (int jj = lastLinkIndex; jj < ii; jj++) {
+						if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
+							this.subtourIndexation[jj] = currentSubtourIndex;
+						}
+					}
+					currentSubtourIndex++;
 					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
 						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
 						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
@@ -126,6 +141,10 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		
 		log.info(str);
 		
+	}
+
+	public int[] getSubtourIndexation() {
+		return subtourIndexation;
 	}
 
 }

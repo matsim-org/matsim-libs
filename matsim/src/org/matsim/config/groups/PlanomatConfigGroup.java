@@ -15,13 +15,13 @@ public class PlanomatConfigGroup extends Module {
 	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
 	public static final String DEFAULT_OPTIMIZATION_TOOLBOX = PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP;
 	private String optimizationToolbox;
-	
+
 	public static final String SCORING_FUNCTION = "scoringFunction";
 	public static final String CHARYPAR_NAGEL_SCORING_FUNCTION = "CharyparNagel";
 	public static final String CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION = "CharyparNagelOpenTimes";
 	public static final ScoringFunctionFactory DEFAULT_SCORING_FUNCTION = new CharyparNagelScoringFunctionFactory();
 	private ScoringFunctionFactory scoringFunctionFactory;
-	
+
 	public static final String POPSIZE = "populationSize";
 	public static final int DEFAULT_POPSIZE = 10; 
 	private int popSize;
@@ -29,12 +29,34 @@ public class PlanomatConfigGroup extends Module {
 	public static final String JGAP_MAX_GENERATIONS = "jgapMaxGenerations";
 	public static final int DEFAULT_JGAP_MAX_GENERATIONS = 100;
 	private int jgapMaxGenerations;
-	
+
+	public static final String TRAVEL_BEHAVIOR = "travelBehavior";
+	public static final String TRAVEL_BEHAVIOR_TIMES = "times";
+	public static final String TRAVEL_BEHAVIOR_TIMES_AND_MODES = "timesAndModes";
+	public enum TravelBehavior { 
+
+		TIMES(TRAVEL_BEHAVIOR_TIMES), 
+		TIMES_AND_MODES(TRAVEL_BEHAVIOR_TIMES_AND_MODES);
+
+		private final String configValue;
+
+		private TravelBehavior(String configValue) {
+			this.configValue = configValue;
+		}
+
+		public String getConfigValue() {
+			return configValue;
+		}
+
+	};
+	public static final TravelBehavior DEFAULT_TRAVEL_BEHAVIOR = TravelBehavior.TIMES;
+	private TravelBehavior travelBehavior;
+
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
 //	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
 	public static final String INDIFFERENCE = "indifference";
 	public static final String BE_VERBOSE = "beVerbose";
-	
+
 	private String legTravelTimeEstimatorName = null;
 //	private String linkTravelTimeEstimatorName = null;
 	private double indifference = -1.0;
@@ -44,13 +66,14 @@ public class PlanomatConfigGroup extends Module {
 
 	public PlanomatConfigGroup() {
 		super(PlanomatConfigGroup.GROUP_NAME);
-		
+
 		// set defaults
 		this.optimizationToolbox = PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX;
 		this.scoringFunctionFactory = PlanomatConfigGroup.DEFAULT_SCORING_FUNCTION;
 		this.popSize = PlanomatConfigGroup.DEFAULT_POPSIZE;
 		this.jgapMaxGenerations = PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS;
-		
+		this.travelBehavior = PlanomatConfigGroup.DEFAULT_TRAVEL_BEHAVIOR;
+
 	}
 
 	@Override
@@ -67,7 +90,7 @@ public class PlanomatConfigGroup extends Module {
 
 		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
 			this.setLegTravelTimeEstimatorName(value);
-//		} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
+//			} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
 //			this.setLinkTravelTimeEstimatorName(value);
 		} else if (JGAP_MAX_GENERATIONS.equals(param_name)) {
 			this.setJgapMaxGenerations(Integer.parseInt(value));
@@ -107,11 +130,11 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 //	public String getLinkTravelTimeEstimatorName() {
-//		return linkTravelTimeEstimatorName;
+//	return linkTravelTimeEstimatorName;
 //	}
-//
+
 //	public void setLinkTravelTimeEstimatorName(String linkTravelTimeEstimatorName) {
-//		this.linkTravelTimeEstimatorName = linkTravelTimeEstimatorName;
+//	this.linkTravelTimeEstimatorName = linkTravelTimeEstimatorName;
 //	}
 
 	public int getJgapMaxGenerations() {
@@ -161,6 +184,14 @@ public class PlanomatConfigGroup extends Module {
 	public void setScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
+	}
+
+	public TravelBehavior getTravelBehavior() {
+		return travelBehavior;
+	}
+
+	public void setTravelBehavior(TravelBehavior travelBehavior) {
+		this.travelBehavior = travelBehavior;
 	}
 
 }

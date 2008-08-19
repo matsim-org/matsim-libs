@@ -20,6 +20,8 @@
 
 package org.matsim.planomat;
 
+import java.util.ArrayList;
+
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
@@ -32,12 +34,15 @@ import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DoubleGene;
+import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
@@ -61,6 +66,23 @@ import org.matsim.world.Location;
  */
 public class PlanOptimizeTimes implements PlanAlgorithm {
 
+	public static enum PossibleModes {
+		
+		CAR(BasicLeg.CARMODE), 
+		PT(BasicLeg.PTMODE);
+		
+		private String basicLegIdentifier;
+
+		private PossibleModes(String basicLegIdentifier) {
+			this.basicLegIdentifier = basicLegIdentifier;
+		}
+
+		public String getBasicLegIdentifier() {
+			return basicLegIdentifier;
+		}
+
+	}
+	
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 
 	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
@@ -74,7 +96,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		// mode differentiation is short-term solution for Portland TRB Conference paper
 		if (!plan.getType().equals(Type.PT)) {
 			// only optimize non-public transport plans
-			
+
 			// distinguish for optimization tools
 			String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 			if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
@@ -106,12 +128,12 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			// for public transport, apply the time allocation mutator
 			PlanMutateTimeAllocation tam = new PlanMutateTimeAllocation(1800);
 			tam.run(plan);
-			
+
 		}
 	}
 
 	protected static org.jgap.Configuration initJGAPConfiguration() {
-		
+
 		Configuration jgapConfiguration = new Configuration();
 
 		try {
@@ -119,7 +141,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			// TODO configuration shouldnt be inited for every plan, but once
 			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
 			Configuration.reset();
-			
+
 			// use random seed from config file to initialize JGAP random number generator
 			// use fixed random seed in order to reproduce test results as well as
 			// to have deterministic behavior of the simulation system
@@ -147,11 +169,11 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return jgapConfiguration;
-		
+
 	}
-	
+
 	protected static IChromosome initSampleChromosome(final Plan plan, final org.jgap.Configuration jgapConfiguration) {
 
 		double planLength = 24.0 * 3600;
@@ -174,99 +196,109 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		// first and last activity are assumed to be the same
 		numActs -= 1;
 
-		//   use ordinary DoubleGene encoding with simple crossover and random mutation, later maybe use a mutator dependent on var mut prob
-		//   genes: 1 for start time, one for time allocation of each activity except the last one, makes nAct double genes in the range between 0 and 24
-		Gene[] sampleGenes = null;
+		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
 		try {
-			sampleGenes = new Gene[numActs];
-			sampleGenes[0] = new DoubleGene(jgapConfiguration, 0.0, planLength);
-			for (int ii=1; ii < sampleGenes.length; ii++) {
-				sampleGenes[ii] = new DoubleGene(jgapConfiguration, 0.0, planLength);
+
+			PlanomatConfigGroup.TravelBehavior tb = Gbl.getConfig().planomat().getTravelBehavior();
+
+			for (int ii=0; ii < numActs; ii++) {
+				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, planLength));
 			}
+			
+			if (tb.getConfigValue().equals(PlanomatConfigGroup.TRAVEL_BEHAVIOR_TIMES_AND_MODES)) {
+				PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+				planAnalyzeSubtours.run(plan);
+				
+				int numSubtours = planAnalyzeSubtours.getNumSubtours();
+				for (int ii=0; ii < numSubtours; ii++) {
+					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, PossibleModes.values().length - 1));
+				} 
+			}
+
 		} catch (InvalidConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		IChromosome sampleChromosome = null;
 		try {
-			sampleChromosome = new Chromosome(jgapConfiguration, sampleGenes);
+			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes.toArray(new Gene[0]) );
 		} catch (InvalidConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return sampleChromosome;
-		
+
 	}
-	
+
 	/**
 	 * @param population the initial GA population that serves as breed for evolution
 	 * @return the fittest individual after evolution
 	 */
 //	protected static IChromosome evolveAndReturnFittest(final Genotype population) {
-//
-//		double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
-//		double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
-////		System.out.println(minDiff);
-//
-//		IChromosome fittest = null;
-//		double avg = 0, max = 0, oldmax = 0;
-//		boolean cancelEvolution = false;
-//		int generation = 0;
-//
-//		int maxNumGenerations = Gbl.getConfig().planomat().getJgapMaxGenerations();
-//		int percentEvolution = maxNumGenerations / 10;
-//
-//		while (cancelEvolution == false) {
-//
-//			population.evolve();
-//
-//			fittest = population.getFittestChromosome();
-//
-//			if (generation == 0) {
-//				oldmax = fittest.getFitnessValue();
-//			} else if ((generation > 0) && (generation % percentEvolution == 0)) {
-//				max = fittest.getFitnessValue();
-//				if (Gbl.getConfig().planomat().isBeVerbose()) {
-//					avg = PlanOptimizeTimes.getAverageFitness(population);
-//					System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
-//				}
-//				if ((max - oldmax) < minDiff) {
-//					cancelEvolution = true;
-//				}
-//				oldmax = max;
-//			}
-//
-//			generation++;
-//			if (generation == maxNumGenerations) {
-//				cancelEvolution = true;
-//			}
-//
-//		}
-//
-//		fittest = population.getFittestChromosome();
-//		if (Gbl.getConfig().planomat().isBeVerbose()) {
-//			double fitness = fittest.getFitnessValue();
-//			System.out.println("Currently fittest Chromosome has fitness " + fitness);
-//		}
-//		return fittest;
+
+//	double travelPenalty = Math.abs(Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "traveling"))) / 3600;
+//	double minDiff = travelPenalty * Gbl.getConfig().planomat().getIndifference();
+////	System.out.println(minDiff);
+
+//	IChromosome fittest = null;
+//	double avg = 0, max = 0, oldmax = 0;
+//	boolean cancelEvolution = false;
+//	int generation = 0;
+
+//	int maxNumGenerations = Gbl.getConfig().planomat().getJgapMaxGenerations();
+//	int percentEvolution = maxNumGenerations / 10;
+
+//	while (cancelEvolution == false) {
+
+//	population.evolve();
+
+//	fittest = population.getFittestChromosome();
+
+//	if (generation == 0) {
+//	oldmax = fittest.getFitnessValue();
+//	} else if ((generation > 0) && (generation % percentEvolution == 0)) {
+//	max = fittest.getFitnessValue();
+//	if (Gbl.getConfig().planomat().isBeVerbose()) {
+//	avg = PlanOptimizeTimes.getAverageFitness(population);
+//	System.out.println(" [Planomat] Generation " + generation + ":\t" + avg + "\t" + max);
+//	}
+//	if ((max - oldmax) < minDiff) {
+//	cancelEvolution = true;
+//	}
+//	oldmax = max;
+//	}
+
+//	generation++;
+//	if (generation == maxNumGenerations) {
+//	cancelEvolution = true;
+//	}
+
+//	}
+
+//	fittest = population.getFittestChromosome();
+//	if (Gbl.getConfig().planomat().isBeVerbose()) {
+//	double fitness = fittest.getFitnessValue();
+//	System.out.println("Currently fittest Chromosome has fitness " + fitness);
+//	}
+//	return fittest;
 //	}
 
 //	protected static double getAverageFitness(final Genotype population) {
-//
-//		double averageFitness = 0;
-//
-//		List<Chromosome> chromosomes = population.getPopulation().getChromosomes();
-//
-//		for (Chromosome c : chromosomes) {
-//			averageFitness += c.getFitnessValue();
-//		}
-//
-//		averageFitness = averageFitness / chromosomes.size();
-//
-//		return averageFitness;
-//
+
+//	double averageFitness = 0;
+
+//	List<Chromosome> chromosomes = population.getPopulation().getChromosomes();
+
+//	for (Chromosome c : chromosomes) {
+//	averageFitness += c.getFitnessValue();
+//	}
+
+//	averageFitness = averageFitness / chromosomes.size();
+
+//	return averageFitness;
+
 //	}
 
 	/**

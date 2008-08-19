@@ -132,7 +132,7 @@ public class MyRuns {
 	public static void run() throws Exception {
 
 //		MyRuns.writeGUESSFile();
-//		MyRuns.testCharyparNagelFitnessFunction();
+		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();

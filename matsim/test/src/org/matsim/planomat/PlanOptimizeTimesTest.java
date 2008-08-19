@@ -27,6 +27,8 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DoubleGene;
+import org.jgap.impl.IntegerGene;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -130,9 +132,21 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		
 		Configuration jgapConfiguration = new Configuration();
 		
-		IChromosome testChromosome = PlanOptimizeTimes.initSampleChromosome(testPlan, jgapConfiguration);
-		assertEquals(2, testChromosome.getGenes().length);
+		IChromosome testChromosome = null;
 		
+		testChromosome = PlanOptimizeTimes.initSampleChromosome(testPlan, jgapConfiguration);
+		assertEquals(2, testChromosome.getGenes().length);
+		assertEquals(DoubleGene.class, testChromosome.getGenes()[0].getClass());
+		assertEquals(DoubleGene.class, testChromosome.getGenes()[1].getClass());
+		
+		Gbl.getConfig().planomat().setTravelBehavior(PlanomatConfigGroup.TravelBehavior.TIMES_AND_MODES);
+
+		testChromosome = PlanOptimizeTimes.initSampleChromosome(testPlan, jgapConfiguration);
+		assertEquals(3, testChromosome.getGenes().length);
+		assertEquals(DoubleGene.class, testChromosome.getGenes()[0].getClass());
+		assertEquals(DoubleGene.class, testChromosome.getGenes()[1].getClass());
+		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
+
 	}
 	
 //	public void testEvolveAndReturnFittest() {
