@@ -37,6 +37,9 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
   
 	public void testTrafficLightIntersection4arms() {
 		
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/fourways/config.xml");
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";

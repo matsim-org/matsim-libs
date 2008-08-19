@@ -35,6 +35,9 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   		
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
   		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
 //		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
 //		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
@@ -118,7 +121,10 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 	}	
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight(){
-  		  		
+  		  	
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
 //		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
 //		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";

@@ -38,6 +38,9 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight(){
   		  		
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
