@@ -444,7 +444,7 @@ public class QueueLink {
 		return this.buffer.peek();
 	}
 
-	boolean bufferIsEmpty() {
+	protected boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
