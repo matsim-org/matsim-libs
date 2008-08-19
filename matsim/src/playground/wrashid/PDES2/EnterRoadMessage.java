@@ -43,10 +43,6 @@ public class EnterRoadMessage extends EventMessage {
 		SimulationParameters.bufferEvent(event);
 	}
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeEnterRoadMessage(this);
-		
-	}
+	
 	
 }

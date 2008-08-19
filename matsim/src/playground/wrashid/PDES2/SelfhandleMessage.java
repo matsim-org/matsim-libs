@@ -13,5 +13,8 @@ public abstract class SelfhandleMessage extends Message {
 		scheduler.schedule(m);
 	}
 	*/
+	public void recycleMessage() {
+		MessageFactory.dispose(this);
+	}
 
 }

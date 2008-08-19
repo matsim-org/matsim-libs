@@ -50,10 +50,6 @@ public class LeaveRoadMessage extends EventMessage {
 		SimulationParameters.bufferEvent(event);
 	}
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeLeaveRoadMessage(this);
-		
-	}
+	
 	
 }

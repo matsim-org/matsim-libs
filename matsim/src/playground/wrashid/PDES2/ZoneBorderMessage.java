@@ -37,8 +37,5 @@ public class ZoneBorderMessage extends SelfhandleMessage {
 		nm.selfhandleMessage();
 	}
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeZoneBorderMessage(this);
-	}
+	
 }

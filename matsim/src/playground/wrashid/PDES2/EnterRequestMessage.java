@@ -32,11 +32,6 @@ public class EnterRequestMessage extends EventMessage {
 
 
 	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeEnterRequestMessage(this);
-	}
-
-	@Override
 	public void logEvent() {
 		// TODO Auto-generated method stub
 		

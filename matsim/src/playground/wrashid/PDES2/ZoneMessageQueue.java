@@ -31,9 +31,10 @@ public class ZoneMessageQueue {
 	
 	public int numberOfIncomingLinks=0;
 	public LinkedList<Link> tempIncomingLinks=new LinkedList<Link>();
-	public LinkedList<Road> messagesArrivedFromRoads=new LinkedList<Road>(); //TODO: use some more efficient data structure than linked lists
+	public HashMap<Road,Integer> messagesArrivedFromRoads=new HashMap<Road,Integer>(); //TODO: use some more efficient data structure than linked lists
 	public HashMap<Road,Integer> numberOfQueuedMessages=new HashMap<Road,Integer>();
 	private Message tmpLastRemovedMessage=null;
+	private final Integer zero=new Integer(0);
 	
 	synchronized public void putMessage(Message m) {
 		assert(!queue1.contains(m)):"inconsistency";
@@ -44,8 +45,8 @@ public class ZoneMessageQueue {
 		
 		if (m.isAcrossBorderMessage){
 			incrementNumberOfQueuedMessages((Road)m.sendingUnit);
-			if (!messagesArrivedFromRoads.contains(m.sendingUnit)){
-				messagesArrivedFromRoads.add((Road)m.sendingUnit);
+			if (!messagesArrivedFromRoads.containsKey(m.sendingUnit)){
+				messagesArrivedFromRoads.put((Road)m.sendingUnit,zero);
 			}
 			if (!(m instanceof ZoneBorderMessage)){
 				System.out.println(m + " - " + m.messageArrivalTime + " - " + arrivalTimeOfLastRemovedMessage);

@@ -13,11 +13,7 @@ public class TimerMessage extends SelfhandleMessage {
 
 	}
 
-	@Override
-	public void recycleMessage() {
-		// TODO: integrate this into the rest...
-		
-	}
+	
 	
 
 

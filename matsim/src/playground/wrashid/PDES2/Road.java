@@ -565,7 +565,7 @@ public class Road extends SimUnit {
 				}
 			}
 			
-			TimerMessage tm=new TimerMessage();
+			TimerMessage tm=MessageFactory.getTimerMessage();
 			tm.sendingUnit=this;
 			tm.receivingUnit=this;
 			tm.messageArrivalTime=nextMessageTime;

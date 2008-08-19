@@ -71,9 +71,6 @@ public class EndRoadMessage extends EventMessage {
 		// don't do anything
 	}
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeEndRoadMessage(this);
-	}
+	
 
 }

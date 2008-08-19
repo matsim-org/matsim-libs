@@ -73,9 +73,5 @@ public class EndLegMessage extends EventMessage {
 	}
 
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeEndLegMessage(this);		
-	}
 	
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import playground.wrashid.DES.utils.Timer;
 // optimized for single producer, single consumer
 // it can be used by multiple producers, but it is not optimized for that case
-public class ConcurrentList<T> {
+public class ConcurrentListSPSC<T> {
 	private LinkedList<T> inputBuffer=new LinkedList<T>();
 	private LinkedList<T> outputBuffer=new LinkedList<T>(); 
 	public void add(T element){
@@ -52,7 +52,7 @@ public class ConcurrentList<T> {
 		
 		// part 1
 		
-		ConcurrentList<Integer> cList=new ConcurrentList<Integer>();
+		ConcurrentListSPSC<Integer> cList=new ConcurrentListSPSC<Integer>();
 		Thread t=new Thread(new ARunnable(cList));
 		t.start();
 		t=new Thread(new BRunnable(cList));
@@ -73,7 +73,7 @@ public class ConcurrentList<T> {
 	}
 
 static class ARunnable implements Runnable{
-	ConcurrentList<Integer> cList=new ConcurrentList<Integer>();
+	ConcurrentListSPSC<Integer> cList=new ConcurrentListSPSC<Integer>();
 	public void run() {
 		Timer timer=new Timer();
 		timer.startTimer();
@@ -83,14 +83,14 @@ static class ARunnable implements Runnable{
 		timer.endTimer();
 		timer.printMeasuredTime("time required for ConcurrentList (producer): ");
 	}
-	public ARunnable(ConcurrentList<Integer> cList){
+	public ARunnable(ConcurrentListSPSC<Integer> cList){
 		super();
 		this.cList=cList;
 	}
 }
 
 static class BRunnable implements Runnable{
-	ConcurrentList<Integer> cList=new ConcurrentList<Integer>();
+	ConcurrentListSPSC<Integer> cList=new ConcurrentListSPSC<Integer>();
 
 	public void run() {
 		Timer timer=new Timer();
@@ -111,7 +111,7 @@ static class BRunnable implements Runnable{
 		timer.endTimer();
 		timer.printMeasuredTime("time required for ConcurrentList (consumer): ");
 	}
-	public BRunnable(ConcurrentList<Integer> cList){
+	public BRunnable(ConcurrentListSPSC<Integer> cList){
 		super();
 		this.cList=cList;
 	}

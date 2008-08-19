@@ -62,7 +62,11 @@ Splitting the map:
  
  
 - TODO: 
-     
+     - performance verbessern
+        - recycle Border Messages und auch TimerMessages => more efficiently than blocked...
+        - road.scheduleZoneBorderMessage => iterator verbessern...
+        - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
+        -  
         
         
 - Done:

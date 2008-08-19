@@ -50,9 +50,6 @@ public class StartingLegMessage extends EventMessage {
 		SimulationParameters.bufferEvent(event);
 	}
 
-	@Override
-	public void recycleMessage() {
-		MessageFactory.disposeStartingLegMessage(this);		
-	}
+	
 	
 }
