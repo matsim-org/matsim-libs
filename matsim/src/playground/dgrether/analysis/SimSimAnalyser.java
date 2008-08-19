@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.controler.ScenarioData;
-import org.matsim.counts.ComparisionErrorStatsCalculator;
+import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.network.Link;
@@ -103,7 +103,7 @@ public class SimSimAnalyser {
 //				countSimComp, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 //		kmlWriter.writeFile(outfile);
 
-		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
 		errorStats.calculateErrorStats(countSimComp);
 		
 		double[] hours = new double[24];

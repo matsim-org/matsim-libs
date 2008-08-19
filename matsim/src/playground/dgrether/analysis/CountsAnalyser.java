@@ -26,7 +26,7 @@ import java.util.Locale;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.config.Config;
-import org.matsim.counts.ComparisionErrorStatsCalculator;
+import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -233,7 +233,7 @@ public class CountsAnalyser {
 		else {
 			throw new IllegalArgumentException("Output format must be txt or kml");
 		}
-		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
 		errorStats.calculateErrorStats(countsComparisonList);
 		
 		double[] hours = new double[24];

@@ -36,7 +36,7 @@ import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.matsim.counts.ComparisionErrorStatsCalculator;
+import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
 
 public class BiasErrorGraph extends CountsGraph {
@@ -51,7 +51,7 @@ public class BiasErrorGraph extends CountsGraph {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
-		ComparisionErrorStatsCalculator errorStats = new ComparisionErrorStatsCalculator();
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
 		errorStats.calculateErrorStats(this.ccl_);
 		
 		double[] meanRelError = errorStats.getMeanRelError();

@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.counts;
 
 import java.util.Iterator;
@@ -26,24 +27,23 @@ import java.util.List;
  * This class provides methods to aggregate the errors
  * and the bias of a CountSimComparison instances list
  * to hourly based mean values.
- * 
- * @author dgrether
  *
+ * @author dgrether
  */
-public class ComparisionErrorStatsCalculator {
-	
+public class ComparisonErrorStatsCalculator {
+
 	private double[] meanRelError = null;
-	
+
 	private double[] meanAbsError = null;
-	
+
 	private double[] meanAbsBias = null;
-	
+
 	private int[] nbrAbsBias = null;
-	
+
 	private int[] nbrRelErr = null;
-	
+
 	private int[] nbrAbsErr = null;
-	
+
 	public void calculateErrorStats(final List<CountSimComparison> ccl) {
 		// init with same value. Shorter stat.?
 		// Possibly not all links have values for all hours.
@@ -86,29 +86,29 @@ public class ComparisionErrorStatsCalculator {
 		}
 	}
 
-	
+
 	public double[] getMeanRelError() {
 		if (meanRelError == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanRelError;
+		return meanRelError.clone();
 	}
 
-	
+
 	public double[] getMeanAbsError() {
 		if (meanAbsError == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanAbsError;
+		return meanAbsError.clone();
 	}
 
-	
+
 	public double[] getMeanAbsBias() {
 		if (meanAbsBias == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanAbsBias;
+		return meanAbsBias.clone();
 	}
-	
+
 
 }
