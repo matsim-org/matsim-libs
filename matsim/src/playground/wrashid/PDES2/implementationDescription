@@ -65,11 +65,11 @@ Splitting the map:
  
 - TODO: 
      - performance verbessern
-        - road.scheduleZoneBorderMessage => iterator verbessern...
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
         - wieso dauert getNextMessage so lang (obwohl empty buffers fast überhaupt nicht dauert).
-        - getThreadId in MessageExecutor (ThreadLocal), dauert ca. 3.3sec zum ausführen => final declariert
-      
+        - getThreadId in MessageExecutor (ThreadLocal), dauert ca. 5.8sec zum ausführen
+            => man könnte es der message mitgeben, etc...
+        - empty buffer takes longer, than one would think...   
         
         
 - Done:
@@ -82,3 +82,5 @@ Splitting the map:
      - MessageFactory updated to support full concurreny for each zone   
      - zone sizing is not equal yet => now each link is considered as a wait for each zone
      - getSimtime consumes around 15%+ of the CPU time => solved by removing ThreadLocal variable simTime in MessageExecutor
+     - message counter removed, because it is a common synchronization point
+     - 

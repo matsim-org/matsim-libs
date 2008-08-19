@@ -114,6 +114,9 @@ public class ZoneMessageQueue {
 	}
 
 	synchronized public void removeMessage(Message m) {
+		if (zoneId!=MessageExecutor.getThreadId()){
+			System.out.println("concurrency occured");
+		}
 		emptyBuffer();
 		queue1.remove(m);
 	}
