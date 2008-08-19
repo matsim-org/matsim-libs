@@ -100,6 +100,12 @@ public class Household {
 		return this.persons_z;
 	}
 	
+	public final Map<Id,Person> getPersons() {
+		Map<Id,Person> map = new HashMap<Id, Person>(this.persons_w);
+		map.putAll(this.persons_z);
+		return map;
+	}
+	
 	public final int getHHTPW() {
 		return this.hhtpw;
 	}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansFilterArea.java
+ * PersonLicenseModel.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,73 +20,70 @@
 
 package playground.balmermi.census2000v2.modules;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.population.Person;
-import org.matsim.population.Population;
+import org.matsim.population.Plan;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class PlansWriteCustomAttributes {
+import playground.balmermi.census2000.models.ModelLicenseOwnership;
+import playground.balmermi.census2000v2.data.CAtts;
+import playground.balmermi.census2000v2.data.Household;
+
+public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(PlansWriteCustomAttributes.class);
+	private final static Logger log = Logger.getLogger(PersonAssignLicenseModel.class);
 
-	private final String outfile;
-	
+	private static final String MALE = "m";
+	private static final String NO = "no";
+	private static final String YES = "yes";
+	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansWriteCustomAttributes(String outfile) {
-		super();
+	public PersonAssignLicenseModel() {
 		log.info("    init " + this.getClass().getName() + " module...");
-		this.outfile = outfile;
 		log.info("    done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// private methods
+	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////
-	// run method
-	//////////////////////////////////////////////////////////////////////
-
-	public void run(final Population plans) {
-		log.info("    running " + this.getClass().getName() + " module...");
+	@Override
+	public void run(Person person) {
+		Map<String,Object> atts = person.getCustomAttributes();
 		
-		Set<String> keys = new HashSet<String>();
+		model.setAge(person.getAge());
+		if (person.getSex().equals(MALE)) { model.setSex(true); }
+		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); }
+		Object o = atts.get(CAtts.HH_W);
+		if (o == null) { o = atts.get(CAtts.HH_Z); }
+		Household hh = (Household)o;
+		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
+		model.setUrbanDegree(hh.getMunicipality().getRegType());
 		
-		for (Person p : plans.getPersons().values()) {
-			if (p.getCustomAttributes().size() > keys.size()) { keys = p.getCustomAttributes().keySet(); }
+		Map<Id,Person> persons = hh.getPersons();
+		model.setHHDimension(persons.size());
+		int kids = 0;
+		for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
+		model.setHHKids(kids);
+		boolean hasLicense = model.calcLicenseOwnership();
+		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
+		if ((person.getAge() < 18) && (hasLicense)) {
+			person.setLicence(NO);
 		}
-		
-		try {
-			FileWriter fw = new FileWriter(outfile);
-			BufferedWriter out = new BufferedWriter(fw);
-			out.write("p_id");
-			for (String key : keys) { out.write("\t"+key); }
-			out.write("\n");
-			out.flush();
-			for (Person p : plans.getPersons().values()) {
-				out.write(p.getId().toString());
-				for (String key : keys) { out.write("\t"+p.getCustomAttributes().get(key)); }
-				out.write("\n");
-			}
-			out.close();
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
+	}
 
-		log.info("    done.");
+	public void run(Plan plan) {
 	}
 }

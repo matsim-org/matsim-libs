@@ -36,6 +36,7 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
+import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
@@ -145,14 +146,18 @@ public class IIDMGeneration {
 		
 		log.info("  adding custom attributes for persons... ");
 		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
-		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  writing households txt file... ");
-		new PlansWriteCustomAttributes(outdir+"/p_atts.txt").run(pop);
-		households.writeTable(outdir+"/output_households.txt");
+		log.info("  runnning person models... ");
+		new PersonAssignLicenseModel().run(pop);
+		log.info("  done.");
+		
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  writing custom attributes of the persons... ");
+		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
 		log.info("  done.");
 
 		log.info("  writing households txt file... ");
