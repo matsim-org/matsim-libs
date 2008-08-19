@@ -65,8 +65,8 @@ public class MessageExecutor extends Thread {
 		
 		//nullMessage.messageArrivalTime=scheduler.timeOfNextBarrier;
 		//scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
-		int barrierRound=0;
-		int unsuccessful=0;
+		//int barrierRound=0;
+		//int unsuccessful=0;
 		try{
 			while (getSimTime()<SimulationParameters.maxSimulationLength){
 				
@@ -95,15 +95,9 @@ public class MessageExecutor extends Thread {
 					while (message!=null){
 						executeMessage();
 						message=scheduler.getNextMessage(i);
-						//System.out.println(".");
-						unsuccessful=0;
 					}
-					//System.out.println("-");
-					unsuccessful++;
-					if (unsuccessful==100000){
-						System.out.println(unsuccessful);
-						//Thread.sleep(100);
-					}
+
+					
 					
 				
 			}

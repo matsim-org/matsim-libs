@@ -29,7 +29,7 @@ public class RoadEntryHandler {
 			}
 			
 			//erm.vehicle=vehicle;
-			System.out.println("register enter request road: " + belongsToRoad.getLink().getId() + "; vehicle: " + erm.vehicle.getOwnerPerson().getId());
+			//System.out.println("register enter request road: " + belongsToRoad.getLink().getId() + "; vehicle: " + erm.vehicle.getOwnerPerson().getId());
 			//System.out.println(erm.messageId);
 			
 			belongsToRoad.scheduler.schedule(erm);
