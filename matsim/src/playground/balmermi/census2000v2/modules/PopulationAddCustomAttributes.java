@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WorldBottom2TopCompletion.java
+ * PersonLicenseModel.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,74 +20,72 @@
 
 package playground.balmermi.census2000v2.modules;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.world.Location;
-import org.matsim.world.World;
+import org.matsim.population.Person;
+import org.matsim.population.Population;
 
-public class WorldWriteFacilityZoneMapping {
+import playground.balmermi.census2000v2.data.CAtts;
+
+public class PopulationAddCustomAttributes {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+	
+	private final static Logger log = Logger.getLogger(PopulationAddCustomAttributes.class);
 
-	private final static Logger log = Logger.getLogger(WorldWriteFacilityZoneMapping.class);
-
-	private final String outfile;
+	private final String infile;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldWriteFacilityZoneMapping(String outfile) {
-		super();
+	public PopulationAddCustomAttributes(final String infile) {
 		log.info("    init " + this.getClass().getName() + " module...");
-		this.outfile = outfile;
+		this.infile = infile;
 		log.info("    done.");
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(World world) {
+	public void run(Population pop) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		try {
-			FileWriter fw = new FileWriter(outfile);
-			BufferedWriter out = new BufferedWriter(fw);
-			out.write("f_id\tz_id\n");
-			out.flush();
-			for (Location f : world.getLayer(Facilities.LAYER_TYPE).getLocations().values()) {
-				if (f.getUpMapping().size() == 0) {
-					Collection<Activity> acts = ((Facility)f).getActivities().values();
-					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }
-					else if (!acts.iterator().next().getType().equals("tta")) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen either!"); }
-					else { log.info("      f_id="+f.getId()+" has no zone mapping (outside CH, act_type='tta')"); }
-				}
-				else if (f.getUpMapping().size() != 1) {
-					Gbl.errorMsg("f_id="+f.getId()+": There must be exactly one zone mapping!");
-				}
-				else {
-					out.write(f.getId()+"\t"+f.getUpMapping().firstKey()+"\n");
-				}
+			FileReader fr = new FileReader(this.infile);
+			BufferedReader br = new BufferedReader(fr);
+			int line_cnt = 0;
+
+			// Skip header
+			String curr_line = br.readLine(); line_cnt++;
+			curr_line = br.readLine(); line_cnt++;
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// P_ZGDE  P_GEBAEUDE_ID  P_HHNR
+				// 1       2              3
+
+				// ZGDE  GEBAEUDE_ID  HHNR  PERSON_ID  PARTNR  HMAT
+				// 1     2            3     5          12      26
+				Person p = pop.getPerson(entries[CAtts.I_PERSON_ID]);
+				if (p == null) { Gbl.errorMsg("person id="+entries[CAtts.I_PERSON_ID]+" not found!"); }
+				
+				Person pp = pop.getPerson(entries[CAtts.I_PARTNR]);
+				if (pp != null) { Gbl.errorMsg("partner id="+entries[CAtts.I_PERSON_ID]+" exists!"); }
+				
+				// progress report
+				if (line_cnt % 100000 == 0) { log.info("      Line " + line_cnt); }
+				line_cnt++;
 			}
-			out.close();
-			fw.close();
+			br.close();
+			fr.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			Gbl.errorMsg(e);
 		}
 		log.info("    done.");
 	}

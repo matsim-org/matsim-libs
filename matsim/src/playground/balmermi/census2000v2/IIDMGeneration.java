@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000v2;
 
+import org.apache.log4j.Logger;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -35,10 +36,17 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
+import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
 public class IIDMGeneration {
+
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(IIDMGeneration.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// createPopulation()
@@ -46,68 +54,68 @@ public class IIDMGeneration {
 
 	public static void createIIDM() {
 
-		System.out.println("MATSim-DB: create iidm.");
+		log.info("MATSim-DB: create iidm.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  extracting input directory... ");
+		log.info("  extracting input directory... ");
 		String indir = Gbl.getConfig().facilities().getInputFile();
 		indir = indir.substring(0,indir.lastIndexOf("/"));
-		System.out.println("    "+indir);
-		System.out.println("  done.");
+		log.info("    "+indir);
+		log.info("  done.");
 
-		System.out.println("  extracting output directory... ");
+		log.info("  extracting output directory... ");
 		String outdir = Gbl.getConfig().facilities().getOutputFile();
 		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
-		System.out.println("    "+outdir);
-		System.out.println("  done.");
+		log.info("    "+outdir);
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  reading world xml file...");
+		log.info("  reading world xml file...");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
 		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  reading facilities xml file...");
+		log.info("  reading facilities xml file...");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		Gbl.getWorld().complete();
-		System.out.println("  done.");
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 		
-		System.out.println("  parsing additional municipality information... ");
+		log.info("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
 		municipalities.parse();
-		System.out.println("  done.");
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running world modules... ");
+		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldValidation().run(Gbl.getWorld());
-		System.out.println("  done.");
+		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  parsing f2z_mapping... ");
+		log.info("  parsing f2z_mapping... ");
 		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(Gbl.getWorld());
-		System.out.println("  done.");
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running world modules... ");
+		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldValidation().run(Gbl.getWorld());
-		System.out.println("  done.");
+		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  reding plans xml file... ");
-		Population plans = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
-		System.out.println("  done.");
+		log.info("  reding plans xml file... ");
+		Population pop = new Population(Population.NO_STREAMING);
+		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 		
@@ -115,10 +123,10 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  parsing households... ");
+		log.info("  parsing households... ");
 		Households households = new Households(municipalities);
-		households.parse(indir+"/households.txt",plans);
-		System.out.println("  done.");
+		households.parse(indir+"/households.txt",pop);
+		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 		
@@ -127,43 +135,48 @@ public class IIDMGeneration {
 //		Coord min = new CoordImpl(640000.0,200000.0);
 //		Coord max = new CoordImpl(740000.0,310000.0);
 
-//		System.out.println("  running person modules... ");
+//		log.info("  running person modules... ");
 //		new PersonCreateFakePlanFromKnowledge().run(plans);
 //		new PlansScenarioCut(min,max).run(plans);
-//		System.out.println("  done.");
+//		log.info("  done.");
+		
+		//////////////////////////////////////////////////////////////////////
+		
+		log.info("  adding custom attributes for persons... ");
+		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
+		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  writing households txt file... ");
+		log.info("  writing households txt file... ");
 		households.writeTable(outdir+"/output_households.txt");
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(plans);
+		log.info("  writing plans xml file... ");
+		PopulationWriter plans_writer = new PopulationWriter(pop);
 		plans_writer.write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing f2z_mapping... ");
+		log.info("  writing f2z_mapping... ");
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing facilities xml file... ");
+		log.info("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
 		fac_writer.write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing world xml file... ");
+		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
 		world_writer.write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("  writing config xml file... ");
+		log.info("  writing config xml file... ");
 		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
 		config_writer.write();
-		System.out.println("  done.");
+		log.info("  done.");
 
-		System.out.println("done.");
-		System.out.println();
+		log.info("done.");
 	}
 
 	//////////////////////////////////////////////////////////////////////
