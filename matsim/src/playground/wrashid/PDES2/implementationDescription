@@ -65,7 +65,6 @@ Splitting the map:
  
 - TODO: 
      - performance verbessern
-        - getSimtime consumes arround 15+% of the CPU time
         - road.scheduleZoneBorderMessage => iterator verbessern...
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
      
@@ -81,3 +80,4 @@ Splitting the map:
       sonst bleibt message queue einfach stehen, weil keine neuen messages mehr produziert werden
      - MessageFactory updated to support full concurreny for each zone   
      - zone sizing is not equal yet => now each link is considered as a wait for each zone
+     - getSimtime consumes around 15%+ of the CPU time => solved by removing ThreadLocal variable simTime in MessageExecutor

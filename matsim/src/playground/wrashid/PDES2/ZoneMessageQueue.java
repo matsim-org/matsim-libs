@@ -21,7 +21,7 @@ public class ZoneMessageQueue {
 	// and then only until the first ZoneBorderMessage or EnterRequestMessage
 
 	private int zoneId = 0;
-
+	public double simTime=0;
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 
 	public int counter = 0;
@@ -145,6 +145,7 @@ public class ZoneMessageQueue {
 			
 
 			arrivalTimeOfLastRemovedMessage = m.messageArrivalTime;
+			simTime=m.messageArrivalTime;
 			tmpLastRemovedMessage = m;
 			return m;
 		}

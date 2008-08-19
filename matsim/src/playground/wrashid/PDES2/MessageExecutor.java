@@ -27,15 +27,15 @@ public class MessageExecutor extends Thread {
     	tId.set(obj);
     }
 
-    private static ThreadLocal simTime = new ThreadLocal();
+    //private static ThreadLocal simTime = new ThreadLocal();
 
-    public static double getSimTime() {
-        return ((Double) (simTime.get())).doubleValue();
-    }
+    //public static double getSimTime() {
+    //    return ((Double) (simTime.get())).doubleValue();
+    //}
 
-    public static void setSimTime(double obj) {
-    	simTime.set(obj);
-    }
+    //public static void setSimTime(double obj) {
+    //	simTime.set(obj);
+    //}
 
    
 
@@ -48,7 +48,7 @@ public class MessageExecutor extends Thread {
 	}
 
 	public void run() {
-		MessageExecutor.setSimTime(0);
+		//MessageExecutor.setSimTime(0);
 		MessageExecutor.setThreadId(threadId);
 		// of course here is a problem:
 		// we first check if empty and then try to get the element. For this reason
@@ -67,8 +67,9 @@ public class MessageExecutor extends Thread {
 		//scheduler.threadMessageQueues[threadId-1].putMessage(nullMessage);
 		//int barrierRound=0;
 		//int unsuccessful=0;
+		double simTime=0;
 		try{
-			while (getSimTime()<SimulationParameters.maxSimulationLength){
+			while (scheduler.zoneMessageQueues[threadId].simTime<SimulationParameters.maxSimulationLength){
 				
 				
 				
@@ -116,7 +117,7 @@ public class MessageExecutor extends Thread {
 	}
 
 	private void executeMessage(){
-		MessageExecutor.setSimTime(message.getMessageArrivalTime());
+		//MessageExecutor.setSimTime(message.getMessageArrivalTime());
 		message.printMessageLogString();
 		if (message instanceof SelfhandleMessage){
 			((SelfhandleMessage) message).selfhandleMessage();
