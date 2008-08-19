@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import playground.wrashid.DES.utils.Timer;
 // optimized for multiple producer, single consumer
-// TODO: This class is not implemented yet!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 public class ConcurrentListMPSC<T> {
 	private LinkedList<T>[] inputBuffer;
 	private LinkedList<T> outputBuffer=new LinkedList<T>(); 
