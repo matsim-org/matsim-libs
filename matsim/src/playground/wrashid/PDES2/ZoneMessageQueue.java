@@ -108,6 +108,7 @@ public class ZoneMessageQueue {
 	}
 
 	synchronized public void removeMessage(Message m) {
+		emptyBuffer();
 		queue1.remove(m);
 	}
 
@@ -117,14 +118,14 @@ public class ZoneMessageQueue {
 		// System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() +
 		// " - " + numberOfIncomingLinks);
 		if (messagesArrivedFromRoads.size() == numberOfIncomingLinks) {
-			
+			emptyBuffer();
 			// System.out.println("getNextMessage()");
-			m = queue1.peek();
-
-			if (queue1.isEmpty() || m.isAcrossBorderMessage){
-				emptyBuffer();
-				m = queue1.peek();
-			}
+			m = queue1.poll();
+			
+			//if (queue1.isEmpty() || m.isAcrossBorderMessage){
+				
+			//	m = queue1.peek();
+			//}
 			
 			
 			if (m.isAcrossBorderMessage) {
@@ -136,7 +137,7 @@ public class ZoneMessageQueue {
 				}
 			}
 			
-			queue1.remove();
+			// queue1.remove();
 			
 
 			arrivalTimeOfLastRemovedMessage = m.messageArrivalTime;

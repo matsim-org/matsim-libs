@@ -123,12 +123,19 @@ public class JavaPDEQSim2 {
 			// assumption, an action is followed by a let always
 			// and a plan starts with a action
 			Act act=null;
+			Leg leg=null;
 			for (int i=0;i<actsLegs.size();i++){
 				
 				if (actsLegs.get(i) instanceof Act){
 					act=(Act) actsLegs.get(i);
 					//System.out.print(".");
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
+				} else {
+					leg = (Leg) actsLegs.get(i);
+					Link[] links=leg.getRoute().getLinkRoute();
+					for (int j=0;j<links.length;j++){
+						bucketCount[getZone(links[j].getFromNode().getCoord().getX(),bucketBoundries)]++;
+					}
 				}
 				//System.out.println();
 			}
@@ -144,7 +151,7 @@ public class JavaPDEQSim2 {
 			//System.out.println(bucketCount[i]);
 		}
 		double maxEventsPerBucket=sumOfBuckets/SimulationParameters.numberOfZones;
-		
+		System.out.println("sumOfBuckets="+sumOfBuckets);
 		
 		
 		// Equi Event zones
@@ -159,6 +166,7 @@ public class JavaPDEQSim2 {
 				tmpBucketCount+=bucketCount[bucketCounter];
 				bucketCounter++;
 			}
+			System.out.println("tmpBucketCount="+tmpBucketCount);
 			SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter];
 			System.out.println(i+"-th boundry:" + SimulationParameters.zoneBorderLines[i]);
 		}
@@ -179,7 +187,7 @@ public class JavaPDEQSim2 {
 		
 		// assign a zone to each road
 		for (Road r:Road.allRoads.values()){
-			r.initializeZoneIdEquiXDistance();
+			r.initializeZoneId();
 		}
 		
 		// 

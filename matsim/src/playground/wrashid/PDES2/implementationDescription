@@ -66,7 +66,8 @@ Splitting the map:
         
         - road.scheduleZoneBorderMessage => iterator verbessern...
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
-        -  
+     
+      
         
         
 - Done:
@@ -77,3 +78,4 @@ Splitting the map:
      - problem lösung: timer message muss höhere priorität bekommen als border message (mit gleichem time stamp),
       sonst bleibt message queue einfach stehen, weil keine neuen messages mehr produziert werden
      - MessageFactory updated to support full concurreny for each zone   
+     - zone sizing is not equal yet => now each link is considered as a wait for each zone

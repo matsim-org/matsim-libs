@@ -58,7 +58,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
+	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()/2;
 	
 	// the number of zones, in which the network is divided
 	//public static final int numberOfZones=numberOfMessageExecutorThreads;
@@ -70,7 +70,9 @@ public class SimulationParameters {
 	public static double maxXCoodrinate=Double.MIN_VALUE;
 	public static double xZoneDistance=0;
 	public static double zoneBorderLines[]=new double[numberOfZones-1];
-	public static int numberOfZoneBuckets=500; //some kind of deadlock can occur for certain cuts?
+	// keep the number of zone buckets big, because else the zones have different
+	// number of events in each zone not equal (ca. 5000)
+	public static int numberOfZoneBuckets=5000;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);

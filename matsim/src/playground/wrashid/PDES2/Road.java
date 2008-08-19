@@ -501,7 +501,7 @@ public class Road extends SimUnit {
 		this.zoneId = zoneId;
 	}
 	
-	public void initializeZoneIdEquiXDistance() {
+	public void initializeZoneId() {
 		int zId=0;
 		double xCoordinate=getXCoordinate();
 		for (int i=0;i<SimulationParameters.numberOfZones-1;i++){
