@@ -145,6 +145,7 @@ public class IIDMGeneration {
 		
 		log.info("  adding custom attributes for persons... ");
 		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
+		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
