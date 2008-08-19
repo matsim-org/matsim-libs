@@ -17,6 +17,7 @@ public abstract class Message implements Comparable {
 	public Lock lock=null;
 	private volatile boolean isAlive=true;
 	public boolean isAcrossBorderMessage=false;
+	public int priority=0;
 	//public FairLock lock=null;
 	
 	// all inheriting or extending modules must
@@ -42,7 +43,16 @@ public abstract class Message implements Comparable {
 			return 1;
 		} else if (messageArrivalTime<otherMessage.messageArrivalTime) {
 			return -1;
-		} else {
+		} else if (priority>otherMessage.priority) {
+			// messages with same arrival time
+			// messages with higher priority should be allowed to advance in the queue
+			// (inverse logic...)
+			return -1;
+		}else if (priority<otherMessage.priority) {
+			// messages with same arrival time
+			return 1;
+		}else {
+			// messages with same arrival time and priority
 			return (int)(messageId-otherMessage.messageId);
 		}
 	}

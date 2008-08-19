@@ -14,6 +14,8 @@ public class ZoneBorderMessage extends SelfhandleMessage {
 
 	public ZoneBorderMessage(){
 		super();
+		priority=-1; // ZoneBorderMessages have the least priority, because for the same time stamp they
+		             // should be processed last
 	}
 
 	@Override

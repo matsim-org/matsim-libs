@@ -102,7 +102,7 @@ public class MessageExecutor extends Thread {
 					unsuccessful++;
 					if (unsuccessful==100000){
 						System.out.println(unsuccessful);
-						Thread.sleep(100);
+						//Thread.sleep(100);
 					}
 					
 				

@@ -64,6 +64,9 @@ public class ZoneMessageQueue {
 			//System.out.println("incounter:"+incounter);
 		}
 		incounter++;
+		
+		//System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() + " - " + numberOfIncomingLinks);
+		//System.out.println(queue1.size());
 	}
 	
 	public ZoneMessageQueue(int zoneId){
@@ -108,7 +111,7 @@ public class ZoneMessageQueue {
 		if (incounter % 100000==0){
 			//System.out.println(incounter);
 			//System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() + " - " + numberOfIncomingLinks);
-			System.out.println(zoneId + " - " + arrivalTimeOfLastRemovedMessage);
+			//System.out.println(zoneId + " - " + arrivalTimeOfLastRemovedMessage);
 			//if (tmpLastRemovedMessage!=null){
 			//	System.out.println(((Road)tmpLastRemovedMessage.sendingUnit).getLink().getLength());
 			//}

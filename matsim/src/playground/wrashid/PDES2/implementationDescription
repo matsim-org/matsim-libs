@@ -57,17 +57,8 @@ Splitting the map:
 
 
 - Problems:
-    - bother message queues have just one message missing to continue and therefore both messageExecutors can't continue
-    - The problem occurs only, because we have moved from equi distant to equi event (although, this shouldn't be a problem)
-    - The problem occurs at random place in time
-    - it could be some kind of deadlock: both try to add a message, but can't do it => is this possible???
-    	=> reason: the other thread is blocking the putMessage, because it is invoking the getNextMessage...
-    	=> first test, if this could be really the case, by sending a thread to sleep(100ms), if it gets 1000 times
-    	   null message back => not confirmed yet, that this is the problem...
-    	=> try to implement this with the buffer, so that putMessage is not synchronized, only getNextMessage is (or not even that?).
-    - sichergehen, ob beide einfach am get message machen sind, oder einver versucht den putMessage vom anderen aufzurufen, während der
-      andere getNextMessage aufruft???
-    - 
+    
+    
  
  
 - TODO: 
@@ -79,4 +70,6 @@ Splitting the map:
      -  perhaps doch several vertical Splits machen: dann können teile der Karte weiterarbeiten,
              anstatt, dass man von der anderen Seite abhängig ist.
              => Gegenargument: Man muss auf die andere Seite sowieso warten.
+     - problem lösung: timer message muss höhere priorität bekommen als border message (mit gleichem time stamp),
+      sonst bleibt message queue einfach stehen, weil keine neuen messages mehr produziert werden
         
