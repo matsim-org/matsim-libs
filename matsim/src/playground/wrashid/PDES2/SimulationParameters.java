@@ -73,7 +73,7 @@ public class SimulationParameters {
 	// keep the number of zone buckets big, because else the zones have different
 	// number of events in each zone not equal (ca. 5000)
 	// need to be high, because else a problem with JavaPDEQSim2.maxEventsPerBucket may occur
-	public static int numberOfZoneBuckets=10000;
+	public static int numberOfZoneBuckets=5000;
 	
 	synchronized public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
