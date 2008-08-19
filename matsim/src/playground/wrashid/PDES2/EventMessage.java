@@ -34,7 +34,7 @@ public abstract class EventMessage extends SelfhandleMessage {
 	public void resetMessage(Scheduler scheduler,Vehicle vehicle){
 		this.scheduler=scheduler;
 		this.vehicle=vehicle;
-		messageId=getMessageCounterAndIncrement();
+		//messageId=getMessageCounterAndIncrement();
 		assert(this.vehicle!=null);
 		isAcrossBorderMessage=false;
 		reviveMessage();

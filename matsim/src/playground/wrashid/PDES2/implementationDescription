@@ -67,7 +67,8 @@ Splitting the map:
      - performance verbessern
         - road.scheduleZoneBorderMessage => iterator verbessern...
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
-     
+        - wieso dauert getNextMessage so lang (obwohl empty buffers fast überhaupt nicht dauert).
+        - getThreadId in MessageExecutor (ThreadLocal), dauert ca. 3.3sec zum ausführen => final declariert
       
         
         

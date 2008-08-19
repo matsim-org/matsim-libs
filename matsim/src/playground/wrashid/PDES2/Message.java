@@ -10,7 +10,7 @@ public abstract class Message implements Comparable {
 	public SimUnit sendingUnit;
 	public SimUnit receivingUnit;
 	public long messageType;
-	public long messageId;
+	//private long messageId;
 	public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
 	public Object firstLock=null;
 	public Object secondLock=null;
@@ -23,7 +23,7 @@ public abstract class Message implements Comparable {
 	// all inheriting or extending modules must
 	// invoke this Constructer first
 	public Message() {
-		messageId=getMessageCounterAndIncrement();
+		//messageId=getMessageCounterAndIncrement();
 	}
 	
 	public double getMessageArrivalTime() {
@@ -53,7 +53,7 @@ public abstract class Message implements Comparable {
 			return 1;
 		}else {
 			// messages with same arrival time and priority
-			return (int)(messageId-otherMessage.messageId);
+			return -1;
 		}
 	}
 
