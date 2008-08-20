@@ -121,12 +121,6 @@ public class Household {
 
 	@Override
 	public final String toString() {
-		return "[id=" + this.id + "]" +
-			"[muni_id=" + this.municipality.getId() + "]" +
-			"[fac_id=" + this.facility.getId() + "]" +
-			"[hhtpz=" + this.hhtpz + "]" +
-			"[hhtpw=" + this.hhtpw + "]" +
-			"[nof_p_w=" + this.persons_w.size() + "]" +
-			"[nof_p_z=" + this.persons_z.size() + "]";
+		return this.id.toString();
 	}
 }

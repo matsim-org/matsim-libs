@@ -37,6 +37,7 @@ import org.matsim.world.algorithms.WorldValidation;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
+import playground.balmermi.census2000v2.modules.PlansFilterPersons;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
@@ -141,6 +142,12 @@ public class IIDMGeneration {
 //		new PersonCreateFakePlanFromKnowledge().run(plans);
 //		new PlansScenarioCut(min,max).run(plans);
 //		log.info("  done.");
+		
+		//////////////////////////////////////////////////////////////////////
+		
+		log.info("  removing persons... ");
+		new PlansFilterPersons().run(pop);
+		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 		
