@@ -51,7 +51,7 @@ public class ZoneMessageQueue {
 	// linked
 	// lists
 	private int messagesArrivedFromRoads;
-	public HashMap<Road, Integer> numberOfQueuedMessages = new HashMap<Road, Integer>();
+	public HashMap<Road, Integer> numberOfQueuedMessages[] = new HashMap[SimulationParameters.numberOfMessageExecutorThreads];
 	private Message tmpLastRemovedMessage = null;
 	private final Integer zero = new Integer(0);
 
@@ -69,7 +69,7 @@ public class ZoneMessageQueue {
 
 		
 			if (m.isAcrossBorderMessage) {
-				
+				//System.out.println(m);
 				
 				if (incrementNumberOfQueuedMessages((Road) m.sendingUnit)==1) {
 					// if new message arrived for an incoming road
@@ -89,6 +89,11 @@ public class ZoneMessageQueue {
 		try {
 			if (!(m instanceof ZoneBorderMessage)){
 				buffer.add(m, MessageExecutor.getThreadId());
+				incounter++;
+			} else {
+				// because ZoneBorderMessages are not scheduled, they also won't be
+				// recycled
+				m.recycleMessage();
 			}
 		} catch (Exception e) {
 			buffer.add(m, 0);
@@ -103,7 +108,7 @@ public class ZoneMessageQueue {
 		if (incounter % 10000 == 0) {
 			// System.out.println("incounter:"+incounter);
 		}
-		incounter++;
+		
 
 		// System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() +
 		// " - " + numberOfIncomingLinks);
@@ -114,6 +119,7 @@ public class ZoneMessageQueue {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
 			// addMessageBuffer[i] = new LinkedList<Message>();
 			// deleteMessageBuffer[i] = new LinkedList<Message>();
+			numberOfQueuedMessages[i] = new HashMap<Road, Integer>(); 
 		}
 		this.zoneId = zoneId;
 	}
@@ -197,19 +203,21 @@ public class ZoneMessageQueue {
 
 	private int incrementNumberOfQueuedMessages(Road fromRoad) {
 		int result=0;
-		synchronized (numberOfQueuedMessages){
-			result=numberOfQueuedMessages.get(fromRoad).intValue() + 1;
-			numberOfQueuedMessages.put(fromRoad, result);
+		int zoneId=fromRoad.getZoneId();
+		synchronized (numberOfQueuedMessages[zoneId]){
+			result=numberOfQueuedMessages[zoneId].get(fromRoad).intValue() + 1;
+			numberOfQueuedMessages[zoneId].put(fromRoad, result);
 		}
 		return result;
 	}
 
 	private int decrementNumberOfQueuedMessages(Road fromRoad) {
 		int result=0;
-		synchronized (numberOfQueuedMessages){
-			result=numberOfQueuedMessages.get(fromRoad).intValue() - 1;
-			numberOfQueuedMessages.put(fromRoad, result);
-		}	
+		int zoneId=fromRoad.getZoneId();
+		synchronized (numberOfQueuedMessages[zoneId]){
+			result=numberOfQueuedMessages[zoneId].get(fromRoad).intValue() - 1;
+			numberOfQueuedMessages[zoneId].put(fromRoad, result);
+		}
 		return result;
 	}
 

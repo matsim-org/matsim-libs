@@ -65,8 +65,9 @@ Splitting the map:
       => vorallem das scheduling ist ein problem, weil es lockings braucht
       	- lösung 1: don't send any message to a node, if we just sent him a real message (sehr kleiner gain)
       	- lösung 2: try building bigger look aheads
-        - lösung 3: don't schedule the ZoneBorderMessages (because they actually do nothing) => implemented.
-      
+        - lösung 3: (implemented): don't schedule the ZoneBorderMessages (because they actually do nothing) => implemented.
+        - lösung 4: (implemented): make numberOfQueuedMessages more concurrent
+            => more possible... 
     
     
 - TODO: 
@@ -77,6 +78,8 @@ Splitting the map:
             => man könnte es der message mitgeben, etc...
         - empty buffer takes longer, than one would think...   
         - unix xwindow aus probieren
+        - auch in normaler DES bzw. erster PDES version das Priority queue problem lösen
+        - => grosse tests ausprobieren
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 

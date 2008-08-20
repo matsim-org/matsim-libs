@@ -79,7 +79,7 @@ public class Scheduler {
 				} else {
 					simulationTerminated=true;
 					SimulationParameters.processEventBuffer();
-					Thread.currentThread().sleep(1000);
+					Thread.currentThread().sleep(5000);
 					for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
 						messageExecutors[i].stop();
 					}
@@ -198,7 +198,7 @@ public class Scheduler {
 					if (!zoneMessageQueues[road.getZoneId()].tempIncomingLinks.contains(inLink)){
 						zoneMessageQueues[road.getZoneId()].tempIncomingLinks.add(inLink);
 						inRoad.isOutBorderRoad=true;
-						zoneMessageQueues[road.getZoneId()].numberOfQueuedMessages.put(inRoad, 0);
+						zoneMessageQueues[road.getZoneId()].numberOfQueuedMessages[inRoad.getZoneId()].put(inRoad, 0);
 						//System.out.println(inRoad.getLink().getLength());
 					}
 				}
