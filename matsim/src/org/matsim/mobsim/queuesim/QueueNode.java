@@ -41,8 +41,6 @@ public class QueueNode {
 
 	private final QueueLink[] tempLinks;
 
-	private final QueueLink[] auxLinks;
-
 	private boolean active = false;
 
 	private Node node;
@@ -56,7 +54,6 @@ public class QueueNode {
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QueueLink[nofInLinks];
 		this.tempLinks = new QueueLink[nofInLinks];
-		this.auxLinks = new QueueLink[nofInLinks];
 	}
 
 	/**
@@ -193,21 +190,17 @@ public class QueueNode {
 					continue;
 				selCap += link.getLink().getCapacity(now);
 				if (selCap >= rndNum) {
-					this.auxLinks[auxCounter] = link;
+//					this.auxLinks[auxCounter] = link;
 					auxCounter++;
 					inLinksCapSum -= link.getLink().getCapacity(now);
 					this.tempLinks[i] = null;
-					break;
-				}
-			}
-		}
-
-		for (int i = 0; i < auxCounter; i++) {
-			QueueLink link = this.auxLinks[i];
-			// Move agents/vehicle data to next link
-			while (!link.bufferIsEmpty()) {
-				Vehicle veh = link.getFirstFromBuffer();
-				if (!moveVehicleOverNode(veh, now)) {
+					//move the link
+					while (!link.bufferIsEmpty()) {
+						Vehicle veh = link.getFirstFromBuffer();
+						if (!moveVehicleOverNode(veh, now)) {
+							break;
+						}
+					}
 					break;
 				}
 			}
