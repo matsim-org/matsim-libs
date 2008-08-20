@@ -61,8 +61,6 @@ Splitting the map:
       the condition, that there are enough messages to process the queue condition is fullfilled
        => this leads to a null pointer exception there...
     
- 
- 
 - TODO: 
      - performance verbessern
         - putMessage should be possible quickly (use my cuncurrent list implementation) => auch möglich mit nur 
@@ -70,7 +68,7 @@ Splitting the map:
         - getThreadId in MessageExecutor (ThreadLocal), dauert ca. 5.8sec zum ausführen
             => man könnte es der message mitgeben, etc...
         - empty buffer takes longer, than one would think...   
-        
+        - unix xwindow aus probieren
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -84,3 +82,14 @@ Splitting the map:
      - getSimtime consumes around 15%+ of the CPU time => solved by removing ThreadLocal variable simTime in MessageExecutor
      - message counter removed, because it is a common synchronization point
      - 
+     
+     
+     ===================================================
+     - (solved) leave road, getFirst problem occured on satawal...
+       => perhaps I am scheduling the message in the wrong messageQueue, because the original deadlock prevention message
+          perhaps is already applied in the previous scheduler?
+       => do we have a race condition between Deadlock prevention message and enterRequestMessage ? 
+ 		=> Fact: two times leave is done on a road (a Deadlock prevention message, which should have been timed out, was still alive)
+ 		=> the problem is not my problem, but rather that of java api: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6207984
+ 		   - use queue.removeAll(Collections.singletonList(o)) instead of queue.remove for priority queues.
+     =======================================================

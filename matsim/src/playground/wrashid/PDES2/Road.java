@@ -58,7 +58,7 @@ public class Road extends SimUnit {
 
 	
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages= new LinkedList<DeadlockPreventionMessage>();
-	private PriorityQueue<DeadlockPreventionMessage> testDeadlockPreventionMessages= new PriorityQueue<DeadlockPreventionMessage>();
+	//private PriorityQueue<DeadlockPreventionMessage> testDeadlockPreventionMessages= new PriorityQueue<DeadlockPreventionMessage>();
 	
 	Lock lock=new ReentrantLock();
 	//public ConcurrentLinkedQueue<Message> waitingOnLock=new ConcurrentLinkedQueue<Message>();
@@ -201,14 +201,14 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (deadlockPreventionMessages.size() > 0) {
 			
-			assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
-			assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
+			//assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
+			//assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
 			
 			DeadlockPreventionMessage m=null;
 			Vehicle nextVehicle=null;
 			try{
 				m=deadlockPreventionMessages.poll();
-				testDeadlockPreventionMessages.poll();
+				//testDeadlockPreventionMessages.poll();
 				nextVehicle = m.vehicle;
 			} catch (Exception e){
 				System.out.println("road:"+link.getId()+  " - " + this + "  -  " + "vehicle " + nextVehicle.getOwnerPerson().getId() + " - " + lock);
@@ -402,16 +402,16 @@ public class Road extends SimUnit {
 				//}
 				dpm=vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().messageArrivalTime +SimulationParameters.stuckTime, this);
 				deadlockPreventionMessages.add(dpm);
-				testDeadlockPreventionMessages.add(dpm);
+				//testDeadlockPreventionMessages.add(dpm);
 				
 			} else {
 				dpm=vehicle.scheduleDeadlockPreventionMessage(simTime+SimulationParameters.stuckTime, this);
 				deadlockPreventionMessages.add(dpm);
-				testDeadlockPreventionMessages.add(dpm);
+				//testDeadlockPreventionMessages.add(dpm);
 			}
-			assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
-			assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
-			assert(testDeadlockPreventionMessages.contains(dpm)):"inconsistency";
+			//assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
+			//assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
+			//assert(testDeadlockPreventionMessages.contains(dpm)):"inconsistency";
 			assert(deadlockPreventionMessages.contains(dpm)):"inconsistency";
 			
 		}
@@ -460,11 +460,11 @@ public class Road extends SimUnit {
 		// need the last element (that function is not available with PriorityQueue)
 		//assert(deadlockPreventionMessages.peek()==dpMessage):"Inconsitency in logic!!! => this should only be invoked from the handler of this message";
 		assert(deadlockPreventionMessages.contains(dpMessage)):"Something is really wrong here";
-		assert(testDeadlockPreventionMessages.contains(dpMessage)):"inconsistency";
+		//assert(testDeadlockPreventionMessages.contains(dpMessage)):"inconsistency";
 		
 		//deadlockPreventionMessages.removeFirst();
 		// the code line above was replaced, because of time causality, there could be a problem
-		testDeadlockPreventionMessages.remove(dpMessage);
+		//testDeadlockPreventionMessages.remove(dpMessage);
 		deadlockPreventionMessages.remove(dpMessage);
 	}
 	

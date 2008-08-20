@@ -1,5 +1,6 @@
 package playground.wrashid.PDES2;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -28,8 +29,8 @@ public class ZoneMessageQueue {
 	public int incounter = 0;
 	public double arrivalTimeOfLastRemovedMessage = 0;
 	private Object bufferLock = new Object();
-	private LinkedList<Message>[] addMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
-	private LinkedList<Message>[] deleteMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	//private LinkedList<Message>[] addMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	//private LinkedList<Message>[] deleteMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
 	public ConcurrentListMPSC<Message> buffer = new ConcurrentListMPSC<Message>(
 			SimulationParameters.numberOfMessageExecutorThreads);
@@ -99,8 +100,8 @@ public class ZoneMessageQueue {
 
 	public ZoneMessageQueue(int zoneId) {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
-			addMessageBuffer[i] = new LinkedList<Message>();
-			deleteMessageBuffer[i] = new LinkedList<Message>();
+			//addMessageBuffer[i] = new LinkedList<Message>();
+			//deleteMessageBuffer[i] = new LinkedList<Message>();
 		}
 		this.zoneId = zoneId;
 	}
@@ -118,7 +119,10 @@ public class ZoneMessageQueue {
 			System.out.println("concurrency occured");
 		}
 		emptyBuffer();
-		queue1.remove(m);
+		
+		queue1.removeAll(Collections.singletonList(m));
+		//queue1.remove(m); => this does not function properly for priotyqueues as intended
+		
 	}
 
 	synchronized public Message getNextMessage() {
