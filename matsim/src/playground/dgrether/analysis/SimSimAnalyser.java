@@ -103,8 +103,7 @@ public class SimSimAnalyser {
 //				countSimComp, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
 //		kmlWriter.writeFile(outfile);
 
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
-		errorStats.calculateErrorStats(countSimComp);
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countSimComp);
 		
 		double[] hours = new double[24];
 		for (int i = 1; i < 25; i++) {

@@ -43,8 +43,12 @@ public class ComparisonErrorStatsCalculator {
 	private int[] nbrRelErr = null;
 
 	private int[] nbrAbsErr = null;
+	
+	public ComparisonErrorStatsCalculator(final List<CountSimComparison> ccl) {
+		this.calculateErrorStats(ccl);
+	}
 
-	public void calculateErrorStats(final List<CountSimComparison> ccl) {
+	private void calculateErrorStats(final List<CountSimComparison> ccl) {
 		// init with same value. Shorter stat.?
 		// Possibly not all links have values for all hours.
 		meanRelError = new double[24];

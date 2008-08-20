@@ -233,8 +233,7 @@ public class CountsAnalyser {
 		else {
 			throw new IllegalArgumentException("Output format must be txt or kml");
 		}
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
-		errorStats.calculateErrorStats(countsComparisonList);
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
 		
 		double[] hours = new double[24];
 		for (int i = 1; i < 25; i++) {

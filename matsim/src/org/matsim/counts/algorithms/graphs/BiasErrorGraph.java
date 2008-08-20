@@ -51,8 +51,7 @@ public class BiasErrorGraph extends CountsGraph {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator();
-		errorStats.calculateErrorStats(this.ccl_);
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
 		
 		double[] meanRelError = errorStats.getMeanRelError();
 		double[] meanAbsError = errorStats.getMeanAbsError();
