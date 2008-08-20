@@ -125,7 +125,15 @@ public class QueueNetwork{
 	 */
 	public void simStep(final double time) {
 		for (QueueNode node : this.simNodesArray) {
-			node.moveNode(time);
+			if (node.isActive()) {
+				/* It is faster to first test if the node is active, and only then call moveNode(),
+				 * than calling moveNode() directly and that one returns immediately when it's not
+				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
+				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
+				 * -marcel/20aug2008
+				 */
+				node.moveNode(time);
+			}
 		}
 		reactivateLinks(time);
 		moveLinks(time);

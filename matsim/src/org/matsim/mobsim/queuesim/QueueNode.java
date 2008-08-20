@@ -143,6 +143,10 @@ public class QueueNode {
 		this.active = true;
 	}
 
+	public final boolean isActive() {
+		return this.active;
+	}
+
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -160,10 +164,6 @@ public class QueueNode {
 	 */
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
-
-		if (!this.active) {
-			return;
-		}
 
 		if (this.cacheIsInvalid) {
 			buildCache();
