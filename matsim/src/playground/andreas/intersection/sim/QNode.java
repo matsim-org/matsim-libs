@@ -28,8 +28,6 @@ public class QNode extends QueueNode{
 
 	private QLink[] tempLinks = null;
 
-	private QLink[] auxLinks = null;
-	
 	public QNode(Node n, QueueNetwork queueNetwork) {
 		super(n,  queueNetwork);
 	}
@@ -86,7 +84,6 @@ public class QNode extends QueueNode{
 		} else {
 
 			//Node is NOT traffic light controlled
-
 			if (this.cacheIsInvalid) {
 				buildCache();
 			}
@@ -113,30 +110,21 @@ public class QNode extends QueueNode{
 						continue;
 					selCap += link.getLink().getCapacity(now);
 					if (selCap >= rndNum) {
-						this.auxLinks[auxCounter] = link;
 						auxCounter++;
 						inLinksCapSum -= link.getLink().getCapacity(now);
 						this.tempLinks[i] = null;
+						for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
+							while (!pseudoLink.flowQueueIsEmpty()) {
+								Vehicle veh = pseudoLink.getFirstFromBuffer();
+								if (!moveVehicleOverNode(veh, pseudoLink)) {
+									break;
+								}
+							}
+						}
 						break;
 					}
 				}
-			}
-			
-			for (int i = 0; i < auxCounter; i++) {
-				QLink qlink = this.auxLinks[i];
-				for (PseudoLink pseudoLink : qlink.getNodePseudoLinks()) {
-					
-//					pseudoLink.setThisTimeStepIsGreen(true);
-					
-					while (!pseudoLink.flowQueueIsEmpty()) {
-						Vehicle veh = pseudoLink.getFirstFromBuffer();
-						if (!moveVehicleOverNode(veh, pseudoLink)) {
-							break;
-						}
-					}
-				}
-			}
-			
+			}	
 			
 //			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
 //				Link link = iter.next();
@@ -200,7 +188,6 @@ public class QNode extends QueueNode{
 			}
 		});
 		this.tempLinks = new QLink[this.getNode().getInLinks().values().size()];
-		this.auxLinks = new QLink[this.getNode().getInLinks().values().size()];
 		this.cacheIsInvalid = false;
 	}
 
