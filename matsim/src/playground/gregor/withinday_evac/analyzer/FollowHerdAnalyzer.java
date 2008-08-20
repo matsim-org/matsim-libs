@@ -22,7 +22,6 @@ package playground.gregor.withinday_evac.analyzer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
@@ -47,30 +46,36 @@ public class FollowHerdAnalyzer implements Analyzer {
 			return null;
 		}
 		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
+		ArrayList<Link> indices = new ArrayList<Link>();
 		for (final InformationEntity ie : ies) {
 			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
 			final Counter c = counts.get(m.getLink());
 			if (c != null) {
 				c.value += 1.0;
-				
 			} else {
 				counts.put(m.getLink(), new Counter(1));
+				indices.add(m.getLink());
+				
 			}
 			
 		}
+				
+			
 		
 
 		double weightSum = 0;
-		for (final Entry<Link, Counter> e : counts.entrySet()) {
-			e.getValue().value = Math.exp(e.getValue().value);
-			weightSum += e.getValue().value; 
+		for (final Link l : indices) {
+			Counter c = counts.get(l);
+			c.value = Math.exp(c.value);
+			weightSum += c.value; 
 		}
 		
 		double selNum = weightSum * MatsimRandom.random.nextDouble();
-		for (final Entry<Link, Counter> e : counts.entrySet()) {
-			selNum -= e.getValue().value;
+		for (final Link l : indices) {
+			Counter c = counts.get(l);
+			selNum -= c.value;
 			if (selNum <= 0) {
-				return new NextLinkOption(e.getKey(),1 * this.coef);
+				return new NextLinkOption(l,1 * this.coef);
 			}
 		}
 				

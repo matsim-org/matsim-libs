@@ -20,8 +20,6 @@
 
 package playground.gregor.withinday_evac.mobsim;
 
-import java.util.Random;
-
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -42,18 +40,17 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	private final playground.gregor.withinday_evac.controler.WithindayControler controler;
 	private final InformationExchanger informationExchanger;
-	private final Random rnd;
 
 
 	public WithindayQueueSimulation(final NetworkLayer net,
 			final Population plans, final Events events, final playground.gregor.withinday_evac.controler.WithindayControler withindayControler) {
 		super(net, plans, events);
-		this.rnd = new Random(1);
+
 		final QueueNetwork qNet = new QueueNetwork(net);
 		this.network = qNet;
 		this.controler = withindayControler;
 		this.informationExchanger = new InformationExchanger(net);
-		super.setAgentFactory(new WithindayAgentFactory(informationExchanger, this.network.getNetworkLayer()));
+		super.setAgentFactory(new WithindayAgentFactory(this.informationExchanger, this.network.getNetworkLayer()));
 		
 	}
 	
