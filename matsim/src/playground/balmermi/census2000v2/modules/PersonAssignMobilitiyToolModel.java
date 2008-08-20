@@ -142,6 +142,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		else { model.setLanguage(1); }
 
 		// calc and assign mobility tools
+		System.out.println("pid="+person.getId());
 		int mobtype = model.calcMobilityTools();
 		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
 		person.setCarAvail(null);

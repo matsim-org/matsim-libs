@@ -248,6 +248,20 @@ public class ModelMobilityTools {
 			prob_sum += probs[i];
 			if (r < prob_sum) { return i; }
 		}
+		System.out.println("r="+r);
+		System.out.println("age="+age);
+		System.out.println("sex="+sex);
+		System.out.println("nat="+nat);
+		System.out.println("nump="+nump);
+		System.out.println("numk="+numk);
+		System.out.println("inc="+inc);
+		System.out.println("udeg="+udeg);
+		System.out.println("license="+license);
+		System.out.println("disthw="+disthw);
+		System.out.println("fuelcost="+fuelcost);
+		System.out.println("language="+language);
+		for (int i = 0; i<utils.length; i++) { System.out.println("utils["+i+"]="+utils[i]); }
+		for (int i = 0; i<probs.length; i++) { System.out.println("probs["+i+"]="+probs[i]); }
 		Gbl.errorMsg("It should never reach this line!");
 		return -1;
 	}
