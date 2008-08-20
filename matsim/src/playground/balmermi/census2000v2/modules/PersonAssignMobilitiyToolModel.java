@@ -129,8 +129,9 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		model.setAge(person.getAge());
 		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
-		model.setHHDimension(persons.size());
-		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } } model.setHHKids(kids);
+		if (persons.size() <= 100) { model.setHHDimension(persons.size()); } else { model.setHHDimension(100); log.info("pid="+person.getId()+": numpHH="+persons.size()); }
+		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
+		if (kids <= 100) { model.setHHKids(kids); } else { model.setHHKids(100); log.info("pid="+person.getId()+": numkidsHH="+kids); }
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
 		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
