@@ -126,7 +126,7 @@ public class QNode extends QueueNode{
 				QLink qlink = this.auxLinks[i];
 				for (PseudoLink pseudoLink : qlink.getNodePseudoLinks()) {
 					
-					pseudoLink.setThisTimeStepIsGreen(true);
+//					pseudoLink.setThisTimeStepIsGreen(true);
 					
 					while (!pseudoLink.flowQueueIsEmpty()) {
 						Vehicle veh = pseudoLink.getFirstFromBuffer();

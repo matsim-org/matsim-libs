@@ -87,6 +87,7 @@ public class QLink extends QueueLink {
 	
 	@Override
 	protected boolean bufferIsEmpty() {
+		this.originalLink.setThisTimeStepIsGreen(true);
 		return this.originalLink.flowQueueIsEmpty();
 	}
 	
