@@ -29,8 +29,10 @@ public class ZoneMessageQueue {
 	public int incounter = 0;
 	public double arrivalTimeOfLastRemovedMessage = 0;
 	private Object bufferLock = new Object();
-	//private LinkedList<Message>[] addMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
-	//private LinkedList<Message>[] deleteMessageBuffer = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	// private LinkedList<Message>[] addMessageBuffer = new
+	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
+	// private LinkedList<Message>[] deleteMessageBuffer = new
+	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
 	public ConcurrentListMPSC<Message> buffer = new ConcurrentListMPSC<Message>(
 			SimulationParameters.numberOfMessageExecutorThreads);
@@ -54,19 +56,27 @@ public class ZoneMessageQueue {
 	private final Integer zero = new Integer(0);
 
 	public void putMessage(Message m) {
-		assert (!queue1.contains(m)) : "inconsistency";
-		assert (m.messageArrivalTime >= 0) : "simulation time cannot be negative";
+		// the following assertions need to be commented out, because this
+		// method is not synchronized
+		// anymore and some of them would lead to
+		// ConcurrentModificationException
+		
+		// assert (!queue1.contains(m)) : "inconsistency";
+		// assert (m.messageArrivalTime >= 0) : "simulation time cannot be
+		// negative";
 
-		assert (((Road) m.receivingUnit).getZoneId() == zoneId);
+		// assert (((Road) m.receivingUnit).getZoneId() == zoneId);
 
-		synchronized (lock) {
+		
 			if (m.isAcrossBorderMessage) {
 				
 				
 				if (incrementNumberOfQueuedMessages((Road) m.sendingUnit)==1) {
 					// if new message arrived for an incoming road
-					//messagesArrivedFromRoads.put((Road) m.sendingUnit, zero);
-					messagesArrivedFromRoads++;
+					// messagesArrivedFromRoads.put((Road) m.sendingUnit, zero);
+					synchronized (lock) {
+						messagesArrivedFromRoads++;
+					}
 				}
 				if (!(m instanceof ZoneBorderMessage)) {
 					// System.out.println(m + " - " + m.messageArrivalTime + " -
@@ -74,7 +84,7 @@ public class ZoneMessageQueue {
 					// + arrivalTimeOfLastRemovedMessage);
 				}
 			}
-		}
+		
 
 		try {
 			buffer.add(m, MessageExecutor.getThreadId());
@@ -100,8 +110,8 @@ public class ZoneMessageQueue {
 
 	public ZoneMessageQueue(int zoneId) {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
-			//addMessageBuffer[i] = new LinkedList<Message>();
-			//deleteMessageBuffer[i] = new LinkedList<Message>();
+			// addMessageBuffer[i] = new LinkedList<Message>();
+			// deleteMessageBuffer[i] = new LinkedList<Message>();
 		}
 		this.zoneId = zoneId;
 	}
@@ -121,7 +131,8 @@ public class ZoneMessageQueue {
 		emptyBuffer();
 		
 		queue1.removeAll(Collections.singletonList(m));
-		//queue1.remove(m); => this does not function properly for priotyqueues as intended
+		// queue1.remove(m); => this does not function properly for priotyqueues
+		// as intended
 		
 	}
 
@@ -145,8 +156,9 @@ public class ZoneMessageQueue {
 			// }
 
 			if (m.isAcrossBorderMessage) {
-				synchronized (lock) {
+				
 					if (decrementNumberOfQueuedMessages((Road) m.sendingUnit) == 0) {
+						synchronized (lock) {
 						messagesArrivedFromRoads--;
 					}
 				}
@@ -179,22 +191,24 @@ public class ZoneMessageQueue {
 	}
 
 	private int incrementNumberOfQueuedMessages(Road fromRoad) {
-		assert (fromRoad != null);
-		assert (numberOfQueuedMessages.get(fromRoad) != null);
-		int result=numberOfQueuedMessages.get(fromRoad).intValue() + 1;
-		numberOfQueuedMessages.put(fromRoad, result);
+		int result=0;
+		synchronized (numberOfQueuedMessages){
+			result=numberOfQueuedMessages.get(fromRoad).intValue() + 1;
+			numberOfQueuedMessages.put(fromRoad, result);
+		}
 		return result;
 	}
 
 	private int decrementNumberOfQueuedMessages(Road fromRoad) {
-		int result=numberOfQueuedMessages.get(fromRoad).intValue() - 1;
-		numberOfQueuedMessages.put(fromRoad, result);
+		int result=0;
+		synchronized (numberOfQueuedMessages){
+			result=numberOfQueuedMessages.get(fromRoad).intValue() - 1;
+			numberOfQueuedMessages.put(fromRoad, result);
+		}	
 		return result;
 	}
 
-	private int getNumberOfQueueMessages(Road fromRoad) {
-		return numberOfQueuedMessages.get(fromRoad);
-	}
+
 
 	public void printSize() {
 		System.out.println("zoneId:" + zoneId + "; size:" + queue1.size());
