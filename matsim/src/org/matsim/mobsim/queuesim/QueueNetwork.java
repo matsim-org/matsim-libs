@@ -55,6 +55,7 @@ public class QueueNetwork{
 	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
 	 */
 	private final static boolean simulateAllLinks = false;
+	private final static boolean simulateAllNodes = false;
 
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
@@ -128,7 +129,7 @@ public class QueueNetwork{
 	 */
 	public void simStep(final double time) {
 		for (QueueNode node : this.simNodesArray) {
-			if (node.isActive()) {
+			if (node.isActive() || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
 				 * than calling moveNode() directly and that one returns immediately when it's not
 				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
