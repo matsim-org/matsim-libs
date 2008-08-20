@@ -45,6 +45,8 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 
 	private final static Logger log = Logger.getLogger(PersonAssignMobilitiyToolModel.class);
 
+	private static final Integer MAXNUMP = 14;
+	
 	private static final String MALE = "m";
 	private static final String YES = "yes";
 
@@ -129,9 +131,18 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		model.setAge(person.getAge());
 		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
-		if (persons.size() <= 100) { model.setHHDimension(persons.size()); } else { model.setHHDimension(100); log.info("pid="+person.getId()+": numpHH="+persons.size()+" => #100"); }
+
+		int nump = persons.size();
 		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
-		if (kids <= 100) { model.setHHKids(kids); } else { model.setHHKids((int)(100*kids/persons.size())); log.info("pid="+person.getId()+": numkidsHH="+kids+" => "+((int)(100*kids/persons.size()))); }
+		if (nump > MAXNUMP) {
+			log.info("pid="+person.getId()+": numpHH="+persons.size()+", kidsHH="+kids);
+			kids = MAXNUMP*kids/nump;
+			nump = MAXNUMP;
+			log.info("=> numpHH="+nump+", kidsHH="+kids);
+		}
+		model.setHHDimension(nump);
+		model.setHHKids(kids);
+
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
 		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
@@ -143,7 +154,6 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		else { model.setLanguage(1); }
 
 		// calc and assign mobility tools
-		System.out.println("pid="+person.getId());
 		int mobtype = model.calcMobilityTools();
 		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
 		person.setCarAvail(null);
