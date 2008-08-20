@@ -57,7 +57,7 @@ public class Scheduler {
 		
 		
 		try {
-			//Thread.currentThread().sleep(20000);
+			//Thread.currentThread().sleep(2000);
 			
 			
 			
@@ -65,8 +65,9 @@ public class Scheduler {
 			while (true){
 				boolean allDead=true;
 				for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
-					if (messageExecutors[i].isAlive){
+					if (!zoneMessageQueues[i].isEmpty()){
 						allDead=false;
+						break;
 					}
 				}
 				if (!allDead){

@@ -60,6 +60,14 @@ Splitting the map:
     - it is possible, that in ZoneMessageQueue.getNextMessage the message queue is empty, even though
       the condition, that there are enough messages to process the queue condition is fullfilled
        => this leads to a null pointer exception there...
+    - es gibt zu viele messages (ca. 3 mal mehr als anwendungs messages). Kann man das irgendwie 
+      runterbringen?
+      => vorallem das scheduling ist ein problem, weil es lockings braucht
+      	- lösung 1: don't send any message to a node, if we just sent him a real message (sehr kleiner gain)
+      	- lösung 2: try building bigger look aheads
+        - lösung 3: don't schedule the ZoneBorderMessages (because they actually do nothing) => implemented.
+      
+    
     
 - TODO: 
      - performance verbessern
@@ -92,4 +100,8 @@ Splitting the map:
  		=> Fact: two times leave is done on a road (a Deadlock prevention message, which should have been timed out, was still alive)
  		=> the problem is not my problem, but rather that of java api: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6207984
  		   - use queue.removeAll(Collections.singletonList(o)) instead of queue.remove for priority queues.
+     =======================================================
+     - when trying to replace lock by a hashmap class, there is some problem, that a message is missing for 
+      some reason (not found out yet).
+      - the problem was, that the read and write operation for messagesArrivedFromRoads needs to be outside  
      =======================================================

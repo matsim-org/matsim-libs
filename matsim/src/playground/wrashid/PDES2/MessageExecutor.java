@@ -69,7 +69,7 @@ public class MessageExecutor extends Thread {
 		//int unsuccessful=0;
 		double simTime=0;
 		try{
-			while (scheduler.zoneMessageQueues[threadId].simTime<SimulationParameters.maxSimulationLength){
+			while (true){
 				
 				
 				

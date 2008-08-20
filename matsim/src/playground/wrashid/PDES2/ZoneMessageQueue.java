@@ -87,7 +87,9 @@ public class ZoneMessageQueue {
 		
 
 		try {
-			buffer.add(m, MessageExecutor.getThreadId());
+			if (!(m instanceof ZoneBorderMessage)){
+				buffer.add(m, MessageExecutor.getThreadId());
+			}
 		} catch (Exception e) {
 			buffer.add(m, 0);
 		}
@@ -185,8 +187,11 @@ public class ZoneMessageQueue {
 		return null;
 	}
 
-	// TODO: implement this properly!!!!!!!!!!
+	
 	synchronized public boolean isEmpty() {
+		if (arrivalTimeOfLastRemovedMessage>SimulationParameters.maxSimulationLength){
+			return true;
+		}
 		return false;
 	}
 
