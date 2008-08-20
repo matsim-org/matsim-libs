@@ -530,11 +530,20 @@ public class Road extends SimUnit {
 		double timeOfNextMessage=currentTime;
 		if (carsOnTheRoad.size()==0){
 			timeOfNextMessage+=linkTravelTime- SimulationParameters.delta;
+			scheduleZoneBorderMessage(timeOfNextMessage);
 		} else {
-			timeOfNextMessage+=inverseOutFlowCapacity- SimulationParameters.delta;
+			//timeOfNextMessage+=inverseOutFlowCapacity- SimulationParameters.delta;
+			
+			// don't schedule any border messages, just set a timer
+			timeOfNextMessage+=linkTravelTime- SimulationParameters.delta;
+			TimerMessage tm=MessageFactory.getTimerMessage();
+			tm.sendingUnit=this;
+			tm.receivingUnit=this;
+			tm.messageArrivalTime=timeOfNextMessage;
+			scheduler.schedule(tm);
 		}
 		
-		scheduleZoneBorderMessage(timeOfNextMessage);
+		
 	}
 	
 	
