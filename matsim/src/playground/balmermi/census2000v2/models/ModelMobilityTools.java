@@ -150,7 +150,7 @@ public class ModelMobilityTools {
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean setAge(int age) {
-		if (age < 0) { return false; }
+		if (age < 0) { Gbl.errorMsg("age="+age+" not allowed."); }
 		this.age = age;
 		return true;
 	}
@@ -168,25 +168,25 @@ public class ModelMobilityTools {
 	}
 
 	public final boolean setHHDimension(int nump) {
-		if (nump <= 0) { return false; }
+		if (nump <= 0) { Gbl.errorMsg("nump="+nump+" not allowed."); }
 		this.nump = nump;
 		return true;
 	}
 
 	public final boolean setHHKids(int numk) {
-		if (numk < 0) { return false; }
+		if (numk < 0) { Gbl.errorMsg("numk="+numk+" not allowed."); }
 		this.numk = numk;
 		return true;
 	}
 
 	public final boolean setIncome(double inc) {
-		if (inc <= 0) { return false; }
+		if (inc <= 0) { Gbl.errorMsg("inc="+inc+" not allowed."); }
 		this.inc = inc;
 		return true;
 	}
 
 	public final boolean setUrbanDegree(int udeg) {
-		if ((udeg < 1) || (5 < udeg)) { return false; }
+		if ((udeg < 1) || (5 < udeg)) { Gbl.errorMsg("udeg="+udeg+" not allowed."); }
 		this.udeg = udeg;
 		return true;
 	}
@@ -198,19 +198,19 @@ public class ModelMobilityTools {
 	}
 
 	public final boolean setDistanceHome2Work(double distance) {
-		if (distance < 0.0) { return false; }
+		if (distance < 0.0) { Gbl.errorMsg("distance="+distance+" not allowed."); }
 		this.disthw = distance;
 		return true;
 	}
 
 	public final boolean setFuelCost(double fuelcost) {
-		if (fuelcost <= 0.0) { return false; }
+		if (fuelcost <= 0.0) { Gbl.errorMsg("fuelcost="+fuelcost+" not allowed."); }
 		this.fuelcost = fuelcost;
 		return true;
 	}
 		
 	public final boolean setLanguage(int language) {
-		if ((language < 1) || (3 < language)) { return false; }
+		if ((language < 1) || (3 < language)) { Gbl.errorMsg("language="+language+" not allowed."); }
 		this.language = language;
 		return true;
 	}

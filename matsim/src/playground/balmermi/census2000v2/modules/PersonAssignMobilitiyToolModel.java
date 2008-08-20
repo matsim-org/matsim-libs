@@ -71,6 +71,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	@Override
 	public void run(Person person) {
 		
+		// get home activity
 		Activity home_act = null;
 		if (person.getKnowledge().getActivities(CAtts.ACT_HOME).size() < 1) {
 			Gbl.errorMsg("pid="+person.getId()+": no "+CAtts.ACT_HOME+" activity defined.");
@@ -91,6 +92,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 			Gbl.errorMsg("pid="+person.getId()+": more than two "+CAtts.ACT_HOME+" activity defined.");
 		}
 
+		// get primary activity
 		Activity prim_act = null;
 		ArrayList<Activity> prim_acts = new ArrayList<Activity>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
@@ -102,7 +104,6 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EHIGH));
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
 		}
-
 		if (!prim_acts.isEmpty()) {
 			double dist = Double.NEGATIVE_INFINITY;
 			for (Activity act : prim_acts) {
@@ -112,31 +113,35 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 			}
 		}
 		
+		// calc distance home<==>prim activity
 		double distance = 0.0;
 		if (prim_act != null) { distance = prim_act.getFacility().getCenter().calcDistance(home_act.getFacility().getCenter()); }
 		
+		// get infos
 		Map<String,Object> atts = person.getCustomAttributes();
 		Object o = atts.get(CAtts.HH_W);
 		if (o == null) { Gbl.errorMsg("pid="+person.getId()+": no '"+CAtts.HH_W+" defined."); }
 		Household hh = (Household)o;
 		Map<Id,Person> persons = hh.getPersons();
+		int cid = hh.getMunicipality().getCantonId();
 		
+		// set model parameters
 		model.setAge(person.getAge());
-		if (person.getSex().equals(MALE)) { model.setSex(true); }
-		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); }
+		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
+		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
 		model.setHHDimension(persons.size());
 		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } } model.setHHKids(kids);
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
-		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); }
+		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
 		model.setDistanceHome2Work(distance);
 		model.setFuelCost(hh.getMunicipality().getFuelCost());
-		// 1-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian) 
-		int cid = hh.getMunicipality().getCantonId();
-		if ((1 <= cid) && (cid <= 9) || (11 <= cid) && (cid <= 20)) {model.setLanguage(1);}
-		if ((22 <= cid) && (cid <= 26) || (cid == 10)) {model.setLanguage(2);}
-		if (cid == 21) {model.setLanguage(3);}
+		// 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian) 
+		if (cid == 21) { model.setLanguage(3); }
+		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
+		else { model.setLanguage(1); }
 
+		// calc and assign mobility tools
 		int mobtype = model.calcMobilityTools();
 		if ((3 <= mobtype) && (mobtype <= 5)) { person.addTravelcard(UNKNOWN); }
 		person.setCarAvail(null);

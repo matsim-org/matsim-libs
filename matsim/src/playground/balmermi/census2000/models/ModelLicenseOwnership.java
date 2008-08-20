@@ -70,7 +70,7 @@ public class ModelLicenseOwnership {
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean setAge(int age) {
-		if (age < 0) { return false; }
+		if (age < 0) { Gbl.errorMsg("age="+age+" not allowed."); }
 		this.age = age;
 		return true;
 	}
@@ -88,25 +88,25 @@ public class ModelLicenseOwnership {
 	}
 
 	public final boolean setHHDimension(int nump) {
-		if (nump <= 0) { return false; }
+		if (nump <= 0) { Gbl.errorMsg("nump="+nump+" not allowed."); }
 		this.nump = nump;
 		return true;
 	}
 
 	public final boolean setHHKids(int numk) {
-		if (numk < 0) { return false; }
+		if (numk < 0) { Gbl.errorMsg("numk="+numk+" not allowed."); }
 		this.numk = numk;
 		return true;
 	}
 
 	public final boolean setIncome(double inc) {
-		if (inc <= 0) { return false; }
+		if (inc <= 0) { Gbl.errorMsg("inc="+inc+" not allowed."); }
 		this.inc = inc;
 		return true;
 	}
 
 	public final boolean setUrbanDegree(int udeg) {
-		if ((udeg < 1) || (5 < udeg)) { return false; }
+		if ((udeg < 1) || (5 < udeg)) { Gbl.errorMsg("udeg="+udeg+" not allowed."); }
 		this.udeg = udeg;
 		return true;
 	}

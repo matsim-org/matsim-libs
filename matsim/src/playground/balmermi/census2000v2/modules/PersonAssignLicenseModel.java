@@ -62,22 +62,23 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 
 	@Override
 	public void run(Person person) {
+		// get infos
 		Map<String,Object> atts = person.getCustomAttributes();
-		
-		model.setAge(person.getAge());
-		if (person.getSex().equals(MALE)) { model.setSex(true); }
-		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); }
 		Object o = atts.get(CAtts.HH_W);
 		if (o == null) { Gbl.errorMsg("pid="+person.getId()+": no '"+CAtts.HH_W+" defined."); }
 		Household hh = (Household)o;
+		Map<Id,Person> persons = hh.getPersons();
+
+		// set model parameters
+		model.setAge(person.getAge());
+		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
+		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
+		model.setHHDimension(persons.size());
+		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } } model.setHHKids(kids);
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
-		
-		Map<Id,Person> persons = hh.getPersons();
-		model.setHHDimension(persons.size());
-		int kids = 0;
-		for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
-		model.setHHKids(kids);
+
+		// calc and assign license ownership
 		boolean hasLicense = model.calcLicenseOwnership();
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
 		if ((person.getAge() < 18) && (hasLicense)) {
