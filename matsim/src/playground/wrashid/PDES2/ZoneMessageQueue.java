@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,7 +53,7 @@ public class ZoneMessageQueue {
 	// linked
 	// lists
 	private int messagesArrivedFromRoads;
-	public HashMap<Road, Integer> numberOfQueuedMessages[] = new HashMap[SimulationParameters.numberOfMessageExecutorThreads];
+	public ConcurrentMap<Road, Integer> numberOfQueuedMessages[] = new ConcurrentHashMap[SimulationParameters.numberOfMessageExecutorThreads];
 	private Message tmpLastRemovedMessage = null;
 	private final Integer zero = new Integer(0);
 
@@ -119,7 +121,7 @@ public class ZoneMessageQueue {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
 			// addMessageBuffer[i] = new LinkedList<Message>();
 			// deleteMessageBuffer[i] = new LinkedList<Message>();
-			numberOfQueuedMessages[i] = new HashMap<Road, Integer>(); 
+			numberOfQueuedMessages[i] = new ConcurrentHashMap<Road, Integer>(1000); 
 		}
 		this.zoneId = zoneId;
 	}
@@ -202,23 +204,31 @@ public class ZoneMessageQueue {
 	}
 
 	private int incrementNumberOfQueuedMessages(Road fromRoad) {
-		int result=0;
-		int zoneId=fromRoad.getZoneId();
-		synchronized (numberOfQueuedMessages[zoneId]){
-			result=numberOfQueuedMessages[zoneId].get(fromRoad).intValue() + 1;
-			numberOfQueuedMessages[zoneId].put(fromRoad, result);
-		}
-		return result;
+		//int result=0;
+		//int zoneId=fromRoad.getZoneId();
+		//synchronized (numberOfQueuedMessages[zoneId]){
+		//	result=numberOfQueuedMessages[zoneId].get(fromRoad).intValue() + 1;
+		//	numberOfQueuedMessages[zoneId].put(fromRoad, result);
+		//}
+		//return result;
+		int zId=fromRoad.getZoneId();
+
+		    Integer oldVal, newVal;
+		    do {
+		      oldVal = numberOfQueuedMessages[zId].get(fromRoad);
+		      newVal = (oldVal + 1);
+		    } while (!numberOfQueuedMessages[zId].replace(fromRoad, oldVal, newVal));
+		return newVal;
 	}
 
 	private int decrementNumberOfQueuedMessages(Road fromRoad) {
-		int result=0;
-		int zoneId=fromRoad.getZoneId();
-		synchronized (numberOfQueuedMessages[zoneId]){
-			result=numberOfQueuedMessages[zoneId].get(fromRoad).intValue() - 1;
-			numberOfQueuedMessages[zoneId].put(fromRoad, result);
-		}
-		return result;
+		int zId=fromRoad.getZoneId();
+		Integer oldVal, newVal;
+	    do {
+	      oldVal = numberOfQueuedMessages[zId].get(fromRoad);
+	      newVal = (oldVal - 1);
+	    } while (!numberOfQueuedMessages[zId].replace(fromRoad, oldVal, newVal));
+	    return newVal;
 	}
 
 

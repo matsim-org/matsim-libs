@@ -68,7 +68,8 @@ Splitting the map:
         - lösung 3: (implemented): don't schedule the ZoneBorderMessages (because they actually do nothing) => implemented.
         - lösung 4: (implemented): make numberOfQueuedMessages more concurrent
             => more possible... 
-    
+    - main problem: incrementNumberOfQueuedMessages => dauert zu lange wegen lock
+    - wir haben zu viele timer messages zum schedulen
     
 - TODO: 
      - performance verbessern
