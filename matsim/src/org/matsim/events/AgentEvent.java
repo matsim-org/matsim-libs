@@ -29,10 +29,10 @@ public abstract class AgentEvent extends BasicEvent {
 
 	//includes data about the agent and agent internals like legnumber, etc
 	public int legId;
-	public transient Leg leg;
+	public Leg leg;
 
 	public String linkId;
-	public transient Link link;
+	public Link link;
 
 
 	AgentEvent(final double time, final Person agent, final Link link, final Leg leg) {
