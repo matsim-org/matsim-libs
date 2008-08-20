@@ -33,6 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
+import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -72,7 +73,13 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 	@Override
 	public void run(Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
+		person.removeWorstPlans(1);
 		Plan plan = person.getSelectedPlan();
+		Leg leg = plan.getNextLeg(plan.getFirstActivity());
+		if(!leg.getMode().equals("car")) {
+			System.out.print("X");
+			return;
+		}
 		if ((count++ % modulo) == 0) {
 			try {
 				ReducePopulationExe.relevantPopulation.addPerson(person);
@@ -93,11 +100,11 @@ public class ReducePopulationExe {
 	 */
 	public static void main(String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
-		String netFileName = "/TU Berlin/tmp/studies/ivtch/ivtch-osm.xml";
-		String outnetFileName = "/TU Berlin/tmp/studies/ivtch/ivtch_red.xml";
+		String netFileName = "../../tmp/studies/ivtch/ivtch-osm.xml";
+		String outnetFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
 
-		String popFileName = "/TU Berlin/tmp/studies/ivtch/plans100p.xml.gz";
-		String outpopFileName = "/TU Berlin/tmp/studies/ivtch/plans50p.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans100p.xml.gz";
+		String outpopFileName = "../../tmp/studies/ivtch/plans100p.xml";
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
@@ -111,7 +118,7 @@ public class ReducePopulationExe {
 		relevantPopulation = new Population(false);
 		Population population = new Population(true);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
-		population.addAlgorithm(new FilterPersons2(2));
+		population.addAlgorithm(new FilterPersons2(1));
 		plansReader.readFile(popFileName);
 
 		System.out.println("read # persons: " );
@@ -129,12 +136,12 @@ public class ReducePopulationExe {
 
 		queueSim.run();
 	
-		Set<Link> nolinkList = new HashSet<Link>();
-		for(Link link : network.getLinks().values()) if(!eventhh.linkList.contains(link.getId().toString())) nolinkList.add(link);
-		
-		for(Link link : nolinkList)network.removeLink(link);
-		
-		new NetworkWriter(network, outnetFileName).write();
+//		Set<Link> nolinkList = new HashSet<Link>();
+//		for(Link link : network.getLinks().values()) if(!eventhh.linkList.contains(link.getId().toString())) nolinkList.add(link);
+//		
+//		for(Link link : nolinkList)network.removeLink(link);
+//		
+//		new NetworkWriter(network, outnetFileName).write();
 		
 	}
 
