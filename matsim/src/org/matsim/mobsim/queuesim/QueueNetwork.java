@@ -92,6 +92,9 @@ public class QueueNetwork{
 		for (Link l : networkLayer.getLinks().values()) {
 			this.links.put(l.getId(), queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
+		for (QueueNode n : this.nodes.values()) {
+			n.init();
+		}
 
 		this.simNodesArray = this.nodes.values().toArray(new QueueNode[this.nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
