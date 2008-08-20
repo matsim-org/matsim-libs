@@ -35,6 +35,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import playground.balmermi.census2000.data.Persons;
 //import playground.ciarif.models.ModelMobiliyTools;
 //import playground.balmermi.census2000.models.ModelMobiliyTools;
+import playground.balmermi.census2000v2.models.ModelMobilityTools;
 
 public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

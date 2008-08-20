@@ -37,6 +37,7 @@ import org.matsim.world.algorithms.WorldValidation;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
+import playground.balmermi.census2000v2.modules.PersonAssignMobilitiyToolModel;
 import playground.balmermi.census2000v2.modules.PlansFilterPersons;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
@@ -159,6 +160,7 @@ public class IIDMGeneration {
 
 		log.info("  runnning person models... ");
 		new PersonAssignLicenseModel().run(pop);
+		new PersonAssignMobilitiyToolModel().run(pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////

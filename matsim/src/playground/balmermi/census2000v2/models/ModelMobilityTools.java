@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ciarif.models;
+package playground.balmermi.census2000v2.models;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;

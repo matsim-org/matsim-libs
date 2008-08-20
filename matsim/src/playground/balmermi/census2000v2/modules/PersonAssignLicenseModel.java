@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -67,7 +68,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		if (person.getSex().equals(MALE)) { model.setSex(true); }
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); }
 		Object o = atts.get(CAtts.HH_W);
-		if (o == null) { o = atts.get(CAtts.HH_Z); }
+		if (o == null) { Gbl.errorMsg("pid="+person.getId()+": no '"+CAtts.HH_W+" defined."); }
 		Household hh = (Household)o;
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
