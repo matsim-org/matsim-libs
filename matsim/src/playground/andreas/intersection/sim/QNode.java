@@ -194,8 +194,8 @@ public class QNode extends QueueNode{
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, new Comparator<QueueLink>() {
-			public int compare(final QueueLink o1, final QueueLink o2) {
+		Arrays.sort(this.inLinksArrayCache, new Comparator<QLink>() {
+			public int compare(final QLink o1, final QLink o2) {
 				return o1.getLink().getId().compareTo(o2.getLink().getId());
 			}
 		});
