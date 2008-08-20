@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * KnowledgeStrategyManagerConfigLoader.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.knowledge;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
@@ -19,7 +38,7 @@ import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModuleI;
+import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -29,14 +48,10 @@ import org.matsim.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCostI;
-import org.matsim.router.util.TravelTimeI;
-import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcherMT;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
+import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
 
-//============================================================================
-// Controler class adds ...
-// Christoph Dobler, August 2008
-//============================================================================
 
 public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigLoader{
 
@@ -54,8 +69,8 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
 
 		NetworkLayer network = controler.getNetwork();
-		TravelCostI travelCostCalc = controler.getTravelCostCalculator();
-		TravelTimeI travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelCost travelCostCalc = controler.getTravelCostCalculator();
+		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -115,12 +130,12 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
@@ -138,7 +153,7 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 			} else if (classname.equals("SNSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherMT(network, travelCostCalc, travelTimeCalc);
+				StrategyModule socialNetStrategyModule= new SNRandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc);
 //				StrategyModuleI socialNetStrategyModule= new SNRandomFacilitySwitcherSM(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} /*else if (classname.equals("LocationChoice")) {
