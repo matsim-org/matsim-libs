@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
-import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -72,77 +71,49 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 
 	@Override
 	public void run(Person person) {
+		Map<String,Object> atts = person.getCustomAttributes();
+		Household hh = (Household)atts.get(CAtts.HH_W);
 		
-		// get home activity
-		Activity home_act = null;
-		if (person.getKnowledge().getActivities(CAtts.ACT_HOME).size() < 1) {
-			Gbl.errorMsg("pid="+person.getId()+": no "+CAtts.ACT_HOME+" activity defined.");
-		}
-		else if (person.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 1) {
-			home_act = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0);
-		}
-		else if (person.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 2) {
-			Gbl.errorMsg("pid="+person.getId()+", home_facid="+home_act.getFacility().getId()+": It should not reach that line anymore.");
-			Household hh = (Household)person.getCustomAttributes().get(CAtts.HH_W);
-			home_act = hh.getFacility().getActivity(CAtts.ACT_HOME);
-			// consistency check
-			if (!person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).equals(home_act) &&
-			    !person.getKnowledge().getActivities(CAtts.ACT_HOME).get(1).equals(home_act)) {
-				Gbl.errorMsg("pid="+person.getId()+", home_facid="+home_act.getFacility().getId()+": Facility is inconsistent with home activities given in the knowledge.");
-			}
-		}
-		else {
-			Gbl.errorMsg("pid="+person.getId()+": more than two "+CAtts.ACT_HOME+" activity defined.");
-		}
+		// age
+		model.setAge(person.getAge());
 
-		// get primary activity
-		Activity prim_act = null;
+		// sex
+		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
+
+		// nat
+		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
+
+		// nump
+		int nump = hh.getPersonsW().size();
+		if (nump > MAXNUMP) { nump = MAXNUMP; }
+		model.setHHDimension(nump);
+
+		// numk
+		double k_frac = hh.getKidsWFraction();
+		model.setHHKids((int)Math.round(k_frac*nump));
+
+		// inc
+		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
+
+		// udeg
+		model.setUrbanDegree(hh.getMunicipality().getRegType());
+
+		// license
+		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
+
+		// disthw
+		Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
 		ArrayList<Activity> prim_acts = new ArrayList<Activity>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
-		if (!prim_acts.isEmpty()) {
-			double dist = Double.NEGATIVE_INFINITY;
-			for (Activity act : prim_acts) {
-				Coord coord = act.getFacility().getCenter();
-				double curr_dist = coord.calcDistance(home_act.getFacility().getCenter());
-				if (curr_dist > dist) { dist = curr_dist; prim_act = act; }
-			}
-		}
-		
-		// calc distance home<==>prim activity
-		double distance = 0.0;
-		if (prim_act != null) { distance = prim_act.getFacility().getCenter().calcDistance(home_act.getFacility().getCenter()); }
-		
-		// get infos
-		Map<String,Object> atts = person.getCustomAttributes();
-		Object o = atts.get(CAtts.HH_W);
-		if (o == null) { Gbl.errorMsg("pid="+person.getId()+": no '"+CAtts.HH_W+" defined."); }
-		Household hh = (Household)o;
-		Map<Id,Person> persons = hh.getPersons();
-		int cid = hh.getMunicipality().getCantonId();
-		
-		// set model parameters
-		model.setAge(person.getAge());
-		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
-		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
+		Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
+		model.setDistanceHome2Work(h_coord.calcDistance(p_coord));
 
-		int nump = persons.size();
-		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
-		if (nump > MAXNUMP) {
-//			log.trace("pid="+person.getId()+": numpHH="+persons.size()+", kidsHH="+kids);
-			kids = Math.round(MAXNUMP*kids/nump);
-			nump = MAXNUMP;
-//			log.trace("=> numpHH="+nump+", kidsHH="+kids);
-		}
-		model.setHHDimension(nump);
-		model.setHHKids(kids);
-
-		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
-		model.setUrbanDegree(hh.getMunicipality().getRegType());
-		if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
-		model.setDistanceHome2Work(distance);
+		// fuelcost
 		model.setFuelCost(hh.getMunicipality().getFuelCost());
-		// 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian) 
+
+		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
+		int cid = hh.getMunicipality().getCantonId();
 		if (cid == 21) { model.setLanguage(3); }
 		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
 		else { model.setLanguage(1); }
