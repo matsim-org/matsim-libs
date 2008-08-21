@@ -58,7 +58,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
+	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()/2;
 	
 	// the number of zones, in which the network is divided
 	//public static final int numberOfZones=numberOfMessageExecutorThreads;
@@ -81,8 +81,8 @@ public class SimulationParameters {
 	
 	public static void bufferEvent(BasicEvent event){
 		bufferEvent(event,MessageExecutor.getThreadId());
-		test_timer++;
-		if (test_timer % 100000==0){System.out.println(test_timer);}
+		//test_timer++;
+		//if (test_timer % 100000==0){System.out.println(test_timer);}
 	}
 	
 	private static void bufferEvent(BasicEvent event, int producerId){

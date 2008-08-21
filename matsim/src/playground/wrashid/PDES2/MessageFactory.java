@@ -176,8 +176,8 @@ public class MessageFactory {
 	}
 
 	public static TimerMessage getTimerMessage() {
-		testCounter++;
-		if (testCounter % 1000000==0){System.out.println(testCounter);}
+		//testCounter++;
+		//if (testCounter % 1000000==0){System.out.println(testCounter);}
 		try {
 			if (timerMessageQueue[MessageExecutor.getThreadId()].size() < SimulationParameters.minQueueLength) {
 				return new TimerMessage();
