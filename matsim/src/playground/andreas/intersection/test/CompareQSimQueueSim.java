@@ -22,6 +22,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -36,8 +37,49 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 	
 	BufferedWriter writer = null;
 	
-	public void testTrafficLightIntersection2arms_w_TrafficLight(){
+	public void testCompareBothSims_wo_trafficLight(){
   		  		
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
+		Config conf = loadConfig("src/playground/andreas/intersection/test/data/bottleneck/config.xml");
+		
+		String signalSystems = null;
+		String groupDefinitions = null;
+		
+		ScenarioData data = new ScenarioData(conf);
+		Events events = new Events();
+		events.addHandler(this);
+		
+		
+		try {		
+			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
+			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
+//			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
+			this.writer.flush();
+			this.writer.close();
+
+			MatsimRandom.reset();
+
+			this.writer = new BufferedWriter(new FileWriter(new File("queuesim_events.txt")));
+
+			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
+			this.writer.flush();
+			this.writer.close();
+			
+			assertEquals(CRCChecksum.getCRCFromFile("qsim_events.txt"),	CRCChecksum.getCRCFromFile("queuesim_events.txt"));
+			
+			new File("qsim_events.txt").delete();
+			new File("queuesim_events.txt").delete();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		
+  	}
+	
+	public void testCompareBothSims_w_trafficLight(){
+	  		
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
@@ -58,6 +100,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 			this.writer.flush();
 			this.writer.close();
 
+			MatsimRandom.reset();
 
 			this.writer = new BufferedWriter(new FileWriter(new File("queuesim_events.txt")));
 
