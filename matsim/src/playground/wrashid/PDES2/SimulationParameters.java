@@ -58,7 +58,7 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	// optimal: numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()
 	//public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
-	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors()/2;
+	public static final int numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
 	
 	// the number of zones, in which the network is divided
 	//public static final int numberOfZones=numberOfMessageExecutorThreads;

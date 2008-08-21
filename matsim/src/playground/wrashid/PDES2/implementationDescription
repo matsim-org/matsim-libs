@@ -89,13 +89,15 @@ Splitting the map:
         - auch in normaler DES bzw. erster PDES version das Priority queue problem lösen
         - => grosse tests ausprobieren
         
-        
+        NEXT: 
         - implemented: such out border roads, which have no timer scheduled (because no car drives over them)
            => do static look ahead at the beginning and schedule all timers. In between do normal timers.
               - for such outborder messages, which will have no car on them during the whole simulation, they
               should send border message for time double.max and then do nothing.
            => resolve problem: perhaps too few events (test 8)
            => think again about the whole procedure, if everything is alright
+             - hatte pracktisch einen deadlock auf satwal (wie konnte das passieren?)
+           - perhaps use treeSet instead of PriorityQueue, because of the missing implementation of remove  
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -108,7 +110,7 @@ Splitting the map:
      - zone sizing is not equal yet => now each link is considered as a wait for each zone
      - getSimtime consumes around 15%+ of the CPU time => solved by removing ThreadLocal variable simTime in MessageExecutor
      - message counter removed, because it is a common synchronization point
-     - 
+   
      
      
      ===================================================
