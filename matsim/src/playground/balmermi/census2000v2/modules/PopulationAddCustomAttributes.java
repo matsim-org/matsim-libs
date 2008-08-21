@@ -69,10 +69,18 @@ public class PopulationAddCustomAttributes {
 				String[] entries = curr_line.split("\t", -1);
 
 				Integer nat = Integer.parseInt(entries[CAtts.I_HMAT]);
+				Integer aperz = Integer.parseInt(entries[CAtts.I_APERZ]);
+				Integer aperw = Integer.parseInt(entries[CAtts.I_APERW]);
+				Integer wkata = Integer.parseInt(entries[CAtts.I_WKATA]);
 
 				Person p = pop.getPerson(entries[CAtts.I_PERSON_ID]);
 				if (p == null) { p = pop.getPerson(entries[CAtts.I_PARTNR]); }
-				if (p != null) { p.getCustomAttributes().put(CAtts.P_HMAT,nat); }
+				if (p != null) {
+					p.getCustomAttributes().put(CAtts.P_HMAT,nat);
+					p.getCustomAttributes().put(CAtts.P_APERZ,aperz);
+					p.getCustomAttributes().put(CAtts.P_APERW,aperw);
+					p.getCustomAttributes().put(CAtts.P_WKATA,wkata);
+				}
 				else { log.debug("      Line "+line_cnt+": neither pid="+entries[CAtts.I_PERSON_ID]+" nor pid="+entries[CAtts.I_PARTNR]+" found in population."); }
 
 				// progress report

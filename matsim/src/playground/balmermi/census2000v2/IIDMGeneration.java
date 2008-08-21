@@ -40,6 +40,7 @@ import playground.balmermi.census2000v2.data.MicroCensus;
 import playground.balmermi.census2000v2.modules.PersonAssignActivityChains;
 import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
 import playground.balmermi.census2000v2.modules.PersonAssignMobilitiyToolModel;
+import playground.balmermi.census2000v2.modules.PlansAnalyse;
 import playground.balmermi.census2000v2.modules.PlansFilterPersons;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
@@ -178,6 +179,8 @@ public class IIDMGeneration {
 		new PersonAssignLicenseModel().run(pop);
 		new PersonAssignMobilitiyToolModel().run(pop);
 		new PersonAssignActivityChains(mz).run(pop);
+		new PlansAnalyse().run(pop);
+		new PlansAnalyse().run(mz_pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////

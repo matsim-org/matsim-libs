@@ -118,6 +118,36 @@ public class Household {
 		return map;
 	}
 	
+	public final Map<Id,Person> getKidsW() {
+		Map<Id,Person> map = new HashMap<Id, Person>();
+		for (Person p : this.persons_w.values()) { if (p.getAge() < 15) { map.put(p.getId(),p); } }
+		return map;
+	}
+	
+	public final Map<Id,Person> getKidsZ() {
+		Map<Id,Person> map = new HashMap<Id, Person>();
+		for (Person p : this.persons_z.values()) { if (p.getAge() < 15) { map.put(p.getId(),p); } }
+		return map;
+	}
+
+	public final Map<Id,Person> getKids() {
+		Map<Id,Person> map = new HashMap<Id, Person>(this.getKidsW());
+		map.putAll(this.getKidsZ());
+		return map;
+	}
+	
+	public final double getKidsWFraction() {
+		return this.getKidsW().size()/this.getPersonsW().size();
+	}
+	
+	public final double getKidsZFraction() {
+		return this.getKidsZ().size()/this.getPersonsZ().size();
+	}
+	
+	public final double getKidsFraction() {
+		return this.getKids().size()/this.getPersons().size();
+	}
+	
 	public final int getHHTPW() {
 		return this.hhtpw;
 	}
