@@ -45,8 +45,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 
 	private final static Logger log = Logger.getLogger(PersonAssignMobilitiyToolModel.class);
 
-	// limit the upper bound of a household size (because of number underflow)
-	private static final Integer MAXNUMP = 100;
+	private static final Integer MAXNUMP = 14;
 	
 	private static final String MALE = "m";
 	private static final String YES = "yes";
@@ -96,19 +95,11 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 			Gbl.errorMsg("pid="+person.getId()+": more than two "+CAtts.ACT_HOME+" activity defined.");
 		}
 
-		// TODO balmermi: check if the prim act should be extracted like that
 		// get primary activity
 		Activity prim_act = null;
 		ArrayList<Activity> prim_acts = new ArrayList<Activity>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
-		if (prim_acts.isEmpty()) {
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EKIGA));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EPRIM));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_ESECO));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EHIGH));
-			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
-		}
 		if (!prim_acts.isEmpty()) {
 			double dist = Double.NEGATIVE_INFINITY;
 			for (Activity act : prim_acts) {
