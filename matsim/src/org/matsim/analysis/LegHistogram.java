@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -53,9 +56,9 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 
 	private int iteration = 0;
 	private final int binSize;
-	private final int[] countsDep;
-	private final int[] countsArr;
-	private final int[] countsStuck;
+	private final int nofBins;
+	private final Map<String, ModeData> data = new HashMap<String, ModeData>(5, 0.85f);
+	private ModeData allModesData = null;
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
@@ -66,9 +69,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	public LegHistogram(final int binSize, final int nofBins) {
 		super();
 		this.binSize = binSize;
-		this.countsDep = new int[nofBins + 1]; // +1 for all times out of our range
-		this.countsArr = new int[nofBins + 1];
-		this.countsStuck = new int[nofBins + 1];
+		this.nofBins = nofBins;
 		reset(0);
 	}
 
@@ -81,18 +82,33 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		this(binSize, 30*3600/binSize + 1);
 	}
 
-	/* Implementation of eventhandler-Interfaces */
+	/* Implementation of EventHandler-Interfaces */
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.countsDep[getBinIndex(event.time)]++;
+		int index = getBinIndex(event.time);
+		allModesData.countsDep[index]++;
+		ModeData modeData = getDataForMode(event.leg.getMode());
+		modeData.countsDep[index]++;
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		this.countsArr[getBinIndex(event.time)]++;
+		int index = getBinIndex(event.time);
+		allModesData.countsArr[index]++;
+		ModeData modeData = getDataForMode(event.leg.getMode());
+		modeData.countsArr[index]++;
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		this.countsStuck[getBinIndex(event.time)]++;
+		int index = getBinIndex(event.time);
+		allModesData.countsStuck[index]++;
+		ModeData modeData = getDataForMode(event.leg.getMode());
+		modeData.countsStuck[index]++;
+	}
+
+	public void reset(final int iter) {
+		this.iteration = iter;
+		this.allModesData = new ModeData(nofBins + 1);
+		this.data.clear();
 	}
 
 	/* output methods */
@@ -120,38 +136,62 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param stream The data stream where to write the gathered data.
 	 */
 	public void write(final PrintStream stream) {
-		stream.println("time\ttime\tdepartures\tarrivals\tstuck\ton_route");
-		int onRoute = 0;
-		for (int i = 0; i < this.countsDep.length; i++) {
-			onRoute = onRoute + this.countsDep[i] - this.countsArr[i] - this.countsStuck[i];
+		stream.print("time\ttime\tdepartures_all\tarrivals_all\tstuck_all\ten-route_all");
+		for (String legMode : this.data.keySet()) {
+			stream.print("\tdepartures_" + legMode + "\tarrivals_" + legMode + "\tstuck_" + legMode + "\ten-route_" + legMode);
+		}
+		stream.print("\n");
+		int allEnRoute = 0;
+		int[] modeEnRoute = new int[this.data.size()];
+		for (int i = 0; i < this.allModesData.countsDep.length; i++) {
+			// data about all modes
+			allEnRoute = allEnRoute + this.allModesData.countsDep[i] - this.allModesData.countsArr[i] - this.allModesData.countsStuck[i];
 			stream.print(Time.writeTime(i*this.binSize) + "\t" + i*this.binSize);
-			stream.println("\t" + this.countsDep[i] + "\t" + this.countsArr[i] + "\t" + this.countsStuck[i] + "\t" + onRoute);
+			stream.print("\t" + this.allModesData.countsDep[i] + "\t" + this.allModesData.countsArr[i] + "\t" + this.allModesData.countsStuck[i] + "\t" + allEnRoute);
+
+			// data about single modes
+			int mode = 0;
+			for (ModeData modeData : this.data.values()) {
+				modeEnRoute[mode] = modeEnRoute[mode] + modeData.countsDep[i] - modeData.countsArr[i] - modeData.countsStuck[i];
+				stream.print("\t" + modeData.countsDep[i] + "\t" + modeData.countsArr[i] + "\t" + modeData.countsStuck[i] + "\t" + modeEnRoute[mode]);
+				mode++;
+			}
+
+			// new line
+			stream.print("\n");
 		}
 	}
 
 	public JFreeChart getGraphic() {
+		return getGraphic(this.allModesData, "all");
+	}
 
-		final XYSeriesCollection data = new XYSeriesCollection();
+	public JFreeChart getGraphic(final String legMode) {
+		return getGraphic(this.data.get(legMode), legMode);
+	}
+
+	private JFreeChart getGraphic(final ModeData modeData, final String modeName) {
+		final XYSeriesCollection xyData = new XYSeriesCollection();
 		final XYSeries departuresSerie = new XYSeries("departures", false, true);
 		final XYSeries arrivalsSerie = new XYSeries("arrivals", false, true);
 		final XYSeries onRouteSerie = new XYSeries("on route", false, true);
 		int onRoute = 0;
-		for (int i = 0; i < this.countsDep.length; i++) {
-			onRoute = onRoute + this.countsDep[i] - this.countsArr[i] - this.countsStuck[i];
+		for (int i = 0; i < modeData.countsDep.length; i++) {
+			onRoute = onRoute + modeData.countsDep[i] - modeData.countsArr[i] - modeData.countsStuck[i];
 			double hour = i*this.binSize / 60.0 / 60.0;
-			departuresSerie.add(hour, this.countsDep[i]);
-			arrivalsSerie.add(hour, this.countsArr[i]);
+			departuresSerie.add(hour, modeData.countsDep[i]);
+			arrivalsSerie.add(hour, modeData.countsArr[i]);
 			onRouteSerie.add(hour, onRoute);
 		}
 
-		data.addSeries(departuresSerie);
-		data.addSeries(arrivalsSerie);
-		data.addSeries(onRouteSerie);
+		xyData.addSeries(departuresSerie);
+		xyData.addSeries(arrivalsSerie);
+		xyData.addSeries(onRouteSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(
-        "Leg Histogram, it." + this.iteration,
+        "Leg Histogram, " + modeName + ", it." + this.iteration,
         "time", "# vehicles",
-        data,
+        xyData,
         PlotOrientation.VERTICAL,
         true,   // legend
         false,   // tooltips
@@ -166,9 +206,57 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return chart;
 	}
 
+	public int[] getDepartures() {
+		return this.allModesData.countsDep.clone();
+	}
+
+	public int[] getArrivals() {
+		return this.allModesData.countsArr.clone();
+	}
+
+	public int[] getStuck() {
+		return this.allModesData.countsStuck.clone();
+	}
+
+	public Set<String> getLegModes() {
+		return this.data.keySet();
+	}
+
+	public int[] getDepartures(final String legMode) {
+		ModeData modeData = this.data.get(legMode);
+		if (modeData == null) {
+			return null;
+		}
+		return modeData.countsDep.clone();
+	}
+
+	public int[] getArrivals(final String legMode) {
+		ModeData modeData = this.data.get(legMode);
+		if (modeData == null) {
+			return null;
+		}
+		return modeData.countsArr.clone();
+	}
+
+	public int[] getStuck(final String legMode) {
+		ModeData modeData = this.data.get(legMode);
+		if (modeData == null) {
+			return null;
+		}
+		return modeData.countsStuck.clone();
+	}
+
 	public void writeGraphic(final String filename) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeGraphic(final String filename, final String legMode) {
+		try {
+			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -178,18 +266,30 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.binSize);
-		if (bin >= this.countsDep.length) {
-			return this.countsDep.length - 1;
+		if (bin >= this.nofBins) {
+			return this.nofBins;
 		}
 		return bin;
 	}
 
-	public void reset(final int iteration) {
-		this.iteration = iteration;
-		for (int i = 0; i < this.countsDep.length; i++ ) {
-			this.countsDep[i] = 0;
-			this.countsArr[i] = 0;
-			this.countsStuck[i] = 0;
+	private ModeData getDataForMode(String legMode) {
+		ModeData modeData = this.data.get(legMode);
+		if (modeData == null) {
+			modeData = new ModeData(nofBins + 1); // +1 for all times out of our range
+			this.data.put(legMode, modeData);
+		}
+		return modeData;
+	}
+
+	private static class ModeData {
+		public final int[] countsDep;
+		public final int[] countsArr;
+		public final int[] countsStuck;
+
+		public ModeData(final int nofBins) {
+			this.countsDep = new int[nofBins];
+			this.countsArr = new int[nofBins];
+			this.countsStuck = new int[nofBins];
 		}
 	}
 

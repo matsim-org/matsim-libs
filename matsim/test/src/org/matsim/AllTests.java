@@ -43,6 +43,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 
 		// run unit tests
+		suite.addTest(org.matsim.analysis.AllTests.suite());
 		suite.addTest(org.matsim.basic.v01.AllTests.suite());
 		suite.addTest(org.matsim.config.AllTests.suite());
 		suite.addTest(org.matsim.controler.AllTests.suite());
