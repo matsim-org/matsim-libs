@@ -21,6 +21,7 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -70,7 +71,17 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 		}
 
 		Person mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
-		if (mz_p == null) { log.warn("pid="+person.getId()+": Person does not belong to a micro census group!"); }
+		if (mz_p == null) {
+			log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
+			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);
+			log.warn("=> Assigning same demographics except that person is handled as a female. NOTE: Works only for CH-Microcensus 2005.");
+			if (mz_p == null) {
+				Gbl.errorMsg("In CH-Microcensus 2005: That should not happen!");
+			}
+		}
+		else {
+			person.addPlan(mz_p.getSelectedPlan());
+		}
 	}
 
 	public void run(Plan plan) {

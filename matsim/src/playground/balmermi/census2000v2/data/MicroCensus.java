@@ -32,10 +32,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.Tuple;
 
-import playground.balmermi.census2000v2.modules.PersonAssignActivityChains;
-
-import sun.util.logging.resources.logging;
-
 public class MicroCensus {
 
 	//////////////////////////////////////////////////////////////////////
@@ -132,7 +128,7 @@ public class MicroCensus {
 		i = i % 32;
 		if (i/16 == 1) { lic = YES; } else { lic = NO; }
 		i = i % 16;
-		if (i/16 == 1) { sex = MALE; } else { sex = FEMALE; }
+		if (i/8 == 1) { sex = MALE; } else { sex = FEMALE; }
 		i = i % 8;
 		if (i == 0) { age = 6; }
 		else if (i == 1) { age = 14; }
