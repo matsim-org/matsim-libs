@@ -51,8 +51,8 @@ public class PlansGeneratorControler extends Controler {
 	@Override
 	protected Population loadPopulation() {
 		
-		return generate4wPersons();
-//		return generateSimplePlans();
+//		return generate4wPersons();
+		return generateSimplePlans();
 	}
 	
 	private Population generate4wPersons(){
@@ -128,12 +128,13 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 		
-		fromLinks.add(this.network.getLink("200"));
+		fromLinks.add(this.network.getLink("1"));
+		fromLinks.add(this.network.getLink("2"));
 		
-		toLinks.add(this.network.getLink("3"));
+		toLinks.add(this.network.getLink("6"));
 		
 		
-		for(int i=0; i < 950; i++){
+		for(int i=0; i < 1000; i++){
 			for (Link fromLink : fromLinks) {
 				
 				for (Link toLink : toLinks) {
@@ -160,7 +161,8 @@ public class PlansGeneratorControler extends Controler {
 		Person p = new Person(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
+			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. , Time.UNDEFINED_TIME, true);
+//			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createLeg("car", null, null, null);
 			plan.createAct("h", 200., 200., toLink, 8 * 60 * 60, 0., 0., true);
 
@@ -174,7 +176,7 @@ public class PlansGeneratorControler extends Controler {
 
 	public static void main(final String[] args) {
 
-		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/test/data/fourways/config.xml" });
+		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/test/data/bottleneck/config.xml" });
 		
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
 		controler.setOverwriteFiles(true);
