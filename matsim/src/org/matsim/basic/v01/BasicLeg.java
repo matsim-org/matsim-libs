@@ -46,14 +46,14 @@ public interface BasicLeg {
 
 	public static final String WALKMODE = "walk";
 
-	public static final String UNDEFINED = "undef";
+	public static final String UNDEFINEDMODE = "undef";
 
 	public int getNum();
 
 	public void setNum(int num);
 
 	public String getMode();
-	
+
 	public void setMode(String mode);
 
 	public BasicRoute getRoute();
@@ -67,10 +67,10 @@ public interface BasicLeg {
 	public double getTravTime();
 
 	public void setTravTime(final double travTime);
-	
+
 	public double getArrTime();
 
 	public void setArrTime(final double arrTime);
-	
-	
+
+
 }
