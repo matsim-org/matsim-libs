@@ -149,8 +149,10 @@ public class ZoneMessageQueue {
 			// System.out.println("getNextMessage()");
 			m = queue1.poll();
 
+			// needed in particular, if used with 1 cpu
 			if (m == null) {
-				System.out.println();
+				return null;
+				//System.out.println(messagesArrivedFromRoads);
 			}
 
 			// if (queue1.isEmpty() || m.isAcrossBorderMessage){

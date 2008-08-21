@@ -17,6 +17,9 @@ public class MessageFactory {
 	private static LinkedList<EnterRequestMessage>[] enterRequestMessageQueue = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	private static LinkedList<TimerMessage>[] timerMessageQueue = new LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 
+	private static int testCounter=0;
+	
+	
 	static {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
 			endLegMessageQueue[i] = new LinkedList<EndLegMessage>();
@@ -173,6 +176,8 @@ public class MessageFactory {
 	}
 
 	public static TimerMessage getTimerMessage() {
+		testCounter++;
+		if (testCounter % 1000000==0){System.out.println(testCounter);}
 		try {
 			if (timerMessageQueue[MessageExecutor.getThreadId()].size() < SimulationParameters.minQueueLength) {
 				return new TimerMessage();

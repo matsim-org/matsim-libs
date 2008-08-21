@@ -8,12 +8,21 @@ public class TimerMessage extends SelfhandleMessage {
 	public void selfhandleMessage() {
 		Road road = (Road) receivingUnit;
 		
+		if (road.lookahead.size()==1){
+			// this means, that the last timer (+ inf) is invoked
+			//System.out.print(".");
+			return;
+		}
+		
 		road.lookahead.removeAll(Collections.singletonList(this));
+		
+		
+		
 		
 		if (road.lookahead.peek().messageArrivalTime<messageArrivalTime){
 			road.scheduleNextZoneBorderMessage(messageArrivalTime);
 		} else {
-			road.scheduleZoneBorderMessage(road.lookahead.peek().messageArrivalTime);
+			road.scheduleZoneBorderMessage(road.lookahead.peek());
 		}
 		
 	}

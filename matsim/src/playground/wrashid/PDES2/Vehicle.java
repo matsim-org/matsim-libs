@@ -235,14 +235,14 @@ public class Vehicle extends SimUnit {
 		sendMessage(m, road,scheduleTime);
 		
 		
-		double lookahead=scheduleTime;
-		for (Link link: getCurrentLeg().getRoute().getLinkRoute()){
-			Road r=Road.allRoads.get(getCurrentLink().getId().toString());
-			lookahead+=r.linkTravelTime;
-			if (r.isOutBorderRoad){
-				r.scheduleZoneBorderMessage(lookahead);
-			}
-		}
+		//double lookahead=scheduleTime;
+		//for (Link link: getCurrentLeg().getRoute().getLinkRoute()){
+		//	Road r=Road.allRoads.get(getCurrentLink().getId().toString());
+		//	lookahead+=r.linkTravelTime;
+		//	if (r.isOutBorderRoad){
+		//		r.scheduleZoneBorderMessage(lookahead);
+		//	}
+		//}
 		
 		//road.roadEntryHandler.addStaringLegMessages(m);
 	}

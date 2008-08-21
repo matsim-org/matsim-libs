@@ -526,9 +526,9 @@ public class Road extends SimUnit {
 
 	
 	
-	public void scheduleInitialZoneBorderMessage(){
-		scheduleZoneBorderMessage(linkTravelTime - SimulationParameters.delta);
-	}
+	//public void scheduleInitialZoneBorderMessage(){
+	//	scheduleZoneBorderMessage(linkTravelTime - SimulationParameters.delta);
+	//}
 	
 	public void scheduleNextZoneBorderMessage(double currentTime){
 		double timeOfNextMessage=currentTime;
@@ -544,7 +544,24 @@ public class Road extends SimUnit {
 		}
 	}
 	
-	
+	public void scheduleZoneBorderMessage(Message tm){
+		double nextMessageTime=tm.messageArrivalTime;
+		assert(isOutBorderRoad);
+			for (Link outLink: getLink().getToNode().getOutLinks().values()){
+				Road outRoad=Road.allRoads.get(outLink.getId().toString());
+				if (getZoneId()!= outRoad.getZoneId()){
+					ZoneBorderMessage nm=MessageFactory.getZoneBorderMessage();
+					nm.sendingUnit=this;
+					nm.receivingUnit=outRoad;
+					nm.messageArrivalTime=nextMessageTime;
+					nm.isAcrossBorderMessage=true;
+					
+					scheduler.schedule(nm);
+
+				}
+			}
+			scheduler.schedule(tm);
+	}
 	
 	// TODO: this can be implemented more efficiently, by storing the effective outgoing
 	// links of this zone into a variable of this class

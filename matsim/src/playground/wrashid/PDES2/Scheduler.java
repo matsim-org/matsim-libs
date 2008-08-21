@@ -79,7 +79,7 @@ public class Scheduler {
 				} else {
 					simulationTerminated=true;
 					SimulationParameters.processEventBuffer();
-					Thread.currentThread().sleep(5000);
+					Thread.currentThread().sleep(2000);
 					for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){
 						messageExecutors[i].stop();
 					}
@@ -144,7 +144,7 @@ public class Scheduler {
 		for (Road road:Road.allRoads.values()){
 			if (road.isOutBorderRoad){
 				road.lookahead.add(road.getTimerMessage(Double.MAX_VALUE));
-				road.scheduleZoneBorderMessage(road.lookahead.peek().messageArrivalTime);
+				road.scheduleZoneBorderMessage(road.lookahead.peek());
 			}
 			//road.scheduleInitialZoneBorderMessage();
 		}

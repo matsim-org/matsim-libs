@@ -81,6 +81,8 @@ public class SimulationParameters {
 	
 	public static void bufferEvent(BasicEvent event){
 		bufferEvent(event,MessageExecutor.getThreadId());
+		test_timer++;
+		if (test_timer % 100000==0){System.out.println(test_timer);}
 	}
 	
 	private static void bufferEvent(BasicEvent event, int producerId){
