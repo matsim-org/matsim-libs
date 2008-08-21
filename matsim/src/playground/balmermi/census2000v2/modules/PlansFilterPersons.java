@@ -80,7 +80,10 @@ public class PlansFilterPersons {
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
 			if (o != null) {
 				Facility f = ((Household)o).getFacility();
+
 				((Household)o).removePersonZ(p.getId());
+				p.getCustomAttributes().remove(CAtts.HH_Z);
+
 				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() != 2) {
 					Gbl.errorMsg("pid="+p.getId()+": has hh_z but only one home_act. That must not happen!");
 				}
