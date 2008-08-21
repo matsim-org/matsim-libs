@@ -36,6 +36,8 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
+import playground.balmermi.census2000v2.data.MicroCensus;
+import playground.balmermi.census2000v2.modules.PersonAssignActivityChains;
 import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
 import playground.balmermi.census2000v2.modules.PersonAssignMobilitiyToolModel;
 import playground.balmermi.census2000v2.modules.PlansFilterPersons;
@@ -158,9 +160,24 @@ public class IIDMGeneration {
 		
 		//////////////////////////////////////////////////////////////////////
 
+		log.info("  reding mz plans xml file... ");
+		Population mz_pop = new Population(Population.NO_STREAMING);
+		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+		
+		log.info("  creating mz data stucture... ");
+		MicroCensus mz = new MicroCensus(mz_pop);
+		mz.print();
+		log.info("  done.");
+		
+		//////////////////////////////////////////////////////////////////////
+
 		log.info("  runnning person models... ");
 		new PersonAssignLicenseModel().run(pop);
 		new PersonAssignMobilitiyToolModel().run(pop);
+		new PersonAssignActivityChains(mz).run(pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////

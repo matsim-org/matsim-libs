@@ -135,10 +135,10 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		int nump = persons.size();
 		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } }
 		if (nump > MAXNUMP) {
-			log.info("pid="+person.getId()+": numpHH="+persons.size()+", kidsHH="+kids);
-			kids = MAXNUMP*kids/nump;
+			log.debug("pid="+person.getId()+": numpHH="+persons.size()+", kidsHH="+kids);
+			kids = Math.round(MAXNUMP*kids/nump);
 			nump = MAXNUMP;
-			log.info("=> numpHH="+nump+", kidsHH="+kids);
+			log.debug("=> numpHH="+nump+", kidsHH="+kids);
 		}
 		model.setHHDimension(nump);
 		model.setHHKids(kids);
