@@ -62,10 +62,9 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		double legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 
 		double expectedLegEndTime = departureTime;
 		expectedLegEndTime += originAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
@@ -87,10 +86,9 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 
 		expectedLegEndTime = departureTime;
 		expectedLegEndTime += depDelay;
@@ -129,10 +127,9 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 		expectedLegEndTime = departureTime;
 		expectedLegEndTime += depDelay;
 		expectedLegEndTime = testee.processLink(originAct.getLink(), expectedLegEndTime);

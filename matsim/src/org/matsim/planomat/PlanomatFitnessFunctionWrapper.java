@@ -23,13 +23,12 @@ package org.matsim.planomat;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
+import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.world.Location;
 
 /**
  * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.
@@ -52,10 +51,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private ScoringFunction sf;
 
 	public PlanomatFitnessFunctionWrapper(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator) {
-		super();
+
 		this.sf = sf;
 		this.plan = plan;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
+
 	}
 	
 	@Override
@@ -73,10 +73,25 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 			sf.startLeg(now, null);
 			
-			Location origin = ((Act) plan.getActsLegs().get(ii * 2)).getLink();
-			Location destination = ((Act) plan.getActsLegs().get((ii + 1) * 2)).getLink();
-			Route route = ((Leg) plan.getActsLegs().get((ii * 2) + 1)).getRoute();
-			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(this.plan.getPerson().getId(), now, origin, destination, route, "car");
+			Act origin = ((Act) plan.getActsLegs().get(ii * 2));
+			Act destination = ((Act) plan.getActsLegs().get((ii + 1) * 2));
+			
+			Leg leg = (Leg) plan.getActsLegs().get((ii * 2) + 1);
+			
+//			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+//					this.plan.getPerson().getId(), 
+//					now, 
+//					origin, 
+//					destination, 
+//					leg.getRoute(), 
+//					leg.getMode());
+//
+			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+					this.plan.getPerson().getId(), 
+					now, 
+					origin, 
+					destination, 
+					leg);
 
 			now += travelTime;
 

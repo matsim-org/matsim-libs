@@ -22,9 +22,10 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Route;
 import org.matsim.router.util.TravelTime;
-import org.matsim.world.Location;
 
 /**
  * Abstract class for <code>LegTravelTimeEstimator</code>s
@@ -47,10 +48,9 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
-	public double getLegTravelTimeEstimation(Id personId,
-			double departureTime, Location origin, Location destination,
-			Route route, String mode) {
-		
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			Act actOrigin, Act actDestination, Leg legIntermediate) {
+
 		double legTravelTimeEstimation = 0.0;
 		
 		return legTravelTimeEstimation;
@@ -86,5 +86,6 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	public String toString() {
 		return this.getClass().getSimpleName();
 	}
+
 
 }

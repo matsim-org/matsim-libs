@@ -417,7 +417,7 @@ public class Controler {
 			this.events.addHandler(tmp);
 			estimator = tmp;
 		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
-			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);
+			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc, this.network);
 		} else if (estimatorName.equalsIgnoreCase("CharyparEtAlCompatibleLegTravelTimeEstimator")) {
 			estimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);
 		} else {

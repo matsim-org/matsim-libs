@@ -48,8 +48,8 @@ import org.matsim.utils.misc.Time;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
-	private NetworkLayer network = null;
-	private Population population = null;
+	protected NetworkLayer network = null;
+	protected Population population = null;
 
 	public static final String TEST_PERSON_ID = "1";
 	public static final int TEST_PLAN_NR = 0;
@@ -62,9 +62,9 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	protected Act originAct = null;
 	protected Act destinationAct = null;
 
-	private TravelTimeCalculator linkTravelTimeEstimator = null;
-	private DepartureDelayAverageCalculator tDepDelayCalc = null;
-	private FixedRouteLegTravelTimeEstimator testee = null;
+	protected TravelTimeCalculator linkTravelTimeEstimator = null;
+	protected DepartureDelayAverageCalculator tDepDelayCalc = null;
+	protected FixedRouteLegTravelTimeEstimator testee = null;
 
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 
@@ -128,9 +128,9 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		double legTravelTimeEstimation = Time.UNDEFINED_TIME;
 
 		// this method does not do something useful, therefore the meaningless parameters
-		legTravelTimeEstimation = testee.getLegTravelTimeEstimation(new IdImpl("1"), 0.0, null, null, null, "dummy mode");
+		legTravelTimeEstimation = testee.getLegTravelTimeEstimation(new IdImpl("1"), 0.0, null, null, null);
 
-		assertEquals(legTravelTimeEstimation, 0.0, EPSILON);
+		assertEquals(legTravelTimeEstimation, Double.MIN_VALUE , EPSILON);
 	}
 
 	public void testProcessDeparture() {

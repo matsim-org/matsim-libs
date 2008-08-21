@@ -25,40 +25,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-import org.jgap.Chromosome;
-import org.jgap.Configuration;
-import org.jgap.Gene;
-import org.jgap.Genotype;
-import org.jgap.IChromosome;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.DoubleGene;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
-import org.matsim.events.handler.EventHandler;
-import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.planomat.PlanomatFitnessFunctionWrapper;
-import org.matsim.planomat.PlanomatStrategyManagerConfigLoader;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
@@ -67,19 +43,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activities;
-import org.matsim.replanning.PlanStrategy;
-import org.matsim.replanning.StrategyManager;
-import org.matsim.replanning.modules.PlanomatOptimizeTimes;
-import org.matsim.replanning.modules.StrategyModule;
-import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.router.util.TravelTime;
-import org.matsim.scoring.CharyparNagelScoringFunction;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
@@ -100,7 +66,6 @@ import org.matsim.utils.vis.kml.Placemark;
 import org.matsim.utils.vis.kml.Point;
 import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.kml.fields.Color;
-import org.matsim.world.Location;
 
 public class MyRuns {
 
@@ -132,7 +97,6 @@ public class MyRuns {
 	public static void run() throws Exception {
 
 //		MyRuns.writeGUESSFile();
-		MyRuns.testCharyparNagelFitnessFunction();
 //		MyRuns.conversionSpeedTest();
 //		MyRuns.convertPlansV0ToPlansV4();
 //		MyRuns.produceSTRC2007KML();
@@ -448,19 +412,6 @@ public class MyRuns {
 
 	}
 
-//	private static void convertPlansV0ToPlansV4() {
-//
-//		System.out.println("performing vo to v4 plans conversion...");
-//
-//		NetworkLayer network = MyRuns.initWorldNetwork();
-//		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
-//		MyRuns.writePopulation(matsimAgentPopulation);
-//
-//		System.out.println("performing vo to v4 plans conversion...DONE.");
-//
-//
-//	}
-
 	public static NetworkLayer initWorldNetwork() {
 
 		NetworkLayer network = null;
@@ -472,13 +423,6 @@ public class MyRuns {
 		System.out.println("  reading network xml file... ");
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		System.out.println("  done.");
-
-		return network;
-	}
-
-	private static NetworkLayer readNetwork(String filename) {
-
-		NetworkLayer network = null;
 
 		return network;
 	}
@@ -507,40 +451,6 @@ public class MyRuns {
 		return population;
 	}
 
-	private static LegTravelTimeEstimator createLegTravelTimeEstimator(Events events, NetworkLayer network, TravelTime linkTravelTimeEstimator) {
-
-		LegTravelTimeEstimator estimator = null;
-
-		int timeBinSize = 900;
-
-		// it would be nice to load the estimator via reflection (see below)
-		// but if we just use make instead of Eclipse (as usual on a remote server)
-		// only classes occuring in the code are compiled,
-		// so we do it without reflection
-		String estimatorName = Gbl.getConfig().planomat().getLegTravelTimeEstimatorName();
-		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
-			estimator = new MyRecentEventsBasedEstimator();
-			events.addHandler((EventHandler) estimator);
-
-		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
-			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, timeBinSize);
-			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
-			events.addHandler((EventHandler) linkTravelTimeEstimator);
-		} else if (estimatorName.equalsIgnoreCase("CharyparEtAlCompatibleLegTravelTimeEstimator")) {
-			DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, timeBinSize);
-			estimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
-			events.addHandler((EventHandler) linkTravelTimeEstimator);
-			events.addHandler(tDepDelayCalc);
-
-		}
-		else {
-			Gbl.errorMsg("Invalid name of implementation of LegTravelTimeEstimatorI: " + estimatorName);
-		}
-
-		return estimator;
-
-	}
-
 	public static void readEvents(Events events, NetworkLayer network) {
 
 		// load test events
@@ -553,272 +463,6 @@ public class MyRuns {
 		System.out.println("  done.");
 		System.out.println("  reading events from file and processing them took " + (endTime - startTime) + " ms.");
 		System.out.flush();
-
-	}
-
-	private static void writePopulation(Population population) {
-
-		System.out.println("Writing plans file...");
-		PopulationWriter plans_writer = new PopulationWriter(population);
-		plans_writer.write();
-		System.out.println("Writing plans file...DONE.");
-	}
-
-	private static void writeNetwork(NetworkLayer network, String filename) {
-
-		System.out.println("writing network file" + filename + " ... ");
-		NetworkWriter network_writer = new NetworkWriter(network, filename);
-		network_writer.write();
-		System.out.println("done.");
-
-	}
-
-	private static void testCharyparNagelFitnessFunction() {
-
-		// initialize scenario with events from a given events file
-		// - network
-		NetworkLayer network = MyRuns.initWorldNetwork();
-		// - population
-		Population matsimAgentPopulation = MyRuns.initMatsimAgentPopulation(Gbl.getConfig().plans().getInputFile(), Population.NO_STREAMING, null);
-		// - events
-		Events events = new Events();
-		TravelTime tTravelCalc = new TravelTimeCalculator(network);
-		LegTravelTimeEstimator ltte = MyRuns.createLegTravelTimeEstimator(events, network, tTravelCalc);
-		events.printEventHandlers();
-		MyRuns.readEvents(events, network);
-
-		// put all the parameters in the config file later
-		double planLength = 24.0 * 3600;
-		//   use fixed default mutation rate from Herrera Et Al, later use a variable mutation rate
-		int mutationRate = 20; // 1/0.005
-		//   use population size of 50 as in previous planomat implentation
-		int popSize = Gbl.getConfig().planomat().getPopSize();
-		int numEvolutions = Gbl.getConfig().planomat().getJgapMaxGenerations();
-		int percentEvolution = numEvolutions / 10;
-
-		Configuration jgapConfiguration = null;
-		IChromosome sampleChromosome = null;
-		Genotype jgapGAPopulation = null;
-
-		Iterator<Person> personIt = matsimAgentPopulation.getPersons().values().iterator();
-		while (personIt.hasNext()) {
-			Person person = personIt.next();
-			System.out.println("  Processing agent # " + person.getId());
-			Plan plan = person.getSelectedPlan();
-
-			// analyze / modify plan for our purposes:
-			// 1, how many activities do we have?
-			// 2, clean all time information
-			int numActs = 0;
-			for (Object o : plan.getActsLegs()) {
-
-				if (o.getClass().equals(Act.class)) {
-					((Act) o).setDur(Time.UNDEFINED_TIME);
-					((Act) o).setEndTime(Time.UNDEFINED_TIME);
-					numActs++;
-				} else if (o.getClass().equals(Leg.class)) {
-					((Leg) o).setTravTime(Time.UNDEFINED_TIME);
-				}
-
-			}
-
-			// first and last activity are assumed to be the same
-			numActs -= 1;
-
-			System.out.println("    Configuring JGAP...");
-			try {
-				jgapConfiguration.reset();
-				jgapConfiguration = new DefaultConfiguration();
-
-				Gene[] sampleGenes = new Gene[numActs];
-				sampleGenes[0] = new DoubleGene(jgapConfiguration, 0.0, planLength);
-				// plan starts at 8:00
-				//sampleGenes[0].setAllele(8.00);
-				for (int ii=1; ii < sampleGenes.length; ii++) {
-					sampleGenes[ii] = new DoubleGene(jgapConfiguration, 0.0, planLength);
-					// each act has same length
-					//sampleGenes[ii].setAllele(planLength / numActs);
-				}
-
-				sampleChromosome = new Chromosome(jgapConfiguration, sampleGenes);
-
-				jgapConfiguration.setSampleChromosome( sampleChromosome );
-
-				// initialize scoring function
-				CharyparNagelScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory();
-				CharyparNagelScoringFunction sf = (CharyparNagelScoringFunction) sfFactory.getNewScoringFunction(plan);
-
-				PlanomatFitnessFunctionWrapper fitFunc = new PlanomatFitnessFunctionWrapper( sf, plan, ltte );
-
-				jgapConfiguration.setFitnessFunction( fitFunc );
-
-				// elitist selection (DeJong, 1975)
-				jgapConfiguration.setPreservFittestIndividual(Boolean.TRUE);
-
-				jgapConfiguration.setPopulationSize( popSize );
-			} catch (InvalidConfigurationException e) {
-				e.printStackTrace();
-			}
-			System.out.println("    Configuring JGAP...DONE.");
-
-			System.out.println("    Generating initial population...");
-			try {
-				jgapGAPopulation = Genotype.randomInitialGenotype( jgapConfiguration );
-			} catch (InvalidConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println("    Generating initial population...DONE.");
-			System.out.println();
-
-			System.out.println("Running evolution...");
-
-			for (int ii=0; ii < numEvolutions; ii++) {
-				jgapGAPopulation.evolve();
-//				// Print progress.
-//				// ---------------
-				if (ii % percentEvolution == 0) {
-					//progress++;
-					IChromosome fittest = jgapGAPopulation.getFittestChromosome();
-					double fitness = fittest.getFitnessValue();
-					System.out.println("Currently fittest Chromosome has fitness " +
-							fitness);
-//					if (fitness >= MAX_FITNESS) {
-//					System.out.println("We discovered that MAX_FITNESS has been reached after " + ii + " generations. Cancelling evolution...");
-//					System.out.flush();
-//					break;
-//					}
-				}
-			}
-
-			System.out.println("Running evolution...DONE.");
-			System.out.println();
-
-			IChromosome fittest = jgapGAPopulation.getFittestChromosome();
-			System.out.println("The fittest looks like this: "  + ((Chromosome) fittest).toString());
-			System.out.println("Fitness of the fittest: " + fittest.getFitnessValue());
-
-			MyRuns.writeChromosome2Plan(fittest, plan, ltte);
-			MyRuns.writePopulation(matsimAgentPopulation);
-
-		}
-
-	}
-
-	/**
-	 * Writes a JGAP chromosome back to matsim plan object.
-	 *
-	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
-	 * @param plan the plan that will be altered
-	 */
-	private static void writeChromosome2Plan(IChromosome individual, Plan plan, LegTravelTimeEstimator estimator) {
-
-		Act activity = null;
-		Leg leg = null;
-
-		Gene[] fittestGenes = individual.getGenes();
-
-		int max = plan.getActsLegs().size();
-		double now = 0;
-
-		for (int ii = 0; ii < max; ii++) {
-
-			Object o = plan.getActsLegs().get(ii);
-
-			if (o.getClass().equals(Act.class)) {
-
-				activity = ((Act) o);
-
-				// handle first activity
-				if (ii == 0) {
-					// set start to midnight
-					activity.setStartTime(now);
-					// set end time of first activity
-					activity.setEndTime(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
-					// calculate resulting duration
-					activity.setDur(activity.getEndTime() - activity.getStartTime());
-					// move now pointer to activity end time
-					now += activity.getEndTime();
-
-					// handle middle activities
-				} else if ((ii > 0) && (ii < (max - 1))) {
-
-					// assume that there will be no delay between arrival time and activity start time
-					activity.setStartTime(now);
-					// set duration middle activity
-					activity.setDur(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
-					// move now pointer by activity duration
-					now += activity.getDur();
-					// set end time accordingly
-					activity.setEndTime(now);
-
-					// handle last activity
-				} else if (ii == (max - 1)) {
-
-					// assume that there will be no delay between arrival time and activity start time
-					activity.setStartTime(now);
-					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					activity.setDur(Time.UNDEFINED_TIME);
-					activity.setEndTime(Time.UNDEFINED_TIME);
-
-				}
-
-			} else if (o.getClass().equals(Leg.class)) {
-
-				leg = ((Leg) o);
-
-				// assume that there will be no delay between end time of previous activity and departure time
-				leg.setDepTime(now);
-				// set arrival time to estimation
-				Location origin = ((Act) plan.getActsLegs().get(ii - 1)).getLink();
-				Location destination = ((Act) plan.getActsLegs().get(ii + 1)).getLink();
-
-				double travelTimeEstimation = estimator.getLegTravelTimeEstimation(
-						plan.getPerson().getId(),
-						0.0,
-						origin,
-						destination,
-						leg.getRoute(),
-				"car");
-				leg.setTravTime(travelTimeEstimation);
-				now += leg.getTravTime();
-				// set planned arrival time accordingly
-				leg.setArrTime(now);
-
-			}
-		}
-
-		System.out.println(plan.getScore());
-
-	}
-
-	private static void conversionSpeedTest() {
-
-		final int MAX = 10000000;
-		String str;
-		long startTime, endTime;
-
-		// with object allocation
-		startTime = System.currentTimeMillis();
-
-		for (int ii=0; ii < MAX; ii++) {
-			str = new Integer(ii).toString();
-		}
-
-		endTime = System.currentTimeMillis();
-
-		System.out.println("With: " + (endTime - startTime));
-
-		// without object allocation
-		startTime = System.currentTimeMillis();
-
-		for (int ii=0; ii < MAX; ii++) {
-			str = Integer.toString(ii);
-		}
-
-		endTime = System.currentTimeMillis();
-
-		System.out.println("Without: " + (endTime - startTime));
 
 	}
 
@@ -890,7 +534,6 @@ public class MyRuns {
 			}
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

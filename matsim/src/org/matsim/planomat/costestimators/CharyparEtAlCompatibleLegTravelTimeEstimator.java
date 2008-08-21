@@ -21,10 +21,9 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.router.util.TravelTime;
-import org.matsim.world.Location;
 
 /**
  * This class estimates travel times from events produced by the 
@@ -53,16 +52,22 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 	}
 
 	@Override
-	public double getLegTravelTimeEstimation(Id personId, double departureTime, Location origin,
-			Location destination, Route route, String mode) {
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			Act actOrigin, Act actDestination, Leg legIntermediate) {
+
+		double legTravelTimeEstimation = Double.MIN_VALUE;
 
 		double now = departureTime;
 
-		now = this.processDeparture((Link) origin, now);
-		now = this.processLink((Link) origin, now);
-		now = this.processRouteTravelTime(route, now);
+		now = this.processDeparture(actOrigin.getLink(), now);
+		now = this.processLink(actOrigin.getLink(), now);
+		now = this.processRouteTravelTime(legIntermediate.getRoute(), now);
+		
+		legTravelTimeEstimation = now - departureTime;
 
-		return (now - departureTime);
+		return legTravelTimeEstimation;
+	
+	
 	}
 
 }

@@ -42,15 +42,14 @@ import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.Location;
 
 /**
  * The "heart" of the planomat external strategy module:
@@ -68,13 +67,19 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	public static enum PossibleModes {
 		
-		CAR(BasicLeg.CARMODE), 
-		PT(BasicLeg.PTMODE);
+		CAR(BasicLeg.CARMODE, 0), 
+		PT(BasicLeg.PTMODE, 1);
 		
 		private String basicLegIdentifier;
+		private int jgapAllele;
 
-		private PossibleModes(String basicLegIdentifier) {
+		private PossibleModes(String basicLegIdentifier, int jgapAllele) {
 			this.basicLegIdentifier = basicLegIdentifier;
+			this.jgapAllele = jgapAllele;
+		}
+
+		public int getJgapAllele() {
+			return jgapAllele;
 		}
 
 		public String getBasicLegIdentifier() {
@@ -115,7 +120,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 					jgapConfiguration.setFitnessFunction( fitnessFunction );
 					population = Genotype.randomInitialGenotype( jgapConfiguration );
 				} catch (InvalidConfigurationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 //				IChromosome fittest = PlanOptimizeTimes.evolveAndReturnFittest(initialGAPopulation);
@@ -166,7 +170,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			jgapConfiguration.setPreservFittestIndividual(true);
 			jgapConfiguration.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -216,7 +219,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			}
 
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -224,7 +226,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		try {
 			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes.toArray(new Gene[0]) );
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -315,7 +316,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		Gene[] fittestGenes = individual.getGenes();
 
 		int max = plan.getActsLegs().size();
-		double now = 0;
+		double now = 0.0;
 
 		for (int ii = 0; ii < max; ii++) {
 
@@ -325,30 +326,15 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 				activity = ((Act) o);
 
-				// handle first activity
-				if (ii == 0) {
-					// set start to midnight
-					activity.setStartTime(now);
-					// set end time of first activity
-					activity.setEndTime(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
-					// calculate resulting duration
-					activity.setDur(activity.getEndTime() - activity.getStartTime());
-					// move now pointer to activity end time
-					now += activity.getEndTime();
+				// handle first activity and middle activities
+				if (ii < (max - 1)) {
 
-					// handle middle activities
-				} else if ((ii > 0) && (ii < (max - 1))) {
-
-					// assume that there will be no delay between arrival time and activity start time
 					activity.setStartTime(now);
-					// set duration middle activity
 					activity.setDur(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
-					// move now pointer by activity duration
 					now += activity.getDur();
-					// set end time accordingly
 					activity.setEndTime(now);
-
-					// handle last activity
+					
+				// handle last activity
 				} else if (ii == (max - 1)) {
 
 					// assume that there will be no delay between arrival time and activity start time
@@ -366,16 +352,16 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepTime(now);
 				// set arrival time to estimation
-				Location origin = ((Act) plan.getActsLegs().get(ii - 1)).getLink();
-				Location destination = ((Act) plan.getActsLegs().get(ii + 1)).getLink();
+				Act origin = ((Act) plan.getActsLegs().get(ii - 1));
+				Act destination = ((Act) plan.getActsLegs().get(ii + 1));
 
+				// TODO is that correct?
 				double travelTimeEstimation = estimator.getLegTravelTimeEstimation(
 						plan.getPerson().getId(),
 						0.0,
 						origin,
 						destination,
-						leg.getRoute(),
-				"car");
+						leg);
 				leg.setTravTime(travelTimeEstimation);
 				now += leg.getTravTime();
 				// set planned arrival time accordingly

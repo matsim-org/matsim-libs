@@ -30,6 +30,8 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Route;
 import org.matsim.world.Location;
 
@@ -96,16 +98,6 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 	public void reset(final int iteration) {
 	}
 
-	public double getLegTravelTimeEstimation(
-			final Id personId,
-			final double departureTime,
-			final Location origin,
-			final Location destination,
-			final Route route,
-			final String mode) {
-		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, origin.getId(), destination.getId(), "car"));
-	}
-
 	public void handleEvent(final AgentDepartureEvent event) {
 
 		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId), event.legId);
@@ -130,8 +122,13 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		// TODO [KM] Auto-generated method stub
+	}
 
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			Act actOrigin, Act actDestination, Leg legIntermediate) {
+
+		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
+	
 	}
 
 }

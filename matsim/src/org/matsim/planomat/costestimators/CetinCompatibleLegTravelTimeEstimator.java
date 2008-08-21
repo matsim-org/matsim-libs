@@ -20,11 +20,13 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
-import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelTime;
-import org.matsim.world.Location;
 
 /**
  * This class estimates travel times from events produced by the
@@ -45,28 +47,42 @@ import org.matsim.world.Location;
  */
 public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTimeEstimator {
 
-	public CetinCompatibleLegTravelTimeEstimator(TravelTime linkTravelTimeEstimator,
-			DepartureDelayAverageCalculator depDelayCalc) {
+	private PlansCalcRoute plansCalcRoute;
+	
+	public CetinCompatibleLegTravelTimeEstimator(
+			final TravelTime linkTravelTimeEstimator,
+			final DepartureDelayAverageCalculator depDelayCalc,
+			final NetworkLayer network) {
 
 		super(linkTravelTimeEstimator, depDelayCalc);
+
+		this.plansCalcRoute = new PlansCalcRoute(network, null, linkTravelTimeEstimator);
 
 	}
 
 	@Override
-	public double getLegTravelTimeEstimation(
-			Id personId,
-			double departureTime,
-			Location origin,
-			Location destination,
-			Route route,
-			String mode) {
+	public double getLegTravelTimeEstimation(Id personId, double departureTime,
+			Act actOrigin, Act actDestination, Leg legIntermediate) {
 
-		double now = departureTime;
+		double legTravelTimeEstimation = Double.MIN_VALUE;
+		
+		if (legIntermediate.getMode().equals(BasicLeg.CARMODE)) {
 
-		now = this.processDeparture((Link) origin, now);
-		now = this.processRouteTravelTime(route, now);
-		now = this.processLink((Link) destination, now);
+			double now = departureTime;
 
-		return (now - departureTime);
+			now = this.processDeparture(actOrigin.getLink(), now);
+			now = this.processRouteTravelTime(legIntermediate.getRoute(), now);
+			now = this.processLink(actDestination.getLink(), now);
+
+			legTravelTimeEstimation = (now - departureTime);
+
+		} else if (legIntermediate.getMode().equals(BasicLeg.PTMODE)) {
+			
+			legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+			
+		}
+		
+		return legTravelTimeEstimation;
 	}
+
 }

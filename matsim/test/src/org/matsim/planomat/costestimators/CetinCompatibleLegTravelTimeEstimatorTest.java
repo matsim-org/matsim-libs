@@ -20,6 +20,7 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
@@ -28,7 +29,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Route;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 
 public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTravelTimeEstimatorTest {
@@ -44,10 +44,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 	@Override
 	public void testGetLegTravelTimeEstimation() {
 
-		DepartureDelayAverageCalculator tDepDelayCalc = super.getTDepDelayCalc();
-		TravelTimeCalculator linkTravelTimeEstimator = super.getLinkTravelTimeEstimator();
-
-		testee = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
+		testee = new CetinCompatibleLegTravelTimeEstimator(this.linkTravelTimeEstimator, this.tDepDelayCalc, this.network);
 
 		Events events = new Events();
 		events.addHandler(tDepDelayCalc);
@@ -63,10 +60,9 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		double legTravelTime = testee.getLegTravelTimeEstimation(
 				testPerson.getId(),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 
 		double expectedLegEndTime = departureTime;
 		for (Link link : links) {
@@ -92,10 +88,9 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 
 		expectedLegEndTime = departureTime;
 		expectedLegEndTime += depDelay;
@@ -134,16 +129,33 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,
-				originAct.getLink(),
-				destinationAct.getLink(),
-				route,
-				testLeg.getMode());
+				originAct,
+				destinationAct,
+				testLeg);
 		expectedLegEndTime = departureTime;
 		expectedLegEndTime += depDelay;
 		expectedLegEndTime = testee.processRouteTravelTime(route, expectedLegEndTime);
 		expectedLegEndTime = testee.processLink(destinationAct.getLink(), expectedLegEndTime);
 
 		assertEquals(expectedLegEndTime, departureTime + legTravelTime, EPSILON);
+
+		// test public transport mode
+		departureTime = Time.parseTime("06:10:00");
+		testLeg.setMode(BasicLeg.PTMODE);
+		legTravelTime = testee.getLegTravelTimeEstimation(
+				new IdImpl(TEST_PERSON_ID),
+				departureTime,
+				originAct,
+				destinationAct,
+				testLeg);
+		// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes
+		expectedLegEndTime = departureTime + (2 * Time.parseTime("00:15:00"));
+
+		// quite a high epsilon here, due to rounding of the free speed in the network.xml file
+		// which is 27.78 m/s, but should be 27.777777... m/s, reflecting 100 km/h
+		// and 5.0 seconds travel time error is not _that_ bad
+		double freeSpeedEpsilon = 5.0;
+		assertEquals(expectedLegEndTime, departureTime + legTravelTime, freeSpeedEpsilon);
 
 	}
 
