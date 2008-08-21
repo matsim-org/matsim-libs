@@ -69,7 +69,8 @@ Splitting the map:
         - lösung 4: (implemented): make numberOfQueuedMessages more concurrent
             => more possible... 
     - main problem: incrementNumberOfQueuedMessages => concurrentHashMap mit ConcurrentMap.replace benutzt.
-    - implemented: don't send any border message, if there is a car on the road, but only set a timer
+    - bad idea: don't send any border message, if there is a car on the road, but only set a timer
+    	=> the getNextMessage would not function anymore...
     - next idea: warn a outBorder road, that traffic is coming. only registered roads should be informed
     	-> need to find a balance: too large areas for look ahead are fragil, too small provide small look ahead
     	=> start with look ahead of one or two roads
@@ -94,6 +95,7 @@ Splitting the map:
               - for such outborder messages, which will have no car on them during the whole simulation, they
               should send border message for time double.max and then do nothing.
            => resolve problem: perhaps too few events (test 8)
+           => think again about the whole procedure, if everything is alright
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 

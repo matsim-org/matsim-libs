@@ -7,6 +7,7 @@ public class TimerMessage extends SelfhandleMessage {
 	@Override
 	public void selfhandleMessage() {
 		Road road = (Road) receivingUnit;
+		
 		road.lookahead.removeAll(Collections.singletonList(this));
 		
 		if (road.lookahead.peek().messageArrivalTime<messageArrivalTime){

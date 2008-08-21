@@ -133,8 +133,22 @@ public class JavaPDEQSim2 {
 				} else {
 					leg = (Leg) actsLegs.get(i);
 					Link[] links=leg.getRoute().getLinkRoute();
+					
+					
+					
+					
+					double lookahead=leg.getDepTime();
+					Link link=null;
 					for (int j=0;j<links.length;j++){
-						bucketCount[getZone(links[j].getFromNode().getCoord().getX(),bucketBoundries)]++;
+						link=links[j];
+						// init buckedCount
+						bucketCount[getZone(link.getFromNode().getCoord().getX(),bucketBoundries)]++;
+						// init all out border roads
+						Road r=Road.allRoads.get(link.getId().toString());
+						lookahead+=r.linkTravelTime;
+						if (r.isOutBorderRoad){
+							r.lookahead.add(r.getTimerMessage(lookahead));
+						}
 					}
 				}
 				//System.out.println();

@@ -69,7 +69,7 @@ public class ZoneMessageQueue {
 
 		// assert (((Road) m.receivingUnit).getZoneId() == zoneId);
 
-		
+		incounter++;
 			if (m.isAcrossBorderMessage) {
 				//System.out.println(m);
 				
@@ -89,14 +89,7 @@ public class ZoneMessageQueue {
 		
 
 		try {
-			if (!(m instanceof ZoneBorderMessage)){
-				buffer.add(m, MessageExecutor.getThreadId());
-				incounter++;
-			} else {
-				// because ZoneBorderMessages are not scheduled, they also won't be
-				// recycled
-				m.recycleMessage();
-			}
+			buffer.add(m, MessageExecutor.getThreadId());
 		} catch (Exception e) {
 			buffer.add(m, 0);
 		}
