@@ -140,8 +140,12 @@ public class Scheduler {
 		
 		
 		
-		// schedule a null message on all roads
+		// schedule a message in future eternity on all roads
 		for (Road road:Road.allRoads.values()){
+			if (road.isOutBorderRoad){
+				road.lookahead.add(road.getTimerMessage(Double.MAX_VALUE));
+				road.scheduleZoneBorderMessage(road.lookahead.peek().messageArrivalTime);
+			}
 			//road.scheduleInitialZoneBorderMessage();
 		}
 		

@@ -295,6 +295,8 @@ public class Road extends SimUnit {
 			// front car, it will be waken up...
 		}
 
+		
+		
 	}
 
 	// gives back the time, when the car can enter the road
@@ -577,15 +579,21 @@ public class Road extends SimUnit {
 		
 	}
 	
-	public TimerMessage scheduleTimerMessage(double nextMessageTime){	
+	public void scheduleTimerMessage (double nextMessageTime){
+		scheduler.schedule(getTimerMessage(nextMessageTime));
+	}
+	
+	public TimerMessage getTimerMessage(double nextMessageTime){	
 		TimerMessage tm=MessageFactory.getTimerMessage();
 		tm.sendingUnit=this;
 		tm.receivingUnit=this;
 		tm.messageArrivalTime=nextMessageTime;
-		scheduler.schedule(tm);
-		lookahead.add(tm);
+		//scheduler.schedule(tm);
+		//lookahead.add(tm);
 		return tm;
 	}
+	
+	
 	
 	
 }

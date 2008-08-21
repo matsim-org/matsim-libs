@@ -87,12 +87,13 @@ Splitting the map:
         - unix xwindow aus probieren
         - auch in normaler DES bzw. erster PDES version das Priority queue problem lösen
         - => grosse tests ausprobieren
-        - next: such out border roads, which have no timer scheduled (because no car drives over them)
-           -> we need to look into future even for such roads, which have a start message, because 
-           else they will stop
-           => !!! do static look ahead at the beginning and schedule all timers. In between do normal timers.
+        
+        
+        - implemented: such out border roads, which have no timer scheduled (because no car drives over them)
+           => do static look ahead at the beginning and schedule all timers. In between do normal timers.
               - for such outborder messages, which will have no car on them during the whole simulation, they
               should send border message for time double.max and then do nothing.
+           => resolve problem: perhaps too few events (test 8)
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
