@@ -73,6 +73,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		model.setAge(person.getAge());
 		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
+		// TODO balmermi: check if the person/kids size should be reduced.
 		model.setHHDimension(persons.size());
 		int kids = 0; for (Person p : persons.values()) { if (p.getAge() < 15) { kids++; } } model.setHHKids(kids);
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
