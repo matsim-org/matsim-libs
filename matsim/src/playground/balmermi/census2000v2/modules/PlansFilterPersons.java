@@ -84,19 +84,18 @@ public class PlansFilterPersons {
 				((Household)o).removePersonZ(p.getId());
 				p.getCustomAttributes().remove(CAtts.HH_Z);
 
-				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() != 2) {
-					Gbl.errorMsg("pid="+p.getId()+": has hh_z but only one home_act. That must not happen!");
-				}
-				Facility f0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
-				Facility f1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1).getFacility();
-				if (f0.getId().equals(f.getId())) {
-					p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(0);
-				}
-				else if (f1.getId().equals(f.getId())) {
-					p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(1);
-				}
-				else {
-					Gbl.errorMsg("pid="+p.getId()+": That must not happen!");
+				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 2) {
+					Facility f0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
+					Facility f1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1).getFacility();
+					if (f0.getId().equals(f.getId())) {
+						p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(0);
+					}
+					else if (f1.getId().equals(f.getId())) {
+						p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(1);
+					}
+					else {
+						Gbl.errorMsg("pid="+p.getId()+": That must not happen!");
+					}
 				}
 			}
 			// checks
