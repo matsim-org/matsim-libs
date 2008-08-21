@@ -32,6 +32,8 @@ public class Road extends SimUnit {
 	public RoadEntryHandler roadEntryHandler = null;
 	public double simTime=0;
 	
+	public PriorityQueue<Message> lookahead=new PriorityQueue<Message>();
+	
 	
 	// the inverseFlowCapacity is simple the inverse
 	// of the capacity meaning, the minimal time between two cars
@@ -536,14 +538,8 @@ public class Road extends SimUnit {
 			
 			// don't schedule any border messages, just set a timer
 			timeOfNextMessage+=linkTravelTime- SimulationParameters.delta;
-			TimerMessage tm=MessageFactory.getTimerMessage();
-			tm.sendingUnit=this;
-			tm.receivingUnit=this;
-			tm.messageArrivalTime=timeOfNextMessage;
-			scheduler.schedule(tm);
+			scheduleTimerMessage(timeOfNextMessage);
 		}
-		
-		
 	}
 	
 	
@@ -575,14 +571,20 @@ public class Road extends SimUnit {
 				}
 			}
 			
-			TimerMessage tm=MessageFactory.getTimerMessage();
-			tm.sendingUnit=this;
-			tm.receivingUnit=this;
-			tm.messageArrivalTime=nextMessageTime;
-			scheduler.schedule(tm);
+			scheduleTimerMessage(nextMessageTime);
 			//assert(test);
 		}
 		
+	}
+	
+	public TimerMessage scheduleTimerMessage(double nextMessageTime){	
+		TimerMessage tm=MessageFactory.getTimerMessage();
+		tm.sendingUnit=this;
+		tm.receivingUnit=this;
+		tm.messageArrivalTime=nextMessageTime;
+		scheduler.schedule(tm);
+		lookahead.add(tm);
+		return tm;
 	}
 	
 	

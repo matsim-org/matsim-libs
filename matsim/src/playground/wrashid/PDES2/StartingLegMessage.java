@@ -19,6 +19,12 @@ public class StartingLegMessage extends EventMessage {
 
 	@Override
 	public void selfhandleMessage() {
+		// inform all outborder roads in this leg about the coming car
+		
+		
+		
+		
+		
 		
 		// attempt to enter street.
 		

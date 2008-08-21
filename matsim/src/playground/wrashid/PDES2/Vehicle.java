@@ -78,14 +78,9 @@ public class Vehicle extends SimUnit {
 		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
 		scheduleStartingLegMessage(departureTime, road);
 		
-		//TODO: Das hier noch einbauchen
-		//if ("car".equals(leg.getMode())) { // we only simulate car traffic
-		//	Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
-		//}
+		// set lookaheads
 		
 		
-		
-		//System.out.println("departureTime:"+departureTime+";simTime:"+scheduler.simTime);
 	}
 
 	public void setCurrentLeg(Leg currentLeg) {
@@ -238,6 +233,17 @@ public class Vehicle extends SimUnit {
 		m.secondLock=this;
 		m.lock=road.lock;
 		sendMessage(m, road,scheduleTime);
+		
+		
+		double lookahead=scheduleTime;
+		for (Link link: getCurrentLeg().getRoute().getLinkRoute()){
+			Road r=Road.allRoads.get(getCurrentLink().getId().toString());
+			lookahead+=r.linkTravelTime;
+			if (r.isOutBorderRoad){
+				r.scheduleZoneBorderMessage(lookahead);
+			}
+		}
+		
 		//road.roadEntryHandler.addStaringLegMessages(m);
 	}
 

@@ -142,7 +142,7 @@ public class Scheduler {
 		
 		// schedule a null message on all roads
 		for (Road road:Road.allRoads.values()){
-			road.scheduleInitialZoneBorderMessage();
+			//road.scheduleInitialZoneBorderMessage();
 		}
 		
 		
