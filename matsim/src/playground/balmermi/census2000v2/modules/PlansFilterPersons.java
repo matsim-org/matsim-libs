@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
@@ -85,13 +86,13 @@ public class PlansFilterPersons {
 				p.getCustomAttributes().remove(CAtts.HH_Z);
 
 				if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() == 2) {
-					Facility f0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
-					Facility f1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1).getFacility();
-					if (f0.getId().equals(f.getId())) {
-						p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(0);
+					Activity a0 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0);
+					Activity a1 = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(1);
+					if (a0.getFacility().getId().equals(f.getId())) {
+						if (!p.getKnowledge().removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}
-					else if (f1.getId().equals(f.getId())) {
-						p.getKnowledge().getActivities(CAtts.ACT_HOME).remove(1);
+					else if (a1.getFacility().getId().equals(f.getId())) {
+						if (!p.getKnowledge().removeActivity(a1)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}
 					else {
 						Gbl.errorMsg("pid="+p.getId()+": That must not happen!");
@@ -99,13 +100,16 @@ public class PlansFilterPersons {
 				}
 			}
 			// checks
-			if ((p.getCustomAttributes().get(CAtts.HH_Z) != null) ||
-				(p.getCustomAttributes().get(CAtts.HH_W) == null) ||
-				(p.getKnowledge().getActivities(CAtts.ACT_HOME).size() != 1)) {
-				Gbl.errorMsg("pid="+p.getId()+": Data inconsistency!");
+			if (p.getCustomAttributes().get(CAtts.HH_Z) != null) {
+					Gbl.errorMsg("pid="+p.getId()+": Still containing hh_z!");
+				}
+			if (p.getCustomAttributes().get(CAtts.HH_W) == null) {
+				Gbl.errorMsg("pid="+p.getId()+": No hh_w!");
+			}
+			if (p.getKnowledge().getActivities(CAtts.ACT_HOME).size() != 1) {
+				Gbl.errorMsg("pid="+p.getId()+": "+ p.getKnowledge().getActivities(CAtts.ACT_HOME).size() + " home acts!");
 			}
 		}
-		
 		
 		log.info("    done.");
 	}
