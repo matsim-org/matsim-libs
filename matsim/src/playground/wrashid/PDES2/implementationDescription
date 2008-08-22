@@ -195,10 +195,11 @@ Experiments and Results
 =========================
 Ex1
 ----
-300K agents (arround 21.4M Events) => Satawal
-MobSim: 36min (events: wahrschein 21M)
-PDES, 1 CPU: 
-PDES2, 1 CPU:   sec. 
+300K agents (arround 21.4M Events) => Satawal.
+Time of descret event simulation part only considered.
+MobSim: 2160 sec. (events: wahrschein 21M) 
+PDES, 1 CPU: 638 sec. => komisch, hält am schluss nicht an, wieso????? => wiederholen
+PDES2, 1 CPU: 2321  sec. => wiederholen
 PDES2, 6 CPU:  411 sec. 
 PDES2, 12 CPU: 152 sec. 
 
@@ -206,15 +207,9 @@ PDES2, 12 CPU: 152 sec.
 
 
 Ex2:
-----    
-300K agents (arround 21M Events)
-
-DES2, 12 CPU:      
-DES, 1 CPU: 
-
-Ex3:
 ----
-67K agents (arround 7.66M events) => alles auf satawal.
+67K agents (arround 7.66M events)  => Satawal.
+Time of descret event simulation part only considered.
 MobSim: 1260 sec
 PDES, 1 CPU: 108 sec 
 PDES2, 1 CPU: 113.8 sec 
