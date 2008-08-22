@@ -39,6 +39,7 @@ import java.util.zip.GZIPOutputStream;
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
 
+	private static final String GZ = ".gz";
 
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
@@ -59,13 +60,13 @@ public class IOUtils {
 			throw new FileNotFoundException("No filename given (filename == null)");
 		}
 		if (new File(filename).exists()) {
-			if (filename.endsWith(".gz")) {
+			if (filename.endsWith(GZ)) {
 				infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename))));
 			} else {
 				infile = new BufferedReader(new FileReader(filename));
 			}
-		} else if (new File(filename + ".gz").exists()) {
-			infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + ".gz"))));
+		} else if (new File(filename + GZ).exists()) {
+			infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + GZ))));
 		}
 
 		if (infile == null) {
@@ -92,9 +93,9 @@ public class IOUtils {
 		if (filename == null) {
 			throw new FileNotFoundException("No filename given (filename == null)");
 		}
-		if (useCompression && !filename.endsWith(".gz")) {
-			return getBufferedWriter(filename + ".gz");
-		} else if (!useCompression && filename.endsWith(".gz")) {
+		if (useCompression && !filename.endsWith(GZ)) {
+			return getBufferedWriter(filename + GZ);
+		} else if (!useCompression && filename.endsWith(GZ)) {
 			return getBufferedWriter(filename.substring(0, filename.length() - 3));
 		} else {
 			return getBufferedWriter(filename);
@@ -115,7 +116,7 @@ public class IOUtils {
 		if (filename == null) {
 			throw new FileNotFoundException("No filename given (filename == null)");
 		}
-		if (filename.endsWith(".gz")) {
+		if (filename.endsWith(GZ)) {
 			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename))));
 		}
 		return new BufferedWriter( new FileWriter (filename));
@@ -229,12 +230,16 @@ public class IOUtils {
 			if (from != null) {
 				try {
 					from.close();
-				} catch (IOException ignored) {}
+				} catch (IOException ignored) {
+					ignored.printStackTrace();
+				}
 			}
 			if (to != null) {
 				try {
 					to.close();
-				} catch (IOException ignored) {}
+				} catch (IOException ignored) {
+					ignored.printStackTrace();
+				}
 			}
 		}
 	}
