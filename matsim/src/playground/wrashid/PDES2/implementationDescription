@@ -109,16 +109,23 @@ Splitting the map:
            
            - ich muss rausfinden, ob ein speed up stattfindet
            
-           - es gib zu wenig events... bei einigen simulationen...
-              => count different events to find out, which messages are missing...
+   
+              
+              => next problem/suspicion: is there any deviation between the events, if we use
+              different number of processors => do check this
+           
            
            - es gibt ein exception beim iterieren, wie unterdrückt man dieses?
+           
+           
+           - use different constructor for events => objects instead of ids
+               => that is more efficient
            
       - vorallem für grosse simulationen mit vielen agenten lohnt sich unsere simulation wahrscheinlich eher, weil dann
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
       ersetzt werden. => try input 7M
       
-      
+      - priotiy queue in PDES => erstzen der operation...
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -163,7 +170,10 @@ Splitting the map:
       - es kommen zu wenig events
            => max simulation time war zu niedrig eingestellt
      =====================================       
-     
+             - es gib zu wenig events... bei einigen simulationen...
+              => count different events to find out, which messages are missing...
+              => lösung: maxSimulationLength war falsch eingestellt
+      ======================================        
      
      
      
@@ -193,10 +203,10 @@ DES, 1 CPU:
 
 Ex3:
 ----
-67K agents (arround )
+67K agents (arround ) => alles auf satawal.
 PDES2, 1 CPU: 113.8 sec (7.66M events)
 PDES2, 6 CPU: 38.8 sec (7.41M events)
 PDES2, 12 CPU: 29.3 sec (7.14M events)
-PDES, 1 CPU: 
-MobSim: 
+PDES, 1 CPU: => 108 sec (7.66M events)
+MobSim: 1260 sec
      
