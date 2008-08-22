@@ -35,25 +35,20 @@ import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
-import playground.balmermi.census2000v2.data.Households;
-import playground.balmermi.census2000v2.data.MicroCensus;
-import playground.balmermi.census2000v2.modules.PersonAssignActivityChains;
-import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
-import playground.balmermi.census2000v2.modules.PersonAssignMobilitiyToolModel;
+import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
 import playground.balmermi.census2000v2.modules.PlansAnalyse;
 import playground.balmermi.census2000v2.modules.PlansFilterPersons;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
-import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
-public class IIDMGeneration {
+public class IIDMGenerationPart2 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(IIDMGeneration.class);
+	private final static Logger log = Logger.getLogger(IIDMGenerationPart2.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// createPopulation()
@@ -125,41 +120,6 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
-		// TODO: write some consistency tests
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  parsing households... ");
-		Households households = new Households(municipalities);
-		households.parse(indir+"/households.txt",pop);
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-		
-//		// Test Demand for Timo Smiezek
-//		// ch.cut.640000.200000.740000.310000.xml
-//		Coord min = new CoordImpl(640000.0,200000.0);
-//		Coord max = new CoordImpl(740000.0,310000.0);
-
-//		log.info("  running person modules... ");
-//		new PersonCreateFakePlanFromKnowledge().run(plans);
-//		new PlansScenarioCut(min,max).run(plans);
-//		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-		
-		log.info("  removing persons... ");
-		new PlansFilterPersons().run(pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-		
-		log.info("  adding custom attributes for persons... ");
-		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding mz plans xml file... ");
 		Population mz_pop = new Population(Population.NO_STREAMING);
@@ -168,27 +128,16 @@ public class IIDMGeneration {
 
 		//////////////////////////////////////////////////////////////////////
 		
-		log.info("  creating mz data stucture... ");
-		MicroCensus mz = new MicroCensus(mz_pop);
-//		mz.print();
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-
 		log.info("  runnning person models... ");
-		new PersonAssignLicenseModel().run(pop);
-		new PersonAssignMobilitiyToolModel().run(pop);
-		new PersonAssignActivityChains(mz).run(pop);
+		new PlansAnalyse().run(pop);
+		new PlansAnalyse().run(mz_pop);
+		new PersonSetLocationsFromKnowledge().run(pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  writing custom attributes of the persons... ");
 		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
-		log.info("  done.");
-
-		log.info("  writing households txt file... ");
-		households.writeTable(outdir+"/output_households.txt");
 		log.info("  done.");
 
 		log.info("  writing plans xml file... ");

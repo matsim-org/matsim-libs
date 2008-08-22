@@ -70,19 +70,19 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignHHSizeModelParamsFromHHW(Person p, Household hh) {
+	private final void assignHHSizeModelParamsFromHH(Person p, Household hh) {
 		// nump
-		int nump = hh.getPersonsW().size();
+		int nump = hh.getPersons().size();
 		if (nump > MAXNUMP) { nump = MAXNUMP; }
 		model.setHHDimension(nump);
 
 		// numk
-		double k_frac = hh.getKidsWFraction();
-		model.setHHKids((int)Math.round(k_frac*nump));
+		double k_frac = hh.getKidsFraction();
+		model.setHHKids((int)(0.5+k_frac*nump));
 		
 		// debug info
-		if (hh.getPersonsW().size() > MAXNUMP) {
-			log.debug("FromHHW: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW().size()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
+		if (hh.getPersons().size() > MAXNUMP) {
+			log.debug("FromHH: pid="+p.getId()+": nump("+hh.getPersons().size()+"),numk("+hh.getKids().size()+"),k_frac("+k_frac+") => nump("+nump+"),numk("+((int)(0.5+k_frac*nump))+")");
 		}
 	}
 	
@@ -124,7 +124,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
 
 //		this.assignHHSizeModelParamsFromCatts(person,hh);
-		this.assignHHSizeModelParamsFromHHW(person,hh);
+		this.assignHHSizeModelParamsFromHH(person,hh);
 		
 		// inc
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
