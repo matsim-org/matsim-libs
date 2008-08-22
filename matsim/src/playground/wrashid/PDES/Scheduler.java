@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import playground.wrashid.PDES.util.CyclicBarrier;
-import playground.wrashid.PDES2.SimulationParameters;
+import playground.wrashid.PDES.SimulationParameters;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
