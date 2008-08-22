@@ -106,8 +106,11 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		ArrayList<Activity> prim_acts = new ArrayList<Activity>();
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 		prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
-		Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
-		model.setDistanceHome2Work(h_coord.calcDistance(p_coord));
+		if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
+		else {
+			Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
+			model.setDistanceHome2Work(h_coord.calcDistance(p_coord));
+		}
 
 		// fuelcost
 		model.setFuelCost(hh.getMunicipality().getFuelCost());
