@@ -105,11 +105,20 @@ Splitting the map:
         
            - problem: single cpu variante produziert zu wenig events bei test1 (test12 ok)
            
+           - make tests and also consider the event count to be part of it
            
+           - ich muss rausfinden, ob ein speed up stattfindet
+           
+           - es gib zu wenig events... bei einigen simulationen...
+              => count different events to find out, which messages are missing...
+           
+           - es gibt ein exception beim iterieren, wie unterdrückt man dieses?
            
       - vorallem für grosse simulationen mit vielen agenten lohnt sich unsere simulation wahrscheinlich eher, weil dann
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
       ersetzt werden. => try input 7M
+      
+      
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -154,3 +163,40 @@ Splitting the map:
       - es kommen zu wenig events
            => max simulation time war zu niedrig eingestellt
      =====================================       
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+Experiments and Results
+=========================
+Ex1:
+----
+300K agents (arround 21M Events)
+DES2, 1 CPU:  210 sec. (13.5 M events)
+DES2, 6 CPU:  378 sec. (15 Millionen events)
+DES2, 12 CPU: 210 sec. (12.7 M events)
+
+Ex2:
+----    
+300K agents (arround 21M Events)
+MobSim: 36min (events: wahrschein 21M)
+DES2, 12 CPU:      
+DES, 1 CPU: 
+
+Ex3:
+----
+67K agents (arround )
+PDES2, 1 CPU: 113.8 sec (7.66M events)
+PDES2, 6 CPU: 38.8 sec (7.41M events)
+PDES2, 12 CPU: 29.3 sec (7.14M events)
+PDES, 1 CPU: 
+MobSim: 
+     

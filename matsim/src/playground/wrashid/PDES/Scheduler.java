@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import playground.wrashid.PDES.util.CyclicBarrier;
+import playground.wrashid.PDES2.SimulationParameters;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
@@ -119,6 +121,9 @@ public class Scheduler {
 		System.out.println("XMedian:"+SimulationParameters.sumXCoordinate/SimulationParameters.noOfCars);
 		System.out.println("XMedianLeft:"+SimulationParameters.sumXCoordinateLeft/SimulationParameters.noOfCarsLeft);
 		System.out.println("XMedianRight:"+SimulationParameters.sumXCoordinateRight/SimulationParameters.noOfCarsRight);
+	
+		SimulationParameters.events.printEventsCount();
+	
 	}
 	
 	
