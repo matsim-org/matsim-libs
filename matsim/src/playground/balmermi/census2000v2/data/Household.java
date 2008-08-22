@@ -137,15 +137,15 @@ public class Household {
 	}
 	
 	public final double getKidsWFraction() {
-		return this.getKidsW().size()/this.getPersonsW().size();
+		return ((double)(this.getKidsW().size()))/((double)(this.getPersonsW().size()));
 	}
 	
 	public final double getKidsZFraction() {
-		return this.getKidsZ().size()/this.getPersonsZ().size();
+		return ((double)(this.getKidsZ().size()))/((double)(this.getPersonsZ().size()));
 	}
 	
 	public final double getKidsFraction() {
-		return this.getKids().size()/this.getPersons().size();
+		return ((double)(this.getKids().size()))/((double)(this.getPersons().size()));
 	}
 	
 	public final int getHHTPW() {

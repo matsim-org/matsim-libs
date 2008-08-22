@@ -31,8 +31,6 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
@@ -44,8 +42,6 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(PersonSetLocationsFromKnowledge.class);
 	
-	private static final Coord ZERO = new CoordImpl(0.0,0.0);
-
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -84,59 +80,65 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 		educ_acts.addAll(k.getActivities(CAtts.ACT_ESECO));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_EHIGH));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_EOTHR));
-		
-		boolean is_prev_home = false;
-		boolean is_prev_work = false;
-		boolean is_prev_educ = false;
+
+		Activity prev_home = null;
+		Activity prev_work = null;
+		Activity prev_educ = null;
 		
 		for (int i=0; i<plan.getActsLegs().size(); i++) {
 			if (i%2 == 0) {
 				Act act = (Act)plan.getActsLegs().get(i);
 				if (act.getType().startsWith("h")) {
-					if (is_prev_home) { log.error("TODO pid="+person.getId()+": Two home acts in a row Not sure yet how to handle that..."); }
+					if (prev_home != null) { log.warn("TODO pid="+person.getId()+": Two home acts in a row. Not sure yet how to handle that..."); }
 					act.setType(home_act.getType());
 					act.setFacility(home_act.getFacility());
-					act.setCoord(home_act.getFacility().getCenter());
-					is_prev_home = true;
-					is_prev_work = false;
-					is_prev_educ = false;
+					act.setCoord(null);
+					prev_home = home_act;
+					prev_work = null;
+					prev_educ = null;
 				}
 				else if (act.getType().startsWith("w")) {
 					if (work_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'w' act but no location known!"); }
-					if (is_prev_work) {
-						log.warn("TODO pid="+person.getId()+": assign another work act.");
-						act.setCoord(ZERO);
+					Activity work_act = null;
+					if (prev_work != null) {
+						ArrayList<Activity> rest = new ArrayList<Activity>(work_acts);
+						rest.remove(prev_work);
+						if (rest.isEmpty()) { work_act = prev_work; log.warn("TODO pid="+person.getId()+": assign another work act."); }
+						else { work_act = rest.get(MatsimRandom.random.nextInt(rest.size())); }
 					}
 					else {
-						Activity a = work_acts.get(MatsimRandom.random.nextInt(work_acts.size()));
-						act.setType(a.getType());
-						act.setFacility(a.getFacility());
-						act.setCoord(a.getFacility().getCenter());
+						work_act = work_acts.get(MatsimRandom.random.nextInt(work_acts.size()));
 					}
-					is_prev_home = false;
-					is_prev_work = true;
-					is_prev_educ = false;
+					act.setType(work_act.getType());
+					act.setFacility(work_act.getFacility());
+					act.setCoord(null);
+					prev_home = null;
+					prev_work = work_act;
+					prev_educ = null;
 				}
 				else if (act.getType().startsWith("e")) {
 					if (educ_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'e' act but no location known!"); }
-					if (is_prev_educ) {
-						log.warn("TODO pid="+person.getId()+": assign another educ act.");
-						act.setCoord(ZERO);
+					Activity educ_act = null;
+					if (prev_educ != null) {
+						ArrayList<Activity> rest = new ArrayList<Activity>(educ_acts);
+						rest.remove(prev_educ);
+						if (rest.isEmpty()) { educ_act = prev_educ; log.warn("TODO pid="+person.getId()+": assign another educ act."); }
+						else { educ_act = rest.get(MatsimRandom.random.nextInt(rest.size())); }
 					}
 					else {
-						Activity a = educ_acts.get(MatsimRandom.random.nextInt(educ_acts.size()));
-						act.setType(a.getType());
-						act.setFacility(a.getFacility());
-						act.setCoord(a.getFacility().getCenter());
+						educ_act = educ_acts.get(MatsimRandom.random.nextInt(educ_acts.size()));
 					}
-					is_prev_home = false;
-					is_prev_work = false;
-					is_prev_educ = true;
+					act.setType(educ_act.getType());
+					act.setFacility(educ_act.getFacility());
+					act.setCoord(null);
+					prev_home = null;
+					prev_work = null;
+					prev_educ = educ_act;
 				}
 				else {
-					is_prev_home = false;
-					is_prev_work = false;
-					is_prev_educ = false;
+					prev_home = null;
+					prev_work = null;
+					prev_educ = null;
 				}
 			}
 		}
