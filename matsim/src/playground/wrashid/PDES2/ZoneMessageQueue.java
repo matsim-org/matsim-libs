@@ -199,7 +199,9 @@ public class ZoneMessageQueue {
 
 	
 	synchronized public boolean isEmpty() {
-		if (queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength){
+		// the first condition is for single cpu
+		// the second condition of multiple cpu
+		if (arrivalTimeOfLastRemovedMessage>SimulationParameters.maxSimulationLength || (!queue1.isEmpty() && queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength)){
 			return true;
 		}
 		return false;
