@@ -102,6 +102,7 @@ public class Scheduler {
 			System.out.println(i+"-th zone incounter: "+zoneMessageQueues[i].incounter);
 		}
 		
+		SimulationParameters.events.printEventsCount();
 	
 	
 	

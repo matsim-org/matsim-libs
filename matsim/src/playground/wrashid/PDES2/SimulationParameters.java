@@ -75,7 +75,7 @@ public class SimulationParameters {
 	// need to be high, because else a problem with JavaPDEQSim2.maxEventsPerBucket may occur
 	public static int numberOfZoneBuckets=5000;
 	
-	synchronized public static void processEvent(BasicEvent event){
+	public static void processEvent(BasicEvent event){
 		SimulationParameters.events.processEvent(event);
 	}
 	
