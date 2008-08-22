@@ -146,10 +146,13 @@ public class ZoneMessageQueue {
 		// " - " + numberOfIncomingLinks);
 		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
 			emptyBuffer();
-			// System.out.println("getNextMessage()");
-			if (queue1.isEmpty()) {
+			
+			// - needed in particular, if used with 1 cpu (isEmpty)
+			// - the second case: multiple cpu, it must be  ensured, that the inf+ timer messages are not removed
+			if (queue1.isEmpty() || queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength) {
 				return null;
 			}
+			
 			
 			m = queue1.poll();
 
@@ -196,7 +199,7 @@ public class ZoneMessageQueue {
 
 	
 	synchronized public boolean isEmpty() {
-		if (arrivalTimeOfLastRemovedMessage>SimulationParameters.maxSimulationLength){
+		if (queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength){
 			return true;
 		}
 		return false;
