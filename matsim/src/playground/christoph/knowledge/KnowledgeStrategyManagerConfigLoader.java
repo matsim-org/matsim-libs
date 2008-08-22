@@ -18,6 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
+ // "LimitedKnowledge" Strategie eingefügt - kann später auch im org.matsim implementiert werden,
+ // dann wäre diese Datei überflüssig!
+
 package playground.christoph.knowledge;
 
 import java.lang.reflect.Constructor;

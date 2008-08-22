@@ -55,4 +55,18 @@ public class KnowledgeControler extends Controler {
 		return manager;
 	}
 	
+	// Workaround!
+	// Wo wird der TravelCostCalculator festgelegt? Gibt's dafür ein Feld in der Konfigurationsdatei?
+	protected void setup() {
+		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
+
+		// TravelTimeCalculator initialisieren
+		this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
+			
+		// Eigenen TravenCostCalculator verwenden...
+		this.travelCostCalculator = new KnowledgeTravelCost(this.travelTimeCalculator);
+		
+		// ... dieser wird von nun folgenden Setup nicht mehr überschrieben.
+		super.setup();
+	}
 }

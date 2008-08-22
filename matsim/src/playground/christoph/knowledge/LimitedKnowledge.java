@@ -21,40 +21,42 @@
 package playground.christoph.knowledge;
 
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Knowledge;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 public class LimitedKnowledge extends ReRouteDijkstra {		
 
-	// Erstmal alle Daten übernehmen... 
+	KnowledgeTravelCost knowledgeCostFunction;
+	
+	// Erstmal alle Daten weiterleiten... 
 	public LimitedKnowledge(NetworkLayer network, TravelCost travelCostCalc, TravelTime travelTimeCalc)
 	{	
 		super(network, travelCostCalc, travelTimeCalc);
+
+		// Referenz auf die TravelCosts abspeichern - da schicken wir dann die jeweils aktuelle Person hin.
+		knowledgeCostFunction = (KnowledgeTravelCost) travelCostCalc;
 		System.out.println("----------------------LimitedKnowledge Router runs!----------------------");
 		
 	}	
 
-
-/*
-public class LimitedKnowledge implements StrategyModuleI {
-
-	@Override
-	public void finish() {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Override
 	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
+		//Knowledge myKnowledge = plan.getPerson().getKnowledge();
+		
+//		if(plan != null && plan.getPerson() != null) 
+//		{ System.out.println("handlePlan, PersonID: " + plan.getPerson().getId().toString()); }
+		
+		// Person weiterleiten...
+		knowledgeCostFunction.setPerson(plan.getPerson());
 
+		
+		// ... und Plan abarbeiten lassen.
+		super.handlePlan(plan);
 	}
 
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-
-	}
-*/
 }
