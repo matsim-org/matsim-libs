@@ -33,9 +33,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
+import playground.balmermi.census2000.models.ModelMobiliyTools;
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
-import playground.balmermi.census2000v2.models.ModelMobilityTools;
 
 public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -55,7 +55,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	private static final String NEVER = "never";
 	private static final String UNKNOWN = "unknown";
 
-	private final ModelMobilityTools model = new ModelMobilityTools();
+	private final ModelMobiliyTools model = new ModelMobiliyTools();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -149,11 +149,11 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		// fuelcost
 		model.setFuelCost(hh.getMunicipality().getFuelCost());
 
-		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
-		int cid = hh.getMunicipality().getCantonId();
-		if (cid == 21) { model.setLanguage(3); }
-		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
-		else { model.setLanguage(1); }
+//		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
+//		int cid = hh.getMunicipality().getCantonId();
+//		if (cid == 21) { model.setLanguage(3); }
+//		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
+//		else { model.setLanguage(1); }
 
 		// calc and assign mobility tools
 		int mobtype = model.calcMobilityTools();

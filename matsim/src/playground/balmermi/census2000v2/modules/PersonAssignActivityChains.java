@@ -79,10 +79,8 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 				Gbl.errorMsg("In CH-Microcensus 2005: That should not happen!");
 			}
 		}
-		else {
-			person.addPlan(mz_p.getSelectedPlan());
-			person.setSelectedPlan(mz_p.getSelectedPlan());
-		}
+		person.addPlan(mz_p.getSelectedPlan());
+		person.setSelectedPlan(mz_p.getSelectedPlan());
 	}
 
 	public void run(Plan plan) {
