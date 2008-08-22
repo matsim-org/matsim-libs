@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 
@@ -40,18 +41,20 @@ public class QControler extends Controler {
 	final String signalSystems;
 	final String groupDefinitions;
 	
-	final static boolean useOTF = false;
+	static boolean useOTF;
 
-	public QControler(final Config config, String signalSystems, String groupDefinitions) {
+	public QControler(final Config config, String signalSystems, String groupDefinitions, boolean useOTF) {
 		super(config);
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
+		this.useOTF = useOTF;
 	}
 
 	@Override
 	protected void runMobSim() {
 		QSim sim = new QSim(this.events, this.population, this.network,
 				this.signalSystems, this.groupDefinitions, useOTF);
+//		QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 		sim.run();
 	}
 
@@ -102,9 +105,9 @@ public class QControler extends Controler {
 //			config = Gbl.createConfig(args);
 //		}
 
-		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
-		final String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
-		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
+//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
+//		final String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
+//		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
 
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
 //		final String signalSystems = "./src/playground/andreas/intersection/test/data/twoways/signalSystemConfig_2lsa.xml";
@@ -115,7 +118,12 @@ public class QControler extends Controler {
 //		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
 
 		
-		final QControler controler = new QControler(config, signalSystems, groupDefinitions);
+		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
+//		config = Gbl.createConfig(new String[] {"./examples/two-routes/config.xml"});
+		final String signalSystems =  null;
+		final String groupDefinitions = null;
+		
+		final QControler controler = new QControler(config, signalSystems, groupDefinitions, false);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEvents(true);
 //		controler.setTraveltimeBinSize(30*60);
