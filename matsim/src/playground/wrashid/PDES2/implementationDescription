@@ -109,10 +109,16 @@ Splitting the map:
            
            - ich muss rausfinden, ob ein speed up stattfindet
            
+           
+           - next step: eher später profilen beginnen, eher probieren jetztige version zu sichern,
+             dass alles ok.
    
               
               => next problem/suspicion: is there any deviation between the events, if we use
               different number of processors => do check this
+              => reason: it was found out, that some simulation have longer durations than others...
+                 (but there is hope, that this is just a wrong alarm, because of some reasons
+                 I may think of at the moment).
            
            
            - es gibt ein exception beim iterieren, wie unterdrückt man dieses?
@@ -187,26 +193,33 @@ Splitting the map:
      
 Experiments and Results
 =========================
-Ex1:
+Ex1
 ----
-300K agents (arround 21M Events)
-DES2, 1 CPU:  210 sec. (13.5 M events)
-DES2, 6 CPU:  378 sec. (15 Millionen events)
-DES2, 12 CPU: 210 sec. (12.7 M events)
+300K agents (arround 21.4M Events) => Satawal
+MobSim: 36min (events: wahrschein 21M)
+PDES, 1 CPU: 
+PDES2, 1 CPU:   sec. 
+PDES2, 6 CPU:  411 sec. 
+PDES2, 12 CPU: 152 sec. 
+
+
+
 
 Ex2:
 ----    
 300K agents (arround 21M Events)
-MobSim: 36min (events: wahrschein 21M)
+
 DES2, 12 CPU:      
 DES, 1 CPU: 
 
 Ex3:
 ----
-67K agents (arround ) => alles auf satawal.
-PDES2, 1 CPU: 113.8 sec (7.66M events)
-PDES2, 6 CPU: 38.8 sec (7.41M events)
-PDES2, 12 CPU: 29.3 sec (7.14M events)
-PDES, 1 CPU: => 108 sec (7.66M events)
+67K agents (arround 7.66M events) => alles auf satawal.
 MobSim: 1260 sec
+PDES, 1 CPU: 108 sec 
+PDES2, 1 CPU: 113.8 sec 
+PDES2, 6 CPU: 38.8 sec 
+PDES2, 12 CPU: 29.3 sec
+
+
      
