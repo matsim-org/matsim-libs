@@ -82,7 +82,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		
 		// debug info
 		if (hh.getPersonsW().size() > MAXNUMP) {
-			log.debug("FromHHW: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
+			log.debug("FromHHW: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW().size()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		
 		// debug info
 		if (hh.getPersonsW().size() > MAXNUMP) {
-			log.debug("FromCatts: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
+			log.debug("FromCatts: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW().size()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
 		}
 	}
 	
