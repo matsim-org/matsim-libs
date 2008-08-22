@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -66,6 +67,45 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	}
 
 	//////////////////////////////////////////////////////////////////////
+	// private methods
+	//////////////////////////////////////////////////////////////////////
+
+	private final void assignHHSizeModelParamsFromHHW(Person p, Household hh) {
+		// nump
+		int nump = hh.getPersonsW().size();
+		if (nump > MAXNUMP) { nump = MAXNUMP; }
+		model.setHHDimension(nump);
+
+		// numk
+		double k_frac = hh.getKidsWFraction();
+		model.setHHKids((int)Math.round(k_frac*nump));
+		
+		// debug info
+		if (hh.getPersonsW().size() > MAXNUMP) {
+			log.debug("FromHHW: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
+		}
+	}
+	
+	private final void assignHHSizeModelParamsFromCatts(Person p, Household hh) {
+		// nump
+		int nump = (Integer)p.getCustomAttributes().get(CAtts.P_APERW);
+		if (nump < 1) { nump = (Integer)p.getCustomAttributes().get(CAtts.P_WKATA); }
+		if (nump < 1) { Gbl.errorMsg("pid"+p.getId()+": neither '"+CAtts.P_APERW+"' nor '"+CAtts.P_WKATA+"' defined!"); }
+		
+		if (nump > MAXNUMP) { nump = MAXNUMP; }
+		model.setHHDimension(nump);
+
+		// numk
+		double k_frac = hh.getKidsWFraction();
+		model.setHHKids((int)Math.round(k_frac*nump));
+		
+		// debug info
+		if (hh.getPersonsW().size() > MAXNUMP) {
+			log.debug("FromCatts: pid="+p.getId()+": nump("+hh.getPersonsW().size()+"),numk("+hh.getKidsW()+") => nump("+nump+"),numk("+((int)Math.round(k_frac*nump))+")");
+		}
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
@@ -83,15 +123,9 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		// nat
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
 
-		// nump
-		int nump = hh.getPersonsW().size();
-		if (nump > MAXNUMP) { nump = MAXNUMP; }
-		model.setHHDimension(nump);
-
-		// numk
-		double k_frac = hh.getKidsWFraction();
-		model.setHHKids((int)Math.round(k_frac*nump));
-
+//		this.assignHHSizeModelParamsFromCatts(person,hh);
+		this.assignHHSizeModelParamsFromHHW(person,hh);
+		
 		// inc
 		model.setIncome(hh.getMunicipality().getIncome()/1000.0);
 

@@ -99,7 +99,8 @@ public class PlansAnalyse {
 			else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
 			mt_cnt[idx]++;
 			// act types
-			Plan plan = p.getSelectedPlan();
+			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
+			Plan plan = p.getPlans().get(0);
 			Iterator<?> a_it = plan.getIteratorAct();
 			while (a_it.hasNext()) {
 				Act a = (Act)a_it.next();
