@@ -101,12 +101,8 @@ Splitting the map:
            - try out bigger input files (e.g. 10% planes).
            - should I make messagesArrivedFromRoads in ZoneMessageQueue volatile?
            
-           - man bleibt stecken bei 13 CPU version auf satwal => im debug mode nicht,
-           aber im normalen mode schon????
-              => 13 cpu => 2 zones hatten ein message zu wenig erhalten und konnten deshalb nicht weiterfahren
-              => es gibt 1 message zu wenig be den zonen aus irgend einen grund
-              => Lösung: es hat mit dem remove der message zu tun ( m!= null) in getNextMessage. Das problem muss behoben werden.
-              
+           - test, if logic of multi processor variant is the same as single cpu
+        
            
       - vorallem für grosse simulationen mit vielen agenten lohnt sich unsere simulation wahrscheinlich eher, weil dann
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
@@ -146,3 +142,12 @@ Splitting the map:
            - wieso hat es soviele Messages (viel mehr als events), weil das sollte nicht mehr so sein.
            => es scheint, dass der split nicht perfekt ist... => zuviele events in einem bereich
      ==============================
+       - man bleibt stecken bei 13 CPU version auf satwal => im debug mode nicht,
+           aber im normalen mode schon????
+              => 13 cpu => 2 zones hatten ein message zu wenig erhalten und konnten deshalb nicht weiterfahren
+              => es gibt 1 message zu wenig be den zonen aus irgend einen grund
+              => Lösung: es hat mit dem remove der message zu tun ( m!= null) in getNextMessage. Das problem muss behoben werden.
+     =================================        
+      - es kommen zu wenig events
+           => max simulation time war zu niedrig eingestellt
+     =====================================       
