@@ -57,7 +57,7 @@ public class Scheduler {
 		
 		
 		try {
-			//Thread.currentThread().sleep(2000);
+			Thread.currentThread().sleep(2000);
 			
 			
 			

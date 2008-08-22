@@ -103,6 +103,9 @@ Splitting the map:
            
            - test, if logic of multi processor variant is the same as single cpu
         
+           - problem: single cpu variante produziert zu wenig events bei test1 (test12 ok)
+           
+           
            
       - vorallem für grosse simulationen mit vielen agenten lohnt sich unsere simulation wahrscheinlich eher, weil dann
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
