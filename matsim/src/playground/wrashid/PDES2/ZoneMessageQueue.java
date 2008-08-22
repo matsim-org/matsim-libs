@@ -147,10 +147,14 @@ public class ZoneMessageQueue {
 		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
 			emptyBuffer();
 			// System.out.println("getNextMessage()");
+			if (queue1.isEmpty()) {
+				return null;
+			}
+			
 			m = queue1.poll();
 
 			// needed in particular, if used with 1 cpu
-			if (m == null) {
+			if (queue1.isEmpty()) {
 				return null;
 				//System.out.println(messagesArrivedFromRoads);
 			}
