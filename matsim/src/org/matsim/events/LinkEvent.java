@@ -21,9 +21,7 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
-import org.matsim.population.Population;
 import org.xml.sax.helpers.AttributesImpl;
 
 public abstract class LinkEvent extends BasicEvent {
@@ -61,11 +59,6 @@ public abstract class LinkEvent extends BasicEvent {
 
 	protected String asString() {
 		return getTimeString(this.time) + this.agentId + "\t" + this.legId + "\t" + this.linkId + "\t0\t"; // FLAG + DESCRIPTION is missing here: concat later
-	}
-
-	protected void rebuildLinkData(final Population population, final NetworkLayer network) {
-		this.agent = population.getPerson(this.agentId);
-		this.link = (Link)network.getLocation(this.linkId);
 	}
 
 }
