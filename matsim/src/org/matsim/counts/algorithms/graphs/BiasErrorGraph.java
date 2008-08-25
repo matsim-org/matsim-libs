@@ -85,6 +85,9 @@ public class BiasErrorGraph extends CountsGraph {
 		final ValueAxis axis2 = new NumberAxis("Mean abs bias [veh/h]");
 		plot.setRangeAxis(1, axis2);
 
+		final ValueAxis axis3 = plot.getRangeAxis(0);
+		axis3.setRange(0.0, 100.0);
+
 		final LineAndShapeRenderer renderer2 = new LineAndShapeRenderer();
 		renderer2.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
 		renderer2.setSeriesToolTipGenerator(1, new StandardCategoryToolTipGenerator());
