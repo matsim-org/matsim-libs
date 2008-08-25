@@ -176,7 +176,12 @@ public class PlansCreateFromCensus2000 {
 		// 1. get the school activity type
 		int gegw = Integer.parseInt(entries[CAtts.I_GEGW]);
 		String act_type = null;
-		if (gegw == -8) { return; } // no educ at the moment
+		if (gegw == -8) { // no educ at the moment, but still assign mandatory education!
+			if (p.getAge()<5) { return; } // too young for school
+			else if (p.getAge()<7) { act_type = CAtts.ACT_EKIGA; } // duty
+			else if (p.getAge()<15) { act_type = CAtts.ACT_EPRIM; }  // duty
+			else { return; } // rest ignore
+		}
 		else if (gegw == -9) {
 			if (p.getAge()<5) { return; } // too young for school
 			else if (p.getAge()<7) { act_type = CAtts.ACT_EKIGA; }
@@ -189,7 +194,7 @@ public class PlansCreateFromCensus2000 {
 			else { return; } // rest ignore
 		}
 		else if ((gegw == 11) || (gegw == 12)) { act_type = CAtts.ACT_EPRIM; }
-		else if ((21 <= gegw) || (gegw <= 23)) { act_type = CAtts.ACT_ESECO; }
+		else if ((gegw == 21) || (gegw == 22) || (gegw == 23)) { act_type = CAtts.ACT_ESECO; }
 		else if ((gegw == 31) || (gegw == 32)) { act_type = CAtts.ACT_EOTHR; }
 		else if ((gegw == 33) || (gegw == 34)) { act_type = CAtts.ACT_EHIGH; }
 		else { Gbl.errorMsg("pid="+p.getId()+",gegw="+gegw+": not known!"); }
