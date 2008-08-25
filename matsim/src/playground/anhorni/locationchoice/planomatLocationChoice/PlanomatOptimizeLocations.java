@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.planomatLocationChoice;
+package playground.anhorni.locationchoice.depr.planomatLocationChoice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 
-import playground.anhorni.locationchoice.planomatLocationChoice.costestimators.CharyparNagelFitnessFunction;
+import playground.anhorni.locationchoice.depr.planomatLocationChoice.costestimators.CharyparNagelFitnessFunction;
 
 /**
  *

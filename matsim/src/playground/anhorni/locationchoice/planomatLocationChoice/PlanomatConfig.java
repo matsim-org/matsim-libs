@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.planomatLocationChoice;
+package playground.anhorni.locationchoice.depr.planomatLocationChoice;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;

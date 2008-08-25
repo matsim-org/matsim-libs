@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.planomatLocationChoice.costestimators;
+package playground.anhorni.locationchoice.depr.planomatLocationChoice.costestimators;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.population.Route;

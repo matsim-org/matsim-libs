@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.planomatLocationChoice.costestimators;
+package playground.anhorni.locationchoice.depr.planomatLocationChoice.costestimators;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
