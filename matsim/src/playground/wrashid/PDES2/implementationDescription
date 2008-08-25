@@ -133,8 +133,8 @@ Splitting the map:
       
      
         
-      -   
-        
+      - problem: test 1 creates to litte messages after having introduced the is killMessage instead of remove from Message queue  
+        => the other tests run ok...
         
         
         
@@ -186,9 +186,11 @@ Splitting the map:
               => lösung: maxSimulationLength war falsch eingestellt
       ======================================        
       - priotiy queue in PDES => erstzen der operation...
-      New class: DebuggedPriorityQueue
-     
-     
+      New class: DebuggedPriorityQueue implemented
+     ========================================
+     ExceptionInInitializerError in JavaPDEQSim2
+     => Simulation of Simulationparameters not successful
+     => 
      
      
      

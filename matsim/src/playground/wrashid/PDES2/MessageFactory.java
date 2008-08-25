@@ -154,8 +154,10 @@ public class MessageFactory {
 			if (zoneBorderMessageQueue[MessageExecutor.getThreadId()].size() < SimulationParameters.minQueueLength) {
 				return new ZoneBorderMessage();
 			} else {
-				return zoneBorderMessageQueue[MessageExecutor.getThreadId()]
-						.poll();
+				ZoneBorderMessage zbm=zoneBorderMessageQueue[MessageExecutor.getThreadId()]
+				                     						.poll();
+				zbm.reviveMessage();
+				return zbm;
 			}
 		} catch (Exception e) {
 			return new ZoneBorderMessage();
@@ -182,7 +184,9 @@ public class MessageFactory {
 			if (timerMessageQueue[MessageExecutor.getThreadId()].size() < SimulationParameters.minQueueLength) {
 				return new TimerMessage();
 			} else {
-				return timerMessageQueue[MessageExecutor.getThreadId()].poll();
+				TimerMessage tm=timerMessageQueue[MessageExecutor.getThreadId()].poll();
+				tm.reviveMessage();
+				return tm;
 			}
 		} catch (Exception e) {
 			// this occurs only at the beginning, when no message executor

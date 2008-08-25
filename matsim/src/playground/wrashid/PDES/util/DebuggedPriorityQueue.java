@@ -21,13 +21,20 @@ public class DebuggedPriorityQueue<T> {
 	}
 	
 	public T poll(){
+		System.out.println(tm.size());
 		T t=tm.firstKey();
 		tm.remove(t);
+		assert(!tm.containsKey(t));
+		System.out.println(tm.size());
 		return t;
 	}
 	
 	public void remove(T t){
+		System.out.println(tm.size());
 		tm.remove(t);
+		
+		assert(!tm.containsKey(t));
+		System.out.println(tm.size());
 	}
 	
 	public boolean isEmpty(){

@@ -17,7 +17,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
-import playground.wrashid.PDES.util.DebuggedPriorityQueue;
+
 
 public class ZoneMessageQueue {
 	// The MessageQueue can only progress if messages from all incoming links
@@ -26,7 +26,7 @@ public class ZoneMessageQueue {
 
 	private int zoneId = 0;
 	public double simTime = 0;
-	private DebuggedPriorityQueue<Message> queue1 = new DebuggedPriorityQueue<Message>();
+	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
 
 	public int counter = 0;
 	public int incounter = 0;
@@ -132,11 +132,12 @@ public class ZoneMessageQueue {
 		if (zoneId!=MessageExecutor.getThreadId()){
 			System.out.println("concurrency occured");
 		}
-		emptyBuffer();
-		
-		
+		//emptyBuffer(); 
 		//queue1.removeAll(Collections.singletonList(m));
-		queue1.remove(m);
+		//queue1.remove(m);
+		m.killMessage();
+		
+		
 		// queue1.remove(m); => this does not function properly for PriorityQueue
 		// as intended
 		
@@ -157,7 +158,15 @@ public class ZoneMessageQueue {
 			}
 			
 			
+			
+			
+			
 			m = queue1.poll();
+			
+			
+			if (!m.isAlive()){
+				return null;
+			}
 
 			// needed in particular, if used with 1 cpu
 			if (queue1.isEmpty()) {

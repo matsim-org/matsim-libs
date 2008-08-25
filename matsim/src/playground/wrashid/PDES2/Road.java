@@ -15,7 +15,6 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
-import playground.wrashid.PDES.util.DebuggedPriorityQueue;
 
 
 
@@ -34,7 +33,7 @@ public class Road extends SimUnit {
 	public RoadEntryHandler roadEntryHandler = null;
 	public double simTime=0;
 	
-	public DebuggedPriorityQueue<Message> lookahead=new DebuggedPriorityQueue<Message>();
+	public PriorityQueue<Message> lookahead=new PriorityQueue<Message>();
 	
 	
 	// the inverseFlowCapacity is simple the inverse
