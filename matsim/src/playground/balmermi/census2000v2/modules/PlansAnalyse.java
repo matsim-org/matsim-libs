@@ -73,18 +73,18 @@ public class PlansAnalyse {
 	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
-		int[] lic_cnt = new int[2]; // yes,no
+		double[] lic_cnt = new double[2]; // yes,no
 		for (int i=0; i<lic_cnt.length; i++) { lic_cnt[i]=0; }
-		int[] mt_cnt = new int[6]; // nev_no,som_no,alw_no,nev_yes,som_yes,alw_yes,
+		double[] mt_cnt = new double[6]; // nev_no,som_no,alw_no,nev_yes,som_yes,alw_yes,
 		for (int i=0; i<mt_cnt.length; i++) { mt_cnt[i]=0; }
-		int a_cnt = 0; // all acts
-		int[] at_cnt = new int[5]; // h,w,e,s,l
+		double a_cnt = 0; // all acts
+		double[] at_cnt = new double[5]; // h,w,e,s,l
 		for (int i=0; i<at_cnt.length; i++) { at_cnt[i]=0; }
-		int leg_cnt = 0; // all modes
-		int[] mtype_cnt = new int[4]; // car,pt,bike,walk
+		double leg_cnt = 0; // all modes
+		double[] mtype_cnt = new double[4]; // car,pt,bike,walk
 		for (int i=0; i<mtype_cnt.length; i++) { mtype_cnt[i]=0; }
 		
-		int[] trip_dist = new int[100];
+		double[] trip_dist = new double[30];
 		for (int i=0; i<trip_dist.length; i++) { trip_dist[i]=0; }
 		
 		for (Person p : plans.getPersons().values()) {
@@ -93,7 +93,8 @@ public class PlansAnalyse {
 			// mob tools
 			int idx = -1;
 			if (p.getTravelcards() == null) { idx = 0; } else { idx = 3; }
-			if (p.getCarAvail().equals(NEVER)) { idx += 0; }
+			if (p.getCarAvail() == null) { ; }
+			else if (p.getCarAvail().equals(NEVER)) { idx += 0; }
 			else if (p.getCarAvail().equals(SOMETIMES)) { idx += 1; }
 			else if (p.getCarAvail().equals(ALWAYS)) { idx += 2; }
 			else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
@@ -124,11 +125,11 @@ public class PlansAnalyse {
 				else if (l.getMode().equals(WALK)) { mtype_cnt[3]++; }
 				else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
 				leg_cnt++;
-				trip_dist[cnt]++;
 			}
+			trip_dist[cnt]++;
 		}
 
-		int nump = plans.getPersons().size();
+		double nump = plans.getPersons().size();
 
 		log.info("Population:                 " + plans.getName());
 		log.info("--------------------------------------------------------");
