@@ -21,8 +21,6 @@
 package playground.christoph.knowledge;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Knowledge;
-import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.router.util.TravelCost;

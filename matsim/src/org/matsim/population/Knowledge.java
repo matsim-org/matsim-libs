@@ -29,9 +29,10 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
+import org.matsim.utils.customize.CustomizableImpl;
 
 
-public class Knowledge {
+public class Knowledge extends CustomizableImpl{
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

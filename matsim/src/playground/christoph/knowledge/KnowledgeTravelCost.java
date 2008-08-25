@@ -26,6 +26,9 @@
 
 package playground.christoph.knowledge;
 
+import java.util.ArrayList;
+
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -63,8 +66,34 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		//System.out.println("time: " + time);
 
 		// Erst die Kosten basierend auf dem globalen Wissen besorgen...
-		double costs = super.getLinkTravelCost(link, time);
+		double cost = super.getLinkTravelCost(link, time);
 
+		// ID des aktuell behandelten Links holen
+		Id ID = link.getId();
+		
+		// kein Check - wir wissen ja, was drinnen steckt...
+		ArrayList<Id> linkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("LinkIDs");
+		ArrayList<Double> costs = (ArrayList<Double>)person.getKnowledge().getCustomAttributes().get("Costs");
+		
+		System.out.println("Length of stored knowledge... " + linkIds.size());
+		
+		for(int i = 0; i < linkIds.size(); i++)
+		{
+			System.out.println("Comparing... " + ID.toString() + " with " + linkIds.get(i).toString());
+			// falls eine Übereinstimmung gefunden wurde
+			if(linkIds.get(i).compareTo(ID) == 0)
+			//if(linkIds.get(i).equals(ID))
+			//if(linkIds.get(i).toString().equals(ID.toString()))
+			{
+				// Derzeit Wert einfach übernehmen - später je nach Strategie
+				// addieren, multiplizieren oder whatever!
+				cost = costs.get(i);
+				//System.out.println("Adapting Travelcosts!!!");
+			}
+			
+		}
+		
+		/*
 		// ID der aktuell behandelten Person holen
 		int ID = Integer.valueOf( person.getId().toString() ).intValue();
 		
@@ -86,9 +115,10 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 			if (ID % 2 == 1) costs = Double.MAX_VALUE;
 			else costs = 0.0;
 		}
+		*/
 		
 		// ... dann prüfen, ob sich durch das lokale Wissen des Agenten Änderungen ergeben.
-		return costs;
+		return cost;
 	}
 		
 }
