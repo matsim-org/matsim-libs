@@ -131,7 +131,12 @@ Splitting the map:
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
       ersetzt werden. => try input 7M
       
-      - priotiy queue in PDES => erstzen der operation...
+     
+        
+      -   
+        
+        
+        
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -180,7 +185,8 @@ Splitting the map:
               => count different events to find out, which messages are missing...
               => lösung: maxSimulationLength war falsch eingestellt
       ======================================        
-     
+      - priotiy queue in PDES => erstzen der operation...
+      New class: DebuggedPriorityQueue
      
      
      
@@ -198,9 +204,11 @@ Ex1
 300K agents (arround 21.4M Events) => Satawal.
 Time of descret event simulation part only considered.
 MobSim: 2160 sec. (events: wahrschein 21M) 
-PDES, 1 CPU: 638 sec. => komisch, hält am schluss nicht an, wieso????? => wiederholen
-PDES2, 1 CPU: 2321  sec. => wiederholen
+PDES, 1 CPU: 660 sec. => komisch, hält am schluss nicht an, wieso????? => wiederholen
+PDES2, 1 CPU: 2014  sec. => wieso so langsam???????
+PDES2, 3 CPU:  548
 PDES2, 6 CPU:  411 sec. 
+PDES2, 9 CPU:  202 sec.
 PDES2, 12 CPU: 152 sec. 
 
 

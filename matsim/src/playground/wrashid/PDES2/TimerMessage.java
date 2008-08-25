@@ -14,7 +14,7 @@ public class TimerMessage extends SelfhandleMessage {
 			return;
 		}
 		
-		road.lookahead.removeAll(Collections.singletonList(this));
+		road.lookahead.remove(this);
 		
 		
 		
