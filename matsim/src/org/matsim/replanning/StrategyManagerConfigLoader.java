@@ -51,8 +51,7 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcher;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
-
-//import playground.anhorni.locationchoice.LocationChoice;
+import org.matsim.locationchoice.LocationChoice;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -162,19 +161,14 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcher(network, travelCostCalc, travelTimeCalc, facilities);
 				strategy.addStrategyModule(socialNetStrategyModule);
-			
-			} /*else if (classname.equals("LocationChoice")) {
+			} else if (classname.equals("LocationChoice")) {
 		    	strategy = new PlanStrategy(new RandomPlanSelector());
-		    	strategy.addStrategyModule(new LocationChoice(
-				controler.getNetwork(),
-				controler.getTravelCostCalculator(),
-				controler.getLinkTravelTimes()));
-
+		    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 				preProcessRoutingData.run(network);
 				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new TimeAllocationMutator());
 			}
-			*/
 			//if none of the strategies above could be selected we try to load the class by name
 			else {
 				//classes loaded by name must not be part of the matsim core
