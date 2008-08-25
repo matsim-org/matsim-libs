@@ -20,6 +20,8 @@
 
 package org.matsim.router;
 
+import org.matsim.testcases.TestDepth;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -28,7 +30,9 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.matsim.router");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(RoutingTest.class);
+		if (TestDepth.getDepth() == TestDepth.extended) {
+			suite.addTestSuite(RoutingTest.class);
+		}
 		//$JUnit-END$
 		return suite;
 	}
