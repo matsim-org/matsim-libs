@@ -136,7 +136,10 @@ Splitting the map:
       - problem: test 1 creates to litte messages after having introduced the is killMessage instead of remove from Message queue  
         => the other tests run ok...
         
-        
+      - die parallelizierung wird nicht genug ausgenützt? bzw. soll ich grössere scenarien ausprobieren um rauszufinden,
+      wieviel es genützt hat? bzw. profiling machen?
+      
+      => continue with test 15...
         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -203,21 +206,23 @@ Experiments and Results
 =========================
 Ex1
 ----
+network used: "VISUM export national network 2007-11-28"
 300K agents (arround 21.4M Events) => Satawal.
 Time of descret event simulation part only considered.
 MobSim: 2160 sec. (events: wahrschein 21M) 
 PDES, 1 CPU: 660 sec. => komisch, hält am schluss nicht an, wieso????? => wiederholen
-PDES2, 1 CPU: 2014  sec. => wieso so langsam???????
-PDES2, 3 CPU:  548
-PDES2, 6 CPU:  411 sec. 
-PDES2, 9 CPU:  202 sec.
-PDES2, 12 CPU: 152 sec. 
+PDES2, 1 CPU: 300  sec. 
+PDES2, 3 CPU:  224 sec.
+PDES2, 6 CPU:  144 sec. 
+PDES2, 9 CPU:  149 sec.
+PDES2, 12 CPU: 135 sec. 
 
 
 
 
 Ex2:
 ----
+network used: "VISUM export national network 2007-11-28"
 67K agents (arround 7.66M events)  => Satawal.
 Time of descret event simulation part only considered.
 MobSim: 1260 sec
