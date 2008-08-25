@@ -41,6 +41,7 @@ import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.WithindayConfigGroup;
 import org.matsim.config.groups.WorldConfigGroup;
+import org.matsim.config.groups.LocationChoiceConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file
@@ -77,6 +78,7 @@ public class Config {
 	private EvacuationConfigGroup evacuation = null;
 	private StrategyConfigGroup strategy = null;
 	private SocNetConfigGroup socnetmodule = null;
+	private LocationChoiceConfigGroup locationchoice = null;
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -148,6 +150,9 @@ public class Config {
 
 		this.socnetmodule = new SocNetConfigGroup();
 		this.modules.put(SocNetConfigGroup.GROUP_NAME, this.socnetmodule);
+		
+		this.locationchoice = new LocationChoiceConfigGroup();
+		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -363,6 +368,10 @@ public class Config {
 
 	public final SocNetConfigGroup socnetmodule() {
 		return this.socnetmodule;
+	}
+	
+	public final LocationChoiceConfigGroup locationchoice() {
+		return this.locationchoice;
 	}
 
 	public PlanomatConfigGroup planomat() {
