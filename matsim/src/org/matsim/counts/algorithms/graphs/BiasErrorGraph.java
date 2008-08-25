@@ -20,7 +20,6 @@
 
 package org.matsim.counts.algorithms.graphs;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
 
@@ -52,15 +51,15 @@ public class BiasErrorGraph extends CountsGraph {
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
 		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
-		
+
 		double[] meanRelError = errorStats.getMeanRelError();
-		double[] meanAbsError = errorStats.getMeanAbsError();
+//		double[] meanAbsError = errorStats.getMeanAbsError();
 		double[] meanAbsBias = errorStats.getMeanAbsBias();
 
 
 		for (int h = 0; h < 24; h++) {
 			dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
-			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
+//			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
 			dataset1.addValue(meanAbsBias[h], "Mean abs bias", Integer.toString(h + 1));
 		}
 
@@ -82,13 +81,14 @@ public class BiasErrorGraph extends CountsGraph {
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(axis1);
 
-		final ValueAxis axis2 = new NumberAxis("Mean abs {bias, error} [veh/h]");
+//		final ValueAxis axis2 = new NumberAxis("Mean abs {bias, error} [veh/h]");
+		final ValueAxis axis2 = new NumberAxis("Mean abs bias [veh/h]");
 		plot.setRangeAxis(1, axis2);
 
 		final LineAndShapeRenderer renderer2 = new LineAndShapeRenderer();
 		renderer2.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
 		renderer2.setSeriesToolTipGenerator(1, new StandardCategoryToolTipGenerator());
-		renderer2.setSeriesPaint(0, Color.black);
+//		renderer2.setSeriesPaint(0, Color.black);
 		plot.setRenderer(1, renderer2);
 		plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
 
