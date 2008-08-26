@@ -168,10 +168,19 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	/**
+	 * @return a graphic showing the number of departures, arrivals and vehicles
+	 * en route of all legs/trips
+	 */
 	public JFreeChart getGraphic() {
 		return getGraphic(this.allModesData, "all");
 	}
 
+	/**
+	 * @param legMode
+	 * @return a graphic showing the number of departures, arrivals and vehicles
+	 * en route for all legs with the specified transportation mode
+	 */
 	public JFreeChart getGraphic(final String legMode) {
 		return getGraphic(this.data.get(legMode), legMode);
 	}
@@ -180,7 +189,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		final XYSeriesCollection xyData = new XYSeriesCollection();
 		final XYSeries departuresSerie = new XYSeries("departures", false, true);
 		final XYSeries arrivalsSerie = new XYSeries("arrivals", false, true);
-		final XYSeries onRouteSerie = new XYSeries("on route", false, true);
+		final XYSeries onRouteSerie = new XYSeries("en route", false, true);
 		int onRoute = 0;
 		for (int i = 0; i < modeData.countsDep.length; i++) {
 			onRoute = onRoute + modeData.countsDep[i] - modeData.countsArr[i] - modeData.countsStuck[i];
@@ -212,22 +221,38 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return chart;
 	}
 
+	/**
+	 * @return number of departures per time-bin, for all legs
+	 */
 	public int[] getDepartures() {
 		return this.allModesData.countsDep.clone();
 	}
 
+	/**
+	 * @return number of all arrivals per time-bin, for all legs
+	 */
 	public int[] getArrivals() {
 		return this.allModesData.countsArr.clone();
 	}
 
+	/**
+	 * @return number of all vehicles that got stuck in a time-bin, for all legs
+	 */
 	public int[] getStuck() {
 		return this.allModesData.countsStuck.clone();
 	}
 
+	/**
+	 * @return Set of all transportation modes data is available for
+	 */
 	public Set<String> getLegModes() {
 		return this.data.keySet();
 	}
 
+	/**
+	 * @param legMode transport mode
+	 * @return number of departures per time-bin, for all legs with the specified mode
+	 */
 	public int[] getDepartures(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
@@ -236,6 +261,10 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return modeData.countsDep.clone();
 	}
 
+	/**
+	 * @param legMode transport mode
+	 * @return number of all arrivals per time-bin, for all legs with the specified mode
+	 */
 	public int[] getArrivals(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
@@ -244,6 +273,10 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return modeData.countsArr.clone();
 	}
 
+	/**
+	 * @param legMode transport mode
+	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
+	 */
 	public int[] getStuck(final String legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
@@ -252,6 +285,14 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return modeData.countsStuck.clone();
 	}
 
+	/**
+	 * Writes a graphic showing the number of departures, arrivals and vehicles
+	 * en route of all legs/trips to the specified file.
+	 *
+	 * @param filename
+	 *
+	 * @see #getGraphic()
+	 */
 	public void writeGraphic(final String filename) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
@@ -260,6 +301,16 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	/**
+	 * Writes a graphic showing the number of departures, arrivals and vehicles
+	 * en route of all legs/trips with the specified transportation mode to the
+	 * specified file.
+	 *
+	 * @param filename
+	 * @param legMode
+	 *
+	 * @see #getGraphic(String)
+	 */
 	public void writeGraphic(final String filename, final String legMode) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
