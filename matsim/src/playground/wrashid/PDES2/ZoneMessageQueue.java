@@ -164,9 +164,10 @@ public class ZoneMessageQueue {
 			
 			m = queue1.poll();
 			
-			
-			if (!m.isAlive()){
-				return null;
+			// skip dead messages and recycle them
+			while  (m!=null && !m.isAlive()){
+				m.recycleMessage();
+				m = queue1.poll();
 			}
 
 			// needed in particular, if used with 1 cpu
