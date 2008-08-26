@@ -52,7 +52,6 @@ public class LimitedKnowledge extends ReRouteDijkstra {
 		// Person weiterleiten...
 		knowledgeCostFunction.setPerson(plan.getPerson());
 
-		
 		// ... und Plan abarbeiten lassen.
 		super.handlePlan(plan);
 	}

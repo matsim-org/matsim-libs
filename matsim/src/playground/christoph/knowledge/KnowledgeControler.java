@@ -31,7 +31,9 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
+import org.matsim.population.Population;
 import org.matsim.replanning.StrategyManager;
 
 public class KnowledgeControler extends Controler {
@@ -76,7 +78,8 @@ public class KnowledgeControler extends Controler {
 		initKnowledge();	// neu...
 		setKnowledge();		// neu...
 		
-		
+		new GenerateKnowledge(this.population, this.network, 4000.0);
+				
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 
 		// TravelTimeCalculator initialisieren
@@ -101,14 +104,18 @@ public class KnowledgeControler extends Controler {
 				p.createKnowledge("Knowledgemodels");
 			}
 			
+			// Kosten für Links fixieren bzw. je Person beeinflussen
 			ArrayList<Id> linkIds = new ArrayList<Id>();
 			ArrayList<Double> costs = new ArrayList<Double>();
-				
+			
+			// Links definieren, die einer Person kennt und somit nutzen kann
+			ArrayList<Id> includedLinkIds = new ArrayList<Id>();
 			
 			//Map<String,Object> newAttrib = this.getPopulation().getPerson("1").getCustomAttributes();
 			Map<String,Object> newAttrib = p.getKnowledge().getCustomAttributes();
 			newAttrib.put("LinkIDs", linkIds);
 			newAttrib.put("Costs", costs);	
+			newAttrib.put("IncludedLinkIDs", includedLinkIds);
 		}
 
 	}
@@ -121,14 +128,16 @@ public class KnowledgeControler extends Controler {
 		while (PersonIterator.hasNext())
 		{
 			Person p = PersonIterator.next();
-			
+			//examples/equil/configKnowledge.xml
+	/*	
 			// ID der aktuell behandelten Person holen
 			//Id ID = p.getId();
 			
 			// kein Check - wir wissen ja, was drinnen steckt...
 			ArrayList<Id> linkIds = (ArrayList<Id>)p.getKnowledge().getCustomAttributes().get("LinkIDs");
 			ArrayList<Double> costs = (ArrayList<Double>)p.getKnowledge().getCustomAttributes().get("Costs");
-			
+
+
 			linkIds.add(new IdImpl("6"));
 			costs.add(Double.MAX_VALUE);
 			
@@ -140,7 +149,7 @@ public class KnowledgeControler extends Controler {
 			
 			linkIds.add(new IdImpl("19"));
 			costs.add(0.0);
-			
+		*/
 		}
 	}
 }

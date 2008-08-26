@@ -75,7 +75,7 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		ArrayList<Id> linkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("LinkIDs");
 		ArrayList<Double> costs = (ArrayList<Double>)person.getKnowledge().getCustomAttributes().get("Costs");
 		
-		System.out.println("Length of stored knowledge... " + linkIds.size());
+		//System.out.println("Length of stored knowledge... " + linkIds.size());
 		
 		for(int i = 0; i < linkIds.size(); i++)
 		{
@@ -91,6 +91,15 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 				//System.out.println("Adapting Travelcosts!!!");
 			}
 			
+		}
+		
+		// Der Person bekanntes Verkehrsnetz holen.
+		ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("IncludedLinkIDs");
+		
+		for(int i = 0; i < includedLinkIds.size(); i++)
+		{
+			// Wenn die Person den Link nicht kennt -> Kosten auf Maximum setzen.
+			if(!includedLinkIds.contains(ID)) cost = Double.MAX_VALUE;
 		}
 		
 		/*
@@ -117,7 +126,7 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		}
 		*/
 		
-		// ... dann prüfen, ob sich durch das lokale Wissen des Agenten Änderungen ergeben.
+		// ... überarbeitete Kosten retour geben
 		return cost;
 	}
 		
