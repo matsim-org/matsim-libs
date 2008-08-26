@@ -100,6 +100,8 @@ public class Scheduler {
 	
 		for (int i=0;i<SimulationParameters.numberOfZones;i++){
 			System.out.println(i+"-th zone incounter: "+zoneMessageQueues[i].incounter);
+			System.out.println(i+"-th zone temp_waitingOnOtherZone: "+zoneMessageQueues[i].temp_waitingOnOtherZone);
+			System.out.println(i+"-test_CompareCounter: "+MessageFactory.test_CompareCounter[i]);		
 		}
 		
 		SimulationParameters.events.printEventsCount();
@@ -213,7 +215,10 @@ public class Scheduler {
 		for (int i=0;i<SimulationParameters.numberOfZones;i++){
 			zoneMessageQueues[i].numberOfIncomingLinks=zoneMessageQueues[i].tempIncomingLinks.size();
 			zoneMessageQueues[i].tempIncomingLinks=null;
+			System.out.println(i+"-zoneMessageQueues.numberOfIncomingLinks:" + zoneMessageQueues[i].numberOfIncomingLinks);
 		}
+		
+		
 		
 	}
 	

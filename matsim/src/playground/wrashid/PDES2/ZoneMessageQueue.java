@@ -57,6 +57,7 @@ public class ZoneMessageQueue {
 	public ConcurrentMap<Road, Integer> numberOfQueuedMessages[] = new ConcurrentHashMap[SimulationParameters.numberOfMessageExecutorThreads];
 	private Message tmpLastRemovedMessage = null;
 	private final Integer zero = new Integer(0);
+	public int temp_waitingOnOtherZone=0;
 
 	public void putMessage(Message m) {
 		// the following assertions need to be commented out, because this
@@ -206,6 +207,7 @@ public class ZoneMessageQueue {
 			// }
 		}
 
+		temp_waitingOnOtherZone++;
 		return null;
 	}
 

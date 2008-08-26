@@ -19,6 +19,7 @@ public class MessageFactory {
 
 	private static int testCounter=0;
 	
+	public static int[] test_CompareCounter=new int[SimulationParameters.numberOfMessageExecutorThreads];
 	
 	static {
 		for (int i = 0; i < SimulationParameters.numberOfMessageExecutorThreads; i++) {
@@ -86,6 +87,7 @@ public class MessageFactory {
 
 	public static EnterRoadMessage getEnterRoadMessage(Scheduler scheduler,
 			Vehicle vehicle) {
+		test_CompareCounter[MessageExecutor.getThreadId()]++;
 		if (enterRoadMessageQueue[MessageExecutor.getThreadId()].size() < SimulationParameters.minQueueLength) {
 			return new EnterRoadMessage(scheduler, vehicle);
 		} else {
@@ -160,6 +162,7 @@ public class MessageFactory {
 				return zbm;
 			}
 		} catch (Exception e) {
+			
 			return new ZoneBorderMessage();
 		}
 	}

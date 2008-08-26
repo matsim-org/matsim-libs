@@ -136,15 +136,21 @@ public class JavaPDEQSim2 {
 					
 					
 					
-					
 					double lookahead=leg.getDepTime();
 					Link link=null;
 					for (int j=0;j<links.length;j++){
 						link=links[j];
-						// init buckedCount
-						bucketCount[getZone(link.getFromNode().getCoord().getX(),bucketBoundries)]++;
-						// init all out border roads
 						Road r=Road.allRoads.get(link.getId().toString());
+						// init buckedCount
+						if (j==0 || j==links.length-1){
+							// if start leg or end leg, increment by two bucket counter
+							bucketCount[getZone(r.getXCoordinate(),bucketBoundries)]++;
+							bucketCount[getZone(r.getXCoordinate(),bucketBoundries)]++;
+						} else {
+							bucketCount[getZone(r.getXCoordinate(),bucketBoundries)]++;
+						}
+						
+						// init all out border roads
 						lookahead+=r.linkTravelTime;
 						if (r.isOutBorderRoad){
 							r.lookahead.add(r.getTimerMessage(lookahead));
@@ -166,7 +172,8 @@ public class JavaPDEQSim2 {
 		}
 		// because later, many bucket may get more than 'maxEventsPerBucket', we can get into the problem
 		// that there is not enough for the last few processors
-		double maxEventsPerBucket=sumOfBuckets/(SimulationParameters.numberOfZones+Math.log(SimulationParameters.numberOfZones/2));
+		double maxEventsPerBucket=sumOfBuckets/(SimulationParameters.numberOfZones);
+		//+Math.log(SimulationParameters.numberOfZones/2)
 		System.out.println("sumOfBuckets="+sumOfBuckets);
 		System.out.println("maxEventsPerBucket="+maxEventsPerBucket);
 		
@@ -183,7 +190,7 @@ public class JavaPDEQSim2 {
 				bucketCounter++;
 			}
 			System.out.println("tmpBucketCount="+tmpBucketCount);
-			SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter];
+			SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter-1];
 			System.out.println(i+"-th boundry:" + SimulationParameters.zoneBorderLines[i]);
 		}
 		

@@ -140,7 +140,9 @@ Splitting the map:
       wieviel es genützt hat? bzw. profiling machen?
       
       => continue with test 15...
-        
+      
+     
+         
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
      -  perhaps doch several vertical Splits machen: dann können teile der Karte weiterarbeiten,
@@ -193,8 +195,21 @@ Splitting the map:
      ========================================
      ExceptionInInitializerError in JavaPDEQSim2
      => Simulation of Simulationparameters not successful
-     => 
-     
+     => static class konnte nicht initializiert werden, weil ich number of threads falsch gesetzt hatte
+     =======================================
+      - alle zones sollten gelich viele messages beinhalten. Momentan haben wir bei 12 cpu starke variationen: ein cpu hat 6M messages, ein anderer 2M.
+      => Vermutung/Bzw. fast sicher: Ob ein run mit x cpus schneller ist als ein run mit y CPUs, gegeben x>y, hängt davon ab, was die maximale Anzahl
+         events pro zone ist. Gegebenfalls könnten y CPUs schneller sein, wenn sie events gleich verteilen.
+         => ich muss das genauer analysieren, bzw. gleichverteilung anstreben.
+         => die vermutung ist nicht ganz sicher (habe gegenbeispiele gesehen: obwohl x>y und maxevent(x)<maxevent(y), trotzdem y CPU schneller.
+         => profilen gegebenenfalls.
+         => könnte es mit speicher zu tun haben?
+         => momentan ist es so, dass anzahl events stark unterschiedlich ist auf strassen => das erklärt den unterschied,
+            aber wie kann dass passieren? Haben wir falsche zone zugewiesen oder?
+            => habe unterschied gefunden: 
+            In JavaPDEQSim2: SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter];
+            ersteztt durch: SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter-1];
+      ===================================================      
      
      
      
@@ -213,8 +228,8 @@ MobSim: 2160 sec. (events: wahrschein 21M)
 PDES, 1 CPU: 660 sec. => komisch, hält am schluss nicht an, wieso????? => wiederholen
 PDES2, 1 CPU: 300  sec. 
 PDES2, 3 CPU:  224 sec.
-PDES2, 6 CPU:  144 sec. 
-PDES2, 9 CPU:  149 sec.
+PDES2, 6 CPU:  128/168 sec. 
+PDES2, 9 CPU:  115/155 sec. (only simulation/simulation with initialization)
 PDES2, 12 CPU: 135 sec. 
 
 
