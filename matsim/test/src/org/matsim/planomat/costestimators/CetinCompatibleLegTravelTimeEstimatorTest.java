@@ -153,7 +153,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 
 		// quite a high epsilon here, due to rounding of the free speed in the network.xml file
 		// which is 27.78 m/s, but should be 27.777777... m/s, reflecting 100 km/h
-		// and 5.0 seconds travel time error is not _that_ bad
+		// and 5.0 seconds travel time estimation error is not _that_ bad
 		double freeSpeedEpsilon = 5.0;
 		assertEquals(expectedLegEndTime, departureTime + legTravelTime, freeSpeedEpsilon);
 

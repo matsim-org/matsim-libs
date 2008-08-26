@@ -65,31 +65,10 @@ import org.matsim.utils.misc.Time;
  */
 public class PlanOptimizeTimes implements PlanAlgorithm {
 
-	public static enum PossibleModes {
-		
-		CAR(BasicLeg.CARMODE, 0), 
-		PT(BasicLeg.PTMODE, 1);
-		
-		private String basicLegIdentifier;
-		private int jgapAllele;
-
-		private PossibleModes(String basicLegIdentifier, int jgapAllele) {
-			this.basicLegIdentifier = basicLegIdentifier;
-			this.jgapAllele = jgapAllele;
-		}
-
-		public int getJgapAllele() {
-			return jgapAllele;
-		}
-
-		public String getBasicLegIdentifier() {
-			return basicLegIdentifier;
-		}
-
-	}
-	
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 
+	private int numActs = Integer.MIN_VALUE;
+	
 	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
@@ -106,15 +85,15 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 			if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-				org.jgap.Configuration jgapConfiguration = PlanOptimizeTimes.initJGAPConfiguration();
-				IChromosome sampleChromosome = PlanOptimizeTimes.initSampleChromosome(plan, jgapConfiguration);
+				org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
+				IChromosome sampleChromosome = this.initSampleChromosome(plan, jgapConfiguration);
 				try {
 					jgapConfiguration.setSampleChromosome(sampleChromosome);
 				} catch (InvalidConfigurationException e1) {
 					e1.printStackTrace();
 				}
 				ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
-				PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, this.legTravelTimeEstimator );
+				PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( sf, plan, this.legTravelTimeEstimator, this.numActs );
 				Genotype population = null;
 				try {
 					jgapConfiguration.setFitnessFunction( fitnessFunction );
@@ -136,7 +115,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		}
 	}
 
-	protected static org.jgap.Configuration initJGAPConfiguration() {
+	protected org.jgap.Configuration initJGAPConfiguration() {
 
 		Configuration jgapConfiguration = new Configuration();
 
@@ -177,47 +156,42 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	}
 
-	protected static IChromosome initSampleChromosome(final Plan plan, final org.jgap.Configuration jgapConfiguration) {
+	protected IChromosome initSampleChromosome(final Plan plan, final org.jgap.Configuration jgapConfiguration) {
 
 		double planLength = 24.0 * 3600;
 
 		// analyze / modify plan for our purposes:
 		// 1, how many activities do we have?
 		// 2, clean all time information
-		int numActs = 0;
+		this.numActs = 0;
 		for (Object o : plan.getActsLegs()) {
 
 			if (o.getClass().equals(Act.class)) {
 				((Act) o).setDur(Time.UNDEFINED_TIME);
 				((Act) o).setEndTime(Time.UNDEFINED_TIME);
-				numActs++;
+				this.numActs++;
 			} else if (o.getClass().equals(Leg.class)) {
 				((Leg) o).setTravTime(Time.UNDEFINED_TIME);
 			}
 
 		}
 		// first and last activity are assumed to be the same
-		numActs -= 1;
+		this.numActs -= 1;
 
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
 		try {
 
-			PlanomatConfigGroup.TravelBehavior tb = Gbl.getConfig().planomat().getTravelBehavior();
-
-			for (int ii=0; ii < numActs; ii++) {
+			for (int ii=0; ii < this.numActs; ii++) {
 				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, planLength));
 			}
-			
-			if (tb.getConfigValue().equals(PlanomatConfigGroup.TRAVEL_BEHAVIOR_TIMES_AND_MODES)) {
-				PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-				planAnalyzeSubtours.run(plan);
-				
-				int numSubtours = planAnalyzeSubtours.getNumSubtours();
-				for (int ii=0; ii < numSubtours; ii++) {
-					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, PossibleModes.values().length - 1));
-				} 
-			}
 
+			PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			planAnalyzeSubtours.run(plan);
+
+			for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
+				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().size() - 1));
+			} 
+			
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
@@ -355,10 +329,9 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				Act origin = ((Act) plan.getActsLegs().get(ii - 1));
 				Act destination = ((Act) plan.getActsLegs().get(ii + 1));
 
-				// TODO is that correct?
 				double travelTimeEstimation = estimator.getLegTravelTimeEstimation(
 						plan.getPerson().getId(),
-						0.0,
+						now,
 						origin,
 						destination,
 						leg);
@@ -373,6 +346,10 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		// invalidate score information
 		plan.setScore(Double.NaN);
 
+	}
+
+	public int getNumActs() {
+		return numActs;
 	}
 
 }

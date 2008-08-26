@@ -20,6 +20,8 @@
 
 package org.matsim.config.groups;
 
+import java.util.ArrayList;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -38,7 +40,13 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( CharyparNagelScoringFunctionFactory.class, Gbl.getConfig().planomat().getScoringFunctionFactory().getClass() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		assertEquals( PlanomatConfigGroup.DEFAULT_TRAVEL_BEHAVIOR, Gbl.getConfig().planomat().getTravelBehavior() );
+		String actualPossibleModesString = "";
+		for (String expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
+			actualPossibleModesString += expectedPossibleMode;
+			actualPossibleModesString += " ";
+		}
+		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
+		assertEquals( PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES, actualPossibleModesString );
 		
 	}
 

@@ -1,5 +1,7 @@
 package org.matsim.config.groups;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 import org.matsim.gbl.Gbl;
@@ -30,27 +32,11 @@ public class PlanomatConfigGroup extends Module {
 	public static final int DEFAULT_JGAP_MAX_GENERATIONS = 100;
 	private int jgapMaxGenerations;
 
-	public static final String TRAVEL_BEHAVIOR = "travelBehavior";
-	public static final String TRAVEL_BEHAVIOR_TIMES = "times";
-	public static final String TRAVEL_BEHAVIOR_TIMES_AND_MODES = "timesAndModes";
-	public enum TravelBehavior { 
-
-		TIMES(TRAVEL_BEHAVIOR_TIMES), 
-		TIMES_AND_MODES(TRAVEL_BEHAVIOR_TIMES_AND_MODES);
-
-		private final String configValue;
-
-		private TravelBehavior(String configValue) {
-			this.configValue = configValue;
-		}
-
-		public String getConfigValue() {
-			return configValue;
-		}
-
-	};
-	public static final TravelBehavior DEFAULT_TRAVEL_BEHAVIOR = TravelBehavior.TIMES;
-	private TravelBehavior travelBehavior;
+	public static final String POSSIBLE_MODES = "possibleModes";
+	public static final String POSSIBLE_MODES_CAR = "car";
+	public static final String POSSIBLE_MODES_CAR_PT = "car pt";
+	public static final String DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
+	private ArrayList<String> possibleModes;
 
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
 //	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
@@ -72,7 +58,10 @@ public class PlanomatConfigGroup extends Module {
 		this.scoringFunctionFactory = PlanomatConfigGroup.DEFAULT_SCORING_FUNCTION;
 		this.popSize = PlanomatConfigGroup.DEFAULT_POPSIZE;
 		this.jgapMaxGenerations = PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS;
-		this.travelBehavior = PlanomatConfigGroup.DEFAULT_TRAVEL_BEHAVIOR;
+		this.possibleModes = new ArrayList<String>();
+		for (String possibleMode : PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES.split(" ")) {
+			this.possibleModes.add(possibleMode);
+		}
 
 	}
 
@@ -186,12 +175,12 @@ public class PlanomatConfigGroup extends Module {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
-	public TravelBehavior getTravelBehavior() {
-		return travelBehavior;
+	public ArrayList<String> getPossibleModes() {
+		return possibleModes;
 	}
 
-	public void setTravelBehavior(TravelBehavior travelBehavior) {
-		this.travelBehavior = travelBehavior;
+	public void setPossibleModes(ArrayList<String> possibleModes) {
+		this.possibleModes = possibleModes;
 	}
 
 }

@@ -23,7 +23,6 @@ package org.matsim.planomat;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
-import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -46,16 +45,18 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Plan plan;	
+	private Plan plan;
+	private int numActs;
 	private LegTravelTimeEstimator legTravelTimeEstimator;
 	private ScoringFunction sf;
 
-	public PlanomatFitnessFunctionWrapper(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator) {
+	public PlanomatFitnessFunctionWrapper(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator, int numActs) {
 
 		this.sf = sf;
 		this.plan = plan;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
-
+		this.numActs = numActs;
+		
 	}
 	
 	@Override
@@ -67,31 +68,22 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		sf.reset();
 		double now = 0.0;
 		// process "middle" activities
-		for (int ii=0; ii < a_subject.size(); ii++) {
+		for (int ii=0; ii < this.numActs; ii++) {
 
 			now += ((DoubleGene) a_subject.getGene(ii)).doubleValue();
-
+			
 			sf.startLeg(now, null);
 			
 			Act origin = ((Act) plan.getActsLegs().get(ii * 2));
-			Act destination = ((Act) plan.getActsLegs().get((ii + 1) * 2));
+			Leg legIntermediate = plan.getNextLeg(origin);
+			Act destination = plan.getNextActivity(legIntermediate);
 			
-			Leg leg = (Leg) plan.getActsLegs().get((ii * 2) + 1);
-			
-//			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
-//					this.plan.getPerson().getId(), 
-//					now, 
-//					origin, 
-//					destination, 
-//					leg.getRoute(), 
-//					leg.getMode());
-//
 			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 					this.plan.getPerson().getId(), 
 					now, 
 					origin, 
 					destination, 
-					leg);
+					legIntermediate);
 
 			now += travelTime;
 
