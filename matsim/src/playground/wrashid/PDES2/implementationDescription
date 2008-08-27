@@ -133,15 +133,26 @@ Splitting the map:
       
      
         
-      - problem: test 1 creates to litte messages after having introduced the is killMessage instead of remove from Message queue  
-        => the other tests run ok...
+      - problem: test 1 creates too litte messages after having introduced the is killMessage instead of remove from Message queue  
+        => the other tests run ok..., when using one thread version
         
       - die parallelizierung wird nicht genug ausgenützt? bzw. soll ich grössere scenarien ausprobieren um rauszufinden,
       wieviel es genützt hat? bzw. profiling machen?
       
       => continue with test 15...
       
+      - man könnte before man lange runs macht, einen benchmark vorschalten, der den split der karte gut macht
+        für die gegebene anzahl processoren oder adaptiv: man verschiebe grenzen so, wie man denkt vom letzten run her
+      
      
+VERY IMPORTANT TODOS:
+      - code aufräumen, code kopieren in core, tests schreiben für code
+ 		=> test z.b. für einen agenten (eqil net)
+      - act start und act end noch machen. Alle personen machen einen act start um 0:00.
+      - enter link am schluss vom leg werfen (gleiche zeit wie end leg), aber vor dem end leg event werfen
+      - anstatt erstes enter link, ein wait2link event werfen am anfang.
+      - Need to compare iterations of MobSim, DeqSim, JavaDESSim
+      - run 600 sample
          
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -230,7 +241,7 @@ PDES2, 1 CPU: 300  sec.
 PDES2, 3 CPU:  224 sec.
 PDES2, 6 CPU:  128/168 sec. 
 PDES2, 9 CPU:  115/155 sec. (only simulation/simulation with initialization)
-PDES2, 12 CPU: 135 sec. 
+PDES2, 12 CPU: 138/182 sec. 
 
 
 
@@ -246,5 +257,20 @@ PDES2, 1 CPU: 113.8 sec
 PDES2, 6 CPU: 38.8 sec 
 PDES2, 12 CPU: 29.3 sec
 
+Ex3:
+----
+615K agents (only MIV, most located in Zurich area - Westumfahrung), arround 55.8M events, run on Satawal
+network used: "VISUM export national network 2007-11-28" 
+ram used: less than 5gb (without facilities, which are more than 9gb at least!!!)
+facilities were disabled, because else more ram were required, than were at my disposal of this experiment.
+(census2000_dilZh30km_miv used)
+folder: input_615K
+
+MobSim: 
+PDES2, 1 CPU: 732/846
+PDES2, 3 CPU: 539/664
+PDES2, 6 CPU: 240/356
+PDES2, 9 CPU: 358/474 => why slower => perphas, because machine not fully free?
+PDES2, 12 CPU: 301/412 sec. => not all the time 12 cpus were availabe, because of this the test must be repated later
 
      
