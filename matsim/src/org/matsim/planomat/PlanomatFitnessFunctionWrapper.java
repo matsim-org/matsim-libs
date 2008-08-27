@@ -23,11 +23,16 @@ package org.matsim.planomat;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
+import org.jgap.impl.IntegerGene;
+import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.population.Route;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.scoring.ScoringFunction;
+import org.matsim.utils.misc.Time;
 
 /**
  * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.
@@ -46,16 +51,20 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private static final long serialVersionUID = 1L;
 
 	private Plan plan;
-	private int numActs;
 	private LegTravelTimeEstimator legTravelTimeEstimator;
 	private ScoringFunction sf;
+	private PlanAnalyzeSubtours planAnalyzeSubtours;
 
-	public PlanomatFitnessFunctionWrapper(ScoringFunction sf, Plan plan, LegTravelTimeEstimator legTravelTimeEstimator, int numActs) {
+	public PlanomatFitnessFunctionWrapper( 
+			final ScoringFunction sf, 
+			Plan plan, 
+			final LegTravelTimeEstimator legTravelTimeEstimator, 
+			final PlanAnalyzeSubtours planAnalyzeSubtours) {
 
 		this.sf = sf;
 		this.plan = plan;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
-		this.numActs = numActs;
+		this.planAnalyzeSubtours = planAnalyzeSubtours;
 		
 	}
 	
@@ -64,20 +73,36 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 		double planScore = 0.0;
 		double travelTime;
-
+		int subtourIndex, modeIndex;
+		String modeName;
+		Act origin = null, destination = null;
+		Leg legIntermediate = null;
+		Route tempRoute = null;
+		
 		sf.reset();
 		double now = 0.0;
 		// process "middle" activities
-		for (int ii=0; ii < this.numActs; ii++) {
+		int numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
+		for (int ii=0; ii < numActs; ii++) {
 
 			now += ((DoubleGene) a_subject.getGene(ii)).doubleValue();
 			
 			sf.startLeg(now, null);
 			
-			Act origin = ((Act) plan.getActsLegs().get(ii * 2));
-			Leg legIntermediate = plan.getNextLeg(origin);
-			Act destination = plan.getNextActivity(legIntermediate);
+			origin = ((Act) plan.getActsLegs().get(ii * 2));
+			legIntermediate = plan.getNextLeg(origin);
+			destination = plan.getNextActivity(legIntermediate);
 			
+			// set mode
+			subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[ii];
+			modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
+			modeName = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
+//			System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
+			legIntermediate.setMode(modeName);
+			
+			// save route, because temporary pt leg handling is based on a routing in a freespeed network
+			tempRoute = legIntermediate.getRoute();
+			// set times
 			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 					this.plan.getPerson().getId(), 
 					now, 
@@ -85,8 +110,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 					destination, 
 					legIntermediate);
 
+//			System.out.println(Time.writeTime(travelTime));
 			now += travelTime;
-
+			
+			// recover route
+			legIntermediate.setRoute(tempRoute);
 			sf.endLeg(now);
 		}
 

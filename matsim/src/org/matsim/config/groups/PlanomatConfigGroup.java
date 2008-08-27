@@ -3,6 +3,7 @@ package org.matsim.config.groups;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Module;
 import org.matsim.gbl.Gbl;
 import org.matsim.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -33,8 +34,8 @@ public class PlanomatConfigGroup extends Module {
 	private int jgapMaxGenerations;
 
 	public static final String POSSIBLE_MODES = "possibleModes";
-	public static final String POSSIBLE_MODES_CAR = "car";
-	public static final String POSSIBLE_MODES_CAR_PT = "car pt";
+	public static final String POSSIBLE_MODES_CAR = BasicLeg.CARMODE;
+	public static final String POSSIBLE_MODES_CAR_PT = BasicLeg.CARMODE + " " + BasicLeg.PTMODE;
 	public static final String DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
 	private ArrayList<String> possibleModes;
 

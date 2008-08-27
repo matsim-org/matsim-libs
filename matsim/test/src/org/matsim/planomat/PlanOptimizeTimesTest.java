@@ -30,7 +30,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
-import org.matsim.config.groups.PlanomatConfigGroup;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -41,14 +41,13 @@ import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEst
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -60,8 +59,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 	private enum PlanomatTestRun {
 
 		NOEVENTS_CAR("noevents_car"),
-		WITHEVENTS_CAR("withevents_car");
-//		NOEVENTS_CAR_PT("noevents_car_pt");
+		WITHEVENTS_CAR("withevents_car"),
+		NOEVENTS_CAR_PT("noevents_car_pt"),
+		WITHEVENTS_CAR_PT("withevents_car_pt");
 
 		private String testIdentifier;
 
@@ -103,23 +103,27 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		for (PlanomatTestRun planomatTestRun : PlanomatTestRun.values()) {
 
-//			if (PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
-//				ArrayList<String> possibleModes = new ArrayList<String>();
-//				possibleModes.add("car");
-//				possibleModes.add("pt");
-//				Gbl.getConfig().planomat().setPossibleModes(possibleModes);
-//			}
-			
+			if (
+					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
+					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
+				ArrayList<String> possibleModes = new ArrayList<String>();
+				possibleModes.add(BasicLeg.CARMODE);
+				possibleModes.add(BasicLeg.PTMODE);
+				Gbl.getConfig().planomat().setPossibleModes(possibleModes);
+			}
+
 			TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
 			DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 
-			if (PlanomatTestRun.WITHEVENTS_CAR.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
+			if (
+					PlanomatTestRun.WITHEVENTS_CAR.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) ||
+					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
 
 				Events events = new Events();
 				events.addHandler(tTravelEstimator);
 				events.addHandler(depDelayCalc);
 				new MatsimEventsReader(events).readFile(this.getInputDirectory() + "equil-times-only-1000.events.txt.gz");
-				
+
 			}
 
 			LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
@@ -179,21 +183,16 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(null);
 
-		testChromosome = testee.initSampleChromosome(testPlan, jgapConfiguration);
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(testPlan);
+
+		testChromosome = testee.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 		assertEquals(3, testChromosome.getGenes().length);
 		assertEquals(DoubleGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(DoubleGene.class, testChromosome.getGenes()[1].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
 
 	}
-
-//	public void testEvolveAndReturnFittest() {
-//	fail("Not yet implemented");
-//	}
-
-//	public void testGetAverageFitness() {
-//	fail("Not yet implemented");
-//	}
 
 	public void testWriteChromosome2Plan() {
 
@@ -212,37 +211,28 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		// init IChromosome (from JGAP)
-		int numActs = 0;
-		for (Object o : testPlan.getActsLegs()) {
-
-			if (o.getClass().equals(Act.class)) {
-				((Act) o).setDur(Time.UNDEFINED_TIME);
-				((Act) o).setEndTime(Time.UNDEFINED_TIME);
-				numActs++;
-			} else if (o.getClass().equals(Leg.class)) {
-				((Leg) o).setTravTime(Time.UNDEFINED_TIME);
-			}
-
-		}
-		// first and last activity are assumed to be the same
-		numActs -= 1;		
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(testPlan);
+		int numActs = planAnalyzeSubtours.getSubtourIndexation().length;		
 
 		Configuration jgapConfiguration = new Configuration();
 
 		try {
-			Gene[] testGenes = new Gene[numActs];
+			Gene[] testGenes = new Gene[numActs + planAnalyzeSubtours.getNumSubtours()];
 
-			testGenes[0] = new DoubleGene(jgapConfiguration);
-			testGenes[0].setAllele(Time.parseTime("07:45:00"));
-
-			for (int ii=1; ii < testGenes.length; ii++) {
-				testGenes[ii] = new DoubleGene(jgapConfiguration);
+			for (int ii=0; ii < testGenes.length; ii++) {
 				switch(ii) {
+				case 0:
+					testGenes[ii] = new DoubleGene(jgapConfiguration);
+					testGenes[ii].setAllele(Time.parseTime("07:45:00"));
+					break;
 				case 1:
-					testGenes[ii].setAllele(Time.parseTime("07:59:59"));
+					testGenes[ii] = new DoubleGene(jgapConfiguration);
+					testGenes[ii].setAllele(Time.parseTime("8:00:01"));
 					break;
 				case 2:
-					testGenes[ii].setAllele(Time.parseTime("16:00:01"));
+					testGenes[ii] = new IntegerGene(jgapConfiguration);
+					testGenes[ii].setAllele(0);
 					break;
 				}
 
@@ -261,7 +251,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc);
 
 		// run the method
-		PlanOptimizeTimes.writeChromosome2Plan(testChromosome, testPlan, ltte);
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+
+		testee.writeChromosome2Plan(testChromosome, testPlan, planAnalyzeSubtours);
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new Population();
