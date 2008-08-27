@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import playground.wrashid.DES.utils.Timer;
 // optimized for multiple producer, single consumer
 // the producer decides, if his inputBuffer should be emptied or not
-// TODO: implemented yet...
+// TODO: not implemented yet...
 public class ConcurrentListMPDSC<T> {
 	private LinkedList<T>[] inputBufferZero;
 	private LinkedList<T>[] inputBuffer;
