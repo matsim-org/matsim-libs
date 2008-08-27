@@ -22,6 +22,7 @@ package org.matsim.basic.v01;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
 
 /**
@@ -78,10 +79,13 @@ public interface BasicPerson<T extends BasicPlan> {
 
 	public Knowledge createKnowledge(final String desc);
 
+	public Desires createDesires(final String desc);
+
 	public void addTravelcard(final String type);
 
 	public TreeSet<String> getTravelcards();
 
 	public Knowledge getKnowledge();
 	
+	public Desires getDesires();
 }

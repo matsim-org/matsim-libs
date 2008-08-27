@@ -98,6 +98,35 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	}
 
 	//////////////////////////////////////////////////////////////////////
+	// <desires ... > ... </desires>
+	//////////////////////////////////////////////////////////////////////
+
+	public void startDesires(final Desires desires, final BufferedWriter out) throws IOException {
+		out.write("\t\t<desires");
+		if (desires.getDesc() != null)
+			out.write(" desc=\"" + desires.getDesc() + "\"");
+		out.write(">\n");
+	}
+
+	public void endDesires(final BufferedWriter out) throws IOException {
+		out.write("\t\t</desires>\n\n");
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// <actDur ... />
+	//////////////////////////////////////////////////////////////////////
+
+	public void startActDur(final String act_type, final double dur, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t<actDur");
+		out.write(" type=\"" + act_type + "\"");
+		out.write(" dur=\"" + dur + "\"");
+		out.write(" />\n");
+	}
+
+	public void endActDur(final BufferedWriter out) throws IOException {
+	}
+
+	//////////////////////////////////////////////////////////////////////
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 

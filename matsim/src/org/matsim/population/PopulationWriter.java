@@ -139,12 +139,24 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			this.handler.startPerson(p,this.out);
 			// travelcards
 			if (p.getTravelcards() != null) {
-			Iterator<String> t_it = p.getTravelcards().iterator();
-			while (t_it.hasNext()) {
-				String t = t_it.next();
-				this.handler.startTravelCard(t,this.out);
-				this.handler.endTravelCard(this.out);
+				Iterator<String> t_it = p.getTravelcards().iterator();
+				while (t_it.hasNext()) {
+					String t = t_it.next();
+					this.handler.startTravelCard(t,this.out);
+					this.handler.endTravelCard(this.out);
+				}
 			}
+			// desires
+			if (p.getDesires() != null) {
+				Desires d = p.getDesires();
+				this.handler.startDesires(d,this.out);
+				if (d.getActivityDurations() != null) {
+					for (String act_type : d.getActivityDurations().keySet()) {
+						this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.out);
+						this.handler.endActDur(this.out);
+					}
+				}
+				this.handler.endDesires(this.out);
 			}
 			// knowledge
 			if (p.getKnowledge() != null) {

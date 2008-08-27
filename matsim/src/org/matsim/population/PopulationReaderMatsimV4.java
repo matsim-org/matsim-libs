@@ -47,6 +47,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String PLANS = "plans";
 	private final static String PERSON = "person";
 	private final static String TRAVELCARD = "travelcard";
+	private final static String DESIRES = "desires";
+	private final static String ACTDUR = "actDur";
 	private final static String KNOWLEDGE = "knowledge";
 	private final static String ACTIVITYSPACE = "activityspace";
 	private final static String PARAM = "param";
@@ -61,6 +63,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private final BasicPopulation plans;
 	private Person currperson = null;
+	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
@@ -87,6 +90,10 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			startPerson(atts);
 		} else if (TRAVELCARD.equals(name)) {
 			startTravelcard(atts);
+		} else if (DESIRES.equals(name)) {
+			startDesires(atts);
+		} else if (ACTDUR.equals(name)) {
+			startActDur(atts);
 		} else if (KNOWLEDGE.equals(name)) {
 			startKnowledge(atts);
 		} else if (ACTIVITYSPACE.equals(name)) {
@@ -125,6 +132,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 				Gbl.errorMsg(e);
 			}
 			this.currperson = null;
+		} else if (DESIRES.equals(name)) {
+			this.currdesires = null;
 		} else if (KNOWLEDGE.equals(name)) {
 				this.currknowledge = null;
 		} else if (ACTIVITYSPACE.equals(name)) {
@@ -190,6 +199,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private void startTravelcard(final Attributes atts) {
 		this.currperson.addTravelcard(atts.getValue("type"));
+	}
+
+	private void startDesires(final Attributes atts) {
+		this.currdesires = this.currperson.createDesires(atts.getValue("desc"));
+	}
+
+	private void startActDur(final Attributes atts) {
+		this.currdesires.putActivityDuration(atts.getValue("type"),atts.getValue("dur"));
 	}
 
 	private void startKnowledge(final Attributes atts) {

@@ -25,7 +25,7 @@
           reference_layer  CDATA #IMPLIED
           xml:lang       NMTOKEN "de-CH">
 
-<!ELEMENT person         (travelcard*,knowledge?,plan*)>
+<!ELEMENT person         (travelcard*,desires?,knowledge?,plan*)>
 <!ATTLIST person
           id             CDATA                    #REQUIRED
           sex            (f|m)                    #IMPLIED
@@ -37,6 +37,15 @@
 <!ELEMENT travelcard     EMPTY>
 <!ATTLIST travelcard
           type           (ch-GA|ch-HT|ch-HT-1y|ch-HT-2y|ch-HT-mobility|unknown) "unknown">
+
+<!ELEMENT desires        (actDur*)>
+<!ATTLIST desires
+          desc           CDATA    #IMPLIED>
+
+<!ELEMENT actDur         EMPTY>
+<!ATTLIST actDur
+          type           CDATA    #REQUIRED
+          dur            CDATA    #REQUIRED>
 
 <!ELEMENT knowledge      (activityspace*,activity*)>
 <!ATTLIST knowledge

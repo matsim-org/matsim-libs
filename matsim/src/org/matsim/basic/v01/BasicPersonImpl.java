@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.population.Desires;
 import org.matsim.population.Knowledge;
 import org.matsim.utils.customize.CustomizableImpl;
 
@@ -44,6 +45,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 
 	private TreeSet<String> travelcards = null; 
 	private Knowledge knowledge = null;
+	private Desires desires = null;
 
 	public BasicPersonImpl(final Id id) {
 		this.id = id;
@@ -160,6 +162,13 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 		return this.knowledge;
 	}
 	
+	public final Desires createDesires(final String desc) {
+		if (this.desires == null) {
+			this.desires = new Desires(desc);
+		}
+		return this.desires;
+	}
+	
 
 	public final void addTravelcard(final String type) {
 		if (this.travelcards == null) {
@@ -181,5 +190,8 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 		return this.knowledge;
 	}
 
+	public final Desires getDesires() {
+		return this.desires;
+	}
 	
 }
