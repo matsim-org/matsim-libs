@@ -33,9 +33,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.geometry.Coord;
 
-import playground.balmermi.census2000.models.ModelMobiliyTools;
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
+import playground.balmermi.census2000v2.models.ModelMobilityTools;
 
 public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -55,7 +55,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	private static final String NEVER = "never";
 	private static final String UNKNOWN = "unknown";
 
-	private final ModelMobiliyTools model = new ModelMobiliyTools();
+	private final ModelMobilityTools model = new ModelMobilityTools();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
