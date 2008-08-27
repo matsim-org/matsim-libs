@@ -80,10 +80,10 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		double k_frac = hh.getKidsFraction();
 		model.setHHKids((int)(0.5+k_frac*nump));
 		
-		// debug info
-		if (hh.getPersons().size() > MAXNUMP) {
-			log.debug("FromHH: pid="+p.getId()+": nump("+hh.getPersons().size()+"),numk("+hh.getKids().size()+"),k_frac("+k_frac+") => nump("+nump+"),numk("+((int)(0.5+k_frac*nump))+")");
-		}
+//		// debug info
+//		if (hh.getPersons().size() > MAXNUMP) {
+//			log.debug("FromHH: pid="+p.getId()+": nump("+hh.getPersons().size()+"),numk("+hh.getKids().size()+"),k_frac("+k_frac+") => nump("+nump+"),numk("+((int)(0.5+k_frac*nump))+")");
+//		}
 	}
 	
 	private final void assignHHSizeModelParamsFromCatts(Person p, Household hh) {
@@ -149,11 +149,11 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		// fuelcost
 		model.setFuelCost(hh.getMunicipality().getFuelCost());
 
-//		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
-//		int cid = hh.getMunicipality().getCantonId();
-//		if (cid == 21) { model.setLanguage(3); }
-//		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
-//		else { model.setLanguage(1); }
+		// language: 0-9 and 11-20 = 1 (German); 10 and 22-26 = 2 (French); 21 = 3 (Italian)
+		int cid = hh.getMunicipality().getCantonId();
+		if (cid == 21) { model.setLanguage(3); }
+		else if ((22 <= cid) && (cid <= 26) || (cid == 10)) { model.setLanguage(2); }
+		else { model.setLanguage(1); }
 
 		// calc and assign mobility tools
 		int mobtype = model.calcMobilityTools();
