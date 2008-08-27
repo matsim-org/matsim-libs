@@ -46,6 +46,19 @@ public class Desires {
 	}
 
 	//////////////////////////////////////////////////////////////////////
+	// accumulate methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final boolean accumulateActivityDuration(final String act_type, final double duration) {
+		if (this.act_durs == null) { return this.putActivityDuration(act_type,duration); }
+		if (this.act_durs.get(act_type) == null)  { return this.putActivityDuration(act_type,duration); }
+		double dur = this.act_durs.get(act_type);
+		dur += duration;
+		if (dur <= 0.0) { return false; }
+		return this.putActivityDuration(act_type,dur);
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 	// put methods
 	//////////////////////////////////////////////////////////////////////
 	
@@ -90,7 +103,7 @@ public class Desires {
 		return d;
 	}
 	
-	protected final Map<String,Double> getActivityDurations() {
+	public final Map<String,Double> getActivityDurations() {
 		return this.act_durs;
 	}
 

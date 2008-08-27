@@ -35,6 +35,7 @@ import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000v2.modules.PersonAssignAndNormalizeTimes;
 import playground.balmermi.census2000v2.modules.PersonAssignShopLeisureLocations;
 import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
 import playground.balmermi.census2000v2.modules.PlansAnalyse;
@@ -130,10 +131,11 @@ public class IIDMGenerationPart2 {
 		//////////////////////////////////////////////////////////////////////
 		
 		log.info("  runnning person models... ");
-		new PlansAnalyse().run(pop);
-		new PlansAnalyse().run(mz_pop);
+		new PersonAssignAndNormalizeTimes().run(pop);
 		new PersonSetLocationsFromKnowledge().run(pop);
 		new PersonAssignShopLeisureLocations(facilities).run(pop);
+		new PlansAnalyse().run(pop);
+		new PlansAnalyse().run(mz_pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////

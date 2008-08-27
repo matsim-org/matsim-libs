@@ -212,7 +212,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double dy = c_end.getX() - c_start.getX();
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal
-			Zone z = (Zone)((Act)plan.getActsLegs().get(start)).getFacility().getUpMapping().get(0);
+			Zone z = (Zone)((Act)plan.getActsLegs().get(start)).getFacility().getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
 				Act act = (Act)plan.getActsLegs().get(i);
