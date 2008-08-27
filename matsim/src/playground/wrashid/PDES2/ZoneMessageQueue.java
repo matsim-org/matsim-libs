@@ -70,7 +70,7 @@ public class ZoneMessageQueue {
 		// negative";
 
 		// assert (((Road) m.receivingUnit).getZoneId() == zoneId);
-		System.out.println("in: "+m);
+		//System.out.println("in: "+m);
 		incounter++;
 			if (m.isAcrossBorderMessage) {
 				//System.out.println(m);
@@ -196,7 +196,7 @@ public class ZoneMessageQueue {
 			arrivalTimeOfLastRemovedMessage = m.messageArrivalTime;
 			simTime = m.messageArrivalTime;
 			tmpLastRemovedMessage = m;
-			System.out.println("out: "+m);
+			//System.out.println("out: "+m);
 			return m;
 		}
 		if (incounter % 100000 == 0) {

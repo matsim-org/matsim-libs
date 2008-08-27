@@ -144,6 +144,8 @@ Splitting the map:
       - man könnte before man lange runs macht, einen benchmark vorschalten, der den split der karte gut macht
         für die gegebene anzahl processoren oder adaptiv: man verschiebe grenzen so, wie man denkt vom letzten run her
       
+      
+      
      
 VERY IMPORTANT TODOS:
       - code aufräumen, code kopieren in core, tests schreiben für code
@@ -153,6 +155,22 @@ VERY IMPORTANT TODOS:
       - anstatt erstes enter link, ein wait2link event werfen am anfang.
       - Need to compare iterations of MobSim, DeqSim, JavaDESSim
       - run 600 sample
+      
+      
+      - der einzige big bottleneck in concurrent version ist, dass bufferEvent. Deshalb sollte ich das auch noch voll parallelizieren.
+        Dann haben alle events freien lauf und das erklärt auch das schlimmer werden, wenn man mehr threads benutzt
+        und das opimum bei 6 threads.
+       => push idee: jeder thread hat seine events list. Diese füllt er auf. Sobald er z.B. 100000 events hat, übergibt er 
+        diese an den main thread, wo es für jeden thread eine queue hat. Dadruch muss nur jeden 100000 event pro Thread ein
+        lock geschehen, anstatt fast jeden event wie bisher.
+      
+      - muss Sachen von home nach data/matsim/wrashid verschieben auf satawal!!!!
+       => speicher nur dort brauchen
+      	=> immer sandbox dort machen...
+      - beim deqsim: grünzeiten simu nicht verwenden
+      - im deqsim config file: numerofthreads gleich anzahl cpus setzen
+      - 
+      
          
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
@@ -221,6 +239,11 @@ VERY IMPORTANT TODOS:
             In JavaPDEQSim2: SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter];
             ersteztt durch: SimulationParameters.zoneBorderLines[i]=bucketBoundries[bucketCounter-1];
       ===================================================      
+           - facilites auch laden, wenn ich genug speicher habe
+        -> braucht ca. 9gb ram
+     =======================================================
+        -es dauert ca. 6min um 1M plans einzulesen auf Satawal
+     =========================================================
      
      
      
@@ -265,12 +288,31 @@ ram used: less than 5gb (without facilities, which are more than 9gb at least!!!
 facilities were disabled, because else more ram were required, than were at my disposal of this experiment.
 (census2000_dilZh30km_miv used)
 folder: input_615K
+time for one iteration taken.
 
-MobSim: 
+MobSim: 52Min
 PDES2, 1 CPU: 732/846
 PDES2, 3 CPU: 539/664
 PDES2, 6 CPU: 240/356
 PDES2, 9 CPU: 358/474 => why slower => perphas, because machine not fully free?
 PDES2, 12 CPU: 301/412 sec. => not all the time 12 cpus were availabe, because of this the test must be repated later
+
+
+Ex4:
+----
+2.28M agents (census2000_miv (2.3 Mio, whole CH)), arround 153.6M events, run on Satawal
+network: whole switzerland
+network: has 60492 links, 40000 in CH, 10000 in Zürich area.
+- beim vertical cut gibt es immer ca. 200 incoming links into zones. nur die 
+randzonen auf beiden seiten haben ca. 100.
+- 21gb with facilities, arround 12gb without facilities.
+
+PDES2, 12 CPU: 877/1273 sec.
+=> attention: profiling run deliverd 150.5M events, some thing is wrong here...
+=> could it have to do something with max simulation length???
+=> könnte es damit zu tun haben, dass time stamp in falscher reihenfolge reinkommen beim processEvent und er diese
+   ignoriert???
+
+
 
      
