@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lightSignalSystems
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd">
+
+  <lanesToLinkAssignment linkIdRef="23">
+    <lane id="3" />
+    <lane id="5">
+      <representedLanes number="2" />
+      <length meter="60.0" />
+    </lane>
+  </lanesToLinkAssignment>
+  
+  <lightSignalSystemDefinition id="23">
+    <defaultCirculationTime seconds="60" />
+    <syncronizationOffset seconds="5" />
+    <defaultInterimTime seconds="3" />
+  </lightSignalSystemDefinition> 
+
+  <lightSignalSystemDefinition id="42">
+    <defaultCirculationTime seconds="50" />
+    <syncronizationOffset seconds="0" />
+    <defaultInterimTime seconds="2" />
+  </lightSignalSystemDefinition> 
+
+  <lightSignalGroupDefinition id="23">
+    <lightSignalSystemDefinition refId="23" />  
+    <lane refId="3" />
+    <lane refId="5" />
+    <toLink refId="1" />  
+    <toLink refId="2" />
+  </lightSignalGroupDefinition>
+
+  <lightSignalGroupDefinition id="42">
+    <lightSignalSystemDefinition refId="42" />  
+    <lane refId="5" />
+    <toLink refId="1"/>  
+    <toLink refId="2" />
+  </lightSignalGroupDefinition>
+</lightSignalSystems>

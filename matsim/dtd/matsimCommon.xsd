@@ -50,6 +50,13 @@ xml:lang="en">
   <xs:attribute name="value" type="xs:string" use="required" />
 </xs:complexType>
 
+<xs:complexType name="matsimTimeAttributeType">
+  <xs:annotation>
+    <xs:documentation>Convenience type for attributes specifying a time in seconds</xs:documentation>  
+  </xs:annotation>
+  <xs:attribute name="seconds" type="xs:double" use="required"></xs:attribute>
+</xs:complexType>
+
 
 <xs:element name="coordinate" type="coordinateType" />
 
@@ -100,5 +107,15 @@ xml:lang="en">
     </xs:sequence>
   </xs:complexType>
 </xs:element>
+
+<xs:simpleType name="probabilityType">
+  <xs:annotation>
+    <xs:documentation>A probability in the range [0,1]</xs:documentation>
+  </xs:annotation>
+  <xs:restriction base="xs:decimal">
+    <xs:maxInclusive value="1.0"></xs:maxInclusive>
+    <xs:minInclusive value="0.0"></xs:minInclusive>
+  </xs:restriction>
+</xs:simpleType>
 
 </xs:schema>
