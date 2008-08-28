@@ -179,7 +179,14 @@ VERY IMPORTANT TODOS:
       - vergleich mit counts: jede 10-te iteration:
         "countsScaleFactor" im config.txt => if 10% sample, then value ist 10 (not 0.1)!
         output jede 10-te iteration, lässt uns grafisch und textual vergleiche machen => unbedingt machen.
-         
+       
+      - überprüfen, ob performence probleme auf Satawal am Donnerstag nur an Ram auslastung lagen
+      
+      - aufräumen Satawal, iterationen ausprobieren.
+      
+      - frage zu iterationen habe ich an Marcel geschickt, mal schauen ob er antwortet.
+       
+       
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
      -  perhaps doch several vertical Splits machen: dann können teile der Karte weiterarbeiten,

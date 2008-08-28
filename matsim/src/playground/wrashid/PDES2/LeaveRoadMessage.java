@@ -1,5 +1,6 @@
 package playground.wrashid.PDES2;
 
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -44,6 +45,8 @@ public class LeaveRoadMessage extends EventMessage {
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
 			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),road.getLink().getId().toString(),vehicle.getLegIndex()-1);
+			//event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),vehicle.getCurrentLink(),vehicle.getCurrentLeg());
+			// uncomment line below, when constructer has been implemented
 		}
 		
 		//SimulationParameters.events.processEvent(event);
