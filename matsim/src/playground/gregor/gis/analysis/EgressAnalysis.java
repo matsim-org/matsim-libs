@@ -39,10 +39,10 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
@@ -56,7 +56,6 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.matsim.world.World;
-import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -83,8 +82,8 @@ public class EgressAnalysis {
 	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
 	private GTH gth;
 	private Map<Id, EgressNode> egressNodes;
-	
-	
+
+
 	public EgressAnalysis(FeatureSource features, Population population,
 			NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
@@ -100,7 +99,7 @@ public class EgressAnalysis {
 		createFeatures();
 //		createGridFeatures();
 		writePolygons();
-		
+
 	}
 
 	private void createGridFeatures() throws Exception {
@@ -109,13 +108,13 @@ public class EgressAnalysis {
 		for (double x = e.getMinX(); x < e.getMaxX(); x += length) {
 			for (double y = e.getMinY(); y < e.getMaxY(); y+= length) {
 				this.features.add(getPolyFeature(new Coordinate(x,y),0,0,length));
-				
-				
+
+
 			}
-			
+
 		}
-		
-		
+
+
 	}
 
 	private void writePolygons() {
@@ -124,21 +123,15 @@ public class EgressAnalysis {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (FactoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
 
 	private Collection<Feature> createFeatures() {
 		double length = 1000;
-		
+
 		for (EgressNode e : this.egressNodes.values()) {
-			
+
 				if (e.num_current == 0) {
 					continue;
 				}
@@ -148,14 +141,14 @@ public class EgressAnalysis {
 				} catch (IllegalAttributeException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}		
+				}
 		}
-		
+
 		return null;
 	}
 
 	private void initFeatureCollection() throws FactoryRegistryException, SchemaException {
-		
+
 		this.features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, this.featureSourcePolygon.getSchema().getDefaultGeometry().getCoordinateSystem());
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
@@ -192,14 +185,14 @@ public class EgressAnalysis {
 				ArrayList<Node> route2 = leg2.getRoute().getRoute();
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
-				
+
 			}
 			log.info("done.");
-			
-			
-			
 
-		
+
+
+
+
 	}
 
 
@@ -216,7 +209,7 @@ public class EgressAnalysis {
 				this.egressNodes.put(id, e);
 			}
 		}
-		
+
 	}
 
 
@@ -226,7 +219,7 @@ public class EgressAnalysis {
 
 
 		String district_shape_file;
-		
+
 
 
 		if (args.length != 2) {
@@ -234,7 +227,7 @@ public class EgressAnalysis {
 		} else {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			district_shape_file = args[1];
-			
+
 		}
 
 		World world = Gbl.createWorld();
@@ -271,12 +264,12 @@ public class EgressAnalysis {
 		}
 
 	}
-	
+
 	private class EgressNode {
 		Node node;
 		int num_shortest;
 		int num_current;
-		
+
 	}
-	
+
 }

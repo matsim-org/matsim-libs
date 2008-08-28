@@ -31,22 +31,20 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
-import org.geotools.feature.SchemaException;
-import org.opengis.referencing.FactoryException;
 /**
- * 
- * This is a simple utility class that provides methods to write Feature instances 
+ *
+ * This is a simple utility class that provides methods to write Feature instances
  * of the geotools framework to an esri shape file.
  * @author glaemmel
  *
  */
 public class ShapeFileWriter {
-	
-	
+
+
 	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
 
 
-	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException, FactoryException, SchemaException{
+	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException {
 
 		log.info("writing features to: " + filename);
 		URL fileURL = (new File(filename)).toURL();

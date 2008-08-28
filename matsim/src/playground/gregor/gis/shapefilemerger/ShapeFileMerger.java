@@ -50,8 +50,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class ShapeFileMerger {
-	
-	
+
+
 	private static ArrayList<Feature> features;
 	private static AttributeType mp;
 	private static FeatureType ftMultiPolygon;
@@ -63,12 +63,12 @@ public class ShapeFileMerger {
 	private final static String WGS84_UTM47S = "PROJCS[\"WGS_1984_UTM_Zone_47S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",10000000.0],PARAMETER[\"Central_Meridian\",99.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]";
 
 	public static void main(String [] args) {
-		
+
 
 		String zone_0_5 = "./padang/zona_0_5.shp";
 		String zone_5_10 = "./padang/zona_5_1.shp";
 		String output = "./padang/scenario_v20080716/input/evacarea.shp";
-		
+
 
 		FeatureSource fz_0_5 = null;
 		try {
@@ -76,17 +76,17 @@ public class ShapeFileMerger {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		FeatureSource fz_5_10 = null;
 		try {
 			fz_5_10 = ShapeFileReader.readDataFile(zone_5_10);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		Collection<Feature> evac_zone = new ArrayList<Feature>();
 		readPolygons(evac_zone,fz_0_5);
 		readPolygons(evac_zone,fz_5_10);
@@ -105,21 +105,17 @@ public class ShapeFileMerger {
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			ShapeFileWriter.writeGeometries(ft, output);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private static Collection<Feature> getFeatures(Collection<Feature> evac_zone) throws IllegalAttributeException {
-		
+
 		FeatureType ftGeometry = null;
 		Collection<Feature> features = new ArrayList<Feature>();
 		Geometry geo = evac_zone.iterator().next().getDefaultGeometry();
@@ -135,7 +131,7 @@ public class ShapeFileMerger {
 			ftGeometry = ftMultiPoint;
 		} else if (geo instanceof Point) {
 			ftGeometry = ftPoint;
-		}  
+		}
 		int id = 0;
 		for (Feature ft : evac_zone) {
 			Geometry g = (Geometry) ft.getAttribute(0);
@@ -145,7 +141,7 @@ public class ShapeFileMerger {
 	}
 
 	private static void initFeatureCollection() throws FactoryRegistryException, SchemaException, FactoryException {
-		
+
 		features = new ArrayList<Feature>();
 		final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM47S);
 		AttributeType mp = DefaultAttributeTypeFactory.newAttributeType("MultiPolygon",MultiPolygon.class, true, null, null, targetCRS);
@@ -163,11 +159,11 @@ public class ShapeFileMerger {
 		ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {point, id}, "geometry");
 		ftMultiPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] {mpoint, id}, "geometry");
 	}
-	
-	
+
+
 	private static void readPolygons(Collection<Feature> evac_zone, FeatureSource fts) {
-		
-		
+
+
 		FeatureIterator it = null;
 		try {
 			it = fts.getFeatures().features();
@@ -179,7 +175,7 @@ public class ShapeFileMerger {
 			evac_zone.add(feature);
 
 		}
-		
+
 	}
 
 }

@@ -43,35 +43,26 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
-import org.matsim.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.PopulationWriter;
-import org.matsim.population.Route;
-import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.matsim.world.World;
-import org.opengis.referencing.FactoryException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -92,7 +83,7 @@ public class DistanceAnalysis {
 	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
 	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
-	
+
 
 
 
@@ -103,10 +94,10 @@ public class DistanceAnalysis {
 		this.population = population;
 		this.network = network;
 		this.envelope  = this.featureSourcePolygon.getBounds();
-		
+
 		this.router = new PlansCalcRoute(network, new TravelTimeDistanceCostCalculator(new FreespeedTravelTimeCost()), new FreespeedTravelTimeCost());
 		this.geofac = new GeometryFactory();
-		
+
 		initFeatureCollection();
 		parsePolygons();
 		createPolygons();
@@ -114,8 +105,8 @@ public class DistanceAnalysis {
 		iteratePolygons();
 		writePolygons();
 
-		
-		
+
+
 
 
 
@@ -126,12 +117,6 @@ public class DistanceAnalysis {
 		try {
 			ShapeFileWriter.writeGeometries(this.features, "./padang/evac_classification.shp");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SchemaException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -148,10 +133,10 @@ public class DistanceAnalysis {
 				Polygon p = gth.getSquare(new Coordinate(x,y), length);
 				this.polygons.add(p);
 			}
-			
+
 		}
-		
-		
+
+
 	}
 
 
@@ -178,10 +163,10 @@ public class DistanceAnalysis {
 			double meanDeviance = (dists[0] - dists[1]) / num_pers;
 			double length_shortest = dists[1] / num_pers;
 			double length_selected = dists[0] / num_pers;
-			double evac_time = (-dists[2] * 10) / num_pers;  
+			double evac_time = (-dists[2] * 10) / num_pers;
 			double varK = dists[3];
 			int dest = (int) dists[4];
-			
+
 			try {
 				this.features.add(getFeature(polygon, meanDeviance, length_shortest, length_selected, num_pers, id++, evac_time,varK, dest));
 			} catch (IllegalAttributeException e) {
@@ -198,13 +183,13 @@ public class DistanceAnalysis {
 
 	private double[] handlePersons(Collection<Person> persons) {
 
-		double [] dist = {0., 0.,0., 0., 0.}; 
+		double [] dist = {0., 0.,0., 0., 0.};
 		double diff = 0;
 		double [] diffAll = new double [persons.size()];
 		int i = 0;
-		int [] dests = new int [100]; 
-		
-		
+		int [] dests = new int [100];
+
+
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDist();
@@ -213,9 +198,9 @@ public class DistanceAnalysis {
 			String destS  = l.getId().toString().replace("el", "");
 			int dest = Integer.parseInt(destS);
 			dests[dest]++;
-			
+
 			dist[0] +=  l1;
-			dist[2] += person.getSelectedPlan().getScore(); 
+			dist[2] += person.getSelectedPlan().getScore();
 			Plan plan = new Plan(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			plan.addLeg(new Leg(1,"car",0.0,0.0,0.0));
@@ -224,7 +209,7 @@ public class DistanceAnalysis {
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDist();
 			dist[1] = l2;
-		
+
 			diff += dist[0] - dist[1];
 			diffAll[i++] = dist[0] - dist[1];
 		}
@@ -232,12 +217,12 @@ public class DistanceAnalysis {
 		double var = 0;
 		for (i = 0; i < persons.size(); i++) {
 			var += (diffAll[i] - mean) * (diffAll[i] - mean);
-			
+
 		}
 		double sd = Math.sqrt(var);
 		double varK = sd / mean;
 		dist[3] = varK;
-		
+
 		int max = 0;
 		int dest = 0;
 		for (int ii = 0; ii < 100; ii++) {
@@ -245,7 +230,7 @@ public class DistanceAnalysis {
 				max = dests[ii];
 				dest = ii;
 			}
-			
+
 		}
 		dist[4] = dest;
 		return dist;
@@ -330,7 +315,7 @@ public class DistanceAnalysis {
 
 
 		String district_shape_file;
-		
+
 
 
 		if (args.length != 2) {
@@ -338,7 +323,7 @@ public class DistanceAnalysis {
 		} else {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			district_shape_file = args[1];
-			
+
 		}
 
 		World world = Gbl.createWorld();
@@ -346,15 +331,15 @@ public class DistanceAnalysis {
 		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
 		NetworkFactory fc = new NetworkFactory();
 		fc.setLinkPrototype(TimeVariantLinkImpl.class);
-		
+
 		NetworkLayer network = new NetworkLayer(fc);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		world.setNetworkLayer(network);
 		world.complete();
 		log.info("done.");
-		
 
-		
+
+
 
 		log.info("loading shape file from " + district_shape_file);
 		FeatureSource features = null;
@@ -380,7 +365,7 @@ public class DistanceAnalysis {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		try {
 			new EgressAnalysis(features,population,network);
 		} catch (Exception e) {

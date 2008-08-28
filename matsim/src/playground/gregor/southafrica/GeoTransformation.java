@@ -33,12 +33,11 @@ import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeoTransformation {
 	private final static String WGS84_UTM34S = "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
-	
+
 
 	public static void main(final String [] args) throws Exception {
 		final String filename = "F:\\Pieter Fourie\\workspace\\matsim\\southafrica\\GP_Input_shapes\\gt_str_h.shp";
@@ -48,7 +47,7 @@ public class GeoTransformation {
 	    final CoordinateReferenceSystem sourceCRS = CRS.parseWKT(SourceWKT);
 	    System.out.println("Target WKT:\n" + WGS84_UTM34S);
 	    final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM34S);
-	    
+
 	    final MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		final Collection<Feature> transformed = new ArrayList<Feature>();
 		final Iterator it = fs.getFeatures().iterator();
@@ -60,5 +59,5 @@ public class GeoTransformation {
 		}
 		ShapeFileWriter.writeGeometries(transformed, "./southafrica/gt_str_h_transformed.shp");
 	}
-	
+
 }

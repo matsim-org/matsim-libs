@@ -1,13 +1,11 @@
 package playground.pieter.demandgeneration;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Scanner;
 
 import org.geotools.data.FeatureSource;
@@ -16,23 +14,17 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class TAZShapeGenerator {
@@ -45,7 +37,7 @@ public class TAZShapeGenerator {
 	private String inputShape;
 	private String outputShape;
 	private String mappingInfo;
-	
+
 	public TAZShapeGenerator(String inputShape, String outputShape, String mappingInfo) {
 		this.inputShape = inputShape;
 		this.outputShape = outputShape;
@@ -56,7 +48,7 @@ public class TAZShapeGenerator {
 		this.outFeatures = new ArrayList<Feature>();
 		initFeatures();
 	}
-	
+
 	public Collection<Feature> getFeatures(final String inputShape) {
 		FeatureSource featSrc = null;
 		try {
@@ -65,7 +57,7 @@ public class TAZShapeGenerator {
 			e.printStackTrace();
 		}
 		this.coordRefSystem = featSrc.getSchema().getDefaultGeometry().getCoordinateSystem();
-		
+
 		final Collection<Feature> featColl = new ArrayList<Feature>();
 		org.geotools.feature.FeatureIterator ftIterator = null;
 		try {
@@ -80,7 +72,7 @@ public class TAZShapeGenerator {
 		}
 		return featColl;
 	}
-	
+
 	private void initFeatures() {
 		//define the output collection
 		final AttributeType[] TAZs = new AttributeType[2];
@@ -88,14 +80,14 @@ public class TAZShapeGenerator {
 		TAZs[1] = AttributeTypeFactory.newAttributeType("TAZ", Integer.class);
 
 		try {
-			this.ftTAZ = FeatureTypeFactory.newFeatureType(TAZs, "TAZ");//						
+			this.ftTAZ = FeatureTypeFactory.newFeatureType(TAZs, "TAZ");//
 		} catch (final FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (final SchemaException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void indexPolygons() {
 		//goes through the collection of polygons
 		for (Feature ft : this.inPolygons){
@@ -113,8 +105,8 @@ public class TAZShapeGenerator {
 			this.inPolygonHashMap.put(EA_CODE, multiPoly);
 		}
 	}
-	
-	private void run() throws IllegalAttributeException, IOException, FactoryException, SchemaException {
+
+	private void run() throws IllegalAttributeException, IOException {
 		indexPolygons();
 		//reads the input file which lists SP_CODE , number of persons in SP who travel by car
 		Scanner inputReader = new Scanner(new File(this.mappingInfo));
@@ -125,7 +117,7 @@ public class TAZShapeGenerator {
 		while(inputReader.hasNext())// first reads each line, catches relevant fields
 		{
 			//create an arraylist to store all the polygons for this TAZ
-			
+
 			if(nextTAZ == 0){
 				currentTAZ = inputReader.nextInt();
 				EAPSU = inputReader.nextInt();
@@ -138,7 +130,7 @@ public class TAZShapeGenerator {
 				getPolysFromMultiPolyAndPutInArrayList(multiPoly,polyArray);
 			}
 			nextTAZ = inputReader.nextInt();
-			
+
 			if(nextTAZ != currentTAZ){
 				//got a new TAZ, so first write the previous one
 				writeTAZGeometry(polyArray, currentTAZ);
@@ -195,6 +187,6 @@ public class TAZShapeGenerator {
 		new TAZShapeGenerator(inputShape, outputShape, mappingInfo).run();
 		System.out.printf("Done! TAZ shapefile output to %s", outputShape);
 	}
-	
-	
+
+
 }

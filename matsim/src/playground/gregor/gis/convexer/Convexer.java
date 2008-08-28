@@ -29,11 +29,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
-
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -42,7 +39,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class Convexer {
 	private final static GeometryFactory geofac = new GeometryFactory();
-	
+
 	private final FeatureSource inFt;
 	private final String outfile;
 	private final FeatureType ftType;
@@ -51,20 +48,20 @@ public class Convexer {
 		this.inFt = inFt;
 		this.ftType = this.inFt.getSchema();
 		this.outfile = output;
-		
+
 	}
-	
+
 	public void convex() {
-		final PseudoConvexDecompositor convexer = new PseudoConvexDecompositor(); 
+		final PseudoConvexDecompositor convexer = new PseudoConvexDecompositor();
 		final Collection<Feature> fts = getPolygons(this.inFt);
 		int toGo = fts.size();
 		for (final Feature ft : fts) {
 			if (toGo-- % 100 == 0) {
 				System.out.println("toGo:"  + toGo);
 			}
-	
-				
-			
+
+
+
 			final Geometry geo = ft.getDefaultGeometry();
 			Polygon poly;
 			if (geo instanceof Polygon) {
@@ -76,14 +73,14 @@ public class Convexer {
 			}
 			final Collection<Polygon> ps = convexer.decompose(poly);
 			addPolygons(ps,ft);
-			
+
 		}
-		
+
 		write();
 	}
-	
+
 	private void addPolygons(final Collection<Polygon> ps, final Feature ft) {
-		
+
 		for (final Polygon p : ps) {
 			Object [] attr = new Object [ft.getNumberOfAttributes()];
 			attr = ft.getAttributes(attr);
@@ -96,7 +93,7 @@ public class Convexer {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 
 	private void write() {
@@ -105,15 +102,9 @@ public class Convexer {
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (final FactoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (final SchemaException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
-		
+
+
 	}
 
 	private  Collection<Feature> getPolygons(final FeatureSource n) {
@@ -136,16 +127,16 @@ public class Convexer {
 //			Polygon polygon = (Polygon) multiPolygon.getGeometryN(0);
 			polygons.add(feature);
 	}
-	
+
 		return polygons;
 	}
-	
+
 	public static void main(final String [] args) throws Exception {
 		final String input = "./padang/buildings.shp";
 		final String output = "./padang/convex_buildings.shp";
 		final FeatureSource inFt = ShapeFileReader.readDataFile(input);
 		new Convexer(inFt,output).convex();
-		
+
 	}
-	
+
 }

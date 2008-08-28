@@ -20,21 +20,19 @@
 
 package playground.gregor.matsim2GIS;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.geotools.feature.SchemaException;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class Network2ESRIShape {
 
@@ -65,10 +63,6 @@ public class Network2ESRIShape {
 		try {
 			ShapeFileWriter.writeGeometries(features, this.filename);
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
 	}

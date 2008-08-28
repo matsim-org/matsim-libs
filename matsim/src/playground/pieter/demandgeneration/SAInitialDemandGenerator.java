@@ -1,7 +1,6 @@
 package playground.pieter.demandgeneration;
 /**code by Gregor Laemmel, Pieter Fourie.
  * Class to generate person home locations from SP tables and SP shapefile */
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,18 +19,14 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.matsim.utils.io.IOUtils;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -295,7 +290,7 @@ public class SAInitialDemandGenerator {
 		}
 
 	}
-	private void run() throws IOException, FactoryException, SchemaException, IllegalAttributeException{
+	private void run() throws IOException, IllegalAttributeException{
 		createHomeLocations();
 		ShapeFileWriter.writeGeometries(this.homeLocationCollection, (this.outputPath + "homeLocations.shp"));
 		createWorkLocations();

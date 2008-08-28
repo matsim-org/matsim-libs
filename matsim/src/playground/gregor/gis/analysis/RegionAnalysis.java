@@ -69,17 +69,17 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	private final HashMap<String,Point> dests = new HashMap<String,Point>();
 	private final QuadTree<Point> tree = new QuadTree<Point>(0,0,690000,9999000);
 	private final HashMap<String,String> colorMap = new HashMap<String,String>();
-	
-	
+
+
 	Collection<Feature> features;
 	private FeatureType ft;
 	private final GeometryFactory geofac;
 	private final String eventsfile;
 	private final NetworkLayer network;
-	
-	
+
+
 	public RegionAnalysis(final CoordinateReferenceSystem targetCRS, final String shapefile, final String eventsfile, final NetworkLayer network) {
-		
+
 		this.network = network;
 		initColorMap();
 		this.crs = targetCRS;
@@ -95,14 +95,14 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		}
 	}
 
-	
+
 	private void initColorMap() {
 		this.colorMap.put("63", "63");
 		this.colorMap.put("14", "63");
 		this.colorMap.put("87", "63");
 		this.colorMap.put("13", "63");
 		this.colorMap.put("61", "63");
-		
+
 		this.colorMap.put("48", "48");
 		this.colorMap.put("30", "48");
 		this.colorMap.put("48", "48");
@@ -112,29 +112,29 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		this.colorMap.put("10", "48");
 		this.colorMap.put("71", "48");
 		this.colorMap.put("69", "48");
-		
+
 		this.colorMap.put("33", "33");
 		this.colorMap.put("24", "33");
-	
+
 		this.colorMap.put("65", "65");
 		this.colorMap.put("77", "65");
 		this.colorMap.put("26", "65");
 		this.colorMap.put("64", "65");
-	
+
 		this.colorMap.put("21", "21");
 		this.colorMap.put("58", "21");
-		
+
 		this.colorMap.put("89", "89");
 		this.colorMap.put("12", "89");
-		
+
 		this.colorMap.put("18", "18");
 		this.colorMap.put("17", "18");
 		this.colorMap.put("47", "18");
 		this.colorMap.put("86", "18");
-		
+
 		this.colorMap.put("2", "2");
 		this.colorMap.put("39", "2");
-		
+
 		this.colorMap.put("76", "76");
 		this.colorMap.put("4", "76");
 		this.colorMap.put("11", "76");
@@ -143,25 +143,25 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		this.colorMap.put("59", "76");
 		this.colorMap.put("36", "76");
 		this.colorMap.put("80", "76");
-		
+
 		this.colorMap.put("29", "8");
-		
+
 		this.colorMap.put("22", "88");
 		this.colorMap.put("43", "88");
-		
+
 		this.colorMap.put("45", "50");
 		this.colorMap.put("19", "50");
 		this.colorMap.put("84", "84");
 		this.colorMap.put("75", "84");
 		this.colorMap.put("53", "84");
 
-		
-		
+
+
 	}
 
 
 	private void initFeatureCollection() throws FactoryRegistryException, SchemaException {
-		
+
 		this.features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
@@ -173,15 +173,15 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,strId,count}, "plansShape");
 	}
 
-	
+
 	public void run() {
-		
+
 		Events events = new Events();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventsfile);
-	
+
 		for (String key : this.dests.keySet()) {
 			String c = getColor(ddc.getColor(key));
 			Point p = this.dests.get(key);
@@ -194,23 +194,19 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-	
-		
+
+
 		try {
 			ShapeFileWriter.writeGeometries(this.features, this.outfile);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
-			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	private String getColor(final String color) {
 		if (this.colorMap.get(color) != null) {
 			return this.colorMap.get(color);
@@ -232,23 +228,23 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 			this.tree.put(p.getX(),p.getY(), p);
 		}
 	}
-	
-	
+
+
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public static void main(final String [] args) throws FactoryException {
 //		String district_shape_file;
-		
+
 		final String shapefile = "./padang/region.shp";
 
 		if (args.length != 1) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
 		} else {
 			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
-			
+
 		}
 
 		World world = Gbl.createWorld();
@@ -275,11 +271,11 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 //		PlansReaderI plansReader = new MatsimPlansReader(population);
 //		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 //		log.info("done.");
-		
+
 		String eventsfile = Gbl.getConfig().events().getInputFile();
-		
+
 		final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM47S);
-		
+
 		new RegionAnalysis(targetCRS,shapefile,eventsfile,network).run();
 	}
 

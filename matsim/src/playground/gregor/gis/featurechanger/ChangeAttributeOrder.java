@@ -28,26 +28,24 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 
 
 
 public class ChangeAttributeOrder {
-	
-	
-	
-	public static void main(String [] args) throws IOException, FactoryException, SchemaException, ArrayIndexOutOfBoundsException, IllegalAttributeException {
+
+
+
+	public static void main(String [] args) throws IOException, ArrayIndexOutOfBoundsException, IllegalAttributeException {
 		String file = "./padang/referencing/referenced10.shp";
 		int from = 2;
 		int to = 3;
 		FeatureSource fs = ShapeFileReader.readDataFile(file);
 		Collection<Feature> fc = processFeatures(fs,from,to);
 		ShapeFileWriter.writeGeometries(fc, file);
-		
-		
+
+
 	}
 
 	private static Collection<Feature> processFeatures(FeatureSource fs, int from, int to) throws IOException, ArrayIndexOutOfBoundsException, IllegalAttributeException {
@@ -60,8 +58,8 @@ public class ChangeAttributeOrder {
 			ft.setAttribute(to, tmp);
 			fc.add(ft);
 		}
-		
-		
+
+
 		return fc;
 	}
 

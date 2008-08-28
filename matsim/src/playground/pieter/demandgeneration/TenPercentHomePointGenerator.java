@@ -1,7 +1,6 @@
 package playground.pieter.demandgeneration;
 /**code by Gregor Laemmel. Class to generate person home locations from SP tables and SP shapefile */
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,17 +14,13 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -94,7 +89,7 @@ public class TenPercentHomePointGenerator {
 		}
 	}
 
-	private void run() throws IllegalAttributeException, IOException, FactoryException, SchemaException {
+	private void run() throws IllegalAttributeException, IOException {
 
 		indexPolygons();
 		this.pointCollection = new ArrayList<Feature>();

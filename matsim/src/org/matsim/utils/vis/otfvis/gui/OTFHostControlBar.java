@@ -110,11 +110,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private ImageIcon pauseIcon = null;
 
 	public JFrame frame = null;
-	
+
 	private Rectangle windowBounds = null;
-	
+
 	private final Object blockReading = new Object();
-	
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
@@ -202,13 +202,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		// Read through the whole file to find the indexes for the time steps...
 
 	}
-	private OTFServerRemote openFile( String fileName) throws RemoteException {
+	private OTFServerRemote openFile( String fileName) {
 		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
 		Gbl.printMemoryUsage();
 		return host;
 	}
 
-	private OTFServerRemote openTVehFile(String netname, String vehname) throws RemoteException {
+	private OTFServerRemote openTVehFile(String netname, String vehname) {
 		OTFServerRemote host = new OTFTVehServer(netname,vehname);
 		return host;
 	}
@@ -238,18 +238,18 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public class PreloadHelper extends Thread {
 		private final Map<String, OTFDrawer> drawers;
-		
+
 		public PreloadHelper(Map<String, OTFDrawer> handlers) {
 			this.drawers = handlers;
 		}
-		
+
 		public void preloadCache() {
 			boolean hasNext = true;
 			OTFTimeLine timeLine = (OTFTimeLine)handlers.get("timeline");
-			
+
 			try {
 				int	time = host.getLocalTime();
-				
+
 				while (hasNext) {
 					synchronized(blockReading) {
 						// remember time the block had before caching next step
@@ -269,7 +269,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 		@Override
 		public void run() {
@@ -311,7 +311,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private void addButtons() {
 
 		this.setFloatable(false);
-		
+
     playIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPlay.png"), "Play");
     pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
@@ -333,7 +333,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		timeField.addActionListener( this );
 
 //		add(createButton("fullscreen", FULLSCREEN, "buttonFullscreen", "toggles to fullscreen and back"));
-		
+
 		//add(createButton("--", ZOOM_OUT));
 		//add(createButton("+", ZOOM_IN));
 
@@ -394,7 +394,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	private void pressed_TO_START() throws IOException {
+	private void pressed_TO_START() {
 		//host.restart()
 	}
 
@@ -414,7 +414,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
  	   	pressed_PAUSE();
  	  }
 	}
-	
+
 	private void pressed_FULLSCREEN() {
 		if (this.frame == null) {
 			return;
@@ -428,7 +428,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	  	gd.setFullScreenWindow(frame);
 		} else {
 			System.out.println("exit fullscreen");
-			gd.setFullScreenWindow(null);			
+			gd.setFullScreenWindow(null);
 			frame.dispose();
 			frame.setUndecorated(false);
 			frame.setBounds(this.windowBounds);
@@ -490,13 +490,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public void setNEWTime(int newTime_s) {
 		if (newTime_s == simTime) return;
-		
+
 		stopMovie();
 		gotoTime = newTime_s;
 		gotoTime();
 	}
-	
-	private void changed_SET_TIME(ActionEvent event) throws IOException {
+
+	private void changed_SET_TIME(ActionEvent event) {
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int newTime_s = (int)Time.parseTime(newTime);
 		progressBar  = new OTFAbortGoto(host, newTime_s);
@@ -511,7 +511,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		//    updateTimeLabel();
 		super.paint(g);
 	}
-	
+
 	protected boolean onAction(String command) {
 		return false; // return id command was handeled
 	}
@@ -612,7 +612,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 		return null;
 	}
-	
+
 	public double getTime() {
 		try {
 			return host.getLocalTime();
@@ -622,7 +622,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 		return -1;
 	}
-	
+
 	int loopStart = 0;
 	int loopEnd = Integer.MAX_VALUE;
 
@@ -635,7 +635,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		if(min != -1) loopStart = min;
 		if(max != -1) loopEnd = max;
 	}
-	
+
 	class MovieTimer extends Thread {
 		boolean isActive = false;
 		boolean terminate = false;
@@ -713,7 +713,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	// consolidate this with the OTFQuadClient Query method , there shoul only be ONE way to send queies,
 	// apparently quereies are not dependen on a certain view right now, so it should be hot.doQuery
-	
+
 	public OTFQuery doQuery(OTFQuery query) {
 		OTFQuery result = null;
 		try {

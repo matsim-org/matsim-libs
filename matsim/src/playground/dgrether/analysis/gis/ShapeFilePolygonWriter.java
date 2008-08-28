@@ -14,9 +14,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -32,25 +30,21 @@ public class ShapeFilePolygonWriter {
 	protected DefaultFeatureTypeFactory dftf;
 	private CoordinateReferenceSystem crs;
 	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
-	
-	
+
+
 	public ShapeFilePolygonWriter() {
 		this.geofac = new GeometryFactory();
 	}
-	
-	
+
+
 	public void writePolygon(Coord[] coords, String outfile) {
 
 		Collection<Feature> features = getFeature(getLinearRing(coords));
-		
-		
+
+
 		try {
 			ShapeFileWriter.writeGeometries(features, outfile);
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (FactoryException e) {
-			e.printStackTrace();
-		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
 	}
@@ -70,8 +64,8 @@ public class ShapeFilePolygonWriter {
 		dftf.addTypes(new AttributeType[] { geom });
 		AttributeType multiPolygonType = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, this.crs);
-		
-		
+
+
 		Polygon p = new Polygon(ring, null, this.geofac);
 		MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
 		Collection<Feature> features = new ArrayList<Feature>();
