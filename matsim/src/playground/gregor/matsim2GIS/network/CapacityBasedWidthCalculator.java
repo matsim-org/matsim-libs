@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS;
+package playground.gregor.matsim2GIS.network;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;

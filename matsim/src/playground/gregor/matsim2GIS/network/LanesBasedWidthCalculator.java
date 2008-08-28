@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FreespeedBasedWidthCalculator.java
+ * LanesBasedWidthCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS;
+package playground.gregor.matsim2GIS.network;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
-public class FreespeedBasedWidthCalculator implements WidthCalculator {
+public class LanesBasedWidthCalculator implements WidthCalculator{
 
-	private final Double widthCoefficient;
+	private final double effectiveLaneWidth;
+	private final double widthCoefficient;
 
-	public FreespeedBasedWidthCalculator(final NetworkLayer network, final Double coef) {
+	public LanesBasedWidthCalculator(final NetworkLayer network, final Double coef) {
+		this.effectiveLaneWidth = network.getEffectiveLaneWidth();
 		this.widthCoefficient = coef;
 	}
 
 	public double getWidth(final Link link) {
-		return link.getFreespeed(org.matsim.utils.misc.Time.UNDEFINED_TIME) * this.widthCoefficient;
+		return link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME) * this.effectiveLaneWidth * this.widthCoefficient;
 	}
 
 
