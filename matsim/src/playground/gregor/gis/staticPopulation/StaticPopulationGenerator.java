@@ -41,7 +41,6 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.gis.ShapeFileReader;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -118,7 +117,7 @@ public class StaticPopulationGenerator {
 			
 		}
 		System.err.println("inh:" + inhabitants_all + " agents:" + id + " lost:" + lost);
-		new PopulationWriter(population,"padang_plans_v20080618.xml.gz", "v4").write();
+		new PopulationWriter(population,"padang_plans_v200800820.xml.gz", "v4").write();
 		
 	}
 	
@@ -132,7 +131,7 @@ public class StaticPopulationGenerator {
 
 	public static void main(final String [] args) {
 		final String netFile = "./networks/padang_net_v20080618.xml";
-		final String zonesFile = "./padang/zones.shp";
+		final String zonesFile = "./padang/podes.shp";
 		
 		Gbl.createWorld();
 		Gbl.createConfig(null);
