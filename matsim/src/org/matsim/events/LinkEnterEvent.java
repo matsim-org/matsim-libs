@@ -21,14 +21,15 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class LinkEnterEvent extends LinkEvent {
 
-	public LinkEnterEvent(final double time, final Person agent, final Link link, final int legNumber) {
-		super(time, agent, link, legNumber);
+	public LinkEnterEvent(final double time, final Person agent, final Link link, final Leg leg) {
+		super(time, agent, link, leg);
 	}
 
 	public LinkEnterEvent(final double time, final String agentId, final String linkId, final int legNumber) {

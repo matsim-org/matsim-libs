@@ -84,13 +84,13 @@ public class QLink extends QueueLink {
 		}
 		return true ;
 	}
-	
+
 	@Override
 	protected boolean bufferIsEmpty() {
 		this.originalLink.setThisTimeStepIsGreen(true);
 		return this.originalLink.flowQueueIsEmpty();
 	}
-	
+
 	@Override
 	public boolean hasSpace() {
 		return this.originalLink.hasSpace();
@@ -106,13 +106,13 @@ public class QLink extends QueueLink {
 
 		QSim.getEvents().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getPerson(),
-						this.getLink(), veh.getCurrentLeg().getNum()));
+						this.getLink(), veh.getCurrentLeg()));
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(){
 		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
 			return this.pseudoLinksList;
-		} 
+		}
 			return this.nodePseudoLinksList;
 	}
 
@@ -137,14 +137,14 @@ public class QLink extends QueueLink {
 
 		if (this.getLink().getLength() < 60){
 			try {
-				throw new Exception("Link is signalized by traffic light with a default signal lane length of 45m, but total links length is less than 60m.\n" + 
+				throw new Exception("Link is signalized by traffic light with a default signal lane length of 45m, but total links length is less than 60m.\n" +
 									"Minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}		
-		
+		}
+
 		boolean firstNodeLinkInitialized = false;
 
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);

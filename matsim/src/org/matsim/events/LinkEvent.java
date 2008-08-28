@@ -21,6 +21,7 @@
 package org.matsim.events;
 
 import org.matsim.network.Link;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -28,16 +29,16 @@ public abstract class LinkEvent extends BasicEvent {
 
 	public String linkId;
 	public transient Link link;
-	/**
-	 * The number of the leg in the plans file, starting from 0.
-	 */
+	public Leg leg = null;
+	/** The number of the leg in the plans file, starting from 0. */
 	public int legId;
 
-	LinkEvent(final double time, final Person agent, final Link link, final int legNumber) {
+	LinkEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
-		this.legId = legNumber;
 		this.link = link;
 		this.linkId = link.getId().toString();
+		this.leg = leg;
+		this.legId = leg.getNum();
 	}
 
 	LinkEvent(final double time, final String agentId, final String linkId, final int legNumber) {

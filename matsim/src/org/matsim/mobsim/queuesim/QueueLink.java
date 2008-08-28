@@ -343,7 +343,7 @@ public class QueueLink {
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
 	/*package*/  protected boolean moveLink(final double now) {
-		updateBufferCapacity(now);
+		updateBufferCapacity();
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from link to buffer
@@ -355,7 +355,7 @@ public class QueueLink {
 	}
 
 	/*package*/  boolean moveLinkWaitFirst(final double now) {
-		updateBufferCapacity(now);
+		updateBufferCapacity();
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
 		// move vehicles from waitingQueue into buffer if possible
@@ -366,7 +366,7 @@ public class QueueLink {
 		return updateActiveStatus();
 	}
 
-	private void updateBufferCapacity(final double time) {
+	private void updateBufferCapacity() {
 		this.bufferCap = this.simulatedFlowCapacity;
 		if (this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFraction;
@@ -395,7 +395,7 @@ public class QueueLink {
 		veh.setDepartureTime_s((int) (now + this.getLink().getFreespeedTravelTime(now)));
 		QueueSimulation.getEvents().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getPerson(),
-						this.link, veh.getCurrentLeg().getNum()));
+						this.link, veh.getCurrentLeg()));
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -422,7 +422,7 @@ public class QueueLink {
 			v2.setLastMovedTime(now);
 		}
 
-		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg().getNum()));
+		QueueSimulation.getEvents().processEvent(new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg()));
 
 		return veh;
 	}
@@ -553,7 +553,7 @@ public class QueueLink {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 
-			int lane = 1 + (Integer.valueOf(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			int lane = 1 + (Integer.parseInt(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
@@ -598,7 +598,7 @@ public class QueueLink {
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
-			int lane = 1 + (Integer.valueOf(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			int lane = 1 + (Integer.parseInt(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, distanceOnLink,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
@@ -653,7 +653,7 @@ public class QueueLink {
 
 			// the cars in the buffer
 			for (Vehicle veh : this.buffer) {
-				int lane = 1 + Integer.valueOf(veh.getID().toString()) % nLanes;
+				int lane = 1 + Integer.parseInt(veh.getID().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
@@ -664,7 +664,7 @@ public class QueueLink {
 
 			// the cars in the drivingQueue
 			for (Vehicle veh : this.vehQueue) {
-				int lane = 1 + Integer.valueOf(veh.getID().toString()) % nLanes;
+				int lane = 1 + Integer.parseInt(veh.getID().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
