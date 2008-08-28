@@ -26,7 +26,8 @@ public class ConcurrentListMPDSC {
 		synchronized (inputBuffer[producerId]) {
 			if (timeOfLatestMessageAfterLastFlush > message.messageArrivalTime) {
 				synchronized (lock) {
-					// because last read of timeOfLatestMessageAfterLastFlush was not locked
+					// because last read of timeOfLatestMessageAfterLastFlush
+					// was not locked
 					if (timeOfLatestMessageAfterLastFlush > message.messageArrivalTime) {
 						timeOfLatestMessageAfterLastFlush = message.messageArrivalTime;
 					}
@@ -37,9 +38,7 @@ public class ConcurrentListMPDSC {
 	}
 
 	public double getTimeOfLatestMessageAfterLastFlush() {
-		synchronized (lock) {
-			return timeOfLatestMessageAfterLastFlush;
-		}
+		return timeOfLatestMessageAfterLastFlush;
 	}
 
 	// returns null, if empty, else the first element
@@ -88,11 +87,13 @@ public class ConcurrentListMPDSC {
 		timeOfLatestMessageAfterLastFlush = Double.MAX_VALUE;
 		LinkedList<Message> swap = null;
 		for (int i = 0; i < inputBuffer.length; i++) {
-			synchronized (inputBuffer[i]) {
-				// only exchange tables, if something has changed
-				swap = outputBuffer[i];
-				outputBuffer[i] = inputBuffer[i];
-				inputBuffer[i] = swap;
+			if (inputBuffer[i].size() > 0) {
+				synchronized (inputBuffer[i]) {
+					// only exchange tables, if something has changed
+					swap = outputBuffer[i];
+					outputBuffer[i] = inputBuffer[i];
+					inputBuffer[i] = swap;
+				}
 			}
 		}
 	}
