@@ -16,6 +16,7 @@ import org.matsim.network.Link;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 
+import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
 
 
@@ -37,8 +38,8 @@ public class ZoneMessageQueue {
 	// private LinkedList<Message>[] deleteMessageBuffer = new
 	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
-	public ConcurrentListMPSC<Message> buffer = new ConcurrentListMPSC<Message>(
-			SimulationParameters.numberOfMessageExecutorThreads);
+	public ConcurrentListMPDSC<Message> buffer = new ConcurrentListMPDSC<Message>(
+			SimulationParameters.numberOfMessageExecutorThreads,10);
 
 	public int numberOfIncomingLinks = 0;
 	public LinkedList<Link> tempIncomingLinks = new LinkedList<Link>();
@@ -259,10 +260,10 @@ public class ZoneMessageQueue {
 	}
 
 	private void emptyBuffer() {
-		Message m = buffer.remove();
-		while (m != null) {
-			queue1.add(m);
-			m = buffer.remove();
+		buffer.flushAllInputBuffers();
+		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
+		while (!messages.isEmpty()){
+			queue1.add(messages.poll());
 		}
 	}
 

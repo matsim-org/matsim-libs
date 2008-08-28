@@ -171,6 +171,11 @@ VERY IMPORTANT TODOS:
       - im deqsim config file: numerofthreads gleich anzahl cpus setzen
       - is event order for event process important (e.g. for computing scoring...)
       
+      - real performance tests can be done, by commenting out the events and see the effect of what the difference
+        of that is (how much they slow down the simulation).
+      
+      - do testing..
+      
       - vergleich mit counts: jede 10-te iteration:
         "countsScaleFactor" im config.txt => if 10% sample, then value ist 10 (not 0.1)!
         output jede 10-te iteration, lässt uns grafisch und textual vergleiche machen => unbedingt machen.
@@ -247,7 +252,7 @@ VERY IMPORTANT TODOS:
      =======================================================
         -es dauert ca. 6min um 1M plans einzulesen auf Satawal
      =========================================================
-        exact event numbers (DEQSim2: test6: 7665182, test12: 1817160)
+        exact event numbers (DEQSim2: input_67K: 7665182, test12: 1817160, input_304K: 21403332)
      
      
      

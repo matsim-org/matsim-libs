@@ -5,10 +5,13 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.PDES.util.ConcurrentListSPSC.ARunnable;
+import playground.wrashid.PDES.util.ConcurrentListSPSC.BRunnable;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
 // the application allows for this case
+// optimized for ZoneMessageQueue
 public class ConcurrentListMPDSC<T> {
 	private LinkedList<T>[] inputBuffer;
 	private LinkedList<LinkedList<T>>[] outputBuffer;
@@ -83,28 +86,48 @@ public class ConcurrentListMPDSC<T> {
 		for (int i=0;i<inputBuffer.length;i++){
 			synchronized (inputBuffer[i]){
 				synchronized (outputBuffer[i]){
-					outputBuffer[i].add(inputBuffer[i]);
-					inputBuffer[i]=new LinkedList<T>();
+					if (!inputBuffer[i].isEmpty()){
+						// only exchange tables, if something has changed
+						outputBuffer[i].add(inputBuffer[i]);
+						inputBuffer[i]=new LinkedList<T>();
+					}
 				}
 			}
-			
 			synchronized (outputBuffer[i]){
 				tempOutputBuffer=outputBuffer[i];
 				outputBuffer[i]=new LinkedList<LinkedList<T>>();
 			}
-			
-
-			for (int j=0;j<tempOutputBuffer.size();j++){
-				if (!tempOutputBuffer.peek().isEmpty()){
-					outputWorkingBuffer.addAll(tempOutputBuffer.poll());
-				} else {
-					tempOutputBuffer.removeFirst();
-				}
+			while (!tempOutputBuffer.isEmpty()){
+				outputWorkingBuffer.addAll(tempOutputBuffer.poll());
 			}
 		}
 	}
 
-	
+public static void main(String[] args){
+		
+		// part 1
+		
+		ConcurrentListMPDSC<Integer> cList=new ConcurrentListMPDSC<Integer>(5,10);
+		for (int i=0;i<1000;i++){
+			cList.add(i, 0);
+		}
+		
+		
+		System.out.println(cList.inputBuffer[0].size());
+		System.out.println(cList.outputBuffer[0].size());
+		
+		//for (int i=0;i<1000;i++){
+		cList.flushAllInputBuffers();
+		System.out.println(cList.inputBuffer[0].size());
+		System.out.println(cList.outputBuffer[0].size());
+		
+		
+			System.out.println(cList.getCucurrencySafeElements().size());
+		//}
+		
+		
+		
+	}
 	
 }
 
