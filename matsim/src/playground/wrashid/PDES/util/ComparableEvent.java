@@ -15,7 +15,6 @@ public class ComparableEvent implements Comparable {
 			return basicEvent;
 		}
 
-		@Override
 		public int compareTo(Object obj) {
 			ComparableEvent otherEvent= (ComparableEvent) obj;
 			if (basicEvent.time<otherEvent.getBasicEvent().time){

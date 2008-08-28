@@ -171,6 +171,9 @@ VERY IMPORTANT TODOS:
       - im deqsim config file: numerofthreads gleich anzahl cpus setzen
       - is event order for event process important (e.g. for computing scoring...)
       
+      - vergleich mit counts: jede 10-te iteration:
+        "countsScaleFactor" im config.txt => if 10% sample, then value ist 10 (not 0.1)!
+        output jede 10-te iteration, lässt uns grafisch und textual vergleiche machen => unbedingt machen.
          
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
