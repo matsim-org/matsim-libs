@@ -156,11 +156,10 @@ public class IIDMGenerationPart2 {
 		pop_writer.write();
 		System.out.println("  done.");
 
-
-		log.info("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(pop);
-		plans_writer.write();
-		log.info("  done.");
+//		log.info("  writing plans xml file... ");
+//		PopulationWriter plans_writer = new PopulationWriter(pop);
+//		plans_writer.write();
+//		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
