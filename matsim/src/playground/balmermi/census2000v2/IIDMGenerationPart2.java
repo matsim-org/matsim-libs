@@ -28,6 +28,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
@@ -38,8 +39,6 @@ import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.PersonAssignAndNormalizeTimes;
 import playground.balmermi.census2000v2.modules.PersonAssignShopLeisureLocations;
 import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
-import playground.balmermi.census2000v2.modules.PlansAnalyse;
-import playground.balmermi.census2000v2.modules.PlansFilterPersons;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
@@ -116,37 +115,57 @@ public class IIDMGenerationPart2 {
 		
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  reding plans xml file... ");
-		Population pop = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  reding mz plans xml file... ");
+		log.info("  reading mz plans xml file... ");
 		Population mz_pop = new Population(Population.NO_STREAMING);
 		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
+
+//		log.info("  reding plans xml file... ");
+//		Population pop = new Population(Population.NO_STREAMING);
+//		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
+//		log.info("  done.");
+
+		System.out.println("  setting up population objects...");
+		Population pop = new Population(Population.USE_STREAMING);
+		PopulationWriter pop_writer = new PopulationWriter(pop);
+		PopulationReader pop_reader = new MatsimPopulationReader(pop);
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
 		
-		log.info("  runnning person models... ");
-		new PersonAssignAndNormalizeTimes().run(pop);
-		new PersonSetLocationsFromKnowledge().run(pop);
-		new PersonAssignShopLeisureLocations(facilities).run(pop);
-		new PlansAnalyse().run(pop);
-		new PlansAnalyse().run(mz_pop);
+//		log.info("  runnning person models... ");
+//		new PersonSetLocationsFromKnowledge().run(pop);
+//		new PersonAssignShopLeisureLocations(facilities).run(pop);
+//		new PersonAssignAndNormalizeTimes().run(pop);
+//		log.info("  done.");
+		
+		System.out.println("  adding person modules... ");
+		pop.addAlgorithm(new PersonSetLocationsFromKnowledge());
+		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
+		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
 		log.info("  done.");
-		
+
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  writing custom attributes of the persons... ");
-		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
-		log.info("  done.");
+		System.out.println("  reading, processing, writing plans...");
+		pop.addAlgorithm(pop_writer);
+		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
+		pop.printPlansCount();
+		pop_writer.write();
+		System.out.println("  done.");
+
 
 		log.info("  writing plans xml file... ");
 		PopulationWriter plans_writer = new PopulationWriter(pop);
 		plans_writer.write();
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  writing custom attributes of the persons... ");
+		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
 		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");

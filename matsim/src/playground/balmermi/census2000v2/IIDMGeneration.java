@@ -179,6 +179,8 @@ public class IIDMGeneration {
 		new PersonAssignLicenseModel().run(pop);
 		new PersonAssignMobilitiyToolModel().run(pop);
 		new PersonAssignActivityChains(mz).run(pop);
+		new PlansAnalyse().run(pop);
+		new PlansAnalyse().run(mz_pop);
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
