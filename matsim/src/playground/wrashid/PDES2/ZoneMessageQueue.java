@@ -39,7 +39,7 @@ public class ZoneMessageQueue {
 	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
 	public ConcurrentListMPDSC<Message> buffer = new ConcurrentListMPDSC<Message>(
-			SimulationParameters.numberOfMessageExecutorThreads,10);
+			SimulationParameters.numberOfMessageExecutorThreads);
 
 	public int numberOfIncomingLinks = 0;
 	public LinkedList<Link> tempIncomingLinks = new LinkedList<Link>();

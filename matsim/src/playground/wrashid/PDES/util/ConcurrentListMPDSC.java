@@ -14,20 +14,12 @@ import playground.wrashid.PDES.util.ConcurrentListSPSC.BRunnable;
 // optimized for ZoneMessageQueue
 public class ConcurrentListMPDSC<T> {
 	private LinkedList<T>[] inputBuffer;
-	private LinkedList<LinkedList<T>>[] outputBuffer;
-	private int maxInputPutListSize; 
 	private LinkedList<T> outputWorkingBuffer=new LinkedList<T>();
 	
 	// producerId 0>=
 	public void add(T element,int producerId){
 		synchronized (inputBuffer[producerId]){
 			inputBuffer[producerId].add(element);
-			if (inputBuffer[producerId].size()>maxInputPutListSize){
-				synchronized(outputBuffer[producerId]){
-					outputBuffer[producerId].add(inputBuffer[producerId]);
-				}
-				inputBuffer[producerId]=new LinkedList<T>();
-			}
 		}	
 	}
 	
@@ -69,37 +61,33 @@ public class ConcurrentListMPDSC<T> {
 	}
 	
 	
-	public ConcurrentListMPDSC (int numberOfProducers, int maxInputPutListSize){
+	public ConcurrentListMPDSC (int numberOfProducers){
 		inputBuffer=new LinkedList[numberOfProducers];
-		outputBuffer=new LinkedList[numberOfProducers];
 		for (int i=0;i<inputBuffer.length;i++){
 			inputBuffer[i]=new LinkedList<T>();
-			outputBuffer[i]=new LinkedList<LinkedList<T>>();
 		}
-		this.maxInputPutListSize=maxInputPutListSize;
 	}
 	
 	
 	// this method should be invoked especially, when all producers have finished production
 	public void flushAllInputBuffers(){
-		LinkedList<LinkedList<T>> tempOutputBuffer;
+		LinkedList<T> tempOutputBuffer=new LinkedList<T>();
+		LinkedList<T> swap=null;
 		for (int i=0;i<inputBuffer.length;i++){
-			synchronized (inputBuffer[i]){
-				synchronized (outputBuffer[i]){
-					if (!inputBuffer[i].isEmpty()){
-						// only exchange tables, if something has changed
-						outputBuffer[i].add(inputBuffer[i]);
-						inputBuffer[i]=new LinkedList<T>();
-					}
+			if (!inputBuffer[i].isEmpty()){
+				synchronized (inputBuffer[i]){
+					// only exchange tables, if something has changed
+					swap=tempOutputBuffer;
+					tempOutputBuffer=inputBuffer[i];
+					inputBuffer[i]=swap;
 				}
 			}
-			synchronized (outputBuffer[i]){
-				tempOutputBuffer=outputBuffer[i];
-				outputBuffer[i]=new LinkedList<LinkedList<T>>();
+			
+			if (!tempOutputBuffer.isEmpty()){
+				outputWorkingBuffer.addAll(tempOutputBuffer);
+				tempOutputBuffer.clear();
 			}
-			while (!tempOutputBuffer.isEmpty()){
-				outputWorkingBuffer.addAll(tempOutputBuffer.poll());
-			}
+			
 		}
 	}
 
@@ -107,19 +95,19 @@ public static void main(String[] args){
 		
 		// part 1
 		
-		ConcurrentListMPDSC<Integer> cList=new ConcurrentListMPDSC<Integer>(5,10);
+		ConcurrentListMPDSC<Integer> cList=new ConcurrentListMPDSC<Integer>(5);
 		for (int i=0;i<1000;i++){
 			cList.add(i, 0);
 		}
 		
 		
 		System.out.println(cList.inputBuffer[0].size());
-		System.out.println(cList.outputBuffer[0].size());
+		//System.out.println(cList.outputBuffer[0].size());
 		
 		//for (int i=0;i<1000;i++){
 		cList.flushAllInputBuffers();
 		System.out.println(cList.inputBuffer[0].size());
-		System.out.println(cList.outputBuffer[0].size());
+		//System.out.println(cList.outputBuffer[0].size());
 		
 		
 			System.out.println(cList.getCucurrencySafeElements().size());

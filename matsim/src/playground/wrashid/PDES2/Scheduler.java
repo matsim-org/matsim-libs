@@ -106,7 +106,7 @@ public class Scheduler {
 		}
 		
 		SimulationParameters.events.printEventsCount();
-	
+	    System.out.println("used memory:"+ (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024/1024 + "MB");
 	
 	
 	}

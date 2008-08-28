@@ -120,7 +120,7 @@ public class SimulationParameters {
 	public static double noOfCarsLeft=0;
 	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
-	public static PriorityConcurrentListMPDSC eventBuffer=new PriorityConcurrentListMPDSC(SimulationParameters.numberOfMessageExecutorThreads,1000,1000000); 
+	public static PriorityConcurrentListMPDSC eventBuffer=new PriorityConcurrentListMPDSC(SimulationParameters.numberOfMessageExecutorThreads,100,10000); 
 	
 	
 	
