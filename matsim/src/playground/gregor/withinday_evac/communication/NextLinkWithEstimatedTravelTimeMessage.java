@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ChooseRandomLink.java
+ * NextLinkWithEstimatedTravelTimeMessage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.analyzer;
+package playground.gregor.withinday_evac.communication;
 
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 
-import playground.gregor.withinday_evac.Beliefs;
+public class NextLinkWithEstimatedTravelTimeMessage implements Message {
 
-public class ChooseRandomLinkAnalyzer implements Analyzer {
+	private final Link link;
+	private final double estTime;
 
-	private double coef;
-	private final Beliefs beliefs;
-	public ChooseRandomLinkAnalyzer(final Beliefs beliefs) {
-		this.beliefs = beliefs;
+	public NextLinkWithEstimatedTravelTimeMessage(final Link link, final double estTime) {
+		this.link = link;
+		this.estTime = estTime;
 	}
 	
-	
-	
-	public NextLinkOption getAction(final double now) {
-		Link link = this.beliefs.getCurrentLink();
-		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.random.nextDouble();
-		double coef = this.coef;
-
-		for (Link l : link.getToNode().getOutLinks().values()) {
-			selnum -= 1.0;
-			if (selnum <= 0) {
-				this.coef = 0;//allow only one time to select a random link
-				return new NextLinkOption(l,1 * coef);
-			}
-			
-			
-		}
-		
-		return null;
+	public Link getLink() {
+		return this.link;
 	}
 	
-	public void setCoefficient(final double coef) {
-		this.coef = coef;
-		
+	public double getEstTTime() {
+		return this.estTime;
 	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FollowNextLinkAnalyzer.java
+ * FollowAgentAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -30,34 +30,82 @@ import org.matsim.network.Link;
 
 import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.communication.InformationEntity;
-import playground.gregor.withinday_evac.communication.NextLinkMessage;
+import playground.gregor.withinday_evac.communication.NextLinkWithEstimatedTravelTimeMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
 
-public class FollowHerdAnalyzer implements Analyzer {
-
+public class FollowFastestAgentAnalyzer implements Analyzer {
+	
 	private final Beliefs beliefs;
 	private double coef;
+	private static final double NORMALIZER = -3600/6;
 
-	public FollowHerdAnalyzer(final Beliefs beliefs) {
+	public FollowFastestAgentAnalyzer(final Beliefs beliefs) {
 		this.beliefs = beliefs;
 		this.coef = 1;
 	}
+	
+	
+//	//progressive
+//	public NextLinkOption getAction(final double now) {
+//		Node to = this.beliefs.getCurrentLink().getToNode();
+//		Node from = this.beliefs.getCurrentLink().getFromNode();
+//		
+//		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
+//		for (Link l : to.getOutLinks().values()) {
+//			if (l.getToNode() == from) {
+//				continue;
+//			}
+//			
+//			Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME, l.getToNode().getId());
+//			if (ies.size() == 0) {
+//				continue;
+//			}
+//			Counter c = new Counter(0,0);
+//			for (InformationEntity ie : ies) {
+//				final NextLinkWithEstimatedTravelTimeMessage m = (NextLinkWithEstimatedTravelTimeMessage) ie.getMsg();
+//				c.value += 1;
+//				c.estTimeSum += m.getEstTTime() / NORMALIZER;
+//			}
+//			counts.put(l, c);
+//		}
+//		
+//		double weightSum = 0;
+//		for (final Counter c : counts.values()) {
+//			c.value = Math.exp(c.estTimeSum/c.value);
+//			weightSum += c.value; 
+//		}
+//		
+//		double selNum = weightSum * MatsimRandom.random.nextDouble();
+//		for (Entry<Link,Counter> e : counts.entrySet()) {
+//			selNum -= e.getValue().value;
+//			if (selNum <= 0) {
+//				return new NextLinkOption(e.getKey(),1 * this.coef);
+//			}			
+//		}
+//		
+//		return null;
+//	}
+	
+	
+//	current link
 	public NextLinkOption getAction(final double now) {
 		Id nodeId = this.beliefs.getCurrentLink().getToNode().getId();
-		Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.MY_NEXT_LINK, nodeId);
-//		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
+		Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME, nodeId);
 		if (ies.size() == 0) {
 			return null;
 		}
+		
+		
 		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
 		ArrayList<Link> indices = new ArrayList<Link>();
 		for (final InformationEntity ie : ies) {
-			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
+			final NextLinkWithEstimatedTravelTimeMessage m = (NextLinkWithEstimatedTravelTimeMessage) ie.getMsg();
 			final Counter c = counts.get(m.getLink());
 			if (c != null) {
 				c.value += 1.0;
+				c.estTimeSum += m.getEstTTime()/NORMALIZER;
 			} else {
-				counts.put(m.getLink(), new Counter(1));
+				counts.put(m.getLink(), new Counter(1,m.getEstTTime()/NORMALIZER));
 				indices.add(m.getLink());
 				
 			}
@@ -65,12 +113,12 @@ public class FollowHerdAnalyzer implements Analyzer {
 		}
 				
 			
-		
+	
 
 		double weightSum = 0;
 		for (final Link l : indices) {
 			Counter c = counts.get(l);
-			c.value = Math.exp(c.value);
+			c.value = Math.exp(c.estTimeSum/c.value);
 			weightSum += c.value; 
 		}
 		
@@ -88,46 +136,21 @@ public class FollowHerdAnalyzer implements Analyzer {
 		return null;
 	}
 	
-	public ArrayList<NextLinkOption> getActions(final double now) {
-		throw new RuntimeException("remove this method from class!!!! don't use this anymore!!!!");
-//		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
-//		if (ies == null) {
-//			return null;
-//		}
-//		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();
-//		int allCount = 0;
-//		for (final InformationEntity ie : ies) {
-//			final NextLinkMessage m = (NextLinkMessage) ie.getMsg();
-//			final Counter c = counts.get(m.getLink());
-//			allCount++;
-//			if (c != null) {
-//				c.value++;
-//				
-//			} else {
-//				counts.put(m.getLink(), new Counter(1));
-//			}
-//			
-//		}
-//		
-//		ArrayList<NextLinkOption> ret = new ArrayList<NextLinkOption>();
-//		for (Entry<Link, Counter> e : counts.entrySet()) {
-//			ret.add(new NextLinkOption(e.getKey(),this.coef * e.getValue().value / allCount));
-//		}
-//		
-//		return ret;
-	}
+
 	
 	
 	
 	private static class Counter {
 		double value;
-		public Counter(final double i) {
+		private double estTimeSum;
+		public Counter(final double i, final double estTime) {
 			this.value = i;
+			this.estTimeSum = estTime;
 		}
 		
 		@Override
 		public String toString(){
-			return this.value + "";
+			return this.value + " " + this.estTimeSum;
 		}
 		
 	}
@@ -138,9 +161,6 @@ public class FollowHerdAnalyzer implements Analyzer {
 		this.coef = coef;
 		
 	}
-
-
-
 
 
 }

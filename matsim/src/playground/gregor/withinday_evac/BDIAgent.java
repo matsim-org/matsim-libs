@@ -21,7 +21,6 @@
 package playground.gregor.withinday_evac;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
@@ -31,17 +30,13 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 
-import playground.gregor.withinday_evac.analyzer.Analyzer;
-import playground.gregor.withinday_evac.analyzer.ChooseRandomLinkAnalyzer;
-import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
-import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
-import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
-import playground.gregor.withinday_evac.communication.FollowGuideMessage;
+import playground.gregor.withinday_evac.analyzer.NextLinkWithEstimatedTravelTimeOption;
+import playground.gregor.withinday_evac.analyzer.Option;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
 import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.Message;
-import playground.gregor.withinday_evac.communication.NextLinkMessage;
+import playground.gregor.withinday_evac.communication.NextLinkWithEstimatedTravelTimeMessage;
 
 
 public class BDIAgent extends PersonAgent {
@@ -56,11 +51,9 @@ public class BDIAgent extends PersonAgent {
 	public BDIAgent(final Person person, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
 		super(person);
 		this.informationExchanger = informationExchanger;
-		this.beliefs = new Beliefs();
+		this.beliefs = new Beliefs(this.informationExchanger);
 		this.intentions = new Intentions();
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
-//		final HashMap<String,Analyzer> analyzers = getAnalyzer(networkLayer);
-//		this.decisionMaker = new DecisionMaker(analyzers);
 		this.decisionTree = new DecisionTree(this.beliefs,this.getPerson().getSelectedPlan(),this.intentions,networkLayer);
 		
 		if (person.getId().toString().contains("guide")) {
@@ -75,23 +68,6 @@ public class BDIAgent extends PersonAgent {
 		return this.replan(SimulationTimer.getTime(), this.getCurrentLink().getToNode().getId());
 	}
 	
-	private HashMap<String, Analyzer> getAnalyzer(final NetworkLayer networkLayer) {
-		final HashMap<String,Analyzer> analyzers = new HashMap<String,Analyzer>();
-//		analyzers.put("FollowGuideAnalyzer", new FollowGuideAnalyzer(this.beliefs));
-		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
-		fha.setCoefficient(1.5);
-		analyzers.put("HerdAnalyzer", fha);
-		FollowPlanAnalyzer ana = new FollowPlanAnalyzer(this.beliefs,this.getPerson().getSelectedPlan());
-		ana.setCoefficient(3);
-		analyzers.put("FollowPlanAnalyzer", ana);
-//		analyzers.put("BlockedLinksAnalyzer", new BlockedLinksAnalyzer(this.beliefs));
-		analyzers.put("ReRouteAnalyzer", new ReRouteAnalyzer(this.beliefs,networkLayer,this.intentions));
-//		analyzers.put("DestinationReachedAnalyzer", new DestinationReachedAnalyzer(this.beliefs,this.intentions));
-		ChooseRandomLinkAnalyzer crl = new ChooseRandomLinkAnalyzer(this.beliefs);
-		crl.setCoefficient(1);
-		analyzers.put("ChooseRandomLinkAnalyzer", crl);
-		return analyzers;
-	}
 
 	private Link replan(final double now, final Id nodeId) {
 		
@@ -99,28 +75,38 @@ public class BDIAgent extends PersonAgent {
 		
 		updateBeliefs(infos.getInformation(now));
 		
-//		Link nextLink = this.decisionMaker.chooseNextLink(now,nodeId,this.isGuide);
-		Link nextLink = this.decisionTree.getNextLink(now);
+
+		Option nextOption = this.decisionTree.getNextOption(now);
+		Link nextLink = nextOption.getNextLink();
+
 		
-		if (nextLink != null && this.isGuide) {
-			this.isGuide = false;
-		} 
-		if (this.isGuide && nextLink == null) {
-			nextLink = this.chooseNextLink();
+		if (nextOption instanceof NextLinkWithEstimatedTravelTimeOption) {
+			Message msg = new NextLinkWithEstimatedTravelTimeMessage(nextLink,((NextLinkWithEstimatedTravelTimeOption)nextOption).getEstTTime());
+			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,msg);
+			infos.addInformationEntity(ie);
+			
+			
 		}
 		
-		if (this.isGuide) {
-			final Message msg = new FollowGuideMessage(nextLink);
-//			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
-			final InformationEntity ie = new InformationEntity(30*3600,now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
-			infos.addInformationEntity(ie);			
-		}
+//		if (nextLink != null && this.isGuide) {
+//			this.isGuide = false;
+//		} 
+//		if (this.isGuide && nextLink == null) {
+//			nextLink = this.chooseNextLink();
+//		}
+//		
+//		if (this.isGuide) {
+//			final Message msg = new FollowGuideMessage(nextLink);
+////			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
+//			final InformationEntity ie = new InformationEntity(30*3600,now,InformationEntity.MSG_TYPE.FOLLOW_ME,msg);
+//			infos.addInformationEntity(ie);			
+//		}
 
 		
 
-		final Message msg = new NextLinkMessage(nextLink);
-		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
-		infos.addInformationEntity(ie);
+//		final Message msg = new NextLinkMessage(nextLink);
+//		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
+//		infos.addInformationEntity(ie);
 		
 		return nextLink;
 		
@@ -129,7 +115,7 @@ public class BDIAgent extends PersonAgent {
 	
 	
 	private void updateBeliefs(final Collection<InformationEntity> information) {
-		this.beliefs.update(information);
+//		this.beliefs.update(information);
 		this.beliefs.setCurrentLink(this.getCurrentLink());
 		
 	}

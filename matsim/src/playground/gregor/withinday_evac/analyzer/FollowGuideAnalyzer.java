@@ -20,10 +20,11 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 
 import playground.gregor.withinday_evac.Beliefs;
@@ -41,8 +42,10 @@ public class FollowGuideAnalyzer implements Analyzer {
 	}
 	
 	public NextLinkOption getAction(final double now) {
-		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.FOLLOW_ME);
-		if (ies == null) {
+		Id nodeId = this.beliefs.getCurrentLink().getToNode().getId();
+		Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.FOLLOW_ME, nodeId);
+//		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.FOLLOW_ME);
+		if (ies.size() == 0) {
 			return new NextLinkOption(null,0);
 		}
 		final HashMap<Link,Counter> counts = new HashMap<Link,Counter>();

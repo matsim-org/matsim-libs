@@ -24,7 +24,7 @@ import org.matsim.network.Link;
 
 public class NextLinkOption extends Option {
 
-	private final Link link;
+
 	
 
 	public NextLinkOption(final Link link, final double conf) {
@@ -32,9 +32,7 @@ public class NextLinkOption extends Option {
 		this.conf = conf;
 	}
 	
-	public Link getNextLink() {
-		return this.link;
-	}
+
 	
 	
 	

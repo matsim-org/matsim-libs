@@ -22,7 +22,6 @@ package playground.gregor.withinday_evac;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -88,26 +87,32 @@ System.out.println(count);
 
 
 	private boolean addNewPlan(final Person pers, final ArrayList<String> strLinks) {
-		HashSet<String> added = new HashSet<String>();
+		
+//		HashSet<String> added = new HashSet<String>();
+//		for (String linkId : strLinks) {
+//			if (added.contains(linkId)){
+//				return false;
+//			}
+//			added.add(linkId);
+//		}
+//		
+		
+		
+		ArrayList<Node> nodes = new ArrayList<Node>();
+//		HashSet<Node> test = new HashSet<Node>();
+
 		for (String linkId : strLinks) {
-			if (added.contains(linkId)){
-				return false;
-			}
-			added.add(linkId);
+//			if (test.contains(this.network.getLink(linkId).getFromNode())) {
+//				return false;
+//			}
+			nodes.add(this.network.getLink(linkId).getFromNode());
 		}
-		
-		
+
+//		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
 		pers.removeWorstPlans(this.maxPlans-1);
 		Plan plan = pers.copySelectedPlan();
 		Act actA = plan.getFirstActivity();
 		Leg leg = plan.getNextLeg(actA);
-		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		for (String linkId : strLinks) {
-
-			nodes.add(this.network.getLink(linkId).getFromNode());
-		}
-		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
 		Route route = new Route();
 		route.setRoute(nodes);
 		route.getDist();
@@ -115,6 +120,7 @@ System.out.println(count);
 		plan.setScore(Plan.UNDEF_SCORE);
 		return true;
 	}
+
 
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub

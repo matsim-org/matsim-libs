@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 
 import playground.gregor.withinday_evac.communication.InformationEntity;
+import playground.gregor.withinday_evac.communication.InformationExchanger;
+import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
 
 public class Beliefs {
@@ -37,31 +40,52 @@ public class Beliefs {
 //	public Beliefs() {
 //		
 //	}
+	private final InformationExchanger informationExchanger;
 
-	public void update(final Collection<InformationEntity> information) {
-		this.infos.clear();
-		
-		for (final InformationEntity ie : information){
-			addIE(ie);
+	
+
+	public Beliefs(final InformationExchanger informationExchanger) {
+		this.informationExchanger = informationExchanger;
+	}
+
+//	public void update(final Collection<InformationEntity> information) {
+//		this.infos.clear();
+//		
+//		for (final InformationEntity ie : information){
+//			addIE(ie);
+//		}
+//		
+//	}
+//	
+//	public void addIE(final InformationEntity ie) {
+//		final MSG_TYPE type = ie.getMsgType();
+//
+//		ArrayList<InformationEntity> info = this.infos.get(type);
+//		if (info == null) {
+//			info = new ArrayList<InformationEntity>();
+//			this.infos.put(type, info);
+//		}
+//		info.add(ie);
+//	}
+//	
+//	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
+//		return this.infos;
+//	}
+
+	public Collection<InformationEntity> getInfos(final double now, final MSG_TYPE type, final Id id) {
+		Collection<InformationEntity> ret = new ArrayList<InformationEntity>();
+		InformationStorage is = this.informationExchanger.getInformationStorage(id);
+		for (InformationEntity ie : is.getInformation(now)) {
+			if (ie.getMsgType() == type) {
+				ret.add(ie);
+			}
+				
 		}
+		return ret;
 		
 	}
 	
-	public void addIE(final InformationEntity ie) {
-		final MSG_TYPE type = ie.getMsgType();
-
-		ArrayList<InformationEntity> info = this.infos.get(type);
-		if (info == null) {
-			info = new ArrayList<InformationEntity>();
-			this.infos.put(type, info);
-		}
-		info.add(ie);
-	}
 	
-	public HashMap<MSG_TYPE,ArrayList<InformationEntity>> getInfos() {
-		return this.infos;
-	}
-
 	public void setCurrentLink(final Link currentLink) {
 		this.currentLink = currentLink;
 	}

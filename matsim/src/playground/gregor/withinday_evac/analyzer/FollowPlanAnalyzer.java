@@ -35,11 +35,17 @@ public class FollowPlanAnalyzer implements Analyzer {
 	double coef = 1;
 	private final Link startLink;
 	private final Link destLink;
+	private final double estArivalTime;
 
 	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan) {
 		this.beliefs = beliefs;
 		this.links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
 		this.startLink = plan.getFirstActivity().getLink();
+		if (plan.getScore() == Plan.UNDEF_SCORE){
+			this.estArivalTime = Double.POSITIVE_INFINITY;
+		} else {
+			this.estArivalTime = plan.getFirstActivity().getEndTime() + plan.getScore() * -600;
+		}
 		this.destLink = plan.getNextActivity(plan.getNextLeg(plan.getFirstActivity())).getLink(); 
 		initLinkHashSet();
 	}
@@ -50,10 +56,10 @@ public class FollowPlanAnalyzer implements Analyzer {
 		}
 	}
 
-	public NextLinkOption getAction(final double now) {
+	public Option getAction(final double now) {
 		Link link = this.beliefs.getCurrentLink();
 		if (link == this.startLink) {
-			return new NextLinkOption(this.links[0],1 * this.coef);
+			return new NextLinkWithEstimatedTravelTimeOption(this.links[0],1 * this.coef,this.estArivalTime-now);
 		}
 		
 		
@@ -64,9 +70,9 @@ public class FollowPlanAnalyzer implements Analyzer {
 		for (int i = 0; i < this.links.length; i++) {
 			if (this.links[i] == link) {
 				if (i > this.links.length-2){
-					return new NextLinkOption(this.destLink,1 * this.coef);
+					return new NextLinkWithEstimatedTravelTimeOption(this.destLink,1 * this.coef, this.estArivalTime-now);
 				}
-				return new NextLinkOption(this.links[i+1],1 * this.coef); 
+				return new NextLinkWithEstimatedTravelTimeOption(this.links[i+1],1 * this.coef, this.estArivalTime-now); 
 			}
 		}
 		throw new RuntimeException("this should not happen!!");

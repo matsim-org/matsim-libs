@@ -26,7 +26,7 @@ public class NextLinkMessage implements Message {
 
 	private final Link link;
 
-	public NextLinkMessage(Link link) {
+	public NextLinkMessage(final Link link) {
 		this.link = link;
 	}
 	

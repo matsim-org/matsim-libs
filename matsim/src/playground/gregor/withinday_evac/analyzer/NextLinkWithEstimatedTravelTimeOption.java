@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MessageAction.java
+ * NextLinkWithEstimatedTravelTimeOption.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,7 +20,20 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
-public class MessageAction extends Option{
+import org.matsim.network.Link;
+
+public class NextLinkWithEstimatedTravelTimeOption extends Option {
+
+	private final double estTime;
+
+	public NextLinkWithEstimatedTravelTimeOption(final Link link, final double conf, final double estTime){
+		this.link = link;
+		this.conf = conf;
+		this.estTime = estTime;
+	}
 	
+	public double getEstTTime() {
+		return this.estTime;
+	}
 
 }

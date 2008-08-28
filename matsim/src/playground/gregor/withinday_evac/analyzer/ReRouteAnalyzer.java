@@ -20,9 +20,10 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Route;
@@ -55,15 +56,17 @@ public class ReRouteAnalyzer implements Analyzer {
 
 	public NextLinkOption getAction(final double now) {
 		
-		updateBlockedLinks();
+		updateBlockedLinks(now);
 		
 		if (this.lastCurrent != null && this.beliefs.getCurrentLink().getId() == this.lastCurrent.getId()){
 			if (!blocked(this.lastNext)){
-				return new NextLinkOption(this.lastNext,1);	
+				return new NextLinkOption(this.lastNext,1*this.coef);	
 			}
 		} else if (this.lastNext != null && this.beliefs.getCurrentLink().getId() == this.lastNext.getId()){
 			if (!blocked(this.linkRoute[this.linkCount])){
-				return new NextLinkOption(this.linkRoute[this.linkCount++],1*this.coef);
+				this.lastCurrent = this.lastNext;
+				this.lastNext = this.linkRoute[this.linkCount++];
+				return new NextLinkOption(this.lastNext ,1*this.coef);
 			}
 		} 
 
@@ -83,10 +86,13 @@ public class ReRouteAnalyzer implements Analyzer {
 		return this.blockedLinks.contains(link);
 	}
 
-	private void updateBlockedLinks() {
+	private void updateBlockedLinks(final double now) {
 		this.blockedLinks = new HashSet<Link>();
-		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.LINK_BLOCKED);
-		if (ies == null) {
+//		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.LINK_BLOCKED);
+		Id nodeId = this.beliefs.getCurrentLink().getToNode().getId();
+		Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.LINK_BLOCKED, nodeId);
+//		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
+		if (ies.size() == 0) {
 			return;
 		}
 		

@@ -29,9 +29,9 @@ import org.matsim.population.Plan;
 
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.ChooseRandomLinkAnalyzer;
-import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowFastestAgentAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
-import playground.gregor.withinday_evac.analyzer.NextLinkOption;
+import playground.gregor.withinday_evac.analyzer.Option;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
 
 public class DecisionTree {
@@ -53,12 +53,26 @@ public class DecisionTree {
 	}
 	
 	
-	public Link getNextLink(final double now){
+	public Option getNextOption(final double now){
 		Node current = this.root;
 		while(current.isInternal) {
 			current = chooseNextNode(current,now);
 		}
-		return current.getNextLinkOption().getNextLink();
+		Link cL = this.beliefs.getCurrentLink();
+		Link nextLink = current.getOption().getNextLink();
+		boolean found = false;
+		for (Link l : cL.getToNode().getOutLinks().values()) {
+			if (l == nextLink) {
+				found = true;
+			}
+		}
+		
+		if (!found) {
+			throw new RuntimeException("this should not happen");
+		}
+		
+		
+		return current.getOption();
 	}
 
 	private Node chooseNextNode(final Node current, final double now) {
@@ -87,39 +101,43 @@ public class DecisionTree {
 		
 		Node internal = new Node();
 		this.root.addChildNode(internal);
-		internal.setNodeWeight(0.1);
+		internal.setNodeWeight(0.99);
 		
 		Node followPlan = new Node();
 		FollowPlanAnalyzer fpa = new FollowPlanAnalyzer(this.beliefs,this.plan);
-		fpa.setCoefficient(0.9);
+		fpa.setCoefficient(0.01);
 		followPlan.setAnalyzer(fpa);
-		this.root.addChildNode(followPlan);
+		internal.addChildNode(followPlan);
+		
+//		this.root.addChildNode(followPlan);
 		
 		Node randomLink = new Node();
 		ChooseRandomLinkAnalyzer crla = new ChooseRandomLinkAnalyzer(this.beliefs);
-		crla.setCoefficient(0.05);
+		crla.setCoefficient(0.01);
 		randomLink.setAnalyzer(crla);
-		internal.addChildNode(randomLink);
+		this.root.addChildNode(randomLink);
+//		internal.addChildNode(randomLink);
 		
-		Node internal2 = new Node();
-		internal.addChildNode(internal2);
-		internal2.setNodeWeight(0.95);
+//		Node internal2 = new Node();
+//		internal.addChildNode(internal2);
+//		internal2.setNodeWeight(0.8);
 		
-		Node followHerd = new Node();
-		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
-		fha.setCoefficient(0.999);
-		followHerd.setAnalyzer(fha);
-		internal2.addChildNode(followHerd);
+		Node followFastest = new Node();
+		FollowFastestAgentAnalyzer fha = new FollowFastestAgentAnalyzer(this.beliefs);
+//		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
+		fha.setCoefficient(0.9899999);
+		followFastest.setAnalyzer(fha);
+		internal.addChildNode(followFastest);
 		
-		Node internal3 = new Node();
-		internal3.setNodeWeight(0.001);
-		internal2.addChildNode(internal3);
+//		Node internal3 = new Node();
+//		internal3.setNodeWeight(0.00001);
+//		internal2.addChildNode(internal3);
 		
 		Node reRoute = new Node();
 		ReRouteAnalyzer rra = new ReRouteAnalyzer(this.beliefs,this.network,this.intentions);
-		rra.setCoefficient(1);
+		rra.setCoefficient(0.0000001);
 		reRoute.setAnalyzer(rra);
-		internal3.addChildNode(reRoute);
+		internal.addChildNode(reRoute);
 		
 	}
 	
@@ -129,7 +147,7 @@ public class DecisionTree {
 		private Analyzer analyzer = null;
 		private double nodeWeight = 0.0;
 		private final ArrayList<Node> children = new ArrayList<Node>();
-		private NextLinkOption option = null;
+		private Option option = null;
 		
 		public void addChildNode(final Node n) {
 			this.isInternal = true;
@@ -167,7 +185,7 @@ public class DecisionTree {
 			
 		}
 		
-		public NextLinkOption getNextLinkOption(){
+		public Option getOption(){
 			return this.option;
 		}
 		

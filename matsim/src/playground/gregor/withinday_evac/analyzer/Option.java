@@ -20,9 +20,12 @@
 
 package playground.gregor.withinday_evac.analyzer;
 
+import org.matsim.network.Link;
+
 public abstract class Option {
 
 	protected double conf;
+	protected Link link;
 		
 	
 	
@@ -32,5 +35,9 @@ public abstract class Option {
 	
 	public void setConfidence(final double conf) {
 		this.conf = conf;
+	}
+	
+	public Link getNextLink(){
+		return this.link;
 	}
 }

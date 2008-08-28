@@ -18,6 +18,7 @@
 	<module name="simulation">
 
 		<param name="evacuationTime" value = "09:00:00" /> <!-- make sure that the specific snapshot plans file exists -->
+         	<param name="endTime" value="12:00:00" />
 
 		<param name="flowCapacityFactor"	value="0.01" />
 		<param name="storageCapacityFactor"	value="0.01" />

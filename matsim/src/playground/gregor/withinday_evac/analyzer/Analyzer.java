@@ -24,5 +24,5 @@ public interface Analyzer {
 
 	public void setCoefficient(double coef);
 	
-	public NextLinkOption getAction(final double now);
+	public Option getAction(final double now);
 }

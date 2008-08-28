@@ -48,8 +48,10 @@ public class BlockedLinksAnalyzer implements Analyzer {
 			if (((TimeVariantLinkImpl)link).getFreespeed(now) <= 0.){
 				final InformationEntity ie = new InformationEntity(now,MSG_TYPE.LINK_BLOCKED,new LinkBlockedMessage(link));
 				ie.setResend(true);
-				this.beliefs.addIE(ie);
+				//FIXME
+//				this.beliefs.addIE(ie);
 				this.blockedLinks.add(link);
+				throw new RuntimeException("something to fix here!!!");
 			}
 		}
 	}
