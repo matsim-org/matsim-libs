@@ -85,6 +85,7 @@ public class ConcurrentListMPDSC {
 	// this method should be invoked especially, when all producers have
 	// finished production
 	public void flushAllInputBuffers() {
+		timeOfLatestMessageAfterLastFlush = Double.MAX_VALUE;
 		LinkedList<Message> swap = null;
 		for (int i = 0; i < inputBuffer.length; i++) {
 			synchronized (inputBuffer[i]) {

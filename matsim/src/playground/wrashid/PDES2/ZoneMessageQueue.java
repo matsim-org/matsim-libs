@@ -156,9 +156,7 @@ public class ZoneMessageQueue {
 			// only need to empty buffer, if newer messages as queue1.peek have arrived
 			if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<queue1.peek().getMessageArrivalTime()){
 				emptyBuffer();
-			} else {
-				System.out.print(".");
-			}
+			} 
 			
 			
 			// - needed in particular, if used with 1 cpu (isEmpty)
