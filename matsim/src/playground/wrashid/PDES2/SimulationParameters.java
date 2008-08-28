@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 
+import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
 
 public class SimulationParameters {
@@ -27,6 +28,7 @@ public class SimulationParameters {
 	public static final String END_LEG="end leg";
 	public static final String ENTER_LINK="enter link";
 	public static final String LEAVE_LINK="leave link";
+	public static BasicEvent temp_be=null;
 	
 	
 	
@@ -80,7 +82,19 @@ public class SimulationParameters {
 	}
 	
 	public static void bufferEvent(BasicEvent event){
-		bufferEvent(event,MessageExecutor.getThreadId());
+		//if (temp_be==null){
+		//	temp_be=event;
+		//} else {
+		//	if (test_timer % 100000==0){
+		//		bufferEvent(temp_be,MessageExecutor.getThreadId());
+		//		temp_be=null;
+		//	}
+			bufferEvent(event,MessageExecutor.getThreadId());
+		//}	
+		//test_timer++;
+		
+		
+		
 		//test_timer++;
 		//if (test_timer % 100000==0){System.out.println(test_timer);}
 	}
@@ -105,7 +119,7 @@ public class SimulationParameters {
 	public static double noOfCarsLeft=0;
 	public static double noOfCarsRight=0;
 	public static double noOfCars=0;
-	public static ConcurrentListMPSC<BasicEvent> eventBuffer=new ConcurrentListMPSC<BasicEvent>(SimulationParameters.numberOfMessageExecutorThreads); 
+	public static ConcurrentListMPDSC<BasicEvent> eventBuffer=new ConcurrentListMPDSC<BasicEvent>(SimulationParameters.numberOfMessageExecutorThreads,1000); 
 	
 	
 	

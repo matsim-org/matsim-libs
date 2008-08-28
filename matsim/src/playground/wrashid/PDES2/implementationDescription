@@ -169,7 +169,7 @@ VERY IMPORTANT TODOS:
       	=> immer sandbox dort machen...
       - beim deqsim: grünzeiten simu nicht verwenden
       - im deqsim config file: numerofthreads gleich anzahl cpus setzen
-      - 
+      - is event order for event process important (e.g. for computing scoring...)
       
          
 - Done:
@@ -244,7 +244,7 @@ VERY IMPORTANT TODOS:
      =======================================================
         -es dauert ca. 6min um 1M plans einzulesen auf Satawal
      =========================================================
-     
+        exact event numbers (DEQSim2: test6: 7665182, test12: 1817160)
      
      
      

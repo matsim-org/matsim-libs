@@ -78,6 +78,7 @@ public class Scheduler {
 					Thread.currentThread().sleep(1000);
 				} else {
 					simulationTerminated=true;
+					SimulationParameters.eventBuffer.flushAllInputBuffers();
 					SimulationParameters.processEventBuffer();
 					Thread.currentThread().sleep(2000);
 					for (int i=0;i<SimulationParameters.numberOfMessageExecutorThreads;i++){

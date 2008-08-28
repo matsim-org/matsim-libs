@@ -5,51 +5,66 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import playground.wrashid.DES.utils.Timer;
 // optimized for multiple producer, single consumer
-// the producer decides, if his inputBuffer should be emptied or not
-// TODO: not implemented yet...
+// the producer decides, when the his inputBuffer should be emptied
+// the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
+// the application allows for this case
 public class ConcurrentListMPDSC<T> {
-	private LinkedList<T>[] inputBufferZero;
 	private LinkedList<T>[] inputBuffer;
-	private LinkedList<T> outputBuffer=new LinkedList<T>(); 
+	private LinkedList<LinkedList<T>>[] outputBuffer;
+	private int maxInputPutListSize; 
+	private LinkedList<T> outputWorkingBuffer=null;
 	
 	// producerId 0>=
 	public void add(T element,int producerId){
-		synchronized (inputBuffer[producerId]){
 			inputBuffer[producerId].add(element);
-			// write in inputBufferZero and only if contains a million elements, then write...
-		}
+			if (inputBuffer[producerId].size()>maxInputPutListSize){
+				synchronized(outputBuffer[producerId]){
+					outputBuffer[producerId].add(inputBuffer[producerId]);
+				}
+				inputBuffer[producerId]=new LinkedList<T>();
+			}
 	}
 	
 	// returns null, if empty, else the first element
 	public T remove(){
-		if (!outputBuffer.isEmpty()){
-			return outputBuffer.poll();
+		if (outputWorkingBuffer!=null && !outputWorkingBuffer.isEmpty()){
+			return outputWorkingBuffer.poll();
 		}
-		for (int i=0;i<inputBuffer.length;i++){
-			if (!inputBuffer[i].isEmpty()){
-				synchronized (inputBuffer[i]){
+		
+		for (int i=0;i<outputBuffer.length;i++){
+			if (!outputBuffer[i].isEmpty()){
+				synchronized (outputBuffer[i]){
 					//swap buffers
-					LinkedList<T> tempList=null; 
-					tempList=inputBuffer[i];
-					inputBuffer[i]=outputBuffer;
-					outputBuffer=tempList;
+					outputWorkingBuffer=outputBuffer[i].poll();
 				}
-				return outputBuffer.poll();
+				return outputWorkingBuffer.poll();
 			}
 		}
 		return null;
 	}
 	
-	public ConcurrentListMPDSC (int numberOfProducers){
+	public ConcurrentListMPDSC (int numberOfProducers, int maxInputPutListSize){
 		inputBuffer=new LinkedList[numberOfProducers];
+		outputBuffer=new LinkedList[numberOfProducers];
 		for (int i=0;i<inputBuffer.length;i++){
 			inputBuffer[i]=new LinkedList<T>();
-			inputBufferZero[i]=new LinkedList<T>();
+			outputBuffer[i]=new LinkedList<LinkedList<T>>();
 		}
+		this.maxInputPutListSize=maxInputPutListSize;
 	}
 	
-	// make a method for emptying all input buffers (sychronized, to be sued at the end of the simulation by the consoumer)
 	
+	// this method should be invoked especially, when all producers have finished production
+	public void flushAllInputBuffers(){
+		for (int i=0;i<inputBuffer.length;i++){
+			synchronized (inputBuffer[i]){
+				synchronized (outputBuffer[i]){
+					outputBuffer[i].add(inputBuffer[i]);
+					inputBuffer[i]=new LinkedList<T>();
+				}
+			}
+		}
+	}
 
 	
 	
