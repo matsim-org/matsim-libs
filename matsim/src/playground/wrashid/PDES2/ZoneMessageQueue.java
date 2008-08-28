@@ -38,7 +38,7 @@ public class ZoneMessageQueue {
 	// private LinkedList<Message>[] deleteMessageBuffer = new
 	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
-	public ConcurrentListMPDSC<Message> buffer = new ConcurrentListMPDSC<Message>(
+	public ConcurrentListMPDSC buffer = new ConcurrentListMPDSC(
 			SimulationParameters.numberOfMessageExecutorThreads);
 
 	public int numberOfIncomingLinks = 0;
@@ -152,11 +152,18 @@ public class ZoneMessageQueue {
 		// System.out.println(zoneId + " - " + messagesArrivedFromRoads.size() +
 		// " - " + numberOfIncomingLinks);
 		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
-			emptyBuffer();
+			
+			// only need to empty buffer, if newer messages as queue1.peek have arrived
+			if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<queue1.peek().getMessageArrivalTime()){
+				emptyBuffer();
+			} else {
+				System.out.print(".");
+			}
+			
 			
 			// - needed in particular, if used with 1 cpu (isEmpty)
 			// - the second case: multiple cpu, it must be  ensured, that the inf+ timer messages are not removed
-			if (queue1.isEmpty() || queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength) {
+			if (queue1.size()==0 || queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength) {
 				return null;
 			}
 			
@@ -170,12 +177,6 @@ public class ZoneMessageQueue {
 			while  (m!=null && !m.isAlive()){
 				m.recycleMessage();
 				m = queue1.poll();
-			}
-
-			// needed in particular, if used with 1 cpu
-			if (queue1.isEmpty()) {
-				return null;
-				//System.out.println(messagesArrivedFromRoads);
 			}
 
 			// if (queue1.isEmpty() || m.isAcrossBorderMessage){
@@ -262,8 +263,11 @@ public class ZoneMessageQueue {
 	private void emptyBuffer() {
 		buffer.flushAllInputBuffers();
 		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
-		while (!messages.isEmpty()){
-			queue1.add(messages.poll());
+		while (messages!=null){
+			while (messages.size()>0){
+				queue1.add(messages.poll());
+			}
+			messages = buffer.getCucurrencySafeElements();
 		}
 	}
 
