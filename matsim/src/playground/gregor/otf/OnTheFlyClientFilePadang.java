@@ -37,7 +37,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
 	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
-	final private static float [] buildingsColor = new float [] {.5f,.1f,.1f,.5f};
+	final private static float [] buildingsColor = new float [] {.5f,.1f,.1f,.7f};
 	final private static float [] linksColor = new float [] {.1f,.1f,.1f,7.f};
 	final private static float [] nodesColor = new float [] {.0f,.0f,.0f,7.f};
 	
@@ -113,8 +113,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, null, connect1);
 
 		final OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-//		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-//		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
 			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 			loadFeatureLayer(this.NODES_FILE,linksColor);
@@ -134,8 +134,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
+//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "./output/ITERS/it.100/100.movie.mvi";
+		final String filename =  "./output/ITERS/it.500/500.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
