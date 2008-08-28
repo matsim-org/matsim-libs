@@ -20,7 +20,6 @@
 
 package org.matsim.mobsim.queuesim;
 
-import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
@@ -29,7 +28,7 @@ import org.matsim.utils.vis.netvis.DrawableAgentI;
 
 public class Vehicle implements DrawableAgentI {
 
-	private final static Logger log = Logger.getLogger(Vehicle.class);
+//	private final static Logger log = Logger.getLogger(Vehicle.class);
 
 	static private int globalID = 0;
 	private double currentDepartureTime = 0;
@@ -37,11 +36,11 @@ public class Vehicle implements DrawableAgentI {
 
 	private PersonAgent driver = null;
 
-	private final Id id = new IdImpl(globalID++); 
+	private final Id id = new IdImpl(globalID++);
 
 	public Vehicle() {}
-	
-	
+
+
 	public double getDepartureTime_s() {
 		return this.currentDepartureTime;
 	}
@@ -56,7 +55,7 @@ public class Vehicle implements DrawableAgentI {
 	public Link getCurrentLink() {
 		return this.driver.getCurrentLink();
 	}
-	 
+
 	public Leg getCurrentLeg() {
 		return this.driver.getCurrentLeg();
 	}
@@ -76,12 +75,12 @@ public class Vehicle implements DrawableAgentI {
 	}
 
 	/**
-	 * @return Returns the iD.
+	 * @return Returns the Id of the vehicle.
 	 */
-	public Id getID() {
+	public Id getId() {
 		return this.id;
 	}
-	
+
 	/**
 	 * @return Returns the time the vehicle moved last.
 	 */
@@ -99,7 +98,7 @@ public class Vehicle implements DrawableAgentI {
 
 	@Override
 	public String toString() {
-		return "Vehicle Id " + getID() + ", driven by (personId) " + this.driver.getPerson().getId()
+		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getPerson().getId()
 				+ ", on link " + this.driver.getCurrentLink().getId() + ", routeindex: " + this.driver.getCurrentNodeIndex()
 				+ ", next activity#: " + this.driver.getNextActivity();
 	}

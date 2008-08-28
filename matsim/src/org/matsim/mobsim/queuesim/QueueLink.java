@@ -553,7 +553,7 @@ public class QueueLink {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.buffer) {
 
-			int lane = 1 + (Integer.parseInt(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			int lane = 1 + (Integer.parseInt(veh.getId().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 
 			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
@@ -598,7 +598,7 @@ public class QueueLink {
 			int cmp = (int) (veh.getDepartureTime_s()
 					+ this.inverseSimulatedFlowCapacity + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
-			int lane = 1 + (Integer.parseInt(veh.getID().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			int lane = 1 + (Integer.parseInt(veh.getId().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, distanceOnLink,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
@@ -653,7 +653,7 @@ public class QueueLink {
 
 			// the cars in the buffer
 			for (Vehicle veh : this.buffer) {
-				int lane = 1 + Integer.parseInt(veh.getID().toString()) % nLanes;
+				int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
@@ -664,7 +664,7 @@ public class QueueLink {
 
 			// the cars in the drivingQueue
 			for (Vehicle veh : this.vehQueue) {
-				int lane = 1 + Integer.parseInt(veh.getID().toString()) % nLanes;
+				int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
 				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (time > cmp ? 0.0 : freespeed);
 				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,

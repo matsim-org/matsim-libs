@@ -29,9 +29,9 @@ import java.util.Comparator;
 public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgent> {
 
 	public PersonAgentDepartureTimeComparator() {	}
-	
-	
-	public int compare(PersonAgent pa1, PersonAgent pa2) {		
+
+
+	public int compare(PersonAgent pa1, PersonAgent pa2) {
 		if (pa1.getDepartureTime() > pa2.getDepartureTime())
 			return 1;
 		if (pa1.getDepartureTime() < pa2.getDepartureTime())
@@ -39,11 +39,11 @@ public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgen
 
 		// Both depart at the same time -> let the one with the larger id be first
 		//TODO this is only due to backwards compatibility: normally the id of the PersonAgent
-		//should be used for comparison, however this will need a full change of 
-		//all checksum reference files 
-		int veh1id = Integer.valueOf(pa1.getVehicle().getID().toString());
-		int veh2id = Integer.valueOf(pa2.getVehicle().getID().toString());
-		
+		//should be used for comparison, however this will need a full change of
+		//all checksum reference files
+		int veh1id = Integer.parseInt(pa1.getVehicle().getId().toString());
+		int veh2id = Integer.parseInt(pa2.getVehicle().getId().toString());
+
 		if (veh1id < veh2id)
 			return 1;
 		if (veh1id > veh2id)
@@ -51,5 +51,5 @@ public class PersonAgentDepartureTimeComparator implements Comparator<PersonAgen
 		return 0;
 	}
 
-	
+
 }
