@@ -115,10 +115,10 @@ public class IIDMGenerationPart2 {
 		
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  reading mz plans xml file... ");
-		Population mz_pop = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
-		log.info("  done.");
+//		log.info("  reading mz plans xml file... ");
+//		Population mz_pop = new Population(Population.NO_STREAMING);
+//		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
+//		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
