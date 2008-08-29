@@ -20,40 +20,37 @@
 
 package playground.balmermi.census2000v2;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 
-import playground.balmermi.census2000.data.Municipalities;
-import playground.balmermi.census2000v2.data.Households;
-import playground.balmermi.census2000v2.data.MicroCensus;
-import playground.balmermi.census2000v2.modules.PersonAssignActivityChains;
-import playground.balmermi.census2000v2.modules.PersonAssignLicenseModel;
-import playground.balmermi.census2000v2.modules.PersonAssignMobilitiyToolModel;
-import playground.balmermi.census2000v2.modules.PlansAnalyse;
-import playground.balmermi.census2000v2.modules.PlansFilterPersons;
-import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
-import playground.balmermi.census2000v2.modules.PopulationAddCustomAttributes;
-import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
-import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
+import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
 
-public class IIDMGeneration {
+public class IIDMGenerationPart3 {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(IIDMGeneration.class);
+	private final static Logger log = Logger.getLogger(IIDMGenerationPart3.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// createPopulation()
@@ -90,130 +87,75 @@ public class IIDMGeneration {
 		Gbl.getWorld().complete();
 		log.info("  done.");
 
+		System.out.println("  reading the network xml file...");
+		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		Gbl.getWorld().complete();
+		System.out.println("  done.");
+
 		//////////////////////////////////////////////////////////////////////
 		
-		log.info("  parsing additional municipality information... ");
-		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
-		municipalities.parse();
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
 		log.info("  running world modules... ");
+		// the link types where no facility can be placed on
+		// Here: for the ivtch network (nationales Netzmodell)
+		Set<String> excludingLinkTypes = new HashSet<String>();
+		excludingLinkTypes.add("0"); excludingLinkTypes.add("1"); excludingLinkTypes.add("2"); excludingLinkTypes.add("3");
+		excludingLinkTypes.add("4"); excludingLinkTypes.add("5"); excludingLinkTypes.add("6"); excludingLinkTypes.add("7");
+		excludingLinkTypes.add("8"); excludingLinkTypes.add("9");
+		excludingLinkTypes.add("10"); excludingLinkTypes.add("11"); excludingLinkTypes.add("12"); excludingLinkTypes.add("13");
+		excludingLinkTypes.add("14"); excludingLinkTypes.add("15"); excludingLinkTypes.add("16"); excludingLinkTypes.add("17");
+		excludingLinkTypes.add("18"); excludingLinkTypes.add("19");
+		excludingLinkTypes.add("20"); excludingLinkTypes.add("21"); excludingLinkTypes.add("22"); excludingLinkTypes.add("23");
+		excludingLinkTypes.add("24"); excludingLinkTypes.add("25"); excludingLinkTypes.add("26"); excludingLinkTypes.add("27");
+		excludingLinkTypes.add("28"); excludingLinkTypes.add("29");
+		excludingLinkTypes.add("90"); excludingLinkTypes.add("91"); excludingLinkTypes.add("92"); excludingLinkTypes.add("93");
+		excludingLinkTypes.add("94"); excludingLinkTypes.add("95"); excludingLinkTypes.add("96"); excludingLinkTypes.add("97");
+		excludingLinkTypes.add("98"); excludingLinkTypes.add("99");
 		new WorldCheck().run(Gbl.getWorld());
+		new WorldBottom2TopCompletion(excludingLinkTypes).run(Gbl.getWorld());
 		new WorldValidation().run(Gbl.getWorld());
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  parsing f2z_mapping... ");
-		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(Gbl.getWorld());
-		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  reding plans xml file... ");
-		Population pop = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
-		log.info("  done.");
+		System.out.println("  setting up population objects...");
+		Population pop = new Population(Population.USE_STREAMING);
+		PopulationWriter pop_writer = new PopulationWriter(pop);
+		PopulationReader pop_reader = new MatsimPopulationReader(pop);
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 		
-		// TODO: write some consistency tests
-
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  parsing households... ");
-		Households households = new Households(municipalities);
-		households.parse(indir+"/households.txt",pop);
+		System.out.println("  adding person modules... ");
+		pop.addAlgorithm(new PersonAssignToNetwork(network));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
-//		// Test Demand for Timo Smiezek
-//		// ch.cut.640000.200000.740000.310000.xml
-//		Coord min = new CoordImpl(640000.0,200000.0);
-//		Coord max = new CoordImpl(740000.0,310000.0);
 
-//		log.info("  running person modules... ");
-//		new PersonCreateFakePlanFromKnowledge().run(plans);
-//		new PlansScenarioCut(min,max).run(plans);
-//		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-		
-		log.info("  removing persons... ");
-		new PlansFilterPersons().run(pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-		
-		log.info("  adding custom attributes for persons... ");
-		new PopulationAddCustomAttributes(indir+"/ETHZ_Pers.tab").run(pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  reding mz plans xml file... ");
-		Population mz_pop = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
-		log.info("  done.");
+		System.out.println("  reading, processing, writing plans...");
+		pop.addAlgorithm(pop_writer);
+		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
+		pop.printPlansCount();
+		pop_writer.write();
+		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-		
-		log.info("  creating mz data stucture... ");
-		MicroCensus mz = new MicroCensus(mz_pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
 
-		log.info("  runnning person models... ");
-		new PersonAssignLicenseModel().run(pop);
-		new PersonAssignMobilitiyToolModel().run(pop);
-		new PersonAssignActivityChains(mz).run(pop);
-		new PlansAnalyse().run(pop);
-		new PlansAnalyse().run(mz_pop);
-		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-
-		log.info("  writing custom attributes of the persons... ");
-		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
-		log.info("  done.");
-
-		log.info("  writing households txt file... ");
-		households.writeTable(outdir+"/output_households.txt");
-		log.info("  done.");
-
-		log.info("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(pop);
-		plans_writer.write();
-		log.info("  done.");
-
-		log.info("  writing f2z_mapping... ");
-		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
+		log.info("  writing network xml file... ");
+		new NetworkWriter(network).write();
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		new FacilitiesWriter(facilities).write();
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
-		world_writer.write();
+		new WorldWriter(Gbl.getWorld()).write();
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
-		config_writer.write();
+		new ConfigWriter(Gbl.getConfig()).write();
 		log.info("  done.");
 
 		log.info("done.");

@@ -217,7 +217,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Activity activity = this.getActivity(c_start,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
-			act.setCoord(null);
+			act.setCoord(act.getFacility().getCenter());
 		}
 		else {
 			// c_start and c_end different
@@ -229,7 +229,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Activity activity = this.getActivity(c1,c2,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
-			act.setCoord(null);
+			act.setCoord(act.getFacility().getCenter());
 		}
 	}
 	
@@ -248,7 +248,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 				Activity activity = this.getActivity(c_start,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
-				act.setCoord(null);
+				act.setCoord(act.getFacility().getCenter());
 			}
 		}
 		else {
@@ -263,7 +263,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 				Activity activity = this.getActivity(c1,c2,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
-				act.setCoord(null);
+				act.setCoord(act.getFacility().getCenter());
 			}
 		}
 	}

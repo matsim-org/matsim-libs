@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.world;
+package org.matsim.world.algorithms;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -29,8 +29,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Test for org.matsim.world");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(WorldParserWriterTest.class);
-		suite.addTest(org.matsim.world.algorithms.AllTests.suite());
+		suite.addTestSuite(WorldCompletionTest.class);
 		//$JUnit-END$
 		return suite;
 	}

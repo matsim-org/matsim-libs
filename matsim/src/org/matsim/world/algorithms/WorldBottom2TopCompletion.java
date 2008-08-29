@@ -21,7 +21,9 @@
 package org.matsim.world.algorithms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
@@ -30,6 +32,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappingRule;
@@ -44,28 +48,75 @@ public class WorldBottom2TopCompletion {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(WorldBottom2TopCompletion.class);
+	
+	private final Set<String> excludingLinkTypes;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public WorldBottom2TopCompletion() {
-		super();
+		this(new HashSet<String>());
+	}
+	
+	public WorldBottom2TopCompletion(Set<String> excludingLinkTypes) {
+		this.excludingLinkTypes = excludingLinkTypes;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean completeNetFacMapping(final MappingRule m) {
-		Facilities up_facilities = (Facilities)m.getUpLayer();
-		NetworkLayer down_network = (NetworkLayer)m.getDownLayer();
+	private final void mapNetFac(Facilities up_facilities, NetworkLayer down_network) {
 		Iterator<? extends Location> f_it = up_facilities.getLocations().values().iterator();
 		while (f_it.hasNext()) {
 			Facility up_f = (Facility)f_it.next();
 			Link down_link = down_network.getNearestRightEntryLink(up_f.getCenter());
 			up_f.addDownMapping(down_link);
 			down_link.addUpMapping(up_f);
+		}
+	}
+	
+	private final boolean completeNetFacMapping(final MappingRule m) {
+		Facilities up_facilities = (Facilities)m.getUpLayer();
+		NetworkLayer down_network = (NetworkLayer)m.getDownLayer();
+
+		// get all links from the network with specified link types
+		ArrayList<Link> linksRemoved = new ArrayList<Link>();
+		for (Link l : down_network.getLinks().values()) { if (this.excludingLinkTypes.contains(l.getType())) { linksRemoved.add(l); } }
+
+		if (linksRemoved.size() == down_network.getLinks().size()) {
+			StringBuffer str = new StringBuffer();
+			for (String s : this.excludingLinkTypes) { str.append(s); str.append(","); }
+			log.warn("No link will be left for the given link types ("+str+"). Therefore, completing the network-facility mapping with the whole network.");
+
+			// find and assign the nearest (right entry) link of all links to each facility
+			this.mapNetFac(up_facilities,down_network);
+		}
+		else {
+			// remove all links from the network with specified link types
+			for (Link l : linksRemoved) { down_network.removeLink(l); }
+			
+			// also remove all nodes which have now no incident links
+			ArrayList<Node> nodesRemoved = new ArrayList<Node>();
+			for (Node n : down_network.getNodes().values()) { if (n.getIncidentLinks().isEmpty()) { nodesRemoved.add(n); } }
+			for (Node n : nodesRemoved) { down_network.removeNode(n); }
+
+			// find and assign the nearest (right entry) link of the remaining links to each facility
+			this.mapNetFac(up_facilities,down_network);
+			
+			// restore the removed nodes
+			for (Node n : nodesRemoved) {
+				down_network.createNode(n.getId(),n.getCoord(),n.getType());
+			}
+
+			// restore the removed links
+			for (Link l : linksRemoved) {
+				down_network.createLink(l.getId(),l.getFromNode(),l.getToNode(),
+				    l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),
+				    l.getCapacity(Time.UNDEFINED_TIME),l.getLanes(Time.UNDEFINED_TIME),
+				    l.getOrigId(),l.getType());
+			}
 		}
 		return true;
 	}

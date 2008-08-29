@@ -22,8 +22,6 @@ package org.matsim.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.examples.TriangleTest;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -33,7 +31,6 @@ public class DesiresTest extends MatsimTestCase {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Config config = null;
 	private final static Logger log = Logger.getLogger(DesiresTest.class);
 
 	//////////////////////////////////////////////////////////////////////
@@ -43,12 +40,11 @@ public class DesiresTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.config = super.loadConfig(null);
+		super.loadConfig(null);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		this.config = null;
 		super.tearDown();
 	}
 

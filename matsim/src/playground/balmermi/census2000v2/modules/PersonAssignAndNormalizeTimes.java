@@ -20,10 +20,11 @@
 
 package playground.balmermi.census2000v2.modules;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Desires;
 import org.matsim.population.Leg;
@@ -127,6 +128,8 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		}
 	}
 	
+	//////////////////////////////////////////////////////////////////////
+
 	private final void assignDesires(Plan p) {
 		Desires d = p.getPerson().createDesires(null);
 		double othr_dur = 0.0;
@@ -142,6 +145,42 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	}
 	
 	//////////////////////////////////////////////////////////////////////
+
+	private final void varyTimes(Plan p) {
+		ArrayList<Object> acts_legs = p.getActsLegs();
+
+		// draw a new random number until the new end time >= 0.0
+		double bias = MatsimRandom.random.nextInt(3600)-1800.0; // [-1800,1800[
+		double first_end_time = ((Act)acts_legs.get(0)).getEndTime();
+		while (first_end_time+bias < 0.0) { bias = MatsimRandom.random.nextInt(3600)-1800.0; }
+		
+		for (int i=0; i<acts_legs.size(); i++) {
+			if (i % 2 == 0) {
+				Act act = (Act)acts_legs.get(i);
+				if (i == 0) { // first act
+					act.setStartTime(0.0);
+					act.setDur(act.getDur()+bias);
+					act.setEndTime(act.getEndTime()+bias);
+				}
+				else if (i == acts_legs.size()-1) { // last act
+					act.setStartTime(act.getStartTime()+bias);
+					act.setDur(Time.UNDEFINED_TIME);
+					act.setEndTime(Time.UNDEFINED_TIME);
+				}
+				else { // in between acts
+					act.setStartTime(act.getStartTime()+bias);
+					act.setEndTime(act.getEndTime()+bias);
+				}
+			}
+			else {
+				Leg leg = (Leg)acts_legs.get(i);
+				leg.setDepTime(leg.getDepTime()+bias);
+				leg.setArrTime(leg.getArrTime()+bias);
+			}
+		} 
+	}
+	
+	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
@@ -154,16 +193,6 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		this.moveTravTimeToNextAct(plan);
 		this.normalizeTimes(plan);
 		this.assignDesires(plan);
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-	// main method
-	//////////////////////////////////////////////////////////////////////
-
-	public static void main(String[] args) {
-		Population pop = new Population(false);
-		new PopulationReaderMatsimV4(pop).readFile("../../input/mz.plans.xml");
-		new PersonAssignAndNormalizeTimes().run(pop);
-		new PopulationWriter(pop,"../../output/output_mz.plans.xml","v4",1.0).write();
+		this.varyTimes(plan);
 	}
 }

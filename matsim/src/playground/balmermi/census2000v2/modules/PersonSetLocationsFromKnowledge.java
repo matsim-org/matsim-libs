@@ -92,7 +92,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					if (prev_home != null) { log.warn("TODO pid="+person.getId()+": Two home acts in a row. Not sure yet how to handle that..."); }
 					act.setType(home_act.getType());
 					act.setFacility(home_act.getFacility());
-					act.setCoord(null);
+					act.setCoord(act.getFacility().getCenter());
 					prev_home = home_act;
 					prev_work = null;
 					prev_educ = null;
@@ -111,7 +111,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					}
 					act.setType(work_act.getType());
 					act.setFacility(work_act.getFacility());
-					act.setCoord(null);
+					act.setCoord(act.getFacility().getCenter());
 					prev_home = null;
 					prev_work = work_act;
 					prev_educ = null;
@@ -130,7 +130,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					}
 					act.setType(educ_act.getType());
 					act.setFacility(educ_act.getFacility());
-					act.setCoord(null);
+					act.setCoord(act.getFacility().getCenter());
 					prev_home = null;
 					prev_work = null;
 					prev_educ = educ_act;
