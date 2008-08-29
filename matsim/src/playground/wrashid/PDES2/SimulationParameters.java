@@ -107,6 +107,7 @@ public class SimulationParameters {
 	public static void processEventBuffer(){
 		BasicEvent be=eventBuffer.remove();
 		while (be!=null){
+			System.out.println(be.toString());
 			SimulationParameters.events.processEvent(be);
 			be=eventBuffer.remove();
 		}

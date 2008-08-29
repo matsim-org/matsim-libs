@@ -45,7 +45,9 @@ public class PriorityConcurrentListMPDSC {
 					//swap buffers
 					outputWorkingBuffer=outputBuffer[i].poll();
 				}
-				outputQueue.addAll(outputWorkingBuffer);
+				while (outputWorkingBuffer.size()>0){
+					outputQueue.add(outputWorkingBuffer.poll());
+				}
 				if (outputQueue.size()>=minOutputBufferLength){
 					return outputQueue.poll().getBasicEvent();
 				}
@@ -88,7 +90,9 @@ public class PriorityConcurrentListMPDSC {
 					//swap buffers
 					outputWorkingBuffer=outputBuffer[i].poll();
 				}
-				outputQueue.addAll(outputWorkingBuffer);
+				while (outputWorkingBuffer.size()>0){
+					outputQueue.add(outputWorkingBuffer.poll());
+				}
 			}
 		}
 	}

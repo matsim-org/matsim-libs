@@ -1,6 +1,7 @@
 package playground.wrashid.PDES.util;
 
 import org.matsim.events.BasicEvent;
+import org.matsim.events.LinkLeaveEvent;
 
 import playground.wrashid.PDES2.Message;
 
@@ -22,6 +23,16 @@ public class ComparableEvent implements Comparable {
 			} else if (basicEvent.time>otherEvent.getBasicEvent().time){
 				return 1;
 			}
+			// for equal time: use the following order
+			if (basicEvent instanceof LinkLeaveEvent){
+				return -1;
+			}
+			if (otherEvent.getBasicEvent() instanceof LinkLeaveEvent){
+				return 1;
+			}
+			
+			
+			
 			return 0;
 		}
 		
