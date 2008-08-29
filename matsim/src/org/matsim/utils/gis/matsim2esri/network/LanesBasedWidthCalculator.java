@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FeatureGenerator.java
+ * LanesBasedWidthCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,13 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.network;
+package org.matsim.utils.gis.matsim2esri.network;
 
-import org.geotools.feature.Feature;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 
-public interface FeatureGenerator {
+public class LanesBasedWidthCalculator implements WidthCalculator{
 
-	public Feature getFeature(Link link);
+	private final double effectiveLaneWidth;
+	private final double widthCoefficient;
+
+	public LanesBasedWidthCalculator(final NetworkLayer network, final Double coef) {
+		this.effectiveLaneWidth = network.getEffectiveLaneWidth();
+		this.widthCoefficient = coef;
+	}
+
+	public double getWidth(final Link link) {
+		return link.getLanes(org.matsim.utils.misc.Time.UNDEFINED_TIME) * this.effectiveLaneWidth * this.widthCoefficient;
+	}
+
+
 
 }

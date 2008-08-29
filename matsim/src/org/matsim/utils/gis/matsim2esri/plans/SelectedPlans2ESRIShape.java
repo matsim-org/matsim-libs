@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.plans;
+package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +54,16 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
+
+/**
+ * Simple class to convert MATSim plans to ESRI shape files. Activities will be converted into points and 
+ * legs will be converted into line strings. Parameters as defined in the population xml file will be added 
+ * as attributes to the shape files. There also some parameters to configure this converter, please consider
+ * the corresponding setters in this class.
+ *  
+ * @author laemmel
+ *
+ */
 public class SelectedPlans2ESRIShape {
 
 	
@@ -197,7 +207,8 @@ public class SelectedPlans2ESRIShape {
 		Double endTime = act.getEndTime();
 		double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;
-		Coord c = new CoordImpl(act.getCoord().getX()+rx,act.getCoord().getY()+ry);
+		Coord cc = act.getLink().getCenter();
+		Coord c = new CoordImpl(cc.getX()+rx,cc.getY()+ry);
 		try {
 			return this.featureTypeAct.create(new Object [] {MGC.coord2Point(c),id, type, linkId, startTime, dur, endTime});
 		} catch (IllegalAttributeException e) {
@@ -280,13 +291,12 @@ public class SelectedPlans2ESRIShape {
 	
 
 	public static void main(final String [] args) throws IllegalAttributeException, IOException, FactoryException, SchemaException {
-//		final String populationFilename = "./examples/equil/plans100.xml";
-//		final String networkFilename = "./examples/equil/network.xml";
-		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz"; 
-		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
-			
-//		final String populationFilename = "./networks/padang_plans_v20080618_demand.xml.gz";
-//		final String networkFilename = "./networks/padang_net_v20080618.xml";
+		final String populationFilename = "./examples/equil/plans100.xml";
+		final String networkFilename = "./examples/equil/network.xml";
+//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz"; 
+//		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
+
+
 		final String outputDir = "./plans/";
 		
 		Gbl.createConfig(null);

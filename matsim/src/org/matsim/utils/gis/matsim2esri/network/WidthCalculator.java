@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FreespeedBasedWidthCalculator.java
+ * WidthCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.network;
+package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 
-public class FreespeedBasedWidthCalculator implements WidthCalculator {
-
-	private final Double widthCoefficient;
-
-	public FreespeedBasedWidthCalculator(final NetworkLayer network, final Double coef) {
-		this.widthCoefficient = coef;
-	}
-
-	public double getWidth(final Link link) {
-		return link.getFreespeed(org.matsim.utils.misc.Time.UNDEFINED_TIME) * this.widthCoefficient;
-	}
+public interface WidthCalculator {
 
 
+	public double getWidth(Link link);
 
 }

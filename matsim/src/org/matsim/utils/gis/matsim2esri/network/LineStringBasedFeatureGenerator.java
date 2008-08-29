@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.network;
+package org.matsim.utils.gis.matsim2esri.network;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;

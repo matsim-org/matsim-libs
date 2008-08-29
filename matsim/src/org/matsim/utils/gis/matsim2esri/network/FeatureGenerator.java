@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * FeatureGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.gis.matsim2esri.network;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.geotools.feature.Feature;
+import org.matsim.network.Link;
 
-public class AllTests {
+public interface FeatureGenerator {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.collections.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.gis.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+	public Feature getFeature(Link link);
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * CapacityBasedWidthCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.gis.matsim2esri.network;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 
-public class AllTests {
+public class CapacityBasedWidthCalculator implements WidthCalculator {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
-		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.collections.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.gis.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
-		//$JUnit-END$
-		return suite;
+	private final double widthCoefficient;
+
+	public CapacityBasedWidthCalculator(final NetworkLayer network, final Double coef) {
+		this.widthCoefficient = coef;
 	}
 
+	public double getWidth(final Link link) {
+		return link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * this.widthCoefficient;
+	}
 }

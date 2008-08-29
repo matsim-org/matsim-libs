@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WidthCalculator.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,13 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.network;
+package org.matsim.utils.gis.matsim2esri.plans;
 
-import org.matsim.network.Link;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public interface WidthCalculator {
+public class AllTests {
 
-
-	public double getWidth(Link link);
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for org.matsim.utils.gis.matsim2esri.network");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(SelectedPlans2ESRIShapeTest.class);
+		//$JUnit-END$
+		return suite;
+	}
 
 }

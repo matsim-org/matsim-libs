@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.matsim2GIS.network;
+package org.matsim.utils.gis.matsim2esri.network;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +34,14 @@ import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+/**
+ * Simple class to convert MATSim network files to ESRI shape files. The network could be written either
+ * as line strings or as polygons. Furthermore the width of the links could be calculated according to
+ * freespeed, lanes or capacity. For some basic examples please have a look at the <code>main</code> method.
+ *  
+ * @author laemmel
+ *
+ */
 public class Network2ESRIShape {
 
 	private static Logger log = Logger.getLogger(Network2ESRIShape.class);
@@ -69,12 +77,13 @@ public class Network2ESRIShape {
 
 	public static void main(final String [] args) {
 
-		final String netfile = "./test/scenarios/berlin/network.xml.gz";
-//		String netfile = "./examples/equil/network.xml";
+		String netfile = "./examples/equil/network.xml";
+//		String netfile = "./test/scenarios/berlin/network.xml.gz";
+
 		String outputFileLs = "./plans/networkLs.shp";
 		String outputFileP = "./plans/networkP.shp";
 		Gbl.createConfig(null);
-		Gbl.getConfig().global().setCoordinateSystem("WGS84_UTM47S");
+		Gbl.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
 		final NetworkLayer network = new NetworkLayer();
@@ -84,7 +93,6 @@ public class Network2ESRIShape {
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
-		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
 		new Network2ESRIShape(network,outputFileLs, builder).write();
 
