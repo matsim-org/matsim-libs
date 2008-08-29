@@ -11,8 +11,10 @@ public class LeaveRoadMessage extends EventMessage {
 	public void selfhandleMessage() {
 		//System.out.println("leave road message");
 		Road road=(Road)this.receivingUnit;
-		road.simTime=messageArrivalTime;
-		road.leaveRoad(vehicle);
+		synchronized (road){
+			road.simTime=messageArrivalTime;
+			road.leaveRoad(vehicle);
+		}
 		
 		//System.out.println("leave road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
 		
@@ -44,6 +46,7 @@ public class LeaveRoadMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
+			
 			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),road.getLink(),vehicle.getCurrentLeg());
 		}
 		

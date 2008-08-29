@@ -15,8 +15,10 @@ public class EnterRequestMessage extends EventMessage {
 		
 		//System.out.println("enter request road: " + toRoad.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
 		//System.out.println(messageId);
-		toRoad.simTime=messageArrivalTime;
-		toRoad.enterRequest(vehicle);
+		synchronized (toRoad){
+			toRoad.simTime=messageArrivalTime;
+			toRoad.enterRequest(vehicle);
+		}
 	}
 
 	

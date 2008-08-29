@@ -131,6 +131,10 @@ Splitting the map:
       sind viele agenten im gleichen area und die bordermessages werden nicht geschickt, weil diese durch normale messages
       ersetzt werden. => try input 7M
       
+     - tests schreiben für meine Datenstrukturen
+     
+     - problem beim bufferen von events using PriorityConcurrentListMPDSC
+       => some events which come in, are missing at output
      
         
       - problem: test 1 creates too litte messages after having introduced the is killMessage instead of remove from Message queue  

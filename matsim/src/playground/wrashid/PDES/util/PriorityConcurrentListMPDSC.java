@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
 
 import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.deqsim.PDESStarter2;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
@@ -15,40 +17,50 @@ import playground.wrashid.DES.utils.Timer;
 // - minOutputBufferLength: defines, when the remove will start working (giving enough time
 // to add, so that priority should work better
 public class PriorityConcurrentListMPDSC {
+	//private LinkedList<ComparableEvent>[] inputBuffer;
 	private LinkedList<ComparableEvent>[] inputBuffer;
-	private LinkedList<LinkedList<ComparableEvent>>[] outputBuffer;
-	private int maxInputPutListSize; 
-	private LinkedList<ComparableEvent> outputWorkingBuffer=null;
 	private int minOutputBufferLength;
 	private PriorityQueue<ComparableEvent> outputQueue=new PriorityQueue<ComparableEvent>();
+	public Integer incounter=0;
+	public Integer outcounter=0;
+	private int maxInputPutListSize;
+	LinkedList<ComparableEvent> outputWorkingBuffer=new LinkedList<ComparableEvent>();
 	
 	// producerId 0>=
 	public void add(BasicEvent element,int producerId){
-			inputBuffer[producerId].add(new ComparableEvent(element));
-			if (inputBuffer[producerId].size()>maxInputPutListSize){
-				synchronized(outputBuffer[producerId]){
-					outputBuffer[producerId].add(inputBuffer[producerId]);
-				}
-				inputBuffer[producerId]=new LinkedList<ComparableEvent>();
+			synchronized (inputBuffer[producerId]){
+				inputBuffer[producerId].add(new ComparableEvent(element));
 			}
 	}
 	
 	// returns null, if empty, else the first element
 	public BasicEvent remove(){
 		if (outputQueue.size()>=minOutputBufferLength){
+			synchronized (outcounter){
+				outcounter++;
+			}
 			return outputQueue.poll().getBasicEvent();
 		}
 		
-		for (int i=0;i<outputBuffer.length;i++){
-			if (!outputBuffer[i].isEmpty()){
-				synchronized (outputBuffer[i]){
-					//swap buffers
-					outputWorkingBuffer=outputBuffer[i].poll();
+		LinkedList<ComparableEvent> swap=null;
+		for (int i=0;i<inputBuffer.length;i++){
+			if (!inputBuffer[i].isEmpty()){
+				if (inputBuffer[i].size()>maxInputPutListSize){
+					synchronized (inputBuffer[i]){
+						swap=outputWorkingBuffer;
+						outputWorkingBuffer=inputBuffer[i];
+						inputBuffer[i]=swap;
+					}	
 				}
+				
 				while (outputWorkingBuffer.size()>0){
 					outputQueue.add(outputWorkingBuffer.poll());
 				}
+				
 				if (outputQueue.size()>=minOutputBufferLength){
+					synchronized (outcounter){
+						outcounter++;
+					}
 					return outputQueue.poll().getBasicEvent();
 				}
 			}
@@ -59,10 +71,8 @@ public class PriorityConcurrentListMPDSC {
 	
 	public PriorityConcurrentListMPDSC (int numberOfProducers, int maxInputPutListSize, int minOutputBufferLength){
 		inputBuffer=new LinkedList[numberOfProducers];
-		outputBuffer=new LinkedList[numberOfProducers];
 		for (int i=0;i<inputBuffer.length;i++){
 			inputBuffer[i]=new LinkedList<ComparableEvent>();
-			outputBuffer[i]=new LinkedList<LinkedList<ComparableEvent>>();
 		}
 		this.maxInputPutListSize=maxInputPutListSize;
 		this.minOutputBufferLength=minOutputBufferLength;
@@ -73,23 +83,15 @@ public class PriorityConcurrentListMPDSC {
 	public void flushAllInputBuffers(){
 		minOutputBufferLength=1;
 		
-		// push all input buffers to ouputBuffer
+		LinkedList<ComparableEvent> swap=null;
 		for (int i=0;i<inputBuffer.length;i++){
-			synchronized (inputBuffer[i]){
-				synchronized (outputBuffer[i]){
-					outputBuffer[i].add(inputBuffer[i]);
-					inputBuffer[i]=new LinkedList<ComparableEvent>();
-				}
-			}
-		}
-		
-		// push all output buffers to outputQueue
-		for (int i=0;i<outputBuffer.length;i++){
-			if (!outputBuffer[i].isEmpty()){
-				synchronized (outputBuffer[i]){
-					//swap buffers
-					outputWorkingBuffer=outputBuffer[i].poll();
-				}
+			if (!inputBuffer[i].isEmpty()){
+				synchronized (inputBuffer[i]){
+					swap=outputWorkingBuffer;
+					outputWorkingBuffer=inputBuffer[i];
+					inputBuffer[i]=swap;
+				}	
+
 				while (outputWorkingBuffer.size()>0){
 					outputQueue.add(outputWorkingBuffer.poll());
 				}
@@ -98,6 +100,29 @@ public class PriorityConcurrentListMPDSC {
 	}
 
 	
+	public static void main(String[] args) {
+		PriorityConcurrentListMPDSC queue=new PriorityConcurrentListMPDSC(2,100,10000);
+		int outEventCount=0;
+		int inEventCount=1000000;
+		for (int i=0;i<inEventCount;i++){
+			queue.add(new AgentArrivalEvent(1,"","",1), 0);
+		}
+		
+		BasicEvent be=queue.remove();
+		outEventCount++;
+		//System.out.println(queue.remove());
+		
+		queue.flushAllInputBuffers();
+		
+		be=queue.remove();
+		while (be!=null){
+			outEventCount++;
+			be=queue.remove();
+		}
+		assert(inEventCount==outEventCount): "in: " + inEventCount + "; out: " + outEventCount;
+		System.out.println("Test passed (if -ea flag set).");
+		
+	}
 	
 }
 

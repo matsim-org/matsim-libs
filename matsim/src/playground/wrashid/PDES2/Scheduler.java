@@ -107,8 +107,8 @@ public class Scheduler {
 		
 		SimulationParameters.events.printEventsCount();
 	    System.out.println("used memory:"+ (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024/1024 + "MB");
-	
-	
+	    System.out.println("event queue incounter:" + SimulationParameters.eventBuffer.incounter);
+	    System.out.println("event queue outcounter:" + SimulationParameters.eventBuffer.outcounter);
 	}
 	
 	

@@ -3,6 +3,7 @@ package playground.wrashid.PDES2;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 
@@ -30,8 +31,6 @@ public class SimulationParameters {
 	public static final String ENTER_LINK="enter link";
 	public static final String LEAVE_LINK="leave link";
 	public static BasicEvent temp_be=null;
-	
-	
 	
 	
 	public static final boolean debugMode=false;
@@ -101,13 +100,16 @@ public class SimulationParameters {
 	}
 	
 	private static void bufferEvent(BasicEvent event, int producerId){
+		if (event instanceof AgentDepartureEvent){
+			System.out.println("in: "+event.toString());
+		}
 		eventBuffer.add(event, producerId);
 	}
 	
 	public static void processEventBuffer(){
 		BasicEvent be=eventBuffer.remove();
 		while (be!=null){
-			System.out.println(be.toString());
+			System.out.println("out: "+be.toString());
 			SimulationParameters.events.processEvent(be);
 			be=eventBuffer.remove();
 		}

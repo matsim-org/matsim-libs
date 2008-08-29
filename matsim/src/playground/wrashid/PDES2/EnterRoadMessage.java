@@ -20,8 +20,10 @@ public class EnterRoadMessage extends EventMessage {
 		
 		
 		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-		road.simTime=messageArrivalTime;
-		road.enterRoad(vehicle);
+		synchronized (road){
+			road.simTime=messageArrivalTime;
+			road.enterRoad(vehicle);
+		}
 		
 		//System.out.println("enter road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());
 		
@@ -36,8 +38,8 @@ public class EnterRoadMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
-			//event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
-			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),vehicle.getCurrentLink(),vehicle.getCurrentLeg());
+			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
+			//event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),vehicle.getCurrentLink(),vehicle.getCurrentLeg());
 		}
 		
 		//SimulationParameters.events.processEvent(event);
