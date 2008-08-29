@@ -19,7 +19,9 @@ public class ComparableEvent implements Comparable {
 			ComparableEvent otherEvent= (ComparableEvent) obj;
 			if (basicEvent.time<otherEvent.getBasicEvent().time){
 				return -1;
-			} 
+			} else if (basicEvent.time>otherEvent.getBasicEvent().time){
+				return 1;
+			}
 			return 0;
 		}
 		
