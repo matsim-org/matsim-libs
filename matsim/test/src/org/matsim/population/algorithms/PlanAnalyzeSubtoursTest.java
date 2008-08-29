@@ -120,6 +120,14 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedSubtourStarts.put(testedRoute, "0 1 4");
 		expectedSubtourIndexations.put(testedRoute, "2 0 0 0 1 1 2");
 
+		testedRoute = "1 2 3 4 3 2 5 4 5 1";
+		expectedSubtourStarts.put(testedRoute, "0 1 2 6");
+		expectedSubtourIndexations.put(testedRoute, "3 1 0 0 1 3 2 2 3");
+
+		testedRoute = "1 2 3 2 3 2 1 2 1";
+		expectedSubtourStarts.put(testedRoute, "0 1 3 6");
+		expectedSubtourIndexations.put(testedRoute, "2 0 0 1 1 2 3 3");
+
 		testedRoute = "1 1 1 1 1 2 1";
 		expectedSubtourStarts.put(testedRoute, "4");
 		expectedSubtourIndexations.put(
