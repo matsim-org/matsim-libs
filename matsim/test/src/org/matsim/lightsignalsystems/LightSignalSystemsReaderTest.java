@@ -63,6 +63,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(id23, l2la.getLinkId());
   	BasicLane lane = l2la.getLanes().get(0);
   	assertEquals(id3, lane.getId());
+  	assertEquals(id1, lane.getToLinkIds().get(0));
   	assertEquals(45.0, lane.getLength());
   	assertEquals(1.0, lane.getNumberOfRepresentedLanes());
   	lane = l2la.getLanes().get(1);

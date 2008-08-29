@@ -87,6 +87,9 @@ public class MatsimLightSignalSystemsReader {
 				l2lAssignment = factory.createLanesToLinkAssignment(new IdImpl(lldef.getLinkIdRef()));
 				for (XMLLaneType laneType : lldef.getLane()) {
 					lane = factory.createLane(new IdImpl(laneType.getId()));
+					for (XMLIdRefType toLinkId : laneType.getToLink()) {
+						lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
+					}
 					if (laneType.getRepresentedLanes() == null) {
 						laneType.setRepresentedLanes(fac.createXMLLaneTypeXMLRepresentedLanes());
 					}

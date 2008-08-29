@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.basic.lightsignalsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.basic.v01.Id;
 
 
@@ -31,6 +34,7 @@ public class BasicLane {
 	private Id id;
 	private double numberOfRepresentedLanes;
 	private double length;
+	private List<Id> toLinkIds;
 
 	/**
 	 * @param id
@@ -46,16 +50,10 @@ public class BasicLane {
 		this.numberOfRepresentedLanes = number;
 	}
 
-	/**
-	 * @param meter
-	 */
 	public void setLength(double meter) {
 		this.length = meter;
 	}
 
-	/**
-	 * @return
-	 */
 	public Id getId() {
 		return id;
 	}
@@ -68,6 +66,17 @@ public class BasicLane {
 	
 	public double getLength() {
 		return length;
+	}
+
+	public void addToLinkId(Id id) {
+		if (this.toLinkIds == null) {
+			this.toLinkIds = new ArrayList<Id>();
+		}
+		this.toLinkIds.add(id);
+	}
+	
+	public List<Id> getToLinkIds() {
+		return this.toLinkIds;
 	}
 
 	

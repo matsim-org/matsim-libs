@@ -5,8 +5,11 @@
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd">
 
   <lanesToLinkAssignment linkIdRef="23">
-    <lane id="3" />
+    <lane id="3">
+      <toLink refId="1" />
+    </lane>
     <lane id="5">
+      <toLink refId="1" />
       <representedLanes number="2" />
       <length meter="60.0" />
     </lane>

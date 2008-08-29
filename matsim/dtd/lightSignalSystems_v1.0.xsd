@@ -32,6 +32,7 @@ the simulation -->
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
       <xs:sequence>
+        <xs:element name="toLink" type="idRefType" minOccurs="1" maxOccurs="unbounded"> </xs:element>
         <xs:element name="representedLanes" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:attribute name="number" type="xs:positiveInteger" use="optional" default="1"></xs:attribute>
