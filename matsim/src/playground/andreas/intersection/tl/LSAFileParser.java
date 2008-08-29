@@ -92,6 +92,7 @@ public class LSAFileParser implements TabularFileHandler {
 			countTLAndSG(lsaData);	
 			
 			HashMap<Integer, HashMap<String, DataCollector>> dataSet = generateDataSets(lsaData);
+//			removeTLWithInsufficientNumberOfRecord(dataSet);
 			removeTLWithAdaptiveControl(dataSet);
 			writeDataSet(dataSet);
 			computeOutputData(dataSet);
@@ -110,6 +111,7 @@ public class LSAFileParser implements TabularFileHandler {
 		writer.write("LSA; LSAID; Umlaufzeit");
 		int numberOFTL = 0;
 		int numberOFSG = 0;
+		HashMap<Integer, Integer> umlaufzeit = new HashMap<Integer, Integer>();
 		for (Integer tlId : dataSet.keySet()) {			
 			int ii = 0;
 			double averageUmlaufzeit = 0;
@@ -117,8 +119,9 @@ public class LSAFileParser implements TabularFileHandler {
 				averageUmlaufzeit += dataSet.get(tlId).get(sgId).getAverageU();
 				ii++;				
 			}
+			umlaufzeit.put(tlId, (Integer.valueOf((int) (averageUmlaufzeit / ii))));
 			writer.newLine();
-			writer.write("LSA; " + tlId + "; " + ((int) (averageUmlaufzeit / ii)));
+			writer.write("LSA; " + tlId + "; " + umlaufzeit.get(tlId));
 			numberOFTL++;
 		}
 		
@@ -126,6 +129,9 @@ public class LSAFileParser implements TabularFileHandler {
 		writer.write("SG; SGID; LSAID; StartRed");
 		for (Integer tlId : dataSet.keySet()) {			
 			for (String sgId : dataSet.get(tlId).keySet()) {
+				if(((int)dataSet.get(tlId).get(sgId).getAverageRed()) > umlaufzeit.get(tlId).intValue()){
+					log.warn(" Got a 'RedStartsTime' of " + ((int)dataSet.get(tlId).get(sgId).getAverageRed()) + ", which is bigger than its umlaufzeit " + umlaufzeit.get((tlId)));
+				}
 				writer.newLine();
 				writer.write("SG; " + sgId + "; " + tlId + "; " + ((int)dataSet.get(tlId).get(sgId).getAverageRed()));
 				numberOFSG++;
@@ -152,7 +158,7 @@ public class LSAFileParser implements TabularFileHandler {
 		}
 		writer.flush(); writer.close();
 		log.info(" WriteDataSet wrote " + entriesWritten + " entries.");
-	}
+	}	
 	
 	private static HashMap<Integer, HashMap<String, DataCollector>> removeTLWithAdaptiveControl(HashMap<Integer, HashMap<String, DataCollector>> dataSet) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("E:/ampel/output/adaptiveControl.txt")));
@@ -188,6 +194,45 @@ public class LSAFileParser implements TabularFileHandler {
 		}
 		
 		log.info(" Guess adaptive marked " + sgRemoved + " SGs to be removed and " + sgRemained + " SGs as could remain.\n"
+				 + " However, " + tlRemoved + " TLs were marked as to be removed." 
+				 + " Thus only " + dataSet.keySet().size() + " TLs with " + numberOfSGsActuallyRemained +  " SGs actually remained.");
+		return dataSet;
+	}
+	
+	private static HashMap<Integer, HashMap<String, DataCollector>> removeTLWithInsufficientNumberOfRecord(HashMap<Integer, HashMap<String, DataCollector>> dataSet) throws IOException{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("E:/ampel/output/insufficient.txt")));
+		writer.write("lsaID; SGID; avGreen; avRed; avU; avMinGreen; avMaxGreen; avMinRed; avMaxRed; avMinU; avMaxU; avLastGreen; n; G + R -U");
+		int sgRemoved = 0;
+		int sgRemained = 0;
+		int tlRemoved = 0;
+		TreeSet<Integer> toBeRemovedTL = new TreeSet<Integer>();
+		for (Integer tlId : dataSet.keySet()) {
+			HashMap<String, DataCollector> currentDataSet = dataSet.get(tlId);		
+			
+			for (String sgId : currentDataSet.keySet()) {
+				if (currentDataSet.get(sgId).getNumberOfEntries() < 50){
+					toBeRemovedTL.add(tlId);
+					sgRemoved++;
+					writer.newLine();
+					writer.write(currentDataSet.get(sgId).getAverage());
+				} else{
+					sgRemained++;
+				}
+			}			
+		}
+		
+		for (Integer tlId : toBeRemovedTL) {
+			dataSet.remove(tlId);
+			tlRemoved++;
+		}
+		writer.flush(); writer.close();
+		
+		int numberOfSGsActuallyRemained = 0;
+		for (Integer tlId : dataSet.keySet()) {
+			numberOfSGsActuallyRemained += dataSet.get(tlId).keySet().size();
+		}
+		
+		log.info(" InsufficientFilter marked " + sgRemoved + " SGs to be removed and " + sgRemained + " SGs as could remain.\n"
 				 + " However, " + tlRemoved + " TLs were marked as to be removed." 
 				 + " Thus only " + dataSet.keySet().size() + " TLs with " + numberOfSGsActuallyRemained +  " SGs actually remained.");
 		return dataSet;
@@ -390,6 +435,9 @@ class DataCollector {
 	
 	public double getDivergation(){
 		return getAverageGreen() + getAverageRed() - getAverageU();
+	}
+	public int getNumberOfEntries(){
+		return this.numberOfEntries;
 	}
 	
 	private double getAverageGreen(){
