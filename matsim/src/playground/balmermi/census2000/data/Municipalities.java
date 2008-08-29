@@ -60,7 +60,11 @@ public class Municipalities {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Municipality getMunicipality(int m_id) {
-		return this.municipalities.get(new IdImpl(m_id));
+		return this.getMunicipality(new IdImpl(m_id));
+	}
+
+	public final Municipality getMunicipality(Id m_id) {
+		return this.municipalities.get(m_id);
 	}
 
 	public final HashMap<Id,Municipality> getMunicipalities() {
