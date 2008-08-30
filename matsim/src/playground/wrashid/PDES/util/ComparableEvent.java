@@ -1,5 +1,6 @@
 package playground.wrashid.PDES.util;
 
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkLeaveEvent;
 
@@ -30,7 +31,12 @@ public class ComparableEvent implements Comparable {
 			if (otherEvent.getBasicEvent() instanceof LinkLeaveEvent){
 				return 1;
 			}
-			
+			if (basicEvent instanceof AgentArrivalEvent){
+				return -1;
+			}
+			if (otherEvent.getBasicEvent() instanceof AgentArrivalEvent){
+				return 1;
+			}
 			
 			
 			return 0;
