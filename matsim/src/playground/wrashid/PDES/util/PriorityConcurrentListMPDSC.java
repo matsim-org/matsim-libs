@@ -16,6 +16,7 @@ import playground.wrashid.deqsim.PDESStarter2;
 // - best effort, for creating output in priority order
 // - minOutputBufferLength: defines, when the remove will start working (giving enough time
 // to add, so that priority should work better
+// TODO: update comments
 public class PriorityConcurrentListMPDSC {
 	//private LinkedList<ComparableEvent>[] inputBuffer;
 	private LinkedList<ComparableEvent>[] inputBuffer;
@@ -23,7 +24,7 @@ public class PriorityConcurrentListMPDSC {
 	private PriorityQueue<ComparableEvent> outputQueue=new PriorityQueue<ComparableEvent>();
 	public Integer incounter=0;
 	public Integer outcounter=0;
-	private int maxInputPutListSize;
+	private int sumInputPutListSize;
 	LinkedList<ComparableEvent> outputWorkingBuffer=new LinkedList<ComparableEvent>();
 	
 	// producerId 0>=
@@ -42,28 +43,24 @@ public class PriorityConcurrentListMPDSC {
 			return outputQueue.poll().getBasicEvent();
 		}
 		
-		LinkedList<ComparableEvent> swap=null;
+		int sumInputBufferLength=0;
 		for (int i=0;i<inputBuffer.length;i++){
-			if (!inputBuffer[i].isEmpty()){
-				if (inputBuffer[i].size()>maxInputPutListSize){
-					synchronized (inputBuffer[i]){
-						swap=outputWorkingBuffer;
-						outputWorkingBuffer=inputBuffer[i];
-						inputBuffer[i]=swap;
-					}	
-				}
-				
-				while (outputWorkingBuffer.size()>0){
-					outputQueue.add(outputWorkingBuffer.poll());
-				}
-				
-				if (outputQueue.size()>=minOutputBufferLength){
-					synchronized (outcounter){
-						outcounter++;
-					}
-					return outputQueue.poll().getBasicEvent();
-				}
+			sumInputBufferLength+=inputBuffer[i].size();
+		}
+		
+		if (sumInputBufferLength>sumInputPutListSize){
+			swapBuffers();
+		} else {
+			return null;
+		}
+			
+		
+		
+		if (outputQueue.size()>=minOutputBufferLength){
+			synchronized (outcounter){
+				outcounter++;
 			}
+			return outputQueue.poll().getBasicEvent();
 		}
 		
 		return null;
@@ -74,7 +71,7 @@ public class PriorityConcurrentListMPDSC {
 		for (int i=0;i<inputBuffer.length;i++){
 			inputBuffer[i]=new LinkedList<ComparableEvent>();
 		}
-		this.maxInputPutListSize=maxInputPutListSize;
+		this.sumInputPutListSize=maxInputPutListSize;
 		this.minOutputBufferLength=minOutputBufferLength;
 	}
 	
@@ -83,6 +80,10 @@ public class PriorityConcurrentListMPDSC {
 	public void flushAllInputBuffers(){
 		minOutputBufferLength=1;
 		
+		swapBuffers();
+	}
+	
+	private void swapBuffers(){
 		LinkedList<ComparableEvent> swap=null;
 		for (int i=0;i<inputBuffer.length;i++){
 			if (!inputBuffer[i].isEmpty()){
