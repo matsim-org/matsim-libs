@@ -30,8 +30,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Network2ESRIShapeTest extends MatsimTestCase  {
 
+	
+	//TODO [GL] - find a way to compare *.dbf files since simple checksum tests are not applicable here. - 08/30/2008 gl
 	public void testPolygonCapacityShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
+		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
@@ -60,7 +62,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 	}
 	
 	public void testPolygonLanesShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
+		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
@@ -87,7 +89,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 	}
 	
 	public void testPolygonFreespeedShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
+		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 		String ref = getInputDirectory() + "./network.shp";
 		
@@ -114,11 +116,11 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 	}
 	
 	public void testLineStringShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
+		String netFileName = "test/scenarios/berlin/network.xml.gz";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
-		String outputFileDbf = getOutputDirectory() + "./network.dbf";
+//		String outputFileDbf = getOutputDirectory() + "./network.dbf";
 		String refShp = getInputDirectory() + "./network.shp";
-		String refDbf = getInputDirectory() + "./network.dbf";
+//		String refDbf = getInputDirectory() + "./network.dbf";
 		
 		
 		Gbl.createConfig(null);
@@ -141,10 +143,10 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
 		
-		System.out.println("calculating *.dbf file checksums...");
-		checksum1 = CRCChecksum.getCRCFromFile(refDbf);;
-		checksum2 = CRCChecksum.getCRCFromGZFile(outputFileDbf);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+//		System.out.println("calculating *.dbf file checksums...");
+//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);;
+//		checksum2 = CRCChecksum.getCRCFromGZFile(outputFileDbf);
+//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
+//		assertEquals(checksum1, checksum2);
 	}
 }

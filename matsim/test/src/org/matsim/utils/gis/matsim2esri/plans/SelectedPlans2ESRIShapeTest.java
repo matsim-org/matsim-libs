@@ -32,16 +32,18 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
+	//TODO [GL] - find a way to compare *.dbf files since simple checksum tests are not applicable here. - 08/30/2008 gl
+	
 	public void testSelectedPlansActsShape() {
-		String populationFilename = "./test/scenarios/equil/plans100.xml";
-		String networkFilename = "./test/scenarios/equil/network.xml";
+		String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 		
 		String refShp = getInputDirectory() + "acts.shp";
-		String refDbf = getInputDirectory() + "acts.dbf";
+//		String refDbf = getInputDirectory() + "acts.dbf";
 		
 		String outShp = getOutputDirectory() + "acts.shp";
-		String outDbf = getOutputDirectory() + "acts.dbf";
+//		String outDbf = getOutputDirectory() + "acts.dbf";
 	
 		Gbl.createConfig(null);
 		Gbl.createWorld();
@@ -66,23 +68,23 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
 		
-		System.out.println("calculating *.dbf file checksums...");
-		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+//		System.out.println("calculating *.dbf file checksums...");
+//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
+//		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
+//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
+//		assertEquals(checksum1, checksum2);
 	}
 	
 	public void testSelectedPlansLegsShape() {
-		String populationFilename = "./test/scenarios/equil/plans100.xml";
-		String networkFilename = "./test/scenarios/equil/network.xml";
+		String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 		
 		String refShp = getInputDirectory() + "legs.shp";
-		String refDbf = getInputDirectory() + "legs.dbf";
+//		String refDbf = getInputDirectory() + "legs.dbf";
 		
 		String outShp = getOutputDirectory() + "legs.shp";
-		String outDbf = getOutputDirectory() + "legs.dbf";
+//		String outDbf = getOutputDirectory() + "legs.dbf";
 	
 		Gbl.createConfig(null);
 		Gbl.createWorld();
@@ -107,11 +109,11 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
 		
-		System.out.println("calculating *.dbf file checksums...");
-		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
-		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+//		System.out.println("calculating *.dbf file checksums...");
+//		checksum1 = CRCChecksum.getCRCFromFile(refDbf);
+//		checksum2 = CRCChecksum.getCRCFromGZFile(outDbf);
+//		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
+//		assertEquals(checksum1, checksum2);
 	}
 	
 }

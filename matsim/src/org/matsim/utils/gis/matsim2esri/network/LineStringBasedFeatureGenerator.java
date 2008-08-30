@@ -26,7 +26,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.network.Link;
@@ -68,7 +68,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
 
 		try {
-			this.featureType = FeatureTypeFactory.newFeatureType(attribs, "link");
+			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {

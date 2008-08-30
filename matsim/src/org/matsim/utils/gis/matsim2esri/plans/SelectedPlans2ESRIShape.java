@@ -29,7 +29,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.gbl.Gbl;
@@ -276,8 +276,8 @@ public class SelectedPlans2ESRIShape {
 		attrLeg[7] = AttributeTypeFactory.newAttributeType("DIST", Double.class);
 
 		try {
-			this.featureTypeAct = FeatureTypeFactory.newFeatureType(attrAct, "activity");
-			this.featureTypeLeg = FeatureTypeFactory.newFeatureType(attrLeg, "leg");
+			this.featureTypeAct = FeatureTypeBuilder.newFeatureType(attrAct, "activity");
+			this.featureTypeLeg = FeatureTypeBuilder.newFeatureType(attrLeg, "leg");
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
 		} catch (SchemaException e) {
