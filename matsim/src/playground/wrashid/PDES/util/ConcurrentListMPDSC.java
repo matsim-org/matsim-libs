@@ -18,17 +18,21 @@ public class ConcurrentListMPDSC {
 	private LinkedList<Message>[] inputBuffer;
 	private LinkedList<Message>[] outputBuffer;
 	private LinkedList<Message> outputWorkingBuffer = new LinkedList<Message>();
-
+    private volatile double timeOfEarliestMessage=0;
 	private Object lock = new Object();
 
 	// producerId 0>=
 	public void add(Message message, int producerId) {
 		synchronized (inputBuffer[producerId]) {
 			inputBuffer[producerId].add(message);
+			if (timeOfEarliestMessage>inputBuffer[producerId].peek().messageArrivalTime){
+				timeOfEarliestMessage=inputBuffer[producerId].peek().messageArrivalTime;
+			}
 		}
 	}
 
 	public double getTimeOfLatestMessageAfterLastFlush() {
+		/*
 		double earliestTimeStamp=Double.MAX_VALUE;
 		for (int i=0;i<inputBuffer.length;i++){
 			if (inputBuffer[i].size()>0 && inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
@@ -36,6 +40,8 @@ public class ConcurrentListMPDSC {
 			}
 		}
 		return earliestTimeStamp;
+		*/
+		return timeOfEarliestMessage;
 	}
 
 	// returns null, if empty, else the first element
