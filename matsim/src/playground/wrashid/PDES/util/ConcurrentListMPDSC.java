@@ -18,27 +18,24 @@ public class ConcurrentListMPDSC {
 	private LinkedList<Message>[] inputBuffer;
 	private LinkedList<Message>[] outputBuffer;
 	private LinkedList<Message> outputWorkingBuffer = new LinkedList<Message>();
-	private double timeOfLatestMessageAfterLastFlush = Double.MAX_VALUE;
+
 	private Object lock = new Object();
 
 	// producerId 0>=
 	public void add(Message message, int producerId) {
 		synchronized (inputBuffer[producerId]) {
-			if (timeOfLatestMessageAfterLastFlush > message.messageArrivalTime) {
-				synchronized (lock) {
-					// because last read of timeOfLatestMessageAfterLastFlush
-					// was not locked
-					if (timeOfLatestMessageAfterLastFlush > message.messageArrivalTime) {
-						timeOfLatestMessageAfterLastFlush = message.messageArrivalTime;
-					}
-				}
-			}
 			inputBuffer[producerId].add(message);
 		}
 	}
 
 	public double getTimeOfLatestMessageAfterLastFlush() {
-		return timeOfLatestMessageAfterLastFlush;
+		double earliestTimeStamp=Double.MAX_VALUE;
+		for (int i=0;i<inputBuffer.length;i++){
+			if (inputBuffer[i].size()>0 && inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
+				earliestTimeStamp=inputBuffer[i].peek().getMessageArrivalTime();
+			}
+		}
+		return earliestTimeStamp;
 	}
 
 	// returns null, if empty, else the first element
@@ -84,7 +81,6 @@ public class ConcurrentListMPDSC {
 	// this method should be invoked especially, when all producers have
 	// finished production
 	public void flushAllInputBuffers() {
-		timeOfLatestMessageAfterLastFlush = Double.MAX_VALUE;
 		LinkedList<Message> swap = null;
 		for (int i = 0; i < inputBuffer.length; i++) {
 			if (inputBuffer[i].size() > 0) {
