@@ -31,9 +31,8 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
 
 /**
- * @author fearonni
+ * @author jillenberger
  * @author dgrether
- *
  */
 public class PlanScore implements AgentContentment {
 
@@ -83,13 +82,10 @@ public class PlanScore implements AgentContentment {
 		this.gamma_late = gamma_late;
 	}
 
-
-
 	// =====================================================================
 	// instance methods
 	// =====================================================================
 
-	@SuppressWarnings("unchecked")
 	public double getContentment() {
 		double time = SimulationTimer.getTime();
 		if (time > this.lastCallTime) {
