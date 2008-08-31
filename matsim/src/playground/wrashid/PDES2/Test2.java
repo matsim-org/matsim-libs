@@ -14,7 +14,7 @@ public class Test2 {
 	public static void main(String[] args) {
 		// the config file comes as input
 		
-		String baseDir="/data/matsim/wrashid/input/input_67K/";
+		String baseDir="/data/matsim/wrashid/input/input_304K/";
 		args=new String[1];
 			
 		args[0]= baseDir + "config.xml";
