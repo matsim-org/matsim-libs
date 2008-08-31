@@ -82,10 +82,10 @@ public class DilutedZurichFilter {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		log.info("  done.");
+//		log.info("  reading world xml file...");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
+//		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+//		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
@@ -178,9 +178,9 @@ public class DilutedZurichFilter {
 		new FacilitiesWriter(facilities).write();
 		log.info("  done.");
 
-		log.info("  writing world xml file... ");
-		new WorldWriter(Gbl.getWorld()).write();
-		log.info("  done.");
+//		log.info("  writing world xml file... ");
+//		new WorldWriter(Gbl.getWorld()).write();
+//		log.info("  done.");
 
 		log.info("  writing config xml file... ");
 		new ConfigWriter(Gbl.getConfig()).write();
