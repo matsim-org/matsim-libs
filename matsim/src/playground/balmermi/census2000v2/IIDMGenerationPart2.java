@@ -37,6 +37,7 @@ import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.PersonAssignAndNormalizeTimes;
+import playground.balmermi.census2000v2.modules.PersonAssignModeChoiceModel;
 import playground.balmermi.census2000v2.modules.PersonAssignShopLeisureLocations;
 import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
 import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
@@ -145,6 +146,7 @@ public class IIDMGenerationPart2 {
 		pop.addAlgorithm(new PersonSetLocationsFromKnowledge());
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
 		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
+//		pop.addAlgorithm(new PersonAssignModeChoiceModel(municipalities));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
