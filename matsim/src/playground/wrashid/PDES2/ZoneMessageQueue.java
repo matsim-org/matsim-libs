@@ -39,7 +39,7 @@ public class ZoneMessageQueue {
 	// LinkedList[SimulationParameters.numberOfMessageExecutorThreads];
 	public Lock lock = new ReentrantLock();
 	public ConcurrentListMPDSC buffer = new ConcurrentListMPDSC(
-			SimulationParameters.numberOfMessageExecutorThreads);
+			SimulationParameters.numberOfMessageExecutorThreads,1000);
 
 	public int numberOfIncomingLinks = 0;
 	public LinkedList<Link> tempIncomingLinks = new LinkedList<Link>();
@@ -154,7 +154,7 @@ public class ZoneMessageQueue {
 		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
 			
 			// only need to empty buffer, if newer messages as queue1.peek have arrived
-			if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<queue1.peek().getMessageArrivalTime()){
+			if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<=queue1.peek().getMessageArrivalTime()){
 				emptyBuffer();
 			} 
 			
@@ -259,7 +259,12 @@ public class ZoneMessageQueue {
 	}
 
 	private void emptyBuffer() {
-		buffer.flushAllInputBuffers();
+		try{
+			buffer.flushAllInputBuffers(queue1.peek().messageArrivalTime);
+		} catch(Exception e) {
+			//buffer.flushAllInputBuffers(Double.MAX_VALUE);
+			// TODO: invoke method: really flush input buffer...
+		}
 		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
 		while (messages!=null){
 			while (messages.size()>0){

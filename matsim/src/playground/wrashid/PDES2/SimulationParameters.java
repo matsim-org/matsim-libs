@@ -115,7 +115,9 @@ public class SimulationParameters {
 	private static void bufferEvent(BasicEvent event, int producerId) {
 		if (event instanceof AgentDepartureEvent
 				|| event instanceof AgentArrivalEvent) {
-			//System.out.println("in: " + event.toString());
+			//if (event.agentId.equalsIgnoreCase("2400337")){
+				//System.out.println("in: " + event.toString());
+			//}
 		}
 		eventBuffer.add(event, producerId);
 	}
@@ -125,7 +127,9 @@ public class SimulationParameters {
 		while (be != null) {
 			if (be instanceof AgentDepartureEvent
 					|| be instanceof AgentArrivalEvent) {
-				//System.out.println("out: " + be.toString());
+				//if (be.agentId.equalsIgnoreCase("2400337")){
+					//System.out.println("out: " + be.toString());
+				//}
 			}
 			try {
 				SimulationParameters.events.processEvent(be);
@@ -145,7 +149,7 @@ public class SimulationParameters {
 	public static double noOfCarsRight = 0;
 	public static double noOfCars = 0;
 	public static PriorityConcurrentListMPDSC eventBuffer = new PriorityConcurrentListMPDSC(
-			SimulationParameters.numberOfMessageExecutorThreads, 2000000,100000);
+			SimulationParameters.numberOfMessageExecutorThreads, 200000,100000);
 
 	public static double test_timer = 0;
 

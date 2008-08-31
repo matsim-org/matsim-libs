@@ -192,6 +192,8 @@ VERY IMPORTANT TODOS:
        
       - Vergleich von Anzahl events bei Mobsim und JDEQSim (PDES2). 
           => zu wenig events....
+          
+      - a departure event is missing in test6.     
        
        
        
@@ -337,5 +339,11 @@ PDES2, 12 CPU: 877/1273 sec.
    ignoriert???
 
 
-
+Ex5:
+----
+6 iterationen, census2000_dilZh30km_miv_transitincl (WU 670'000, MIV only)
+events: 75.25M+ events
+DEQSim, 4 CPU: 
+MobSim: 
+JDEQSim: 
      

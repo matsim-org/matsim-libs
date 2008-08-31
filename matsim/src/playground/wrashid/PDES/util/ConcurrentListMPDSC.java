@@ -16,31 +16,34 @@ import playground.wrashid.PDES2.Message;
 
 public class ConcurrentListMPDSC {
 	private LinkedList<Message>[] inputBuffer;
+	private LinkedList<LinkedList<Message>>[] middleBuffer;
 	private LinkedList<Message>[] outputBuffer;
 	private LinkedList<Message> outputWorkingBuffer = new LinkedList<Message>();
-    private volatile double timeOfEarliestMessage=0;
+	private volatile double timeOfEarliestMessage = 0;
 	private Object lock = new Object();
+	private int minListSize; // if inputBuffer bigger than this, then put it
+								// into middleBuffer
 
 	// producerId 0>=
 	public void add(Message message, int producerId) {
 		synchronized (inputBuffer[producerId]) {
 			inputBuffer[producerId].add(message);
-			if (timeOfEarliestMessage>inputBuffer[producerId].peek().messageArrivalTime){
-				timeOfEarliestMessage=inputBuffer[producerId].peek().messageArrivalTime;
+			if (inputBuffer[producerId].size() > minListSize) {
+				synchronized (middleBuffer[producerId]) {
+					middleBuffer[producerId].add(inputBuffer[producerId]);
+				}
 			}
 		}
 	}
 
 	public double getTimeOfLatestMessageAfterLastFlush() {
 		/*
-		double earliestTimeStamp=Double.MAX_VALUE;
-		for (int i=0;i<inputBuffer.length;i++){
-			if (inputBuffer[i].size()>0 && inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
-				earliestTimeStamp=inputBuffer[i].peek().getMessageArrivalTime();
-			}
-		}
-		return earliestTimeStamp;
-		*/
+		 * double earliestTimeStamp=Double.MAX_VALUE; for (int i=0;i<inputBuffer.length;i++){
+		 * if (inputBuffer[i].size()>0 &&
+		 * inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
+		 * earliestTimeStamp=inputBuffer[i].peek().getMessageArrivalTime(); } }
+		 * return earliestTimeStamp;
+		 */
 		return timeOfEarliestMessage;
 	}
 
@@ -75,30 +78,72 @@ public class ConcurrentListMPDSC {
 		return null;
 	}
 
-	public ConcurrentListMPDSC(int numberOfProducers) {
+	public ConcurrentListMPDSC(int numberOfProducers, int minListSize) {
 		outputBuffer = new LinkedList[numberOfProducers];
 		inputBuffer = new LinkedList[numberOfProducers];
+		middleBuffer = new LinkedList[numberOfProducers];
 		for (int i = 0; i < inputBuffer.length; i++) {
 			inputBuffer[i] = new LinkedList<Message>();
 			outputBuffer[i] = new LinkedList<Message>();
+			middleBuffer[i] = new LinkedList<LinkedList<Message>>();
 		}
+		this.minListSize = minListSize;
 	}
 
 	// this method should be invoked especially, when all producers have
 	// finished production
-	public void flushAllInputBuffers() {
+	public void flushAllInputBuffers(double queueTime) {
 		LinkedList<Message> swap = null;
+		boolean breakLoop = false;
+		Message tempMessage = null;
 		for (int i = 0; i < inputBuffer.length; i++) {
-			if (inputBuffer[i].size() > 0) {
-				synchronized (inputBuffer[i]) {
-					// only exchange tables, if something has changed
-					swap = outputBuffer[i];
-					outputBuffer[i] = inputBuffer[i];
-					inputBuffer[i] = swap;
+			breakLoop = false;
+
+			synchronized (middleBuffer[i]) {
+				swap = middleBuffer[i].poll();
+			}
+			while (swap != null) {
+				tempMessage = swap.poll();
+				while (tempMessage != null) {
+					outputBuffer[i].add(tempMessage);
+					
+					if (tempMessage.messageArrivalTime>queueTime){
+						breakLoop=true;
+					}
+					
+					tempMessage = swap.poll();
+				}
+
+				if (breakLoop) {
+					break;
+				} else {
+					synchronized (middleBuffer[i]) {
+						swap = middleBuffer[i].poll();
+					}
 				}
 			}
+			
+			// if middleBuffer empty
+			if (swap==null) {
+				// try to get the first element of middleBuffer
+				synchronized (middleBuffer[i]) {
+					swap = middleBuffer[i].poll();
+				}
+				
+				if (swap!=null){
+					// do invoke method: really flush input buffer...
+					
+				} else {
+					// TODO: continue here...
+				}
+				
+			}
+
 		}
 	}
+	
+	
+	
 
 	public static void main(String[] args) {
 
