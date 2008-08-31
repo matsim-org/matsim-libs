@@ -190,6 +190,8 @@ VERY IMPORTANT TODOS:
       
       - frage zu iterationen habe ich an Marcel geschickt, mal schauen ob er antwortet.
        
+      - Vergleich von Anzahl events bei Mobsim und JDEQSim (PDES2). 
+       
        
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
