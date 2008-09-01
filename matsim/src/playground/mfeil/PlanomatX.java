@@ -15,16 +15,17 @@ import org.matsim.planomat.*;
  */
 public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm {
 	
-
+	PlanAlgorithm planomatAlgorithm = null;
 	public PlanomatX (final LegTravelTimeEstimator legTravelTimeEstimator) {
 
-		PlanAlgorithm planomatAlgorithm = new PlanOptimizeTimes (legTravelTimeEstimator);
-	//	planomatAlgorithm =  new PlanOptimizeTimes (legTravelTimeEstimator);
+		planomatAlgorithm = new PlanOptimizeTimes (legTravelTimeEstimator);
 
 		
 	}
 	public void run (final Plan plan){
-		System.out.println("Das ist nur ein PlanomatX-Test, Pläne bleiben unverändert.");
+//		System.out.println("Das ist nur ein PlanomatX-Test, Pläne bleiben unverändert.");
+//		this.planomatAlgorithm.run (plan);
+		
 		
 	}
 
