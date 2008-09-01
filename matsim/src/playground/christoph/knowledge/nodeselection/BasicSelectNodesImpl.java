@@ -27,20 +27,18 @@ import org.matsim.network.Node;
 
 
 public class BasicSelectNodesImpl implements SelectNodes {
-	
+
 	NetworkLayer network;
 
-	@Override
 	public void getNodes(ArrayList<Node> nodeList) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
 	public ArrayList<Node> getNodes() {
 		// TODO Auto-generated method stub
 		return new ArrayList<Node>();
 	}
-	
+
 	public NetworkLayer getNetwork() {
 		return network;
 	}
@@ -50,5 +48,5 @@ public class BasicSelectNodesImpl implements SelectNodes {
 	}
 
 
-	
+
 }
