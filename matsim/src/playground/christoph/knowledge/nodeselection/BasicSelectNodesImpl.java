@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LimitedKnowledge.java
+ * BasicSelectNodesImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,42 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.knowledge;
+package playground.christoph.knowledge.nodeselection;
+
+import java.util.ArrayList;
 
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plan;
-import org.matsim.replanning.modules.ReRouteDijkstra;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+import org.matsim.network.Node;
 
-public class LimitedKnowledge extends ReRouteDijkstra {		
 
-	KnowledgeTravelCost knowledgeCostFunction;
+public class BasicSelectNodesImpl implements SelectNodes {
 	
-	// Erstmal alle Daten weiterleiten... 
-	public LimitedKnowledge(NetworkLayer network, TravelCost travelCostCalc, TravelTime travelTimeCalc)
-	{	
-		super(network, travelCostCalc, travelTimeCalc);
-
-		// Referenz auf die TravelCosts abspeichern - da schicken wir dann die jeweils aktuelle Person hin.
-		knowledgeCostFunction = (KnowledgeTravelCost) travelCostCalc;
-		System.out.println("----------------------LimitedKnowledge Router runs!----------------------");
-		
-	}	
+	NetworkLayer network;
 
 	@Override
-	public void handlePlan(Plan plan) {
+	public void getNodes(ArrayList<Node> nodeList) {
 		// TODO Auto-generated method stub
-		//Knowledge myKnowledge = plan.getPerson().getKnowledge();
-		
-//		if(plan != null && plan.getPerson() != null) 
-//		{ System.out.println("handlePlan, PersonID: " + plan.getPerson().getId().toString()); }
-		
-		// Person weiterleiten...
-		knowledgeCostFunction.setPerson(plan.getPerson());
-
-		// ... und Plan abarbeiten lassen.
-		super.handlePlan(plan);
 	}
 
+	@Override
+	public ArrayList<Node> getNodes() {
+		// TODO Auto-generated method stub
+		return new ArrayList<Node>();
+	}
+	
+	public NetworkLayer getNetwork() {
+		return network;
+	}
+
+	public void setNetwork(NetworkLayer network) {
+		this.network = network;
+	}
+
+
+	
 }

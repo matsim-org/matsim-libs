@@ -21,7 +21,7 @@
  // "LimitedKnowledge" Strategie eingefügt - kann später auch im org.matsim implementiert werden,
  // dann wäre diese Datei überflüssig!
 
-package playground.christoph.knowledge;
+package playground.christoph.knowledge.replanning;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -54,6 +54,9 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.socialnetworks.replanning.SNRandomFacilitySwitcher;
+
+import playground.christoph.knowledge.replanning.modules.LimitedKnowledge;
+
 
 
 public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigLoader{

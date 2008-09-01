@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgeTravelCost.java
+ * GenerateKnowledge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -40,6 +40,8 @@ import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.utils.geometry.Coord;
 
+import playground.christoph.knowledge.utils.GetAllLinks;
+
 public class GenerateKnowledge {
 
 	Population population;
@@ -65,7 +67,7 @@ public class GenerateKnowledge {
 		{
 			Person person = PersonIterator.next();
 			
-			ArrayList<Link> links = getLinks(person);
+			ArrayList<Link> links = new GetAllLinks().getAllLinks(person);
 			
 			setKnowledge(person, links);
 			
@@ -74,48 +76,6 @@ public class GenerateKnowledge {
 			//setKnowledge(person, nodes);
 		}
 	}
-	
-	
-	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der übergebenen Person sind.
-	protected ArrayList<Link> getLinks(Person person)
-	{
-		ArrayList<Link> links = new ArrayList<Link>();
-		ArrayList<Id> linkIDs = new ArrayList<Id>();
-		
-		Plan plan = person.getSelectedPlan();
-
-		// Links holen, an denen Acts stattfinden
-		ActIterator actIterator = plan.getIteratorAct();
-		while (actIterator.hasNext())
-		{
-			//BasicActImpl act = actIterator.next();
-			Act act = (Act)actIterator.next();
-			
-			// Hinzufügen, falls neues Element
-			if(!links.contains(act.getLink())) links.add(act.getLink());
-		}	// while actIterator.hasNext()
-
-		// Routen holen, die die Acts verbinden
-		LegIterator legIterator = plan.getIteratorLeg();
-		while (legIterator.hasNext())
-		{
-			Leg leg = (Leg)legIterator.next();
-
-			Route route = leg.getRoute();
-				
-			Link[] linkArray = route.getLinkRoute(); 
-			
-			for(int i = 0; i < linkArray.length; i++)
-			{
-				Link link = linkArray[i];
-			
-				// Hinzufügen, falls neues Element
-				if(!links.contains(link)) links.add(link);
-			}
-		}	// while legIterator.hasNext()
-
-		return links;
-	} //getLinks(Person)
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
@@ -240,44 +200,4 @@ public class GenerateKnowledge {
 		return includedLinks;
 	}
 	
-	
-/*	
-	protected ArrayList<Node> getIncludedNodes(ArrayList<Node> nodes)
-	{
-		ArrayList<Node> includedNodes = new ArrayList<Node>();
-		
-		TreeMap<Id, Node> nodeMap = (TreeMap<Id, Node>)network.getNodes();
-		//Map<Id, Node> nodeMap = network.getNodes();
-		
-		Iterator nodeIterator = nodeMap.entrySet().iterator();
-		
-		while(nodeIterator.hasNext())
-		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
-			Map.Entry<Id, Node> nextNode = (Map.Entry<Id, Node>)nodeIterator.next();
-			Id id = nextNode.getKey();
-			Node node = nextNode.getValue();
-			
-			Coord coord = node.getCoord();
-			
-			// Abstand zu allen Knoten der übergebenen Person untersuchen
-			for (int i = 0; i < nodes.size(); i++)
-			{
-				double dist = coord.calcDistance(nodes.get(i).getCoord());
-				
-				// Innerhalb des Bereichs?
-				if (dist <= distance)
-				{
-					// Knoten in Liste speichern
-					includedNodes.add(node);
-					
-					// Treffer -> Schleife abbrechen
-					i = nodes.size();
-				}
-			}			
-		}	// while nodeIterator.hasNext()
-		
-		return includedNodes;
-	}
-	*/
 }

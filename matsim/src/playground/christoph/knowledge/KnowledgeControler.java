@@ -32,9 +32,17 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.replanning.StrategyManager;
+import org.matsim.router.Dijkstra;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.PreProcessDijkstra;
+
+import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
+import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 
 public class KnowledgeControler extends Controler {
 
@@ -78,7 +86,23 @@ public class KnowledgeControler extends Controler {
 		initKnowledge();	// neu...
 		setKnowledge();		// neu...
 		
-		new GenerateKnowledge(this.population, this.network, 4000.0);
+		DijkstraForSelectNodes snd = new DijkstraForSelectNodes(this.network);
+		snd.executeNetwork(network.getNode("12"));
+		//snd.executeRoute(network.getNode("12"), network.getNode("20"));
+		Map<Node, Double> myMap = snd.getMinDistances();
+		
+		DijkstraForSelectNodes snd2 = new DijkstraForSelectNodes(this.network);
+		snd2.executeNetwork(network.getNode("20"));
+		Map<Node, Double> myMap2 = snd2.getMinDistances();
+		
+		System.out.println("--------------");
+		System.out.println(myMap.get(network.getNode("20")));
+		System.out.println(myMap2.get(network.getNode("12")));
+
+		// Test soweit fertig...
+		System.exit(0);
+		
+		//new GenerateKnowledge(this.population, this.network, 4000.0);
 				
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 
