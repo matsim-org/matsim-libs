@@ -154,9 +154,9 @@ public class ZoneMessageQueue {
 		if (messagesArrivedFromRoads == numberOfIncomingLinks) {
 			
 			// only need to empty buffer, if newer messages as queue1.peek have arrived
-			if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<=queue1.peek().getMessageArrivalTime()){
+			//if (queue1.isEmpty() || buffer.getTimeOfLatestMessageAfterLastFlush()<=queue1.peek().getMessageArrivalTime()){
 				emptyBuffer();
-			} 
+			//} 
 			
 			
 			// - needed in particular, if used with 1 cpu (isEmpty)
@@ -262,8 +262,7 @@ public class ZoneMessageQueue {
 		try{
 			buffer.flushAllInputBuffers(queue1.peek().messageArrivalTime);
 		} catch(Exception e) {
-			//buffer.flushAllInputBuffers(Double.MAX_VALUE);
-			// TODO: invoke method: really flush input buffer...
+			buffer.flushEverything();
 		}
 		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
 		while (messages!=null){

@@ -19,10 +19,11 @@ public class ConcurrentListMPDSC {
 	private LinkedList<LinkedList<Message>>[] middleBuffer;
 	private LinkedList<Message>[] outputBuffer;
 	private LinkedList<Message> outputWorkingBuffer = new LinkedList<Message>();
-	private volatile double timeOfEarliestMessage = 0;
+	// private volatile double timeOfEarliestMessage = 0;
 	private Object lock = new Object();
 	private int minListSize; // if inputBuffer bigger than this, then put it
-								// into middleBuffer
+
+	// into middleBuffer
 
 	// producerId 0>=
 	public void add(Message message, int producerId) {
@@ -31,22 +32,22 @@ public class ConcurrentListMPDSC {
 			if (inputBuffer[producerId].size() > minListSize) {
 				synchronized (middleBuffer[producerId]) {
 					middleBuffer[producerId].add(inputBuffer[producerId]);
+					inputBuffer[producerId] = new LinkedList<Message>();
 				}
 			}
 		}
 	}
 
-	public double getTimeOfLatestMessageAfterLastFlush() {
-		/*
-		 * double earliestTimeStamp=Double.MAX_VALUE; for (int i=0;i<inputBuffer.length;i++){
-		 * if (inputBuffer[i].size()>0 &&
-		 * inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
-		 * earliestTimeStamp=inputBuffer[i].peek().getMessageArrivalTime(); } }
-		 * return earliestTimeStamp;
-		 */
-		return timeOfEarliestMessage;
-	}
-
+	// public double getTimeOfLatestMessageAfterLastFlush() {
+	/*
+	 * double earliestTimeStamp=Double.MAX_VALUE; for (int i=0;i<inputBuffer.length;i++){
+	 * if (inputBuffer[i].size()>0 &&
+	 * inputBuffer[i].peek().getMessageArrivalTime()<earliestTimeStamp){
+	 * earliestTimeStamp=inputBuffer[i].peek().getMessageArrivalTime(); } }
+	 * return earliestTimeStamp;
+	 */
+	// return timeOfEarliestMessage;
+	// }
 	// returns null, if empty, else the first element
 	/*
 	 * public T remove(){ if (outputWorkingBuffer!=null &&
@@ -90,60 +91,83 @@ public class ConcurrentListMPDSC {
 		this.minListSize = minListSize;
 	}
 
-	// this method should be invoked especially, when all producers have
-	// finished production
+	// flush all messages, with time stamp smaller than queueTime
 	public void flushAllInputBuffers(double queueTime) {
 		LinkedList<Message> swap = null;
 		boolean breakLoop = false;
 		Message tempMessage = null;
+		int numberOfListsInMiddleBuffer = 0;
 		for (int i = 0; i < inputBuffer.length; i++) {
 			breakLoop = false;
 
+			// empty middleBuffer, as far as needed
 			synchronized (middleBuffer[i]) {
-				swap = middleBuffer[i].poll();
+				numberOfListsInMiddleBuffer = middleBuffer[i].size();
 			}
-			while (swap != null) {
-				tempMessage = swap.poll();
-				while (tempMessage != null) {
-					outputBuffer[i].add(tempMessage);
-					
-					if (tempMessage.messageArrivalTime>queueTime){
-						breakLoop=true;
-					}
-					
-					tempMessage = swap.poll();
-				}
-
-				if (breakLoop) {
-					break;
-				} else {
-					synchronized (middleBuffer[i]) {
-						swap = middleBuffer[i].poll();
-					}
-				}
-			}
-			
-			// if middleBuffer empty
-			if (swap==null) {
-				// try to get the first element of middleBuffer
+			for (int j = 0; j < numberOfListsInMiddleBuffer; j++) {
 				synchronized (middleBuffer[i]) {
 					swap = middleBuffer[i].poll();
 				}
-				
-				if (swap!=null){
-					// do invoke method: really flush input buffer...
-					
-				} else {
-					// TODO: continue here...
+				tempMessage = swap.poll();
+				while (tempMessage != null) {
+					outputBuffer[i].add(tempMessage);
+					if (tempMessage.messageArrivalTime > queueTime) {
+						breakLoop = true;
+					}
+					tempMessage = swap.poll();
 				}
-				
+				if (breakLoop) {
+					break;
+				}
 			}
 
+			// if middleBuffer emptied => try to empty inputBuffers
+			if (!breakLoop) {
+				flushEverything(i);
+			}
 		}
 	}
+
+	// at the time of invocation of this method: everything in input buffer and
+	// middle buffer should
+	// be emptied 
+	public void flushEverything(){
+		for (int i = 0; i < inputBuffer.length; i++) {
+			flushEverything(i);
+		}
+	}
+			
 	
 	
-	
+	// empty input and middle buffer for the given bufferId
+	public void flushEverything(int bufferId) {
+		LinkedList<Message> tempInputBuffer = null;
+		LinkedList<Message> swap = null;
+		int numberOfListsInMiddleBuffer = 0;
+		int i = bufferId;
+		synchronized (inputBuffer[i]) {
+			// empty inputBuffer
+			tempInputBuffer = inputBuffer[i];
+			inputBuffer[i] = new LinkedList<Message>();
+			synchronized (middleBuffer[i]) {
+				numberOfListsInMiddleBuffer = middleBuffer[i].size();
+			}
+		}
+
+		// empty middleBuffer
+		for (int j = 0; j < numberOfListsInMiddleBuffer; j++) {
+			synchronized (middleBuffer[i]) {
+				swap = middleBuffer[i].poll();
+			}
+			while (swap.size() > 0) {
+				outputBuffer[i].add(swap.poll());
+			}
+		}
+
+		while (tempInputBuffer.size() > 0) {
+			outputBuffer[i].add(tempInputBuffer.poll());
+		}
+	}
 
 	public static void main(String[] args) {
 
