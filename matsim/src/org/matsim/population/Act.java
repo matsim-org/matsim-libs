@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -31,13 +31,8 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
-public class Act extends BasicActImpl /*implements Serializable*/ {
+public class Act extends BasicActImpl {
 
-//	private static final long serialVersionUID = 1L;
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 	private boolean isPrimary = false;
 
 	//////////////////////////////////////////////////////////////////////
@@ -143,42 +138,6 @@ public class Act extends BasicActImpl /*implements Serializable*/ {
 				"[isPrimary=" + this.isPrimary + "]";
 	}
 
-
-	/* seems the code below is nowhere really used, so I commented it out. Additionally,
-	 * I think it doesn't work correctly, as it serializes some non-transient members 
-	 * manually, so they are basically serialized twice.
-	 * If nobody needs this code, I will delete it soon.   marcel/9jul2008
-	 * TODO [MR] delete code
-	 */
-	// BasicAct is not yet serializable, so we have to serialize it by hand
-	// plus Link Reference serialized as ID int
-	/* not sure about that: BasicAct is not serializable, but Act inherits from BasicAct, and is serializable.
-	 * Thus when serializing an Act, it should include the inherited members... at least that's my guess...
-	 * Anybody ever tried that?  marcel/9jul2008
-	 */
-/*	private void writeObject(final ObjectOutputStream s) throws IOException {
-	    // The standard non-transient fields.
-	  s.defaultWriteObject();
-	  s.writeDouble(getStartTime());
-	  s.writeDouble(getDur());
-	  s.writeDouble(getEndTime());
-	  s.writeObject(getType());
-	  s.writeObject(this.link.getId().toString());
-	}
-
-	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
-	  // the `size' field.
-	  s.defaultReadObject();
-	  setStartTime(s.readDouble());
-	  setDur(s.readDouble());
-	  setEndTime(s.readDouble());
-	  setType((String)s.readObject());
-	  String linkId = (String)s.readObject();
-	  NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-	  this.link = (Link) network.getLocation(linkId);
-	}
-*/
-
 	public final double getDur() {
 		return this.dur;
 	}
@@ -197,11 +156,11 @@ public class Act extends BasicActImpl /*implements Serializable*/ {
 		return this.link.getId();
 	}
 
-	
+
 	/**
 	 * This method calculates the duration of the activity from the start and endtimes if set.
 	 * If neither end nor starttime is set, but the duration is stored in the attribute of the
-	 * class the duration is returned. 
+	 * class the duration is returned.
 	 * If only start time is set, assume this is the last activity of the day.
 	 * If only the end time is set, assume this is the first activity of the day.
 	 * If the duration could neither be calculated nor the act.dur attribute is set to a value

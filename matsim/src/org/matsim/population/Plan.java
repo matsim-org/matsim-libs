@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -30,15 +30,7 @@ import org.matsim.network.Link;
 import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.misc.Time;
 
-
 public class Plan extends BasicPlanImpl {
-
-	/* removed serialization because I think nobody uses it. If someone does,
-	 * please complain, otherwise I'll soon delete these lines permanently.
-	 * marcel/9jul2008
-	 * TODO [MR] delete code
-	 */
-//	private static final long serialVersionUID = 1L;
 
 	private final static Logger log = Logger.getLogger(Plan.class);
 
