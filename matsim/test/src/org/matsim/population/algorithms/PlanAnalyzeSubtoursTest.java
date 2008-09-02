@@ -35,6 +35,14 @@ import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
+/**
+ * Test class for {@link PlanAnalyzeSubtours}.
+ * 
+ * Contains illustrative examples for subtour analysis.
+ * 
+ * @author meisterk
+ *
+ */
 public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 	private Population population = null;
@@ -77,59 +85,58 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		person = new Person(new IdImpl("1000"));
 
 		// now let's test different types of activity plans
-		TreeMap<String, String> expectedSubtourStarts = new TreeMap<String, String>();
 		TreeMap<String, String> expectedSubtourIndexations = new TreeMap<String, String>();
-
+		TreeMap<String, Integer> expectedNumSubtours = new TreeMap<String, Integer>();
+		
 		String testedRoute = "1 2 1";
-		expectedSubtourStarts.put(testedRoute, "0");
 		expectedSubtourIndexations.put(testedRoute, "0 0");
-
+		expectedNumSubtours.put(testedRoute, 1);
+		
 		testedRoute = "1 2 20 1";
-		expectedSubtourStarts.put(testedRoute, "0");
 		expectedSubtourIndexations.put(testedRoute, "0 0 0");
+		expectedNumSubtours.put(testedRoute, 1);
 
 		testedRoute = "1 2 1 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 2");
 		expectedSubtourIndexations.put(testedRoute, "0 0 1 1");
+		expectedNumSubtours.put(testedRoute, 2);
 
 		testedRoute = "1 2 1 3 1";
-		expectedSubtourStarts.put(testedRoute, "0 2");
 		expectedSubtourIndexations.put(testedRoute, "0 0 1 1");
-		
+		expectedNumSubtours.put(testedRoute, 2);
+
 		testedRoute = "1 2 2 1";
-		expectedSubtourStarts.put(testedRoute, "0");
 		expectedSubtourIndexations.put(testedRoute, "0 0 0");
+		expectedNumSubtours.put(testedRoute, 1);
 		
 		testedRoute = "1 2 2 2 2 2 2 2 1";
-		expectedSubtourStarts.put(testedRoute, "0");
 		expectedSubtourIndexations.put(testedRoute, "0 0 0 0 0 0 0 0");
+		expectedNumSubtours.put(testedRoute, 1);
 
 		testedRoute = "1 2 3 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 1");
 		expectedSubtourIndexations.put(testedRoute, "1 0 0 1");
+		expectedNumSubtours.put(testedRoute, 2);
 
 		testedRoute = "1 2 3 4 3 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 1 2");
 		expectedSubtourIndexations.put(testedRoute, "2 1 0 0 1 2");
+		expectedNumSubtours.put(testedRoute, 3);
 
 		testedRoute = "1 2 14 2 14 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 1 3");
 		expectedSubtourIndexations.put(testedRoute, "2 0 0 1 1 2");
+		expectedNumSubtours.put(testedRoute, 3);
 
 		testedRoute = "1 2 14 14 2 14 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 1 4");
 		expectedSubtourIndexations.put(testedRoute, "2 0 0 0 1 1 2");
+		expectedNumSubtours.put(testedRoute, 3);
 
 		testedRoute = "1 2 3 4 3 2 5 4 5 1";
-		expectedSubtourStarts.put(testedRoute, "0 1 2 6");
 		expectedSubtourIndexations.put(testedRoute, "3 1 0 0 1 3 2 2 3");
+		expectedNumSubtours.put(testedRoute, 4);
 
 		testedRoute = "1 2 3 2 3 2 1 2 1";
-		expectedSubtourStarts.put(testedRoute, "0 1 3 6");
 		expectedSubtourIndexations.put(testedRoute, "2 0 0 1 1 2 3 3");
+		expectedNumSubtours.put(testedRoute, 4);
 
 		testedRoute = "1 1 1 1 1 2 1";
-		expectedSubtourStarts.put(testedRoute, "4");
 		expectedSubtourIndexations.put(
 				testedRoute, 
 				new String(
@@ -137,23 +144,24 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " 0 0"));
+		expectedNumSubtours.put(testedRoute, 1);
 
 		testedRoute = "1 2 1 1";
-		expectedSubtourStarts.put(testedRoute, "0");
 		expectedSubtourIndexations.put(
 				testedRoute, 
 				"0 0 " + PlanAnalyzeSubtours.UNDEFINED);
+		expectedNumSubtours.put(testedRoute, 1);
 
 		testedRoute = "1 2 3 4";
-		expectedSubtourStarts.put(testedRoute, "");
 		expectedSubtourIndexations.put(
 				testedRoute, 
 				new String(
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED)));
+		expectedNumSubtours.put(testedRoute, 0);
 
-		for (String linkString : expectedSubtourStarts.keySet()) {
+		for (String linkString : expectedSubtourIndexations.keySet()) {
 
 			log.info("Testing location sequence: " + linkString);
 
@@ -179,16 +187,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				}
 			}
 			testee.run(plan);
-			testee.printSubtours();
 			
-			String actualSubtourStart = new String("");
-			for (int value : testee.getSubtours()) {
-				actualSubtourStart += Integer.toString(value);
-				actualSubtourStart += " ";
-			}
-			actualSubtourStart = actualSubtourStart.substring(0, Math.max(0, actualSubtourStart.length() - 1));
-			assertEquals(expectedSubtourStarts.get(linkString), actualSubtourStart);
-
 			String actualSubtourIndexation = new String("");
 			for (int value : testee.getSubtourIndexation()) {
 				actualSubtourIndexation += Integer.toString(value);
@@ -196,6 +195,8 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			}
 			actualSubtourIndexation = actualSubtourIndexation.substring(0, actualSubtourIndexation.length() - 1);
 			assertEquals(expectedSubtourIndexations.get(linkString), actualSubtourIndexation);
+			
+			assertEquals(expectedNumSubtours.get(linkString).intValue(), testee.getNumSubtours());
 		}
 
 	}
