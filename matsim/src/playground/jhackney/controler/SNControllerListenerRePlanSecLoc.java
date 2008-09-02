@@ -188,7 +188,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS && event.getIteration()%50==0){
+			if(CALCSTATS && event.getIteration()%10==0){
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
@@ -202,7 +202,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.log.info(" ... done");
 			}
 
-			if(event.getIteration()%50==0){
+			if(event.getIteration()%10==0){
 				this.log.info(" Writing out social network for iteration " + snIter + " ...");
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
