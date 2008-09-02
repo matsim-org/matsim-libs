@@ -38,13 +38,13 @@ public class NewSmallPlansControler {
 
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
-		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/input/plans_10pct_miv_zrh.xml.gz";
+		final String netFilename = "../data/ivtch/input/ivtch-osm.xml";
+		final String plansFilename = "../data/ivtch/input/plans_all_zrh30km_transitincl_10pct.xml.gz";
 
 		World world = Gbl.getWorld();
 		Gbl.createConfig(new String[] {
 		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-				"../data/ivtch/make0.1pctPlans.xml" });
+				"../data/ivtch/make10pctPlans.xml" });
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
