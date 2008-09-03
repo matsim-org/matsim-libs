@@ -111,9 +111,14 @@ public class ConcurrentListMPDSC {
 	// side effect: the consumer must empty the result list before next
 	// invocation!!!
 	public LinkedList<Message> getCucurrencySafeElements() {
+		LinkedList<Message> result=null;
 		for (int i = 0; i < outputBuffer.length; i++) {
 			if (outputBuffer[i].size() > 0) {
-				return outputBuffer[i];
+				synchronized(outputBuffer[i]){
+					result=outputBuffer[i];
+					outputBuffer[i]=new LinkedList<Message>();
+				}
+				return result;
 			}
 		}
 		return null;
