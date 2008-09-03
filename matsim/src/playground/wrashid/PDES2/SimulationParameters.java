@@ -135,7 +135,7 @@ public class SimulationParameters {
 				SimulationParameters.events.processEvent(be);
 			} catch (Exception e) {
 				System.out.println("error:" + be.toString());
-				System.exit(0);
+				//System.exit(0);
 			}
 			
 			be = eventBuffer.remove();
