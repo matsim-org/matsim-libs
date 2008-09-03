@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -32,6 +32,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.jfree.util.Log;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.MatsimNetworkReader;
@@ -46,7 +49,6 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileWriter;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -54,19 +56,15 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-
 /**
- * Simple class to convert MATSim plans to ESRI shape files. Activities will be converted into points and 
- * legs will be converted into line strings. Parameters as defined in the population xml file will be added 
- * as attributes to the shape files. There also some parameters to configure this converter, please consider
- * the corresponding setters in this class.
- *  
- * @author laemmel
+ * Simple class to convert MATSim plans to ESRI shape files. Activities will be converted into points and
+ * legs will be converted into line strings. Parameters as defined in the population xml file will be added
+ * as attributes to the shape files. There are also some parameters to configure this converter, please
+ * consider the corresponding setters in this class.
  *
+ * @author laemmel
  */
 public class SelectedPlans2ESRIShape {
-
-	
 
 	private final CoordinateReferenceSystem crs;
 	private final Population population;
@@ -81,7 +79,6 @@ public class SelectedPlans2ESRIShape {
 	private FeatureType featureTypeLeg;
 	private final GeometryFactory geofac;
 
-	
 	public SelectedPlans2ESRIShape(final Population population, final CoordinateReferenceSystem crs, final String outputDir) {
 		this.population = population;
 		this.crs = crs;
@@ -89,115 +86,76 @@ public class SelectedPlans2ESRIShape {
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 	}
-	
-	
+
 	public void setOutputSample(final double sample) {
 		this.outputSample = sample;
 	}
-	
-	
+
 	public void setWriteActs(final boolean writeActs) {
 		this.writeActs = writeActs;
 	}
-	
+
 	public void setWriteLegs(final boolean writeLegs) {
 		this.writeLegs = writeLegs;
 	}
-	
+
 	public void setActBlurFactor(final double actBlurFactor) {
 		this.actBlurFactor = actBlurFactor;
 	}
-	
+
 	public void setLegBlurFactor(final double legBlurFactor) {
 		this.legBlurFactor  = legBlurFactor;
 	}
-	
-	
-	public void write(){
-		
-		drawOutputSample();		
-		
-		
-		if(this.writeActs) {
+
+	public void write() throws IOException {
+		drawOutputSample();
+		if (this.writeActs) {
 			writeActs();
 		}
-		
-		if(this.writeLegs){
+		if (this.writeLegs) {
 			writeLegs();
 		}
-		
 	}
-	
-	
-	
-	
-	
+
 	private void drawOutputSample() {
 		this.outputSamplePlans = new ArrayList<Plan>();
 		for (Person pers : this.population.getPersons().values()) {
-			if (MatsimRandom.random.nextDouble() > this.outputSample) {
-				continue;
+			if (MatsimRandom.random.nextDouble() <= this.outputSample) {
+				this.outputSamplePlans.add(pers.getSelectedPlan());
 			}
-			Plan plan = pers.getSelectedPlan();
-			this.outputSamplePlans.add(plan);
 		}
-		
 	}
 
-
-	private void writeActs() {
+	private void writeActs() throws IOException {
 		String outputFile = this.outputDir + "/acts.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
-			Act act = plan.getFirstActivity();
-			while(act != null) {
-				fts.add(getActFeature(id,act));
-				Leg leg = plan.getNextLeg(act);
-				if (leg != null) {
-					act = plan.getNextActivity(leg);
-				} else {
-					act = null;
-				}
-				
+			ActIterator iter = plan.getIteratorAct();
+			while (iter.hasNext()) {
+				Act act = (Act) iter.next();
+				fts.add(getActFeature(id, act));
 			}
-			
-			
 		}
-		
-		try {
-			ShapeFileWriter.writeGeometries(fts, outputFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+
+		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
 
-	private void writeLegs() {
+	private void writeLegs() throws IOException {
 		String outputFile = this.outputDir + "/legs.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
 		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
-			Leg leg = plan.getNextLeg(plan.getFirstActivity());
-			while(leg != null && leg.getRoute().getDist() > 0) {
-				fts.add(getLegFeature(leg,id));
-				Act act = plan.getNextActivity(leg);
-				if (act != null) {
-					leg = plan.getNextLeg(act);
-				} else {
-					leg = null;
+			LegIterator iter = plan.getIteratorLeg();
+			while (iter.hasNext()) {
+				Leg leg = (Leg) iter.next();
+				if (leg.getRoute().getDist() > 0) {
+					fts.add(getLegFeature(leg, id));
 				}
 			}
-			
 		}
-		try {
-			ShapeFileWriter.writeGeometries(fts, outputFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		ShapeFileWriter.writeGeometries(fts, outputFile);
 	}
-
-
 
 	private Feature getActFeature(final String id, final Act act) {
 		String type = act.getType();
@@ -214,7 +172,7 @@ public class SelectedPlans2ESRIShape {
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -225,7 +183,7 @@ public class SelectedPlans2ESRIShape {
 		Double travTime = leg.getTravTime();
 		Double arrTime = leg.getArrTime();
 		Double dist = leg.getRoute().getDist();
-		
+
 		org.matsim.network.Link[] links = leg.getRoute().getLinkRoute();
 		Coordinate [] coords = new Coordinate[links.length + 1];
 		for (int i = 0; i < links.length; i++) {
@@ -235,21 +193,21 @@ public class SelectedPlans2ESRIShape {
 			Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
 			coords[i] = cc;
 		}
-		
+
 		Coord c = links[links.length -1 ].getToNode().getCoord();
 		double rx = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 		double ry = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 		Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
 		coords[links.length] = cc;
-		
+
 		LineString ls = this.geofac.createLineString(coords);
-		
+
 		try {
 			return this.featureTypeLeg.create(new Object[] {ls,id,num,mode,depTime,travTime,arrTime,dist});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -264,7 +222,7 @@ public class SelectedPlans2ESRIShape {
 		attrAct[4] = AttributeTypeFactory.newAttributeType("START_TIME", Double.class);
 		attrAct[5] = AttributeTypeFactory.newAttributeType("DUR", Double.class);
 		attrAct[6] = AttributeTypeFactory.newAttributeType("END_TIME", Double.class);
-		
+
 		AttributeType [] attrLeg = new AttributeType[8];
 		attrLeg[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attrLeg[1] = AttributeTypeFactory.newAttributeType("PERS_ID", String.class);
@@ -283,31 +241,26 @@ public class SelectedPlans2ESRIShape {
 		} catch (SchemaException e) {
 			e.printStackTrace();
 		}
-
-		
 	}
 
-
-	
-
-	public static void main(final String [] args) throws IllegalAttributeException, IOException, FactoryException, SchemaException {
+	public static void main(final String [] args) {
+		// FIXME hard-coded file names; does this class really need a main-method?
 		final String populationFilename = "./examples/equil/plans100.xml";
 		final String networkFilename = "./examples/equil/network.xml";
-//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz"; 
+//		final String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 //		final String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 
-
 		final String outputDir = "./plans/";
-		
+
 		Gbl.createConfig(null);
 		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		Gbl.getWorld().setNetworkLayer(network);
-		
+
 		Population population = new Population();
 		new MatsimPopulationReader(population).readFile(populationFilename);
-		
+
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
 		sp.setOutputSample(0.05);
@@ -315,11 +268,13 @@ public class SelectedPlans2ESRIShape {
 		sp.setLegBlurFactor(100);
 		sp.setWriteActs(true);
 		sp.setWriteLegs(true);
-		
-		sp.write();
-		
-		
+
+		try {
+			sp.write();
+		} catch (IOException e) {
+			Log.error(e.getMessage(), e);
+		}
 	}
-	
+
 }
 
