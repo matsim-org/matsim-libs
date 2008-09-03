@@ -173,20 +173,20 @@ public class ConcurrentListMPDSC {
 
 		// part 1
 		/*
-		 * ConcurrentListMPDSC<Integer> cList=new ConcurrentListMPDSC<Integer>(5);
-		 * for (int i=0;i<1000;i++){ cList.add(i, 0); }
-		 * 
-		 * 
-		 * System.out.println(cList.inputBuffer[0].size());
-		 * //System.out.println(cList.outputBuffer[0].size());
-		 * 
-		 * //for (int i=0;i<1000;i++){ cList.flushAllInputBuffers();
-		 * System.out.println(cList.inputBuffer[0].size());
-		 * //System.out.println(cList.outputBuffer[0].size());
-		 * 
-		 * System.out.println(cList.getCucurrencySafeElements().size()); //}
-		 * 
-		 */
+		  ConcurrentListMPDSC cList=new ConcurrentListMPDSC(5,10);
+		  for (int i=0;i<1000;i++){ cList.add(i, 0); }
+		  
+		  
+		  System.out.println(cList.inputBuffer[0].size());
+		  //System.out.println(cList.outputBuffer[0].size());
+		  
+		  //for (int i=0;i<1000;i++){ cList.flushAllInputBuffers();
+		  System.out.println(cList.inputBuffer[0].size());
+		  //System.out.println(cList.outputBuffer[0].size());
+		  
+		  System.out.println(cList.getCucurrencySafeElements().size()); //}
+		  */
+		 
 
 	}
 
