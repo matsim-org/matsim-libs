@@ -195,7 +195,25 @@ VERY IMPORTANT TODOS:
           
       - a departure event is missing in test6.     
        
-       
+      - message werden von benachbarten zonen nicht in ascending order scheduled. d.h. x kann für y eine  message zu zeit 10 und nachher 9 schedulen.
+        Das sollte eigentlich nicht gestattet sein!!!
+        => explaination: assume a car leaves zone 1 and enters zone 2. Zone 2 will in this case schedule
+           the EndRoadMessage in zone 1. As streets may have different length, it might happen, that a message
+           with a higher timeStamp (longer road) is scheduled before that of a low timeStamp (short road).
+              This can cause some problems? Think about it.
+              => This could cause problems perhaps: A zone waits, until it has receive message from all
+              incoming roads. If there is some kind of timer set, it could happen, that the timer is executed (allowing the neighbouring thread to continue)
+              and the EndRoadMessage is scheduled too late...
+              
+              
+       - efficient ConcurrentListMPDSC => produced far too few events
+       - current method, produced also too  few events       
+          => act start and actend are not produced yet by my simulation
+             and also wait2link
+          => furthermore, the idea in mobsim is: actEnd, departure, wait2link, leavelink
+          => on arrival: enter link, arrival, actStart
+          => deshalb habe ich auch noch differenzen
+          
        
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 

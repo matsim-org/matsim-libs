@@ -13,6 +13,10 @@ public class MyPriorityQueue implements Comparable {
 		this.queue = queue;
 	}
 	
+	public MyPriorityQueue(){
+		this.queue = new PriorityQueue<Message>();
+	}
+	
 	public PriorityQueue<Message> getQueue(){
 		return queue;
 	}

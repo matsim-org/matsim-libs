@@ -270,10 +270,15 @@ public class ZoneMessageQueue {
 
 	private void emptyBuffer() {
 		try{
+			// TODO: uncomment this.
 			//buffer.flushAllInputBuffers(queue1.peek().messageArrivalTime);
-			buffer.flushEverything();
+			//buffer.flushEverything();
 		} catch(Exception e) {
+			if (queue1.peek()!=null){
+				e.printStackTrace();
+			}
 			assert(queue1.peek()==null);
+			
 			buffer.flushEverything();
 		}
 		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
