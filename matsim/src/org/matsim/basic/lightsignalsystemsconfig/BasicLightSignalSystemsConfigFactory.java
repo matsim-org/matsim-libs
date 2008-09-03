@@ -28,9 +28,9 @@ import org.matsim.basic.v01.Id;
  */
 public class BasicLightSignalSystemsConfigFactory {
 
-	public BasicLightSignalSystemÇonfiguration createLightSignalSystemConfiguration(
+	public BasicLightSignalSystemConfiguration createLightSignalSystemConfiguration(
 			Id refId) {
-		return new BasicLightSignalSystemÇonfiguration(refId);
+		return new BasicLightSignalSystemConfiguration(refId);
 	}
 
 	public BasicPlanBasedLightSignalSystemControlInfo createPlanBasedLightSignalSystemControlInfo() {

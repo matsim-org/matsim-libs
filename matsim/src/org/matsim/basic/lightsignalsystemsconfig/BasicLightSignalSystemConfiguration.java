@@ -17,38 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.lightsignalsystemsconfig;
 
 import org.matsim.basic.v01.Id;
 
-
 /**
  * @author dgrether
- *
  */
-public class BasicLightSignalSystemÇonfiguration {
+public class BasicLightSignalSystemConfiguration {
 
-	private Id lightSignalSystemId;
-	
+	private final Id lightSignalSystemId;
+
 	private BasicPlanBasedLightSignalSystemControlInfo controlInfo;
 
-	public BasicLightSignalSystemÇonfiguration(Id lightSignalSystemId) {
-		this.lightSignalSystemId = lightSignalSystemId; 
+	public BasicLightSignalSystemConfiguration(final Id lightSignalSystemId) {
+		this.lightSignalSystemId = lightSignalSystemId;
 	}
 
 	public void setLightSignalSystemControlInfo(
-			BasicPlanBasedLightSignalSystemControlInfo controlInfo) {
+			final BasicPlanBasedLightSignalSystemControlInfo controlInfo) {
 		this.controlInfo = controlInfo;
 	}
-	
+
 	public Id getLightSignalSystemId() {
-		return lightSignalSystemId;
+		return this.lightSignalSystemId;
 	}
-	
+
 	public BasicLightSignalSystemControlInfo getControlInfo() {
-		return controlInfo;
+		return this.controlInfo;
 	}
-	
-	
+
+
 
 }

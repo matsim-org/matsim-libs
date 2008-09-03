@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemÇonfiguration;
+import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
@@ -50,13 +50,13 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   
   
   public void testParser() {
-  	List<BasicLightSignalSystemÇonfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemÇonfiguration>();
+  	List<BasicLightSignalSystemConfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
   	MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
   	assertEquals(2, lssConfigs.size());
   	//test first
-  	BasicLightSignalSystemÇonfiguration lssConfiguration = lssConfigs.get(0);
+  	BasicLightSignalSystemConfiguration lssConfiguration = lssConfigs.get(0);
   	assertNotNull(lssConfiguration);
   	assertEquals(id23, lssConfiguration.getLightSignalSystemId());
   	BasicPlanBasedLightSignalSystemControlInfo controlInfo = (BasicPlanBasedLightSignalSystemControlInfo) lssConfiguration.getControlInfo();

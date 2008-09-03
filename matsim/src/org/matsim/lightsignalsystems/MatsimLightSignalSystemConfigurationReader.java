@@ -35,7 +35,7 @@ import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemsConfigFactory;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemÇonfiguration;
+import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.lightsignalsystemsconfig.xml.XMLAdaptiveLightSignalSystemControlInfoType;
 import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalGroupConfigurationType;
@@ -58,9 +58,9 @@ public class MatsimLightSignalSystemConfigurationReader {
 	
   private BasicLightSignalSystemsConfigFactory factory = new BasicLightSignalSystemsConfigFactory();
 
-	private List<BasicLightSignalSystemÇonfiguration> lssConfigurations;
+	private List<BasicLightSignalSystemConfiguration> lssConfigurations;
   
-	public MatsimLightSignalSystemConfigurationReader(List<BasicLightSignalSystemÇonfiguration> lssConfigs) {
+	public MatsimLightSignalSystemConfigurationReader(List<BasicLightSignalSystemConfiguration> lssConfigs) {
 		this.lssConfigurations = lssConfigs;
 	}
 	
@@ -77,7 +77,7 @@ public class MatsimLightSignalSystemConfigurationReader {
 					new FileInputStream( filename ) );
 			
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
-				BasicLightSignalSystemÇonfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
+				BasicLightSignalSystemConfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
 				
