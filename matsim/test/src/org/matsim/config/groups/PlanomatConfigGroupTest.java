@@ -20,8 +20,6 @@
 
 package org.matsim.config.groups;
 
-import java.util.ArrayList;
-
 import org.matsim.gbl.Gbl;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -47,7 +45,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		}
 		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
 		assertEquals( PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES, actualPossibleModesString );
-		
+		assertEquals( PlanomatConfigGroup.DEFAULT_LINK_TRAVEL_TIME_ESTIMATOR, Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName());
+		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 	}
 
 }

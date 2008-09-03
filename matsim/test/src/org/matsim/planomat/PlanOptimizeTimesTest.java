@@ -101,8 +101,21 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	public void testRun() {
 
+		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
+
+		Events events = new Events();
+		events.addHandler(tTravelEstimator);
+		events.addHandler(depDelayCalc);
+
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+
 		for (PlanomatTestRun planomatTestRun : PlanomatTestRun.values()) {
 
+			log.info("Testing " + planomatTestRun.getTestIdentifier() + "...");
+			
 			if (
 					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
 					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
@@ -112,23 +125,15 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 				Gbl.getConfig().planomat().setPossibleModes(possibleModes);
 			}
 
-			TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
-			DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
-
+			tTravelEstimator.resetTravelTimes();
+			depDelayCalc.resetDepartureDelays();
 			if (
 					PlanomatTestRun.WITHEVENTS_CAR.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) ||
 					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
 
-				Events events = new Events();
-				events.addHandler(tTravelEstimator);
-				events.addHandler(depDelayCalc);
 				new MatsimEventsReader(events).readFile(this.getInputDirectory() + "equil-times-only-1000.events.txt.gz");
 
 			}
-
-			LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
-
-			PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
 
 			// init test Plan
 			final String TEST_PERSON_ID = "100";
@@ -162,6 +167,8 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			log.info("Expected checksum: " + Long.toString(expectedChecksum));
 			log.info("Actual checksum: " + Long.toString(actualChecksum));
 			assertEquals(expectedChecksum, actualChecksum);
+
+			log.info("Testing " + planomatTestRun.getTestIdentifier() + "...done.");
 
 		}
 	}

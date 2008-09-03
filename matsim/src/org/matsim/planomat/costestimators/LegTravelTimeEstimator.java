@@ -23,8 +23,6 @@ package org.matsim.planomat.costestimators;
 import org.matsim.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.Route;
-import org.matsim.world.Location;
 
 /**
  * Interface for the estimation of the travel time of a leg. Implement it
@@ -38,23 +36,14 @@ public interface LegTravelTimeEstimator {
 
 	/**
 	 * Implement your assumption on travel time estimation here.
-	 *
+	 * 
 	 * @param personId identifier of the replanning person
 	 * @param departureTime the departure time of the leg
-	 * @param origin the location of the prior activity
-	 * @param destination the location of the next activity
-	 * @param route
-	 * @param mode
-	 * @return Returns a travel time estimation.
+	 * @param actOrigin the activity at the beginning of the leg
+	 * @param actDestination the activity at the end of the leg
+	 * @param legIntermediate the leg for which a travel time is estimated
+	 * @return a travel time estimation.
 	 */
-//	public double getLegTravelTimeEstimation(
-//			Id personId,
-//			double departureTime,
-//			Location origin,
-//			Location destination,
-//			Route route,
-//			String mode);
-
 	public double getLegTravelTimeEstimation(
 			Id personId,
 			double departureTime,

@@ -39,15 +39,26 @@ public class PlanomatConfigGroup extends Module {
 	public static final String DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
 	private ArrayList<String> possibleModes;
 
+	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
+	public static final String TRAVEL_TIME_CALCULATOR = "org.matsim.trafficmonitoring.TravelTimeCalculator";
+	public static final String LINEAR_INTERPOLATING = "org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator";
+	public static final String DEFAULT_LINK_TRAVEL_TIME_ESTIMATOR = TRAVEL_TIME_CALCULATOR;
+	private String linkTravelTimeEstimatorName;
+
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR = "legTravelTimeEstimator";
-//	public static final String LINK_TRAVEL_TIME_ESTIMATOR = "linkTravelTimeEstimator";
+	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
+	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
+	public static final String DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR = CETIN_COMPATIBLE;
+	private String legTravelTimeEstimatorName;
+	
 	public static final String INDIFFERENCE = "indifference";
 	public static final String BE_VERBOSE = "beVerbose";
 
-	private String legTravelTimeEstimatorName = null;
-//	private String linkTravelTimeEstimatorName = null;
-	private double indifference = -1.0;
-	private boolean beVerbose = false;
+	/**
+	 * TODO [meisterk, Sep 2, 2008] keep the use of this parameter as a controler for efficiency of the algorithm
+	 * e.g. when changing to integer coded times, use it to control size of time slices
+	 */
+	//private double indifference = -1.0;
 
 	private final static Logger log = Logger.getLogger(PlanomatConfigGroup.class);
 
@@ -63,7 +74,9 @@ public class PlanomatConfigGroup extends Module {
 		for (String possibleMode : PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES.split(" ")) {
 			this.possibleModes.add(possibleMode);
 		}
-
+		this.linkTravelTimeEstimatorName = PlanomatConfigGroup.DEFAULT_LINK_TRAVEL_TIME_ESTIMATOR;
+		this.legTravelTimeEstimatorName = PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR;
+		
 	}
 
 	@Override
@@ -90,8 +103,6 @@ public class PlanomatConfigGroup extends Module {
 			} else {
 				log.error("Unknown optimization toolbox identifier. Aborting...");
 			}
-		} else if (INDIFFERENCE.equals(param_name)) {
-			this.setIndifference(Double.parseDouble(value));
 		} else if (POPSIZE.equals(param_name)) {
 			int popSize = 0;
 			try {
@@ -104,9 +115,7 @@ public class PlanomatConfigGroup extends Module {
 				Gbl.errorMsg("JGAP Population size must be a non-null positive integer.");
 			}
 			this.setPopSize(popSize);
-		} else if (BE_VERBOSE.equals(param_name)) {
-			this.setBeVerbose(Boolean.parseBoolean(value));
-		}
+		} 
 	}
 
 	// getters/setters
@@ -115,17 +124,9 @@ public class PlanomatConfigGroup extends Module {
 		return this.legTravelTimeEstimatorName;
 	}
 
-	public void setLegTravelTimeEstimatorName(final String legTravelTimeEstimatorName) {
-		this.legTravelTimeEstimatorName = legTravelTimeEstimatorName;
+	public String getLinkTravelTimeEstimatorName() {
+		return linkTravelTimeEstimatorName;
 	}
-
-//	public String getLinkTravelTimeEstimatorName() {
-//	return linkTravelTimeEstimatorName;
-//	}
-
-//	public void setLinkTravelTimeEstimatorName(String linkTravelTimeEstimatorName) {
-//	this.linkTravelTimeEstimatorName = linkTravelTimeEstimatorName;
-//	}
 
 	public int getJgapMaxGenerations() {
 		return this.jgapMaxGenerations;
@@ -143,28 +144,12 @@ public class PlanomatConfigGroup extends Module {
 		this.optimizationToolbox = optimizationToolbox;
 	}
 
-	public double getIndifference() {
-		return this.indifference;
-	}
-
-	public void setIndifference(final double indifference) {
-		this.indifference = indifference;
-	}
-
 	public int getPopSize() {
 		return this.popSize;
 	}
 
 	public void setPopSize(final int popSize) {
 		this.popSize = popSize;
-	}
-
-	public boolean isBeVerbose() {
-		return this.beVerbose;
-	}
-
-	public void setBeVerbose(final boolean beVerbose) {
-		this.beVerbose = beVerbose;
 	}
 
 	public ScoringFunctionFactory getScoringFunctionFactory() {
@@ -182,6 +167,10 @@ public class PlanomatConfigGroup extends Module {
 
 	public void setPossibleModes(ArrayList<String> possibleModes) {
 		this.possibleModes = possibleModes;
+	}
+
+	public void setLegTravelTimeEstimatorName(String legTravelTimeEstimatorName) {
+		this.legTravelTimeEstimatorName = legTravelTimeEstimatorName;
 	}
 
 }

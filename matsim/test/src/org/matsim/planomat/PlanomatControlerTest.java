@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatOptimizeTimes.java
+ * PlanomatControlerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.replanning.modules;
+package org.matsim.planomat;
 
-import org.matsim.planomat.PlanOptimizeTimes;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.apache.log4j.Logger;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.CRCChecksum;
 
-/**
- * This class is just a multithreading wrapper for instances of the
- * optimizing plan algorithm which is usually called "planomat".
- *
- * @author meisterk
- */
-public class PlanomatOptimizeTimes extends MultithreadedModuleA {
+public class PlanomatControlerTest extends MatsimTestCase {
 
-	private LegTravelTimeEstimator estimator = null;
-
-	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator) {
-		this.estimator = estimator;
+	private static final Logger log = Logger.getLogger(PlanomatControlerTest.class);
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		
 	}
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-
-		PlanAlgorithm planomatAlgorithm = null;
-		planomatAlgorithm =  new PlanOptimizeTimes(this.estimator);
-
-		return planomatAlgorithm;
+	public void testMain() {
+		
+		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
+		
+		PlanomatControler.main(args);
+		
+		// actual test: compare checksums of the files
+		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
+		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		log.info("Expected checksum: " + Long.toString(expectedChecksum));
+		log.info("Actual checksum: " + Long.toString(actualChecksum));
+		assertEquals(expectedChecksum, actualChecksum);
 	}
 
 }

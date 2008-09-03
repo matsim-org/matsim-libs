@@ -28,6 +28,6 @@ public class PlanomatControler {
 		final Controler controler = new Controler(args);
 		controler.addControlerListener(new PlanomatControlerListener());
 		controler.run();
-		System.exit(0);
+//		System.exit(0);
 	}
 }

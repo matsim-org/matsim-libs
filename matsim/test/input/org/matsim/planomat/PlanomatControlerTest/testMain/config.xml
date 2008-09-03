@@ -17,6 +17,21 @@
 		<param name="inputPlansFile" value="test/scenarios/equil/plans2000.xml.gz" />
 	</module>
 
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/org/matsim/planomat/PlanomatControlerTest/testMain" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+
 	<module name="planCalcScore">
 		<param name="learningRate" value="0.1" />
 		<param name="BrainExpBeta" value="2.0" />
@@ -42,15 +57,18 @@
 		<param name="activityClosingTime_1"     value="24:00:00" />
 	</module>
 	
-	<module name="planomat">
-	
-<!--		<param name="optimizationToolbox" value="jgap" />-->
-<!--		<param name="populationSize" value="10" />-->
-<!--		<param name="scoringFunction" value="CharyparNagel" />-->
-<!--		<param name="jgapMaxGenerations" value="1000" />-->
-<!--		<param name="" value="" />-->
-<!--		<param name="" value="" />-->
-<!--		<param name="" value="" />-->
-	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="6" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="SelectExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="Planomat" />
 	</module>
+
+	<module name="planomat">
+		<param name="jgapMaxGenerations" value="100" />
+	</module>
+
 </config>

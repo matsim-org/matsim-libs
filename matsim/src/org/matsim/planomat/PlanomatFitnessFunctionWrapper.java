@@ -32,7 +32,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.utils.misc.Time;
 
 /**
  * This class connects the JGAP FitnessFunction class with the MATSim ScoringFunction interface.

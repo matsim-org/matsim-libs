@@ -44,6 +44,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.controler.corelisteners.LegHistogramListener;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
@@ -416,9 +417,9 @@ public class Controler {
 			MyRecentEventsBasedEstimator tmp = new MyRecentEventsBasedEstimator();
 			this.events.addHandler(tmp);
 			estimator = tmp;
-		} else if (estimatorName.equalsIgnoreCase("CetinCompatibleLegTravelTimeEstimator")) {
+		} else if (estimatorName.equalsIgnoreCase(PlanomatConfigGroup.CETIN_COMPATIBLE)) {
 			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc, this.network);
-		} else if (estimatorName.equalsIgnoreCase("CharyparEtAlCompatibleLegTravelTimeEstimator")) {
+		} else if (estimatorName.equalsIgnoreCase(PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE)) {
 			estimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);
 		} else {
 			Gbl.errorMsg("Invalid name of implementation of LegTravelTimeEstimatorI: " + estimatorName);

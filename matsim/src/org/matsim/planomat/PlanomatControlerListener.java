@@ -20,15 +20,19 @@
 
 package org.matsim.planomat;
 
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.handler.EventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
 import org.matsim.router.util.TravelTime;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class PlanomatControlerListener implements StartupListener, IterationStartsListener {
 
@@ -55,15 +59,15 @@ public class PlanomatControlerListener implements StartupListener, IterationStar
 
 		TravelTime linkTravelTimeEstimator = null;
 
-//		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
-//
-//		if (travelTimeIName.equalsIgnoreCase("org.matsim.trafficmonitoring.TravelTimeCalculatorArray")) {
-//			linkTravelTimeEstimator = new TravelTimeCalculatorArray(network);
-//		} else if (travelTimeIName.equalsIgnoreCase("org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator")) {
-//			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
-//		} else {
-//			Gbl.errorMsg("Invalid name of implementation of TravelTime: " + travelTimeIName);
-//		}
+		String travelTimeIName = Gbl.getConfig().planomat().getLinkTravelTimeEstimatorName();
+
+		if (travelTimeIName.equalsIgnoreCase(PlanomatConfigGroup.TRAVEL_TIME_CALCULATOR)) {
+			linkTravelTimeEstimator = new TravelTimeCalculator(network);
+		} else if (travelTimeIName.equalsIgnoreCase(PlanomatConfigGroup.LINEAR_INTERPOLATING)) {
+			linkTravelTimeEstimator = new LinearInterpolatingTTCalculator(network);
+		} else {
+			Gbl.errorMsg("Invalid name of implementation of TravelTime: " + travelTimeIName);
+		}
 
 		return linkTravelTimeEstimator;
 	}
