@@ -22,7 +22,6 @@ public class MyPriorityQueue implements Comparable {
 	}
 	
 	
-	@Override
 	public int compareTo(Object arg0) {
 		MyPriorityQueue otherQueue= (MyPriorityQueue) arg0;
 		if (queue.peek().messageArrivalTime<otherQueue.getQueue().peek().messageArrivalTime){
