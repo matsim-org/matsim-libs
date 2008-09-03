@@ -44,5 +44,6 @@ public class MobSimController extends Controler {
 		controler.run();
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
+		controler.events.printEventsCount();
 	}
 }
