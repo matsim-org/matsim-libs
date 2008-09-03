@@ -107,7 +107,10 @@ public class Road extends SimUnit {
 		
 		roadEntryHandler = new RoadEntryHandler(this);
 		
-		
+		// TODO: remove this, this is just a quick fix
+		if (link.getLength()<1){
+			link.setLength(10);
+		}
 		
 		linkTravelTime= link.getLength()  / link.getFreespeed(SimulationParameters.linkCapacityPeriod);
 		if (linkTravelTime<1){
