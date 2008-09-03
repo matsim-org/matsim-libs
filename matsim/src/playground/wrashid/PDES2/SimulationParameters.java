@@ -73,7 +73,7 @@ public class SimulationParameters {
 	// public static final int
 	// numberOfMessageExecutorThreads=Runtime.getRuntime().availableProcessors();
 	public static final int numberOfMessageExecutorThreads = Runtime
-			.getRuntime().availableProcessors();
+			.getRuntime().availableProcessors()-12;
 
 	// the number of zones, in which the network is divided
 	// public static final int numberOfZones=numberOfMessageExecutorThreads;
