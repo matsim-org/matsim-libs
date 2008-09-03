@@ -92,9 +92,18 @@ public class ZoneMessageQueue {
 		
 
 		try {
+			
 			buffer.add(m, MessageExecutor.getThreadId());
 		} catch (Exception e) {
-			buffer.add(m, 0);
+			// todo: perhaps we could directly insert into queue1
+			// put everything in your own zone at the starting of the simulation
+			
+			
+			// the buffer requires, that messages are inserted in timestamp order
+			// but the start leg messages are not ordered at all
+			// these are directly put into the queue1 instead of he buffer
+			queue1.add(m);
+			//buffer.add(m, zoneId);
 		}
 		// queue1.add(m);
 
@@ -219,6 +228,7 @@ public class ZoneMessageQueue {
 		// the first condition is for single cpu
 		// the second condition of multiple cpu
 		if (queue1.isEmpty() || queue1.peek().messageArrivalTime>SimulationParameters.maxSimulationLength){
+			assert(buffer.assert_EverythingEmpty());
 			return true;
 		}
 		return false;
@@ -260,8 +270,10 @@ public class ZoneMessageQueue {
 
 	private void emptyBuffer() {
 		try{
-			buffer.flushAllInputBuffers(queue1.peek().messageArrivalTime);
+			//buffer.flushAllInputBuffers(queue1.peek().messageArrivalTime);
+			buffer.flushEverything();
 		} catch(Exception e) {
+			assert(queue1.peek()==null);
 			buffer.flushEverything();
 		}
 		LinkedList<Message> messages = buffer.getCucurrencySafeElements();

@@ -57,7 +57,7 @@ public class Scheduler {
 		
 		
 		try {
-			Thread.currentThread().sleep(2000);
+			Thread.currentThread().sleep(3000);
 			
 			
 			
@@ -123,8 +123,8 @@ public class Scheduler {
 	// exist at the beginning of the simulation
 	public void initializeSimulation(){
 		
-		
-		
+		// MainThread has id -1
+		SimulationParameters.mainThreadId=Thread.currentThread().getId();
 		
 		
 		// initialize objects (and schedule start leg messages)
@@ -136,7 +136,7 @@ public class Scheduler {
 			su.initialize();
 		}
 		
-		
+
 		
 		
 		

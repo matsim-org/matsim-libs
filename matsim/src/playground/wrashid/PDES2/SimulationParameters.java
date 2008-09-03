@@ -152,5 +152,6 @@ public class SimulationParameters {
 			SimulationParameters.numberOfMessageExecutorThreads, 200000,100000);
 
 	public static double test_timer = 0;
+	public static long mainThreadId=-1;
 
 }

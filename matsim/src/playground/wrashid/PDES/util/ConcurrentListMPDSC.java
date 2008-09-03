@@ -3,6 +3,7 @@ package playground.wrashid.PDES.util;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import playground.wrashid.DES.utils.Timer;
@@ -13,6 +14,8 @@ import playground.wrashid.PDES.util.ConcurrentListSPSC.BRunnable; // optimized f
 // the application allows for this case
 // optimized for ZoneMessageQueue
 import playground.wrashid.PDES2.Message;
+import playground.wrashid.PDES2.MessageExecutor;
+import playground.wrashid.PDES2.SimulationParameters;
 
 public class ConcurrentListMPDSC {
 	private LinkedList<Message>[] inputBuffer;
@@ -26,12 +29,27 @@ public class ConcurrentListMPDSC {
 	// into middleBuffer
 
 	// producerId 0>=
+	// precondition: a producer has to add messages in time stamp order
 	public void add(Message message, int producerId) {
 		synchronized (inputBuffer[producerId]) {
+			// the main thread is not allowed to insert anything here!
+			assert(SimulationParameters.mainThreadId != Thread.currentThread().getId());
+			
+			// Find out, why the following assertion does not hold and why 
+			// we need to use priotyqueues for input buffer
+			//assert(inputBuffer[producerId].size()>0?inputBuffer[producerId].getLast().getMessageArrivalTime()<=message.messageArrivalTime:true): inputBuffer[producerId].getLast().getMessageArrivalTime() + "- " + message.messageArrivalTime;
+			// just for debugging
+			
+			
+			
+			// if inputBuffer not empty, then only the main thread may insert out of order messages (and no other thread)
+			// this does not work: the start leg messages already inserted have time stemps bigger than the new messages
+			//assert(inputBuffer[producerId].size()>0?(SimulationParameters.mainThreadId != Thread.currentThread().getId())?inputBuffer[producerId].peek().messageArrivalTime<=message.messageArrivalTime:true:true) : SimulationParameters.mainThreadId +" - "+ Thread.currentThread().getId();
 			inputBuffer[producerId].add(message);
 			if (inputBuffer[producerId].size() > minListSize) {
 				synchronized (middleBuffer[producerId]) {
 					middleBuffer[producerId].add(inputBuffer[producerId]);
+					assert(middleBuffer[producerId].getLast()==inputBuffer[producerId]);
 					inputBuffer[producerId] = new LinkedList<Message>();
 				}
 			}
@@ -93,11 +111,13 @@ public class ConcurrentListMPDSC {
 
 	// flush all messages, with time stamp smaller than queueTime
 	public void flushAllInputBuffers(double queueTime) {
+		
 		LinkedList<Message> swap = null;
 		boolean breakLoop = false;
 		Message tempMessage = null;
 		int numberOfListsInMiddleBuffer = 0;
 		for (int i = 0; i < inputBuffer.length; i++) {
+			//System.out.print(inputBuffer[i].size()>0 && inputBuffer[i].peek().getMessageArrivalTime()<queueTime?inputBuffer[i].peek().getMessageArrivalTime()+ " - " +queueTime + "\n":"");
 			breakLoop = false;
 
 			// empty middleBuffer, as far as needed
@@ -125,6 +145,9 @@ public class ConcurrentListMPDSC {
 			if (!breakLoop) {
 				flushEverything(i);
 			}
+			
+			// there is a message in the inputBuffer, which shouldn't be there, as we for some wrong reason did a breakLoop
+			//assert(inputBuffer[i].size()>0?inputBuffer[i].peek().getMessageArrivalTime()>=queueTime && breakLoop:true): inputBuffer[i].peek().getMessageArrivalTime()+ " - " +queueTime + " - " + i + " - "  +MessageExecutor.getThreadId();
 		}
 	}
 
@@ -188,6 +211,23 @@ public class ConcurrentListMPDSC {
 		  */
 		 
 
+	}
+	
+	// assume, single threading at this point
+	public boolean assert_EverythingEmpty(){
+		boolean result=true;;
+		for (int i = 0; i < inputBuffer.length; i++) {
+			if (inputBuffer[i].size()!=0 || middleBuffer[i].size()!=0 ||  outputBuffer[i].size()!=0){
+				//System.out.println(inputBuffer[i].size());
+				//System.out.println(middleBuffer[i].size());
+				//System.out.println(outputBuffer[i].size());
+				
+				result=false;
+				break;
+			}
+		}
+		
+		return result;
 	}
 
 }
