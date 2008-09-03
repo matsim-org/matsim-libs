@@ -17,27 +17,84 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
+package org.matsim.basic.lightsignalsystemsconfig;
 
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
 
 
 /**
  * @author dgrether
  *
  */
-public class AllTests {
+public class BasicLightSignalGroupConfiguration {
 
-	public static Test suite() {
+	private Id referencedSignalGroupId;
 
-		TestSuite suite = new TestSuite("Test for org.matsim.lightsignalsystems");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LightSignalSystemsReaderTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-		//$JUnit-END$
-		return suite;
+
+	private double roughCast;
+	private double dropping;
+
+	private double interimTimeRoughcast = Double.NaN;
+	private double interimTimeDropping = Double.NaN;
+	
+	
+	public BasicLightSignalGroupConfiguration(Id referencedSignalGroupId) {
+		this.referencedSignalGroupId = referencedSignalGroupId;
 	}
+
+
+	
+	public double getRoughCast() {
+		return roughCast;
+	}
+
+
+	
+	public void setRoughCast(double roughCast) {
+		this.roughCast = roughCast;
+	}
+
+
+	
+	public double getDropping() {
+		return dropping;
+	}
+
+
+	
+	public void setDropping(double dropping) {
+		this.dropping = dropping;
+	}
+
+
+	
+	public double getInterimTimeRoughcast() {
+		return interimTimeRoughcast;
+	}
+
+
+	
+	public void setInterimTimeRoughcast(double interimTimeRoughcast) {
+		this.interimTimeRoughcast = interimTimeRoughcast;
+	}
+
+
+	
+	public double getInterimTimeDropping() {
+		return interimTimeDropping;
+	}
+
+
+	
+	public void setInterimTimeDropping(double interimTimeDropping) {
+		this.interimTimeDropping = interimTimeDropping;
+	}
+
+
+	
+	public Id getReferencedSignalGroupId() {
+		return referencedSignalGroupId;
+	}
+	
 
 }

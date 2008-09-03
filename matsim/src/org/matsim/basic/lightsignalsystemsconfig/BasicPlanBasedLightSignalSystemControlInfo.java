@@ -17,27 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
+package org.matsim.basic.lightsignalsystemsconfig;
 
+import java.util.HashMap;
+import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
 
 
 /**
  * @author dgrether
  *
  */
-public class AllTests {
+public class BasicPlanBasedLightSignalSystemControlInfo implements BasicLightSignalSystemControlInfo {
 
-	public static Test suite() {
+	private Map<Id, BasicLightSignalSystemPlan> plans;
 
-		TestSuite suite = new TestSuite("Test for org.matsim.lightsignalsystems");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LightSignalSystemsReaderTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-		//$JUnit-END$
-		return suite;
+	
+	public Map<Id, BasicLightSignalSystemPlan> getPlans() {
+		return plans;
+	}
+
+	public void addPlan(BasicLightSignalSystemPlan plan) {
+		if (this.plans == null) {
+			this.plans = new HashMap<Id, BasicLightSignalSystemPlan>();
+		}
+		this.plans.put(plan.getId(), plan);
 	}
 
 }

@@ -17,27 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
+package org.matsim.basic.lightsignalsystems;
 
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
 
 
 /**
  * @author dgrether
  *
  */
-public class AllTests {
+public class BasicLightSignalSystemsFactory {
 
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Test for org.matsim.lightsignalsystems");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LightSignalSystemsReaderTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-		//$JUnit-END$
-		return suite;
+	
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id id) {
+		return new BasicLanesToLinkAssignment(id);
 	}
 
+	public BasicLane createLane(Id id) {
+		return new BasicLane(id);
+	}
+
+	public BasicLightSignalSystemDefinition createLightSignalSystemDefinition(
+			Id id) {
+		return new BasicLightSignalSystemDefinition(id);
+	}
+
+	public BasicLightSignalGroupDefinition createLightSignalGroupDefinition(
+			Id id) {
+		return new BasicLightSignalGroupDefinition(id);
+	}
+	
 }

@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<signalSystemConfig
+<lightSignalSystemConfig
   xmlns="http://www.matsim.org/files/dtd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystemConfig.xsd">
-
-  <signalSystemConfiguration id="456">
-		<signalSystemControlInfo xsi:type="planbasedSignalSystemControlInfoType">
-			<signalSystemPlan id="7">
-				<start daytime="00:00:00" />
-				<stop daytime="24:00:00" />
-				<circulationTime sec="60" />
-				<syncTime sec="0" />
-				<powerOnTime sec="0" />
-				<powerOffTime sec="50" />
-				<signalGroupSettings refId="123">
-					<roughcast sec="0" />
-					<dropping sec="45" />
-					<interimTimeRoughcast sec="2" />
-					<interimTimeDropping sec="3" />
-				</signalGroupSettings>
-			</signalSystemPlan>
-		</signalSystemControlInfo>
-  </signalSystemConfiguration>
-</signalSystemConfig>
+	
+  <lightSignalSystemConfiguration refId="23">
+    <lightSignalSystemControlInfoType xsi:type="planbasedSignalSystemControlInfoType">
+      <lightSignalSystemPlan id="7">
+        <start daytime="00:00:00" />
+        <stop daytime="24:00:00" />
+<!--        <syncTime sec="0" />-->
+        <lightSignalGroupConfiguration refId="123">
+          <roughcast sec="0" />
+          <dropping sec="45" />
+          <interimTimeRoughcast sec="2" />
+          <interimTimeDropping sec="3" />
+        </lightSignalGroupConfiguration>
+      </lightSignalSystemPlan>
+    </lightSignalSystemControlInfoType>
+  </lightSignalSystemConfiguration>
+		
+  
+</lightSignalSystemConfig>

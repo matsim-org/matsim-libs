@@ -17,27 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
-
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package org.matsim.basic.lightsignalsystemsconfig;
 
 
 /**
+ * Currently just a marker interface for all ControlInfo subtypes
  * @author dgrether
  *
  */
-public class AllTests {
-
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Test for org.matsim.lightsignalsystems");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LightSignalSystemsReaderTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+public interface BasicLightSignalSystemControlInfo {
 
 }

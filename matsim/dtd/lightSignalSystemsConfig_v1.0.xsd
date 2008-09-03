@@ -11,7 +11,7 @@ the simulation -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
-<xs:element name="signalSystemConfig">
+<xs:element name="lightSignalSystemConfig">
   <xs:complexType>
     <xs:annotation>
       <xs:documentation>
@@ -19,12 +19,12 @@ the simulation -->
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
- 		  <xs:element name="signalSystemConfiguration" type="signalSystemConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+ 		  <xs:element name="lightSignalSystemConfiguration" type="lightSignalSystemConfigurationType" minOccurs="0" maxOccurs="unbounded" />
  		</xs:sequence>
   </xs:complexType>
 </xs:element>
 
-<xs:complexType name="signalSystemConfigurationType">
+<xs:complexType name="lightSignalSystemConfigurationType">
   <xs:annotation>
     <xs:documentation>
     This type is used to configure the signal groups, i.e. which signal groups are controlled together. Furthermore
@@ -33,9 +33,9 @@ the simulation -->
     </xs:documentation>
   </xs:annotation>
   <xs:complexContent>
-    <xs:extension base="matsimObjectType">
+    <xs:extension base="idRefType">
 		<xs:sequence>
-			<xs:element name="signalSystemControlInfo" type="signalSystemControlInfoType" minOccurs="1" maxOccurs="1">
+			<xs:element name="lightSignalSystemControlInfo" type="lightSignalSystemControlInfoType" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 				 	<xs:documentation>Each system may have a different control strategy. See also comments for the type
 				 	definition.</xs:documentation>
@@ -46,7 +46,7 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="signalSystemControlInfoType" abstract="true">
+<xs:complexType name="lightSignalSystemControlInfoType" abstract="true">
   <xs:annotation>
     <xs:documentation>
     This type or more precisely its subtypes define how a signal group system is controlled. Control can be adaptive, plan based or both.
@@ -58,11 +58,11 @@ the simulation -->
 
 
 
-<xs:complexType name="planbasedSignalSystemControlInfoType">
+<xs:complexType name="planbasedlightSignalSystemControlInfoType">
   <xs:complexContent>
-		<xs:extension base="signalSystemControlInfoType">
+		<xs:extension base="lightSignalSystemControlInfoType">
 			<xs:sequence>
-				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="lightSignalSystemPlan" type="lightSignalSystemPlanType" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>A signal system's plan based control is given by one or more plans per
 						signal group. Which signal groups are controled by a plan based system can be determined
@@ -77,13 +77,13 @@ the simulation -->
 </xs:complexType>
 
 
-<xs:complexType name="adaptiveSignalSystemControlInfoType">
+<xs:complexType name="adaptiveLightSignalSystemControlInfoType">
 	<xs:annotation>
 		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
 		can be set in the element of this type.</xs:documentation>
 	</xs:annotation>
   <xs:complexContent>
-		<xs:extension base="signalSystemControlInfoType">
+		<xs:extension base="lightSignalSystemControlInfoType">
 			<xs:sequence>
 				<xs:element name="adaptiveControler" type="xs:string" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="signalGroup" type="idRefType" minOccurs="1" maxOccurs="unbounded">
@@ -101,16 +101,16 @@ the simulation -->
 
 
 
-<xs:complexType name="adaptivePlanbasedSignalSystemControlInfoType">
+<xs:complexType name="adaptivePlanbasedLightSignalSystemControlInfoType">
 	<xs:annotation>
 		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
 		can be set in the element of this type. For plan based adaptive control strategies
 		one or more plans can be added as well.</xs:documentation>
 	</xs:annotation>
   <xs:complexContent>
-		<xs:extension base="adaptiveSignalSystemControlInfoType">
+		<xs:extension base="adaptiveLightSignalSystemControlInfoType">
 			<xs:sequence>
-				<xs:element name="signalSystemPlan" type="signalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="lightSignalSystemPlan" type="lightSignalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>An adaptive control can use signal plans to control the system. How this
 						plans are used depends on the adaptive control strategy choosen.
@@ -126,7 +126,7 @@ the simulation -->
 
 
 
-<xs:complexType name="signalSystemPlanType">
+<xs:complexType name="lightSignalSystemPlanType">
   <xs:annotation>
     <xs:documentation> This type specifies a plan for a traffic light system.
     </xs:documentation>
@@ -150,42 +150,7 @@ the simulation -->
 						<xs:attribute name="daytime" type="xs:time" use="required"/>
 					</xs:complexType>
   			</xs:element>
-    		<xs:element name="circulationTime">
-		    	<xs:annotation>
-    				<xs:documentation>The time in seconds needed to process this plan.</xs:documentation>
-    			</xs:annotation>
-					<xs:complexType>
-					  <xs:attribute name="sec" type="xs:nonNegativeInteger" use="required"/>
-					</xs:complexType>
-   		 	</xs:element>
-				<xs:element name="syncTime" minOccurs="0" maxOccurs="1" >
-    			<xs:annotation>
-		    		<xs:documentation>The second of the circulation time which is used
-    				for synchronization.</xs:documentation>
-    			</xs:annotation>
-		  		<xs:complexType>
-					  <xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
-					</xs:complexType>
-   		 </xs:element>
-			 <xs:element name="powerOnTime" minOccurs="0" maxOccurs="1" >
-    			<xs:annotation>
-    				<xs:documentation>The second of the circulation time which specifies where
-    				to start in the plan when the signal system is starting to work.</xs:documentation>
-    			</xs:annotation>
-	 		 		<xs:complexType>
-					  <xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
-					</xs:complexType>
-    		</xs:element>
-		    <xs:element name="powerOffTime" minOccurs="0" maxOccurs="1">
-    			<xs:annotation>
-    				<xs:documentation>The second of the circulation time which specifies where
-    				to stop in the plan when the signal system is switched off.</xs:documentation>
-		    	</xs:annotation>
-    			<xs:complexType>
-					  <xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
-					</xs:complexType>
-    		</xs:element>
-    		<xs:element name="signalGroupSettings" type="signalGroupSettingsType" minOccurs="1" maxOccurs="unbounded">
+    		<xs:element name="lightSignalGroupConfiguration" type="lightSignalGroupConfigurationType" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>This element contains information when to switch on or off a signal group.</xs:documentation>
 					</xs:annotation>
@@ -195,7 +160,7 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="signalGroupSettingsType">
+<xs:complexType name="lightSignalGroupConfigurationType">
 	<xs:complexContent>
 		<xs:extension base="idRefType" >
 			<xs:sequence>

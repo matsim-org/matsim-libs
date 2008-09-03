@@ -34,7 +34,7 @@ import org.matsim.basic.lightsignalsystems.BasicLane;
 import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemFactory;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemsFactory;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
 import org.matsim.basic.lightsignalsystems.xml.ObjectFactory;
 import org.matsim.basic.lightsignalsystems.xml.XMLIdRefType;
@@ -57,10 +57,8 @@ public class MatsimLightSignalSystemsReader {
 
 	
 	private BasicLightSignalSystems lightSignalSystems;
-
-  private XMLLightSignalSystems xmlLssDefinition;
-    
-  private BasicLightSignalSystemFactory factory = new BasicLightSignalSystemFactory();
+   
+  private BasicLightSignalSystemsFactory factory = new BasicLightSignalSystemsFactory();
 
 	
 	public MatsimLightSignalSystemsReader(BasicLightSignalSystems lightSignalSystems) {
@@ -68,9 +66,9 @@ public class MatsimLightSignalSystemsReader {
 	}
 	
 	
-	
 	public void readFile(final String filename) {
   	JAXBContext jc;
+    XMLLightSignalSystems xmlLssDefinition;
 		try {
 			jc = JAXBContext.newInstance(org.matsim.basic.lightsignalsystems.xml.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();

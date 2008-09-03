@@ -17,27 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
+package org.matsim.basic.lightsignalsystemsconfig;
 
+import java.util.HashMap;
+import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.Id;
 
 
 /**
  * @author dgrether
  *
  */
-public class AllTests {
+public class BasicLightSignalSystemPlan {
 
-	public static Test suite() {
+	private Id id;
+	private double startTime;
+	private double endTime;
+	private Map<Id, BasicLightSignalGroupConfiguration> groupConfigs;
 
-		TestSuite suite = new TestSuite("Test for org.matsim.lightsignalsystems");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(LightSignalSystemsReaderTest.class);
-		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-		//$JUnit-END$
-		return suite;
+	public BasicLightSignalSystemPlan(Id id) {
+		this.id = id;
 	}
+
+	public void setStartTime(double seconds) {
+		this.startTime = seconds;
+	}
+
+	public void setEndTime(double seconds) {
+		this.endTime = seconds;
+	}
+
+	public Id getId() {
+		return id;
+	}
+
+	public void addLightSignalGroupConfiguration(
+			BasicLightSignalGroupConfiguration groupConfig) {
+		if (this.groupConfigs == null) {
+			this.groupConfigs = new HashMap<Id, BasicLightSignalGroupConfiguration>();
+		}
+		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
+	}
+
+	
+	public double getStartTime() {
+		return startTime;
+	}
+
+	
+	public double getEndTime() {
+		return endTime;
+	}
+
+	
+	public Map<Id, BasicLightSignalGroupConfiguration> getGroupConfigs() {
+		return groupConfigs;
+	}
+	
+	
+	
 
 }
