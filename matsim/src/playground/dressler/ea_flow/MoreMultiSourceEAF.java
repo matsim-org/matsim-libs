@@ -50,7 +50,7 @@ public class MoreMultiSourceEAF {
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
 		 
 		 HashMap<Link, EdgeIntervalls> flow;
-		 int timeHorizon = 3000000;
+		 int timeHorizon = 6;
 		 ArrayList<Link> routeLinks = new ArrayList<Link>();
 		 LinkedList<ArrayList<Link>> routeLinksList = new LinkedList<ArrayList<Link>>();
 
@@ -61,7 +61,7 @@ public class MoreMultiSourceEAF {
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/equil/network.xml");
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/two-routes/network.xml");
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/roundabout/network.xml");
-		 networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/xmas_network.xml");		 
+		 networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");		 
 		 
 		// CODE
 		flow = new HashMap<Link, EdgeIntervalls>();
@@ -77,7 +77,7 @@ public class MoreMultiSourceEAF {
 				maxId = node.getId();
 			}
 		}*/
-		Node sink = network.getNode("6_zweite_sink");
+		Node sink = network.getNode("5_zweite_sink");
 		
 		if (source == null || sink == null) {
 			System.out.println("nicht da");

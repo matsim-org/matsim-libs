@@ -626,8 +626,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 						//flow.get(link);
 						//System.out.println("Flow: " + flow.get(link).getFlowAt(Dists.getDistance(v)));
 						//System.out.println("Capacity: " + (int) (link.getCapacity(1.)));
-						if (flow.get(link).getFlowAt(Dists.getDistance(v)) < (int) (link
-								.getCapacity(1.))) {
+						if (flow.get(link).getFlowAt(Dists.getDistance(v)) < (int) (link.getCapacity(1.))) {
 							//System.out.println("forward if");
 							visitNode(v, w, dist);
 							pred.put(w, link);
