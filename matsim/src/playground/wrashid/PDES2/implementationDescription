@@ -359,9 +359,26 @@ PDES2, 12 CPU: 877/1273 sec.
 
 Ex5:
 ----
+(with handlers)
 6 iterationen, census2000_dilZh30km_miv_transitincl (WU 670'000, MIV only)
 events: 75.25M+ events
-DEQSim, 4 CPU: 
-MobSim: 
-JDEQSim: 
+(time measured only for microsimulation 
+start line: 2008-08-31 18:50:14,161  INFO Events:140 adding/removing Event-Handler: org.matsim.events.algorithms.EventWriterTXT
+end line: 2008-08-31 19:15:22,875  INFO Controler$CoreControlerListener:1227 [0] average trip duration is: 195573 seconds = 54:19:33
+)
+assertions not enabled for JDEQSim (because lots of assertions used there)
+DEQSim, 1 CPU: 
+MobSim: 6883 sec.
+JDEQSim, 1 CPU: 
      
+Ex6:
+----
+(with handlers)
+network used: "VISUM export national network 2007-11-28"
+67K agents (arround 7.66M events)  => Satawal.
+Time of descret event simulation part only considered.
+MobSim: 
+DEQSim, 1CPU: 
+JDEQSim, 1CPU: 
+
+
