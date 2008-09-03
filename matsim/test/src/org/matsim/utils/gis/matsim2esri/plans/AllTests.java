@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.utils.gis.matsim2esri.network");
+		TestSuite suite = new TestSuite("Tests for org.matsim.utils.gis.matsim2esri.plans");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SelectedPlans2ESRIShapeTest.class);
 		//$JUnit-END$
