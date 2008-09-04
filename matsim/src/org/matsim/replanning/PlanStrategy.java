@@ -103,7 +103,7 @@ public class PlanStrategy {
 	 * Indicates that no additional persons will be handed to this module and
 	 * waits until this strategy has finished handling all persons.
 	 *
-	 * @see #run()
+	 * @see #run(Person)
 	 */
 	public void finish() {
 		if (this.firstModule != null) {
