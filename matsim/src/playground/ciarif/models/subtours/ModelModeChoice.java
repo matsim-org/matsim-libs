@@ -40,7 +40,7 @@ public abstract class ModelModeChoice {
 	protected double dist_subtour; // distance of the sub-tour (in kilometers)
 	protected double dist_h_w; // distance between home and work or education facility (in km)
 	protected double tickets; // holds some kind of season tickets 
-	protected int purpose; // main purpose of the tour (Work = 1, Education = 2, Shop=3)
+	protected int purpose; // main purpose of the tour (Work = 0, Education = 1, Shop=2, leis=3)
 	protected String car; // availability of car (Always, Sometimes, Never)
 	protected String male; // 0-[unlimited]
 	protected boolean bike; // bike ownership
@@ -129,7 +129,8 @@ public abstract class ModelModeChoice {
 	}
 	
 	public final boolean setTickets(TreeSet<String> tickets) {
-		if (tickets.isEmpty()) { this.tickets = 0.0; }
+		if (tickets == null) { this.tickets = 0.0; }
+		else if (tickets.isEmpty()) { this.tickets = 0.0; }
 		else { this.tickets = 1.0; }
 		return true;
 	}

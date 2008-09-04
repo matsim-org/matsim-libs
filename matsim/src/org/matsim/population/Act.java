@@ -104,6 +104,10 @@ public class Act extends BasicActImpl {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	public final void setPrimary(boolean isPrimary) {
+		this.isPrimary = isPrimary;
+	}
+	
 	protected void setFacility(final String f_id) {
 		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		if (facilities == null) { throw new RuntimeException("Facilities Layer does not exist!"); }

@@ -132,14 +132,6 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final int calcHHSizeFromHH(Person p, Household hh) {
-		int nump = hh.getPersons().size();
-		if (nump > MAXNUMP) { nump = MAXNUMP; }
-		return nump;
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-
 	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
 		double dist = 0.0;
 		for (int j=1; j<act_indices.size(); j++) {
@@ -161,7 +153,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			else if (mainpurpose == 3) { m = new ModelModeChoiceLeisure18Plus(); }
 			else { Gbl.errorMsg("This should never happen!"); }
 		}
-		else { // TODO balmermi: ask Francesco
+		else {
 			if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Minus (); }
 			else { m = new ModelModeChoiceOther18Minus (); }
 		}
@@ -202,9 +194,6 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	@Override
 	public void run(Person person) {
 
-		Map<String,Object> atts = person.getCustomAttributes();
-		Household hh = (Household)atts.get(CAtts.HH_W);
-
 		// GET the subtours
 		Plan p = person.getSelectedPlan();
 		past.run(p);
@@ -239,33 +228,30 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// SET variables
 			// age; // 0-[unlimited]
 			model.setAge(person.getAge());
-			// nump; // number of persons of the household
-			// TODO balmermi: ask Francesco
-			model.setHHDimension(this.calcHHSizeFromHH(person,hh));
 			// udeg; // degree of urbanization [2-5] (1=urbanized=reference)
-			// TODO balmermi: ask Francesco
 			model.setUrbanDegree(this.getUrbanDegree(act_indices,p));
 			// license; // yes = 1; no = 0;
 			if (person.getLicense().equals(YES)) { model.setLicenseOwnership(true); } else { model.setLicenseOwnership(false); }
 			// dist_subtour; // distance of the sub-tour (in kilometers)
-			// TODO balmermi: ask Francesco
 			model.setDistanceTour(this.calcTourDistance(act_indices,p));
 			// dist_h_w; // distance between home and work or education facility (in km)
-			// TODO balmermi: ask Francesco
 			Coord h_coord = person.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility().getCenter();
 			ArrayList<Activity> prim_acts = new ArrayList<Activity>();
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W2));
 			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_W3));
+			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EKIGA));
+			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EPRIM));
+			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_ESECO));
+			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EHIGH));
+			prim_acts.addAll(person.getKnowledge().getActivities(CAtts.ACT_EOTHR));
 			if (prim_acts.isEmpty()) { model.setDistanceHome2Work(0.0); }
 			else {
 				Coord p_coord = prim_acts.get(MatsimRandom.random.nextInt(prim_acts.size())).getFacility().getCenter();
 				model.setDistanceHome2Work(h_coord.calcDistance(p_coord)/1000.0);
 			}
 			// tickets; // holds some kind of season tickets 
-			// TODO balmermi: ask Francesco
 			model.setTickets(person.getTravelcards());
-			// purpose; // main purpose of the tour (Work = 1, Education = 2, Shop=3)
-			// TODO balmermi: ask Francesco
+			// purpose; // main purpose of the tour (Work = 0, Education = 1, Shop=2, leis=3)
 			model.setMainPurpose(mainpurpose);
 			// car; // availability of car (Always, Sometimes, Never)
 			model.setCar(person.getCarAvail());
@@ -274,15 +260,12 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// bike; // bike ownership
 			if (MatsimRandom.random.nextDouble() < 0.54) { model.setBike(true); } else { model.setBike(false); }
 			// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
-			// TODO: balmermi!!!!
 			model.setPrevMode(this.getPrevMode(act_indices.get(0),p));
 			// home_coord; //Coordinates of the home facility of the agent
 			model.setHomeCoord(h_coord);
 			// ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check the reason it works like this
-			// TODO balmermi: ask Francesco
 			model.setRide(this.isRidePossible(person));
 			// pt; // pt possible
-			// TODO balmermi: ask Francesco
 			model.setPt(this.isPtPossible(person));
 			// END SET
 

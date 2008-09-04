@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 
-public class FacilityWriteTable {
+public class FacilityWriteTable extends AbstractFacilityAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -47,7 +47,7 @@ public class FacilityWriteTable {
 		super();
 		this.act_type = act_type;
 		try {
-			fw = new FileWriter("output/facilities_" + act_type + ".txt");
+			fw = new FileWriter("../../output/facilities_" + act_type + ".txt");
 			out = new BufferedWriter(fw);
 			out.write("fId\tx\ty\tcap\n");
 			out.flush();
@@ -76,24 +76,20 @@ public class FacilityWriteTable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Facilities facilities) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
+	public void run(Facility facility) {
 		try {
-			for (Facility f : facilities.getFacilities().values()) {
-				Iterator<Activity> a_it = f.getActivities().values().iterator();
-				while (a_it.hasNext()) {
-					Activity a = a_it.next();
-					if (a.getType().equals(this.act_type)) {
-						out.write(f.getId() + "\t" + f.getCenter().getX() + "\t" + f.getCenter().getY() + "\t" + a.getCapacity() + "\n");
-					}
+			Iterator<Activity> a_it = facility.getActivities().values().iterator();
+			while (a_it.hasNext()) {
+				Activity a = a_it.next();
+				if (a.getType().equals(this.act_type)) {
+					out.write(facility.getId() + "\t" + facility.getCenter().getX() + "\t" + facility.getCenter().getY() + "\t" + a.getCapacity() + "\n");
 				}
-				out.flush();
 			}
+			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		System.out.println("    done.");
 	}
+
 }

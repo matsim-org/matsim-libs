@@ -21,13 +21,14 @@
 package playground.balmermi;
 
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.gbl.Gbl;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldCreateRasterLayer;
-import org.matsim.world.algorithms.WorldValidation;
+
+import playground.balmermi.algos.FacilityWriteTable;
+import playground.balmermi.census2000v2.data.CAtts;
 
 public class ScenarioParsing {
 
@@ -39,16 +40,16 @@ public class ScenarioParsing {
 
 		System.out.println("TEST RUN 01:");
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		System.out.println("  done.");
+//		System.out.println("  reading world xml file... ");
+//		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
+//		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+//		System.out.println("  done.");
 
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		Gbl.getWorld().complete();
-		System.out.println("  done.");
+//		System.out.println("  reading facilities xml file... ");
+//		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+//		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+//		Gbl.getWorld().complete();
+//		System.out.println("  done.");
 
 //		System.out.println("  reading the network xml file...");
 ////		NetworkLayer network = null;
@@ -101,13 +102,39 @@ public class ScenarioParsing {
 //		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
+		
+		Facilities facs = new Facilities(null,true);
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EHIGH));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EKIGA));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EOTHR));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_EPRIM));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_ESECO));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_HOME));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_LC));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_LG));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_LS));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_S1));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_S2));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_S3));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_S4));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_S5));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_SOTHR));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_W2));
+		facs.addAlgorithm(new FacilityWriteTable(CAtts.ACT_W3));
+		facs.addAlgorithm(new FacilityWriteTable("tta"));
+//		FacilitiesWriterAlgorithm writer = new FacilitiesWriterAlgorithm(facs);
+//		facs.addAlgorithm(writer);
+		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(facs);
+		reader.readFile("../../input/facilities.xml.gz");
+		
+		//////////////////////////////////////////////////////////////////////
 
-		System.out.println("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
-		System.out.println("  done.");
+//		System.out.println("  running world modules... ");
+//		new WorldCheck().run(Gbl.getWorld());
+//		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+//		new WorldValidation().run(Gbl.getWorld());
+//		new WorldCheck().run(Gbl.getWorld());
+//		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -128,9 +155,9 @@ public class ScenarioParsing {
 
 //		Scenario.writePlans(plans);
 //		Scenario.writeNetwork(network);
-		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld(Gbl.getWorld());
-		Scenario.writeConfig();
+//		Scenario.writeFacilities(facilities);
+//		Scenario.writeWorld(Gbl.getWorld());
+//		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
