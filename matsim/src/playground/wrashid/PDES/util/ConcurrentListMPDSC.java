@@ -110,18 +110,17 @@ public class ConcurrentListMPDSC {
 	// gives back a list, until null
 	// side effect: the consumer must empty the result list before next
 	// invocation!!!
-	public LinkedList<Message> getCucurrencySafeElements() {
-		LinkedList<Message> result=null;
+	public LinkedList<Message>[] getCucurrencySafeElements() {
+		LinkedList<Message>[] result=new LinkedList[inputBuffer.length];
 		for (int i = 0; i < outputBuffer.length; i++) {
 			if (outputBuffer[i].size() > 0) {
 				synchronized(outputBuffer[i]){
-					result=outputBuffer[i];
+					result[i]=outputBuffer[i];
 					outputBuffer[i]=new LinkedList<Message>();
 				}
-				return result;
 			}
 		}
-		return null;
+		return result;
 	}
 
 	public ConcurrentListMPDSC(int numberOfProducers, int minListSize) {

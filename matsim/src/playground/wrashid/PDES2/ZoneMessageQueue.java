@@ -281,12 +281,14 @@ public class ZoneMessageQueue {
 			
 			buffer.flushEverything();
 		}
-		LinkedList<Message> messages = buffer.getCucurrencySafeElements();
-		while (messages!=null){
-			while (messages.size()>0){
-				queue1.add(messages.poll());
+		LinkedList<Message>[] messages = buffer.getCucurrencySafeElements();
+		for (int i=0;i<messages.length;i++){
+			if (messages[i]!=null){
+				while (messages[i].size()>0){
+					queue1.add(messages[i].poll());
+				}
 			}
-			messages = buffer.getCucurrencySafeElements();
+			
 		}
 	}
 
