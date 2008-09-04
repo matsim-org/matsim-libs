@@ -49,4 +49,18 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 	}
 
+	public void testAddParam() {
+
+		super.loadConfig(this.getInputDirectory() + "config.xml");
+
+		String actualPossibleModesString = "";
+		for (String expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
+			actualPossibleModesString += expectedPossibleMode;
+			actualPossibleModesString += " ";
+		}
+		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
+		assertEquals( PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT, actualPossibleModesString );
+		
+	}
+	
 }

@@ -21,6 +21,7 @@
 package org.matsim.planomat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -37,16 +38,16 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.basic.v01.BasicPlan.Type;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
@@ -78,11 +79,14 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-			org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
-
+			// save original routes
+			// HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
+			
 			// analyze plan: how many activities do we have?
 			PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(plan);
+
+			org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
 
 			IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 			try {
@@ -106,6 +110,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			population.evolve( Gbl.getConfig().planomat().getJgapMaxGenerations() );
 			IChromosome fittest = population.getFittestChromosome();
 			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
+//			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours, originalRoutes );
 
 		}
 	}
@@ -123,6 +128,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			// use random seed from config file to initialize JGAP random number generator
 			// use fixed random seed in order to reproduce test results as well as
 			// to have deterministic behavior of the simulation system
+			// TODO use different random seed for each run, e.g. using MatsimRandom.getLocalInstance
 			StockRandomGenerator rng = new StockRandomGenerator();
 			rng.setSeed( Gbl.getConfig().global().getRandomSeed() );
 			jgapConfiguration.setRandomGenerator(rng);
@@ -187,10 +193,20 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 	 * @param individual the GA individual (usually the fittest after evolution) whose values will be written back to a plan object
 	 * @param plan the plan that will be altered
 	 */
-	protected void writeChromosome2Plan(final IChromosome individual, final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours) {
+	protected void writeChromosome2Plan(
+			final IChromosome individual, 
+			final Plan plan, 
+			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
+//		protected void writeChromosome2Plan(
+//				final IChromosome individual, 
+//				final Plan plan, 
+//				final PlanAnalyzeSubtours planAnalyzeSubtours, 
+//				final HashMap<Leg, Route> originalRoutes ) {
 
 		Act activity = null;
 		Leg leg = null;
+
+		HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
 
 		Gene[] fittestGenes = individual.getGenes();
 //		for (Gene gene: fittestGenes) {
@@ -253,6 +269,10 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 						leg);
 
 				leg.setTravTime(travelTimeEstimation);
+				
+				// correctly set route object
+				// restore original routes, because planomat must not alter routes at all
+				leg.setRoute(originalRoutes.get(leg));
 				leg.getRoute().setTravTime(travelTimeEstimation);
 
 				now += leg.getTravTime();
@@ -267,4 +287,18 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	}
 
+	public static HashMap<Leg, Route> getLegsRoutes(final Plan plan) {
+		
+		HashMap<Leg, Route> routes = new HashMap<Leg, Route>();
+		
+		LegIterator legIterator = plan.getIteratorLeg();
+		while (legIterator.hasNext()) {
+			Leg curLeg = (Leg) legIterator.next();
+			routes.put(curLeg, new Route(curLeg.getRoute()));
+		}
+		
+		return routes;
+		
+	}
+	
 }

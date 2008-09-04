@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Module;
-import org.matsim.gbl.Gbl;
-import org.matsim.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -81,41 +79,55 @@ public class PlanomatConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String param_name, final String value) {
-		if (SCORING_FUNCTION.equals(param_name)) {
-
-			if (CHARYPAR_NAGEL_SCORING_FUNCTION.equals(value)) {
-				this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
-			} else if (CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION.equals(value)) {
-				this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
-			} else {
-				Gbl.errorMsg("Unknown scoring function identifier. Aborting...");
+		
+		if (PlanomatConfigGroup.POSSIBLE_MODES.equals(param_name)) {
+			if (
+					PlanomatConfigGroup.POSSIBLE_MODES_CAR.equals(value) ||
+					PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT.equals(value)) {
+				this.possibleModes = new ArrayList<String>();
+				for (String possibleMode : value.split(" ")) {
+					this.possibleModes.add(possibleMode);
+				}
 			}
-
-		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
-			this.setLegTravelTimeEstimatorName(value);
-//			} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
-//			this.setLinkTravelTimeEstimatorName(value);
-		} else if (JGAP_MAX_GENERATIONS.equals(param_name)) {
-			this.setJgapMaxGenerations(Integer.parseInt(value));
-		} else if (OPTIMIZATION_TOOLBOX.equals(param_name)) {
-			if (OPTIMIZATION_TOOLBOX_JGAP.equals(value)) {
-				this.setOptimizationToolbox(value);
-			} else {
-				log.error("Unknown optimization toolbox identifier. Aborting...");
-			}
-		} else if (POPSIZE.equals(param_name)) {
-			int popSize = 0;
-			try {
-				popSize = Integer.parseInt(value);
-			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (popSize <= 0) {
-				Gbl.errorMsg("JGAP Population size must be a non-null positive integer.");
-			}
-			this.setPopSize(popSize);
-		} 
+		}
+		
+		// TODO add remaining config parameters to test
+		
+//		if (SCORING_FUNCTION.equals(param_name)) {
+//
+//			if (CHARYPAR_NAGEL_SCORING_FUNCTION.equals(value)) {
+//				this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
+//			} else if (CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION.equals(value)) {
+//				this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
+//			} else {
+//				Gbl.errorMsg("Unknown scoring function identifier. Aborting...");
+//			}
+//
+//		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
+//			this.setLegTravelTimeEstimatorName(value);
+////			} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
+////			this.setLinkTravelTimeEstimatorName(value);
+//		} else if (JGAP_MAX_GENERATIONS.equals(param_name)) {
+//			this.setJgapMaxGenerations(Integer.parseInt(value));
+//		} else if (OPTIMIZATION_TOOLBOX.equals(param_name)) {
+//			if (OPTIMIZATION_TOOLBOX_JGAP.equals(value)) {
+//				this.setOptimizationToolbox(value);
+//			} else {
+//				log.error("Unknown optimization toolbox identifier. Aborting...");
+//			}
+//		} else if (POPSIZE.equals(param_name)) {
+//			int popSize = 0;
+//			try {
+//				popSize = Integer.parseInt(value);
+//			} catch (NumberFormatException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			if (popSize <= 0) {
+//				Gbl.errorMsg("JGAP Population size must be a non-null positive integer.");
+//			}
+//			this.setPopSize(popSize);
+//		} 
 	}
 
 	// getters/setters

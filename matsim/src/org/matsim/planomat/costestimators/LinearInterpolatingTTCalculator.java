@@ -40,6 +40,9 @@ import org.matsim.utils.misc.Time;
  * estimation. Mainly a copy of TravelTimeCalculator, should be reworked
  * in order to have nice source code!
  *
+ * TODO move linear interpolation of travel times out of planomat package,
+ * into org.matsim.trafficmonitoring.TravelTime*
+ *
  * @author meisterk
  *
  */

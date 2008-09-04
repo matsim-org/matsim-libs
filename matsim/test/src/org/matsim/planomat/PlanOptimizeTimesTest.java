@@ -21,6 +21,7 @@
 package org.matsim.planomat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
@@ -36,17 +37,20 @@ import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
+import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
+import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
@@ -285,4 +289,32 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	}
 
+	public void testGetOriginalRoutes() {
+		
+		// init test Plan
+		final String TEST_PERSON_ID = "100";
+		final int TEST_PLAN_NR = 0;
+
+		// first person
+		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		// only plan of that person
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		
+		Route expectedRoute = new Route();
+		expectedRoute.setRoute("2 7 12");
+		
+		HashMap<Leg, Route> legsRoutes = PlanOptimizeTimes.getLegsRoutes(testPlan);
+		
+		// this code should changes to the route of the plan leg object, 
+		// but should not affect the previously saved routes 
+		Leg modifyMe = testPlan.getNextLeg(testPlan.getFirstActivity());
+		Route differentRoute = new Route();
+		differentRoute.setRoute("2 10 12");
+		modifyMe.setRoute(differentRoute);
+		
+		ArrayList<Node> actualRoute = legsRoutes.get(modifyMe).getRoute();
+		assertEquals(expectedRoute.getRoute(), actualRoute);
+		
+	}
+	
 }

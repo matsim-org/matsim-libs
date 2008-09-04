@@ -33,7 +33,7 @@ public class PlanomatControlerTest extends MatsimTestCase {
 		
 	}
 
-	public void testMain() {
+	public void testMainCar() {
 		
 		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
 		
@@ -47,4 +47,19 @@ public class PlanomatControlerTest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 	}
 
+	public void testMainCarPt() {
+
+		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
+		
+		PlanomatControler.main(args);
+
+		// actual test: compare checksums of the files
+		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
+		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		log.info("Expected checksum: " + Long.toString(expectedChecksum));
+		log.info("Actual checksum: " + Long.toString(actualChecksum));
+		assertEquals(expectedChecksum, actualChecksum);
+		
+	}
+	
 }

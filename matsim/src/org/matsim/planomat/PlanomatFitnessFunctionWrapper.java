@@ -20,6 +20,8 @@
 
 package org.matsim.planomat;
 
+import java.util.HashMap;
+
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
@@ -76,7 +78,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		String modeName;
 		Act origin = null, destination = null;
 		Leg legIntermediate = null;
-		Route tempRoute = null;
+		HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
 		
 		sf.reset();
 		double now = 0.0;
@@ -99,8 +101,6 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 //			System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 			legIntermediate.setMode(modeName);
 			
-			// save route, because temporary pt leg handling is based on a routing in a freespeed network
-			tempRoute = legIntermediate.getRoute();
 			// set times
 			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 					this.plan.getPerson().getId(), 
@@ -112,8 +112,8 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 //			System.out.println(Time.writeTime(travelTime));
 			now += travelTime;
 			
-			// recover route
-			legIntermediate.setRoute(tempRoute);
+			// recover original route
+			legIntermediate.setRoute(originalRoutes.get(legIntermediate));
 			sf.endLeg(now);
 		}
 
