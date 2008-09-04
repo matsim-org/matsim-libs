@@ -63,7 +63,7 @@ public class JavaDEQSim {
 		SimulationParameters.events=events;
 		SimulationParameters.stuckTime= Double.parseDouble(Gbl.getConfig().getParam("simulation", "stuckTime"));
 		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
-		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
+		SimulationParameters.storageCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
 		
 	}
 	

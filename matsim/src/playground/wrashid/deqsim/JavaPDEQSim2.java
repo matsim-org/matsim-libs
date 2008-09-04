@@ -61,9 +61,9 @@ public class JavaPDEQSim2 {
 		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
 		SimulationParameters.events=events;
-		SimulationParameters.stuckTime= Double.parseDouble(Gbl.getConfig().getParam("simulation", "stuckTime"));
+		SimulationParameters.stuckTime= Gbl.getConfig().simulation().getStuckTime();//getParam("simulation", "stuckTime"));
 		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
-		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
+		SimulationParameters.storageCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
 		
 	}
 	

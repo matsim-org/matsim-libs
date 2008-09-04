@@ -396,3 +396,4 @@ assertions not enabled for all simulations
 DEQSim, 1 CPU: 1778 sec.
 MobSim: 2536 sec.
 JDEQSim, 1 CPU: 1574 sec. 
+DES, 1CPU: 

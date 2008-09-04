@@ -61,12 +61,13 @@ public class ConcurrentListMPDSCTest extends MatsimTestCase {
 		list.flushAllInputBuffers(queueTime);
 		
 		LinkedList<Message>[] messages = list.getCucurrencySafeElements();
-		if (messages==null){
+
+		if (messages[0]==null){
 			assertEquals(expectedNumberOfMessages,0);
 		} else {
 			assertEquals(expectedNumberOfMessages,messages[0].size());
-			assertEquals(10.0,messages[0].poll().messageArrivalTime);
 		}
+		
 	}
 	
 	// considering the out of order messages
@@ -91,7 +92,7 @@ public class ConcurrentListMPDSCTest extends MatsimTestCase {
 		list.flushAllInputBuffers(queueTime);
 		
 		LinkedList<Message>[] messages = list.getCucurrencySafeElements();
-		if (messages==null){
+		if (messages[0]==null){
 			assertEquals(expectedNumberOfMessages,0);
 		} else {
 			assertEquals(expectedNumberOfMessages,messages[0].size());
