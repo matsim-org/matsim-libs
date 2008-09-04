@@ -21,15 +21,15 @@ public class ConcurrentListMPDSCTest extends MatsimTestCase {
 		list.add(m1, 0);
 		
 		// TODO: uncomment this.
-		//list.flushEverything();
+		list.flushEverything();
 		
-		LinkedList<Message> messages = list.getCucurrencySafeElements();
-		assertEquals(2,messages.size());
-		assertEquals(10.0,messages.poll().messageArrivalTime);
-		assertEquals(20.0,messages.poll().messageArrivalTime);
+		LinkedList<Message>[] messages = list.getCucurrencySafeElements();
+		assertEquals(2,messages[0].size());
+		assertEquals(10.0,messages[0].poll().messageArrivalTime);
+		assertEquals(20.0,messages[0].poll().messageArrivalTime);
 		
 		messages = list.getCucurrencySafeElements();
-		assertEquals(messages,null);
+		//assertEquals(messages,null);
 	}
 		
 	public void testFlushAllInputBuffers(){
@@ -58,14 +58,14 @@ public class ConcurrentListMPDSCTest extends MatsimTestCase {
 		list.add(m1, 0);
 		
 		// TODO: uncomment this.
-		//list.flushAllInputBuffers(queueTime);
+		list.flushAllInputBuffers(queueTime);
 		
-		LinkedList<Message> messages = list.getCucurrencySafeElements();
+		LinkedList<Message>[] messages = list.getCucurrencySafeElements();
 		if (messages==null){
 			assertEquals(expectedNumberOfMessages,0);
 		} else {
-			assertEquals(expectedNumberOfMessages,messages.size());
-			assertEquals(10.0,messages.poll().messageArrivalTime);
+			assertEquals(expectedNumberOfMessages,messages[0].size());
+			assertEquals(10.0,messages[0].poll().messageArrivalTime);
 		}
 	}
 	
@@ -88,14 +88,14 @@ public class ConcurrentListMPDSCTest extends MatsimTestCase {
 		list.add(m1, 0);
 		
 		// TODO: uncomment this.
-		//list.flushAllInputBuffers(queueTime);
+		list.flushAllInputBuffers(queueTime);
 		
-		LinkedList<Message> messages = list.getCucurrencySafeElements();
+		LinkedList<Message>[] messages = list.getCucurrencySafeElements();
 		if (messages==null){
 			assertEquals(expectedNumberOfMessages,0);
 		} else {
-			assertEquals(expectedNumberOfMessages,messages.size());
-			assertEquals(timeOfFirstOutput,messages.poll().messageArrivalTime);
+			assertEquals(expectedNumberOfMessages,messages[0].size());
+			assertEquals(timeOfFirstOutput,messages[0].poll().messageArrivalTime);
 		}
 	}
 	
