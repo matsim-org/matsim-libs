@@ -4,7 +4,7 @@
 
 	<module name="planomat">
 <!--		<param name="" value="" />-->
-		<param name="" value="" />
+		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
 		<param name="possibleModes" value="car pt" />
 		
 	</module>

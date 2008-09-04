@@ -44,7 +44,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
-import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.controler.corelisteners.LegHistogramListener;
 import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
@@ -79,11 +78,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.MyRecentEventsBasedEstimator;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -152,9 +147,9 @@ public class Controler {
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
-	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
+	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 
 	/** Stores data commonly used by all router instances. */
 	private PreProcessLandmarks commonRoutingData = null;
@@ -366,7 +361,6 @@ public class Controler {
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator);
 		}
-		this.legTravelTimeEstimator = initLegTravelTimeEstimator(this.travelTimeCalculator);
 		this.events.addHandler(this.travelTimeCalculator);
 
 		/* TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has 15min-steps,
@@ -392,40 +386,6 @@ public class Controler {
 	/* ===================================================================
 	 * private methods
 	 * =================================================================== */
-
-	private LegTravelTimeEstimator initLegTravelTimeEstimator(final TravelTime linkTravelTimeCalculator) {
-		/* TODO [MR] move this method somewhere else, it should be more general instead just being here in the
-		 * Controler. Think of a bigger picture: this estimator as well as travel time / cost calculators
-		 * are all kind of singletons, and all have similar requirements (plans, network, events). Maybe this
-		 * could somehow be generalized? -marcel/18jan2008   */
-		/* This estimator is currently only used with the planomat, maybe moving it to the planomat somewhere?
-		 * -marcel/18jan2008  */
-		LegTravelTimeEstimator estimator = null;
-
-		int timeBinSize = 900;
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, timeBinSize);
-		this.events.addHandler(tDepDelayCalc);
-
-		/* it would be nice to load the estimator via reflection,
-		 * but if we just use make instead of Eclipse (as usual on a remote server)
-		 * only classes occurring in the code are compiled, so we do it the classic way. */
-		String estimatorName = Gbl.getConfig().planomat().getLegTravelTimeEstimatorName();
-		if (estimatorName == null) {
-			return null;
-		}
-		if (estimatorName.equalsIgnoreCase("MyRecentEventsBasedEstimator")) {
-			MyRecentEventsBasedEstimator tmp = new MyRecentEventsBasedEstimator();
-			this.events.addHandler(tmp);
-			estimator = tmp;
-		} else if (estimatorName.equalsIgnoreCase(PlanomatConfigGroup.CETIN_COMPATIBLE)) {
-			estimator = new CetinCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc, this.network);
-		} else if (estimatorName.equalsIgnoreCase(PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE)) {
-			estimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeCalculator, tDepDelayCalc);
-		} else {
-			Gbl.errorMsg("Invalid name of implementation of LegTravelTimeEstimatorI: " + estimatorName);
-		}
-		return estimator;
-	}
 
 	/**
 	 * Loads the configuration object with the correct settings.
@@ -967,10 +927,6 @@ public class Controler {
 		return this.travelTimeCalculator;
 	}
 
-	public final LegTravelTimeEstimator getLegTravelTimeEstimator() {
-		return this.legTravelTimeEstimator;
-	}
-
 	/**
 	 * Sets a new {@link org.matsim.scoring.ScoringFunctionFactory} to use. <strong>Note:</strong> This will
 	 * reset all scores calculated so far! Only call this before any events are generated in an iteration.
@@ -1248,4 +1204,9 @@ public class Controler {
 		}
 		System.exit(0);
 	}
+
+	public LegTravelTimeEstimator getLegTravelTimeEstimator() {
+		return legTravelTimeEstimator;
+	}
+
 }

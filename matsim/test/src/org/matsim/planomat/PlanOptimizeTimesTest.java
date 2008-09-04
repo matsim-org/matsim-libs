@@ -123,10 +123,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			if (
 					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
 					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
-				ArrayList<String> possibleModes = new ArrayList<String>();
-				possibleModes.add(BasicLeg.CARMODE);
-				possibleModes.add(BasicLeg.PTMODE);
-				Gbl.getConfig().planomat().setPossibleModes(possibleModes);
+				Gbl.getConfig().planomat().setPossibleModes(BasicLeg.CARMODE + " " + BasicLeg.PTMODE);
 			}
 
 			tTravelEstimator.resetTravelTimes();

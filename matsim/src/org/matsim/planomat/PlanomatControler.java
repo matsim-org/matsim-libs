@@ -21,13 +21,42 @@
 package org.matsim.planomat;
 
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
-public class PlanomatControler {
+public class PlanomatControler extends Controler {
+
+	public PlanomatControler(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected void setup() {
+		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
+		if (this.travelTimeCalculator == null) {
+			this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
+		}
+		this.legTravelTimeEstimator = initLegTravelTimeEstimator();
+		super.setup();
+	}
+	
+	private LegTravelTimeEstimator initLegTravelTimeEstimator() {
+
+		LegTravelTimeEstimator estimator = null;
+
+		int timeBinSize = 900;
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, timeBinSize);
+		this.events.addHandler(tDepDelayCalc);
+
+		estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(this.travelTimeCalculator, tDepDelayCalc, network);
+		
+		return estimator;
+	}
 
 	public static void main(final String[] args) {
-		final Controler controler = new Controler(args);
-		controler.addControlerListener(new PlanomatControlerListener());
+		final Controler controler = new PlanomatControler(args);
 		controler.run();
-//		System.exit(0);
 	}
+
 }
