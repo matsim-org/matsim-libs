@@ -367,9 +367,9 @@ start line: 2008-08-31 18:50:14,161  INFO Events:140 adding/removing Event-Handl
 end line: 2008-08-31 19:15:22,875  INFO Controler$CoreControlerListener:1227 [0] average trip duration is: 195573 seconds = 54:19:33
 )
 assertions not enabled for JDEQSim (because lots of assertions used there)
-DEQSim, 1 CPU: 
+DEQSim, 1 CPU: 1778 sec.
 MobSim: 6883 sec.
-JDEQSim, 1 CPU: 
+JDEQSim, 1 CPU: sim ende: 3600, writing end 4469 sec.
      
 Ex6:
 ----
@@ -382,3 +382,17 @@ DEQSim, 1CPU:
 JDEQSim, 1CPU: 
 
 
+Ex8:
+----
+(without write file handler)
+1 iteration, census2000_dilZh30km_miv_transitincl (WU 670'000, MIV only)
+Satawal
+events: 75.25M+ events
+(time measured only for microsimulation 
+start line: 2008-08-31 18:50:14,161  INFO Events:140 adding/removing Event-Handler: org.matsim.events.algorithms.EventWriterTXT
+end line: 2008-08-31 19:15:22,875  INFO Controler$CoreControlerListener:1227 [0] average trip duration is: 195573 seconds = 54:19:33
+)
+assertions not enabled for all simulations
+DEQSim, 1 CPU: 1778 sec.
+MobSim: 2536 sec.
+JDEQSim, 1 CPU: 1574 sec. 
