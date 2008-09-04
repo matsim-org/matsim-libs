@@ -9,7 +9,7 @@ provided which influences the probability the strategy gets chosen for a person.
 The probability for a strategy to be chosen is defined as the strategy's weight
 divided by the sum of all strategies' weights.</p>
 
-<p>A {@link org.matsim.replanning.Strategy} always consists
+<p>A {@link org.matsim.replanning.PlanStrategy} always consists
 of exactly one <code>PlanSelector</code> and zero or more <code>StrategyModule</code>s.
 A {@link org.matsim.replanning.selectors.PlanSelector
 PlanSelector} selects one of the agents' existing plans, while
@@ -64,23 +64,23 @@ StrategyManager
 	StrategyManager manager = new StrategyManager();
 
 	// strategy1
-	Strategy strategy1 = new Strategy(new KeepSelected());
+	PlanStrategy strategy1 = new PlanStrategy(new KeepSelected());
 	strategy1.addStrategyModule(new TimeAllocationMutator());
 
 	// strategy2
-	Strategy strategy2 = new Strategy(new RandomPlanSelector());
+	PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
 	strategy2.addStrategyModule(new ReRoute());
 
 	// strategy3
-	Strategy strategy3 = new Strategy(new RandomPlanSelector());
+	PlanStrategy strategy3 = new PlanStrategy(new RandomPlanSelector());
 	strategy3.addStrategyModule(new TimeAllocationMutator());
 	strategy3.addStrategyModule(new ReRoute());
 
 	// strategy4
-	Strategy strategy4 = new Strategy(new BestScoreSelector());
+	PlanStrategy strategy4 = new PlanStrategy(new BestScoreSelector());
 
 	// strategy5
-	Strategy strategy5 = new Strategy(new ExpBetaSelector());
+	PlanStrategy strategy5 = new PlanStrategy(new ExpBetaSelector());
 
 	// add the strategies to the manager
 	manager.addStrategy(strategy1, 0.05);
