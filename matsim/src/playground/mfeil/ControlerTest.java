@@ -25,7 +25,8 @@ public class ControlerTest extends org.matsim.controler.Controler {
 	
 	@Override
 		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();			
+			StrategyManager manager = new StrategyManager();	
+			manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 			PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
 			StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, legTravelTimeEstimator);
 			 // Note that legTravelTimeEstimator is given as an argument here while all other arguments for the 

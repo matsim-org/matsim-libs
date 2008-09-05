@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans name="created by 'org.matsim.population.algorithms.PlansCreateFromNetwork' with network 'triangle test network'">
+
+<!-- ====================================================================== -->
+
+	<person id="1" sex="m" age="46" license="no" car_avail="never" employed="no">
+		
+		<plan selected="yes">
+			<act type="home" link="110" x="60.0" y="110.0" start_time="00:00:00" dur="07:00:49" end_time="07:00:49" />
+			<leg num="0" mode="car" dep_time="07:00:49" trav_time="00:00:00" arr_time="07:00:49">
+			</leg>
+			<act type="education" link="101" x="120.0" y="0.0" start_time="07:00:49" dur="06:00:00" end_time="13:00:49" />
+			<leg num="1" mode="car" dep_time="13:00:49" trav_time="00:00:00" arr_time="13:00:49">
+			</leg>
+			<act type="work" link="104" x="330.0" y="30.0" start_time="13:00:49" dur="06:00:00" end_time="19:00:49" />
+			<leg num="2" mode="car" dep_time="19:00:49" trav_time="00:00:00" arr_time="19:00:49">
+			</leg>
+			<act type="home" link="110" x="60.0" y="110.0" start_time="19:00:49" dur="04:59:11" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="2" sex="m" age="19" license="yes" car_avail="never" employed="yes">
+	
+		<plan selected="yes">
+			<act type="home" link="102" x="200.0" y="0.0" start_time="00:00:00" dur="08:57:34" end_time="08:57:34" />
+			<leg num="0" mode="car" dep_time="08:57:34" trav_time="00:00:00" arr_time="08:57:34">
+			</leg>
+			<act type="work" link="104" x="330.0" y="30.0" start_time="08:57:34" dur="12:00:00" end_time="20:57:34" />
+			<leg num="1" mode="car" dep_time="20:57:34" trav_time="00:00:00" arr_time="20:57:34">
+			</leg>
+			<act type="home" link="102" x="200.0" y="0.0" start_time="20:57:34" dur="03:02:26" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="3" sex="m" age="48" license="yes" car_avail="always" employed="yes">
+	
+
+		<plan selected="yes">
+			<act type="home" link="101" x="120.0" y="0.0" start_time="00:00:00" dur="08:36:38" end_time="08:36:38" />
+			<leg num="0" mode="car" dep_time="08:36:38" trav_time="00:00:00" arr_time="08:36:38">
+			</leg>
+			<act type="work" link="100" x="50.0" y="0.0" start_time="08:36:38" dur="04:00:00" end_time="12:36:38" />
+			<leg num="1" mode="car" dep_time="12:36:38" trav_time="00:00:00" arr_time="12:36:38">
+			</leg>
+			<act type="leisure" link="107" x="250.0" y="270.0" start_time="12:36:38" dur="04:00:00" end_time="16:36:38" />
+			<leg num="2" mode="car" dep_time="16:36:38" trav_time="00:00:00" arr_time="16:36:38">
+			</leg>
+			<act type="work" link="107" x="250.0" y="270.0" start_time="16:36:38" dur="04:00:00" end_time="20:36:38" />
+			<leg num="3" mode="car" dep_time="20:36:38" trav_time="00:00:00" arr_time="20:36:38">
+			</leg>
+			<act type="home" link="101" x="120.0" y="0.0" start_time="20:36:38" dur="03:23:22" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="4" sex="m" age="97" license="yes" car_avail="never" employed="no">
+		
+		<plan selected="yes">
+			<act type="home" link="105" x="310.0" y="150.0" start_time="00:00:00" dur="07:52:27" end_time="07:52:27" />
+			<leg num="0" mode="car" dep_time="07:52:27" trav_time="00:00:00" arr_time="07:52:27">
+			</leg>
+			<act type="shop" link="100" x="50.0" y="0.0" start_time="07:52:27" dur="06:00:00" end_time="13:52:27" />
+			<leg num="1" mode="car" dep_time="13:52:27" trav_time="00:00:00" arr_time="13:52:27">
+			</leg>
+			<act type="leisure" link="111" x="10.0" y="50.0" start_time="13:52:27" dur="06:00:00" end_time="19:52:27" />
+			<leg num="2" mode="car" dep_time="19:52:27" trav_time="00:00:00" arr_time="19:52:27">
+			</leg>
+			<act type="home" link="105" x="310.0" y="150.0" start_time="19:52:27" dur="04:07:33" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="5" sex="m" age="63" license="yes" car_avail="always" employed="no">
+		
+		<plan selected="yes">
+			<act type="home" link="102" x="200.0" y="0.0" start_time="00:00:00" dur="07:14:53" end_time="07:14:53" />
+			<leg num="0" mode="car" dep_time="07:14:53" trav_time="00:00:00" arr_time="07:14:53">
+			</leg>
+			<act type="education" link="108" x="110.0" y="270.0" start_time="07:14:53" dur="04:00:00" end_time="11:14:53" />
+			<leg num="1" mode="car" dep_time="11:14:53" trav_time="00:00:00" arr_time="11:14:53">
+			</leg>
+			<act type="home" link="102" x="200.0" y="0.0" start_time="11:14:53" dur="04:00:00" end_time="15:14:53" />
+			<leg num="2" mode="car" dep_time="15:14:53" trav_time="00:00:00" arr_time="15:14:53">
+			</leg>
+			<act type="education" link="108" x="130.0" y="230.0" start_time="15:14:53" dur="04:00:00" end_time="19:14:53" />
+			<leg num="3" mode="car" dep_time="19:14:53" trav_time="00:00:00" arr_time="19:14:53">
+			</leg>
+			<act type="home" link="102" x="200.0" y="0.0" start_time="19:14:53" dur="04:45:07" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="6" sex="m" age="34" license="yes" car_avail="never" employed="yes">
+		
+
+		<plan selected="yes">
+			<act type="home" link="105" x="310.0" y="150.0" start_time="00:00:00" dur="07:07:56" end_time="07:07:56" />
+			<leg num="0" mode="car" dep_time="07:07:56" trav_time="00:00:00" arr_time="07:07:56">
+			</leg>
+			<act type="work" link="120" x="290.0" y="0.0" start_time="07:07:56" dur="06:00:00" end_time="13:07:56" />
+			<leg num="1" mode="car" dep_time="13:07:56" trav_time="00:00:00" arr_time="13:07:56">
+			</leg>
+			<act type="leisure" link="111" x="10.0" y="50.0" start_time="13:07:56" dur="06:00:00" end_time="19:07:56" />
+			<leg num="2" mode="car" dep_time="19:07:56" trav_time="00:00:00" arr_time="19:07:56">
+			</leg>
+			<act type="home" link="105" x="310.0" y="150.0" start_time="19:07:56" dur="04:52:04" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="7" sex="f" age="42" license="yes" car_avail="never" employed="no">
+		
+		<plan selected="yes">
+			<act type="home" link="102" x="200.0" y="0.0" start_time="00:00:00" dur="07:13:06" end_time="07:13:06" />
+			<leg num="0" mode="car" dep_time="07:13:06" trav_time="00:00:00" arr_time="07:13:06">
+			</leg>
+			<act type="leisure" link="111" x="10.0" y="50.0" start_time="07:13:06" dur="04:00:00" end_time="11:13:06" />
+			<leg num="1" mode="car" dep_time="11:13:06" trav_time="00:00:00" arr_time="11:13:06">
+			</leg>
+			<act type="home" link="102" x="200.0" y="0.0" start_time="11:13:06" dur="04:00:00" end_time="15:13:06" />
+			<leg num="2" mode="car" dep_time="15:13:06" trav_time="00:00:00" arr_time="15:13:06">
+			</leg>
+			<act type="work" link="107" x="250.0" y="270.0" start_time="15:13:06" dur="04:00:00" end_time="19:13:06" />
+			<leg num="3" mode="car" dep_time="19:13:06" trav_time="00:00:00" arr_time="19:13:06">
+			</leg>
+			<act type="home" link="102" x="200.0" y="0.0" start_time="19:13:06" dur="04:46:54" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="8" sex="m" age="50" license="yes" car_avail="sometimes" employed="yes">
+		
+		<plan selected="yes">
+			<act type="home" link="101" x="120.0" y="0.0" start_time="00:00:00" dur="07:12:52" end_time="07:12:52" />
+			<leg num="0" mode="car" dep_time="07:12:52" trav_time="00:00:00" arr_time="07:12:52">
+			</leg>
+			<act type="education" link="101" x="120.0" y="0.0" start_time="07:12:52" dur="12:00:00" end_time="19:12:52" />
+			<leg num="1" mode="car" dep_time="19:12:52" trav_time="00:00:00" arr_time="19:12:52">
+			</leg>
+			<act type="home" link="101" x="120.0" y="0.0" start_time="19:12:52" dur="04:47:08" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="9" sex="m" age="5" license="no" car_avail="never" employed="no">
+		
+		<plan selected="yes">
+			<act type="home" link="104" x="310.0" y="70.0" start_time="00:00:00" dur="08:49:15" end_time="08:49:15" />
+			<leg num="0" mode="car" dep_time="08:49:15" trav_time="00:00:00" arr_time="08:49:15">
+			</leg>
+			<act type="home" link="104" x="310.0" y="70.0" start_time="08:49:15" dur="04:00:00" end_time="12:49:15" />
+			<leg num="1" mode="car" dep_time="12:49:15" trav_time="00:00:00" arr_time="12:49:15">
+			</leg>
+			<act type="work" link="107" x="250.0" y="270.0" start_time="12:49:15" dur="04:00:00" end_time="16:49:15" />
+			<leg num="2" mode="car" dep_time="16:49:15" trav_time="00:00:00" arr_time="16:49:15">
+			</leg>
+			<act type="leisure" link="111" x="10.0" y="50.0" start_time="16:49:15" dur="04:00:00" end_time="20:49:15" />
+			<leg num="3" mode="car" dep_time="20:49:15" trav_time="00:00:00" arr_time="20:49:15">
+			</leg>
+			<act type="home" link="104" x="310.0" y="70.0" start_time="20:49:15" dur="03:10:45" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="10" sex="m" age="50" license="yes" car_avail="always" employed="yes">
+		
+		<plan selected="yes">
+			<act type="home" link="104" x="310.0" y="70.0" start_time="00:00:00" dur="08:58:47" end_time="08:58:47" />
+			<leg num="0" mode="car" dep_time="08:58:47" trav_time="00:00:00" arr_time="08:58:47">
+			</leg>
+			<act type="home" link="104" x="310.0" y="70.0" start_time="08:58:47" dur="06:00:00" end_time="14:58:47" />
+			<leg num="1" mode="car" dep_time="14:58:47" trav_time="00:00:00" arr_time="14:58:47">
+			</leg>
+			<act type="home" link="104" x="310.0" y="70.0" start_time="14:58:47" dur="06:00:00" end_time="20:58:47" />
+			<leg num="2" mode="car" dep_time="20:58:47" trav_time="00:00:00" arr_time="20:58:47">
+			</leg>
+			<act type="home" link="104" x="310.0" y="70.0" start_time="20:58:47" dur="03:01:13" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="11" sex="m" age="44" license="yes" car_avail="always" employed="yes">
+	
+		<plan selected="yes">
+			<act type="home" link="101" x="120.0" y="0.0" start_time="00:00:00" dur="07:52:49" end_time="07:52:49" />
+			<leg num="0" mode="car" dep_time="07:52:49" trav_time="00:00:00" arr_time="07:52:49">
+			</leg>
+			<act type="work" link="100" x="50.0" y="0.0" start_time="07:52:49" dur="04:00:00" end_time="11:52:49" />
+			<leg num="1" mode="car" dep_time="11:52:49" trav_time="00:00:00" arr_time="11:52:49">
+			</leg>
+			<act type="home" link="101" x="120.0" y="0.0" start_time="11:52:49" dur="04:00:00" end_time="15:52:49" />
+			<leg num="2" mode="car" dep_time="15:52:49" trav_time="00:00:00" arr_time="15:52:49">
+			</leg>
+			<act type="work" link="104" x="310.0" y="70.0" start_time="15:52:49" dur="04:00:00" end_time="19:52:49" />
+			<leg num="3" mode="car" dep_time="19:52:49" trav_time="00:00:00" arr_time="19:52:49">
+			</leg>
+			<act type="home" link="101" x="120.0" y="0.0" start_time="19:52:49" dur="04:07:11" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</plans>
