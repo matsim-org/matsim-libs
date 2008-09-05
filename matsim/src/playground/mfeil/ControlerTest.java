@@ -4,10 +4,14 @@
 package playground.mfeil;
 
 
+import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.replanning.modules.ReRoute;
 
 
 /**
@@ -25,16 +29,38 @@ public class ControlerTest extends org.matsim.controler.Controler {
 	
 	@Override
 		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();	
-			manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
-			PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
-			StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, legTravelTimeEstimator);
-			 // Note that legTravelTimeEstimator is given as an argument here while all other arguments for the 
-			 // router algorithm are retrieved in the PlanomatXInitialiser. Both is possible. Should be 
-			 // harmonised later on.
-			strategy.addStrategyModule(planomatXStrategyModule);
-			manager.addStrategy(strategy, 1);
-			return manager;
+		
+		StrategyManager manager = new StrategyManager();	
+		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
+			
+		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+			double rate = settings.getProbability();
+			if (rate == 0.0) {
+				continue;
+			}
+			String classname = settings.getModuleName();	
+			PlanStrategy strategy = null;
+			
+			if (classname.equals("PlanomatX")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, legTravelTimeEstimator);
+				// Note that legTravelTimeEstimator is given as an argument here while all other arguments for the 
+				// router algorithm are retrieved in the PlanomatXInitialiser. Both is possible. Should be 
+				// harmonised later on.
+				strategy.addStrategyModule(planomatXStrategyModule);
+			}
+			else if  (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new ReRoute(this));
+			}
+			else if (classname.equals("BestScore")) {
+			strategy = new PlanStrategy(new BestPlanSelector());
+			}
+		
+			manager.addStrategy(strategy, rate);
 		}
-	
+
+		return manager;
+
+	}
 }
