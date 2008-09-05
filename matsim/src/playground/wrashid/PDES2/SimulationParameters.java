@@ -7,6 +7,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
+import org.matsim.events.handler.EventHandler;
 
 import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
@@ -153,5 +154,5 @@ public class SimulationParameters {
 
 	public static double test_timer = 0;
 	public static long mainThreadId=-1;
-
+    public static EventHandler testEventHandler=null;
 }

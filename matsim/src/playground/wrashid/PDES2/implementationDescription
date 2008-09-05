@@ -215,6 +215,16 @@ VERY IMPORTANT TODOS:
           => deshalb habe ich auch noch differenzen
           
        
+       
+       - testing und regression testing machen...
+       		insbesondere das problem mit den events, das trat früher nicht auf.
+       - performance testing wieder machen durch profilen 
+       
+       evtl. memory leak (Entdeckt durch Marcel Rieser bei DES):
+       "Hi Rashid. Die DES scheint noch irgendwo ein MemoryLeak zu haben. Der speicherverbrauch nimmt von Iteration zu Iteration massiv zu, ohne dass die Garbage Collection etwas ausrichten kann. Kann dir morgen mal meine Auswertungen zeigen, ist da ziemlich eindeutig"
+          
+          
+       
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
      -  perhaps doch several vertical Splits machen: dann können teile der Karte weiterarbeiten,
@@ -397,3 +407,10 @@ DEQSim, 1 CPU: 1778 sec.
 MobSim: 2536 sec.
 JDEQSim, 1 CPU: 1574 sec. 
 DES, 1CPU: 
+
+
+Ex9:
+----
+same as Ex8 setting.
+PDES2, 1 CPU: 1574 sec.
+PDES2, 9 CPU: 
