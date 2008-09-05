@@ -3,6 +3,8 @@ package playground.wrashid.DES;
 import java.util.ArrayList;
 
 import org.matsim.events.Events;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.population.Plan;
 
 public class SimulationParameters {
 	// EventHeap
@@ -45,5 +47,9 @@ public class SimulationParameters {
 	public static final int minQueueLength=Runtime.getRuntime().availableProcessors()*10;
 	// if a lot of messages are not needed any more, then GC should be allowed
 	public static final int maxQueueLength=10000;
+	
+	// test injection variables
+	public static EventHandler testEventHandler=null;
+	public static String testPlanPath=null;
 	
 }

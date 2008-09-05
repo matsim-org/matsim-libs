@@ -21,10 +21,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 import org.matsim.gbl.Gbl;
 import playground.wrashid.PDES2.SimulationParameters;
+import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESController2;
 import playground.wrashid.deqsim.PDESStarter2;
 
-public class PDESController2Test extends MatsimTestCase {
+public class PDESStarter2Test extends MatsimTestCase {
 
 	static class TestHandler implements ActEndEventHandler,
 			AgentDepartureEventHandler, AgentWait2LinkEventHandler,
@@ -38,6 +39,8 @@ public class PDESController2Test extends MatsimTestCase {
 		public int linkLeaveEventCounter = 0;
 		public int departureEventCounter = 0;
 		public int arrivalEventCounter = 0;
+		
+		public boolean printEvent=true;
 
 		public void reset(final int iteration) {
 			this.eventCounter = 0;
@@ -49,6 +52,9 @@ public class PDESController2Test extends MatsimTestCase {
 
 		public void handleEvent(final AgentDepartureEvent event) {
 			this.departureEventCounter++;
+			if (printEvent){
+				System.out.println(event.toString());
+			}
 		}
 
 		public void handleEvent(final AgentWait2LinkEvent event) {
@@ -57,14 +63,23 @@ public class PDESController2Test extends MatsimTestCase {
 
 		public void handleEvent(final LinkLeaveEvent event) {
 			this.linkLeaveEventCounter++;
+			if (printEvent){
+				System.out.println(event.toString());
+			}
 		}
 
 		public void handleEvent(final LinkEnterEvent event) {
 			this.linkEnterEventCounter++;
+			if (printEvent){
+				System.out.println(event.toString());
+			}
 		}
 
 		public void handleEvent(final AgentArrivalEvent event) {
 			this.arrivalEventCounter++;
+			if (printEvent){
+				System.out.println(event.toString());
+			}
 		}
 
 		public void handleEvent(final ActStartEvent event) {

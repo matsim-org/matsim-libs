@@ -32,9 +32,12 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.population.PopulationReaderMatsimV4;
 
 import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
@@ -44,8 +47,8 @@ import playground.wrashid.DES.utils.Timer;
 
 public class JavaDEQSim {
 
-	final Population population;
-	final NetworkLayer network;
+	Population population;
+	NetworkLayer network;
 	
 	public JavaDEQSim(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
@@ -64,6 +67,19 @@ public class JavaDEQSim {
 		SimulationParameters.stuckTime= Double.parseDouble(Gbl.getConfig().getParam("simulation", "stuckTime"));
 		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
 		SimulationParameters.storageCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
+		
+		
+		// allowed testing to hook in here
+		if (SimulationParameters.testEventHandler!=null){
+			events.addHandler(SimulationParameters.testEventHandler);
+		}
+		
+		if (SimulationParameters.testPlanPath!=null){
+			Population pop=new Population(Population.NO_STREAMING);;
+			PopulationReader plansReader = new MatsimPopulationReader(pop);
+			plansReader.readFile(SimulationParameters.testPlanPath);
+			this.population = pop;
+		}
 		
 	}
 	

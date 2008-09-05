@@ -13,15 +13,15 @@ public class Scheduler {
 	
 	
 	public void schedule(Message m){		
-		if (m.getMessageArrivalTime()>=simTime){	
+		//if (m.getMessageArrivalTime()>=simTime){	
 			queue.putMessage(m);
-		} else {
-			System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
+		//} else {
+			//System.out.println("WARNING: You tried to send a message in the past. Message discarded.");
 			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
 			//System.out.println("simTime:"+simTime);
 			//System.out.println(m.getClass());
-			assert(false); // for backtracing, where a wrong message has been scheduled
-		}
+			assert(m.getMessageArrivalTime()>=simTime); // for backtracing, where a wrong message has been scheduled
+		//}
 	}
 	
 	public void unschedule(Message m){
