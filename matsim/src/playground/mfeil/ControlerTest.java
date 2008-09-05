@@ -4,8 +4,10 @@
 package playground.mfeil;
 
 
+import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
-import playground.mfeil.StrategyManagerConfigLoaderTest;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.RandomPlanSelector;
 
 
 /**
@@ -13,20 +15,21 @@ import playground.mfeil.StrategyManagerConfigLoaderTest;
  * Adjusting the Controler in order to refer to the StrategyManagerConfigLoaderTest
  */
 public class ControlerTest extends org.matsim.controler.Controler {
-	public ControlerTest (){
-		super("");
+	public ControlerTest (String [] args){
+		super(args);
 	}
 		/**
 		 * @return A fully initialized StrategyManager for the plans replanning.
 		 */
 	
-// Although illustrating that this method is overriding the superclass method it does not. To be clarified...	
+	
 	@Override
 		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();
-			CopyOfStrategyManagerConfigLoaderTest cf = new CopyOfStrategyManagerConfigLoaderTest();
-			System.out.println ("Das ist der ControlerTest.");
-			cf.load(this, this.config, manager);
+			StrategyManager manager = new StrategyManager();			
+			PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+			StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(legTravelTimeEstimator);
+			strategy.addStrategyModule(planomatXStrategyModule);
+			manager.addStrategy(strategy, 1);
 			return manager;
 		}
 	

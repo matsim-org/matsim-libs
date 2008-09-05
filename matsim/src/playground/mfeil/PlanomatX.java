@@ -18,10 +18,15 @@ import java.util.ArrayList;
  */
 public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm {
 	
-	int neighbourhoodSize;
-	double weightChangeOrder, weightChangeNumber, weightChangeType;
-	PlanAlgorithm planomatAlgorithm = null;
+	final int neighbourhoodSize;
+	final double weightChangeOrder, weightChangeNumber, weightChangeType;
+	final PlanAlgorithm planomatAlgorithm;
 	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Constructor
+	//////////////////////////////////////////////////////////////////////
+		
 	public PlanomatX (final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		planomatAlgorithm = new PlanOptimizeTimes (legTravelTimeEstimator);
@@ -30,6 +35,12 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		weightChangeNumber = 0.2;
 		weightChangeType = 0.2;
 	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// run() method
+	//////////////////////////////////////////////////////////////////////
+	
+	
 	
 	public void run (final Plan plan){
 		//System.out.println("Das ist nur ein PlanomatX-Test, Pläne bleiben unverändert.");
@@ -54,12 +65,14 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		this.planomatAlgorithm.run (plan); //Calling standard Planomat to optimise starttimes and mode choice
 		
 		
-		//////////////////////////////////////////////////////////////////////
-		// New section neighbourhood definition (under construction)
-		//////////////////////////////////////////////////////////////////////
+		
+		
+	//////////////////////////////////////////////////////////////////////
+	// New section neighbourhood definition (under construction)
+	//////////////////////////////////////////////////////////////////////
 				
 		Plan [] neighbourhood = new Plan [neighbourhoodSize];
-		System.out.println("Länge von neighbourhood ist "+neighbourhood.length);
+		//System.out.println("Länge von neighbourhood ist "+neighbourhood.length);
 		int z;
 		for (z = 0; z<(int)(neighbourhoodSize*weightChangeOrder); z++){
 			neighbourhood[z]=changeOrder(plan);

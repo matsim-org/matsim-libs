@@ -3,7 +3,6 @@
  */
 package playground.mfeil;
 
-import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
