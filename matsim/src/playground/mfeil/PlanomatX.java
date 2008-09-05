@@ -14,6 +14,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.population.Act;
 
 import java.util.ArrayList;
 
@@ -57,38 +58,38 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	public void run (final Plan plan){
 
 		//ArrayList<Object> al = new ArrayList<Object> (plan.getActsLegs());
-		ArrayList<Object> al = plan.getActsLegs();
-		int i = (al.size()/2)+1;  //size() returns Acts und Legs, therefore dividing by 2 yields number of Legs, +1 yields number of Acts.
-		System.out.println ("Das ist die Länge der Aktivitätenliste "+i);
+		//ArrayList<Object> al = plan.getActsLegs();
+		//int i = (al.size()/2)+1;  //size() returns Acts und Legs, therefore dividing by 2 yields number of Legs, +1 yields number of Acts.
+		//System.out.println ("Das ist die Länge der Aktivitätenliste "+i);
 
-		Leg leg;
-		leg = (Leg)(al.get(1));
-		ArrayList<Node> nodes = new ArrayList<Node> ();
-		nodes = leg.getRoute().getRoute();
+		//Leg leg;
+		//leg = (Leg)(al.get(1));
+		//ArrayList<Node> nodes = new ArrayList<Node> ();
+		//nodes = leg.getRoute().getRoute();
 		
-		if (i>3){
+		//if (i>3){
 			//System.out.println("Hier gibt es eine lange Liste: "+al);
-			Object oOne = al.get(4);
-			Object oTwo = al.get(2);
+			//Object oOne = al.get(4);
+			//Object oTwo = al.get(2);
 			//System.out.println("Das ist Objekt o: "+oOne);
 			//System.out.println("Das ist Objekt o: "+oTwo);
-			al.add(2, oOne);
-			al.add(5, oTwo);
-			al.remove(3);
-			al.remove(5);
+			//al.add(2, oOne);
+			//al.add(5, oTwo);
+			//al.remove(3);
+			//al.remove(5);
 			//System.out.println("Nun schaut die Liste so aus: "+al);		
 			
-		}
+		//}
 		//this.planomatAlgorithm.run (plan); //Calling standard Planomat to optimise start times and mode choice
-		System.out.println("Plan davor: "+plan.getPerson().getId()+" mit dem Leg: "+nodes);	
+		//System.out.println("Plan davor: "+plan.getPerson().getId()+" mit dem Leg: "+nodes);	
 		
-		this.router.run(plan);
+		//this.router.run(plan);
 		
-		Leg leg1;
-		leg1 = (Leg)(al.get(1));
-		ArrayList<Node> nodes1 = new ArrayList<Node> ();
-		nodes1 = leg1.getRoute().getRoute();
-		System.out.println("Plan danach: "+plan.getPerson().getId()+" mit dem Leg: "+nodes1);
+		//Leg leg1;
+		//leg1 = (Leg)(al.get(1));
+		//ArrayList<Node> nodes1 = new ArrayList<Node> ();
+		//nodes1 = leg1.getRoute().getRoute();
+		//System.out.println("Plan danach: "+plan.getPerson().getId()+" mit dem Leg: "+nodes1);
 		
 		
 		
@@ -98,31 +99,51 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//////////////////////////////////////////////////////////////////////
 				
 		Plan [] neighbourhood = new Plan [neighbourhoodSize];
-		//System.out.println("Länge von neighbourhood ist "+neighbourhood.length);
+
 		int z;
 		for (z = 0; z<(int)(neighbourhoodSize*weightChangeOrder); z++){
-			neighbourhood[z]=changeOrder(plan);
+			neighbourhood[z]=this.changeOrder(plan);
 		}
 	
 		for (z = (int) (neighbourhoodSize*weightChangeOrder); z<((int)(neighbourhoodSize*weightChangeOrder)+(int)(neighbourhoodSize*weightChangeNumber)); z++){
-			neighbourhood[z]=changeNumber(plan);
+			neighbourhood[z]=this.changeNumber(plan);
 		}
 	
 		for (z = (int) (neighbourhoodSize*weightChangeOrder)+(int)(neighbourhoodSize*weightChangeNumber); z<neighbourhoodSize; z++){
-			neighbourhood[z]=changeType(plan);
+			neighbourhood[z]=this.changeType(plan);
 		}
-		
-		//for (z=0;z<neighbourhoodSize; z++){
-		//	System.out.println("Das ist das "+z+". Feld von neighbourhood: "+ neighbourhood[z]);
-		//}
 		
 	}
 	
 	
 	public Plan changeOrder (Plan basePlan){
-		ArrayList<Object> ActsLegs = new ArrayList<Object>(basePlan.getActsLegs());
-		//System.out.println("Aufruf Methode changeOrder.");
-		return basePlan;
+		System.out.println("Aufruf Methode changeOrder.");
+		ArrayList<Object> actslegs = basePlan.getActsLegs();
+		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order.
+			return basePlan;
+		}
+		else {
+			for (int x = 2; x <= actslegs.size()-4; x=x+2){ //Go through the "inner" acts only
+				Act act2 = (Act)(actslegs.get(x));
+				Act act4 = (Act)(actslegs.get(x+4));
+				if (act2.getType()!=act4.getType()){
+					System.out.println("Hab was gefunden!");
+					System.out.println("Plan davor: "+actslegs);
+					Act act1 = (Act)(actslegs.get(x-2));
+					Act act3 = (Act)(actslegs.get(x+2));
+					if (act1.getType()!=act3.getType()){
+						Act actHelp = new Act ((Act)(actslegs.get(x)));
+						actslegs.set(x, actslegs.get(x+2));
+						actslegs.set(x+2, actHelp);
+						System.out.println("Plan danach: "+actslegs);
+						this.router.run(basePlan);
+						System.out.println("Neuer Plan :"+actslegs);
+					}
+					break;
+				}
+			}		
+			return basePlan;
+		}
 	}
 	
 	public Plan changeNumber (Plan basePlan){
