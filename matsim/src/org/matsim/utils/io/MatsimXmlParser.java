@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
+import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -199,11 +200,14 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		}
 
 		// systemId could not be resolved, try it locally
-		String localFileName = Gbl.getConfig().global().getLocalDtdBase() + shortSystemId;
-		File dtdFile = new File(localFileName);
-		if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-			Logger.getLogger(this.getClass()).info("Using the local DTD " + localFileName);
-			return new InputSource(localFileName);
+		final Config config = Gbl.getConfig();
+		if (config != null && config.global() != null) {
+			String localFileName = config.global().getLocalDtdBase() + shortSystemId;
+			File dtdFile = new File(localFileName);
+			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+				Logger.getLogger(this.getClass()).info("Using the local DTD " + localFileName);
+				return new InputSource(localFileName);
+			}
 		}
 
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
