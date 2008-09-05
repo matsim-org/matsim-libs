@@ -27,7 +27,10 @@ public class ControlerTest extends org.matsim.controler.Controler {
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();			
 			PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
-			StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(legTravelTimeEstimator);
+			StrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, legTravelTimeEstimator);
+			 // Note that legTravelTimeEstimator is given as an argument here while all other arguments for the 
+			 // router algorithm are retrieved in the PlanomatXInitialiser. Both is possible. Should be 
+			 // harmonised later on.
 			strategy.addStrategyModule(planomatXStrategyModule);
 			manager.addStrategy(strategy, 1);
 			return manager;
