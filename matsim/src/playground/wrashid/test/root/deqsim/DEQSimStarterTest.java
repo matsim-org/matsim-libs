@@ -36,28 +36,36 @@ import playground.wrashid.test.root.util.DummyPopulationModifier;
 import playground.wrashid.test.root.util.PopulationModifier;
 import playground.wrashid.test.root.util.TestHandlerEventCountChecker;
 import playground.wrashid.test.root.util.TestHandler;
+import playground.wrashid.test.root.util.TestHandlerDetailedEventChecker;
 import playground.wrashid.test.root.scenarios.EquilPopulationPlans1Modified1;
 
 public class DEQSimStarterTest extends MatsimTestCase {
 
 	public void testScenarios() {
-		t_equilPlans1EventCounts();
+		t_equilPlans1();
 		Gbl.reset();
-		t_equilEventCounts();
+		
+		t_equilEvent();
+		Gbl.reset();
+		
+		t_Berlin();
+		Gbl.reset();
 	}
 	
-	private void t_equilEventCounts() {
-		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
-		countChecker.startTestDES("test/scenarios/equil/config.xml",false,null,null);
+	private void t_equilEvent() {
+		TestHandlerDetailedEventChecker orderChecker = new TestHandlerDetailedEventChecker();
+		orderChecker.startTestDES("test/scenarios/equil/config.xml",false,null,null);
 	}
 	
-	private void t_equilPlans1EventCounts() {
-		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
-		countChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new EquilPopulationPlans1Modified1());
+	private void t_equilPlans1() {
+		TestHandlerDetailedEventChecker orderChecker= new TestHandlerDetailedEventChecker();
+		orderChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new EquilPopulationPlans1Modified1());
 	}
 	
-	// noch testen, ob departure und arrival in richtiger reihenfolge passieren
-	// vielleicht noch detailliertere kontrolle für einen bestimmten agent
-	// eventuell eine single agent simulation machen: da kann man sagen, es soll einfach
-	// mit dem plan exact vergleichen, weil ja dieser alle strassen einfach abfahren kann
+	private void t_Berlin() {
+		TestHandlerDetailedEventChecker orderChecker = new TestHandlerDetailedEventChecker();
+		orderChecker.startTestDES("test/scenarios/berlin/config.xml",false,null,null);
+	}
+	
+
 }

@@ -19,6 +19,7 @@ import org.matsim.population.Population;
 
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarter;
+import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerEventCountChecker extends TestHandler {
 
@@ -37,8 +38,8 @@ public class TestHandlerEventCountChecker extends TestHandler {
 
 	@Override
 	public void checkAssertions() {
-		assertEquals(expectedLinkEnterEvents,linkEnterEventCounter); // nicht sicher ob stimmt
-		assertEquals(expectedLinkLeaveEvents,linkLeaveEventCounter); // nicht sicher ob stimmt
+		assertEquals(expectedLinkEnterEvents,linkEnterEventCounter); 
+		assertEquals(expectedLinkLeaveEvents,linkLeaveEventCounter); 
 		assertEquals(expectedDepartureEvents,departureEventCounter);
 		assertEquals(expectedArrivalEvents,arrivalEventCounter); 
 	}
@@ -156,5 +157,31 @@ public class TestHandlerEventCountChecker extends TestHandler {
 		this.estimateExpectedNumberOfEvents(SimulationParameters.testPopulationModifier.getPopulation());
 		SimulationParameters.testEventHandler.checkAssertions();
 	}
+	
+	// if populationModifier == null, then the DummyPopulationModifier is used
+	// if planFilePath == null, then the plan specified in the config file is used
+	public void startTestPDES2(String configFilePath,boolean printEvent,String planFilePath,PopulationModifier populationModifier) {
+		String[] args = new String[1];
+		args[0] = configFilePath;
+		this.printEvent=printEvent;
+		playground.wrashid.PDES2.SimulationParameters.testEventHandler =this;
+		
+		if (planFilePath!=null){
+			playground.wrashid.PDES2.SimulationParameters.testPlanPath=planFilePath;
+		} else {
+			playground.wrashid.PDES2.SimulationParameters.testPlanPath=null;
+		}
+		
+		if (populationModifier!=null){
+			playground.wrashid.PDES2.SimulationParameters.testPopulationModifier=populationModifier;
+		} else {
+			playground.wrashid.PDES2.SimulationParameters.testPopulationModifier=new DummyPopulationModifier();
+		}		
+		
+		PDESStarter2.main(args);
+		this.estimateExpectedNumberOfEvents(playground.wrashid.PDES2.SimulationParameters.testPopulationModifier.getPopulation());
+		playground.wrashid.PDES2.SimulationParameters.testEventHandler.checkAssertions();
+	}
+	
 
 }

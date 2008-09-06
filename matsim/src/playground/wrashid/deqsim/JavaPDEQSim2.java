@@ -32,9 +32,11 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.PDES2.Scheduler;
@@ -44,8 +46,8 @@ import playground.wrashid.DES.utils.Timer;
 
 public class JavaPDEQSim2 {
 
-	final Population population;
-	final NetworkLayer network;
+	Population population;
+	NetworkLayer network;
 	
 	public JavaPDEQSim2(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
@@ -71,7 +73,20 @@ public class JavaPDEQSim2 {
 		if (SimulationParameters.testEventHandler!=null){
 			events.addHandler(SimulationParameters.testEventHandler);
 		}
-		//Gbl.getConfig().controler().setLastIteration(0);
+		
+		if (SimulationParameters.testPlanPath!=null){
+			// read population
+			Population pop=new Population(Population.NO_STREAMING);;
+			PopulationReader plansReader = new MatsimPopulationReader(pop);
+			plansReader.readFile(SimulationParameters.testPlanPath);
+			
+			this.population=pop;
+			
+		}
+		
+		if (SimulationParameters.testPopulationModifier!=null){
+			this.population=SimulationParameters.testPopulationModifier.modifyPopulation(this.population);
+		}
 		
 	}
 	

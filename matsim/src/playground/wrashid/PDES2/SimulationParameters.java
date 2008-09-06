@@ -12,6 +12,8 @@ import org.matsim.events.handler.EventHandler;
 import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
 import playground.wrashid.PDES.util.PriorityConcurrentListMPDSC;
+import playground.wrashid.test.root.util.PopulationModifier;
+import playground.wrashid.test.root.util.TestHandler;
 
 public class SimulationParameters {
 	// EventHeap
@@ -154,5 +156,10 @@ public class SimulationParameters {
 
 	public static double test_timer = 0;
 	public static long mainThreadId=-1;
-    public static EventHandler testEventHandler=null;
+
+	// test injection variables
+	public static TestHandler testEventHandler=null;
+	public static String testPlanPath=null;
+	public static PopulationModifier testPopulationModifier=null;
+	
 }
