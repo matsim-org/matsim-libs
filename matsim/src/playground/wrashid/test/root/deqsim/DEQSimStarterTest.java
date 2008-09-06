@@ -1,5 +1,8 @@
 package playground.wrashid.test.root.deqsim;
 
+import java.util.ArrayList;
+
+import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.AgentArrivalEvent;
@@ -17,125 +20,68 @@ import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 
 import org.matsim.gbl.Gbl;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarter;
+import playground.wrashid.test.root.util.DummyPopulationModifier;
+import playground.wrashid.test.root.util.PopulationModifier;
+import playground.wrashid.test.root.util.TestHandlerEventCountChecker;
+import playground.wrashid.test.root.util.TestHandler;
 
 public class DEQSimStarterTest extends MatsimTestCase {
 
-	static class TestHandler implements ActEndEventHandler,
-	AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-	LinkLeaveEventHandler, LinkEnterEventHandler,
-	AgentArrivalEventHandler, ActStartEventHandler,
-	AgentStuckEventHandler {
-
-public int eventCounter = 0;
-
-public int linkEnterEventCounter = 0;
-public int linkLeaveEventCounter = 0;
-public int departureEventCounter = 0;
-public int arrivalEventCounter = 0;
-
-public boolean printEvent=true;
-
-public void reset(final int iteration) {
-	this.eventCounter = 0;
-}
-
-public void handleEvent(final ActEndEvent event) {
-	this.eventCounter++;
-}
-
-public void handleEvent(final AgentDepartureEvent event) {
-	this.departureEventCounter++;
-	if (printEvent){
-		System.out.println(event.toString());
-	}
-}
-
-public void handleEvent(final AgentWait2LinkEvent event) {
-	this.eventCounter++;
-}
-
-public void handleEvent(final LinkLeaveEvent event) {
-	this.linkLeaveEventCounter++;
-	if (printEvent){
-		System.out.println(event.toString());
-	}
-}
-
-public void handleEvent(final LinkEnterEvent event) {
-	this.linkEnterEventCounter++;
-	if (printEvent){
-		System.out.println(event.toString());
-	}
-}
-
-public void handleEvent(final AgentArrivalEvent event) {
-	this.arrivalEventCounter++;
-	if (printEvent){
-		System.out.println(event.toString());
-	}
-}
-
-public void handleEvent(final ActStartEvent event) {
-	this.eventCounter++;
-}
-
-public void handleEvent(final AgentStuckEvent event) {
-	this.eventCounter++;
-}
-
-};
+	
 
 	public void testScenarios() {
-		t_equilPlans1EventCounts();
-		//t_equilEventCounts();
+		//t_equilPlans1EventCounts();
+		t_equilEventCounts();
 		
 	}
 	
 	
 	
-  //TODO: continue test cases here...
 	private void t_equilEventCounts() {
-		// nochmals kontrollieren, ob diese zahlen stimmen
-		// 201 departure
-		// 201 actend
-		// 201 arrival
-		// 200 wait2link
-		// 201 actstart
-		// 700 left link
-		// 700 entered link
-		// => thats all
-		String[] args = new String[1];
-		args[0] = "test/scenarios/equil/config.xml";
-		TestHandler testHandler = new TestHandler();
-		SimulationParameters.testEventHandler = testHandler;
+		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
+		countChecker.startTestDES("test/scenarios/equil/config.xml",false,null,null);
+	}
+	
+	
+	static class MyPopulationModifier implements PopulationModifier{
+
+		Population population=null;
 		
+		public Population getPopulation(){
+			return population;
+		} 
 		
-		DEQSimStarter.main(args);
-		assertEquals(700,testHandler.linkEnterEventCounter); // nicht sicher ob stimmt
-		assertEquals(700,testHandler.linkLeaveEventCounter); // nicht sicher ob stimmt
-		assertEquals(201,testHandler.departureEventCounter);
-		assertEquals(201,testHandler.arrivalEventCounter); 
+		@Override
+		public Population modifyPopulation(Population population) {
+			// modify population: we need act end time (plan has only duration)
+			this.population=population;
+			Person p=population.getPerson("1");
+			Plan plan= p.getSelectedPlan();
+			ArrayList<Object> actsLegs =plan.getActsLegs();
+			((Leg)actsLegs.get(1)).setDepTime(360);
+			((Leg)actsLegs.get(3)).setDepTime(900); // immediate departure required
+			((Leg)actsLegs.get(5)).setDepTime(2000);
+			return population;
+		}
+		
 	}
 	
 	
 	private void t_equilPlans1EventCounts() {
-		String[] args = new String[1];
-		args[0] = "test/scenarios/equil/config.xml";
-		TestHandler testHandler = new TestHandler();
-		SimulationParameters.testEventHandler = testHandler;
-		SimulationParameters.testPlanPath="test/scenarios/equil/plans1.xml";
-		
-		
-		DEQSimStarter.main(args);
-		assertEquals(700,testHandler.linkEnterEventCounter); // nicht sicher ob stimmt
-		assertEquals(700,testHandler.linkLeaveEventCounter); // nicht sicher ob stimmt
-		assertEquals(201,testHandler.departureEventCounter);
-		assertEquals(201,testHandler.arrivalEventCounter); 
+		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
+		countChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new MyPopulationModifier());
 	}
 	
 	// noch testen, ob departure und arrival in richtiger reihenfolge passieren

@@ -75,10 +75,17 @@ public class JavaDEQSim {
 		}
 		
 		if (SimulationParameters.testPlanPath!=null){
+			// read population
 			Population pop=new Population(Population.NO_STREAMING);;
 			PopulationReader plansReader = new MatsimPopulationReader(pop);
 			plansReader.readFile(SimulationParameters.testPlanPath);
-			this.population = pop;
+			
+			this.population=pop;
+			
+		}
+		
+		if (SimulationParameters.testPopulationModifier!=null){
+			this.population=SimulationParameters.testPopulationModifier.modifyPopulation(this.population);
 		}
 		
 	}

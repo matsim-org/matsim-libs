@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.population.Plan;
+import org.matsim.population.Population;
+
+import playground.wrashid.test.root.util.PopulationModifier;
+import playground.wrashid.test.root.util.TestHandler;
 
 public class SimulationParameters {
 	// EventHeap
@@ -49,7 +53,8 @@ public class SimulationParameters {
 	public static final int maxQueueLength=10000;
 	
 	// test injection variables
-	public static EventHandler testEventHandler=null;
+	public static TestHandler testEventHandler=null;
 	public static String testPlanPath=null;
+	public static PopulationModifier testPopulationModifier=null;
 	
 }

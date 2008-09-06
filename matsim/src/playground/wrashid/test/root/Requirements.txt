@@ -1,0 +1,7 @@
+plans file:
+============
+Each leg must have a departure time. 
+- An agent starts a leg at the specified departure time.
+- If upon ending a leg, he finds out, that the departure time of the next leg is already
+  in the past, he starts the next leg immediately.
+- 
