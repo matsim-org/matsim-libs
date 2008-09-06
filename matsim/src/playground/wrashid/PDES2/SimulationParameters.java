@@ -115,7 +115,7 @@ public class SimulationParameters {
 		// if (test_timer % 100000==0){System.out.println(test_timer);}
 	}
 
-	private static void bufferEvent(BasicEvent event, int producerId) {
+	synchronized private static void bufferEvent(BasicEvent event, int producerId) {
 		if (event instanceof AgentDepartureEvent
 				|| event instanceof AgentArrivalEvent) {
 			//if (event.agentId.equalsIgnoreCase("2400337")){

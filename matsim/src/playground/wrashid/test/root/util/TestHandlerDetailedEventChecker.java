@@ -27,7 +27,7 @@ import playground.wrashid.deqsim.PDESStarter2;
 public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	private HashMap<String,LinkedList<BasicEvent>> events=new HashMap<String,LinkedList<BasicEvent>>();
-	private HashMap<String,EstimatedNumberOfMessages> estimatedNumberOfMessages=new HashMap<String,EstimatedNumberOfMessages>();
+	private HashMap<String,ExpectedNumberOfEvents> expectedNumberOfMessages=new HashMap<String,ExpectedNumberOfEvents>();
 	public boolean printEvent = true;
 	private Population population;
 	
@@ -42,12 +42,19 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		for (LinkedList<BasicEvent> list:events.values()){
 			lastTimeStamp=Double.NEGATIVE_INFINITY;
 			for (int i=0;i<list.size();i++){
+				if (lastTimeStamp>list.get(i).time){
+						for (int j=0;j<list.size();j++){
+							System.out.println(list.get(j).toString());
+						}
+						System.out.println(lastTimeStamp);
+						System.out.println(list.get(i).time);
+				}	
 				assertEquals(true, lastTimeStamp<=list.get(i).time);
 				lastTimeStamp=list.get(i).time;
 			}
 		}
 		
-		// check, if estimated number of events per agent, per event type
+		// compare with expected number of events per agent, per event type
 		for (LinkedList<BasicEvent> list:events.values()){
 			int linkEnterEventCounter = 0;
 			int linkLeaveEventCounter = 0;
@@ -68,7 +75,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 				}
 
 			}
-			EstimatedNumberOfMessages estimate=estimatedNumberOfMessages.get(list.get(0).agentId);
+			ExpectedNumberOfEvents expected=expectedNumberOfMessages.get(list.get(0).agentId);
 			//if (estimate.expectedLinkEnterEvents!=linkEnterEventCounter){
 			//	for (int j=0;j<list.size();j++){
 			//		System.out.println(list.get(j).toString());
@@ -77,10 +84,10 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 			//	System.out.println("ok");
 			//}
 			
-			assertEquals(estimate.expectedLinkEnterEvents, linkEnterEventCounter);
-			assertEquals(estimate.expectedLinkLeaveEvents, linkLeaveEventCounter);
-			assertEquals(estimate.expectedDepartureEvents, departureEventCounter);
-			assertEquals(estimate.expectedArrivalEvents, arrivalEventCounter);
+			assertEquals(expected.expectedLinkEnterEvents, linkEnterEventCounter);
+			assertEquals(expected.expectedLinkLeaveEvents, linkLeaveEventCounter);
+			assertEquals(expected.expectedDepartureEvents, departureEventCounter);
+			assertEquals(expected.expectedArrivalEvents, arrivalEventCounter);
 		}
 		
 		
@@ -93,7 +100,13 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 					
 					LinkEnterEvent enterEvent=(LinkEnterEvent)list.get(i);
 					LinkLeaveEvent leaveEvent=(LinkLeaveEvent)list.get(i+1);
-					assertEquals(true, enterEvent.link==leaveEvent.link);
+					//System.out.println(enterEvent);
+					//if (enterEvent.link!=leaveEvent.link){
+					//	System.out.println(leaveEvent.link.getId());
+					//	System.out.println(leaveEvent.agentId);
+					//	System.out.println(enterEvent.linkId);
+					//}
+					assertEquals(true, enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId));
 				}				
 			}
 		}
@@ -217,7 +230,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}		
 		
 		DEQSimStarter.main(args);
-		this.doEstimates(SimulationParameters.testPopulationModifier.getPopulation());
+		this.calculateExpectedNumberOfEvents(SimulationParameters.testPopulationModifier.getPopulation());
 		SimulationParameters.testEventHandler.checkAssertions();
 	}
 	
@@ -242,36 +255,36 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}		
 		
 		PDESStarter2.main(args);
-		this.doEstimates(playground.wrashid.PDES2.SimulationParameters.testPopulationModifier.getPopulation());
+		this.calculateExpectedNumberOfEvents(playground.wrashid.PDES2.SimulationParameters.testPopulationModifier.getPopulation());
 		playground.wrashid.PDES2.SimulationParameters.testEventHandler.checkAssertions();
 	}
 	
-	public void doEstimates(Population population){
+	public void calculateExpectedNumberOfEvents(Population population){
 		this.population = population;
 		
 		for (Person p:population.getPersons().values()){
 			Plan plan= p.getSelectedPlan();
-			EstimatedNumberOfMessages estimate=new EstimatedNumberOfMessages();
+			ExpectedNumberOfEvents expected=new ExpectedNumberOfEvents();
 			ArrayList<Object> actsLegs =plan.getActsLegs();
-			estimate.expectedDepartureEvents+=actsLegs.size() / 2 ;
+			expected.expectedDepartureEvents+=actsLegs.size() / 2 ;
 			
 			LegIterator iter=plan.getIteratorLeg();
 			while (iter.hasNext()){
 				Leg leg=(Leg)iter.next();
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equalsIgnoreCase("car")){
-					estimate.expectedLinkEnterEvents+=leg.getRoute().getLinkRoute().length+1;
+					expected.expectedLinkEnterEvents+=leg.getRoute().getLinkRoute().length+1;
 				}
 			}
 			
-			estimate.expectedArrivalEvents=estimate.expectedDepartureEvents;
-			estimate.expectedLinkLeaveEvents=estimate.expectedLinkEnterEvents;
+			expected.expectedArrivalEvents=expected.expectedDepartureEvents;
+			expected.expectedLinkLeaveEvents=expected.expectedLinkEnterEvents;
 			
-			estimatedNumberOfMessages.put(p.getId().toString(), estimate);
+			expectedNumberOfMessages.put(p.getId().toString(), expected);
 		}
 	}
 	
-	private class EstimatedNumberOfMessages{
+	private class ExpectedNumberOfEvents{
 		public int expectedLinkEnterEvents;
 		public int expectedLinkLeaveEvents;
 		public int expectedDepartureEvents;

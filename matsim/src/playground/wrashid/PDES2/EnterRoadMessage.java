@@ -38,6 +38,7 @@ public class EnterRoadMessage extends EventMessage {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
+			//System.out.println(vehicle.getCurrentLink());
 			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
 			//event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson(),vehicle.getCurrentLink(),vehicle.getCurrentLeg());
 		}

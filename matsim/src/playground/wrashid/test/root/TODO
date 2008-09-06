@@ -1,3 +1,12 @@
+- Test: PriorityConcurrentListMPDSC
+- rausfinden, wieso das mit dem out of order entsteht und ob man 
+  es einfach reparieren kann durch einen gute implementierung von PriorityConcurrentListMPDSC
+=> Wir haben einen link verlassen, bevor wir ihn betreten...
+evtl. zwei bugs (wrong times + wrong order => PriorityConcurrencyList müsste ja ordnung
+machen)
+
+
+
 - evtl. noch zeit kontrollieren für einen agenten detailliert?
 - ein leg kann nicht schneller zurückgelegt werden als die mindestlänge der strecke
 - PDES: noch kontrollieren, wieso man einen link verlässt, den man gar nicht geentert ist.
