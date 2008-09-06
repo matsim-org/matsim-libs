@@ -142,6 +142,8 @@ public class TestHandlerEventCountChecker extends TestHandler {
 		
 		if (planFilePath!=null){
 			SimulationParameters.testPlanPath=planFilePath;
+		} else {
+			SimulationParameters.testPlanPath=null;
 		}
 		
 		if (populationModifier!=null){

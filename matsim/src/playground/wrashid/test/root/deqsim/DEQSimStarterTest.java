@@ -36,58 +36,28 @@ import playground.wrashid.test.root.util.DummyPopulationModifier;
 import playground.wrashid.test.root.util.PopulationModifier;
 import playground.wrashid.test.root.util.TestHandlerEventCountChecker;
 import playground.wrashid.test.root.util.TestHandler;
+import playground.wrashid.test.root.scenarios.EquilPopulationPlans1Modified1;
 
 public class DEQSimStarterTest extends MatsimTestCase {
 
-	
-
 	public void testScenarios() {
-		//t_equilPlans1EventCounts();
+		t_equilPlans1EventCounts();
+		Gbl.reset();
 		t_equilEventCounts();
-		
 	}
-	
-	
 	
 	private void t_equilEventCounts() {
 		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
 		countChecker.startTestDES("test/scenarios/equil/config.xml",false,null,null);
 	}
 	
-	
-	static class MyPopulationModifier implements PopulationModifier{
-
-		Population population=null;
-		
-		public Population getPopulation(){
-			return population;
-		} 
-		
-		@Override
-		public Population modifyPopulation(Population population) {
-			// modify population: we need act end time (plan has only duration)
-			this.population=population;
-			Person p=population.getPerson("1");
-			Plan plan= p.getSelectedPlan();
-			ArrayList<Object> actsLegs =plan.getActsLegs();
-			((Leg)actsLegs.get(1)).setDepTime(360);
-			((Leg)actsLegs.get(3)).setDepTime(900); // immediate departure required
-			((Leg)actsLegs.get(5)).setDepTime(2000);
-			return population;
-		}
-		
-	}
-	
-	
 	private void t_equilPlans1EventCounts() {
 		TestHandlerEventCountChecker countChecker= new TestHandlerEventCountChecker();
-		countChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new MyPopulationModifier());
+		countChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new EquilPopulationPlans1Modified1());
 	}
 	
 	// noch testen, ob departure und arrival in richtiger reihenfolge passieren
 	// vielleicht noch detailliertere kontrolle für einen bestimmten agent
 	// eventuell eine single agent simulation machen: da kann man sagen, es soll einfach
 	// mit dem plan exact vergleichen, weil ja dieser alle strassen einfach abfahren kann
-	
-
 }
