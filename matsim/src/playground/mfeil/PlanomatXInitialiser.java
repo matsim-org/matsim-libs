@@ -12,6 +12,8 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.controler.*;
+import org.matsim.gbl.Gbl;
+import org.matsim.scoring.*;
 
 /**
  * @author Matthias Feil
@@ -24,6 +26,7 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 	private NetworkLayer network;
 	private TravelCost travelCostCalc;
 	private TravelTime travelTimeCalc;
+	private ScoringFunctionFactory factory;
 
 	public PlanomatXInitialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
 		this.estimator = estimator;
@@ -32,15 +35,15 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 		preProcessRoutingData.run(network);
 		travelCostCalc = controlerTest.getTravelCostCalculator();
 		travelTimeCalc = controlerTest.getTravelTimeCalculator();
-
+		factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX(this.estimator, this.network, this.travelCostCalc, 
-				this.travelTimeCalc, this.preProcessRoutingData);
+		planomatXAlgorithm =  new PlanomatX (this.estimator, this.network, this.travelCostCalc, 
+				this.travelTimeCalc, this.preProcessRoutingData, this.factory);
 
 		return planomatXAlgorithm;
 	}
