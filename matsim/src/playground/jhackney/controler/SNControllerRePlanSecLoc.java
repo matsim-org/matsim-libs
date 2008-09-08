@@ -10,7 +10,7 @@ public class SNControllerRePlanSecLoc extends Controler {
 	public static void main(final String[] args) {
 		final Controler controler = new SNControllerRePlanSecLoc(args);
 		controler.addControlerListener(new SNControllerListenerRePlanSecLoc());
-		controler.setOverwriteFiles(true);
+		controler.setOverwriteFiles(false);
 		controler.run();
 		System.exit(0);
 	}

@@ -48,7 +48,9 @@ import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.scoring.SNScoringGeneralFactory;
+import org.matsim.socialnetworks.scoring.SNScoringGeneralFactory2;
 import org.matsim.socialnetworks.scoring.SpatialScorer;
+import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
@@ -110,7 +112,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	private SpatialScorer spatialScorer=null;
+	//SSTEST private SpatialScorer spatialScorer=null;
+	private TrackEventsOverlap teo=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
@@ -151,10 +154,13 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-		this.spatialScorer = new SpatialScorer();
-		this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
-		SNScoringGeneralFactory factory = new SNScoringGeneralFactory
-		("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
+		//SSTEST this.spatialScorer = new SpatialScorer();
+		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
+		this.teo = new TrackEventsOverlap();//makes TimeWindowMap
+		//SSTEST SNScoringGeneralFactory factory = new SNScoringGeneralFactory
+		//SSTEST ("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
+		SNScoringGeneralFactory2 factory = new SNScoringGeneralFactory2("leisure", this.teo, controler.getScoringFunctionFactory());
+		
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
@@ -162,6 +168,10 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		scoring = new EventsToScore(this.controler.getPopulation(), factory);
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
+		// SSTEST
+		teo = new TrackEventsOverlap();
+		this.controler.getEvents().addHandler(teo);
+		this.log.info(" ... Instantiation of events overlap tracking done");
 
 		snsetup();
 	}
@@ -170,16 +180,14 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		this.log.info("scoring");
 
-		this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
-
+		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 		scoring.finish();
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		this.log.info("finishIteration ... "+event.getIteration());
-//		snIter = event.getIteration();
-//		this.spatialScorer.scoreActs(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+
 		if( event.getIteration()%replan_interval==0){
 			// Removing the social links here rather than before the replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");

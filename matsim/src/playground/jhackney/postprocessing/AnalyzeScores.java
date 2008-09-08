@@ -65,144 +65,20 @@ public class AnalyzeScores {
 		Scenario.setUpScenarioConfig();
 		Config config =Gbl.getConfig();
 
-//		config.plans().setInputFile(Scenario.getSNInDir() + "output_plans"+i+".xml");
-
 		Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
 		for(int i=0; i<501; i+=10){
-//			config.socnetmodule().setInitIter(Integer.toString(i));
-			config.socnetmodule().setInitIter(Integer.toString(0));
+			config.socnetmodule().setInitIter(Integer.toString(i));
+//			config.socnetmodule().setInitIter(Integer.toString(0));
 			Population plans = Scenario.readPlans(i);
 			//read in social network
 			System.out.println(" Initializing the social network ...");
 			SocialNetwork snet=new SocialNetwork(plans);
 
 			System.out.println("... done");
-
-			//read in facilities knowledge
-//			new InitializeKnowledge(plans);
-
-			//////////////////////////////////////////////////////////////////////
-
-//			// ch.cut.640000.200000.740000.310000.xml
-//			CoordI min = new Coord(640000.0,200000.0);
-//			CoordI max = new Coord(740000.0,310000.0);
-
-//			System.out.println("  running plans modules... ");
-//			new PersonRemoveReferences().run(plans);
-//			new PlansScenarioCut(min,max).run(plans);
-//			System.out.println("  done.");
-
-			//////////////////////////////////////////////////////////////////////
-
-//			System.out.println("  running facilities modules... ");
-////			new FacilitiesSetCapacity().run(facilities);
-//			new FacilitiesScenarioCut(min,max).run(facilities);
-//			System.out.println("  done.");
-
-			//////////////////////////////////////////////////////////////////////
-
-//			System.out.println("  running network modules... ");
-//			network.addAlgorithm(new NetworkSummary());
-//			new NetworkScenarioCut(min,max).run(network);
-//			network.addAlgorithm(new NetworkSummary());
-//			network.addAlgorithm(new NetworkCleaner(false));
-//			network.addAlgorithm(new NetworkSummary());
-//			NetworkWriteAsTable nwat = new NetworkWriteAsTable();
-//			network.addAlgorithm(nwat);
-//			network.runAlgorithms();
-//			nwat.close();
-//			System.out.println("  done.");
-
-			//////////////////////////////////////////////////////////////////////
-
-//			System.out.println("  running world modules... ");
-//			new WorldCreateRasterLayer(3000).run(Gbl.getWorld());
-//			new WorldCheck().run(Gbl.getWorld());
-//			new WorldBottom2TopCompletion().run(Gbl.getWorld());
-//			new WorldValidation().run(Gbl.getWorld());
-//			new WorldCheck().run(Gbl.getWorld());
-//			System.out.println("  done.");
-
-			//////////////////////////////////////////////////////////////////////
-
-//			System.out.println("  running plans modules... ");
-//			new PersonAssignLinkViaFacility(network,facilities).run(plans);
-////			new XY2Links(network).run(plans);
-//			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-//			new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
-//			new PersonsRandomizeId(plans);
-
-//			PlansPlotScoreDistance ppsd=new PlansPlotScoreDistance(plans);
-//			ppsd.run(plans);
-//			ppsd.plot(Gbl.getConfig().socnetmodule().getOutDir(), "TRB5");
-
-
-//			Person ego=plans.getPerson("21924270");
-
-//			Write out the KML for the EgoNet of a chosen agent
-//			System.out.println("  Initializing the KML output");
-
-//			EgoNetPlansItersMakeKML.setUp(Scenario.getConfig(), network);
-//			EgoNetPlansItersMakeKML.generateStyles();
-
-//			System.out.println("... done");
-
-//			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-//			Person testP=plans.getPerson("21924270");//1pct
-//			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-//			EgoNetPlansItersMakeKML.loadData(testP,500);
-//			EgoNetPlansItersMakeKML.write();
-
-//			System.out.println(" ... done");
-
-
-			// social network statistics
-//			System.out.println(" Opening the files for the social network statistics...");
-//			SocialNetworkStatistics snetstat=new SocialNetworkStatistics(Gbl.getConfig().socnetmodule().getOutDir());
-//			snetstat.openFiles();
-
-//			System.out.println(" ... done");
-//			System.out.println(" Calculating and reporting network statistics ...");
-//			snetstat.calculate(500, snet, plans);
-//			System.out.println(" ... done");
-
-//			PajekWriter pjw = new PajekWriter(Gbl.getConfig().socnetmodule().getOutDir(), (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
-
-//			System.out.println(" Writing out social network for iteration " + 500 + " ...");
-//			pjw.write(snet.getLinks(), plans, 500);
-//			pjw.writeGeo(plans,snet, 500);
-//			System.out.println(" ... done");
-//			snetstat.closeFiles();
-
-			//Extract the ego's social net for more analyses
-//			Plans egoPlans = new PersonGetEgoNetGetPlans().extract(ego, plans);
-
-//			socialPlans.addAlgorithm(new PersonCalcActivitySpace("all"));
-
-//			System.out.println("  done.");
-
-
-			//////////////////////////////////////////////////////////////////////
-
-//			System.out.println("  running matrices algos... ");
-//			new MatricesCompleteBasedOnFacilities(facilities, (ZoneLayer)Gbl.getWorld().getLayer("municipality")).run(Matrices.getSingleton());
-//			System.out.println("  done.");
-
-			//////////////////////////////////////////////////////////////////////
-//			System.out.println("  finishing person algorithms...");
-//			socialPlans.runAlgorithms();
-//			pwast.close();
-//			System.out.println("  done.");
-
-//			Scenario.writePlans(socialPlans);
-//			Scenario.writeNetwork(network);
-//			Scenario.writeFacilities(facilities);
-//			Scenario.writeWorld(Gbl.getWorld());
-//			Scenario.writeConfig();
 
 			double totaliterationfriendscore=0;
 			double totaliterationscore=0;
@@ -232,7 +108,6 @@ public class AnalyzeScores {
 					totaliterationscore+=plan.getScore();
 				}
 				numplans++;
-//				System.out.println("TOTAL "+totaliterationscore+" "+numplans);
 			}
 			double avgfriendscore=totaliterationfriendscore/((double) numplans);
 			double avgscore=totaliterationscore/((double) numplans);
