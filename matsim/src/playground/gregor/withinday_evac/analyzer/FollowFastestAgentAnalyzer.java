@@ -25,23 +25,30 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
+import org.matsim.network.Node;
 
 import playground.gregor.withinday_evac.Beliefs;
 import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.NextLinkWithEstimatedTravelTimeMessage;
 import playground.gregor.withinday_evac.communication.InformationEntity.MSG_TYPE;
+import playground.gregor.withinday_evac.debug.DebugFollowFastestAgent;
 
 public class FollowFastestAgentAnalyzer implements Analyzer {
 	
 	private final Beliefs beliefs;
 	private double coef;
 	private static final double NORMALIZER = -3600/6;
+	private static double EPSILON = 0.01;
 
 	public FollowFastestAgentAnalyzer(final Beliefs beliefs) {
 		this.beliefs = beliefs;
 		this.coef = 1;
+		if (Controler.getIteration() >= 50) {
+			EPSILON = (0.01 * 1 / (Controler.getIteration() - 49));
+		}
 	}
 	
 	
@@ -92,6 +99,7 @@ public class FollowFastestAgentAnalyzer implements Analyzer {
 		Id nodeId = this.beliefs.getCurrentLink().getToNode().getId();
 		Collection<InformationEntity> ies = this.beliefs.getInfos(now, MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME, nodeId);
 		if (ies.size() == 0) {
+			DebugFollowFastestAgent.increNull();
 			return null;
 		}
 		
@@ -102,19 +110,70 @@ public class FollowFastestAgentAnalyzer implements Analyzer {
 			final NextLinkWithEstimatedTravelTimeMessage m = (NextLinkWithEstimatedTravelTimeMessage) ie.getMsg();
 			final Counter c = counts.get(m.getLink());
 			if (c != null) {
-				c.value += 1.0;
+				c.value += 1.0;				
 				c.estTimeSum += m.getEstTTime()/NORMALIZER;
+				
+//				c.value = 1.0;
+//				c.estTimeSum = Math.max(c.estTimeSum, m.getEstTTime()/NORMALIZER);
 			} else {
 				counts.put(m.getLink(), new Counter(1,m.getEstTTime()/NORMALIZER));
 				indices.add(m.getLink());
 				
 			}
-			
+			//DEBUG
+			DebugFollowFastestAgent.updateAlt(indices.size());
 		}
 				
-			
+		return getNextLinkGreedy(indices,counts);	
 	
 
+
+	}
+	
+
+	
+	
+	
+	private NextLinkOption getNextLinkGreedy(final ArrayList<Link> indices,
+			final HashMap<Link, Counter> counts) {
+		
+		if(MatsimRandom.random.nextDouble() < EPSILON){
+			//DEBUG
+			DebugFollowFastestAgent.incrGreedy();
+			
+			Node n = this.beliefs.getCurrentLink().getToNode();
+			double selNum = n.getOutLinks().size() * MatsimRandom.random.nextDouble();
+			for (Link l : n.getOutLinks().values()) {
+				selNum--;
+				if (selNum <= 0) {
+					return new NextLinkOption(l,1 * this.coef);
+				}
+			}
+			return null;
+		} else {
+			double bestEstTime = Double.POSITIVE_INFINITY;
+			Link link = null;
+			for (final Link l : indices) {
+				Counter c = counts.get(l);
+				double currEstTime = c.estTimeSum / c.value;
+				if (currEstTime < bestEstTime) {
+					bestEstTime = currEstTime;
+					link = l;
+				}
+			}
+			if (link == null) {
+				throw new RuntimeException("this should not happen!!");
+				
+			}
+			return new NextLinkOption(link,1 * this.coef);
+		}
+		
+
+	}
+
+
+	private NextLinkOption getNextLinkLogit(final ArrayList<Link> indices,
+			final HashMap<Link, Counter> counts) {
 		double weightSum = 0;
 		for (final Link l : indices) {
 			Counter c = counts.get(l);
@@ -135,11 +194,11 @@ public class FollowFastestAgentAnalyzer implements Analyzer {
 		
 		return null;
 	}
-	
 
-	
-	
-	
+
+
+
+
 	private static class Counter {
 		double value;
 		private double estTimeSum;

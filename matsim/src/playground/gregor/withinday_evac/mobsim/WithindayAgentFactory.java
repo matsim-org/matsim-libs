@@ -34,18 +34,20 @@ import playground.gregor.withinday_evac.communication.InformationExchanger;
  */
 public class WithindayAgentFactory extends AgentFactory {
 
-	private InformationExchanger informationExchanger;
-	private NetworkLayer network;
+	private final InformationExchanger informationExchanger;
+	private final NetworkLayer network;
+	private final int iteration;
 
-	public WithindayAgentFactory(InformationExchanger informationExchanger,
-			NetworkLayer networkLayer) {
+	public WithindayAgentFactory(final InformationExchanger informationExchanger,
+			final NetworkLayer networkLayer, final int iteration) {
 		this.informationExchanger = informationExchanger;
 		this.network = networkLayer;
+		this.iteration = iteration;
 	}
 
 	@Override
-	public PersonAgent createPersonAgent(Person p) {
-		return new BDIAgent(p, this.informationExchanger, this.network);
+	public PersonAgent createPersonAgent(final Person p) {
+		return new BDIAgent(p, this.informationExchanger, this.network, this.iteration);
 	}
 	
 	

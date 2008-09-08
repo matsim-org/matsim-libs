@@ -20,6 +20,7 @@
 
 package playground.gregor.withinday_evac.mobsim;
 
+import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -50,7 +51,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 		this.network = qNet;
 		this.controler = withindayControler;
 		this.informationExchanger = new InformationExchanger(net);
-		super.setAgentFactory(new WithindayAgentFactory(this.informationExchanger, this.network.getNetworkLayer()));
+		super.setAgentFactory(new WithindayAgentFactory(this.informationExchanger, this.network.getNetworkLayer(),Controler.getIteration()));
 		
 	}
 	

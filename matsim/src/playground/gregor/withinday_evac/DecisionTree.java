@@ -30,9 +30,12 @@ import org.matsim.population.Plan;
 import playground.gregor.withinday_evac.analyzer.Analyzer;
 import playground.gregor.withinday_evac.analyzer.ChooseRandomLinkAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowFastestAgentAnalyzer;
+import playground.gregor.withinday_evac.analyzer.FollowHerdAnalyzer;
 import playground.gregor.withinday_evac.analyzer.FollowPlanAnalyzer;
 import playground.gregor.withinday_evac.analyzer.Option;
 import playground.gregor.withinday_evac.analyzer.ReRouteAnalyzer;
+import playground.gregor.withinday_evac.communication.InformationExchanger;
+import playground.gregor.withinday_evac.debug.DebugDecisionTree;
 
 public class DecisionTree {
 	
@@ -42,14 +45,16 @@ public class DecisionTree {
 	private Node root;
 	private final Intentions intentions;
 	private final NetworkLayer network;
+	private final InformationExchanger informationExchanger;
 
 
-	public DecisionTree(final Beliefs beliefs, final Plan plan, final Intentions intentions, final NetworkLayer network) {
+	public DecisionTree(final Beliefs beliefs, final Plan plan, final Intentions intentions, final NetworkLayer network, final int iteration, final InformationExchanger informationExchanger) {
 		this.beliefs = beliefs;
 		this.plan = plan;
 		this.intentions = intentions;
 		this.network = network;
-		init();
+		this.informationExchanger = informationExchanger;
+		init(iteration);
 	}
 	
 	
@@ -58,6 +63,9 @@ public class DecisionTree {
 		while(current.isInternal) {
 			current = chooseNextNode(current,now);
 		}
+		//DEBUG
+		DebugDecisionTree.incr(current.analyzer);
+		
 		Link cL = this.beliefs.getCurrentLink();
 		Link nextLink = current.getOption().getNextLink();
 		boolean found = false;
@@ -96,7 +104,7 @@ public class DecisionTree {
 
 
 	//for now every thing is hardcoded
-	private void init() {
+	private void init(final int iteration) {
 		this.root = new Node();
 		
 		Node internal = new Node();
@@ -104,18 +112,21 @@ public class DecisionTree {
 		internal.setNodeWeight(0.99);
 		
 		Node followPlan = new Node();
-		FollowPlanAnalyzer fpa = new FollowPlanAnalyzer(this.beliefs,this.plan);
-		fpa.setCoefficient(0.01);
+		FollowPlanAnalyzer fpa = new FollowPlanAnalyzer(this.beliefs,this.plan, this.informationExchanger);
+		fpa.setCoefficient(1);
+
 		followPlan.setAnalyzer(fpa);
-		internal.addChildNode(followPlan);
+
+		
 		
 //		this.root.addChildNode(followPlan);
 		
 		Node randomLink = new Node();
 		ChooseRandomLinkAnalyzer crla = new ChooseRandomLinkAnalyzer(this.beliefs);
-		crla.setCoefficient(0.01);
+		crla.setCoefficient(1);
+
 		randomLink.setAnalyzer(crla);
-		this.root.addChildNode(randomLink);
+//		this.root.addChildNode(randomLink);
 //		internal.addChildNode(randomLink);
 		
 //		Node internal2 = new Node();
@@ -125,19 +136,36 @@ public class DecisionTree {
 		Node followFastest = new Node();
 		FollowFastestAgentAnalyzer fha = new FollowFastestAgentAnalyzer(this.beliefs);
 //		FollowHerdAnalyzer fha = new FollowHerdAnalyzer(this.beliefs);
-		fha.setCoefficient(0.9899999);
+		fha.setCoefficient(1);
 		followFastest.setAnalyzer(fha);
-		internal.addChildNode(followFastest);
+		if (MatsimRandom.random.nextDouble() < 0.2) {
+			internal.addChildNode(followPlan);	
+		} else {
+			internal.addChildNode(followFastest);	
+		}
 		
-//		Node internal3 = new Node();
-//		internal3.setNodeWeight(0.00001);
-//		internal2.addChildNode(internal3);
+		
+		Node internal1 = new Node();
+		internal1.setNodeWeight(0.0000000001);
+		internal.addChildNode(internal1);
+		
+		
+		Node internal2 = new Node();
+		internal2.setNodeWeight(0.0000000001);
+		internal1.addChildNode(internal2);
 		
 		Node reRoute = new Node();
 		ReRouteAnalyzer rra = new ReRouteAnalyzer(this.beliefs,this.network,this.intentions);
-		rra.setCoefficient(0.0000001);
+		rra.setCoefficient(1);
 		reRoute.setAnalyzer(rra);
-		internal.addChildNode(reRoute);
+//		internal2.addChildNode(reRoute);
+		internal2.addChildNode(randomLink);
+		
+		Node followHerd = new Node();
+		FollowHerdAnalyzer herdAna = new FollowHerdAnalyzer(this.beliefs);
+		followHerd.setAnalyzer(herdAna);
+		herdAna.setCoefficient(1);
+		internal1.addChildNode(followHerd);
 		
 	}
 	

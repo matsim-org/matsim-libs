@@ -36,6 +36,7 @@ import playground.gregor.withinday_evac.communication.InformationEntity;
 import playground.gregor.withinday_evac.communication.InformationExchanger;
 import playground.gregor.withinday_evac.communication.InformationStorage;
 import playground.gregor.withinday_evac.communication.Message;
+import playground.gregor.withinday_evac.communication.NextLinkMessage;
 import playground.gregor.withinday_evac.communication.NextLinkWithEstimatedTravelTimeMessage;
 
 
@@ -47,14 +48,16 @@ public class BDIAgent extends PersonAgent {
 	private final Intentions intentions;
 	private boolean isGuide;
 	private final DecisionTree decisionTree;
+	private final int iteration;
 
-	public BDIAgent(final Person person, final InformationExchanger informationExchanger, final NetworkLayer networkLayer){
+	public BDIAgent(final Person person, final InformationExchanger informationExchanger, final NetworkLayer networkLayer, final int iteration){
 		super(person);
 		this.informationExchanger = informationExchanger;
 		this.beliefs = new Beliefs(this.informationExchanger);
 		this.intentions = new Intentions();
 		this.intentions.setDestination(networkLayer.getNode(new IdImpl("en2")));
-		this.decisionTree = new DecisionTree(this.beliefs,this.getPerson().getSelectedPlan(),this.intentions,networkLayer);
+		this.iteration = iteration;
+		this.decisionTree = new DecisionTree(this.beliefs,this.getPerson().getSelectedPlan(),this.intentions,networkLayer, iteration, this.informationExchanger);
 		
 		if (person.getId().toString().contains("guide")) {
 			this.isGuide = true;
@@ -82,7 +85,7 @@ public class BDIAgent extends PersonAgent {
 		
 		if (nextOption instanceof NextLinkWithEstimatedTravelTimeOption) {
 			Message msg = new NextLinkWithEstimatedTravelTimeMessage(nextLink,((NextLinkWithEstimatedTravelTimeOption)nextOption).getEstTTime());
-			final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,msg);
+			final InformationEntity ie = new InformationEntity(60,now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,msg);
 			infos.addInformationEntity(ie);
 			
 			
@@ -104,9 +107,9 @@ public class BDIAgent extends PersonAgent {
 
 		
 
-//		final Message msg = new NextLinkMessage(nextLink);
-//		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
-//		infos.addInformationEntity(ie);
+		final Message msg = new NextLinkMessage(nextLink);
+		final InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK,msg);
+		infos.addInformationEntity(ie);
 		
 		return nextLink;
 		

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ChooseRandomLink.java
+ * DebugFollowFastestAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.withinday_evac.analyzer;
+package playground.gregor.withinday_evac.debug;
 
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.Link;
-
-import playground.gregor.withinday_evac.Beliefs;
-
-public class ChooseRandomLinkAnalyzer implements Analyzer {
-
-	private double coef;
-	private final Beliefs beliefs;
-	public ChooseRandomLinkAnalyzer(final Beliefs beliefs) {
-		this.beliefs = beliefs;
+public class DebugFollowFastestAgent {
+	
+	private static int GREEDY = 0;
+	private static int ALTERNATIVES = 0;
+	private static int CALLS = 0;
+	private static int NULL = 0;
+	
+	public static void updateAlt(final int alt) {
+		CALLS++;
+		ALTERNATIVES += alt;
 	}
 	
+	public static void incrGreedy(){
+		GREEDY++;
+	}
 	
+	public static void increNull() {
+		NULL++;
+	}
+	public static void reset(){
+		GREEDY = 0;
+		ALTERNATIVES = 0;
+		CALLS = 0;
+		NULL  = 0;
+	}
 	
-	public NextLinkOption getAction(final double now) {
-		Link link = this.beliefs.getCurrentLink();
-		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.random.nextDouble();
-		double coef = this.coef;
+	public static void print() {
+		System.out.println("================D E B U G  I N F O (FollowFastest)================");
+		System.out.println("non-Greedy:");
+		System.out.println("\ttotal: " + GREEDY);
+		System.out.println("\tperc: " +  (double)GREEDY / (double)CALLS);
+		System.out.println();
+		System.out.println("Alternatives:");
+		System.out.println("\taverage: " + (double)ALTERNATIVES / (double)CALLS);
+		System.out.println("Null:");
+		System.out.println("\ttotal: " + NULL);
+		System.out.println("================D E B U G  I N F O (FollowFastest)================");
+	}
 
-		for (Link l : link.getToNode().getOutLinks().values()) {
-			selnum -= 1.0;
-			if (selnum <= 0) {
-//				this.coef = 0;//allow only one time to select a random link
-				return new NextLinkOption(l,1 * coef);
-			}
-			
-			
-		}
-		
-		return null;
-	}
-	
-	public void setCoefficient(final double coef) {
-		this.coef = coef;
-		
-	}
 
 }

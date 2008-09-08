@@ -26,6 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Plan;
 
 import playground.gregor.withinday_evac.Beliefs;
+import playground.gregor.withinday_evac.communication.InformationExchanger;
 
 public class FollowPlanAnalyzer implements Analyzer {
 
@@ -36,14 +37,19 @@ public class FollowPlanAnalyzer implements Analyzer {
 	private final Link startLink;
 	private final Link destLink;
 	private final double estArivalTime;
+	private final InformationExchanger informationExchanger;
+	private final boolean isScored;
 
-	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan) {
+	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan, final InformationExchanger informationExchanger) {
 		this.beliefs = beliefs;
+		this.informationExchanger = informationExchanger;
 		this.links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
 		this.startLink = plan.getFirstActivity().getLink();
 		if (plan.getScore() == Plan.UNDEF_SCORE){
+			this.isScored = false;
 			this.estArivalTime = Double.POSITIVE_INFINITY;
 		} else {
+			this.isScored = true;
 			this.estArivalTime = plan.getFirstActivity().getEndTime() + plan.getScore() * -600;
 		}
 		this.destLink = plan.getNextActivity(plan.getNextLeg(plan.getFirstActivity())).getLink(); 
@@ -59,7 +65,11 @@ public class FollowPlanAnalyzer implements Analyzer {
 	public Option getAction(final double now) {
 		Link link = this.beliefs.getCurrentLink();
 		if (link == this.startLink) {
-			return new NextLinkWithEstimatedTravelTimeOption(this.links[0],1 * this.coef,this.estArivalTime-now);
+			if (this.isScored) {
+				return new NextLinkWithEstimatedTravelTimeOption(this.links[0],1 * this.coef,this.estArivalTime-now);
+			} else {
+				return new NextLinkOption(this.links[0],1 * this.coef);
+			}
 		}
 		
 		
@@ -70,9 +80,25 @@ public class FollowPlanAnalyzer implements Analyzer {
 		for (int i = 0; i < this.links.length; i++) {
 			if (this.links[i] == link) {
 				if (i > this.links.length-2){
-					return new NextLinkWithEstimatedTravelTimeOption(this.destLink,1 * this.coef, this.estArivalTime-now);
+//					//TEST
+//					Message m = new NextLinkWithEstimatedTravelTimeMessage(this.destLink,this.estArivalTime - now);
+//					InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,m);
+//					this.informationExchanger.getInformationStorage(link.getToNode().getId()).addInformationEntity(ie);
+					if (this.isScored) {
+						return new NextLinkWithEstimatedTravelTimeOption(this.destLink,1 * this.coef, this.estArivalTime-now);
+					}
+					return new NextLinkOption(this.destLink,1 * this.coef);
 				}
-				return new NextLinkWithEstimatedTravelTimeOption(this.links[i+1],1 * this.coef, this.estArivalTime-now); 
+//				//TEST
+//				Message m = new NextLinkWithEstimatedTravelTimeMessage(this.links[i+1],this.estArivalTime - now);
+//				InformationEntity ie = new InformationEntity(now,InformationEntity.MSG_TYPE.MY_NEXT_LINK_W_EST_TRAVELTIME,m);
+//				this.informationExchanger.getInformationStorage(link.getToNode().getId()).addInformationEntity(ie);
+				if (this.isScored){
+					return new NextLinkWithEstimatedTravelTimeOption(this.links[i+1],1 * this.coef, this.estArivalTime-now); 
+				} else {
+					return new NextLinkOption(this.links[i+1],1 * this.coef);
+				}
+				
 			}
 		}
 		throw new RuntimeException("this should not happen!!");

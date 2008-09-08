@@ -28,6 +28,7 @@ import org.matsim.controler.corelisteners.PlansDumping;
 import org.matsim.controler.corelisteners.PlansReplanning;
 import org.matsim.controler.corelisteners.PlansScoring;
 import org.matsim.evacuation.EvacuationQSimControler;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 
 import playground.gregor.withinday_evac.PlanGenerator;
 import playground.gregor.withinday_evac.mobsim.WithindayQueueSimulation;
@@ -52,10 +53,16 @@ public class WithindayControler extends EvacuationQSimControler {
 	protected void runMobSim() {
 //		log.info("Starting withinday replanning iteration...");
 
-		//build the queuesim
-		final WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
-		//run the simulation
-		sim.run();
+		if (getIteration() < 300 && getIteration() > 0) {
+			//build the queuesim
+			final WithindayQueueSimulation sim = new WithindayQueueSimulation(this.network, this.population, this.events, this);
+			//run the simulation
+			sim.run();
+		} else {
+			QueueSimulation sim = new QueueSimulation(this.network,this.population, this.events);
+			sim.run();
+		}
+	
 	}
 
 	@Override

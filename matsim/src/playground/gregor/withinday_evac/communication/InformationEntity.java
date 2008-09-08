@@ -20,7 +20,7 @@
 
 package playground.gregor.withinday_evac.communication;
 
-import org.matsim.gbl.Gbl;
+
 
 public class InformationEntity implements Comparable<InformationEntity> {
 	
@@ -33,7 +33,7 @@ public class InformationEntity implements Comparable<InformationEntity> {
 		UNDEFIND;
 	}
 	
-	private static final double DEFAULT_TTL = 10;
+	private static final double DEFAULT_TTL = 5;
 	private final double ttl;
 	private final double initTime;
 	private final double endTime;
@@ -42,7 +42,8 @@ public class InformationEntity implements Comparable<InformationEntity> {
 	private boolean resend = false;
 	
 	public InformationEntity(final double time, final MSG_TYPE msgType, final Message msg){
-		this(DEFAULT_TTL/Gbl.getConfig().simulation().getFlowCapFactor(),time,msgType, msg);
+//		this(DEFAULT_TTL/Gbl.getConfig().simulation().getFlowCapFactor(),time,msgType, msg);
+		this(DEFAULT_TTL,time,msgType, msg);
 	}
 	
 	public InformationEntity(final double ttl, final double time, final MSG_TYPE msgType, final Message msg) {

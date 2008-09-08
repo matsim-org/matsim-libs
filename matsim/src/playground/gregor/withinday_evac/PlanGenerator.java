@@ -22,6 +22,7 @@ package playground.gregor.withinday_evac;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -34,6 +35,7 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -43,6 +45,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+
+import playground.gregor.withinday_evac.debug.DebugDecisionTree;
+import playground.gregor.withinday_evac.debug.DebugFollowFastestAgent;
 
 public class PlanGenerator implements StartupListener, BeforeMobsimListener, AfterMobsimListener,
 AgentStuckEventHandler, LinkEnterEventHandler{
@@ -64,10 +69,17 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
+		//DEBUG
+		DebugDecisionTree.print();
+		DebugDecisionTree.reset();
+		DebugFollowFastestAgent.print();
+		DebugFollowFastestAgent.reset();
+		
 		int count = 0;
 		for (Entry<String,ArrayList<String>> e : this.traces.entrySet()) {
 			Person pers = this.population.getPerson(e.getKey());
 			Plan plan = pers.getSelectedPlan();
+		
 			Link[] links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
 			ArrayList<String> strLinks = e.getValue();
 			if (strLinks.size() < links.length) {
@@ -88,36 +100,42 @@ System.out.println(count);
 
 	private boolean addNewPlan(final Person pers, final ArrayList<String> strLinks) {
 		
-//		HashSet<String> added = new HashSet<String>();
-//		for (String linkId : strLinks) {
-//			if (added.contains(linkId)){
-//				return false;
-//			}
-//			added.add(linkId);
-//		}
-//		
+
 		
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-//		HashSet<Node> test = new HashSet<Node>();
+		HashSet<Node> added = new HashSet<Node>();
 
 		for (String linkId : strLinks) {
-//			if (test.contains(this.network.getLink(linkId).getFromNode())) {
-//				return false;
-//			}
-			nodes.add(this.network.getLink(linkId).getFromNode());
+			Node node = this.network.getLink(linkId).getFromNode();
+			if (added.contains(node)) {
+				return false;
+			}
+			added.add(node);
+			nodes.add(node);
 		}
 
 //		nodes.add(this.network.getLink(strLinks.get(strLinks.size()-1)).getToNode());
-		pers.removeWorstPlans(this.maxPlans-1);
-		Plan plan = pers.copySelectedPlan();
-		Act actA = plan.getFirstActivity();
-		Leg leg = plan.getNextLeg(actA);
+		
+//		pers.removeWorstPlans(this.maxPlans-1);
+		Plan plan = new Plan(pers);
+		Act oldA = pers.getSelectedPlan().getFirstActivity();
+		Act a = new Act("h",oldA.getCoord().getX(),oldA.getCoord().getY(),oldA.getLink(),oldA.getStartTime(),oldA.getEndTime(), oldA.getDur(),oldA.isPrimary());
+		Leg oldL = pers.getSelectedPlan().getNextLeg(oldA);
+		Leg l = new Leg(oldL.getNum(),oldL.getMode(),oldL.getDepTime(),oldL.getTravTime(),oldL.getArrTime());
+		Act oldB = pers.getSelectedPlan().getNextActivity(oldL);
+		Act b = new Act(oldB.getType(),oldB.getCoord().getX(),oldB.getCoord().getY(),oldB.getLink(),oldB.getStartTime(),oldB.getEndTime(),oldB.getDur(),oldB.isPrimary());
+		plan.addAct(a);
 		Route route = new Route();
 		route.setRoute(nodes);
 		route.getDist();
-		leg.setRoute(route);
+		l.setRoute(route);
+		plan.addLeg(l);
+		plan.addAct(b);
 		plan.setScore(Plan.UNDEF_SCORE);
+		
+		pers.removeWorstPlans(Gbl.getConfig().strategy().getMaxAgentPlanMemorySize()-1);
+		pers.exchangeSelectedPlan(plan, true);
 		return true;
 	}
 

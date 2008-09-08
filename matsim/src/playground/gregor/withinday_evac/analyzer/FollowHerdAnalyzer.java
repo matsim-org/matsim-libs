@@ -23,6 +23,7 @@ package playground.gregor.withinday_evac.analyzer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
@@ -67,6 +68,15 @@ public class FollowHerdAnalyzer implements Analyzer {
 			
 		
 
+
+				
+		
+//		return getNextLinkLogit(indices, counts);
+		return getNextLinkMaxCount(counts);
+	}
+	
+	private NextLinkOption getNextLinkLogit(final ArrayList<Link> indices,
+			final HashMap<Link, Counter> counts) {
 		double weightSum = 0;
 		for (final Link l : indices) {
 			Counter c = counts.get(l);
@@ -82,12 +92,24 @@ public class FollowHerdAnalyzer implements Analyzer {
 				return new NextLinkOption(l,1 * this.coef);
 			}
 		}
-				
-		
-		
 		return null;
 	}
-	
+	private NextLinkOption getNextLinkMaxCount(final HashMap<Link, Counter> counts) {
+		double maxCount = 0;
+		Link ret = null;
+		for (Map.Entry<Link, Counter> e : counts.entrySet()) {
+			if (e.getValue().value > maxCount) {
+				maxCount = e.getValue().value;
+				ret = e.getKey();
+			}
+			
+		}
+		
+		if (ret == null) {
+			return null;
+		}
+		return new NextLinkOption(ret,1 * this.coef);
+	}
 	public ArrayList<NextLinkOption> getActions(final double now) {
 		throw new RuntimeException("remove this method from class!!!! don't use this anymore!!!!");
 //		final ArrayList<InformationEntity> ies = this.beliefs.getInfos().get(MSG_TYPE.MY_NEXT_LINK);
