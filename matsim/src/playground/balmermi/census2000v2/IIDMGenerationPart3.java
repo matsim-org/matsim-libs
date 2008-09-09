@@ -102,10 +102,10 @@ public class IIDMGenerationPart3 {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
-		log.info("  done.");
+//		log.info("  running world modules... ");
+//		new WorldCheck().run(Gbl.getWorld());
+//		new WorldValidation().run(Gbl.getWorld());
+//		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
