@@ -34,8 +34,6 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.PersonAssignModeChoiceModel;
@@ -115,10 +113,10 @@ public class IIDMGenerationPart3 {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  running world modules... ");
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
-		log.info("  done.");
+//		log.info("  running world modules... ");
+//		new WorldCheck().run(Gbl.getWorld());
+//		new WorldValidation().run(Gbl.getWorld());
+//		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
 
