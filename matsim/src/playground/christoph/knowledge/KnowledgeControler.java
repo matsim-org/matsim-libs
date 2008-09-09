@@ -30,22 +30,37 @@ import java.util.Map;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.AfterMobsimEvent;
+import org.matsim.controler.events.BeforeMobsimEvent;
+import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.AfterMobsimListener;
+import org.matsim.controler.listener.BeforeMobsimListener;
+import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.StartupListener;
+import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
+import org.matsim.utils.misc.Time;
 
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
 import playground.christoph.knowledge.replanning.KnowledgeStrategyManagerConfigLoader;
 
 public class KnowledgeControler extends Controler {
 
+	EventWriterTXT eventWriter = null;
+	
 	public KnowledgeControler(String args[])
 	{
 		super(args);
@@ -86,6 +101,10 @@ public class KnowledgeControler extends Controler {
 		initKnowledge();	// neu...
 		setKnowledge();		// neu...
 		
+		// EventWriter ersetzen...
+		//eventWriter = null;
+		
+/*		
 		DijkstraForSelectNodes snd = new DijkstraForSelectNodes(this.network);
 		snd.executeNetwork(network.getNode("12"));
 		//snd.executeRoute(network.getNode("12"), network.getNode("20"));
@@ -101,8 +120,8 @@ public class KnowledgeControler extends Controler {
 
 		// Test soweit fertig...
 		System.exit(0);
-		
-		//new GenerateKnowledge(this.population, this.network, 4000.0);
+*/		
+		new GenerateKnowledge(this.population, this.network, 4000.0);
 				
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
 
@@ -176,4 +195,6 @@ public class KnowledgeControler extends Controler {
 		*/
 		}
 	}
+
+	
 }
