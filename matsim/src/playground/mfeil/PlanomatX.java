@@ -61,6 +61,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		//////////////////////////////////////////////////////////////////////
 		// New section TS iterations (under construction)
 		//////////////////////////////////////////////////////////////////////
+		
+		
 		int currentIteration;
 		
 		PlanomatXPlan [] neighbourhood = new PlanomatXPlan [neighbourhoodSize+1];
@@ -68,6 +70,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		for (neighbourhoodInitialisation = 0; neighbourhoodInitialisation < neighbourhood.length; neighbourhoodInitialisation++){
 			neighbourhood[neighbourhoodInitialisation] = new PlanomatXPlan (plan.getPerson());
 			neighbourhood[neighbourhoodInitialisation].copyPlan(plan);
+	
 		}
 		
 		int [] notNewInNeighbourhood = new int [neighbourhoodSize];
@@ -93,34 +96,46 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					// Scoring
 					
 					neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
-					double scoreTwo = neighbourhood[x].getScore();
-					System.out.println("Person: "+neighbourhood[x].getPerson().getId()+", Scoring danach: "+scoreTwo);
+					//double scoreTwo = neighbourhood[x].getScore();
+					//System.out.println("Person: "+neighbourhood[x].getPerson().getId()+", Scoring danach: "+scoreTwo);
 					nonTabuNeighbourhood.add(0, neighbourhood[x]);
+					System.out.println(0+". nonTabuNeighbourhood: "+nonTabuNeighbourhood.get(0).getActsLegs());
 				}
 			}
 			
 			java.util.Collections.sort(nonTabuNeighbourhood);
 			for (int x = 0; x<nonTabuNeighbourhood.size();x++)System.out.println(x+". nonTabuNeighbourhood: "+nonTabuNeighbourhood.get(x));
 			
-			//Write final solution back to plan.
-			ArrayList<Object> al = plan.getActsLegs();
-			
-			for (int i = 1; i<al.size()-1;i++){
-				al.remove(i);
-				al.add(i, nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getActsLegs().get(i));	
-			}
 			if (currentIteration==maxIterations) {
 				System.out.println("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
+			//	if (nonTabuNeighbourhood.size()>0){
+					if (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore()>plan.getScore()){
+						System.out.println("Bin in der Schreib-Schleife.");
+						ArrayList<Object> al = plan.getActsLegs();
+					
+						for (int i = 1; i<al.size()-1;i++){
+							al.remove(i);
+							al.add(i, nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getActsLegs().get(i));	
+						}
+					}
+			//	}
+			
 			}
 		}
 		
-		//Write final solution back to plan.
-		//ArrayList<Object> al = plan.getActsLegs();
-		
-		//for (int i = 1; i<al.size()-1;i++){
-		//	al.remove(i);
-		//	al.add(i, nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getActsLegs().get(i));	
+		//Write final solution back to plan if it is better than the base plan.
+		//if (nonTabuNeighbourhood.size()>0){
+		//	if (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore()>plan.getScore()){
+			
+		//		ArrayList<Object> al = plan.getActsLegs();
+			
+		//		for (int i = 1; i<al.size()-1;i++){
+		//			al.remove(i);
+		//			al.add(i, nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getActsLegs().get(i));	
+		//		}
+		//	}
 		//}
+		System.out.println("Person: "+plan.getPerson().getId()+", Finaler Plan: "+plan);
 	}
 				
 	//////////////////////////////////////////////////////////////////////
@@ -187,21 +202,23 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				Act act4 = (Act)(actslegs.get(loopCounter+4));
 				if (act2.getType()!=act4.getType()){
 					//System.out.println("Hab was gefunden!");
-					//System.out.println("Plan davor: "+actslegs);
+					System.out.println("Person "+basePlan.getPerson().getId()+", Plan davor: "+actslegs);
 					Act act1 = (Act)(actslegs.get(loopCounter-2));
 					Act act3 = (Act)(actslegs.get(loopCounter+2));
 					if (act1.getType()!=act3.getType()){
 						double scoreOne = basePlan.getScore();
 						System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor: "+scoreOne);
 						Act actHelp = new Act ((Act)(actslegs.get(loopCounter)));
+						//actHelp.setStartTime(actslegs.get(loopCounter+2).getStartTime());
 						actslegs.set(loopCounter, actslegs.get(loopCounter+2));
 						actslegs.set(loopCounter+2, actHelp);
-						//System.out.println("Plan danach: "+basePlan.getActsLegs());
+					
+						System.out.println("Person "+basePlan.getPerson().getId()+", Plan danach: "+basePlan.getActsLegs());
 						
 						// Routing
 					
 						this.router.run(basePlan);
-						//System.out.println("Neuer Plan :"+actslegs);
+						System.out.println("Person "+basePlan.getPerson().getId()+", Neuer Plan :"+actslegs);
 						
 						//Optimizing the start times
 						
