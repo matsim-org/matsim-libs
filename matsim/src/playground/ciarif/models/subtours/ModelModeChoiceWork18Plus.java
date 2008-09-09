@@ -153,7 +153,7 @@ public class ModelModeChoiceWork18Plus extends ModelModeChoice {
 	
 	@Override
 	protected final double calcPublicUtil() {
-		System.out.println("pt = " + pt);
+//		System.out.println("pt = " + pt);
 		if (pt) {
 			double util = 0.0;
 			util += B1_Season * tickets ;

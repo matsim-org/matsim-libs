@@ -193,6 +193,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	@Override
 	public void run(Person person) {
+		log.debug("pid="+person.getId());
 
 		// GET the subtours
 		Plan p = person.getSelectedPlan();
