@@ -62,7 +62,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 	private ArrayList<Id> locationIds = null;
 	private int numSubtours = Integer.MIN_VALUE;
-	
+
 	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
 
 	public PlanAnalyzeSubtours() {
@@ -81,21 +81,21 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		}
 
 		this.numSubtours = 0;
-		
+
 //		this.subtours = new TreeSet<Integer>();
 		this.subtourIndexation = new int[locationIds.size() - 1];
 		for (int ii = 0; ii < this.subtourIndexation.length; ii++) {
 			this.subtourIndexation[ii] = PlanAnalyzeSubtours.UNDEFINED;
 		}
-		
+
 		this.extractSubtours(0, locationIds.size() - 1);
 
 	}
 
 	protected void extractSubtours(final int startIndex, final int endIndex) {
 
-//		log.info("startIndex: " + startIndex);
-//		log.info("endIndex: " + endIndex);
+		log.info("startIndex: " + startIndex);
+		log.info("endIndex: " + endIndex);
 
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
 
@@ -104,21 +104,20 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 			Id currentLinkId = locationIds.get(ii);
 			if (locationEnumerator.contains(currentLinkId)) {
 				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId) + startIndex;
-				// two consecutive equal locations do NOT constitute a tour
-				if ((ii - lastLinkIndex) > 1) {
-					for (int jj = lastLinkIndex; jj < ii; jj++) {
-						if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
-							this.subtourIndexation[jj] = numSubtours;
-						}
+				for (int jj = lastLinkIndex; jj < ii; jj++) {
+					if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
+						this.subtourIndexation[jj] = numSubtours;
 					}
-					numSubtours++;
+				}
+				numSubtours++;
+				if (locationEnumerator.size() > (lastLinkIndex + 1)) {
 					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
-//						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
 						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
 					}
-					for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
-						locationEnumerator.set(removeMe, INVALID_ID);
-					}
+				}
+				for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
+					locationEnumerator.set(removeMe, INVALID_ID);
 				}
 			}
 			locationEnumerator.add(currentLinkId);

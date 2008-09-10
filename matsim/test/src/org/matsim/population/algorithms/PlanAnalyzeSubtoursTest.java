@@ -20,6 +20,7 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -85,8 +86,8 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		person = new Person(new IdImpl("1000"));
 
 		// now let's test different types of activity plans
-		TreeMap<String, String> expectedSubtourIndexations = new TreeMap<String, String>();
-		TreeMap<String, Integer> expectedNumSubtours = new TreeMap<String, Integer>();
+		HashMap<String, String> expectedSubtourIndexations = new HashMap<String, String>();
+		HashMap<String, Integer> expectedNumSubtours = new HashMap<String, Integer>();
 		
 		String testedRoute = "1 2 1";
 		expectedSubtourIndexations.put(testedRoute, "0 0");
@@ -105,12 +106,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedNumSubtours.put(testedRoute, 2);
 
 		testedRoute = "1 2 2 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 0");
-		expectedNumSubtours.put(testedRoute, 1);
+		expectedSubtourIndexations.put(testedRoute, "1 0 1");
+		expectedNumSubtours.put(testedRoute, 2);
 		
 		testedRoute = "1 2 2 2 2 2 2 2 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 0 0 0 0 0 0");
-		expectedNumSubtours.put(testedRoute, 1);
+		expectedSubtourIndexations.put(testedRoute, "6 0 1 2 3 4 5 6");
+		expectedNumSubtours.put(testedRoute, 7);
 
 		testedRoute = "1 2 3 2 1";
 		expectedSubtourIndexations.put(testedRoute, "1 0 0 1");
@@ -125,8 +126,8 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedNumSubtours.put(testedRoute, 3);
 
 		testedRoute = "1 2 14 14 2 14 2 1";
-		expectedSubtourIndexations.put(testedRoute, "2 0 0 0 1 1 2");
-		expectedNumSubtours.put(testedRoute, 3);
+		expectedSubtourIndexations.put(testedRoute, "3 1 0 1 2 2 3");
+		expectedNumSubtours.put(testedRoute, 4);
 
 		testedRoute = "1 2 3 4 3 2 5 4 5 1";
 		expectedSubtourIndexations.put(testedRoute, "3 1 0 0 1 3 2 2 3");
@@ -137,20 +138,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedNumSubtours.put(testedRoute, 4);
 
 		testedRoute = "1 1 1 1 1 2 1";
-		expectedSubtourIndexations.put(
-				testedRoute, 
-				new String(
-						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
-						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
-						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
-						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " 0 0"));
-		expectedNumSubtours.put(testedRoute, 1);
+		expectedSubtourIndexations.put(testedRoute, "0 1 2 3 4 4");
+		expectedNumSubtours.put(testedRoute, 5);
 
 		testedRoute = "1 2 1 1";
-		expectedSubtourIndexations.put(
-				testedRoute, 
-				"0 0 " + PlanAnalyzeSubtours.UNDEFINED);
-		expectedNumSubtours.put(testedRoute, 1);
+		expectedSubtourIndexations.put(testedRoute, "0 0 1");
+		expectedNumSubtours.put(testedRoute, 2);
 
 		testedRoute = "1 2 3 4";
 		expectedSubtourIndexations.put(
@@ -161,6 +154,10 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED)));
 		expectedNumSubtours.put(testedRoute, 0);
 
+		testedRoute = "1 2 2 3 2 2 2 1 4 1";
+		expectedSubtourIndexations.put(testedRoute, "4 0 1 1 2 3 4 5 5");
+		expectedNumSubtours.put(testedRoute, 6);
+		
 		for (String linkString : expectedSubtourIndexations.keySet()) {
 
 			log.info("Testing location sequence: " + linkString);
