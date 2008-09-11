@@ -26,8 +26,6 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -85,12 +83,6 @@ public class IIDMGenerationPart3 {
 		Gbl.getWorld().complete();
 		log.info("  done.");
 
-		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		Gbl.getWorld().complete();
-		System.out.println("  done.");
-
 		//////////////////////////////////////////////////////////////////////
 		
 		log.info("  parsing additional municipality information... ");
@@ -100,24 +92,10 @@ public class IIDMGenerationPart3 {
 
 		//////////////////////////////////////////////////////////////////////
 
-//		log.info("  running world modules... ");
-//		new WorldCheck().run(Gbl.getWorld());
-//		new WorldValidation().run(Gbl.getWorld());
-//		log.info("  done.");
-		
-		//////////////////////////////////////////////////////////////////////
-
 		log.info("  parsing f2z_mapping... ");
 		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(Gbl.getWorld());
 		log.info("  done.");
 
-		//////////////////////////////////////////////////////////////////////
-
-//		log.info("  running world modules... ");
-//		new WorldCheck().run(Gbl.getWorld());
-//		new WorldValidation().run(Gbl.getWorld());
-//		log.info("  done.");
-		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");

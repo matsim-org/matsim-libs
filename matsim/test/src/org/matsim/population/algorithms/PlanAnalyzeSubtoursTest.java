@@ -24,14 +24,12 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.MatsimNetworkReader;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
@@ -45,8 +43,7 @@ import org.matsim.utils.misc.Time;
  */
 public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
-	private Population population = null;
-	private NetworkLayer network = null;
+	private Facilities facilities = null;
 
 	private static final String CONFIGFILE = "test/scenarios/equil/config.xml";
 
@@ -58,127 +55,112 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 		super.loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
 
-		log.info("Reading network xml file...");
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		log.info("Reading plans xml file...");
-		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
-		log.info("Reading plans xml file...done.");
-
+		log.info("Reading facilities xml file...");
+		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		log.info("Reading facilities xml file...done.");
 	}
 
 	public void testRun() throws Exception {
 
-		// At first, we test a standard h-w-h plan with different locations from the equil-test scenario
-		Person person = population.getPerson("2");
-		Plan plan = person.getPlans().get(0);
-
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
-		testee.run(plan);
-		assertEquals(1, testee.getNumSubtours());
 
-		person = new Person(new IdImpl("1000"));
+		Person person = new Person(new IdImpl("1000"));
 
-		// now let's test different types of activity plans
+		// test different types of activity plans
 		HashMap<String, String> expectedSubtourIndexations = new HashMap<String, String>();
 		HashMap<String, Integer> expectedNumSubtours = new HashMap<String, Integer>();
 		
-		String testedRoute = "1 2 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0");
-		expectedNumSubtours.put(testedRoute, 1);
+		String testedActChainLocations = "1 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 0");
+		expectedNumSubtours.put(testedActChainLocations, 1);
 		
-		testedRoute = "1 2 20 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 0");
-		expectedNumSubtours.put(testedRoute, 1);
+		testedActChainLocations = "1 2 20 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 0 0");
+		expectedNumSubtours.put(testedActChainLocations, 1);
 
-		testedRoute = "1 2 1 2 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 1 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 1 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 0 1 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 
-		testedRoute = "1 2 1 3 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 1 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 1 3 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 0 1 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 
-		testedRoute = "1 2 2 1";
-		expectedSubtourIndexations.put(testedRoute, "1 0 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "1 0 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 		
-		testedRoute = "1 2 2 2 2 2 2 2 1";
-		expectedSubtourIndexations.put(testedRoute, "6 0 1 2 3 4 5 6");
-		expectedNumSubtours.put(testedRoute, 7);
+		testedActChainLocations = "1 2 2 2 2 2 2 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "6 0 1 2 3 4 5 6");
+		expectedNumSubtours.put(testedActChainLocations, 7);
 
-		testedRoute = "1 2 3 2 1";
-		expectedSubtourIndexations.put(testedRoute, "1 0 0 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 3 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "1 0 0 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 
-		testedRoute = "1 2 3 4 3 2 1";
-		expectedSubtourIndexations.put(testedRoute, "2 1 0 0 1 2");
-		expectedNumSubtours.put(testedRoute, 3);
+		testedActChainLocations = "1 2 3 4 3 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "2 1 0 0 1 2");
+		expectedNumSubtours.put(testedActChainLocations, 3);
 
-		testedRoute = "1 2 14 2 14 2 1";
-		expectedSubtourIndexations.put(testedRoute, "2 0 0 1 1 2");
-		expectedNumSubtours.put(testedRoute, 3);
+		testedActChainLocations = "1 2 14 2 14 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "2 0 0 1 1 2");
+		expectedNumSubtours.put(testedActChainLocations, 3);
 
-		testedRoute = "1 2 14 14 2 14 2 1";
-		expectedSubtourIndexations.put(testedRoute, "3 1 0 1 2 2 3");
-		expectedNumSubtours.put(testedRoute, 4);
+		testedActChainLocations = "1 2 14 14 2 14 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "3 1 0 1 2 2 3");
+		expectedNumSubtours.put(testedActChainLocations, 4);
 
-		testedRoute = "1 2 3 4 3 2 5 4 5 1";
-		expectedSubtourIndexations.put(testedRoute, "3 1 0 0 1 3 2 2 3");
-		expectedNumSubtours.put(testedRoute, 4);
+		testedActChainLocations = "1 2 3 4 3 2 5 4 5 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "3 1 0 0 1 3 2 2 3");
+		expectedNumSubtours.put(testedActChainLocations, 4);
 
-		testedRoute = "1 2 3 2 3 2 1 2 1";
-		expectedSubtourIndexations.put(testedRoute, "2 0 0 1 1 2 3 3");
-		expectedNumSubtours.put(testedRoute, 4);
+		testedActChainLocations = "1 2 3 2 3 2 1 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "2 0 0 1 1 2 3 3");
+		expectedNumSubtours.put(testedActChainLocations, 4);
 
-		testedRoute = "1 1 1 1 1 2 1";
-		expectedSubtourIndexations.put(testedRoute, "0 1 2 3 4 4");
-		expectedNumSubtours.put(testedRoute, 5);
+		testedActChainLocations = "1 1 1 1 1 2 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 1 2 3 4 4");
+		expectedNumSubtours.put(testedActChainLocations, 5);
 
-		testedRoute = "1 2 1 1";
-		expectedSubtourIndexations.put(testedRoute, "0 0 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 1 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "0 0 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 
-		testedRoute = "1 2 3 4";
+		testedActChainLocations = "1 2 3 4";
 		expectedSubtourIndexations.put(
-				testedRoute, 
+				testedActChainLocations, 
 				new String(
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED)));
-		expectedNumSubtours.put(testedRoute, 0);
+		expectedNumSubtours.put(testedActChainLocations, 0);
 
-		testedRoute = "1 2 2 3 2 2 2 1 4 1";
-		expectedSubtourIndexations.put(testedRoute, "4 0 1 1 2 3 4 5 5");
-		expectedNumSubtours.put(testedRoute, 6);
+		testedActChainLocations = "1 2 2 3 2 2 2 1 4 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "4 0 1 1 2 3 4 5 5");
+		expectedNumSubtours.put(testedActChainLocations, 6);
 		
-		testedRoute = "1 2 3 4 3 1";
-		expectedSubtourIndexations.put(testedRoute, "1 1 0 0 1");
-		expectedNumSubtours.put(testedRoute, 2);
+		testedActChainLocations = "1 2 3 4 3 1";
+		expectedSubtourIndexations.put(testedActChainLocations, "1 1 0 0 1");
+		expectedNumSubtours.put(testedActChainLocations, 2);
 		
-		for (String linkString : expectedSubtourIndexations.keySet()) {
+		for (String facString : expectedSubtourIndexations.keySet()) {
 
-			log.info("Testing location sequence: " + linkString);
+			log.info("Testing location sequence: " + facString);
 
-			plan = new Plan(person);
+			Plan plan = new Plan(person);
 
-			String[] linkIdSequence = linkString.split(" ");
-			for (int aa=0; aa < linkIdSequence.length; aa++) {
-				plan.createAct(
-						"actOnLink" + linkIdSequence[aa], 
-						100.0, 
-						100.0, 
-						network.getLink(linkIdSequence[aa]), 
+			String[] facIdSequence = facString.split(" ");
+			for (int aa=0; aa < facIdSequence.length; aa++) {
+				Act act = plan.createAct(
+						"actOnLink" + facIdSequence[aa], 
+						100.0, 100.0, null,
 						Time.parseTime("10:00:00"), 
 						Time.parseTime("10:00:00"), 
 						Time.parseTime("00:00:00"), 
 						false);
-				if (aa != (linkIdSequence.length - 1)) {
+				act.setFacility(facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
+				if (aa != (facIdSequence.length - 1)) {
 					plan.createLeg(
 							"car", 
 							Time.parseTime("10:30:00"), 
@@ -194,9 +176,9 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				actualSubtourIndexation += " ";
 			}
 			actualSubtourIndexation = actualSubtourIndexation.substring(0, actualSubtourIndexation.length() - 1);
-			assertEquals(expectedSubtourIndexations.get(linkString), actualSubtourIndexation);
+			assertEquals(expectedSubtourIndexations.get(facString), actualSubtourIndexation);
 			
-			assertEquals(expectedNumSubtours.get(linkString).intValue(), testee.getNumSubtours());
+			assertEquals(expectedNumSubtours.get(facString).intValue(), testee.getNumSubtours());
 		}
 
 	}

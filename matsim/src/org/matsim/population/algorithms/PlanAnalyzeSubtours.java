@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.facilities.Facility;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
 
@@ -32,8 +33,8 @@ import org.matsim.population.Plan;
  * 
  * A subtour is a sequence of activities whose first 
  * and the last activity are at the same location.
- * The current implementation uses the {@link Link} as location information, 
- * thus activities at the same link constitute a subtour.
+ * The current implementation uses the {@link Facility} as location information, 
+ * thus activities at the same facility constitute a subtour.
  * <br><br>
  * Usage:
  * <br><br>
@@ -62,8 +63,6 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	private ArrayList<Id> locationIds = null;
 	private int numSubtours = Integer.MIN_VALUE;
 
-//	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
-
 	public PlanAnalyzeSubtours() {
 		super();
 	}
@@ -75,7 +74,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii).getClass().equals(Act.class)) {
-				locationIds.add(((Act) actsLegs.get(ii)).getLinkId());
+				locationIds.add(((Act) actsLegs.get(ii)).getFacility().getId());
 			}
 		}
 
@@ -115,15 +114,15 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 * <br>
 	 * Example:<br>
 	 * <br>
-	 * Imagine an activity plan whose activities are located at {@link Link}s with the following ids, in this order:<br>
+	 * Imagine an activity plan whose activities are located at {@link Facility}s with the following ids, in this order:<br>
 	 * <br>
 	 * 1 2 1 2 3 2 1<br>
 	 * <br>
 	 * Three subtours can be identified:<br>
 	 * <ul>
-	 * <li> One from the first activity at link #1 to the second activity at link #1.
-	 * <li> One from the second activity at link #1 to the last activity at link #1, excluding the activities/legs in between.
-	 * <li> One from the first activity at link #2 to the last activity at link #2.
+	 * <li> One from the first activity at facility #1 to the second activity at facility #1.
+	 * <li> One from the second activity at facility #1 to the last activity at facility #1, excluding the activities/legs in between.
+	 * <li> One from the first activity at facility #2 to the last activity at facility #2.
 	 * </ul>
 	 * <br>
 	 * The returned result in this case is an array of size 6 containing the numbers:<br>
@@ -147,15 +146,15 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 * <br>
 	 * Example:<br>
 	 * <br>
-	 * Imagine an activity plan whose activities are located at the following links, in this order:<br>
+	 * Imagine an activity plan whose activities are located at the following facility, in this order:<br>
 	 * <br>
 	 * 1 2 1 2 3 2 1<br>
 	 * <br>
 	 * Three subtours can be identified:<br>
 	 * <ul>
-	 * <li> One from the first activity at link #1 to the second activity at link #1.
-	 * <li> One from the second activity at link #1 to the last activity at link #1, excluding the activities/legs in between.
-	 * <li> One from the first activity at link #2 to the last activity at link #2.
+	 * <li> One from the first activity at facility #1 to the second activity at facility #1.
+	 * <li> One from the second activity at facility #1 to the last activity at facility #1, excluding the activities/legs in between.
+	 * <li> One from the first activity at facility #2 to the last activity at facility #2.
 	 * </ul>
 	 * <br>
 	 * The returned result in this case is:<br>
