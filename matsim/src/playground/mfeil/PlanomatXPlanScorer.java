@@ -12,7 +12,10 @@ import org.matsim.scoring.ScoringFunctionFactory;
 
 /**
  * @author Matthias Feil
- *
+ * Extends the standard PlanScorer to enable scoring of plans that do not have fully documented legs or acts. 
+ * acts: Works also for acts that have only duration or endTime (first activity only)
+ * legs: Works also for legs that have only travTime
+ * Necessary e.g., for equil scenario.
  */
 public class PlanomatXPlanScorer extends PlanScorer {
 
@@ -24,7 +27,6 @@ public class PlanomatXPlanScorer extends PlanScorer {
 	public PlanomatXPlanScorer(ScoringFunctionFactory factory) {
 		super(factory);
 		this.factory = factory;
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -50,11 +52,8 @@ public class PlanomatXPlanScorer extends PlanScorer {
 							depTime = 24*3600;
 						}
 					}
-					//else if (legHelp.getTravTime()>=0){
-						//depTime = legHelp.getTravTime() + depTime;
-					//}
 				}
-				//System.out.println("depTime ist "+depTime);
+				
 				function.startLeg(depTime, leg);
 				
 				if (leg.getTravTime()>=0){
@@ -63,7 +62,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				else{
 					arrTime = depTime;
 				}
-				//System.out.println("arrTime ist "+arrTime);
+				
 				function.endLeg(arrTime);
 			}
 		}

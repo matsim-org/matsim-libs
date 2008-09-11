@@ -24,7 +24,6 @@ package playground.mfeil;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.matsim.replanning.*;
-import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
@@ -62,11 +61,13 @@ import org.matsim.locationchoice.LocationChoice;
  */
 
 /**
+ * @author mrieser
  * Loads the strategy modules specified in the config-file. This class offers
  * backwards-compatibility to the old StrategyManager where the complete class-
  * names were given in the configuration.
- * @author mrieser
  */
+
+@Deprecated
 public class CopyOfStrategyManagerConfigLoaderTest {
 
 //	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
@@ -79,8 +80,6 @@ public class CopyOfStrategyManagerConfigLoaderTest {
 	 * @param manager the {@link StrategyManager} to be configured according to the configuration
 	 */
 	public static void load(final Controler controler, final Config config, final StrategyManager manager) {
-
-		System.out.println ("Hello world, this is the adjusted Config Loader!");
 		
 		NetworkLayer network = controler.getNetwork();
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();

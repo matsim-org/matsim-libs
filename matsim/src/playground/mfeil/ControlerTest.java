@@ -11,18 +11,18 @@ import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.replanning.modules.ReRoute;
 
 
 /**
  * @author Matthias Feil
- * Adjusting the Controler in order to refer to the StrategyManagerConfigLoaderTest
+ * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
 public class ControlerTest extends org.matsim.controler.Controler {
+	
 	public ControlerTest (String [] args){
 		super(args);
 	}
-		/**
+		/*
 		 * @return A fully initialized StrategyManager for the plans replanning.
 		 */
 	
@@ -30,7 +30,7 @@ public class ControlerTest extends org.matsim.controler.Controler {
 	@Override
 		protected StrategyManager loadStrategyManager() {
 		
-		StrategyManager manager = new StrategyManager();	
+		final StrategyManager manager = new StrategyManager();	
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 			
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {

@@ -16,22 +16,21 @@ import org.matsim.population.Act;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import java.util.ArrayList;
-import org.matsim.config.*;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.gbl.Gbl;
+
 
 /**
  * @author Matthias Feil
  * PlanomatX will be the class where to implement the Tabu Search. Currently, work focus is on the definition of 
  * the neighbourhood. Changing the order of activities already works. Next is to integrate the TS mechanisms.
  */
+
 public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
-	private final int neighbourhoodSize, maxIterations;
-	private final double weightChangeOrder, weightChangeNumber;// weightChangeType;
-	private final PlanAlgorithm planomatAlgorithm;
-	private final PlansCalcRouteLandmarks router;
-	private final PlanScorer scorer;
+	private final int 						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
+	private final double 					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;// weightChangeType;
+	private final PlanAlgorithm 			planomatAlgorithm;
+	private final PlansCalcRouteLandmarks 	router;
+	private final PlanScorer 				scorer;
 	
 	
 	
@@ -45,11 +44,11 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		planomatAlgorithm = new PlanOptimizeTimes (legTravelTimeEstimator);
 		router = new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		scorer = new PlanomatXPlanScorer (factory);
-		neighbourhoodSize = 5;//TODO @MF: variables to be configured externally, sum must be smaller or equal than 1.0
-		weightChangeOrder = 0.8; 
-		weightChangeNumber = 0.2;
-		//weightChangeType = 0.0;
-		maxIterations = 1;
+		NEIGHBOURHOOD_SIZE = 5;							//TODO @MF: variables to be configured externally, sum must be smaller or equal than 1.0
+		WEIGHT_CHANGE_ORDER = 0.8; 
+		WEIGHT_CHANGE_NUMBER = 0.2;
+			//weightChangeType = 0.0;
+		MAX_ITERATIONS = 1;
 	}
 	
 		
@@ -68,7 +67,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		int currentIteration;
 		
-		PlanomatXPlan [] neighbourhood = new PlanomatXPlan [neighbourhoodSize+1];
+		PlanomatXPlan [] neighbourhood = new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
 		int neighbourhoodInitialisation;
 		for (neighbourhoodInitialisation = 0; neighbourhoodInitialisation < neighbourhood.length; neighbourhoodInitialisation++){
 			neighbourhood[neighbourhoodInitialisation] = new PlanomatXPlan (plan.getPerson());
@@ -76,11 +75,11 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 		}
 		
-		int [] notNewInNeighbourhood = new int [neighbourhoodSize];
-		int [] tabuInNeighbourhood = new int [neighbourhoodSize];
+		int [] notNewInNeighbourhood = new int [NEIGHBOURHOOD_SIZE];
+		int [] tabuInNeighbourhood = new int [NEIGHBOURHOOD_SIZE];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood = new ArrayList<PlanomatXPlan>();
 		
-		for (currentIteration = 1; currentIteration<maxIterations+1;currentIteration++){
+		for (currentIteration = 1; currentIteration<MAX_ITERATIONS+1;currentIteration++){
 			
 			this.createNeighbourhood(neighbourhood);	
 			
@@ -96,7 +95,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				break; 
 			}
 			
-			for (int x=0; x<neighbourhoodSize;x++){
+			for (int x=0; x<NEIGHBOURHOOD_SIZE;x++){
 				if(tabuInNeighbourhood[x]==0){
 					
 					// Scoring
@@ -111,7 +110,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			java.util.Collections.sort(nonTabuNeighbourhood);
 			
-			if (currentIteration==maxIterations) {
+			if (currentIteration==MAX_ITERATIONS) {
 				System.out.println("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 			
 				//if (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore()>plan.getScore()){
@@ -130,61 +129,61 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//////////////////////////////////////////////////////////////////////
 	
 	public void createNeighbourhood (PlanomatXPlan [] neighbourhood) {
-		int z;
-		int x = 2;
-		for (z = 1; z<(int)(neighbourhoodSize*weightChangeOrder); z++){
-			x =this.changeOrder(neighbourhood[z], x);
+		int neighbourPos;
+		int planPos = 2;
+		for (neighbourPos = 1; neighbourPos<(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos++){
+			planPos =this.changeOrder(neighbourhood[neighbourPos], planPos);
 		}
 	
-		for (z = (int) (neighbourhoodSize*weightChangeOrder); z<((int)(neighbourhoodSize*weightChangeOrder)+(int)(neighbourhoodSize*weightChangeNumber)); z++){
-			neighbourhood[z]=this.changeNumber(neighbourhood[z]);
+		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<((int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER)+(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_NUMBER)); neighbourPos++){
+			neighbourhood[neighbourPos]=this.changeNumber(neighbourhood[neighbourPos]);
 		}
 	
-		for (z = (int) (neighbourhoodSize*weightChangeOrder)+(int)(neighbourhoodSize*weightChangeNumber); z<neighbourhoodSize; z++){
-			neighbourhood[z]=this.changeType(neighbourhood[z]);
+		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER)+(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_NUMBER); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
+			neighbourhood[neighbourPos]=this.changeType(neighbourhood[neighbourPos]);
 		}
 	}
 			
 	
 	
-	public int changeOrder (PlanomatXPlan basePlan, int x){
+	public int changeOrder (PlanomatXPlan basePlan, int planBasePos){
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
-		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order.
-			double scoreOne = basePlan.getScore();
-			System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor: "+scoreOne);
+		
+		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.
 			
+			System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor: "+basePlan.getScore());
 			System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor, nochmal mit Scorer: "+scorer.getScore(basePlan));
 			
-			return x;
+			return planBasePos;
 		}
 		else {
-			for (int loopCounter = x; loopCounter <= actslegs.size()-4; loopCounter=loopCounter+2){ //Go through the "inner" acts only
-				x=x+2;
+			for (int planRunningPos = planBasePos; planRunningPos <= actslegs.size()-4; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
+				planBasePos=planBasePos+2;
 				
 				//Activity swapping
 				
-				Act act2 = (Act)(actslegs.get(loopCounter));
-				Act act4 = (Act)(actslegs.get(loopCounter+4));
+				Act act2 = (Act)(actslegs.get(planRunningPos));
+				Act act4 = (Act)(actslegs.get(planRunningPos+4));
 				if (act2.getType()!=act4.getType()){
-					Act act1 = (Act)(actslegs.get(loopCounter-2));
-					Act act3 = (Act)(actslegs.get(loopCounter+2));
+					Act act1 = (Act)(actslegs.get(planRunningPos-2));
+					Act act3 = (Act)(actslegs.get(planRunningPos+2));
 					if (act1.getType()!=act3.getType()){
 						double scoreOne = basePlan.getScore();
 						System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor: "+scoreOne);
 						System.out.println("Person: "+basePlan.getPerson().getId()+", Scoring davor, nochmal mit Scorer: "+scorer.getScore(basePlan));
 						
-						Act actHelp = new Act ((Act)(actslegs.get(loopCounter)));
-						Act actHelp3 = new Act ((Act) (actslegs.get(loopCounter+2)));
-						actslegs.set(loopCounter, actslegs.get(loopCounter+2));
+						Act actHelp = new Act ((Act)(actslegs.get(planRunningPos)));
+						Act actHelp3 = new Act ((Act) (actslegs.get(planRunningPos+2)));
+						actslegs.set(planRunningPos, actslegs.get(planRunningPos+2));
 						
-						Act act2New = (Act)(actslegs.get(loopCounter));
+						Act act2New = (Act)(actslegs.get(planRunningPos));
 						act2New.setStartTime(actHelp.getStartTime());
 						act2New.setEndTime(actHelp.getEndTime());
 
-						actslegs.set(loopCounter+2, actHelp);
+						actslegs.set(planRunningPos+2, actHelp);
 						
-						Act act3New = (Act)(actslegs.get(loopCounter+2));
+						Act act3New = (Act)(actslegs.get(planRunningPos+2));
 						act3New.setStartTime(actHelp3.getStartTime());
 						act3New.setEndTime(actHelp3.getEndTime());
 					
@@ -207,7 +206,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					
 				}
 			}		
-			return x;
+			return planBasePos;
 		}
 	}
 	

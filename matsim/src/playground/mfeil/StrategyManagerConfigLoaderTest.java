@@ -13,7 +13,7 @@ import org.matsim.controler.Controler;
  * strategy. Note: Would only work if the "load()" method weren't static. 
  */
 
-
+@Deprecated
 public class StrategyManagerConfigLoaderTest extends org.matsim.replanning.StrategyManagerConfigLoader {
 
 
