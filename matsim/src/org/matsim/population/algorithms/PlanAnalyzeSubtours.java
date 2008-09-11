@@ -110,11 +110,9 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 					}
 				}
 				numSubtours++;
-				if (locationEnumerator.size() > (lastLinkIndex + 1)) {
-					if (!locationEnumerator.get(lastLinkIndex + 1).equals(INVALID_ID)) {
-						log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
-						this.extractSubtours((lastLinkIndex + 1), (ii - 1));
-					}
+				if (this.subtourIndexation[lastLinkIndex] == PlanAnalyzeSubtours.UNDEFINED) {
+					log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
+					this.extractSubtours((lastLinkIndex + 1), (ii - 1));
 				}
 				for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
 					locationEnumerator.set(removeMe, INVALID_ID);
