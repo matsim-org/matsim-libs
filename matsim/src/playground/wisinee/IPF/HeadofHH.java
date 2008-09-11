@@ -14,7 +14,7 @@ import java.util.ArrayList;
 		try{
 			File inFile = new File("./input/MenInsee_income_NP.txt");			
 			BufferedReader in = new BufferedReader(new FileReader(inFile));
-			File outFile = new File("./input/MenInsee_income_NP_Age_Sex1.txt");	
+			File outFile = new File("./output/MenInsee_income_NP_Age_Sex1.txt");	
 			FileOutputStream out = new FileOutputStream(outFile);			
 			
 			
