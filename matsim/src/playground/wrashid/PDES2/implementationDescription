@@ -222,8 +222,12 @@ VERY IMPORTANT TODOS:
        
        evtl. memory leak (Entdeckt durch Marcel Rieser bei DES):
        "Hi Rashid. Die DES scheint noch irgendwo ein MemoryLeak zu haben. Der speicherverbrauch nimmt von Iteration zu Iteration massiv zu, ohne dass die Garbage Collection etwas ausrichten kann. Kann dir morgen mal meine Auswertungen zeigen, ist da ziemlich eindeutig"
+          => static class/field leaks, because memory increases beween iterations. "GC overhead limit exceeded"
           
-          
+       -> replace "synchronized", with "ReentrantLock"
+       
+       
+       
        
 - Done:
      -  perhaps move arround the zone separators to achieve better lookahead propoerties? 
