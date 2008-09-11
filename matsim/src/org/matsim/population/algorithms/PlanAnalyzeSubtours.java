@@ -22,7 +22,6 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Act;
@@ -63,7 +62,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	private ArrayList<Id> locationIds = null;
 	private int numSubtours = Integer.MIN_VALUE;
 
-	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
+//	private static Logger log = Logger.getLogger(PlanAnalyzeSubtours.class);
 
 	public PlanAnalyzeSubtours() {
 		super();
@@ -82,38 +81,24 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 		this.numSubtours = 0;
 
-//		this.subtours = new TreeSet<Integer>();
 		this.subtourIndexation = new int[locationIds.size() - 1];
 		for (int ii = 0; ii < this.subtourIndexation.length; ii++) {
 			this.subtourIndexation[ii] = PlanAnalyzeSubtours.UNDEFINED;
 		}
 
-		this.extractSubtours(0, locationIds.size() - 1);
-
-	}
-
-	protected void extractSubtours(final int startIndex, final int endIndex) {
-
-		log.info("startIndex: " + startIndex);
-		log.info("endIndex: " + endIndex);
-
 		ArrayList<Id> locationEnumerator = new ArrayList<Id>();
 
-		int ii = startIndex;
-		while(ii <= endIndex) {
+		int ii = 0;
+		while(ii <= locationIds.size() - 1) {
 			Id currentLinkId = locationIds.get(ii);
 			if (locationEnumerator.contains(currentLinkId)) {
-				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId) + startIndex;
+				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId);
 				for (int jj = lastLinkIndex; jj < ii; jj++) {
 					if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
 						this.subtourIndexation[jj] = numSubtours;
 					}
 				}
 				numSubtours++;
-				if (this.subtourIndexation[lastLinkIndex] == PlanAnalyzeSubtours.UNDEFINED) {
-					log.info("Calling extractSubtours(...) from " + (lastLinkIndex + 1) + " to " + (ii - 1));
-					this.extractSubtours((lastLinkIndex + 1), (ii - 1));
-				}
 				for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
 					locationEnumerator.set(removeMe, INVALID_ID);
 				}
