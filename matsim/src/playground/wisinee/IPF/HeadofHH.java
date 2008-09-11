@@ -12,9 +12,9 @@ import java.util.ArrayList;
 			System.out.println("Finish reading information on survey data!!");
 			System.out.println("Start reading information from Insee....");
 		try{
-			File inFile = new File("MenInsee_income_NP.txt");			
+			File inFile = new File("./input/MenInsee_income_NP.txt");			
 			BufferedReader in = new BufferedReader(new FileReader(inFile));
-			File outFile = new File("MenInsee_income_NP_Age_Sex1.txt");	
+			File outFile = new File("./input/MenInsee_income_NP_Age_Sex1.txt");	
 			FileOutputStream out = new FileOutputStream(outFile);			
 			
 			
@@ -120,7 +120,7 @@ import java.util.ArrayList;
 					//clear temporary data;
 					binPP = new int[5][5][5];
 					GlobalVars.orgn.clear();
-//					if (z==1) break;
+//					if (z==2) break;
 					if (z==776) System.out.println("Finish for all zones!!");
 				}	
 				if (row < lastRowData){

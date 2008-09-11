@@ -27,7 +27,7 @@ public class InputSurveyData1 {
 
 			
 			
-			File inFile = new File("Personne06_1.csv");			
+			File inFile = new File("./input/Personne06_1.csv");			
 			BufferedReader in = new BufferedReader(new FileReader(inFile));
 						
 			s1= in.readLine();		//read out the data heading	

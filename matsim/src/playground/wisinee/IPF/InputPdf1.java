@@ -23,7 +23,7 @@ public class InputPdf1 {
 				String s1, value;
 				int col = 0;
 							
-				File inFile = new File("sex_age_Distb_Head.csv");			
+				File inFile = new File("./input/sex_age_Distb_Head.csv");			
 				BufferedReader in = new BufferedReader(new FileReader(inFile));			
 				s1= in.readLine();		//read out the data heading	
 				for (int n = 1; n < z; n++){
