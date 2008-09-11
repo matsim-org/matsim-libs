@@ -21,7 +21,6 @@
 package playground.balmermi.census2000v2.modules;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
@@ -39,7 +38,6 @@ import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.CAtts;
-import playground.balmermi.census2000v2.data.Household;
 import playground.ciarif.models.subtours.ModelModeChoice;
 import playground.ciarif.models.subtours.ModelModeChoiceEducation18Minus;
 import playground.ciarif.models.subtours.ModelModeChoiceEducation18Plus;
@@ -56,7 +54,6 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	private final static Logger log = Logger.getLogger(PersonAssignModeChoiceModel.class);
 
-	private static final Integer MAXNUMP = 14;
 	private static final String YES = "yes";
 	private static final String ALWAYS = "always";
 
@@ -193,7 +190,6 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	@Override
 	public void run(Person person) {
-		log.debug("pid="+person.getId());
 
 		// GET the subtours
 		Plan p = person.getSelectedPlan();
