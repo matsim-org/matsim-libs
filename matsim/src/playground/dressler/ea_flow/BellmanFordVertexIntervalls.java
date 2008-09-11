@@ -67,9 +67,13 @@ public class BellmanFordVertexIntervalls {
 	private LinkedList<Link> _pathToRoute;
 
 	private LinkedList<Link> _sources;
+	
+	private ArrayList _paths;
 	private int _timeHorizon;
 
 	private int _gamma;
+	
+	private Node _sink;
 
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
 
@@ -142,19 +146,35 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	
-	private void refreshLabels(){
+	private LinkedList<Node> refreshLabels(){
+		LinkedList<Node> nodes = new LinkedList<Node>();
+		for(Node node: network.getNodes().values()){
+			_labels.put(node, new VertexIntervalls());
+			if(isActiveSource(node)){
+				nodes.add(node);
+				_labels.get(node).getIntervallAt(0).setDist(true);
+			}
+			
+		}
+		return nodes;
 		
 	}
 	
+	
+	private boolean isActiveSource(Node node) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	private void augmentFlow(){
-		
+		// TODO Auto-generated method stub
 	}
 	
 	private void constructRoute(){
-		
+		// TODO Auto-generated method stub
 	}
 	private void findGamma(){
-		
+		// TODO Auto-generated method stub
 	} 
 	
 	
@@ -164,7 +184,7 @@ public class BellmanFordVertexIntervalls {
 	 * @param to Node to which we want to go 
 	 * @param over Link upon which we travel
 	 * @param forward indicates, weather we use a forwar or backwards edge
-	 * @return
+	 * @return true if any label of Node to has changed
 	 */
 	private boolean relabel(Node from, Node to, Link over,boolean forward){
 		VertexIntervalls labelfrom = _labels.get(from);
@@ -190,8 +210,7 @@ public class BellmanFordVertexIntervalls {
 		
 	}
 		
-		private boolean doCalculations(final Node supersource, final Node toNode,
-				final double startTime, final HashMap<Link, EdgeIntervalls> flow) {
+		private boolean doCalculations() {
 		// outprints
 		/*
 		 * for (Link link : network.getLinks().values()) {
@@ -205,7 +224,7 @@ public class BellmanFordVertexIntervalls {
 
 		// queue to save nodes we have to scan
 		Queue<Node> queue = new LinkedList<Node>();
-		queue.add(supersource);
+		queue.addAll(refreshLabels());
 
 		// v is first vertex in the queue
 		// w is the vertex we probably want to insert to the queue or to
@@ -238,23 +257,7 @@ public class BellmanFordVertexIntervalls {
 			}
 
 		}
-		//printAll();
-		// calculate shortest path with back-tracking and send flow in find
-		// ShortestPath
-		/**
-		if (Dists.getDistance(toNode) == Integer.MAX_VALUE) {
-			pathToRoute = null;
-			System.out.println("No path found!");
-			return false;
-		} else if (Dists.getDistance(toNode) > timeHorizon) {
-			pathToRoute = null;
-			System.out.println("Out of time horizon!");
-			System.out.println(timeHorizon + " < " + Dists.getDistance(toNode));
-			return false;
-		} else {
-			pathToRoute = findPath(fromNode, toNode);
-			return true;
-		}**/
+		
 		return false; //TODO remove
 	}
 	
