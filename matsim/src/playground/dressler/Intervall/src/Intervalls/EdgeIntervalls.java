@@ -21,6 +21,8 @@
 
 package playground.dressler.Intervall.src.Intervalls;
 
+import java.util.ArrayList;
+
 
 
 
@@ -41,6 +43,8 @@ public class EdgeIntervalls {
 	 */
 	private EdgeIntervall _last; 
 	
+	final int traveltime;
+	
 	
 	
 //-----------------------METHODS----------------------------------//
@@ -53,11 +57,12 @@ public class EdgeIntervalls {
 	 * Default Constructor Constructs an object containing only 
 	 * one EdgeIntervall [0,Integer.MAX_VALUE) with flow equal to 0
 	 */
-	public EdgeIntervalls(){
+	public EdgeIntervalls(int traveltime){
 		EdgeIntervall intervall = new EdgeIntervall(0,Integer.MAX_VALUE);
 		_tree = new AVLTree();
 		_tree.insert(intervall);
 		_last = intervall;
+		this.traveltime=traveltime;
 	}
 
 //------------------------SPLITTING--------------------------------//	
@@ -214,10 +219,11 @@ public class EdgeIntervalls {
 
 	
 	/**
-	 * finds the next EdgeIntervall that
-	 * @param t
-	 * @param u
-	 * @return
+	 * finds the next EdgeIntervall that has flow less than u after time t
+	 * so that additional flow could be sent during the Intervall
+	 * @param t time >=0 !!!
+	 * @param u capacity
+	 * @return EdgeIntervall[a,b] with f<u  and a>=t
 	 */
 	public EdgeIntervall minPossible(int t,int u){
 		if (t<0){
@@ -234,6 +240,84 @@ public class EdgeIntervalls {
 		return null;
 	}
 	
+	/**
+	 * finds the next EdgeIntervall after time t-traveltime upon which f>0 
+	 * so that flow could be sent over the Residual Edge starting at time t and arrive 
+	 * during the returned Intervall  
+	 * @param t time >= traveltime
+	 * @return Edge Intervall [a,b] with f>0 a>=t-traveltime
+	 */
+	public EdgeIntervall minPossibleResidual(int t){
+		t=t-traveltime;
+		t=Math.max(0, t);
+		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
+			if(((EdgeIntervall)_tree._curr.obj).getFlow()>0){
+				return ((EdgeIntervall)_tree._curr.obj);
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param i
+	 * @param u
+	 * @param forward
+	 * @return
+	 */
+	public ArrayList<Intervall> propagate(Intervall i, int u ,boolean forward){
+		ArrayList<Intervall> result = new ArrayList<Intervall>();
+		int t = i.getLowBound();
+		int max =i.getHighBound();
+		if(forward){
+			while(t<max){
+				Intervall j =minPossible(t,u);
+				if(j==null){
+					break;
+				}
+				t=j.getHighBound();
+				if( i.intersects(j)){
+					j=i.Intersection(j).shiftPositive(traveltime);
+					if(j!=null){
+						result.add(i.Intersection(j));
+					}	
+				}	
+			}//TODO implement backwards and comment
+		}
+		if(!forward){
+			while(t<max){
+				Intervall j =minPossibleResidual(t);
+				if(j==null){
+					break;
+				}
+				t=j.getHighBound();
+				if( i.intersects(j)){
+					j=i.Intersection(j);
+					if(j!=null){
+						result.add(i.Intersection(j));
+					}	
+				}	
+			}
+			
+		}
+		if(!result.isEmpty()){
+			ArrayList<Intervall> temp= new ArrayList<Intervall>();
+			Intervall part= result.get(0);
+			for(int j=1;j< result.size(); j++){
+				Intervall test = result.get(j);
+				if(part.getHighBound()==test.getLowBound()){
+					part.setHighBound(test.getHighBound());
+				}else{
+					temp.add(part);
+					part=test;
+				}
+			}
+			temp.add(part);
+			result=temp; 
+		}
+		return result;
+		//TODO unify different flow intervalls with positive capacity
+	}
 	
 //------------------------Augmentation--------------------------------//
 	

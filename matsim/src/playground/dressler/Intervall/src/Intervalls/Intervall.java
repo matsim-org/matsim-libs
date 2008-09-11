@@ -528,6 +528,20 @@ implements Comparable<Intervall>
 		return (l+this._l+","+this._r+r);
 			
 	}
+	//TODO comment
+	public Intervall shiftPositive(int tau){
+		int l,r;
+		if(Integer.MAX_VALUE!=this._r ){
+			r=this._r+tau;
+		}else{
+			r=this._r;
+		}
+		l=Math.max(0,this._l+tau);
+		if(legalBounds(l,r)){
+			return new Intervall(l,r);
+		}else return null;
+		
+	}
 
 //-------------------------MAIN METHOD------------------------------------------//
 	

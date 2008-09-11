@@ -66,7 +66,8 @@ public class MoreMultiSourceEAF {
 		// CODE
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
-			flow.put(link, new EdgeIntervalls());
+			flow.put(link, new EdgeIntervalls((int)link.getFreespeed(1.)));
+			//TODO achtung cast von double auf int
 		}
 		
 		// find source and sink

@@ -20,12 +20,9 @@
 
 
 package playground.dressler.Intervall.src.Intervalls;
-
+import org.matsim.network.Link;
 import java.util.Collection;
 
-/**
- * 
- */
 
 /**
  * @author manuelschneider
@@ -38,15 +35,16 @@ public class VertexIntervall extends Intervall {
 //---------------------------FIELDS----------------------------//	
 	
 	/**
-	 * minimal distance to the sink at time lowbound
+	 * shows weateher the vertex is reacheable during the time intervall
 	 */
-	private int _dist = Integer.MAX_VALUE;
+	private boolean _dist = false;
 
 	/**
 	 * predecessor in a shortest path
 	 */
 	//TODO predecessor
-	private String _predecessor=null;
+	private Link _predecessor=null;
+	
 
 //---------------------------METHODS----------------------------//
 //**************************************************************//
@@ -80,7 +78,7 @@ public class VertexIntervall extends Intervall {
 	 * @param r highbound
 	 * @param d distance
 	 */
-	public VertexIntervall(int l, int r, int d) {
+	public VertexIntervall(int l, int r, boolean d) {
 		super(l, r);
 		this.setDist(d);
 	}
@@ -94,9 +92,11 @@ public class VertexIntervall extends Intervall {
 	 * @param d distance
 	 * @param pred Predecessor in a shortest path
 	 */
-	public VertexIntervall(int l, int r, int d, String pred) {
+	public VertexIntervall(int l, int r, boolean d, Link pred) {
 		super(l, r);
 		this.setDist(d);
+		this.setPredecessor(pred);
+		
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class VertexIntervall extends Intervall {
 	 * Setter for the min distance to the sink at time lowbound
 	 * @param d min distance to sink
 	 */
-	public void setDist(int d){
+	public void setDist(boolean d){
 		this._dist=d;
 	}
 	
@@ -122,23 +122,11 @@ public class VertexIntervall extends Intervall {
 	 * Getter for the min distance to the sink at time lowbound
 	 * @return min distance to sink
 	 */
-	public int getDist(){
+	public boolean getDist(){
 		return this._dist;
 	}
 	
-	/**
-	 * Calculates the actual min distance to the sink at time t assuming that 
-	 * it incrases proportional with time
-	 * @param t time
-	 * @return minimal distance to the sink at time t
-	 */
-	public int getDistAt(int t){
-		if(this.contains(t)){
-			int l= this.getLowBound();
-			return (this._dist+ (t-l));
-		}
-		else throw new IllegalArgumentException("Inntervall does not contain the time " +t);
-	}
+	
 	
 //----------------------------PREDECESSOR------------------------//
 	
@@ -146,7 +134,7 @@ public class VertexIntervall extends Intervall {
 	 * Setter for the predecessor in a shortest path
 	 * @param pred predesessor vertex
 	 */
-	public void setPredecessor(String pred){
+	public void setPredecessor(Link pred){
 		this._predecessor=pred;
 	}
 	
@@ -154,7 +142,7 @@ public class VertexIntervall extends Intervall {
 	 * Getter for the predecessor in a shortest path
 	 * @return predecessor vertex 
 	 */
-	public String getPredecessor(){
+	public Link getPredecessor(){
 		return this._predecessor;
 	}
 	
@@ -169,7 +157,7 @@ public class VertexIntervall extends Intervall {
 	 *@return new Interval 
 	 */
 	public VertexIntervall splitAt(int t){
-		int newdist = this.getDistAt(t);
+		boolean newdist = this.getDist();
 		Intervall j =super.splitAt(t);
 		VertexIntervall k = new VertexIntervall(j);
 		k._dist =newdist;
@@ -177,21 +165,6 @@ public class VertexIntervall extends Intervall {
 		return k;
 	}
 
-	public static VertexIntervall maxRight( Collection<VertexIntervall> C){
-		if(C==null)throw new NullPointerException("Collection was null");
-		if(!C.isEmpty()){
-			int max = Integer.MIN_VALUE;
-			VertexIntervall maxintervall = null;
-			for(VertexIntervall i : C){
-				if (max<=i.getHighBound()){
-					max= i.getHighBound();
-					maxintervall=i;
-				}
-			}
-		 return maxintervall;	
-		}
-		throw new IllegalArgumentException("Empty Collection");
-	}
 	
 //----------------------------MAIN METHOD--------------------------//
 	
