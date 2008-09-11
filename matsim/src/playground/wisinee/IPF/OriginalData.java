@@ -1,4 +1,4 @@
-package globalVariables;
+package playground.wisinee.IPF;
 
 public class OriginalData {	
 	public String data;			//for keeping the all the original data

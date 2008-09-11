@@ -1,4 +1,4 @@
-package globalVariables;
+package playground.wisinee.IPF;
 import java.util.ArrayList;
 
 public class GlobalVars {

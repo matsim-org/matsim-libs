@@ -1,11 +1,7 @@
-package ageSexHeadHH;
+package playground.wisinee.IPF;
 
 import java.io.*;
 import java.util.ArrayList;
-
-import globalVariables.GlobalVars;
-import globalVariables.OriginalData;
-import ipf.Ipf;
 
 	public class HeadofHH {
 
@@ -103,9 +99,9 @@ import ipf.Ipf;
 					System.out.println("Start IPF calculation....");
 					//call ipf for each iris	
 					Ipf i1 = new Ipf();
-					i1.getFixRow(GlobalVars.fixedR, 125);
-					i1.getFixColumn(GlobalVars.fixedC, 42);
-					i1.getInitialMatrix(GlobalVars.intialRij, 125, 42);
+					i1.setFixRow(GlobalVars.fixedR, 125);
+					i1.setFixColumn(GlobalVars.fixedC, 42);
+					i1.setInitialMatrix(GlobalVars.intialRij, 125, 42);
 					GlobalVars.finalRij=i1.ipfcal(125, 42);	
 				
 					System.out.println("Finish IPF calculation!!");

@@ -1,9 +1,7 @@
-package ageSexHeadHH;
+package playground.wisinee.IPF;
 
 import java.util.Random;
-import globalVariables.GlobalVars;
-import globalVariables.OriginalData;
-import ipf.Ipf;
+
 
 
 public class LinktoInsee1 {
