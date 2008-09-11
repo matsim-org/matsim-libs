@@ -35,7 +35,9 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 		preProcessRoutingData.run(network);
 		travelCostCalc = controlerTest.getTravelCostCalculator();
 		travelTimeCalc = controlerTest.getTravelTimeCalculator();
-		factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
+		//factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
+		factory = new CharyparNagelScoringFunctionFactory();
+		
 	}
 
 	@Override
