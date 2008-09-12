@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -61,7 +62,8 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			int time = 7*3600 + (MatsimRandom.random.nextInt(2*3600));
 
 			// first act (= home)
-			p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,time,time,false);
+			Act a = p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,time,time,false);
+			a.setFacility(home_facility);
 			p.createLeg("car",time,0.0,time);
 
 			int nof_acts = 1 + MatsimRandom.random.nextInt(3);
@@ -72,13 +74,15 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 				int act_index = MatsimRandom.random.nextInt(acts.size());
 				Activity act = acts.get(act_index);
 				Facility f = act.getFacility();
-				p.createAct(act.getType(),f.getCenter().getX(),f.getCenter().getY(),f.getLink(),time,(time+dur),dur,false);
+				a = p.createAct(act.getType(),f.getCenter().getX(),f.getCenter().getY(),f.getLink(),time,(time+dur),dur,false);
+				a.setFacility(f);
 				time += dur;
 				p.createLeg("car",time,0.0,time);
 			}
 
 			// last act (= home)
-			p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),time,(24*3600),(24*3600-time),false);
+			a = p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),time,(24*3600),(24*3600-time),false);
+			a.setFacility(home_facility);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
