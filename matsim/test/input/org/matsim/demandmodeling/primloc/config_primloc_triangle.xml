@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+	<!-- = Sample configuration for the Triangle sample scenario             == -->
+	<!-- ====================================================================== -->
+	
+	<module name="primary location choice">
+		
+		<!-- Optional layer on which to aggregate facilities and residents -->
+		<!-- Otherwise the user has to specify a layer with PrimlocModule.setLayer() --> 
+		<param name="aggregation layer" value="municipality"/>
+		
+		<!-- Describe the primary activity in term of facility type. All trips have home as origin -->		
+		<param name="destination facility type" value="work" />
+		
+		<!-- Default value for the logit scale parameter. Units are in $
+			compared to travel costs -->
+		<param name="mu" value="5.0" />
+		
+		<!-- Optional: use Euclidean crow-distance as a proxy for travel costs -->
+		<param name="euclidean distance costs" value="true" />
+		
+		<!-- Optional matrix file for the calibration -->
+		<!-- param name="calibration matrix" value="file:/some_matrix.format" -->
+		
+		<!-- Module can be silent/verbose -->
+		<param name="verbose" value="true" />
+
+				<!-- Below are parameters that can be safely left untouched -->
+		<param name="maxiter" value="100"/>
+		<param name="theta" value="0.5" />
+		<param name="threshold1" value="1E-4" />
+		<param name="threshold2" value="1E-6" />
+		<param name="threshold3" value="1E-2" />
+	</module>
+	<!-- ====================================================================== -->
+</config>
