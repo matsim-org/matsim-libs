@@ -57,10 +57,8 @@ public class FacilitiesAllActivitiesFTE {
 
 	public void run(Facilities facilities) {
 
-//		this.createThem2008();
 		this.loadFacilityActivities();
 //		this.createThem(facilities);
-		//this.testTemporaryFacilityIds();
 
 	}
 
@@ -281,19 +279,6 @@ public class FacilitiesAllActivitiesFTE {
 		log.info("creating facilities...DONE.");
 
 	}
-
-//	private void testTemporaryFacilityIds() {
-
-//	int number = 2000;
-//	String attrId = "krassomat";
-//	String tempFacId = this.createTemporaryFacilityID(number, attrId);
-
-//	System.out.println(
-//	tempFacId + System.getProperty("line.separator") +
-//	this.getNumberFromTemporaryFacilityID(tempFacId) + System.getProperty("line.separator") +
-//	this.getAttributeIdFromTemporaryFacilityID(tempFacId));
-
-//	}
 
 	private String createTemporaryFacilityID(final int number, final String attributeId) {
 
