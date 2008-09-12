@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FakeTravelTimeCost.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dressler.ea_flow;
 
 // java imports
@@ -53,29 +72,52 @@ public class BellmanFordVertexIntervalls {
 	 */
 	final TravelTime timeFunction;
 	
-	
-	
 	/**
 	 * Datastructure to to represent the flow on a network  
 	 */
 	private HashMap<Link, EdgeIntervalls> _flow;
 	
-	
+	/**
+	 * Datastructure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
+	 */
 	private HashMap<Node, VertexIntervalls> _labels;
 
-	
-	private LinkedList<Link> _pathToRoute;
-
+	/**
+	 * 
+	 */
 	private LinkedList<Link> _sources;
 	
+	/**
+	 * 
+	 */
+	private HashMap<Node,Integer> _demands;
+	
+	/**
+	 * 
+	 */
 	private ArrayList _paths;
+	
+	/**
+	 * 
+	 */
 	private int _timeHorizon;
-
+	
+	/**
+	 * 
+	 */
 	private int _gamma;
 	
+	/**
+	 * 
+	 */
 	private Node _sink;
 
+	/**
+	 * 
+	 */
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
+	
+	
 
 	
 	/**
@@ -100,16 +142,8 @@ public class BellmanFordVertexIntervalls {
 
 		this._flow = flow;
 		_timeHorizon = Integer.MAX_VALUE;
-
-		_pathToRoute = new LinkedList<Link>();
 		_gamma = Integer.MAX_VALUE;
 		
-
-		/**
-		for (Node node : network.getNodes().values()) {
-			pred.put(node, null);
-			waited.put(node, 0);
-		}**/
 	}
 
 	/**
@@ -134,15 +168,7 @@ public class BellmanFordVertexIntervalls {
 
 		this._flow = flow;
 		this._timeHorizon = timeHorizon;
-
-		_pathToRoute = new LinkedList<Link>();
 		_gamma = Integer.MAX_VALUE;
-		/**
-		for (Node node : network.getNodes().values()) {
-			pred.put(node, null);
-			waited.put(node, 0);
-		}**/
-
 	}
 	
 	
@@ -154,10 +180,8 @@ public class BellmanFordVertexIntervalls {
 				nodes.add(node);
 				_labels.get(node).getIntervallAt(0).setDist(true);
 			}
-			
 		}
 		return nodes;
-		
 	}
 	
 	
@@ -166,12 +190,13 @@ public class BellmanFordVertexIntervalls {
 		return false;
 	}
 
-	private void augmentFlow(){
+	private void augmentFlow(ArrayList<Link> links){
 		// TODO Auto-generated method stub
 	}
 	
-	private void constructRoute(){
+	private ArrayList<Link> constructRoute(){
 		// TODO Auto-generated method stub
+		return null;
 	}
 	private void findGamma(){
 		// TODO Auto-generated method stub
@@ -209,8 +234,12 @@ public class BellmanFordVertexIntervalls {
 		return changed;
 		
 	}
-		
-		private boolean doCalculations() {
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean doCalculations() {
 		// outprints
 		/*
 		 * for (Link link : network.getLinks().values()) {
@@ -219,16 +248,15 @@ public class BellmanFordVertexIntervalls {
 		 * length.getLinkTravelCost(link, 0.)); }
 		 */
 
-		// set the start distances Dists of the vertices
-		//TODO implement init(fromNode);
-
+		
 		// queue to save nodes we have to scan
 		Queue<Node> queue = new LinkedList<Node>();
+		//set the startLabels and add active sources to to the queue
 		queue.addAll(refreshLabels());
 
 		// v is first vertex in the queue
-		// w is the vertex we probably want to insert to the queue or to
-		// decrease the distance
+		// w is the vertex we probably want to insert to the queue and 
+		// decrease its distance
 		Node v, w;
 		// dist is the distance from the source to w over v
 
@@ -238,6 +266,7 @@ public class BellmanFordVertexIntervalls {
 			v = queue.poll();
 
 			// visit neighbors
+			
 			// link is outgoing edge of v => forward edge
 			for (Link link : v.getOutLinks().values()) {
 				w=link.getToNode();
@@ -253,12 +282,9 @@ public class BellmanFordVertexIntervalls {
 				if (changed && !queue.contains(w)) {
 					queue.add(w);
 				}
-				
 			}
-
-		}
-		
-		return false; //TODO remove
+		}	
+		return false; //TODO whatever should be returned
 	}
 	
 
