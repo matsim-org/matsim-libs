@@ -6,7 +6,9 @@ evtl. zwei bugs (wrong times + wrong order => PriorityConcurrencyList müsste ja 
 machen)
 
 
-
+- test case: just start one executorThread => expected behaviour: the other exectorTrhead 
+  shouldn't be able to continue
+-   
 
 
 - man muss noch testen, ob deadlock prevention funktioniert

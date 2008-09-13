@@ -220,11 +220,32 @@ VERY IMPORTANT TODOS:
        		insbesondere das problem mit den events, das trat früher nicht auf.
        - performance testing wieder machen durch profilen 
        
+       -----
        evtl. memory leak (Entdeckt durch Marcel Rieser bei DES):
        "Hi Rashid. Die DES scheint noch irgendwo ein MemoryLeak zu haben. Der speicherverbrauch nimmt von Iteration zu Iteration massiv zu, ohne dass die Garbage Collection etwas ausrichten kann. Kann dir morgen mal meine Auswertungen zeigen, ist da ziemlich eindeutig"
           => static class/field leaks, because memory increases beween iterations. "GC overhead limit exceeded"
+       
+         => check if this is fixed
+       -----
+       
+       
           
-       -> replace "synchronized", with "ReentrantLock"
+       -> replace "synchronized", with "ReentrantLock" (nop...)
+       -----
+       JMM: Java Memory Model anschauen.
+       -----
+       How to get most speedup:
+          - use less synchronized
+          - contention?
+          - don't write immediatly to neighbouring thread, but only at predefined points in time
+            (genau überlegen, wie man rausfinden kann, dass der andere CPU am warten ist)
+            => analysieren, wie lange zone message freie runs in der queue sind. Bis dann müsste
+            man eigentlich gar kein empty buffer (synchronized) machen!!!!
+       -----
+       
+       
+       
+       
        
        
        
