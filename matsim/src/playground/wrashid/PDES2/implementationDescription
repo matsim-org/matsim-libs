@@ -241,6 +241,14 @@ VERY IMPORTANT TODOS:
             (genau überlegen, wie man rausfinden kann, dass der andere CPU am warten ist)
             => analysieren, wie lange zone message freie runs in der queue sind. Bis dann müsste
             man eigentlich gar kein empty buffer (synchronized) machen!!!!
+            => im moment, wenn man queue weiterverarbeiten kann, dann soll man den "run" messen
+            => immer am schluss eines solchen runs perform empty buffer
+            => but first make tests on the current variant.
+            => internal messages haben länge von ca. zu 2/3 länge 1-3 und 1/3 länge several thousand.
+               (unterschiedlich zwischen den zonen)
+            => evtl. zone Ids anschauen?
+            
+            
        -----
        
        
