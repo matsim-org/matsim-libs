@@ -23,7 +23,7 @@ public class SimulationParameters {
 													// diese wird auch skaliert mit dem flowCapacityFactor
 													// Attention: This is 1800 per lane!!!!
 	
-	public static ArrayList<EventLog> eventOutputLog=new ArrayList<EventLog>();
+	//public static ArrayList<EventLog> eventOutputLog=new ArrayList<EventLog>();
 	
 	public static final String START_LEG="start leg";
 	public static final String END_LEG="end leg";

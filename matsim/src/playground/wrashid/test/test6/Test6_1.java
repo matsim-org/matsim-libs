@@ -52,12 +52,12 @@ public class Test6_1 {
 		} 
 		
 		
-		ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
+		//ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
 		
 		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
 		
 		//EventLog.print(eventLog1);
 		
-		EventLog.compare(eventLog1,eventLog2);
+		//EventLog.compare(eventLog1,eventLog2);
 	}
 }
