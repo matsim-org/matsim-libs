@@ -23,13 +23,15 @@ package playground.yu.newPlan;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicPlan.Type;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
+import playground.yu.analysis.PlanModeJudger;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -46,8 +48,8 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan3(final Population plans) {
 		super(plans);
@@ -61,17 +63,18 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 		for (Plan pl : person.getPlans()) {
 			Leg firstLeg = (Leg) pl.getActsLegs().get(1);
 			String legMode = firstLeg.getMode();
-			pl.setType(NewAgentPtPlan2.getPlanType(legMode));
+			//pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
 
 			if (!legMode.equals("car")) {
 				if (person.getLicense().equals("yes")) {
 					Plan copyPlan = new Plan(person);
-					copyPlan.setType(Plan.Type.CAR);
+					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
+					// ??
 					copyPlans.add(copyPlan);
 				}
 			} else if (!legMode.equals("pt")) {
 				Plan copyPlan = new Plan(person);
-				copyPlan.setType(Plan.Type.PT);
+				// copyPlan.setType(Plan.Type.PT);//?????????????????????
 				copyPlans.add(copyPlan);
 			}
 
@@ -86,7 +89,9 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 						Leg leg = (Leg) o;
 						Leg copyLeg = new Leg(leg);
 						copyLeg.setRoute(null);
-						copyLeg.setMode(copyPlan.getType().toString());
+						copyLeg.setMode(
+						// copyPlan.getType().toString()
+								PlanModeJudger.getMode(copyPlan));
 						// -----------------------------------------------
 						// WITHOUT routeSetting!! traveltime of "pt" or
 						// "car"can be calculated automaticly!!
@@ -104,7 +109,9 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 		if (person.getLicense().equals("no")) {
 			List<Plan> plans = person.getPlans();
 			for (Plan pl : plans)
-				if (pl.getType().equals(Type.CAR))
+				if (
+				// pl.getType().equals(BasicLeg.CARMODE)
+				PlanModeJudger.getMode(pl).equals(BasicLeg.CARMODE))
 					plans.remove(pl);
 		}
 

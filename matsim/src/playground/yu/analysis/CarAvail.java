@@ -83,28 +83,44 @@ public class CarAvail extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		String carAvail = person.getCarAvail();
+		PlanModeJudger pmj = new PlanModeJudger();
 		if (carAvail != null) {
-			Plan.Type planType = person.getSelectedPlan().getType();
-			if (planType != null && planType != Plan.Type.UNDEFINED)
-				if (carAvail.equals("never")) {
-					never_hasCar++;
-					if (planType == Plan.Type.CAR)
-						never_but_car_plan++;
-					else if (planType.equals(Plan.Type.PT))
-						never_but_pt_plan++;
-				} else if (carAvail.equals("always")) {
-					always_hasCar++;
-					if (planType.equals(Plan.Type.PT))
-						always_but_pt_plan++;
-					else if (planType.equals(Plan.Type.CAR))
-						always_but_car_plan++;
-				} else if (carAvail.equals("sometimes")) {
-					sometimes_hasCar++;
-					if (planType.equals(Plan.Type.PT))
-						sometimes_but_pt_plan++;
-					else if (planType.equals(Plan.Type.CAR))
-						sometimes_but_car_plan++;
-				}
+			Plan selectedPlan = person.getSelectedPlan();
+			// Plan.Type planType = person.getSelectedPlan().getType();
+			// if (planType != null && planType != Plan.Type.UNDEFINED)
+
+			boolean useCar = new PlanModeJudger().useCar(selectedPlan);
+			if (carAvail.equals("never")) {
+				never_hasCar++;
+				if (
+				// planTyp == Plan.Type.CAR
+				PlanModeJudger.useCar(selectedPlan))
+					never_but_car_plan++;
+				else if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan))
+					never_but_pt_plan++;
+			} else if (carAvail.equals("always")) {
+				always_hasCar++;
+				if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan))
+					always_but_pt_plan++;
+				else if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedPlan))
+					always_but_car_plan++;
+			} else if (carAvail.equals("sometimes")) {
+				sometimes_hasCar++;
+				if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan))
+					sometimes_but_pt_plan++;
+				else if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedPlan))
+					sometimes_but_car_plan++;
+			}
 		}
 	}
 

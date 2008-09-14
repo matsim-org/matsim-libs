@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -18,9 +17,11 @@ import org.matsim.population.PopulationReader;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 
+import playground.yu.analysis.PlanModeJudger;
+
 /**
- * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>,
- * only some small changes were taken.
+ * it is a copy of <class>org.matsim.run.CompareSelectedPlansTable</class>, only
+ * some small changes were taken.
  * 
  */
 public class CompareSelectedPlansTable {
@@ -141,13 +142,16 @@ public class CompareSelectedPlansTable {
 				out.write(d1 + ";");
 				out.write(Double.toString(d1 - d0) + ";");
 
-				Type type0 = person.getSelectedPlan().getType();
-				String tp0 = ((type0.equals(Type.CAR) || type0.equals(Type.PT)) ? type0
-						: "-").toString();
+				String mode0 = PlanModeJudger.getMode(person.getSelectedPlan());
+				String tp0 = ((PlanModeJudger.useCar(person.getSelectedPlan()) || PlanModeJudger
+						.usePt(person.getSelectedPlan())) ? mode0 : "-")
+						.toString();
 				out.write(tp0 + ";");
-				Type type1 = person_comp.getSelectedPlan().getType();
-				String tp1 = ((type1.equals(Type.CAR) || type1.equals(Type.PT)) ? type1
-						: "-").toString();
+				String mode1 = PlanModeJudger.getMode(person_comp
+						.getSelectedPlan());
+				String tp1 = ((PlanModeJudger.useCar(person_comp
+						.getSelectedPlan()) || PlanModeJudger.usePt(person_comp
+						.getSelectedPlan())) ? mode1 : "-").toString();
 				out.write(tp1 + ";");
 				out.write(tp0 + "->" + tp1 + ";");
 
@@ -224,7 +228,7 @@ public class CompareSelectedPlansTable {
 		return numberOfLegs;
 	}
 
-	// --------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
 
 	private void run(String plansfilePath0, String plansfilePath1,
 			String outfile, String networkPath) {

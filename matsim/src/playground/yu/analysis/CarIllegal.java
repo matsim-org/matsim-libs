@@ -39,7 +39,8 @@ import org.matsim.world.World;
  */
 public class CarIllegal extends AbstractPersonAlgorithm {
 	private int count = 0;
-	private Plan.Type planType = null;
+
+	// private Plan.Type planType = null;
 
 	/**
 	 */
@@ -49,8 +50,10 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		if (person != null) {
-			planType = person.getSelectedPlan().getType();
-			if (!(planType != null && planType != Plan.Type.CAR))
+			Plan selectedPlan = person.getSelectedPlan();
+			if (
+			// planType != null && planType != Plan.Type.CAR
+			PlanModeJudger.useCar(selectedPlan))
 				if (person.getAge() < 18 || person.getLicense().equals("no"))
 					count++;
 		}

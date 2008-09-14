@@ -89,17 +89,23 @@ public class SameActLocTest {
 			if (person != null) {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
-					Plan.Type planType = p.getType();
+					// Plan.Type planType = p.getType();
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
 						nextTmpLinkId = ai.next().getLink().getId().toString();
 						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (tmpLinkId.equals(nextTmpLinkId)) {
 								actLocCount++;
-								if (planType != null
-										&& Plan.Type.UNDEFINED != planType)
-									if (planType.equals(Plan.Type.CAR))
+								if (
+								// planType != null
+								// && Plan.Type.UNDEFINED != planType
+								!PlanModeJudger.useUndefined(p))
+									if (
+									// planType.equals(Plan.Type.CAR)
+									PlanModeJudger.useCar(p))
 										carActLocCount++;
-									else if (planType.equals(Plan.Type.PT))
+									else if (
+									// planType.equals(Plan.Type.PT)
+									PlanModeJudger.usePt(p))
 										ptActLocCount++;
 								actsAtSameLink = true;
 								try {

@@ -22,6 +22,7 @@ package playground.yu.newPlan;
 
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -33,6 +34,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.world.World;
+
+import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
@@ -54,34 +57,42 @@ public class ModeChoicePlan extends NewPlan {
 		person.getPlans().clear();
 		person.addPlan(sp);
 
-		Plan.Type t = sp.getType();
+		// Plan.Type t = sp.getType();
 		Plan cp = new Plan(person);
 		List actsLegs = sp.getActsLegs();
 
-		if (t.equals(Plan.Type.CAR)) {
+		if (
+		// t.equals(Plan.Type.CAR)
+		PlanModeJudger.useCar(sp)) {
 			addNewPlan = true;
-			cp.setType(Plan.Type.PT);
+			// cp.setType(Plan.Type.PT);//?????????????????????????????????????
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
 					cp.addAct((Act) o);
 				} else {
 					Leg cl = new Leg((Leg) o);
-					cl.setMode("pt");
+					cl.setMode(
+					// "pt"
+							BasicLeg.PTMODE);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}
 			}
-		} else if (t.equals(Plan.Type.PT)) {
+		} else if (
+		// t.equals(Plan.Type.PT)
+		PlanModeJudger.usePt(sp)) {
 			addNewPlan = true;
-			cp.setType(Plan.Type.CAR);
+			// cp.setType(Plan.Type.CAR);
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
 				if (i % 2 == 0) {
 					cp.addAct((Act) o);
 				} else {
 					Leg cl = new Leg((Leg) o);
-					cl.setMode("car");
+					cl.setMode(
+					// "car"
+							BasicLeg.CARMODE);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}

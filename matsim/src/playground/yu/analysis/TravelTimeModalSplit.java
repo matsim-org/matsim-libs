@@ -28,9 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -59,10 +59,10 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 	private final int[] arrCount, carArrCount, ptArrCount;
 
 	/**
-	 * @param arg0 -
-	 *            String agentId
-	 * @param arg1 -
-	 *            Double departure time
+	 * @param arg0
+	 *            - String agentId
+	 * @param arg1
+	 *            - Double departure time
 	 */
 	private final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
@@ -87,7 +87,8 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
-	public TravelTimeModalSplit(final NetworkLayer network, final Population plans) {
+	public TravelTimeModalSplit(final NetworkLayer network,
+			final Population plans) {
 		this(300, network, plans);
 	}
 
@@ -123,12 +124,19 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 				ae.agent = this.plans.getPerson(ae.agentId);
 			}
 
-			Plan.Type planType = ae.agent.getSelectedPlan().getType();
-			if (planType != null && Plan.Type.UNDEFINED != planType) {
-				if (planType.equals(Plan.Type.CAR)) {
+			// Plan.Type planType = ae.agent.getSelectedPlan().getType();
+			Plan selectedplan = ae.agent.getSelectedPlan();
+			if (
+			// planType != null && Plan.Type.UNDEFINED != planType
+			!PlanModeJudger.useUndefined(selectedplan)) {
+				if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedplan)) {
 					carTravelTimes[binIdx] += travelTime;
 					carArrCount[binIdx]++;
-				} else if (planType.equals(Plan.Type.PT)) {
+				} else if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedplan)) {
 					ptTravelTimes[binIdx] += travelTime;
 					ptArrCount[binIdx]++;
 				}

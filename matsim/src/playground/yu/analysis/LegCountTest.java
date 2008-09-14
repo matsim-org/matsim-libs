@@ -103,11 +103,15 @@ public class LegCountTest {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				Plan.Type planType = p.getType();
-				if (planType != null && Plan.Type.UNDEFINED != planType) {
-					if (planType.equals(Plan.Type.CAR))
+				// Plan.Type planType = p.getType();
+				if (
+				// planType != null && Plan.Type.UNDEFINED != planType
+				!PlanModeJudger.useUndefined(p)) {
+					if (// planType.equals(Plan.Type.CAR)
+					PlanModeJudger.useCar(p))
 						carAppend(nLegs);
-					else if (planType.equals(Plan.Type.PT)) {
+					else if (// planType.equals(Plan.Type.PT)
+					PlanModeJudger.usePt(p)) {
 						ptUserCount++;
 						ptLegCount += nLegs;
 					}

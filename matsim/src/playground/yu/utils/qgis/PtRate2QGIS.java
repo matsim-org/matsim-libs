@@ -34,6 +34,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.yu.analysis.PlanModeJudger;
+
 /**
  * @author ychen
  * 
@@ -66,7 +68,7 @@ public class PtRate2QGIS implements X2QGIS {
 				if (a == null)
 					a = Integer.valueOf(0);
 				agents.put(linkId, Integer.valueOf(a.intValue() + 1));
-				if (plan.getType().equals(Plan.Type.PT)) {
+				if (PlanModeJudger.usePt(plan)) {
 					Integer p = ptUsers.get(linkId);
 					if (p == null)
 						p = Integer.valueOf(0);
@@ -116,19 +118,20 @@ public class PtRate2QGIS implements X2QGIS {
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		/*
 		 * ///////////////////////////////////////////////////////////////
-		 * pt-rate and MATSim-network to Shp-file // *
+		 * pt-rate and MATSim-network to Shp-file //
 		 * ///////////////////////////////////////////////////////////////
 		 */
 		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml");
 		// mn2q.setCrs(ch1903);
 		// LinkPtRate lpr = new LinkPtRate();
-		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		//mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
 		// lpr);
 		// mn2q.addParameter("PtRate", Double.class, lpr.getPtRate());
 		// mn2q.addParameter("PtUsers", Integer.class, lpr.getPtUsers());
 		// mn2q.addParameter("Persons", Integer.class, lpr.getAgents());
 		// mn2q
-		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.ptRate.shp");
+		// .writeShapeFile(
+		// "/net/ils/run466/output/ITERS/it.500/466.500.ptRate.shp");
 		/*
 		 * //
 		 * ////////////////////////////////////////////////////////////////////

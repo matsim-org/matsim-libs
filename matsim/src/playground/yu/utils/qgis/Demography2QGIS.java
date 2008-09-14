@@ -40,9 +40,12 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.io.IOUtils;
 
+import playground.yu.analysis.PlanModeJudger;
+
 /**
- * this class quote codes from <class>org.matsim.run.CompareSelectedPlansTable</class>
- * offered a simplified function
+ * this class quote codes from
+ * <class>org.matsim.run.CompareSelectedPlansTable</class> offered a simplified
+ * function
  * 
  * @author ychen
  * 
@@ -118,8 +121,8 @@ public class Demography2QGIS {
 					out.write("-;-;-;");
 				}
 
-				out.write(sp.getType().toString() + ";" + sp.getScore() + ";"
-						+ fa.getEndTime() + ";");
+				out.write(PlanModeJudger.getMode(sp) + ";" + sp.getScore()
+						+ ";" + fa.getEndTime() + ";");
 				out.write(getTravelTime(person) + ";");
 				out.write(getTravelDist(person) + ";");
 				out.write(getNumberOfTrips(person));
@@ -172,7 +175,7 @@ public class Demography2QGIS {
 		return numberOfLegs;
 	}
 
-	// --------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
 
 	private void run(String networkPath, String plansfilePath, String outfile) {
 		this.init(networkPath);

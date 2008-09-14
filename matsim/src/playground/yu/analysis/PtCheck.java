@@ -53,8 +53,8 @@ public class PtCheck extends AbstractPersonAlgorithm {
 
 	// -----------------------CONSTRUCTOR--------------------------------
 	/**
-	 * @param fileName -
-	 *            the filename of the .txt-file, in which the public transit
+	 * @param fileName
+	 *            - the filename of the .txt-file, in which the public transit
 	 *            user amount and fraction will be saved.
 	 * @throws IOException
 	 */
@@ -77,11 +77,18 @@ public class PtCheck extends AbstractPersonAlgorithm {
 	@Override
 	public void run(Person person) {
 		this.personCnt++;
-		Plan.Type planType = person.getSelectedPlan().getType();
-		if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
-			if (planType.equals(Plan.Type.PT)) {
+		// Plan.Type planType = person.getSelectedPlan().getType();
+		Plan selectedPlan = person.getSelectedPlan();
+		if (
+		// (planType != null) && (Plan.Type.UNDEFINED != planType)
+		!PlanModeJudger.useUndefined(selectedPlan)) {
+			if (
+			// planType.equals(Plan.Type.PT)
+			PlanModeJudger.usePt(selectedPlan)) {
 				this.ptUserCnt++;
-			} else if (planType.equals(Plan.Type.CAR)) {
+			} else if (
+			// planType.equals(Plan.Type.CAR)
+			PlanModeJudger.useCar(selectedPlan)) {
 				this.carUserCnt++;
 			}
 		}
@@ -119,8 +126,8 @@ public class PtCheck extends AbstractPersonAlgorithm {
 	}
 
 	/**
-	 * @param ptUserCnt -
-	 *            The ptUserCnt to set.
+	 * @param ptUserCnt
+	 *            - The ptUserCnt to set.
 	 */
 	public void setPtUserCnt(int ptUserCnt) {
 		this.ptUserCnt = ptUserCnt;
@@ -129,8 +136,8 @@ public class PtCheck extends AbstractPersonAlgorithm {
 	/**
 	 * writes public transit user amount and fraction into .txt-file.
 	 * 
-	 * @param Iter -
-	 *            number of iteration
+	 * @param Iter
+	 *            - number of iteration
 	 * @throws IOException
 	 */
 	public void write(int Iter) throws IOException {

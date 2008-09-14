@@ -32,12 +32,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import playground.yu.analysis.PlanModeJudger;
 
 /**
  * @author yu
@@ -79,7 +80,9 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 		int ivCnt = 0;
 		int oevCnt = 0;
 		for (Plan pl : person.getPlans())
-			if (pl.getType().equals(Type.CAR))
+			if (
+			// pl.getType().equals(Type.CAR)
+			PlanModeJudger.useCar(pl))
 				ivCnt++;
 			else
 				oevCnt++;
@@ -113,8 +116,8 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 				text.append(r.getDist() + "\t" + r.getTravTime() + "\t");
 			}
 			try {
-				out.writeBytes(person.getId().toString() + "\t" + pl.getType()
-						+ text + "\n");
+				out.writeBytes(person.getId().toString() + "\t"
+						+ PlanModeJudger.getMode(pl) + text + "\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.basic.v01.BasicPlan.Type;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
@@ -58,14 +57,15 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 
 	private int arrCount, carArrCount, ptArrCount, otherArrCount;
 	/**
-	 * @param arg0 -
-	 *            String agentId
-	 * @param arg1 -
-	 *            Double departure time
+	 * @param arg0
+	 *            - String agentId
+	 * @param arg1
+	 *            - Double departure time
 	 */
 	private final HashMap<String, Double> tmpDptTimes = new HashMap<String, Double>();
 
-	public TripDurationHandler(final NetworkLayer network, final Population plans) {
+	public TripDurationHandler(final NetworkLayer network,
+			final Population plans) {
 		this.network = network;
 		this.plans = plans;
 	}
@@ -89,12 +89,19 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 				event.agent = this.plans.getPerson(event.agentId);
 			}
 
-			Type planType = event.agent.getSelectedPlan().getType();
-			if (planType != null && Plan.Type.UNDEFINED != planType) {
-				if (planType.equals(Plan.Type.CAR)) {
+			// Type planType = event.agent.getSelectedPlan().getType();d
+			Plan selectedPlan = event.agent.getSelectedPlan();
+			if (
+			// planType != null && Plan.Type.UNDEFINED != planType
+			!PlanModeJudger.useUndefined(selectedPlan)) {
+				if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedPlan)) {
 					carTravelTimes += travelTime;
 					carArrCount++;
-				} else if (planType.equals(Plan.Type.PT)) {
+				} else if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan)) {
 					ptTravelTimes += travelTime;
 					ptArrCount++;
 				}

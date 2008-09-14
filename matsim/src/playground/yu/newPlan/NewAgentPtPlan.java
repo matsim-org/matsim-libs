@@ -23,6 +23,7 @@ package playground.yu.newPlan;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -42,8 +43,8 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan(final Population plans) {
 		super(plans);
@@ -54,10 +55,10 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 		List<Plan> copyPlans = new ArrayList<Plan>();
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
-			pl.setType(Plan.Type.CAR);
+			// pl.setType(Plan.Type.CAR);//???????????????????
 
 			Plan copyPlan = new Plan(person);
-			copyPlan.setType(Plan.Type.PT);
+			// copyPlan.setType(Plan.Type.PT);//???????????????????
 
 			List actsLegs = pl.getActsLegs();
 			for (int i = 0; i < actsLegs.size(); i++) {
@@ -67,16 +68,16 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 				} else {
 					Leg leg = (Leg) o;
 					Leg copyLeg = new Leg(leg);
-					copyLeg.setMode("pt");
+					copyLeg.setMode(BasicLeg.PTMODE);
 					copyLeg.setRoute(null);
 					// -----------------------------------------------
 					// WITHOUT routeSetting!! traveltime of PT can be calculated
 					// automaticly!!
 					// -----------------------------------------------
 					copyPlan.addLeg(copyLeg);
-					if (!leg.getMode().equals("car")) {
+					if (!leg.getMode().equals(BasicLeg.CARMODE)) {
 						leg.setRoute(null);
-						leg.setMode("car");
+						leg.setMode(BasicLeg.CARMODE);
 					}
 				}
 			}

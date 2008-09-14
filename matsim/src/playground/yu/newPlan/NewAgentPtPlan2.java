@@ -40,16 +40,18 @@ import org.matsim.population.Population;
  */
 public class NewAgentPtPlan2 extends NewPlan {
 	private List<Plan> copyPlans = new ArrayList<Plan>();
+	private List<String> copyPlansModes = new ArrayList<String>();
 
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentPtPlan2(final Population plans) {
 		super(plans);
 		this.copyPlans.clear();
+		this.copyPlansModes.clear();
 	}
 
 	@Override
@@ -59,21 +61,26 @@ public class NewAgentPtPlan2 extends NewPlan {
 			for (Plan pl : person.getPlans()) {
 				Leg firstLeg = (Leg) pl.getActsLegs().get(1);
 				String legMode = firstLeg.getMode();
-				pl.setType(getPlanType(legMode));
+				// pl.setType(getPlanType(legMode));//????????????
 
-				if (!legMode.equals("car")) {
+				if (!legMode.equals(BasicLeg.CARMODE)) {
 					Plan copyPlan = new Plan(person);
-					copyPlan.setType(Plan.Type.CAR);
+					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
+					this.copyPlansModes.add(BasicLeg.CARMODE);
 				} else if (!legMode.equals("pt")) {
 					Plan copyPlan = new Plan(person);
-					copyPlan.setType(Plan.Type.PT);
+					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
+					this.copyPlansModes.add(BasicLeg.PTMODE);
 				}
 
 				List actsLegs = pl.getActsLegs();
 				int actsLegsSize = actsLegs.size();
-				for (Plan copyPlan : this.copyPlans) {
+				for (
+				// Plan copyPlan : this.copyPlans
+				int j = 0; j > this.copyPlans.size(); j++) {
+					Plan copyPlan = copyPlans.get(j);
 					for (int i = 0; i < actsLegsSize; i++) {
 						Object o = actsLegs.get(i);
 						if (i % 2 == 0) {
@@ -82,10 +89,11 @@ public class NewAgentPtPlan2 extends NewPlan {
 							Leg leg = (Leg) o;
 							Leg copyLeg = new Leg(leg);
 							copyLeg.setRoute(null);
-							copyLeg.setMode(copyPlan.getType().toString());
+							copyLeg.setMode(this.copyPlansModes.get(j));
 							// -----------------------------------------------
-							// WITHOUT routeSetting!! traveltime of "pt" or
-							// "car"can be calculated automaticly!!
+							// WITHOUT routeSetting!! traveltime of
+							// BasicLeg.PTMODE or
+							// BasicLeg.CARMODE can be calculated automaticly!!
 							// -----------------------------------------------
 							copyPlan.addLeg(copyLeg);
 						}
@@ -99,26 +107,25 @@ public class NewAgentPtPlan2 extends NewPlan {
 		}
 		this.pw.writePerson(person);
 	}
-
-	static Plan.Type getPlanType(String mode) {
-		if (BasicLeg.MIVMODE.equalsIgnoreCase(mode))
-			return Plan.Type.CAR;
-		else if (BasicLeg.CARMODE.equalsIgnoreCase(mode))
-			return Plan.Type.CAR;
-		else if (BasicLeg.RIDEMODE.equalsIgnoreCase(mode))
-			return Plan.Type.UNDEFINED;
-		else if (BasicLeg.MOTORBIKEMODE.equalsIgnoreCase(mode))
-			return Plan.Type.UNDEFINED;
-		else if (BasicLeg.PTMODE.equalsIgnoreCase(mode))
-			return Plan.Type.PT;
-		else if (BasicLeg.TRAINMODE.equalsIgnoreCase(mode))
-			return Plan.Type.UNDEFINED;
-		else if (BasicLeg.BIKEMODE.equalsIgnoreCase(mode))
-			return Plan.Type.BIKE;
-		else if (BasicLeg.WALKMODE.equalsIgnoreCase(mode))
-			return Plan.Type.WALK;
-		else {
-			return Plan.Type.UNDEFINED;
-		}
-	}
+	// static Plan.Type getPlanType(String mode) {
+	// if (BasicLeg.MIVMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.CAR;
+	// else if (BasicLeg.CARMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.CAR;
+	// else if (BasicLeg.RIDEMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.UNDEFINED;
+	// else if (BasicLeg.MOTORBIKEMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.UNDEFINED;
+	// else if (BasicLeg.PTMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.PT;
+	// else if (BasicLeg.TRAINMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.UNDEFINED;
+	// else if (BasicLeg.BIKEMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.BIKE;
+	// else if (BasicLeg.WALKMODE.equalsIgnoreCase(mode))
+	// return Plan.Type.WALK;
+	// else {
+	// return Plan.Type.UNDEFINED;
+	// }
+	// }
 }

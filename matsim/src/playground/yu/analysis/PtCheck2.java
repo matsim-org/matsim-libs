@@ -30,9 +30,9 @@ import org.matsim.utils.io.IOUtils;
 
 /**
  * outputs the amount of public transit user or its fraction into .txt-files
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class PtCheck2 extends AbstractPersonAlgorithm {
 	// ----------------------MEMBER VARIABLES----------------------------
@@ -46,23 +46,23 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 	private int licensedCarUserCnt;
 
 	/**
-	 * @param licensedPtUserCnt -
-	 *            Counter of all persons, who use public transport
+	 * @param licensedPtUserCnt
+	 *            - Counter of all persons, who use public transport
 	 */
 	private int licensedPtUserCnt;
 
 	private int licensedOtherModalCnt;
 
 	/**
-	 * @param out -
-	 *            internal outputStream
+	 * @param out
+	 *            - internal outputStream
 	 */
 	private BufferedWriter out;
 
 	// -----------------------CONSTRUCTOR--------------------------------
 	/**
-	 * @param fileName -
-	 *            the filename of the .txt-file, in which the public transit
+	 * @param fileName
+	 *            - the filename of the .txt-file, in which the public transit
 	 *            user amount and fraction will be saved.
 	 * @throws IOException
 	 */
@@ -84,11 +84,18 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 		this.personCnt++;
 		if (person.getLicense().equals("yes")) {
 			this.licensedCnt++;
-			Plan.Type planType = person.getSelectedPlan().getType();
-			if ((planType != null) && (Plan.Type.UNDEFINED != planType)) {
-				if (planType.equals(Plan.Type.PT)) {
+			// Plan.Type planType = person.getSelectedPlan().getType();
+			Plan selectedPlan = person.getSelectedPlan();
+			if (
+			// (planType != null) && (Plan.Type.UNDEFINED != planType)
+			!PlanModeJudger.useUndefined(selectedPlan)) {
+				if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan)) {
 					this.licensedPtUserCnt++;
-				} else if (planType.equals(Plan.Type.CAR)) {
+				} else if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedPlan)) {
 					this.licensedCarUserCnt++;
 				} else {
 					this.licensedOtherModalCnt++;
@@ -114,7 +121,8 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 
 	public double getLicensedOtherModalRate() {
 		if (this.licensedCnt > 0)
-			return (double) this.licensedOtherModalCnt / (double) this.licensedCnt;
+			return (double) this.licensedOtherModalCnt
+					/ (double) this.licensedCnt;
 		System.err.println("there is no persons licensed gecheckt!!");
 		return -1.0;
 	}
@@ -150,8 +158,8 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 	}
 
 	/**
-	 * @param ptUserCnt -
-	 *            The ptUserCnt to set.
+	 * @param ptUserCnt
+	 *            - The ptUserCnt to set.
 	 */
 	public void setLicensedPtUserCnt(int ptUserCnt) {
 		this.licensedPtUserCnt = ptUserCnt;
@@ -159,17 +167,17 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 
 	/**
 	 * writes public transit user amount and fraction into .txt-file.
-	 *
-	 * @param Iter -
-	 *            number of iteration
+	 * 
+	 * @param Iter
+	 *            - number of iteration
 	 * @throws IOException
 	 */
 	public void write(int Iter) throws IOException {
-		this.out.write(Iter + "\t" + this.personCnt + "\t" + this.licensedCnt + "\t"
-				+ this.licensedPtUserCnt + "\t" + getLicensedPtRate() + "\t"
-				+ this.licensedCarUserCnt + "\t" + getLicensedCarRate() + "\t"
-				+ this.licensedOtherModalCnt + "\t" + getLicensedOtherModalRate()
-				+ "\n");
+		this.out.write(Iter + "\t" + this.personCnt + "\t" + this.licensedCnt
+				+ "\t" + this.licensedPtUserCnt + "\t" + getLicensedPtRate()
+				+ "\t" + this.licensedCarUserCnt + "\t" + getLicensedCarRate()
+				+ "\t" + this.licensedOtherModalCnt + "\t"
+				+ getLicensedOtherModalRate() + "\n");
 		this.out.flush();
 	}
 

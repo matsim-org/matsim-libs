@@ -22,6 +22,7 @@ package playground.yu.newPlan;
 
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -41,8 +42,8 @@ public class NewAgentCarPlan extends NewPlan {
 	/**
 	 * Constructor, writes file-head
 	 * 
-	 * @param plans -
-	 *            a Plans Object, which derives from MATSim plansfile
+	 * @param plans
+	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
 	public NewAgentCarPlan(Population plans) {
 		super(plans);
@@ -59,7 +60,7 @@ public class NewAgentCarPlan extends NewPlan {
 					if (i % 2 != 0) {
 						if (((Leg) o).getMode().equals("car")) {
 							this.haveCar = true;
-							pl.setType(Plan.Type.CAR);
+							// pl.setType(Plan.Type.CAR);
 							break a;
 						}
 					}
@@ -69,7 +70,7 @@ public class NewAgentCarPlan extends NewPlan {
 				for (int j = 0; j < actsLegs.size(); j++) {
 					Object o = actsLegs.get(j);
 					if (j % 2 != 0) {
-						((Leg) o).setMode("car");
+						((Leg) o).setMode(BasicLeg.CARMODE);
 					}
 				}
 			}

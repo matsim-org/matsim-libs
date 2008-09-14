@@ -35,9 +35,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
@@ -52,8 +52,8 @@ import org.matsim.utils.misc.Time;
 /**
  * @author mrieser
  * 
- * Counts the number of vehicles departed, arrived or got stuck per time bin
- * based on events.
+ *         Counts the number of vehicles departed, arrived or got stuck per time
+ *         bin based on events.
  */
 public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
@@ -143,13 +143,18 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 			// rebuild event
 			ae.agent = this.plans.getPerson(ae.agentId);
 		}
-		
-		Plan.Type planType = ae.agent.getSelectedPlan().getType();
+
+		// Plan.Type planType = ae.agent.getSelectedPlan().getType();
+		Plan selectedPlan = ae.agent.getSelectedPlan();
 		if (Integer.parseInt(ae.agentId) > 1000000000)
 			otherCount[binIdx]++;
-		if (planType.equals(Plan.Type.CAR)) {
+		if (
+		// planType.equals(Plan.Type.CAR)
+		PlanModeJudger.useCar(selectedPlan)) {
 			carCount[binIdx]++;
-		} else if (planType.equals(Plan.Type.PT)) {
+		} else if (
+		// planType.equals(Plan.Type.PT)
+		PlanModeJudger.usePt(selectedPlan)) {
 			if (ptCount != null)
 				ptCount[binIdx]++;
 		}
