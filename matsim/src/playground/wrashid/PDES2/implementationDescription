@@ -248,7 +248,19 @@ VERY IMPORTANT TODOS:
                (unterschiedlich zwischen den zonen)
             => evtl. zone Ids anschauen?
             
-            
+            => ausprobieren wie kleines scenario behavt mit zonen (test schreiben)
+             (werden die richtige anzahl messages geschickt, sind sie auf infinite gestellt)
+             => assertions + tests
+             => test möglichst allgemein machen und nicht abhängig von einem bestimmten
+                test case.
+             =>    
+              
+             
+             
+       - write, that we are implementing a LP, with several input and outputs, which is not
+         usually done for parallel simulation.
+         
+              
        -----
        
        
