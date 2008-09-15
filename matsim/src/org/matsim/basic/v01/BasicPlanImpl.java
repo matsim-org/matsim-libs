@@ -177,4 +177,11 @@ public class BasicPlanImpl implements BasicPlan {
 		this.actsLegs.add(act);
 	}
 
+	public boolean containsActivity( String activityType ){
+		ActIterator planit = getIteratorAct();		
+		while( planit.hasNext())	
+			if( planit.next().getType().equals(activityType) )
+				return true;
+		return false;
+	}
 }
