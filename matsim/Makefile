@@ -25,6 +25,7 @@ LIBS := $(LIBS):libs/jung-1.7.6.jar
 LIBS := $(LIBS):libs/log4j-1.2.15.jar
 LIBS := $(LIBS):libs/commons-math-1.2/commons-math-1.2.jar
 LIBS := $(LIBS):libs/trove-2.0.3/lib/trove-2.0.3.jar
+LIBS := $(LIBS):libs/jama-1.0.2.jar
 
 LIBS := $(LIBS):libs/jaxb-2.1.7/lib/activation.jar
 LIBS := $(LIBS):libs/jaxb-2.1.7/lib/jaxb-api.jar
