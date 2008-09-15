@@ -54,6 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.snapshots.postprocessor.processors.DestinationDependentColorizer;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
@@ -165,17 +166,22 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		this.features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Point",Point.class, true, null, null, this.crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID", Integer.class);
-		AttributeType strId = AttributeTypeFactory.newAttributeType("nodeID", String.class);
+		AttributeType strId = AttributeTypeFactory.newAttributeType("sign", String.class);
 		AttributeType count = AttributeTypeFactory.newAttributeType("count", Integer.class);
+		AttributeType angle1 = AttributeTypeFactory.newAttributeType("angle1", Double.class);
+		AttributeType angle2 = AttributeTypeFactory.newAttributeType("angle2", Double.class);
+		AttributeType angle3 = AttributeTypeFactory.newAttributeType("angle3", Double.class);
 //		AttributeType shortest = AttributeTypeFactory.newAttributeType("shortest", Integer.class);
 //		AttributeType current = AttributeTypeFactory.newAttributeType("current", Integer.class);
 //		AttributeType deviance = AttributeTypeFactory.newAttributeType("diffsc", Integer.class);
-		this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,strId,count}, "plansShape");
+		this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] {geom, id,strId,count, angle1, angle2, angle3}, "plansShape");
 	}
 
 
 	public void run() {
 
+		Coordinate superSink = MGC.coord2Coordinate(this.network.getNode("en1").getCoord());
+		
 		Events events = new Events();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
@@ -183,10 +189,32 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 		new EventsReaderTXTv1(events).readFile(this.eventsfile);
 
 		for (String key : this.dests.keySet()) {
+			
+			
+			String eId = "el" + ddc.getColor(key);
+			Link link = this.network.getLink(eId);
+			
+			if (link == null) {
+				continue;
+			}
+			
+			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
+			
 			String c = getColor(ddc.getColor(key));
 			Point p = this.dests.get(key);
+			
+			
+			double dy1 = from.y - superSink.y;
+			double dist1 = superSink.distance(from);
+			double angle1 = 360 * Math.asin(dy1/dist1)/ (2*Math.PI) ;
+			
+			double dy2 = p.getY() - from.y;
+			double dist2 = from.distance(p.getCoordinate());
+			double angle2 = 360 * Math.asin(dy2/dist2)/ (2*Math.PI) + 90 ;
+			double angle3 = 360 * Math.asin(dy2/dist2)/ (2*Math.PI);
+			
 			try {
-				this.features.add(this.ft.create(new Object [] {p,Integer.parseInt(c),c,0}));
+				this.features.add(this.ft.create(new Object [] {p,Integer.parseInt(c),"-->",0, angle1, angle2, angle3}));
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -238,7 +266,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	public static void main(final String [] args) throws FactoryException {
 //		String district_shape_file;
 
-		final String shapefile = "./padang/region.shp";
+		final String shapefile = "../inputs/padang/region.shp";
 
 		if (args.length != 1) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
