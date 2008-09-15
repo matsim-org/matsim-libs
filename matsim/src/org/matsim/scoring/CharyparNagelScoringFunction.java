@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -174,18 +174,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
-	public final static String CONFIG_MODULE = "planCalcScore";
-
-	public final static String CONFIG_WAITING = "waiting";
-	public final static String CONFIG_LATE_ARRIVAL = "lateArrival";
-	public final static String CONFIG_EARLY_DEPARTURE = "earlyDeparture";
-	public final static String CONFIG_TRAVELING = "traveling";
-	public final static String CONFIG_TRAVELING_PT = "travelingPT";
-	public final static String CONFIG_PERFORMING = "performing";
-	public final static String CONFIG_LEARNINGRATE = "learningRate";
-	public final static String CONFIG_DISTANCE_COST = "distanceCost";
-
-	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	private static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
 	private static double marginalUtilityOfWaiting = Double.NaN;
 	private static double marginalUtilityOfLateArrival = Double.NaN;
 	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
@@ -324,7 +313,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(Act act) {
+	protected double[] getOpeningInterval(final Act act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
