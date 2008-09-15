@@ -15,9 +15,9 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
 
 
 public class CompareTimeWindows {
-	
+
 	final private static Logger log = Logger.getLogger(CompareTimeWindows.class);
-	
+
 	/**
 	 * Calculates a set of statistics about the face to face interactions
 	 * at a social event and maps them to the act in the plan
@@ -33,6 +33,7 @@ public class CompareTimeWindows {
 	public static Hashtable<Act,ArrayList<Double>> calculateTimeWindowEventActStats(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap) {
 
 		Hashtable<Act,ArrayList<Double>> actStats = new Hashtable<Act,ArrayList<Double>>();
+		int count=0;
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
@@ -45,7 +46,7 @@ public class CompareTimeWindows {
 			TimeWindow tw2 = null;
 			Person p1 = null;
 			Person p2 = null;
-			
+
 			Facility myFacility=(Facility) fit.next();
 			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacility);
 			if(!timeWindowMap.keySet().contains(myFacility)){
@@ -56,52 +57,50 @@ public class CompareTimeWindows {
 			}
 			// Go through the visits
 			for(int i=0; i<visits.size();i++){
-				for(int j=i;j<visits.size();j++){
-				p1 = visits.get(i).person;
-				p2 = visits.get(j).person;
 				tw1 = visits.get(i);
-				tw2 = visits.get(j);
-				if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2) && !p1.equals(p2)){
-					EgoNet net = p1.getKnowledge().getEgoNet();
-					if(net.getAlters().contains(p2)){
-						friend++;
-						totalTimeWithFriends+=CompareTimeWindows.getTimeWindowOverlapDuration(tw1,tw2);
-					}else{
-						foe++;
-					}
-				}
-				
-				}
-			}
-			if(!actStats.keySet().contains(tw1.act)){
-				ArrayList<Double> stats=new ArrayList<Double>();
-				if((friend+foe)==0){
-					stats.add((double) 0);
-				}else{
-					stats.add(friend/(foe+.1*(friend+foe)));
-				}
-				stats.add(friend);
-				stats.add(totalTimeWithFriends);
+				p1 = visits.get(i).person;
 
-				actStats.put(tw1.act,stats);	
-			}
-			if(actStats.keySet().contains(tw1.act)){
-				ArrayList<Double> stats=actStats.get(tw1.act);
-				if((friend+foe)==0){
-					stats.add((double) 0);
-				}else{
-					stats.add(friend/(foe+.1*(friend+foe)));
+				for(int j=i+1;j<visits.size();j++){
+					p2 = visits.get(j).person;
+					tw2 = visits.get(j);
+					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2) && !p1.equals(p2)){
+						EgoNet net = p1.getKnowledge().getEgoNet();
+						if(net.getAlters().contains(p2)){
+							friend++;
+							totalTimeWithFriends+=CompareTimeWindows.getTimeWindowOverlapDuration(tw1,tw2);
+						}else{
+							foe++;
+						}
+					}
+
+				}			
+
+				if(actStats.isEmpty() || !(actStats.keySet().contains(tw1.act))){
+					ArrayList<Double> stats=new ArrayList<Double>();
+					actStats.put(tw1.act,stats);
+//					log.info("making new act statistic entry for "+ tw1.act.getType());
 				}
-				stats.add(friend);
-				stats.add(totalTimeWithFriends);
-			}	
+
+				if(actStats.containsKey(tw1.act)){
+					ArrayList<Double> stats=actStats.get(tw1.act);
+					if((friend+foe)==0){
+						stats.add((double) 0);
+					}else{
+						stats.add(friend/(foe+.1*(friend+foe)));
+					}
+					stats.add(friend);
+					stats.add(totalTimeWithFriends);
+//					log.info(count+" filling act statistics for "+myFacility.getId()+" "+ tw1.act.getType()+" "+tw1.startTime+" "+tw1.endTime+" "+stats.get(0)+" "+stats.get(1)+" "+stats.get(2));
+					count++;
+				}
+			}
 		}
 
 		return actStats;
 	}	
-	
-	
-	
+
+
+
 	public static boolean overlapTimePlaceType(TimeWindow tw1, TimeWindow tw2){
 //		System.out.println("Checking overlap "+act1.getType()+" "+act1.getFacility().getId()+": "+act2.getType()+" "+act2.getFacility().getId());
 		if(tw1.act.getFacility().getActivity(tw2.act.getType())==null){
@@ -120,10 +119,11 @@ public class CompareTimeWindows {
 		}
 		return overlap;
 	}
-	
+
 	public static double getTimeWindowOverlapDuration(TimeWindow tw1, TimeWindow tw2) {
-		double duration=0.;
-		duration = Math.min(tw1.endTime,tw2.endTime)-Math.max(tw1.startTime,tw2.startTime);
+		double duration = Math.min(tw1.endTime,tw2.endTime)-Math.max(tw1.startTime,tw2.startTime);
+		if(duration<0) duration=0.;
+		
 		return duration;
 	}
 }

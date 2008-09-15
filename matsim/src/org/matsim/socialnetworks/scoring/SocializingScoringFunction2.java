@@ -45,7 +45,8 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 	static final private Logger log = Logger.getLogger(SocializingScoringFunction.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
-	private final TrackEventsOverlap teo;
+//	private final TrackEventsOverlap teo;
+	private final Hashtable<Act,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -59,12 +60,13 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public SocializingScoringFunction2(final Plan plan, final ScoringFunction scoringFunction, String factype, TrackEventsOverlap teo) {
+	public SocializingScoringFunction2(final Plan plan, final ScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
-		this.teo=teo;
+//		this.teo=teo;
 		this.factype=factype;
+		this.actStats=actStats;
 		if(this.betaNFriends!= 0 && this.betaLogNFriends!=0){
 			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
 		}
@@ -82,7 +84,7 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 		ActIterator ait = this.plan.getIteratorAct();
 
 //		Hashtable<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
-		Hashtable<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
+//		Hashtable<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 //		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
@@ -135,5 +137,4 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 	public void startLeg(final double time, final Leg leg) {
 		this.scoringFunction.startLeg(time, leg);
 	}
-
 }

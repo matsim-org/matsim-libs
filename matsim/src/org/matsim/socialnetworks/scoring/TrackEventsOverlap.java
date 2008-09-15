@@ -55,7 +55,8 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 
 	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap=new Hashtable<Facility,ArrayList<TimeWindow>>();
 	HashMap<Act,Double> startMap = new HashMap<Act,Double>();
-	
+	HashMap<Act,Double> endMap = new HashMap<Act,Double>();
+
 	static final private Logger log = Logger.getLogger(TrackEventsOverlap.class);
 
 	public TrackEventsOverlap() {
@@ -65,34 +66,70 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 	}
 
 
-	public void handleEvent(final ActStartEvent event) {
-		startMap.put(event.act,event.time);
-	}
-	
 	public void handleEvent(final ActEndEvent event) {
+
+		double eventStartTime=-999;// event start time is unknown
 		double eventEndTime=event.time;
-		double eventStartTime=startMap.get(event.act);
-		Person agent = event.agent;
-		
-		Facility facility = event.act.getFacility();
-		if(this.timeWindowMap.containsKey(facility)){
-			ArrayList<TimeWindow> myTable=timeWindowMap.get(facility);
-			myTable.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
-			timeWindowMap.remove(facility);
-			timeWindowMap.put(facility, myTable);
-		}else{
-			ArrayList<TimeWindow> myTable= new ArrayList<TimeWindow>();
-			myTable.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
-			timeWindowMap.put(facility, myTable);
+
+		if(startMap!=null){
+			if(startMap.get(event.act)!=null){
+				eventStartTime=startMap.get(event.act);
+			}
 		}
-		
+		if(eventStartTime>0){// if a valid start event is found, make a timeWindow and add to Map
+			Person agent = event.agent;
+
+			Facility facility = event.act.getFacility();
+			if(this.timeWindowMap.containsKey(facility)){
+				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
+				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
+				timeWindowMap.remove(facility);
+				timeWindowMap.put(facility, windowList);
+			}else{
+				ArrayList<TimeWindow> windowList= new ArrayList<TimeWindow>();
+				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
+				timeWindowMap.put(facility, windowList);
+			}
+		}else{
+			//do nothing immediately if there is no start event, just save this end event for later
+			endMap.put(event.act,event.time);
+		}
+	}
+
+	public void handleEvent(final ActStartEvent event) {
+
+		double eventStartTime=event.time;
+		double eventEndTime=-999;// the event end time is not known
+		if(endMap!=null){
+			if(endMap.get(event.act)!=null){
+				eventEndTime=endMap.get(event.act);
+			}
+		}
+		if(eventEndTime>0){// if a valid end time is found, make a timeWindow and add to Map
+			Person agent = event.agent;
+
+			Facility facility = event.act.getFacility();
+			if(this.timeWindowMap.containsKey(facility)){
+				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
+				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
+				timeWindowMap.remove(facility);
+				timeWindowMap.put(facility, windowList);
+			}else{
+				ArrayList<TimeWindow> windowList= new ArrayList<TimeWindow>();
+				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.act));
+				timeWindowMap.put(facility, windowList);
+			}
+		}else{
+			// if the event is not complete, save the start information for later
+			startMap.put(event.act,event.time);
+		}
 	}
 
 
 	public void reset(final int iteration) {
 //		this.agentScorers.clear();
 	}
-	
+
 	public Hashtable<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
