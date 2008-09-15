@@ -8,32 +8,39 @@
 	
 	<module name="primary location choice">
 		
+		<!-- Describe the primary activity in term of trip purpose. -->
+		<!-- The activity at the origin is implicitly set to "home" -->
+		<!-- To take multiple trips per person or other type of origins into account (e.g. shop-leisure trips)
+			one must extends the methods "setupNumberHomesPerZone" and "setupNumberJobsPerZone"
+			of class "PrimlocModule" --> 				
+		<param name="primary activity" value="work" />
+
 		<!-- Optional layer on which to aggregate facilities and residents -->
 		<!-- Otherwise the user has to specify a layer with PrimlocModule.setLayer() --> 
 		<param name="aggregation layer" value="municipality"/>
 		
-		<!-- Describe the primary activity in term of facility type. All trips have home as origin -->		
-		<param name="destination facility type" value="work" />
+		<!-- Optional: use Euclidean crow-distance as a proxy for travel costs -->
+		<param name="euclidean distance costs" value="true" />
 		
+		<!-- calibrate the model or just simulate for a given mu -->
+		<param name="calibration" value="false"/>	
+				
 		<!-- Default value for the logit scale parameter. Units are in $
 			compared to travel costs -->
 		<param name="mu" value="5.0" />
 		
-		<!-- Optional: use Euclidean crow-distance as a proxy for travel costs -->
-		<param name="euclidean distance costs" value="true" />
-		
-		<!-- Optional matrix file for the calibration -->
-		<!-- param name="calibration matrix" value="file:/some_matrix.format" -->
-		
 		<!-- Module can be silent/verbose -->
 		<param name="verbose" value="true" />
+		
+		<!-- Knowledge of the agent can be increased or modified -->
+		<param name="overwrite knowledge" value="true" />
 
-				<!-- Below are parameters that can be safely left untouched -->
-		<param name="maxiter" value="100"/>
-		<param name="theta" value="0.5" />
-		<param name="threshold1" value="1E-4" />
-		<param name="threshold2" value="1E-6" />
-		<param name="threshold3" value="1E-2" />
+		<!-- Below are simulation parameters that can be safely left untouched -->
+		<param name="maxiter" value="100"/> <!-- maximum number of iterative substitutions -->
+		<param name="theta" value="0.5" /> <!-- adaptation factor of Newton method -->
+		<param name="threshold1" value="1E-4" /> <!-- stop criterion for substitutions -->
+		<param name="threshold2" value="1E-6" /> <!-- stop criterion for linear solver -->
+		<param name="threshold3" value="1E-2" /> <!-- stop criterion for calibration loop -->
 	</module>
 	<!-- ====================================================================== -->
 </config>
