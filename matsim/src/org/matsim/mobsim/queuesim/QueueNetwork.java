@@ -78,20 +78,20 @@ public class QueueNetwork{
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	public QueueNetwork(NetworkLayer networkLayer) {
+	public QueueNetwork(final NetworkLayer networkLayer) {
 		this(networkLayer, new DefaultQueueNetworkFactory());
 	}
 
-	public QueueNetwork(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public QueueNetwork(final NetworkLayer networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
-			this.nodes.put(n.getId(), queueNetworkFactory.newQueueNode(n, this));
+			this.nodes.put(n.getId(), this.queueNetworkFactory.newQueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.links.put(l.getId(), queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
+			this.links.put(l.getId(), this.queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
 		for (QueueNode n : this.nodes.values()) {
 			n.init();
@@ -111,7 +111,7 @@ public class QueueNetwork{
 		return this.networkLayer;
 	}
 
-	public void beforeSim() {
+	protected void beforeSim() {
 		this.simLinksArray.clear();
 		if (simulateAllLinks) {
 			this.simLinksArray.addAll(this.links.values());
@@ -127,7 +127,7 @@ public class QueueNetwork{
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
-	public void simStep(final double time) {
+	protected void simStep(final double time) {
 		for (QueueNode node : this.simNodesArray) {
 			if (node.isActive() || simulateAllNodes) {
 				/* It is faster to first test if the node is active, and only then call moveNode(),
@@ -143,7 +143,7 @@ public class QueueNetwork{
 		moveLinks(time);
 	}
 
-	protected void moveLinks(final double time) {
+	private void moveLinks(final double time) {
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
 		QueueLink link;
 		boolean isActive;
@@ -199,18 +199,11 @@ public class QueueNetwork{
 	/**
 	 * @return Returns the simLinksArray.
 	 */
-	public Collection<QueueLink> getSimulatedLinks() {
+	protected Collection<QueueLink> getSimulatedLinks() {
 		return this.simLinksArray;
 	}
 
-	/**
-	 * @return Returns the simNodesArray.
-	 */
-	public Collection<QueueNode> getSimulatedNodes() {
-		return Arrays.asList(this.simNodesArray);
-	}
-
-	public void afterSim() {
+	protected void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
@@ -221,7 +214,7 @@ public class QueueNetwork{
 		}
 	}
 
-	/*package*/ void addActiveLink(final QueueLink link) {
+	protected void addActiveLink(final QueueLink link) {
 		if (!simulateAllLinks) {
 			this.simActivateThis.add(link);
 		}
@@ -263,9 +256,9 @@ public class QueueNetwork{
 	}
 
 	final private static class LinkActivation implements Comparable<LinkActivation> {
-		final public double time;
-		final public QueueLink link;
-		public LinkActivation(final double time, final QueueLink link) {
+		final protected double time;
+		final protected QueueLink link;
+		protected LinkActivation(final double time, final QueueLink link) {
 			this.time = time;
 			this.link = link;
 		}
@@ -290,11 +283,11 @@ public class QueueNetwork{
 		}
 	}
 
-	public QueueLink getQueueLink(Id id) {
+	public QueueLink getQueueLink(final Id id) {
 		return this.links.get(id);
 	}
 
-	public QueueNode getQueueNode(IdImpl id) {
+	public QueueNode getQueueNode(final IdImpl id) {
 		return this.nodes.get(id);
 	}
 
