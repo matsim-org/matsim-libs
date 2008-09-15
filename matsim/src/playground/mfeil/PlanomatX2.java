@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanomatX2.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.mfeil;
 
 import org.matsim.network.NetworkLayer;
@@ -21,8 +37,9 @@ import java.util.ArrayList;
 
 /**
  * @author Matthias Feil
- * PlanomatX will be the class where to implement the Tabu Search. Currently, work focus is on the definition of 
- * the neighbourhood. Changing the order of activities already works. Next is to integrate the TS mechanisms.
+ * PlanomatX2 now includes full TS functionality over more than 1 iteration. Neighbourhood definition is through
+ * changing the order of the activities only. Next tasks to implement also changing of type and
+ * number of activities. A refined tabu determination and re-calculation is to come up as well.
  */
 
 public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorithm { 
@@ -146,8 +163,6 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 		// Update the plan with the final solution 		
 		java.util.Collections.sort(tabuList);
 		ArrayList<Object> al = plan.getActsLegs();
-		System.out.println("original solution für Person"+plan.getPerson().getId()+" mit "+plan+" und der Plan "+plan.getActsLegs());
-		System.out.println("final solution für Person "+plan.getPerson().getId()+" mit "+tabuList.get(tabuList.size()-1)+" und der Plan "+tabuList.get(tabuList.size()-1).getActsLegs());
 		for (int i = 1; i<al.size()-1;i++){
 			al.remove(i);
 			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	

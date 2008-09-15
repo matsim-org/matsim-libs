@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StrategyManagerConfigLoader.java
+ * CopyOfStrategyManagerConfigLoaderTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
