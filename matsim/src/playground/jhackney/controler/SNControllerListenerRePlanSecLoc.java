@@ -21,8 +21,10 @@
 package playground.jhackney.controler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -37,11 +39,13 @@ import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
 import org.matsim.socialnetworks.io.ActivityActReader;
@@ -114,6 +118,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 	//SSTEST private SpatialScorer spatialScorer=null;
 	private TrackEventsOverlap teo=null;
+	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
@@ -156,10 +161,15 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 		//SSTEST this.spatialScorer = new SpatialScorer();
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
-		this.teo = new TrackEventsOverlap();//makes TimeWindowMap
+		
 		//SSTEST SNScoringGeneralFactory factory = new SNScoringGeneralFactory
 		//SSTEST ("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
-		SNScoringGeneralFactory2 factory = new SNScoringGeneralFactory2("leisure", this.teo, controler.getScoringFunctionFactory());
+		// SSTEST
+		teo = new TrackEventsOverlap();
+		this.controler.getEvents().addHandler(this.teo);
+		this.log.info(" ... Instantiation of events overlap tracking done");
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
+		SNScoringGeneralFactory2 factory = new SNScoringGeneralFactory2("leisure", controler.getScoringFunctionFactory(),actStats);
 		
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
@@ -168,10 +178,6 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		scoring = new EventsToScore(this.controler.getPopulation(), factory);
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
-		// SSTEST
-		teo = new TrackEventsOverlap();
-		this.controler.getEvents().addHandler(teo);
-		this.log.info(" ... Instantiation of events overlap tracking done");
 
 		snsetup();
 	}
@@ -181,6 +187,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("scoring");
 
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
+		this.actStats.clear();
+		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap()));
 		scoring.finish();
 	}
 
@@ -255,8 +263,6 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 				this.log.info("     (none)");
 			}
 			this.log.info(" ... Spatial interactions done\n");
-
-			this.log.info("  Instantiating social network scoring function");
 
 			this.log.info(" Non-Spatial interactions ...");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
