@@ -22,25 +22,19 @@ package org.matsim.demandmodeling.primloc;
 
 /**
  * Solves primary location choice with capacity constraints.
+ * 
  * The method is described in : F. Marchal (2005), "A trip generation method for time-dependent
  * large-scale simulations of transport and land-use", Networks and Spatial Economics 5(2),
  * Kluwer Academic Publishers, 179-192.
+ * 
  * @author Fabrice Marchal
  *
  */
 
 import java.text.DecimalFormat;
+
 import Jama.Matrix;
 
-// TODO:
-// Separate test case from core
-// Driver -> rename as a "Module" 
-// Engine -> rename to Core
-// put things under demandmodeling.primloc
-// Should read HOMES from KNowledge not from plans
-// Should read Work from Facilities
-// Determine IF the person is performing the prim activity from scanning the existing plans
-// Expose the layer / customized
 
 public class PrimlocCore {
 
@@ -51,13 +45,13 @@ public class PrimlocCore {
 	int numZ;    // number of zones
 	double N;    // total number of trips
 
-	double P[];  // number of residents
-	double J[];  // number of jobs
+	double P[];  // number of residents per zone
+	double J[];  // number of jobs per zone
 	double X[];  // rent patterns
 
-	Matrix cij;  // Input:		travel impedances
+	Matrix cij;  // Input:		zone to zone travel costs 
 	Matrix ecij; // Internal:	exp( - cij/ mu )
-	Matrix trips;  // Output:		Trip matrix
+	Matrix trips;  // Output:	Trip matrix
 
 	//
 	// Parameters of the solver
@@ -71,8 +65,9 @@ public class PrimlocCore {
 	double threshold3 = 1E-2;
 	DecimalFormat df;
 	boolean verbose;
-	boolean calibration;
-	double maxCost;
+	
+	// Travel Cost statistics
+	double minCost, maxCost, avgCost, stdCost;
 
 	PrimlocCalibrationError calib;
 
@@ -86,10 +81,11 @@ public class PrimlocCore {
 		this.calib = calib;
 	}
 	
-	void runModel(){
+	public void runModel(){
 		
 		System.out.println("PLCM: Running model with mu = "+df.format(mu));
 
+		setup_expCij();
 		initRent();
 
 		if( verbose ){
@@ -104,7 +100,7 @@ public class PrimlocCore {
 		computeFinalRents();
 	}
 
-	void runCalibrationProcess(){
+	public void runCalibrationProcess(){
 		
 		double muC = mu;
 		double muL = mu;
@@ -115,15 +111,14 @@ public class PrimlocCore {
 
 		
 		runModel();
-		errC = calib.error();
+		errC = calib.error( trips, X );
 		System.out.println("PLCM:\tCalibration loop. Initial condition run completed");
 		calibrationLoopInfo( mu, errC );
 		
 		while( errL < errC ){
 			mu = muL = mu/2;
-			setupECij();
 			runModel();
-			errL = calib.error();
+			errL = calib.error( trips, X );
 			calibrationLoopInfo( mu, errL );
 			if( errL < errC ){
 				errR = errC;
@@ -136,18 +131,16 @@ public class PrimlocCore {
 		mu = muR;
 		while( errR < errC ){
 			mu = muR = 2*mu;
-			setupECij();
 			runModel();
-			errR = calib.error();
+			errR = calib.error( trips, X );
 			calibrationLoopInfo( mu, errR );
 		}
 
 		double err = Double.POSITIVE_INFINITY;
 		while( Math.min( errR-errC, errL-errC)/errC > threshold3 ){
 			mu = (muC+muL)/2;
-			setupECij();
 			runModel();
-			err = calib.error();
+			err = calib.error( trips, X );
 			calibrationLoopInfo( mu, err );
 			if( err< errC ){
 				muR = muC;
@@ -160,9 +153,8 @@ public class PrimlocCore {
 				errL = err;
 			}
 			mu = (muC+muR)/2;
-			setupECij();
 			runModel();
-			err = calib.error();
+			err = calib.error( trips, X );
 			calibrationLoopInfo( mu, err );	
 			if( err< errC ){
 				muL = muC;
@@ -191,7 +183,7 @@ public class PrimlocCore {
 			J[i] = J[i]*sumJ;
 	}
 
-	void computeTripMatrix(){
+	private void computeTripMatrix(){
 		// Compute the logsums Zk
 		double Z[] = new double[ numZ ];
 		for( int j=0; j<numZ; j++ )
@@ -205,7 +197,7 @@ public class PrimlocCore {
 				trips.set(i, j, J[j] * ecij.get(i, j) * X[i] / Z[j] );
 	}
 
-	void computeFinalRents(){
+	private void computeFinalRents(){
 		// Restore rent values in X
 		double minir = Double.POSITIVE_INFINITY;
 		
@@ -225,7 +217,7 @@ public class PrimlocCore {
 	}
 
 	
-	void initRent(){
+	private void initRent(){
 		X = new double[ numZ ];
 		// Initialize rent with the solution of the
 		// problem without transportation cost
@@ -239,7 +231,7 @@ public class PrimlocCore {
 			System.err.println("Warning: rent undefined in "+undefs+" locations");
 	}
 
-	void rentStatistics(){
+	private void rentStatistics(){
 
 		double minix=Double.POSITIVE_INFINITY;
 		double maxix=Double.NEGATIVE_INFINITY;
@@ -267,14 +259,14 @@ public class PrimlocCore {
 		System.out.println("PLCM:\t\tRent interval: [ "+ df.format(minR) + ", " + df.format(maxR) + " ]\t std.dev. = " + df.format(sigmaR) );
 	}
 
-	void setupECij(){
+	private void setup_expCij(){
 		ecij = new Matrix( numZ, numZ );
 		for( int i=0; i<numZ; i++)
 			for( int j=0; j<numZ; j++)
 				ecij.set(i,j,Math.exp(-cij.get(i, j)/mu));
 	}
 
-	void iterativeSubstitutions(){
+	private void iterativeSubstitutions(){
 		Matrix PR = new Matrix( numZ, numZ );
 		double[] Z  = new double[ numZ ];
 		double[] DX = new double[ numZ ];
@@ -343,7 +335,7 @@ public class PrimlocCore {
 		}
 	}
 
-	void solvequs(){
+	private void solvequs(){
 		// Since X[i] are known up to a multiplicative factor,
 		// we assume that X[numZ-1] is known and
 		// X[numZ-1] = P[numZ-1]
@@ -419,13 +411,13 @@ public class PrimlocCore {
 		}
 	}
 
-	double sumofel( Matrix A ){
-		double z=0.0;
-		for( int i=0; i<A.getRowDimension();i++)
-			for( int j=0; j<A.getColumnDimension();j++)
-				z+=A.get(i, j);
-		return z;
-	}
+//	double sumofel( Matrix A ){
+//		double z=0.0;
+//		for( int i=0; i<A.getRowDimension();i++)
+//			for( int j=0; j<A.getColumnDimension();j++)
+//				z+=A.get(i, j);
+//		return z;
+//	}
 
 	double[] getCijScale( int n ){
 		// Return scale of cij
@@ -459,7 +451,7 @@ public class PrimlocCore {
 		}
 		return bins;
 	}
-
+	
 	double getHistogramError( Matrix x, Matrix y ){
 		double error = 0.0;
 		double[] scale = getCijScale( 100 );
@@ -469,4 +461,32 @@ public class PrimlocCore {
 			error += ( u[i] - v[i] )*( u[i] - v[i] );
 		return Math.sqrt( error );
 	}
+	
+//	void setupCostStatistics(){
+//		for( int i=0; i<numZ; i++ ){
+//			double mincij = Double.POSITIVE_INFINITY;
+//			for( int j=0; j<numZ; j++ ){
+//				double v=cij.get(i, j);
+//				if( (v < mincij) && (v>0.0) )
+//					mincij = v;
+//			}
+//			if( cij.get(i, i) == 0.0 )
+//				cij.set(i, i, mincij );
+//		}
+//
+//		maxCost = Double.NEGATIVE_INFINITY;
+//		double meanCost=0.0;
+//		double stdCost=0.0;
+//		for( int i=0; i<numZ; i++ ){
+//			for( int j=0; j<numZ; j++ ){
+//				double v=cij.get(i, j);
+//				meanCost += v;
+//				stdCost += v*v;
+//				if( v > maxCost ){
+//					maxCost = v;
+//				}
+//			}
+//		}
+//	}
+
 }

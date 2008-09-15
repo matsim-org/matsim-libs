@@ -20,15 +20,21 @@
 
 package org.matsim.demandmodeling.primloc;
 
+/**
+ * This Module adapts the MATSIM-independent Primary Location Choice Model (PrimlocEngine), 
+ * to the MATSIM Plans, Population, Persons, Layers, etc.
+ * 
+ * This Module modifies the Person by adding know Facilities to the Knowledge of the Person 
+ * 
+ * @author Fabrice Marchal
+ */
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -36,6 +42,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.world.Layer;
@@ -45,84 +52,78 @@ import org.matsim.world.ZoneLayer;
 
 import Jama.Matrix;
 
-
-//TODO:
-//Separate test case from core
-//Driver -> rename as a "Module" 
-//Engine -> rename to Core
-//put things under demandmodeling.primloc
-//Should read HOMES from KNowledge not from plans
-//Should read Work from Facilities
-//Determine IF the person is performing the prim activity from scanning the existing plans
-//Expose the layer / customized
-
 public class PrimlocModule  implements PersonAlgorithm {
 
 	final static String module_name = "primary location choice";
 
-	private final static Logger log = Logger.getLogger(PrimlocModule.class);
-
-	PrimlocCore core = new PrimlocCore();
+	PrimlocCore core = new PrimlocCore();  // Core of the module, independent of MATSIM plans
+	String primaryActivityName; // activity to be considered in trips enumeration 
 	
+	// Agreggation layer 
 	Zone[] zones;
 	Layer zoneLayer;
-	PrimlocTravelCostAggregator travelCostAggregator;
-	
 	HashMap<Zone,Integer> zoneids = new HashMap<Zone,Integer>();
 	HashMap<Zone, ArrayList<Facility>> primActFacilitiesPerZone =
 		new HashMap<Zone, ArrayList<Facility>>();
-	String primaryActivityName;
 	
+	// Object responsible for the computation of Travel_cost(Zone #i, Zone #j)
+	PrimlocTravelCostAggregator travelCostAggregator;
+	
+	// Options
+	boolean overwriteKnowledge; // toggle knowledge creation/modification
+	boolean calibration; // toggle calibration/simple simulation
+	
+	// Utility classes
+	private final static Logger log = Logger.getLogger(PrimlocModule.class);
 	Random random;
-	
 	
 	public void run(Person guy){
 
-		// Modify the plans of the agents accordingly
-		// For each agent: replace the location of the primary
-		// activity in the selected plan
+		// Modify the plans of the agents accordingly to the Primloc model 
+		// that was run in setup()
+		// 
+		// For each agent performing the primary activity at least once:
+		// increase the knowledge of the agent by one Facility
 		
-		Knowledge know = guy.getKnowledge();
-		Facility home = know.getActivities("home").get(0).getFacility();
+		if( !agentHasPrimaryActivityInPlan( guy ) )
+			return;
+				
+		Knowledge knowledge = guy.getKnowledge();
+		Facility home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCenter(), null).get(0);
 		if( homezone == null )
-			log.warn("Homeless employed person (poor guy)" );
+			log.warn("Homeless person (poor guy)" );
 		else{			
-
-//			// We check if the person is performing primary activity or not
-//			if( guy.getKnowledge().getActivities(primaryActivityName).size() == 0 )
-//				return;			
+			int homeZoneID = zoneids.get(homezone);
 			
-			int homeZoneID = this.zoneids.get(homezone);
+			// Compute a random work zone using the trip matrix as a
+			// probability distribution, with home being conditional
 			double epsilon = Math.random();
 			double cumul=0.0;
 			int workZoneID = 0;
-			while( (cumul < epsilon) && (workZoneID<this.core.numZ-1) ){
-				cumul += (this.core.trips.get(homeZoneID, workZoneID))/this.core.P[homeZoneID];
+			while( (cumul < epsilon) && (workZoneID<core.numZ-1) ){
+				cumul += (core.trips.get(homeZoneID, workZoneID))/core.P[homeZoneID];
 				workZoneID++;
 			}
-			// We assigned a zone where he works now
-			// assign a link location for that workplace
-			ArrayList<Facility> workplaces = this.primActFacilitiesPerZone.get( this.zones[workZoneID] );
+			
+			// Assign a link location corresponding to the workplace
+			ArrayList<Facility> workplaces = primActFacilitiesPerZone.get( zones[workZoneID] );
 			while( workplaces.size() == 0 ){
 				// This can happen if a person has a job in a zone without
-				// any job facility because of the hack.
+				// any job facility because of the hack in normalizeJobHomeVectors().
 				// Hack: it is then reassigned to a random zone
-				int zid = (int)(random.nextDouble()*this.core.numZ);
-				workplaces = this.primActFacilitiesPerZone.get( this.zones[zid] );
+				int zid = (int)(random.nextDouble()*core.numZ);
+				workplaces = primActFacilitiesPerZone.get( zones[zid] );
 			}
 			int wid = (int)(random.nextDouble()*workplaces.size());
 			Facility workplace = workplaces.get(wid);
-			// Change the knowledge of the person too
-			ArrayList<Activity> primActs = guy.getKnowledge().getActivities(primaryActivityName);
-			if (primActs.size() > 0) {
-				guy.getKnowledge().removeActivity(primActs.get(0)); // delete current work location
-			}
-			guy.getKnowledge().addActivity(new Activity(primaryActivityName, workplace));
+
+			// Change the knowledge of the person
+			if( overwriteKnowledge )
+				knowledge.removeActivities( primaryActivityName );
+			knowledge.addActivity(new Activity(primaryActivityName, workplace));
 		}
 	}
-
-
 
 	public void setup( Population population ){
 
@@ -133,22 +134,21 @@ public class PrimlocModule  implements PersonAlgorithm {
 		setupAggregationLayer();
 
 		setupTravelCosts();
-	
-		
-		getNumberHomesPerZone( population );
+			
+		setupNumberHomesPerZone( population );
 
-		getNumberJobsPerZone();
+		setupNumberJobsPerZone();
 
-		normalizeJobHomevectors();
+		normalizeJobHomeVectors();
 
-		if( this.core.calibration )
-			loadCalibrationMatrix();
+		//if( core.calibration )
+		//	loadCalibrationMatrix();
 		
 		// Run the core location choice model
-		if( this.core.calibration )
-			this.core.runCalibrationProcess();
+		if( calibration )
+			core.runCalibrationProcess();
 		else
-			this.core.runModel();
+			core.runModel();
 
 	}
 	
@@ -167,8 +167,10 @@ public class PrimlocModule  implements PersonAlgorithm {
 		
 		// Fetch parameters from the config file
 		
-		primaryActivityName = cfg.getParam( module_name, "destination facility type");
-				
+		primaryActivityName = cfg.getParam( module_name, "primary activity");		
+		overwriteKnowledge = Boolean.parseBoolean( cfg.getParam(module_name, "overwrite knowledge"));
+		calibration = Boolean.parseBoolean( cfg.getParam(module_name, "calibration"));
+			
 		core.mu = Double.parseDouble( cfg.getParam(module_name, "mu") );
 		core.theta = Double.parseDouble( cfg.getParam(module_name, "theta") );
 		core.threshold1 = Double.parseDouble( cfg.getParam(module_name, "threshold1") );
@@ -176,6 +178,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 		core.threshold3 = Double.parseDouble( cfg.getParam(module_name, "threshold3") );
 		core.maxiter = Integer.parseInt( cfg.getParam(module_name, "maxiter") );
 		core.verbose = Boolean.parseBoolean(cfg.getParam(module_name, "verbose"));
+		
 	}
 	
 	void setupAggregationLayer(){
@@ -210,105 +213,95 @@ public class PrimlocModule  implements PersonAlgorithm {
 		Config cfg = Gbl.getConfig();
 		String distParam = cfg.getParam(module_name, "euclidean distance costs");
 		if( distParam != null ){
-			if( Boolean.parseBoolean( distParam) )
+			if( Boolean.parseBoolean( distParam ) )
 				setEuclideanDistanceImpedances();
-			else
-				getTravelImpedancesfromFile( Gbl.getConfig().getParam( module_name, "impedances matrix file") );
+			else if( travelCostAggregator == null )
+				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );				
 		}
+		else if( travelCostAggregator == null )
+				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
 	}
 
-
-	void loadCalibrationMatrix(){
-		// read the matric from the following URL: cfg.getParam( module_name, "calibration matrix" ) );
-		// core.calib = ...
-	}
-
-
-
-	void getNumberHomesPerZone( Population population ){
-		this.core.P = new double[ this.core.numZ ];
+	void setupNumberHomesPerZone( Population population ){
+		// Setup the number of originating trips.
+		// In this case it corresponds to the number of Persons which will 
+		// make at least one trip with activity type = primaryActivityName
+		// We assume that agents have plans that contains at least the agenda of
+		// their activities
+		
+		core.P = new double[ core.numZ ];
 		// Determine how many employed persons live in each zone
-		Map<Id, Person> agents = population.getPersons();
-		for (Person guy : agents.values()) {
-			Facility facility = guy.getKnowledge().getActivities("home").get(0).getFacility();
-			ArrayList<Location> list = this.zoneLayer.getNearestLocations(facility.getCenter(), null);
-			Zone homezone = (Zone) list.get(0);
-			if( homezone == null )
-				log.warn("Homeless employed person (poor guy)" );
-			else
-				this.core.P[ this.zoneids.get(homezone) ]++;
-		}
+		for (Person guy : population.getPersons().values()) 
+			if( agentHasPrimaryActivityInPlan( guy ) ){
+				Facility homeOfGuy = guy.getKnowledge().getActivities("home").get(0).getFacility();
+				ArrayList<Location> list = zoneLayer.getNearestLocations(homeOfGuy.getCenter(), null);
+				Zone homezone = (Zone) list.get(0);
+				if( homezone == null )
+					log.warn("Homeless employed person (poor guy)" );
+				else
+					core.P[ zoneids.get(homezone) ]++;								
+			}
 	}
-
-	void getNumberJobsPerZone(){
-		this.core.J = new double[ this.core.numZ ];
-		// Determine the number of jobs per zone
-		// and remember the work facilities that belong to given zones
-		Collection<? extends Facility> facilities = ((Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE)).getFacilities().values();
-		for( Facility facility : facilities ){
-			Activity act = facility.getActivity( this.primaryActivityName );
+	
+	boolean agentHasPrimaryActivityInPlan( Person guy ){
+		for( Plan plan : guy.getPlans() )
+			if( plan.containsActivity(primaryActivityName))
+				return true;
+		return false;
+	}
+	
+	void setupNumberJobsPerZone(){
+		// Setup the number of available facilities at the destination of the trips
+		// In this case we take the capacities of the existing Facilities
+		// and maintain a list of Facilities per Zone
+		core.J = new double[ core.numZ ];
+		Facilities facilities = ((Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
+		for( Facility facility : facilities.getFacilities().values() ){
+			Activity act = facility.getActivity( primaryActivityName );
 			if( act != null ){
-				ArrayList<Location> list = this.zoneLayer.getNearestLocations( facility.getCenter(), null);
+				ArrayList<Location> list = zoneLayer.getNearestLocations( facility.getCenter(), null);
 				Zone zone = (Zone) list.get(0);
-				this.core.J[ this.zoneids.get(zone) ] += act.getCapacity();
-				this.primActFacilitiesPerZone.get( zone ).add( facility );
+				core.J[ zoneids.get(zone) ] += act.getCapacity();
+				primActFacilitiesPerZone.get( zone ).add( facility );
 			}
 		}
 	}
 
-	void normalizeJobHomevectors(){
+	void normalizeJobHomeVectors(){
 		// Hack to ensure that no element is zero (singular matrix)
-		this.core.N = 0.0;
-		for( int i=0; i<this.core.numZ; i++){
-			this.core.P[i] = Math.max(1.0, this.core.P[i]);
-			this.core.J[i] = Math.max(1.0, this.core.J[i]);
-			this.core.N += this.core.P[i];
+		core.N = 0.0;
+		for( int i=0; i<core.numZ; i++){
+			core.P[i] = Math.max(1.0, core.P[i]);
+			core.J[i] = Math.max(1.0, core.J[i]);
+			core.N += core.P[i];
 		}
-		System.out.println("# employed "+this.core.N);
-		this.core.normalizeJobVector();
+		System.out.println("# employed "+core.N);
+		core.normalizeJobVector();
 		System.out.println("Zone attribute vector:");
-		for( int i=0; i<this.core.numZ; i++){
-			System.out.println( "Zone #"+this.zones[i].getId()+
-					"\t#residents: "+this.core.df.format(this.core.P[i]) +
-					"\t#"+this.primaryActivityName+": "+this.core.df.format(this.core.J[i]));
+		for( int i=0; i<core.numZ; i++){
+			System.out.println( "Zone #"+zones[i].getId()+
+					"\t#residents: "+core.df.format(core.P[i]) +
+					"\t#"+primaryActivityName+": "+core.df.format(core.J[i]));
 		}
 	}
-
 	
 	void setEuclideanDistanceImpedances(){
-		// Compute a simple Travel impedance matrix
-		// with euclidean distance
-		this.core.cij = new Matrix( this.core.numZ, this.core.numZ );
+		// Compute a simple Travel Cost matrix
+		// based on the euclidean distance between centroids
+		core.cij = new Matrix( core.numZ, core.numZ );
 
-		for( int i=0; i<this.core.numZ; i++){
-			for( int j=0; j<this.core.numZ; j++){
-				this.core.cij.set( i, j, this.zones[i].calcDistance( this.zones[j].getCenter() ) );
-				// The method requires cii > 0
-			}
-			this.core.cij.set(i, i, (this.zones[i].getMax().calcDistance(this.zones[i].getMin()))/2 );
-			if( this.core.cij.get( i, i ) == 0.0 ){
+		for( int i=0; i<core.numZ; i++){
+			for( int j=0; j<core.numZ; j++)
+				core.cij.set( i, j, zones[i].calcDistance( zones[j].getCenter() ) );
+
+			// The method requires cii > 0 therefore we set
+			// cii = length of the diagonal of the bounding box of Zone #i
+			
+			core.cij.set(i, i, (zones[i].getMax().calcDistance(zones[i].getMin()))/2 );
+			
+			if( core.cij.get( i, i ) == 0.0 )
 				Gbl.errorMsg( new Exception("PrimLocChoice_core requires Cii>0 for intrazonal travel costs"));
-			}
+			
 		}
-		this.core.setupECij();
-	}
-
-	void getTravelImpedancesfromFile( String costFileName ){
-
-//		this.core.cij = new Matrix( this.core.numZ, this.core.numZ );
-//		System.out.println("Reading travel impedances from " + costFileName );
-//		this.core.cij = SomeIO.readODMatrix( costFileName, this.core.numZ, this.core.numZ);
-//		for( int i=0; i<this.core.numZ; i++ ){
-//			double mincij = Double.POSITIVE_INFINITY;
-//			for( int j=0; j<this.core.numZ; j++ ){
-//				double v=this.core.cij.get(i, j);
-//				if( (v < mincij) && (v>0.0) )
-//					mincij = v;
-//			}
-//			if( this.core.cij.get(i, i) == 0.0 )
-//				this.core.cij.set(i, i, mincij );
-//		}
-//		this.core.setupECij();
-	}
-	
+	}	
 }
