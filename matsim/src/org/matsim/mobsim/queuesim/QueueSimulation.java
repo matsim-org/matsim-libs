@@ -77,14 +77,14 @@ public class QueueSimulation {
  	 */
 	private static PriorityQueue<Vehicle> teleportationList = new PriorityQueue<Vehicle>(30, new VehicleDepartureTimeComparator());
 
-	private Date starttime = new Date();
+	private final Date starttime = new Date();
 
 	private double stopTime = 100*3600;
 
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
 	private AgentFactory agentFactory;
-	
+
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -119,14 +119,14 @@ public class QueueSimulation {
 		}
 		for (Person p : this.plans.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-			
+
 			Vehicle veh;
 			try {
 				veh = this.vehiclePrototype.newInstance();
 				//not needed in new agent class
 				veh.setDriver(agent);
 				agent.setVehicle(veh);
-				
+
 				if (agent.initialize()) {
 					addVehicleToLink(veh);
 				}
@@ -216,7 +216,6 @@ public class QueueSimulation {
 			}
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
-
 				this.snapshotWriters.add(new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile));
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
@@ -348,7 +347,7 @@ public class QueueSimulation {
 		QueueSimulation.events = events;
 	}
 
-	public static final void handleUnknownLegMode(final Vehicle veh) {
+	protected static final void handleUnknownLegMode(final Vehicle veh) {
 		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravTime());
 		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
@@ -384,8 +383,8 @@ public class QueueSimulation {
 	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
 	}
-	
-	public void setAgentFactory(AgentFactory fac) {
+
+	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
 	}
 
