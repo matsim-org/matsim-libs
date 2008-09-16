@@ -1,6 +1,8 @@
 package playground.wrashid.PHV.Utility;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.LinkLeaveEvent;
@@ -9,17 +11,21 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
+import playground.wrashid.PDES.util.ComparableEvent;
 
 
+//TODO: write tests for this class
 
 public class ElectricCostHandler implements LinkLeaveEventHandler {
 
 	private static HashMap<Id,Double> energyLevel =new HashMap<Id,Double>();
 	private final double fullEnergyLevel=10; // 10 kW
 	private NetworkLayer network=null;
+	private EnergyConsumptionSamples energyConsumptionSamples=null;
 	
-	public ElectricCostHandler(NetworkLayer network){
+	public ElectricCostHandler(NetworkLayer network,EnergyConsumptionSamples energyConsumptionSamples){
 		this.network=network;
+		this.energyConsumptionSamples=energyConsumptionSamples;
 	}
 	
 	
@@ -30,20 +36,14 @@ public class ElectricCostHandler implements LinkLeaveEventHandler {
 			energyLevel.put(event.agent.getId(), fullEnergyLevel);
 		}
 		
-		// consume energy for link
+		// updated consumed energy for link
 		energyLevel.put(event.agent.getId(), energyLevel.get(event.agent.getId())-getEnergyConsumption(event.link));
 	}
 	
 	private double getEnergyConsumption(Link link){
 		double freeSpeed=link.getFreespeed(network.getCapacityPeriod());
-		double travelTime=link.getFreespeedTravelTime(network.getCapacityPeriod());
-		
-		// TODO: 
-		// do some rounding here to values
-		// and write how much energy was consumed
-		
-		
-		return 0;
+		double linkLength=link.getLength();
+		return energyConsumptionSamples.getInterpolatedEnergyConsumption(freeSpeed,linkLength);
 	}
 	
 
@@ -53,6 +53,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler {
 		
 	}
 
+	
+	
+	
+	
+	
+	
+	
 
 
 }
