@@ -246,6 +246,7 @@ public class SnowballExe {
 			deltaLastVisited = deltaVisited;
 			logger.info(String.format(Locale.US, "Sampling efficiency is %1.4f", efficiency));
 			
+//			sampler.calculateSampleProbas(g, lastNumSampledVertices, lastNumSampledVertices2, g.numVertices());
 			sampler.calculateSampleProbas(g, lastNumSampledVertices, lastNumSampledVertices2, g.numVertices());
 			
 			summaryWriter.write(String.valueOf(sampler.getCurrentWave()));

@@ -311,7 +311,7 @@ public class Sampler {
 			}
 			SampledVertex sample = (SampledVertex) v.getUserDatum(SAMPLED_ELEMENT_KEY);
 			if(sample != null) {
-//				if(sample.getWaveSampled() == currentWave)
+				if(sample.getWaveSampled() == currentWave || sample.getWaveDetected() == currentWave)
 					sample.setSampleProbability(p);
 			}
 //			probas.put(v.degree(), p);
