@@ -127,7 +127,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 
 
 	public void reset(final int iteration) {
-//		this.agentScorers.clear();
+		this.timeWindowMap.clear();
 	}
 
 	public Hashtable<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){

@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Facility;
@@ -45,6 +46,8 @@ import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
+
+import playground.jhackney.controler.SNControllerListenerRePlanSecLoc;
 
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
@@ -68,11 +71,16 @@ import edu.uci.ics.jung.utils.UserData;
  * JUNG jar (at least 1.7 and preferably the newest) as well as Apache Commons
  * Collections jar (at least 3.1) and Cern Colt jar externally linked.
  *
+ * Could be tailored to the network object in MATSim instead of causing overhead by using JUNG
+ * 
+ * Should be static -jh 9/2008
+ *  
  * @author jhackney
  *
  */
 public class SocialNetworkStatistics {
 
+	private final Logger log = Logger.getLogger(SocialNetworkStatistics.class);
 	private String statsoutdir;
 
 	private BufferedWriter aout = null;
@@ -103,7 +111,7 @@ public class SocialNetworkStatistics {
 
 		File snDir = new File(statsoutdir);
 		if (!snDir.mkdir() && !snDir.exists()) {
-			Gbl.errorMsg("Cannot make directory " + statsoutdir);
+			log.error("Cannot make directory" + statsoutdir);
 		}
 		String aoutfile = statsoutdir + "agent.txt";
 		String eoutfile = statsoutdir + "edge.txt";
@@ -115,7 +123,8 @@ public class SocialNetworkStatistics {
 			aout = new BufferedWriter(new FileWriter(aoutfile));
 			// aout.write("tstep egoid egozone egodeg egoasd egoclust egoaccess
 			// lastactivity rseed var\r\n");
-			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
+//			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
+			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown pop\r\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
 			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\r\n");
 		} catch (IOException ex) {
@@ -132,7 +141,7 @@ public class SocialNetworkStatistics {
 		String goutfile = outputPath + "/graph.txt";
 
 		if (!snDir.mkdir() && !snDir.exists()) {
-			Gbl.errorMsg("Cannot make directory " + statsoutdir);
+			log.error("Cannot make directory " + statsoutdir);
 		}
 
 		try {
@@ -141,7 +150,8 @@ public class SocialNetworkStatistics {
 			aout = new BufferedWriter(new FileWriter(aoutfile));
 			// aout.write("tstep egoid egozone egodeg egoasd egoclust egoaccess
 			// lastactivity rseed var\r\n");
-			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
+//			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown a b x y theta pop\r\n");
+			aout.write("iter id homeid deg asd1 asd2 asd3 clust plantype placesknown pop\r\n");
 			gout = new BufferedWriter(new FileWriter(goutfile));
 			gout.write("iter deg clust clustratio asd1 asd2 asd3 dyad_dist link_age meet_freq\r\n");
 		} catch (IOException ex) {
@@ -160,17 +170,15 @@ public class SocialNetworkStatistics {
 		// Then fill the graph using the MatSim ego nets
 		fillGraph(this.g, snet, plans);
 
-		System.out
-		.println("   MatSim social network converted into a JUNG graph for analysis");
-		System.out
-		.println("     >> See Palla et al for k-clustering calculations or check JUNG");
+		log.info("   MatSim social network converted into a JUNG graph for analysis");
+		log.info("     >> See Palla et al for k-clustering calculations or check JUNG");
 		// Now you can run whatever statistics you want on g, its vertices, or
 		// its edges
 
 		// Prepare aggregate graph stats
 		this.clusterMap = GraphStatistics.clusteringCoefficients(this.g);
 		double deg = getGraphAvgDeg(this.g);
-		System.out.println("   avg degree " + deg);
+		log.info("   avg degree " + deg);
 		if (deg != 0) {
 			makeDegreeHistogram(iteration);
 		}
@@ -261,7 +269,7 @@ public class SocialNetworkStatistics {
 
 	private int max(DoubleArrayList degvals) {
 		degvals.quickSort();
-		System.out.println("   max degree " + degvals.get(degvals.size() - 1));
+		log.info("   max degree " + degvals.get(degvals.size() - 1));
 		return (int) degvals.get(degvals.size() - 1);
 	}
 
@@ -303,11 +311,11 @@ public class SocialNetworkStatistics {
 			double aSd3 = len.getPlanLength(myPerson.getSelectedPlan());
 
 			//calculate the ego space and record xcen,ycen,a,b,theta
-			double esa=0;
-			double esb=0;
-			double esx=0;
-			double esy=0;
-			double est=0;
+//			double esa=0;
+//			double esb=0;
+//			double esx=0;
+//			double esy=0;
+//			double est=0;
 //			new PersonCalcEgoSpace().run(myPerson);
 //			ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
 //			if(space instanceof ActivitySpaceEllipse){
@@ -358,13 +366,16 @@ public class SocialNetworkStatistics {
 			// Iterator viter = myPerson.getKnowledge().map.getAllPlaces().iterator();
 			// while(viter.hasNext()){
 			// CoolPlace place = (CoolPlace) viter.next();
-			// System.out.println(iter+"\t"+id+"\t"+place.activity.getType()+"\t"+place.facility.getId());
+			// log.info(iter+"\t"+id+"\t"+place.activity.getType()+"\t"+place.facility.getId());
 			// }
 			try {
+//				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
+//						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
+//						+ " " + myPerson.getKnowledge().getActivities().size() + " "+
+//						esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
 				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
 						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-						+ " " + myPerson.getKnowledge().getActivities().size() + " "+
-						esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
+						+ " " + myPerson.getKnowledge().getActivities().size() + " "+pop);
 				aout.newLine();
 			} catch (IOException e) {
 
@@ -456,7 +467,7 @@ public class SocialNetworkStatistics {
 			e.addUserDatum("timeLastUsed", myLink.getTimeLastUsed(), UserData.SHARED);
 			e.addUserDatum("type", myLink.getType(), UserData.SHARED);
 			e.addUserDatum("visitNum", myLink.getTimesMet(), UserData.SHARED);
-			// System.out.println(myLink.getTimeMade()-myLink.getTimeLastUsed());
+			// log.info(myLink.getTimeMade()-myLink.getTimeLastUsed());
 			// Add the link to the graph
 			g.addEdge(e);
 		}
@@ -472,11 +483,11 @@ public class SocialNetworkStatistics {
 		} catch (IOException ex2) {
 		}
 		try {
-			System.out.println("Batch: closed output files");
+			log.info("Batch: closed output files");
 			gout.close();
 		} catch (IOException ex2) {
 		}
-		System.out.println("Social network output files closed.");
+		log.info("Social network output files closed.");
 	}
 
 }

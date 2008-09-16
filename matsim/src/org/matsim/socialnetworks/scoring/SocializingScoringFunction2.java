@@ -97,7 +97,7 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 				this.timeWithFriends+=actStats.get(act).get(2);
 			}
 		}
-//		log.info("Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
+//		log.info("SSTEST Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
 	}
 
 	public void agentStuck(final double time) {
