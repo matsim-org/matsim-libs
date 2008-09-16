@@ -5,13 +5,13 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
 
-public class SNScoringGeneralFactory implements ScoringFunctionFactory {
+public class SocScoringFactoryPlan implements ScoringFunctionFactory {
 
 	private String factype;
-	private SpatialScorer scorer;
+	private TrackActsOverlap scorer;
 	private ScoringFunctionFactory factory;
 
-	public SNScoringGeneralFactory(String factype, SpatialScorer scorer, ScoringFunctionFactory sf) {
+	public SocScoringFactoryPlan(String factype, TrackActsOverlap scorer, ScoringFunctionFactory sf) {
 		this.factype=factype;
 		this.scorer=scorer;
 		this.factory=sf;
@@ -19,8 +19,7 @@ public class SNScoringGeneralFactory implements ScoringFunctionFactory {
 	}
 
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-//		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
-		return new SocializingScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
+		return new SocScoringFunctionPlan(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
 	}
 
 

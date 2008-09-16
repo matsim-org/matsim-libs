@@ -38,16 +38,13 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 
-public class SpatialScorer {
+public class TrackActsOverlap {
 
 	SocialNetwork net;
 
 	Hashtable<Activity,ArrayList<Person>> activityMap;
-	static final private Logger log = Logger.getLogger(SpatialScorer.class);
+	static final private Logger log = Logger.getLogger(TrackActsOverlap.class);
 
-//	public SpatialScorer() {
-
-//	}
 	/**
 	 * The Plans contain all agents who are chosen to get scores for social interactions.
 	 * Generally all agents in the population get scored.
@@ -71,7 +68,7 @@ public class SpatialScorer {
 	 * @param iteration
 	 * 
 	 */
-	public void scoreActs(Population plans, int iteration) {
+	public void trackActs(Population plans, int iteration) {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 

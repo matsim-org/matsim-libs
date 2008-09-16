@@ -40,9 +40,9 @@ import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
  *
  * @author jhackney
  */
-public class SocializingScoringFunction2 implements ScoringFunction{
+public class SocScoringFunctionEvent implements ScoringFunction{
 
-	static final private Logger log = Logger.getLogger(SocializingScoringFunction.class);
+	static final private Logger log = Logger.getLogger(SocScoringFunctionPlan.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
@@ -60,7 +60,7 @@ public class SocializingScoringFunction2 implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public SocializingScoringFunction2(final Plan plan, final ScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
+	public SocScoringFunctionEvent(final Plan plan, final ScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
