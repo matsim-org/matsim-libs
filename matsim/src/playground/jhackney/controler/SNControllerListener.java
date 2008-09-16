@@ -95,7 +95,7 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * @author jhackney
  *
  */
-public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
+public class SNControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
 
@@ -121,7 +121,7 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private EventsToScore scoring =null;
 
-	private final Logger log = Logger.getLogger(SNControllerListenerRePlanSecLoc.class);
+	private final Logger log = Logger.getLogger(SNControllerListener.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
