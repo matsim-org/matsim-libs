@@ -50,20 +50,17 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	
 	private static final Logger log = Logger.getLogger(KnowledgeReplanner.class);
 	
-	@Override
 	public void handleEvent(ActEndEvent event) {
 		// TODO Auto-generated method stub
 		log.info("KnowledgeReplaner ActEndEvent.................................");
 		Replanning(event);
 	}
 	
-	@Override
 	public void handleEvent(AgentReplanEvent event) {
 		// TODO Auto-generated method stub
 //		System.out.println("KnowledgeReplaner AgentReplanEvent.................................");
 	}
 
-	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		// TODO Auto-generated method stub
 //		System.out.println("KnowledgeReplaner LinkLeaveEvent.................................");
@@ -71,7 +68,6 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	}
 	
 	
-	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 		
@@ -82,7 +78,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		
 	}
 	
-	// Wofür den Controler?!
+	// Wofï¿½r den Controler?!
 	public KnowledgeReplanner(Controler controler)
 	{
 		this.controler = controler;
@@ -150,33 +146,33 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	
 	/**
 	 * Ansatz:
-	 * Die Router von MATSim generieren jeweils Routen für ganze Pläne. Da wird nichts
-	 * an den Routern ändern wollen und auch keine eigenen schreiben wollen, generieren
+	 * Die Router von MATSim generieren jeweils Routen fï¿½r ganze Plï¿½ne. Da wird nichts
+	 * an den Routern ï¿½ndern wollen und auch keine eigenen schreiben wollen, generieren
 	 * wir stattdessen einen neuen Plan, welcher nur die Bewegung von der Ist-Position
-	 * bis hin zur nächsten Aktivität enthält. Dieser Plan wird dann an den Router
+	 * bis hin zur nï¿½chsten Aktivitï¿½t enthï¿½lt. Dieser Plan wird dann an den Router
 	 * geschickt und das Ergebnis anschliessend beim aktiven Agenten hinterlegt. 
 	 * 
 	 * Die Routen werden neu geplant, wenn der Agent beschliesst, loszufahren - nicht wenn
-	 * er tatsächlich auf den ersten Link einbiegt.
-	 * Die Konsequenz daraus lässt sich leicht
+	 * er tatsï¿½chlich auf den ersten Link einbiegt.
+	 * Die Konsequenz daraus lï¿½sst sich leicht
 	 * am Equil Tutorial mit 100 Personen zeigen. Alle 100 Personen wollen sich um 06:00 auf
 	 * den Weg zur Arbeit machen und planen auch zu dieser Uhrzeit ihre Route. Nun ist die zu
-	 * diesem Zeitpunkt allerdings noch leer, weshalb alle Agenten dieselbe Route wählen.
-	 * Würde das Routing erst beim Effektiven einbiegen auf die Strasse passieren, würden
-	 * die Agenten unterschiedliche Routen wählen! 
+	 * diesem Zeitpunkt allerdings noch leer, weshalb alle Agenten dieselbe Route wï¿½hlen.
+	 * Wï¿½rde das Routing erst beim Effektiven einbiegen auf die Strasse passieren, wï¿½rden
+	 * die Agenten unterschiedliche Routen wï¿½hlen! 
 	 * 
 	 * @param plan
 	 */
 	protected void Routing(Act fromAct, Leg nextLeg)
 	{		
-		// die geplante Endzeit mit der tatsächlichen Endzeit ersetzen
+		// die geplante Endzeit mit der tatsï¿½chlichen Endzeit ersetzen
 		fromAct.setEndTime(time);
 		
-		// aktuell gewählten Plan sichern
+		// aktuell gewï¿½hlten Plan sichern
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// Neuen Plan generieren und selektieren.
-		// Dieser enthält nur den Weg von der letzten bis zur nächten Aktivität.
+		// Dieser enthï¿½lt nur den Weg von der letzten bis zur nï¿½chten Aktivitï¿½t.
 		// -> Mehr wollen wir schliesslich noch gar nicht neu planen!
 		Plan newPlan = new Plan(person);
 		person.setSelectedPlan(newPlan);
@@ -195,7 +191,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
 		planAlgorithm.run(newPlan);
 		
-/* Gar nicht nötig - die Änderungen werden direkt am nextLeg durchgeführt und
+/* Gar nicht nï¿½tig - die ï¿½nderungen werden direkt am nextLeg durchgefï¿½hrt und
  * sind somit auch im eigentlich Plan direkt vorhanden! 	
 		// neu berechnete Route holen
 		Leg leg = newPlan.getNextLeg(newPlan.getFirstActivity());
@@ -213,17 +209,17 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	/**
 	 * Route am Ende jedes Links neu berechnen.
 	 * Ansatz:
-	 * - Neue Aktivität beim aktuellen Link generieren und Zielaktivität beibehalten.
+	 * - Neue Aktivitï¿½t beim aktuellen Link generieren und Zielaktivitï¿½t beibehalten.
 	 * - Route generieren 
 	 * - Alte Route mit neuer Route mergen
 	 *   -> Annahme: ein Link ist in jeder Route nur 1x vorhanden (was auch Sinn macht, da
-	 *      "Rundfahrten" wohl kaum die kürzesten Wege von A nach B darstellen.
-	 *   -> Könnte doch noch Probleme hervorrufen. Agenten könnten an Stellen gelangen, wo
-	 *      z.B. aufgrund von Staus umkehren sinnvoller wäre, was wiederum duplizierte Links
-	 *      in den Routen hervorrufen würde :?
+	 *      "Rundfahrten" wohl kaum die kï¿½rzesten Wege von A nach B darstellen.
+	 *   -> Kï¿½nnte doch noch Probleme hervorrufen. Agenten kï¿½nnten an Stellen gelangen, wo
+	 *      z.B. aufgrund von Staus umkehren sinnvoller wï¿½re, was wiederum duplizierte Links
+	 *      in den Routen hervorrufen wï¿½rde :?
 	 *      
-	 * Klappt derzeit so nicht - der Event wird erst ausgelöst, NACHDEM der Agent von der
-	 * Simulation bereits auf den nächsten Link geschoben wurde -> Replanning via
+	 * Klappt derzeit so nicht - der Event wird erst ausgelï¿½st, NACHDEM der Agent von der
+	 * Simulation bereits auf den nï¿½chsten Link geschoben wurde -> Replanning via
 	 * "Replanner.java", welcher direkt vor dem Verschieben der Fahrzeuge neu plant.
 	 */
 	protected void Routing(Link fromLink, Leg leg)
@@ -243,7 +239,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		}
 
 		
-		// Daten für die neue Aktivität generieren
+		// Daten fï¿½r die neue Aktivitï¿½t generieren
 		String type = "w";
 		
 		Node toNode = fromLink.getToNode();
@@ -271,9 +267,9 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		
 		if (!nodesRoute.contains(newStartNode)) log.error("Neuer Startnode " + newStartNode.getId() + " nicht in der Route enthalten?!");
 		
-		// Alle Nodes aus der Route löschen, die bereits "befahren" wurden
-		// Die gelöschten gleichzeitig in einer ArrayList ablegen - diese werden
-		// anschliessend mit der neue generierten Subroute wieder zusammengefügt!
+		// Alle Nodes aus der Route lï¿½schen, die bereits "befahren" wurden
+		// Die gelï¿½schten gleichzeitig in einer ArrayList ablegen - diese werden
+		// anschliessend mit der neue generierten Subroute wieder zusammengefï¿½gt!
 		while(nodesRoute.size() > 0)
 		{
 			Node node = nodesRoute.get(0);
@@ -291,7 +287,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 			}
 		}
 			
-		// neue, gekürzte Route erstellen
+		// neue, gekï¿½rzte Route erstellen
 		Route subRoute = new Route();
 		subRoute.setRoute(nodesRoute);
 
@@ -299,7 +295,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		Leg newLeg = new Leg(0, leg.getMode(), leg.getDepTime(), leg.getTravTime(), leg.getArrTime());
 		newLeg.setRoute(subRoute);
 				
-		// aktuell gewählten Plan 
+		// aktuell gewï¿½hlten Plan 
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// neuen Plan generieren und selektieren
@@ -328,7 +324,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 //		for(int i = 0; i < nodeBuffer.size(); i++) log.info(nodeBuffer.get(i));
 		
 		
-		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenführen
+		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenfï¿½hren
 		nodeBuffer.addAll(newRoute.getRoute());
 		
 //		log.info("new - to be driven");
