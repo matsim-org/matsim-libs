@@ -28,25 +28,27 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.socialnetworks.io.PajekWriter;
 /**
- * The social network replanning StrategyModule is not multi-threaded because each
- * agent could refer to and alter other agent objects in a random manner.
- *  
+ * A sample location choice replanning StrategyModule. The facility
+ * (the place an activity takes place) is exchanged randomly for another
+ * facility chosen randomly from facilities in agent's knowledge.
+ * This is only performed for a given type(s) of activity.
  * @author jhackney
  *
  */
 
-public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
-	private final static Logger log = Logger.getLogger(SNRandomFacilitySwitcher.class);
+public class RandomFacilitySwitcherK extends MultithreadedModuleA {
+	private final static Logger log = Logger.getLogger(RandomFacilitySwitcherK.class);
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
 	/** 
-	 * TODO [JH] this is hard-coded here but has to match the standard facility types
-	 * in the facilities object. Need to make this change in the SNControllers, too.
+	 * TODO [JH] Activity types are hard-coded here but have to match the
+	 * standard facility types in the facilities object as well as plans object.
+	 * Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public SNRandomFacilitySwitcher(NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+    public RandomFacilitySwitcherK(NetworkLayer network, TravelCost tcost, TravelTime ttime) {
 
 		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;
@@ -56,7 +58,7 @@ public class SNRandomFacilitySwitcher extends MultithreadedModuleA {
 
     public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new SNSecLocRandom(factypes, network, tcost, ttime);
+	return new RandomChangeLocationK(factypes, network, tcost, ttime);
     }
 
 

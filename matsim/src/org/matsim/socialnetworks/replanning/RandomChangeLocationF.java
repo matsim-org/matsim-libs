@@ -43,7 +43,15 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
-public class SecLocRandom  implements PlanAlgorithm{
+/**
+ * Sample replanning strategy to change activity location:
+ * uses all facilities
+ *  
+ * @author jhackney
+ *
+ */
+
+public class RandomChangeLocationF  implements PlanAlgorithm{
 	private final String weights;
 
 	private double[] cum_p_factype;
@@ -53,7 +61,7 @@ public class SecLocRandom  implements PlanAlgorithm{
 	private String[] factypes;
 	private Facilities facs;
 
-	public SecLocRandom(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Facilities facs) {
+	public RandomChangeLocationF(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, Facilities facs) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;

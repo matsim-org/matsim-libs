@@ -27,25 +27,28 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 /**
- * The social network replanning StrategyModule is not multi-threaded because each
- * agent could refer to and alter other agent objects in a random manner.
+ * A sample location choice replanning StrategyModule. The facility
+ * (the place an activity takes place) is exchanged randomly for another
+ * facility chosen randomly from all available facilities.
+ * This is only performed for a given type(s) of activity.
  *  
  * @author jhackney
  *
  */
 
-public class RandomFacilitySwitcher extends MultithreadedModuleA {
+public class RandomFacilitySwitcherF extends MultithreadedModuleA {
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
 	private Facilities facs=null;
 	/** 
-	 * TODO [JH] this is hard-coded here but has to match the standard facility types
-	 * in the facilities object. Need to make this change in the SNControllers, too.
+	 * TODO [JH] Activity types are hard-coded here but have to match the
+	 * standard facility types in the facilities object as well as plans object.
+	 * Need to make this change in the SNControllers, too.
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public RandomFacilitySwitcher(NetworkLayer network, TravelCost tcost, TravelTime ttime, Facilities facs) {
+    public RandomFacilitySwitcherF(NetworkLayer network, TravelCost tcost, TravelTime ttime, Facilities facs) {
 
 		System.out.println("initializing RandomFacilitySwitcher");
     	this.network=network;
@@ -56,7 +59,7 @@ public class RandomFacilitySwitcher extends MultithreadedModuleA {
 
     public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
-	return new SecLocRandom(factypes, network, tcost, ttime, facs);
+	return new RandomChangeLocationF(factypes, network, tcost, ttime, facs);
     }
 
 

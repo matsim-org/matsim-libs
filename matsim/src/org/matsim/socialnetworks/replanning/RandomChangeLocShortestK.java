@@ -41,7 +41,7 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.geometry.CoordImpl;
 
-public class SNSecLocShortest implements PlanAlgorithm {
+public class RandomChangeLocShortestK implements PlanAlgorithm {
 
 	private final String weights;
 
@@ -52,7 +52,7 @@ public class SNSecLocShortest implements PlanAlgorithm {
 	private TravelTime ttime;
 	private String[] factypes;
 
-	public SNSecLocShortest(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime) {
+	public RandomChangeLocShortestK(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
