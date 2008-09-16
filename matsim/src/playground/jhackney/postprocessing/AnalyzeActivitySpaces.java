@@ -34,7 +34,7 @@ import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.scoring.SpatialScorer;
+import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.utils.charts.XYScatterChart;

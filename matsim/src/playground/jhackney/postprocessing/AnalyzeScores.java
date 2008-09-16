@@ -38,7 +38,7 @@ import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.scoring.SpatialScorer;
+import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.utils.charts.XYScatterChart;
@@ -83,8 +83,8 @@ public class AnalyzeScores {
 			double totaliterationfriendscore=0;
 			double totaliterationscore=0;
 			int numplans=0;
-			SpatialScorer scorer =new SpatialScorer();
-			scorer.scoreActs(plans, i);
+			TrackActsOverlap scorer =new TrackActsOverlap();
+			scorer.trackActs(plans, i);
 			//for each plan this is how it is calculated in the TRB runs, which is incorrect!!
 			Iterator<Person> planiter=plans.iterator();
 			while(planiter.hasNext()){

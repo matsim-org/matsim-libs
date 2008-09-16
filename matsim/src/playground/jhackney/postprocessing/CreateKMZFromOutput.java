@@ -31,7 +31,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.socialnetworks.scoring.SpatialScorer;
+import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
