@@ -27,23 +27,6 @@ import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl {
 
-	public Leg(final int num, final String mode, final String depTime, final String travTime, final String arrTime) {
-		this.num = num;
-		if (this.num < 0) {
-			throw new NumberFormatException("A Leg's num has to be an  integer >= 0.");
-		}
-		this.mode = mode.intern();
-		if (depTime != null) {
-			this.setDepTime(Time.parseTime(depTime));
-		}
-		if (travTime != null) {
-			this.setTravTime(Time.parseTime(travTime));
-		}
-		if (arrTime != null) {
-			this.setArrTime(Time.parseTime(arrTime));
-		}
-	}
-
 	public Leg(final int num, final String mode, final double depTime, final double travTime, final double arrTime) {
 		this.num = num;
 		if ((this.num < 0) && (this.num != Integer.MIN_VALUE)) {
