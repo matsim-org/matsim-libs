@@ -34,6 +34,8 @@ import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -82,12 +84,18 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(PlanOptimizeTimesTest.class);
 
 	private NetworkLayer network = null;
+	private Facilities facilities = null;
 	private Population population = null;
 
 	protected void setUp() throws Exception {
 
 		super.setUp();
 		super.loadConfig(this.getClassInputDirectory() + "config.xml");
+
+		log.info("Reading facilities xml file...");
+		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		log.info("Reading facilities xml file...done.");
 
 		log.info("Reading network xml file...");
 		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);

@@ -9,6 +9,10 @@
 		<param name="numberOfThreads" value="1" />
 	</module>
 
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+	</module>
+
 	<module name="network">
 		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
 	</module>
