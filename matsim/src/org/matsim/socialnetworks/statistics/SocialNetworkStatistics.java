@@ -47,7 +47,7 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 
-import playground.jhackney.controler.SNControllerListenerRePlanSecLoc;
+import playground.jhackney.controler.SNControllerListener;
 
 import cern.colt.list.DoubleArrayList;
 import edu.uci.ics.jung.graph.Edge;
