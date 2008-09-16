@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>Zurich test case</comment>
+<comment>Zurich test case data</comment>
+<!-- This file is not intended to be a sample config file and is only used by the tests of the Primloc Core -->
+<!-- For a description of the parameters, refer to the sample config: config_primloc_triangle.xml file instead -->
 	<entry key="costFileName">test/input/org/matsim/demandmodeling/primloc/zh_costs.txt.gz</entry>
 	<entry key="zoneFileName">test/input/org/matsim/demandmodeling/primloc/zh_zones.txt.gz</entry>
 	<entry key="jobsFileName">test/input/org/matsim/demandmodeling/primloc/zh_jobs.txt.gz</entry>
