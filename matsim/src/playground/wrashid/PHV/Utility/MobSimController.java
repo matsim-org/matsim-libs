@@ -26,7 +26,7 @@ public class MobSimController extends Controler {
 		Events events=controler.getEvents();
 		
 		
-		ElectricCostHandler ecHandler=new ElectricCostHandler(controler.network,getEnergyConsumptionSamples());
+		ElectricCostHandler ecHandler=new ElectricCostHandler(controler.network,getEnergyConsumptionSamples(),events);
 		events.addHandler(ecHandler);
 		
 		

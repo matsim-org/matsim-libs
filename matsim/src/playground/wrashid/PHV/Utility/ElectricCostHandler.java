@@ -7,6 +7,8 @@ import java.util.PriorityQueue;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
+import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
@@ -26,10 +28,12 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventH
 	private final double fullEnergyLevel=36000000; // in [J] (=10 kWh)
 	private NetworkLayer network=null;
 	private EnergyConsumptionSamples energyConsumptionSamples=null;
+	private Events events=null;
 	
-	public ElectricCostHandler(NetworkLayer network,EnergyConsumptionSamples energyConsumptionSamples){
+	public ElectricCostHandler(NetworkLayer network,EnergyConsumptionSamples energyConsumptionSamples,Events events){
 		this.network=network;
 		this.energyConsumptionSamples=energyConsumptionSamples;
+		this.events=events;
 	}
 	
 	
@@ -81,16 +85,24 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventH
 		EnergyApplicatonSpecificState state=energyLevel.get(event.agent.getId());
 		
 		// assumption is, the agent starts immediately charging, until the energyLevel is full
-		// TODO: Make chargingPower and
+		// TODO: read chargingPower and costPerJule from config file
 		double chargingPower=3500; //  in J/s (=Watt) 
-		double costPerJule=1; // in "util"
-		double timeCharged=event.time - state.startTimeOfLastAct; // in seconds
-		double energyCharged=chargingPower*timeCharged; // in J
+		double costPerJule=1; // in "util" per Jule
+		
+		double activityTime=event.time - state.startTimeOfLastAct; // in seconds
+		double energyCharged=chargingPower*activityTime; // in J
 		
 		
+		// adjust energyCharged (if could charge more than full battery)
+		if (state.energyLevel+energyCharged>fullEnergyLevel){
+			energyCharged=fullEnergyLevel-state.energyLevel;
+		}
 		
-		state.energyLevel-=getEnergyConsumption(event.link);
+		double costOfEnergy=energyCharged*costPerJule; // in "util"
 		
+		events.processEvent(new AgentUtilityEvent(event.time,event.agent,costOfEnergy));
+				
+		state.energyLevel+=energyCharged;
 	}
 
 	
