@@ -155,7 +155,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
-		initializeKnowledge(this.controler.getPopulation());
+		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -309,7 +309,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final Population plans ) {
+	void initializeKnowledge(final Population plans, Facilities facilities ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
@@ -342,7 +342,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //				The activities and acts are not associated correctly.
 //				does this mean that the act.RefId() needs to be unique per act AND plan?
 				k.getMentalMap().initializeActActivityMapRandom(plan);
-				k.getMentalMap().initializeActActivityMapFromFile(plan,aar);
+				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
 			}
 		}
 		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){

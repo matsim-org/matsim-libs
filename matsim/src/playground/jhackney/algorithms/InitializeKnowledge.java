@@ -2,6 +2,7 @@ package playground.jhackney.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
@@ -10,7 +11,7 @@ import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.ActivityActReader;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final Population plans){
+	public InitializeKnowledge(final Population plans, final Facilities facilities){
 
 		ActivityActReader aar = null;
 
@@ -42,7 +43,7 @@ public class InitializeKnowledge {
 
 				k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
 				k.getMentalMap().initializeActActivityMapRandom(plan);
-				k.getMentalMap().initializeActActivityMapFromFile(plan,aar);
+				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities, aar);
 			}
 		}
 		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){

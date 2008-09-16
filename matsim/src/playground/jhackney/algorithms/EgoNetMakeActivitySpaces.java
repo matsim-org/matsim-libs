@@ -20,6 +20,7 @@
 
 package playground.jhackney.algorithms;
 
+import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
@@ -49,13 +50,14 @@ public class EgoNetMakeActivitySpaces {
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
 		Population plans = Scenario.readPlans();
+		Facilities facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
 		new SocialNetwork(plans);
 		System.out.println("... done");
 		
 		//read in facilities knowledge
-		new InitializeKnowledge(plans);
+		new InitializeKnowledge(plans, facilities);
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 		//////////////////////////////////////////////////////////////////////
 
