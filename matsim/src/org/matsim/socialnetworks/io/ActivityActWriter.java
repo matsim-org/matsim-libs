@@ -33,19 +33,9 @@ public class ActivityActWriter {
 	public void openFile(String outFileName){
 		//open file here
 
-//		File outDir = new File(outDirName);
-//		if (!outDir.mkdir() && !outDir.exists()) {
-//		Gbl.errorMsg("Cannot make directory " + outDirName);
-//		}
-//		File outFile = new File(outFileName);
-//		if (!outFile.mkdir() && !outFile.exists()) {
-//		Gbl.errorMsg("Cannot make directory " + outFileName);
-//		}
-
-//		String outFileName = outDirName + "ActivityActMap.txt";
 		try{
 			out = new BufferedWriter(new FileWriter(outFileName));
-			out.write("iter id facilityid actid");
+			out.write("iter id facilityid acttype");
 			out.newLine();
 
 		}catch (IOException ex ){
@@ -58,23 +48,18 @@ public class ActivityActWriter {
 		Iterator<Person> pIt = myPlans.iterator();
 		while(pIt.hasNext()){
 			Person myPerson = (Person) pIt.next();
-			Knowledge myKnowledge = myPerson.getKnowledge();
 			List<Plan> myPersonPlans = myPerson.getPlans();
 
 			for (int i=0;i<myPersonPlans.size();i++){
 				Plan myPlan = myPersonPlans.get(i);
 				ArrayList<Object> actsLegs=myPlan.getActsLegs();
-				int actIndex=0;
+
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					Act myAct= (Act) actsLegs.get(j);
-//					Activity myActivity= myKnowledge.getMentalMap().getActivity(myAct);
-					//Above line calls code that results in a null pointer. Test
-					// michi's new change. Note the Act.setFacility() might not
-					// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
 					Activity myActivity=myAct.getFacility().getActivity(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
-						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+actIndex);
+						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());
 						out.newLine();
 
 					} catch (IOException e) {
@@ -83,7 +68,6 @@ public class ActivityActWriter {
 						System.out.println(myAct.toString());
 						e.printStackTrace();
 					}
-					actIndex++;
 				}
 			}
 		}

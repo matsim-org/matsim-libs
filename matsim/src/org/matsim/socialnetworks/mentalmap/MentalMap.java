@@ -24,14 +24,17 @@ package org.matsim.socialnetworks.mentalmap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
+import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -124,7 +127,7 @@ public class MentalMap {
 		}
 	}
 
-	public void initializeActActivityMapFromFile(Plan myPlan, ActivityActReader aar){
+	public void initializeActActivityMapFromFile(Plan myPlan, Facilities facilities, ActivityActReader aar){
 
 
 		if(aar==null) return;
@@ -132,13 +135,14 @@ public class MentalMap {
 		ActIterator planActIter = myPlan.getIteratorAct();
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
-			Id myActivityId = aar.getNextActivityId();
-			Activity myActivity = knowledge.getActivity(myActivityId);
-			if(myActivity!=null){
-				myAct.setFacility(myActivity.getFacility());
-				this.knowledge.addActivity(myActivity);
-//				learnActsActivities(myAct,myActivity);
-			}	
+
+			TreeMap<Id,String> nextFac = aar.getNextPoint();
+			Id myFacilityId = nextFac.firstKey();
+			String myActivityType=nextFac.get(myFacilityId);
+
+			Facility fac = facilities.getFacilities().get(myFacilityId);
+			myAct.setFacility(fac);
+			this.knowledge.addActivity(fac.getActivity(myActivityType));
 		}
 
 	}
@@ -184,13 +188,13 @@ public class MentalMap {
 		// from Act --> Facility.
 		this.knowledge.removeActivity(myactivity);
 	}
-/**
- * ManageMemory is an algorithm that could be written to serve many purposes. Here, it tags
- * activities in excess of what is needed by an agent and deletes them from the agent's knowledge.
- *  
- * @param max
- * @param myPlans
- */
+	/**
+	 * ManageMemory is an algorithm that could be written to serve many purposes. Here, it tags
+	 * activities in excess of what is needed by an agent and deletes them from the agent's knowledge.
+	 *  
+	 * @param max
+	 * @param myPlans
+	 */
 	public void manageMemory(int max, List<Plan> myPlans){
 
 		if(myPlans.get(0).getActsLegs().size()*myPlans.size()/2 >max){

@@ -3,6 +3,8 @@ package org.matsim.socialnetworks.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -14,7 +16,7 @@ public class ActivityActReader {
 	private BufferedReader br = null;
 	private int[] iter;
 	private String[] pId;
-	private int[] activityId;
+	private String[] acttype;
 	private int[] readActId;
 	private int iteration=-1;
 	private boolean tapeAtStartPosition=false;
@@ -82,7 +84,7 @@ public class ActivityActReader {
 
 				iter[i] = Integer.valueOf(s[0]).intValue();
 				pId[i] = s[1];
-				activityId[i] =Integer.valueOf(s[2]).intValue();
+				acttype[i] =s[2];
 				readActId[i] =Integer.valueOf(s[3]).intValue();
 				i++;
 			}
@@ -95,9 +97,40 @@ public class ActivityActReader {
 		}
 	}
 
-	public Id getNextActivityId(){
+////	public Id getNextActivityId(){
+//	public String getNextActivityType(){
+//
+////		Id myId=null;
+//		String myType=null;
+//
+////		readLine is positioned at the first line that interests us and this line is already read
+//
+//		try{
+//			if(!tapeAtStartPosition){
+//				thisLineOfData=br.readLine();
+//			}
+//
+////			int jjj=Integer.valueOf(thisLineOfData.split(patternStr)[2]).intValue();
+////			myId=new IdImpl(jjj);
+//			myType=thisLineOfData.split(patternStr)[2];
+//			tapeAtStartPosition=false;
+//
+//		} catch (NumberFormatException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+////		return myId;
+//		return myType;
+//	}
 
-		Id myId=null;
+	public TreeMap<Id, String> getNextPoint(){
+
+		TreeMap<Id,String> newPoint=new TreeMap<Id,String>();
+		Id myFacId=null;
+		String myType=null;
 
 //		readLine is positioned at the first line that interests us and this line is already read
 
@@ -106,8 +139,9 @@ public class ActivityActReader {
 				thisLineOfData=br.readLine();
 			}
 
-			int jjj=Integer.valueOf(thisLineOfData.split(patternStr)[2]).intValue();
-			myId=new IdImpl(jjj);
+			int jjj=Integer.valueOf(thisLineOfData.split(patternStr)[1]).intValue();
+			myFacId=new IdImpl(jjj);
+			myType=thisLineOfData.split(patternStr)[2];
 			tapeAtStartPosition=false;
 
 		} catch (NumberFormatException e) {
@@ -117,9 +151,10 @@ public class ActivityActReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return myId;
+		newPoint.put(myFacId, myType);
+		return newPoint;
 	}
-
+	
 	public void close(){
 		try {
 			System.out.println(" Closing "+ fileName);
@@ -135,8 +170,8 @@ public class ActivityActReader {
 	public String[] getpId(){
 		return pId;
 	}
-	public int[] getActivityId(){
-		return activityId;
+	public String[] getActivityType(){
+		return acttype;
 	}
 	public int[] actId(){
 		return readActId;
