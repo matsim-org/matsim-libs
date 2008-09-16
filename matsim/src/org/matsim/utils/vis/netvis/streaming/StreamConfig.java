@@ -36,15 +36,17 @@ import org.matsim.utils.vis.netvis.config.TemporalConfig;
  * Most of this is package private so the streaming cannot be disturbed by
  * changes in this class. Package private getters of this class are available
  * via StreamReaderA's and StreamWriterA's public getters.
- * 
+ *
  * @author gunnar
- * 
+ *
  */
 public class StreamConfig {
 
     // -------------------- CLASS VARIABLES --------------------
 
     private static final String CONFIGFILE_IDENT = "CONFIG";
+
+    private static final String NEWLINE = "\n";
 
     // -------------------- MEMBER VARIABLES --------------------
 
@@ -82,7 +84,7 @@ public class StreamConfig {
     }
 
     public String getStreamFileName(int fileStartTime_s) {
-        return filePrefix + Time.strFromSec(fileStartTime_s) + "." + fileSuffix;
+        return filePrefix + Time.writeTime(fileStartTime_s, '-') + "." + fileSuffix;
     }
 
     // -------------------- FILE READING --------------------
@@ -108,42 +110,42 @@ public class StreamConfig {
                     getConfigFileName()));
 
             writer.write("<?xml version='1.0' encoding='UTF-8'?>");
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
 
             writer.write("<config>");
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
 
             /*
              * STREAMING
              */
             writer.write("\t<!--");
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
             writer.write("\tAuto generated configuration file.");
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
             writer.write("\tUsed StreamWriter implementation: ");
-            writer.newLine();
+            writer.write(NEWLINE);
             writer.write("\t  " + streamWriterClass.getName());
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
             writer.write("\t -->");
-            writer.newLine();
-            writer.newLine();
+            writer.write(NEWLINE);
+            writer.write(NEWLINE);
 
             /*
              * GENERAL
              */
             writer.write(generalConfig.asXmlSegment(4));
-            writer.newLine();
+            writer.write(NEWLINE);
 
             /*
              * TEMPORAL
              */
             writer.write(temporalConfig.asXmlSegment(4));
-            writer.newLine();
+            writer.write(NEWLINE);
 
             /*
              * FURTHER CONFIGS
@@ -151,17 +153,17 @@ public class StreamConfig {
             if (furtherConfigs != null)
                 for (ConfigModuleI module : furtherConfigs) {
                     writer.write(module.asXmlSegment(4));
-                    writer.newLine();
+                    writer.write(NEWLINE);
                 }
 
             /*
              * INDEXATION
              */
             writer.write(indexConfig.asXmlSegment(4));
-            writer.newLine();
+            writer.write(NEWLINE);
 
             writer.write("</config>");
-            writer.newLine();
+            writer.write(NEWLINE);
 
             writer.flush();
             writer.close();

@@ -195,7 +195,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     public String asXmlSegment(int indentCnt) {
         final String indent = indent(indentCnt);
-        final String newline = System.getProperty("line.separator");
+        final String newline = "\n";
         final String quote = "\"";
 
         final StringBuffer result = new StringBuffer();

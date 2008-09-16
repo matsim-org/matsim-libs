@@ -46,10 +46,10 @@ public class TemporalConfig extends ConfigModule {
             int timeStepLength_s) {
         super(CLASS_NAME);
 
-        set(START_TIME_S, Time.strFromSec(startTime_s));
-        set(END_TIME_S, Time.strFromSec(endTime_s));
+        set(START_TIME_S, Time.writeTime(startTime_s, Time.TIMEFORMAT_HHMMSS, '-'));
+        set(END_TIME_S, Time.writeTime(endTime_s, Time.TIMEFORMAT_HHMMSS, '-'));
         set(BUFFER_SIZE, Integer.toString(bufferSize));
-        set(TIMESTEP_LENGTH_S, Time.strFromSec(timeStepLength_s));
+        set(TIMESTEP_LENGTH_S, Time.writeTime(timeStepLength_s, Time.TIMEFORMAT_HHMMSS, '-'));
     }
 
     @Override
@@ -71,13 +71,13 @@ public class TemporalConfig extends ConfigModule {
     @Override
     protected void cache(String name, String value) {
         if (START_TIME_S.equals(name))
-            startTime_s = Time.secFromStr(value);
+            startTime_s = (int)Time.parseTime(value, '-');
         else if (END_TIME_S.equals(name))
-            endTime_s = Time.secFromStr(value);
+            endTime_s = (int)Time.parseTime(value, '-');
         else if (BUFFER_SIZE.equals(name))
             bufferSize = Integer.parseInt(value);
         else if (TIMESTEP_LENGTH_S.equals(name))
-            timeStepLength_s = Time.secFromStr(value);
+            timeStepLength_s = (int)Time.parseTime(value, '-');
     }
 
     public int getStartTime_s() {

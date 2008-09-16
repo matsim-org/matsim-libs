@@ -155,7 +155,7 @@ public class ControlToolbar extends JToolBar implements ActionListener, ItemList
 
     public void updateTimeLabel() {
         if (reader != null)
-            timeField.setText(Time.strFromSec(reader.getCurrentTime_s()));
+            timeField.setText(Time.writeTime(reader.getCurrentTime_s(), Time.TIMEFORMAT_HHMMSS, '-'));
     }
 
     // ---------- IMPLEMENTATION OF ActionListener INTERFACE ----------
@@ -222,7 +222,7 @@ public class ControlToolbar extends JToolBar implements ActionListener, ItemList
 
     private void changed_SET_TIME(ActionEvent event) throws IOException {
     	String newTime = ((JFormattedTextField)event.getSource()).getText();
-    	int newTime_s = Time.secFromStr(newTime);
+    	int newTime_s = (int)Time.parseTime(newTime, '-');
         stopMovie();
         reader.toTimeStep(newTime_s);
     }
