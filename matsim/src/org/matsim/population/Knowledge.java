@@ -21,6 +21,7 @@
 package org.matsim.population;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
@@ -108,13 +109,12 @@ public class Knowledge extends CustomizableImpl{
 
 	public final boolean removeActivities(final String act_type) {
 		boolean removed = false;
-		for( Activity act: activities ){
+		for( Activity act : activities.toArray(new Activity[0])){
 			if (act.getType().equals(act_type)){ 
 				activities.remove( act );
 				removed = true;
 			}
 		}
-		
 		return removed;
 	}
 
