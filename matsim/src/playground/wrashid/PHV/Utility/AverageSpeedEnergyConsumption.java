@@ -4,7 +4,7 @@ package playground.wrashid.PHV.Utility;
 
 public class AverageSpeedEnergyConsumption implements Comparable<AverageSpeedEnergyConsumption> {
 	private double speed=0; // in [m/s]
-	private double energyConsumption=0; // consumed energy in [kWh] (by driving one meter with the given speed)
+	private double energyConsumption=0; // consumed energy in [J] (by driving one meter with the given speed)
 	
 	public AverageSpeedEnergyConsumption(double speed, double energyConsumption){
 		this.speed=speed;

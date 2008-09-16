@@ -5,7 +5,11 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -16,10 +20,10 @@ import playground.wrashid.PDES.util.ComparableEvent;
 
 //TODO: write tests for this class
 
-public class ElectricCostHandler implements LinkLeaveEventHandler {
+public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventHandler,ActEndEventHandler {
 
-	private static HashMap<Id,Double> energyLevel =new HashMap<Id,Double>();
-	private final double fullEnergyLevel=10; // 10 kW
+	private static HashMap<Id,EnergyApplicatonSpecificState> energyLevel =new HashMap<Id,EnergyApplicatonSpecificState>();
+	private final double fullEnergyLevel=36000000; // in [J] (=10 kWh)
 	private NetworkLayer network=null;
 	private EnergyConsumptionSamples energyConsumptionSamples=null;
 	
@@ -29,15 +33,15 @@ public class ElectricCostHandler implements LinkLeaveEventHandler {
 	}
 	
 	
-	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		// initialize the energyLevel at the beginning to full energy
 		if (!energyLevel.containsKey(event.agent.getId())){
-			energyLevel.put(event.agent.getId(), fullEnergyLevel);
+			energyLevel.put(event.agent.getId(), new EnergyApplicatonSpecificState());
 		}
 		
 		// updated consumed energy for link
-		energyLevel.put(event.agent.getId(), energyLevel.get(event.agent.getId())-getEnergyConsumption(event.link));
+		EnergyApplicatonSpecificState state=energyLevel.get(event.agent.getId());
+		state.energyLevel-=getEnergyConsumption(event.link);
 	}
 	
 	private double getEnergyConsumption(Link link){
@@ -47,9 +51,45 @@ public class ElectricCostHandler implements LinkLeaveEventHandler {
 	}
 	
 
-	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		energyLevel.clear();
+	}
+	
+	private class EnergyApplicatonSpecificState{
+		public double energyLevel=0; // in J
+		public double startTimeOfLastAct=0; // in sec (offset midnight = 0sec)
+	}
+
+	public void handleEvent(ActStartEvent event) {
+		// initialize the energyLevel at the beginning to full energy
+		if (!energyLevel.containsKey(event.agent.getId())){
+			energyLevel.put(event.agent.getId(), new EnergyApplicatonSpecificState());
+		}
+		
+		// set start time of act
+		EnergyApplicatonSpecificState state=energyLevel.get(event.agent.getId());
+		state.startTimeOfLastAct =event.time;
+	}
+
+	// precondition: energyLevel for agent exists
+	public void handleEvent(ActEndEvent event) {
+		assert(energyLevel.containsKey(event.agent.getId()));
+		
+		// update energyLevel (how much the car loaded during the parking) and also put the cost
+		// for the charging into the bill (utility function) of the agent
+		
+		EnergyApplicatonSpecificState state=energyLevel.get(event.agent.getId());
+		
+		// assumption is, the agent starts immediately charging, until the energyLevel is full
+		// TODO: Make chargingPower and
+		double chargingPower=3500; //  in J/s (=Watt) 
+		double costPerJule=1; // in "util"
+		double timeCharged=event.time - state.startTimeOfLastAct; // in seconds
+		double energyCharged=chargingPower*timeCharged; // in J
+		
+		
+		
+		state.energyLevel-=getEnergyConsumption(event.link);
 		
 	}
 

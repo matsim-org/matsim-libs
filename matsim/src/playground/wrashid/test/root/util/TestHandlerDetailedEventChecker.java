@@ -35,7 +35,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		
 	}
 	
-	@Override
+
 	public void checkAssertions() {
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
@@ -116,7 +116,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		
 	}
 
-	@Override
+
 	public void handleEvent(ActEndEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -127,12 +127,12 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+
 	public void reset(int iteration) {
 		
 	}
 
-	@Override
+
 	public void handleEvent(AgentDepartureEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -143,7 +143,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+
 	public void handleEvent(AgentWait2LinkEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -154,7 +154,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+
 	public void handleEvent(LinkLeaveEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -165,7 +165,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+	
 	public void handleEvent(LinkEnterEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -176,7 +176,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+
 	public void handleEvent(AgentArrivalEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -187,7 +187,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+	
 	public void handleEvent(ActStartEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());
@@ -198,7 +198,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		}
 	}
 
-	@Override
+	
 	public void handleEvent(AgentStuckEvent event) {
 		if (!events.containsKey(event.agentId)){
 			events.put(event.agentId, new LinkedList<BasicEvent>());

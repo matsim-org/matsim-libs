@@ -17,7 +17,7 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 		return population;
 	} 
 	
-	@Override
+
 	public Population modifyPopulation(Population population) {
 		// modify population: we need act end time (plan has only duration)
 		this.population=population;

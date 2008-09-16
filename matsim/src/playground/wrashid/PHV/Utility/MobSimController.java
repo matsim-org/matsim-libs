@@ -39,6 +39,7 @@ public class MobSimController extends Controler {
 	public static EnergyConsumptionSamples getEnergyConsumptionSamples(){
 		EnergyConsumptionSamples ecs=new EnergyConsumptionSamples();
 		
+		// TODO: update values
 		ecs.add(new AverageSpeedEnergyConsumption(5.555555556,8.815789E-05));
 		ecs.add(new AverageSpeedEnergyConsumption(8.333333333,1.175460E-04));
 		ecs.add(new AverageSpeedEnergyConsumption(11.11111111,1.541647E-04));

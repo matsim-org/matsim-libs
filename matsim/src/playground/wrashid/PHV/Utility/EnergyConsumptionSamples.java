@@ -20,7 +20,7 @@ public class EnergyConsumptionSamples{
 	}
 	
 	// returns for a given speed the energy consumption
-	// precondition: use this method only, if some average consumptions added to sample
+	// precondition: use this method only, if at least one average consumption added to sample
 	public double getInterpolatedEnergyConsumption(double speed, double distance){
 		assert(queue.size()>0);
 		
