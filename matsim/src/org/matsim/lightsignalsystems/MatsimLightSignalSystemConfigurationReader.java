@@ -33,18 +33,18 @@ import javax.xml.validation.Schema;
 
 import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
+import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemsConfigFactory;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLAdaptiveLightSignalSystemControlInfoType;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalGroupConfigurationType;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalSystemConfig;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalSystemConfigurationType;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalSystemControlInfoType;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLLightSignalSystemPlanType;
-import org.matsim.basic.lightsignalsystemsconfig.xml.XMLPlanbasedlightSignalSystemControlInfoType;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLAdaptiveLightSignalSystemControlInfoType;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalGroupConfigurationType;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfig;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemConfigurationType;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemControlInfoType;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType;
+import org.matsim.basic.xml.lightsignalsystemsconfig.XMLPlanbasedlightSignalSystemControlInfoType;
 import org.xml.sax.SAXException;
 
 
@@ -67,7 +67,7 @@ public class MatsimLightSignalSystemConfigurationReader {
 	public void readFile(final String filename) {
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.basic.lightsignalsystemsconfig.xml.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystemsconfig.ObjectFactory.class);
 //			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
@@ -75,12 +75,11 @@ public class MatsimLightSignalSystemConfigurationReader {
 			u.setSchema(schema);
 			xmlLssConfig = (XMLLightSignalSystemConfig)u.unmarshal( 
 					new FileInputStream( filename ) );
-			
+
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
 				BasicLightSignalSystemConfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
-				
 				if (xmlcit instanceof XMLPlanbasedlightSignalSystemControlInfoType) {
 					XMLPlanbasedlightSignalSystemControlInfoType xmlpcit = (XMLPlanbasedlightSignalSystemControlInfoType) xmlcit;
 					
@@ -90,15 +89,20 @@ public class MatsimLightSignalSystemConfigurationReader {
 						BasicLightSignalSystemPlan plan = factory.createLightSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
-						
+						if (xmlplan.getCirculationTime() != null) {
+							plan.setCirculationTime(xmlplan.getCirculationTime().getSeconds());
+						}
+						if (xmlplan.getSyncronizationOffset() != null) {
+							plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSeconds());
+						}
 						for (XMLLightSignalGroupConfigurationType xmlgroupconfig : xmlplan.getLightSignalGroupConfiguration()) {
 							BasicLightSignalGroupConfiguration groupConfig = factory.createLightSignalGroupConfiguration(new IdImpl(xmlgroupconfig.getRefId()));
 							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec().doubleValue());
 							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec().doubleValue());
 							if (xmlgroupconfig.getInterimTimeRoughcast() != null)
-								groupConfig.setInterimTimeRoughcast(xmlgroupconfig.getInterimTimeRoughcast().getSec().doubleValue());
+								groupConfig.setInterimTimeRoughcast(Double.valueOf(xmlgroupconfig.getInterimTimeRoughcast().getSec()));
 							if (xmlgroupconfig.getInterimTimeDropping() != null)
-								groupConfig.setInterimTimeDropping(xmlgroupconfig.getInterimTimeDropping().getSec().doubleValue());
+								groupConfig.setInterimTimeDropping(Double.valueOf(xmlgroupconfig.getInterimTimeDropping().getSec()));
 							
 							plan.addLightSignalGroupConfiguration(groupConfig);
 						}

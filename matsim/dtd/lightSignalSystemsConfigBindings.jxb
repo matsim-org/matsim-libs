@@ -4,10 +4,15 @@
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
               schemaLocation = "lightSignalSystemsConfig_v1.0.xsd">
 
-<!--  <jxb:bindings >-->
+<jxb:globalBindings>
+   <jxb:javaType name="int"  xmlType="xs:nonNegativeInteger"
+                  parseMethod="javax.xml.bind.DatatypeConverter.parseInt" 
+                  printMethod="javax.xml.bind.DatatypeConverter.printInt"/> 
+</jxb:globalBindings>
+
 
 <jxb:schemaBindings>
-  <jxb:package name="org.matsim.basic.lightsignalsystemsconfig.xml" />
+  <jxb:package name="org.matsim.basic.xml.lightsignalsystemsconfig" />
   
   <jxb:nameXmlTransform>
     <jxb:elementName prefix="XML" />

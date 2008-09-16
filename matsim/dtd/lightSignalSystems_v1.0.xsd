@@ -3,6 +3,8 @@
            xmlns="http://www.matsim.org/files/dtd"
            elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           jxb:version="2.1"
            xml:lang="en">
 
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
@@ -35,7 +37,12 @@ the simulation -->
         <xs:element name="toLink" type="idRefType" minOccurs="1" maxOccurs="unbounded"> </xs:element>
         <xs:element name="representedLanes" minOccurs="0" maxOccurs="1">
           <xs:complexType>
-            <xs:attribute name="number" type="xs:positiveInteger" use="optional" default="1"></xs:attribute>
+            <xs:attribute name="number" type="xs:positiveInteger" use="optional" default="1">
+              <xs:annotation>
+                <xs:appinfo>
+                  </xs:appinfo>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
         <xs:element name="length" minOccurs="0" maxOccurs="1">
@@ -58,7 +65,7 @@ the simulation -->
           <xs:documentation>Umlaufzeit</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="syncronizationOffset" type="matsimTimeAttributeType" minOccurs="1" maxOccurs="1" >
+      <xs:element name="defaultSyncronizationOffset" type="matsimTimeAttributeType" minOccurs="1" maxOccurs="1" >
         <xs:annotation>
           <xs:documentation>Versatzzeit</xs:documentation>
         </xs:annotation>
@@ -81,6 +88,7 @@ the simulation -->
       <xs:element name="lane" type="idRefType" minOccurs="1" maxOccurs="unbounded"></xs:element>
       <xs:element name="toLink" type="idRefType" minOccurs="1" maxOccurs="unbounded"></xs:element>
     </xs:sequence>
+    <xs:attribute name="linkIdRef" type="matsimIdType" use="required"></xs:attribute>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>

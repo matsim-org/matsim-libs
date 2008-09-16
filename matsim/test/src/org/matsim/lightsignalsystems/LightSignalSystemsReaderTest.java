@@ -54,6 +54,28 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	BasicLightSignalSystems lss = new BasicLightSignalSystems();
   	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
+  	
+  	checkContent(lss);
+  }
+  
+  public void testWriter() {
+  	String testoutput = this.getOutputDirectory()  + "testLssOutput.xml";
+  	//read the test file
+  	BasicLightSignalSystems lss = new BasicLightSignalSystems();
+  	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
+  	reader.readFile(this.getPackageInputDirectory() + TESTXML);
+
+  	//write the test file
+  	MatsimLightSignalSystemsWriter writer = new MatsimLightSignalSystemsWriter(lss);
+  	writer.writeFile(testoutput);
+  	
+  	lss = new BasicLightSignalSystems();
+  	reader = new MatsimLightSignalSystemsReader(lss);
+  	reader.readFile(testoutput);
+  	checkContent(lss);
+  }
+
+  private void checkContent(BasicLightSignalSystems lss) {
   	assertEquals(1, lss.getLanesToLinkAssignments().size());
   	assertEquals(2, lss.getLightSignalSystemDefinitions().size());
   	assertEquals(2, lss.getLightSignalGroupDefinitions().size());
@@ -65,29 +87,29 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(id3, lane.getId());
   	assertEquals(id1, lane.getToLinkIds().get(0));
   	assertEquals(45.0, lane.getLength());
-  	assertEquals(1.0, lane.getNumberOfRepresentedLanes());
+  	assertEquals(1, lane.getNumberOfRepresentedLanes());
   	lane = l2la.getLanes().get(1);
   	assertEquals(id5, lane.getId());
   	assertEquals(60.0, lane.getLength());
-  	assertEquals(2.0, lane.getNumberOfRepresentedLanes());	
+  	assertEquals(2, lane.getNumberOfRepresentedLanes());	
   	
   	BasicLightSignalSystemDefinition lssd;
   	lssd = lss.getLightSignalSystemDefinitions().get(0);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
   	assertEquals(60.0, lssd.getDefaultCirculationTime());
-  	assertEquals(5.0, lssd.getSyncronizationOffset());
+  	assertEquals(5.0, lssd.getDefaultSyncronizationOffset());
   	assertEquals(3.0, lssd.getDefaultInterimTime());
   	
   	BasicLightSignalGroupDefinition lsgd;
   	lsgd = lss.getLightSignalGroupDefinitions().get(1);
   	assertNotNull(lsgd);
+  	assertEquals(id42, lsgd.getLinkRefId());
   	assertEquals(id42, lsgd.getId());
   	assertEquals(id42, lsgd.getLightSignalSystemDefinitionId());
   	assertEquals(id5, lsgd.getLaneIds().get(0));
   	assertEquals(id1, lsgd.getToLinkIds().get(0));
   	assertEquals(id2, lsgd.getToLinkIds().get(1));
-  	
   }
   
  

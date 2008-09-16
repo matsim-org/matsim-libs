@@ -150,6 +150,16 @@ the simulation -->
 						<xs:attribute name="daytime" type="xs:time" use="required"/>
 					</xs:complexType>
   			</xs:element>
+        <xs:element name="circulationTime" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
+          <xs:annotation>
+            <xs:documentation>Umlaufzeit</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="syncronizationOffset" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
+          <xs:annotation>
+            <xs:documentation>Versatzzeit</xs:documentation>
+          </xs:annotation>
+        </xs:element>
     		<xs:element name="lightSignalGroupConfiguration" type="lightSignalGroupConfigurationType" minOccurs="1" maxOccurs="unbounded">
 					<xs:annotation>
 						<xs:documentation>This element contains information when to switch on or off a signal group.</xs:documentation>

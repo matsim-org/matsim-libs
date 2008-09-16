@@ -31,11 +31,24 @@
   </appender>-->
 
 	 <!-- Print only messages of level warn or above in the package com.foo -->
-	<!--<logger name="org.matsim.demandmodeling.mobsim.QueueLink">
-      <level value="INFO"/>
-  </logger>-->
+	<!--<logger name="org.matsim.mobsim">
+      <level value="ERROR"/>
+  </logger>--><!-- -->
+<!-- 	<logger name="org.matsim.gbl">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.events.Events">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.replanning.PlanStrategy">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.replanning">
+      <level value="ERROR"/>
+  </logger> -->
+  
 	<root>
-		<priority value="DEBUG"></priority>
+		<priority value="debug"></priority>
 		<appender-ref ref="stdout"/>
 		<appender-ref ref="stderr"/>
 	</root>

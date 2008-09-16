@@ -35,6 +35,8 @@ public class BasicLightSignalSystemPlan {
 	private double startTime;
 	private double endTime;
 	private Map<Id, BasicLightSignalGroupConfiguration> groupConfigs;
+	private Double syncronizationOffset = null;
+	private Double circulationTime = null;
 
 	public BasicLightSignalSystemPlan(Id id) {
 		this.id = id;
@@ -73,6 +75,24 @@ public class BasicLightSignalSystemPlan {
 	
 	public Map<Id, BasicLightSignalGroupConfiguration> getGroupConfigs() {
 		return groupConfigs;
+	}
+
+	public void setCirculationTime(Double seconds) {
+		this.circulationTime = seconds;
+	}
+	
+	public void setSyncronizationOffset(Double seconds) {
+		this.syncronizationOffset = seconds;
+	}
+
+	
+	public Double getSyncronizationOffset() {
+		return syncronizationOffset;
+	}
+
+	
+	public Double getCirculationTime() {
+		return circulationTime;
 	}
 	
 	

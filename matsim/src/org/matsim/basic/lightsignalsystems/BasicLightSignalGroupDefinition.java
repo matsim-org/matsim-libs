@@ -36,27 +36,29 @@ public class BasicLightSignalGroupDefinition {
 	private Id lightSignalSystemDefinitionId;
 	private List<Id> laneIds;
 	private List<Id> toLinkIds;
+	private Id linkRefId;
 	
-	public BasicLightSignalGroupDefinition(Id id) {
+	
+
+	public BasicLightSignalGroupDefinition(Id linkRefId, Id id) {
+		this.linkRefId = linkRefId;
 		this.id = id;
 	}
 
-	/**
-	 * @param idImpl
-	 */
 	public void setLightSignalSystemDefinitionId(IdImpl id) {
 		this.lightSignalSystemDefinitionId = id;
 	}
 
-	/**
-	 * @param idImpl
-	 */
 	public void addLaneId(Id id) {
 		if (this.laneIds == null)
 			this.laneIds = new ArrayList<Id>();
 		this.laneIds.add(id);
 	}
 	
+	public Id getLinkRefId() {
+		return linkRefId;
+	}
+
 	public void addToLinkId(Id id) {
 		if (this.toLinkIds == null)
 			this.toLinkIds = new ArrayList<Id>();

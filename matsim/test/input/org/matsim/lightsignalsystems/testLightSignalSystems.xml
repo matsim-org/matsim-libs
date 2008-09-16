@@ -17,17 +17,17 @@
   
   <lightSignalSystemDefinition id="23">
     <defaultCirculationTime seconds="60" />
-    <syncronizationOffset seconds="5" />
+    <defaultSyncronizationOffset seconds="5" />
     <defaultInterimTime seconds="3" />
   </lightSignalSystemDefinition> 
 
   <lightSignalSystemDefinition id="42">
     <defaultCirculationTime seconds="50" />
-    <syncronizationOffset seconds="0" />
+    <defaultSyncronizationOffset seconds="0" />
     <defaultInterimTime seconds="2" />
   </lightSignalSystemDefinition> 
 
-  <lightSignalGroupDefinition id="23">
+  <lightSignalGroupDefinition linkIdRef="23" id="23">
     <lightSignalSystemDefinition refId="23" />  
     <lane refId="3" />
     <lane refId="5" />
@@ -35,10 +35,12 @@
     <toLink refId="2" />
   </lightSignalGroupDefinition>
 
-  <lightSignalGroupDefinition id="42">
+  <lightSignalGroupDefinition linkIdRef="42" id="42">
     <lightSignalSystemDefinition refId="42" />  
     <lane refId="5" />
     <toLink refId="1"/>  
     <toLink refId="2" />
   </lightSignalGroupDefinition>
+  
+  
 </lightSignalSystems>

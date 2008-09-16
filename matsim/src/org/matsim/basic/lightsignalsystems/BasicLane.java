@@ -32,7 +32,7 @@ import org.matsim.basic.v01.Id;
 public class BasicLane {
 
 	private Id id;
-	private double numberOfRepresentedLanes;
+	private int numberOfRepresentedLanes;
 	private double length;
 	private List<Id> toLinkIds;
 
@@ -46,7 +46,7 @@ public class BasicLane {
 	/**
 	 * @param number
 	 */
-	public void setNumberOfRepresentedLanes(double number) {
+	public void setNumberOfRepresentedLanes(int number) {
 		this.numberOfRepresentedLanes = number;
 	}
 
@@ -59,7 +59,7 @@ public class BasicLane {
 	}
 
 	
-	public double getNumberOfRepresentedLanes() {
+	public int getNumberOfRepresentedLanes() {
 		return numberOfRepresentedLanes;
 	}
 

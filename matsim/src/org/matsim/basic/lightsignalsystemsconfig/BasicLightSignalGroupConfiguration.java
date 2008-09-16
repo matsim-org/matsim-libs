@@ -34,8 +34,8 @@ public class BasicLightSignalGroupConfiguration {
 	private double roughCast;
 	private double dropping;
 
-	private double interimTimeRoughcast = Double.NaN;
-	private double interimTimeDropping = Double.NaN;
+	private Double interimTimeRoughcast = null;
+	private Double interimTimeDropping = null;
 	
 	
 	public BasicLightSignalGroupConfiguration(Id referencedSignalGroupId) {
@@ -68,25 +68,25 @@ public class BasicLightSignalGroupConfiguration {
 
 
 	
-	public double getInterimTimeRoughcast() {
+	public Double getInterimTimeRoughcast() {
 		return interimTimeRoughcast;
 	}
 
 
 	
-	public void setInterimTimeRoughcast(double interimTimeRoughcast) {
+	public void setInterimTimeRoughcast(Double interimTimeRoughcast) {
 		this.interimTimeRoughcast = interimTimeRoughcast;
 	}
 
 
 	
-	public double getInterimTimeDropping() {
+	public Double getInterimTimeDropping() {
 		return interimTimeDropping;
 	}
 
 
 	
-	public void setInterimTimeDropping(double interimTimeDropping) {
+	public void setInterimTimeDropping(Double interimTimeDropping) {
 		this.interimTimeDropping = interimTimeDropping;
 	}
 

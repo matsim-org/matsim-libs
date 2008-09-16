@@ -9,6 +9,8 @@
       <lightSignalSystemPlan id="5">
         <start daytime="00:00:00" />
         <stop daytime="00:00:00" />
+        <circulationTime seconds="40" />
+        <syncronizationOffset seconds="3" />
         <lightSignalGroupConfiguration refId="23">
           <roughcast sec="0" />
           <dropping sec="45" />

@@ -34,18 +34,16 @@ import org.matsim.basic.lightsignalsystems.BasicLane;
 import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemsFactory;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
-import org.matsim.basic.lightsignalsystems.xml.ObjectFactory;
-import org.matsim.basic.lightsignalsystems.xml.XMLIdRefType;
-import org.matsim.basic.lightsignalsystems.xml.XMLLaneType;
-import org.matsim.basic.lightsignalsystems.xml.XMLLanesToLinkAssignmentType;
-import org.matsim.basic.lightsignalsystems.xml.XMLLightSignalGroupDefinitionType;
-import org.matsim.basic.lightsignalsystems.xml.XMLLightSignalSystemDefinitionType;
-import org.matsim.basic.lightsignalsystems.xml.XMLLightSignalSystems;
-//import org.matsim.basic.lightsignalsystems.xml.*;
-
+import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemsFactory;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
+import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;
+import org.matsim.basic.xml.lightsignalsystems.XMLLaneType;
+import org.matsim.basic.xml.lightsignalsystems.XMLLanesToLinkAssignmentType;
+import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalGroupDefinitionType;
+import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalSystemDefinitionType;
+import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalSystems;
 import org.xml.sax.SAXException;
 
 
@@ -70,7 +68,7 @@ public class MatsimLightSignalSystemsReader {
   	JAXBContext jc;
     XMLLightSignalSystems xmlLssDefinition;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.basic.lightsignalsystems.xml.ObjectFactory.class);
+			jc = JAXBContext.newInstance(org.matsim.basic.xml.lightsignalsystems.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			XMLSchemaFactory schemaFac = new XMLSchemaFactory();
@@ -91,7 +89,7 @@ public class MatsimLightSignalSystemsReader {
 					if (laneType.getRepresentedLanes() == null) {
 						laneType.setRepresentedLanes(fac.createXMLLaneTypeXMLRepresentedLanes());
 					}
-					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes().getNumber().doubleValue());
+					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes().getNumber());
 					if (laneType.getLength() == null) {
 						laneType.setLength(fac.createXMLLaneTypeXMLLength());
 					}
@@ -106,13 +104,13 @@ public class MatsimLightSignalSystemsReader {
 				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef.getId()));
 				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime().getSeconds());
 				lssdef.setDefaultInterimTime(xmllssDef.getDefaultInterimTime().getSeconds());
-				lssdef.setSyncronizationOffset(xmllssDef.getSyncronizationOffset().getSeconds());
+				lssdef.setDefaultSyncronizationOffset(xmllssDef.getDefaultSyncronizationOffset().getSeconds());
 				lightSignalSystems.addLightSignalSystemDefinition(lssdef);
 			}
-			
+			//parsing lightSignalGroupDefinitions
 			BasicLightSignalGroupDefinition lsgdef;
 			for (XMLLightSignalGroupDefinitionType xmllsgdef : xmlLssDefinition.getLightSignalGroupDefinition()) {
-				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef.getId()));
+				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
 				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef.getLightSignalSystemDefinition().getRefId()));
 				for (XMLIdRefType refIds : xmllsgdef.getLane()) {
 					lsgdef.addLaneId(new IdImpl(refIds.getRefId()));

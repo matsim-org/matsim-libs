@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.basic.lightsignalsystems;
 
-import org.matsim.basic.lightsignalsystems.xml.XMLLanesToLinkAssignmentType;
 import org.matsim.basic.v01.Id;
 
 
@@ -50,11 +49,11 @@ public class BasicLightSignalSystemDefinition {
 		this.defaultCirculationTime = defaultCirculationTime;
 	}
 	
-	public double getSyncronizationOffset() {
+	public double getDefaultSyncronizationOffset() {
 		return syncronizationOffset;
 	}
 	
-	public void setSyncronizationOffset(double syncronizationOffset) {
+	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
 		this.syncronizationOffset = syncronizationOffset;
 	}
 	

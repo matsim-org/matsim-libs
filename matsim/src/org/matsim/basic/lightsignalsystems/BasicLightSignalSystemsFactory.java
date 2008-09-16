@@ -43,8 +43,8 @@ public class BasicLightSignalSystemsFactory {
 	}
 
 	public BasicLightSignalGroupDefinition createLightSignalGroupDefinition(
-			Id id) {
-		return new BasicLightSignalGroupDefinition(id);
+			Id linkRefId, Id id) {
+		return new BasicLightSignalGroupDefinition(linkRefId, id);
 	}
 	
 }
