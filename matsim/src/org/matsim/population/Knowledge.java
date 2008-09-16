@@ -25,7 +25,6 @@ import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
@@ -90,11 +89,13 @@ public class Knowledge extends CustomizableImpl{
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean addActivity(final Activity activity) {
-		if (!this.activities.contains(activity)) { 
-			this.activities.add(activity);
-			return true;
+		for( Activity act : this.activities ){
+			if (act.getType().equals(activity.getType())) 
+				if( act.getFacility().equals( activity.getFacility()))
+					return false;
 		}
-		return false;
+		activities.add( activity );
+		return true;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -102,27 +103,18 @@ public class Knowledge extends CustomizableImpl{
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean removeActivity(final Activity activity) {
-		boolean removed = this.activities.remove(activity);
-		if (removed) {
-			Facility f = activity.getFacility();
-			for (int i=0; i<this.activities.size(); i++) {
-				Facility other = this.activities.get(i).getFacility();
-				if (other.equals(f)) { return true; }
-			}
-			return true;
-		}
-		return false;
+		return this.activities.remove(activity);
 	}
 
 	public final boolean removeActivities(final String act_type) {
 		boolean removed = false;
-		for (int i=0; i<this.activities.size(); i++) {
-			Activity a = this.activities.get(i);
-			if (a.getType().equals(act_type)) {
-				boolean b = this.removeActivity(a);
-				if (b) { removed = true; }
+		for( Activity act: activities ){
+			if (act.getType().equals(act_type)){ 
+				activities.remove( act );
+				removed = true;
 			}
 		}
+		
 		return removed;
 	}
 
