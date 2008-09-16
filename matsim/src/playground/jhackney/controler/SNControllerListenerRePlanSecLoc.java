@@ -188,7 +188,9 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
 		this.actStats.clear();
+		log.info("SSTEST Recalculating actStats "+snIter);
 		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap()));
+		log.info("SSTEST Finish Scoring with actStats "+snIter);
 		scoring.finish();
 	}
 
@@ -197,7 +199,8 @@ public class SNControllerListenerRePlanSecLoc implements StartupListener, Iterat
 		this.log.info("finishIteration ... "+event.getIteration());
 
 		if( event.getIteration()%replan_interval==0){
-			// Removing the social links here rather than before the replanning and assignment lets you use the actual encounters in a social score
+			// Removing the social links here rather than before the
+			//replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... done");
