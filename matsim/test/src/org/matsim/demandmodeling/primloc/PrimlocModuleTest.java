@@ -20,6 +20,7 @@
 
 package org.matsim.demandmodeling.primloc;
 
+import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -28,14 +29,12 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.population.PopulationReader;
-import org.matsim.population.Population;
 import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
-import org.matsim.testcases.MatsimTestCase;
-import org.matsim.config.Config;
 
 public class PrimlocModuleTest extends MatsimTestCase{
 
@@ -62,10 +61,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		
 		config.facilities().setInputFile(inputfolder + "facilities.xml");
 		config.facilities().setOutputFile(outputDirectory + "output_facilities.xml");
-		
-		//config.matrices().setInputFile(studyfolder + "matrices.xml");
-		//config.matrices().setOutputFile(outputDirectory + "output_matrices.xml");
-		
+				
 		config.plans().setInputFile(inputfolder + "init_plans.xml.gz" );
 		config.plans().setOutputFile(outputDirectory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
@@ -109,7 +105,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// ***************
 		
 		System.out.println("  adding plan algorithms");
-		System.out.println("  ** adding primary location choice");
+		System.out.println("  ** adding primary location choice module (PLCM)");
 		PrimlocModule plcm = new PrimlocModule();
 		plcm.setup( population );
 		population.addAlgorithm( plcm );

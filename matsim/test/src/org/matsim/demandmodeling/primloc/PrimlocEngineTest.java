@@ -111,8 +111,6 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 			if( core.cij.get(i, i) == 0.0 )
 				core.cij.set(i, i, mincij );
 		}
-		
-		core.setupECij();
 
 		core.maxCost = Double.NEGATIVE_INFINITY;
 		double meanCost=0.0;
