@@ -49,26 +49,6 @@ public class Time {
 		defaultTimeFormat = format;
 	}
 
-	/**
-	 * @deprecated use Time.parseTime(String, '-') instead
-	 * @param timeStr
-	 * @return
-	 */
-	@Deprecated
-	public static int secFromStr(final String timeStr) {
-		return (int)parseTime(timeStr, '-');
-	}
-
-	/**
-	 * @deprecated use Time.writeTime(double, '-') instead.
-	 * @param time_s
-	 * @return
-	 */
-	@Deprecated
-	public static String strFromSec(final int time_s) {
-		return writeTime(time_s, TIMEFORMAT_HHMMSS, '-');
-	}
-
 	public static final String writeTime(final double seconds, final String timeformat) {
 		return writeTime(seconds, timeformat, ':');
 	}
