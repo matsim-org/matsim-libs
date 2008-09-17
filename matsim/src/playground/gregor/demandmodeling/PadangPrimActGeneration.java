@@ -230,7 +230,11 @@ public class PadangPrimActGeneration {
 				}
 				
 				Link link = getRandomLinkWithin(ftW);
-				Leg leg = new Leg(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
+				Leg leg = new Leg("car");
+				leg.setNum(0);
+				leg.setDepTime(Time.UNDEFINED_TIME);
+				leg.setTravTime(Time.UNDEFINED_TIME);
+				leg.setArrTime(Time.UNDEFINED_TIME);
 				Act act = new Act("w",link.getCenter().getX(),link.getCenter().getY(),link,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,true);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);

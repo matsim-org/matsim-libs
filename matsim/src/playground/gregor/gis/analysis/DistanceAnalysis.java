@@ -203,7 +203,12 @@ public class DistanceAnalysis {
 			dist[2] += person.getSelectedPlan().getScore();
 			Plan plan = new Plan(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
-			plan.addLeg(new Leg(1,"car",0.0,0.0,0.0));
+			Leg ll = new Leg("car");
+			ll.setNum(1);
+			ll.setArrTime(0.0);
+			ll.setDepTime(0.0);
+			ll.setTravTime(0.0);
+			plan.addLeg(ll);
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 			router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());

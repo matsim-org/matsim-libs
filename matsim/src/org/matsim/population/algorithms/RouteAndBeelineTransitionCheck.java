@@ -86,7 +86,12 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
 		while (it.hasNext()) {
-			beeline.addLeg(new Leg(1, "car", 0.0, 0.0, 0.0));
+			Leg leg = new Leg("car");
+			leg.setNum(1);
+			leg.setDepTime(0.0);
+			leg.setTravTime(0.0);
+			leg.setArrTime(0.0);
+			beeline.addLeg(leg);
 			beeline.addAct(it.next());
 		}
 		this.router.run(beeline);

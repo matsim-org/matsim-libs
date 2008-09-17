@@ -26,13 +26,23 @@ import org.matsim.utils.misc.Time;
 public class BasicLegImpl implements BasicLeg {
 
 	protected int num = Integer.MIN_VALUE;
-	protected String mode;
+	protected String stringmode;
 	protected BasicRoute route = null;
 
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
 	private double arrTime = Time.UNDEFINED_TIME;
+	private Mode mode;
 
+	public BasicLegImpl(String mode) {
+		this.setMode(mode);
+	}
+	
+	
+	public BasicLegImpl(BasicLeg.Mode mode) {
+		this.mode = mode;
+	}
+	
 	
 	public final int getNum() {
 		return this.num;
@@ -51,29 +61,29 @@ public class BasicLegImpl implements BasicLeg {
 	}
 
 	public final String getMode() {
-		return this.mode;
+		return this.stringmode;
 	}
 
 	public final void setMode(String mode) {
 		if (MIVMODE.equalsIgnoreCase(mode))
-			this.mode = MIVMODE;
+			this.stringmode = MIVMODE;
 		else if (CARMODE.equalsIgnoreCase(mode))
-			this.mode = CARMODE;
+			this.stringmode = CARMODE;
 		else if (RIDEMODE.equalsIgnoreCase(mode))
-			this.mode = RIDEMODE;
+			this.stringmode = RIDEMODE;
 		else if (MOTORBIKEMODE.equalsIgnoreCase(mode))
-			this.mode = MOTORBIKEMODE;
+			this.stringmode = MOTORBIKEMODE;
 		else if (PTMODE.equalsIgnoreCase(mode))
-			this.mode = PTMODE;
+			this.stringmode = PTMODE;
 		else if (TRAINMODE.equalsIgnoreCase(mode))
-			this.mode = TRAINMODE;
+			this.stringmode = TRAINMODE;
 		else if (BIKEMODE.equalsIgnoreCase(mode))
-			this.mode = BIKEMODE;
+			this.stringmode = BIKEMODE;
 		else if (WALKMODE.equalsIgnoreCase(mode))
-			this.mode = WALKMODE;
+			this.stringmode = WALKMODE;
 		else {
 			Logger.getLogger(BasicLegImpl.class).warn("Unknown Leg mode: " + mode);
-			this.mode = mode.intern();
+			this.stringmode = mode.intern();
 		}
 	}
 

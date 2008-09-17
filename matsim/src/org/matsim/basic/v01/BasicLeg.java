@@ -25,7 +25,9 @@ package org.matsim.basic.v01;
 */
 
 public interface BasicLeg {
-
+	
+	public enum Mode {MIV, CAR, RIDE, MOTORBIKE, PT, TRAIN, BUS, TRAM, BIKE, WALK, UNDEFINED};
+	
 	public static final String MIVMODE = "miv";
 
 	public static final String CARMODE = "car";

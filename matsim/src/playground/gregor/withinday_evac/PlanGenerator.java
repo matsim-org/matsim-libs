@@ -121,9 +121,14 @@ System.out.println(count);
 		Plan plan = new Plan(pers);
 		Act oldA = pers.getSelectedPlan().getFirstActivity();
 		Act a = new Act("h",oldA.getCoord().getX(),oldA.getCoord().getY(),oldA.getLink(),oldA.getStartTime(),oldA.getEndTime(), oldA.getDur(),oldA.isPrimary());
-		Leg oldL = pers.getSelectedPlan().getNextLeg(oldA);
-		Leg l = new Leg(oldL.getNum(),oldL.getMode(),oldL.getDepTime(),oldL.getTravTime(),oldL.getArrTime());
-		Act oldB = pers.getSelectedPlan().getNextActivity(oldL);
+		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
+		Leg l = new Leg(oldLeg.getMode());
+		l.setNum(oldLeg.getNum());
+		l.setDepTime(oldLeg.getDepTime());
+		l.setTravTime(oldLeg.getTravTime());
+		l.setArrTime(oldLeg.getArrTime());
+		
+		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Act b = new Act(oldB.getType(),oldB.getCoord().getX(),oldB.getCoord().getY(),oldB.getLink(),oldB.getStartTime(),oldB.getEndTime(),oldB.getDur(),oldB.isPrimary());
 		plan.addAct(a);
 		Route route = new Route();

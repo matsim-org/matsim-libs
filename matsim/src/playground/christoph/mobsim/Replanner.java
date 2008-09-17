@@ -108,14 +108,14 @@ public class Replanner{
 	/**
 	 * Route am Ende jedes Links neu berechnen.
 	 * Ansatz:
-	 * - Neue Aktivität beim aktuellen Link generieren und Zielaktivität beibehalten.
+	 * - Neue Aktivitï¿½t beim aktuellen Link generieren und Zielaktivitï¿½t beibehalten.
 	 * - Route generieren 
 	 * - Alte Route mit neuer Route mergen
 	 *   -> Annahme: ein Link ist in jeder Route nur 1x vorhanden (was auch Sinn macht, da
-	 *      "Rundfahrten" wohl kaum die kürzesten Wege von A nach B darstellen.
-	 *   -> Könnte doch noch Probleme hervorrufen. Agenten könnten an Stellen gelangen, wo
-	 *      z.B. aufgrund von Staus umkehren sinnvoller wäre, was wiederum duplizierte Links
-	 *      in den Routen hervorrufen würde :?
+	 *      "Rundfahrten" wohl kaum die kï¿½rzesten Wege von A nach B darstellen.
+	 *   -> Kï¿½nnte doch noch Probleme hervorrufen. Agenten kï¿½nnten an Stellen gelangen, wo
+	 *      z.B. aufgrund von Staus umkehren sinnvoller wï¿½re, was wiederum duplizierte Links
+	 *      in den Routen hervorrufen wï¿½rde :?
 	 */
 	protected void Routing(Link fromLink)
 	{	
@@ -127,7 +127,7 @@ public class Replanner{
 			//System.exit(0);
 		}
 		
-		// Daten für die neue Aktivität generieren
+		// Daten fï¿½r die neue Aktivitï¿½t generieren
 		String type = "w";
 		
 		Node toNode = fromLink.getToNode();
@@ -152,12 +152,12 @@ public class Replanner{
 		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
 		Node newStartNode = fromLink.getToNode();
 		
-		// Alle Nodes aus der Route löschen, die bereits "befahren" wurden
-		// Die gelöschten gleichzeitig in einer ArrayList ablegen - diese werden
-		// anschliessend mit der neue generierten Subroute wieder zusammengefügt!
+		// Alle Nodes aus der Route lï¿½schen, die bereits "befahren" wurden
+		// Die gelï¿½schten gleichzeitig in einer ArrayList ablegen - diese werden
+		// anschliessend mit der neue generierten Subroute wieder zusammengefï¿½gt!
 		
-		// Achtung: derzeit können so keine "Schlaufen" gefahren werden, hierfür
-		// würde ein Counter oder dergleichen benötigt werden!
+		// Achtung: derzeit kï¿½nnen so keine "Schlaufen" gefahren werden, hierfï¿½r
+		// wï¿½rde ein Counter oder dergleichen benï¿½tigt werden!
 		while(nodesRoute.size() > 0)
 		{
 			Node node = nodesRoute.get(0);
@@ -175,15 +175,20 @@ public class Replanner{
 			}
 		}
 			
-		// neue, gekürzte Route erstellen
+		// neue, gekï¿½rzte Route erstellen
 		Route subRoute = new Route();
 		subRoute.setRoute(nodesRoute);
 
 		// die neue Route in neuem Leg hinterlegen
-		Leg newLeg = new Leg(0, leg.getMode(), leg.getDepTime(), leg.getTravTime(), leg.getArrTime());
+		Leg newLeg = new Leg(leg.getMode());
+		newLeg.setNum(0);
+		newLeg.setDepTime(leg.getDepTime());
+		newLeg.setTravTime(leg.getTravTime());
+		newLeg.setArrTime(leg.getArrTime());
+		newLeg.setRoute(subRoute);
 		newLeg.setRoute(subRoute);
 				
-		// aktuell gewählten Plan 
+		// aktuell gewï¿½hlten Plan 
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// neuen Plan generieren und selektieren
@@ -211,7 +216,7 @@ public class Replanner{
 //		for(int i = 0; i < nodeBuffer.size(); i++) log.info(nodeBuffer.get(i));
 		
 		
-		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenführen
+		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenfï¿½hren
 		nodeBuffer.addAll(newRoute.getRoute());
 		
 //		log.info("new - to be driven");

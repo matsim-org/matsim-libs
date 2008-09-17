@@ -58,7 +58,11 @@ public class RoadSignAgentsGenerator {
 			for (Link dest : node.getOutLinks().values()){
 				Plan plan  = new Plan(p);
 				Act actA = new Act("h", link.getCenter().getX(), link.getCenter().getY(), link, Time.UNDEFINED_TIME, 3600 * 3 - 2, 0.0, true);
-				Leg leg = new Leg(0,"car",0.0,0.0,0.0);
+				Leg leg = new Leg("car");
+				leg.setNum(0);
+				leg.setDepTime(0.0);
+				leg.setTravTime(0.0);
+				leg.setArrTime(0.0);
 				Act actB = new Act("h",dest.getCenter().getX(), dest.getCenter().getY(), dest, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, 0.0, true);
 				plan.addAct(actA);
 				plan.addLeg(leg);

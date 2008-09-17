@@ -103,7 +103,11 @@ public class EvacuationPlansGenerator {
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new Leg(1,"car",0.0,0.0,0.0);
+			Leg leg = new Leg("car");
+			leg.setNum(1);
+			leg.setDepTime(0.0);
+			leg.setTravTime(0.0);
+			leg.setArrTime(0.0);
 			plan.addLeg(leg);
 
 			Act actB = new Act("h", 12000.0, -12000.0, network.getLink(saveLinkId), Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, 0.0, true);

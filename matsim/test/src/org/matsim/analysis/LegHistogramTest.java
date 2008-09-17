@@ -52,7 +52,11 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = new Person(new IdImpl(1));
 		Person person2 = new Person(new IdImpl(2));
-		Leg leg = new Leg(0, Leg.CARMODE, 7*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+		Leg leg = new Leg(Leg.CARMODE);
+		leg.setNum(0);
+		leg.setDepTime(7*3600);
+		leg.setTravTime(Time.UNDEFINED_TIME);
+		leg.setArrTime(Time.UNDEFINED_TIME);
 		LegHistogram histo = new LegHistogram(5*60);
 		histo.handleEvent(new AgentDepartureEvent(7*3600, person1, link, leg));
 		histo.handleEvent(new AgentDepartureEvent(7*3600 + 6*60, person2, link, leg));
@@ -97,7 +101,12 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
 		Person person1 = new Person(new IdImpl(1));
-		Leg leg = new Leg(0, Leg.CARMODE, 7*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+		Leg leg = new Leg(Leg.CARMODE);
+		leg.setNum(0);
+		leg.setDepTime(7*3600);
+		leg.setTravTime(Time.UNDEFINED_TIME);
+		leg.setArrTime(Time.UNDEFINED_TIME);
+		
 		LegHistogram histo = new LegHistogram(5*60, 10); // latest time-bin: 2700-2999
 
 		assertEquals(11, histo.getDepartures().length);
@@ -130,7 +139,12 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
 		Person person1 = new Person(new IdImpl(1));
-		Leg leg = new Leg(0, Leg.CARMODE, 7*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+		Leg leg = new Leg(Leg.CARMODE);
+		leg.setNum(0);
+		leg.setDepTime(7*3600);
+		leg.setTravTime(Time.UNDEFINED_TIME);
+		leg.setArrTime(Time.UNDEFINED_TIME);
+		
 		LegHistogram histo = new LegHistogram(5*60);
 
 		histo.handleEvent(new AgentDepartureEvent(7*3600, person1, link, leg));

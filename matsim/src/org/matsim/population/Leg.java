@@ -20,6 +20,7 @@
 
 package org.matsim.population;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.BasicRouteImpl;
@@ -27,15 +28,12 @@ import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl {
 
-	public Leg(final int num, final String mode, final double depTime, final double travTime, final double arrTime) {
-		this.num = num;
-		if ((this.num < 0) && (this.num != Integer.MIN_VALUE)) {
-			throw new NumberFormatException("A Leg's num has to be an  integer >= 0.");
-		}
-		this.mode = mode.intern();
-		this.setDepTime(depTime);
-		this.setTravTime(travTime);
-		this.setArrTime(arrTime);
+	public Leg(BasicLeg.Mode mode) {
+		super(mode);
+	}
+
+	public Leg(String mode) {
+		super(mode);
 	}
 
 	/**
@@ -44,8 +42,10 @@ public class Leg extends BasicLegImpl {
 	 * @param leg
 	 */
 	public Leg(final Leg leg) {
+		//FIXME dg 
+		super(BasicLeg.Mode.UNDEFINED);
 		this.num = leg.num;
-		this.mode = leg.mode;
+		this.stringmode = leg.stringmode;
 		this.setDepTime(leg.getDepTime());
 		this.setTravTime(leg.getTravTime());
 		this.setArrTime(leg.getArrTime());
@@ -84,7 +84,7 @@ public class Leg extends BasicLegImpl {
 	@Override
 	public final String toString() {
 		return "[num=" + this.num + "]" +
-				"[mode=" + this.mode + "]" +
+				"[mode=" + this.stringmode + "]" +
 				"[depTime=" + Time.writeTime(this.getDepTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravTime()) + "]" +
 				"[arrTime=" + Time.writeTime(this.getArrTime()) + "]" +

@@ -178,7 +178,12 @@ public class EgressAnalysis {
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new Plan(person);
 				plan.addAct(person.getSelectedPlan().getFirstActivity());
-				plan.addLeg(new Leg(1,"car",0.0,0.0,0.0));
+				Leg l = new Leg("car");
+				l.setNum(1);
+				l.setDepTime(0.0);
+				l.setTravTime(0.0);
+				l.setArrTime(0.0);
+				plan.addLeg(l);
 				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 				router.run(plan);
 				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());

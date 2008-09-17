@@ -292,7 +292,11 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		subRoute.setRoute(nodesRoute);
 
 		// die neue Route hinterlegen in neuem Leg hinterlege
-		Leg newLeg = new Leg(0, leg.getMode(), leg.getDepTime(), leg.getTravTime(), leg.getArrTime());
+		Leg newLeg = new Leg(leg.getMode());
+		newLeg.setNum(0);
+		newLeg.setDepTime(leg.getDepTime());
+		newLeg.setTravTime(leg.getTravTime());
+		newLeg.setArrTime(leg.getArrTime());
 		newLeg.setRoute(subRoute);
 				
 		// aktuell gew�hlten Plan 

@@ -91,9 +91,13 @@ public class Plan extends BasicPlanImpl {
 		verifyCreateLeg();
 		// Override leg number with an appropriate value
 		int legnum = (this.actsLegs.size()-1) /2;
-		Leg l = new Leg(legnum, mode, depTime, travTime, arrTime);
-		this.actsLegs.add(l);
-		return l;
+		Leg leg = new Leg(mode);
+		leg.setNum(legnum);
+		leg.setDepTime(depTime);
+		leg.setTravTime(travTime);
+		leg.setArrTime(arrTime);
+		this.actsLegs.add(leg);
+		return leg;
 	}
 
 	private final void verifyCreateLeg() throws Exception {

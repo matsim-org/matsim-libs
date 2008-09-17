@@ -17,6 +17,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.utils.io.IOUtils;
 
+import playground.dgrether.DgPaths;
 import playground.yu.analysis.PlanModeJudger;
 
 /**
@@ -44,6 +45,25 @@ public class CompareSelectedPlansTable {
 	 */
 	public static void main(String[] args) {
 
+
+		Gbl.createConfig(null);
+	
+		
+		String plans1 = DgPaths.VSPCVSBASE + "runs/run465/it.500/500.plans.xml.gz";
+		
+//		String plans2 = DgPaths.VSPCVSBASE + "runs/run495/it.500/500.plans.xml.gz";
+//		
+//		String out = DgPaths.VSPCVSBASE + "runs/run495/495vs465it500planscompare.txt";
+		String plans2 = DgPaths.VSPCVSBASE + "runs/run568/it.500/500.plans.xml.gz";
+		
+		String out = DgPaths.VSPCVSBASE + "runs/run568/568vs465it500planscompare.txt";
+		
+		String network = DgPaths.IVTCHNET;
+		
+		String[] args2 = {plans1, plans2, out, network};
+		
+		args = args2;
+		
 		if (args.length < 4) {
 			System.out.println("Too few arguments.");
 			printUsage();
