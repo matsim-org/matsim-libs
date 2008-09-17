@@ -107,6 +107,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  adding plan algorithms");
 		System.out.println("  ** adding primary location choice module (PLCM)");
 		PrimlocModule plcm = new PrimlocModule();
+		plcm.externalTripDist = CumulativeDistribution.readDistributionFromFile("test/input/org/matsim/demandmodeling/primloc/sample_dist.txt");
 		plcm.setup( population );
 		population.addAlgorithm( plcm );
 		System.out.println("  done.");
