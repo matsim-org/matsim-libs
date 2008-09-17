@@ -99,4 +99,8 @@ public class CountControlerListener implements StartupListener,
 			controler.stopwatch.endOperation("compare with counts");
 		}
 	}
+	
+	public Counts getCounts() {
+		return this.counts;
+	}
 }
