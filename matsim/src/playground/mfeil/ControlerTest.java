@@ -23,6 +23,7 @@ package playground.mfeil;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
@@ -33,7 +34,7 @@ import org.matsim.replanning.selectors.RandomPlanSelector;
  * @author Matthias Feil
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
-public class ControlerTest extends org.matsim.controler.Controler {
+public class ControlerTest extends org.matsim.planomat.PlanomatControler {
 	
 	public ControlerTest (String [] args){
 		super(args);
@@ -70,7 +71,12 @@ public class ControlerTest extends org.matsim.controler.Controler {
 				strategy.addStrategyModule(new ReRoute(this));
 			}
 			else if (classname.equals("BestScore")) {
-			strategy = new PlanStrategy(new BestPlanSelector());
+				strategy = new PlanStrategy(new BestPlanSelector());
+			}
+			else if (classname.equals("Planomat")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				strategy.addStrategyModule(planomatStrategyModule);
 			}
 		
 			manager.addStrategy(strategy, rate);

@@ -20,6 +20,7 @@
 package playground.mfeil;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
@@ -30,6 +31,7 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import java.util.ArrayList;
@@ -43,21 +45,22 @@ import java.util.ArrayList;
  * number of activities. A refined tabu determination and re-calculation is to come up as well.
  */
 
-public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX3 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int 						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double 					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;// weightChangeType;
+	private final double 					WEIGHT_INC_NUMBER;
 	private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
 
-	private static final Logger log = Logger.getLogger(PlanomatX2.class);
+	private static final Logger log = Logger.getLogger(PlanomatX3.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX2 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX3 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
@@ -67,6 +70,7 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 		WEIGHT_CHANGE_ORDER 	= 0.8; 
 		WEIGHT_CHANGE_NUMBER 	= 0.2;
 		//weightChangeType	 	= 0.0;
+		WEIGHT_INC_NUMBER 			= 0.5; 				//Weighing whether adding or removing activities in change number method.
 		MAX_ITERATIONS 			= 8;
 	}
 	
@@ -127,10 +131,10 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 					//Routing
 					//System.out.println("Aufruf des Routers für Person "+neighbourhood[x].getPerson().getId()+" in Iteration "+currentIteration);
 					this.router.run(neighbourhood[x]);
-					
+										
 					//Optimizing the start times
 					this.planomatAlgorithm.run (neighbourhood[x]); //Calling standard Planomat to optimise start times and mode choice
-					//System.out.println("Neuer Plan nach Planomat: "+actslegs);
+					System.out.println("Neuer Plan nach Planomat für Person "+neighbourhood[x].getPerson().getId()+" ist : "+neighbourhood[x].getActsLegs());
 										
 					// Scoring
 					//System.out.println("run method(), Person: "+neighbourhood[x].getPerson().getId()+", Score vor dem Scorer"+neighbourhood[x]);
@@ -167,11 +171,35 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 		// Update the plan with the final solution 		
 		java.util.Collections.sort(tabuList);
 		ArrayList<Object> al = plan.getActsLegs();
-		for (int i = 1; i<al.size()-1;i++){
+		
+		if(al.size()>tabuList.get(tabuList.size()-1).getActsLegs().size()){ //TODO @MF: Adjust as currently never called!
+			int i;
+			for (i = 0; i<al.size()-2;i++){
+				al.remove(i);
+				al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+			}
+			al.remove(i);
+			al.remove(i);
+		}
+		else if(al.size()<tabuList.get(tabuList.size()-1).getActsLegs().size()){
+			int i;
+			log.info("In der Schleife für längere neue Pläne!");
+			for (i = 0; i<al.size();i++){
+				al.remove(i);
+				al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+			}
+			for (int j = i; j<tabuList.get(tabuList.size()-1).getActsLegs().size();j++){			
+				al.add(j, tabuList.get(tabuList.size()-1).getActsLegs().get(j));
+				//al.add(i+1, tabuList.get(tabuList.size()-1).getActsLegs().get(i+1));
+			}
+		}
+		else {
+			for (int i = 0; i<al.size();i++){
 			al.remove(i);
 			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+			}
 		}
-		
+		log.info("Finaler Plan für Person "+plan.getPerson().getId()+" ist "+plan.getActsLegs());
 	}
 				
 	//////////////////////////////////////////////////////////////////////
@@ -186,7 +214,7 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 		}
 	
 		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
-			neighbourhood[neighbourPos]=this.changeNumber(neighbourhood[neighbourPos]);
+			this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER);
 		}
 	
 		for (neighbourPos = (int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
@@ -245,9 +273,15 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 		}
 	}
 	
-	public PlanomatXPlan changeNumber (PlanomatXPlan basePlan){
+	public void changeNumber (PlanomatXPlan basePlan, double weight){
 		//System.out.println("Aufruf Methode changeNumber!");
-		return basePlan;
+		
+		if(MatsimRandom.random.nextDouble()<weight){
+			//Choose a position where to add the activity, uniformly distributed
+			//int position = (int)(Math.floor(MatsimRandom.random.nextDouble()*(int)(basePlan.getActsLegs().size()/2)*10))+1;	
+			this.insertAct((int)(Math.floor(MatsimRandom.random.nextDouble()*(int)(basePlan.getActsLegs().size()/2)))+1, basePlan);
+		}
+		else System.out.println("Hier wäre removeAct() für Person "+basePlan.getPerson().getId());
 	}
 	
 	public PlanomatXPlan changeType (PlanomatXPlan basePlan){
@@ -336,5 +370,19 @@ public class PlanomatX2 implements org.matsim.population.algorithms.PlanAlgorith
 			return (acts1.equals(acts2));
 		}
 	}	
+	
+	public void insertAct (int position, PlanomatXPlan basePlan){
+		ArrayList<Object> actslegs = basePlan.getActsLegs();
+		Act actHelp = new Act ((Act)(actslegs.get((position*2)-2)));
+		actHelp.setDur(0);
+		Leg legHelp = new Leg ((Leg)(actslegs.get((position*2)-1)));
+		actslegs.add(position*2, legHelp);
+		actslegs.add(position*2, actHelp);
+		for (int i = position*2+1; i<actslegs.size(); i=i+2){
+			Leg leg = (Leg)actslegs.get(i);
+			leg.setNum(leg.getNum()+1);
+		}
+		System.out.println("Person: "+basePlan.getPerson().getId()+" mit Plan nach insertAct: "+basePlan.getActsLegs());
+	}
 }
 	
