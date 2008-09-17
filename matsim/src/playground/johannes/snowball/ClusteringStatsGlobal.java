@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
 import java.util.HashSet;
 import java.util.Set;

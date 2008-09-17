@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TIntObjectHashMap;

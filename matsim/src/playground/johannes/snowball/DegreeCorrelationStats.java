@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 

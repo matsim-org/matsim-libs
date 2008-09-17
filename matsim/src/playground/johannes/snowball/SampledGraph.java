@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseVertex.java
+ * SampledGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,35 +21,59 @@
 /**
  * 
  */
-package playground.johannes.graph;
+package playground.johannes.snowball;
 
-import playground.johannes.ArraySet;
+import java.util.Set;
+
+import playground.johannes.graph.SparseGraph;
+import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SparseVertex implements Vertex {
+public class SampledGraph extends SparseGraph {
 
-	private ArraySet<SparseEdge> edges = new ArraySet<SparseEdge>();
-	
-	private ArraySet<SparseVertex> neighbours = new ArraySet<SparseVertex>();
-	
-	public ArraySet<? extends SparseEdge> getEdges() {
-		return edges;
+	@Override
+	public SampledEdge addEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledEdge) super.addEdge(v1, v2);
 	}
 
-	public ArraySet<? extends SparseVertex> getNeighbours() {
-		return neighbours;
+	@Override
+	public SampledVertex addVertex() {
+		return (SampledVertex) super.addVertex();
 	}
 
-	void addEdge(SparseEdge e) {
-		edges.add(e);
-		neighbours.add(e.getOpposite(this));
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledEdge> getEdges() {
+		return (Set<? extends SampledEdge>) super.getEdges();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SampledVertex> getVertices() {
+		return (Set<? extends SampledVertex>) super.getVertices();
+	}
+
+	@Override
+	protected SampledEdge newEdge(SparseVertex v1, SparseVertex v2) {
+		if(v1 instanceof SampledVertex && v2 instanceof SampledVertex)
+			return new SampledEdge((SampledVertex)v1, (SampledVertex)v2);
+		else
+			throw new IllegalArgumentException("Vertex must be instance of SampledVertex.");
+	}
+
+	@Override
+	protected SampledVertex newVertex() {
+		return new SampledVertex();
 	}
 	
-	void optimize() {
-		edges.trimToSize();
-		neighbours.trimToSize();
+	public void reset() {
+		for(SampledVertex v : getVertices())
+			v.reset();
+		for(SampledEdge e : getEdges())
+			e.reset();
 	}
+
 }

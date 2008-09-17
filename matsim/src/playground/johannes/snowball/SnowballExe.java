@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -76,7 +76,7 @@ public class SnowballExe {
 	
 //	private static final String TYPE_CLUSTERS_KEY = "typeClusters";
 	
-//	private static final String COMPONENT_STATS_KEY = "componentStats";
+	private static final String COMPONENT_KEY = "components";
 	
 	private static final String MUTUALITY_KEY = "mutuality";
 	/**
@@ -143,6 +143,8 @@ public class SnowballExe {
 				statistics.put(key, new CorrelationStatsWeighted(outputDir + key, responseRate));
 			} else if(MUTUALITY_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new MutualityStats(outputDir + key, responseRate));
+			} else if(COMPONENT_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new ComponentStats(outputDir + key));
 			} else {
 				logger.warn(String.format("No class found for statistics \"%1$s\"!", key));
 			}

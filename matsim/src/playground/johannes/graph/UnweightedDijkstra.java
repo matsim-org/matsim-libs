@@ -23,10 +23,8 @@
  */
 package playground.johannes.graph;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -45,8 +43,8 @@ public class UnweightedDijkstra<V extends Vertex> {
 		this.projection = new DijkstraGraph(graph);
 	}
 	
-	public List<V> run(V source) {
-		List<V> reachedVertices = new LinkedList<V>();
+	public List<DijkstraVertex> run(V source) {
+		List<DijkstraVertex> reachedVertices = new ArrayList<DijkstraVertex>();
 		DijkstraVertex dsource = projection.getVertex(source); 
 		unsettledVertices = new PriorityQueue<DijkstraVertex>(projection.getVertices().size());
 		for(VertexDecorator<V> dvertex : projection.getVertices())
@@ -56,12 +54,15 @@ public class UnweightedDijkstra<V extends Vertex> {
 		unsettledVertices.add(dsource);
 		
 		DijkstraVertex dvertex;
+	
 		while((dvertex = unsettledVertices.poll()) != null) {
 			if(!dvertex.isSettled()) {
 				dvertex.setSettled(true);
-				reachedVertices.add(dvertex.getDelegate());
+				reachedVertices.add(dvertex);
 				
-				for(Vertex neighbour : dvertex.getNeighbours()) {
+				int cnt = dvertex.getNeighbours().size();
+				for(int i = 0; i < cnt; i++) {
+					Vertex neighbour = dvertex.getNeighbours().get(i);
 					DijkstraVertex dneighbour = (DijkstraVertex)neighbour;
 					if(!dneighbour.isSettled()) {
 						int d = dvertex.getDistance() + 1; 
@@ -83,30 +84,37 @@ public class UnweightedDijkstra<V extends Vertex> {
 			}
 		}
 		
-		
+		reachedVertices.remove(dsource);
 		return reachedVertices;
 	}
 	
 	public class DijkstraGraph extends GraphProjection<Graph, V, Edge> {
 
-		private Map<V, DijkstraVertex> vMapping = new HashMap<V, DijkstraVertex>();
+//		private Map<V, DijkstraVertex> vMapping = new HashMap<V, DijkstraVertex>();
+//		
+//		@SuppressWarnings("unchecked")
+//		public DijkstraGraph(Graph g) {
+//			super(g);
+//			
+//			for(Vertex v : g.getVertices()) {
+//				vMapping.put((V)v, (DijkstraVertex) addVertex((V)v));
+//			}
+//			
+//			for(Edge e : g.getEdges()) {
+//				DijkstraVertex v1 = vMapping.get(e.getVertices().getFirst());
+//				DijkstraVertex v2 = vMapping.get(e.getVertices().getSecond());
+//				addEdge(v1, v2);
+//			}
+//		}
 		
-		public DijkstraGraph(Graph g) {
-			super(g);
-			
-			for(Vertex v : g.getVertices()) {
-				vMapping.put((V)v, (DijkstraVertex) addVertex((V)v));
-			}
-			
-			for(Edge e : g.getEdges()) {
-				DijkstraVertex v1 = vMapping.get(e.getVertices().getFirst());
-				DijkstraVertex v2 = vMapping.get(e.getVertices().getSecond());
-				addEdge(v1, v2);
-			}
+		public DijkstraGraph(Graph delegate) {
+			super(delegate);
+			decorate(delegate);
 		}
-		
+
 		public DijkstraVertex getVertex(V v) {
-			return vMapping.get(v);
+//			return vMapping.get(v);
+			return (DijkstraVertex) super.getVertex(v);
 		}
 
 		@Override
@@ -123,7 +131,9 @@ public class UnweightedDijkstra<V extends Vertex> {
 		
 		private int distance;
 		
-		private LinkedList<DijkstraVertex> predecessors;
+//		private ArrayList<DijkstraVertex> predecessors;
+//		private LinkedList<DijkstraVertex> predecessors;
+		private DijkstraVertex[] predecessors;
 		
 		public DijkstraVertex() {
 			super();
@@ -153,24 +163,46 @@ public class UnweightedDijkstra<V extends Vertex> {
 			distance = d;
 		}
 		
-		public List<DijkstraVertex> getPredecessors() {
+//		public List<DijkstraVertex> getPredecessors() {
+//			return predecessors;
+//		}
+//		
+//		public void setPredecessor(DijkstraVertex v) {
+//			predecessors.clear();
+//			predecessors.add(v);
+//		}
+//		
+//		public void addPredecessor(DijkstraVertex v) {
+//			predecessors.add(v);
+//		}
+		public DijkstraVertex[] getPredecessors() {
 			return predecessors;
 		}
 		
+		@SuppressWarnings("unchecked")
 		public void setPredecessor(DijkstraVertex v) {
-			predecessors.clear();
-			predecessors.add(v);
+			if(predecessors.length != 1)
+				predecessors = new UnweightedDijkstra.DijkstraVertex[1];
+			predecessors[0] = v;
 		}
 		
+		@SuppressWarnings("unchecked")
 		public void addPredecessor(DijkstraVertex v) {
-			predecessors.add(v);
+			DijkstraVertex[] newPredecessors = new UnweightedDijkstra.DijkstraVertex[predecessors.length + 1];
+			for(int i = 0; i < predecessors.length; i++)
+				newPredecessors[i] = predecessors[i];
+			newPredecessors[predecessors.length] = v;
+			predecessors = newPredecessors;
 		}
 		
+		@SuppressWarnings("unchecked")
 		public void reset() {
 			isSettled = false;
 			isVisited = false;
 			distance = Integer.MAX_VALUE;
-			predecessors = new LinkedList<DijkstraVertex>();
+//			predecessors = new ArrayList<DijkstraVertex>();
+//			predecessors = new LinkedList<DijkstraVertex>();
+			predecessors = new UnweightedDijkstra.DijkstraVertex[0];
 		}
 		
 		public int compareTo(DijkstraVertex o) {

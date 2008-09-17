@@ -27,8 +27,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -53,14 +55,20 @@ public class GraphAnalyser {
 		logger.info(String.format("Loaded graph: %1$s vertices, %2$s edges.", numVertices, numEdges));
 
 		double meanDegree = GraphStatistics.getDegreeStatistics(g).getMean();
-		double clustering = GraphStatistics.getClusteringStatistics(g).getMean();
-		double mutuality = GraphStatistics.getMutuality(g);
-		double dcorrelation = GraphStatistics.getDegreeCorrelation(g);
-		
 		logger.info(String.format("Mean degree is %1$s.", meanDegree));
+		
+		double clustering = GraphStatistics.getClusteringStatistics(g).getMean();
 		logger.info(String.format("Mean clustering coefficient is %1$s.", clustering));
+		
+		double mutuality = GraphStatistics.getMutuality(g);
 		logger.info(String.format("Mutuality is %1$s.", mutuality));
+		
+		double dcorrelation = GraphStatistics.getDegreeCorrelation(g);
 		logger.info(String.format("Degree correlation is %1$s.", dcorrelation));
+		
+		Tuple<DescriptiveStatistics, DescriptiveStatistics> centrality = GraphStatistics.getCentralityStatistics(g);
+		logger.info(String.format("Betweenness centrality is %1$s.", centrality.getFirst()));
+		logger.info(String.format("Closeness centrality is %1$s.", centrality.getSecond()));
 		
 		if(args.length > 1) {
 			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);
@@ -88,7 +96,16 @@ public class GraphAnalyser {
 			writer.write("dcorrelation=");
 			writer.write(String.valueOf(dcorrelation));
 			writer.newLine();
+
+			writer.write("betweenness=");
+			writer.write(String.valueOf(centrality.getFirst().getMean()));
+			writer.newLine();
 			
+			writer.write("closeness=");
+			writer.write(String.valueOf(centrality.getSecond().getMean()));
+			writer.newLine();
+
+
 			writer.close();
 		}
 	}

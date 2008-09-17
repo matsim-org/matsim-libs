@@ -21,10 +21,9 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
-import java.util.Set;
-
+import playground.johannes.ArraySet;
 import playground.johannes.graph.SparseVertex;
 import playground.johannes.graph.VertexDecorator;
 
@@ -54,14 +53,14 @@ public class SampledVertex extends SparseVertex {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SampledEdge> getEdges() {
-		return (Set<? extends SampledEdge>) super.getEdges();
+	public ArraySet<? extends SampledEdge> getEdges() {
+		return (ArraySet<? extends SampledEdge>) super.getEdges();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SampledVertex> getNeighbours() {
-		return (Set<? extends SampledVertex>) super.getNeighbours();
+	public ArraySet<? extends SampledVertex> getNeighbours() {
+		return (ArraySet<? extends SampledVertex>) super.getNeighbours();
 	}
 
 	public void detect(int iteration) {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraph.java
+ * SampledEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,59 +21,46 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
-import java.util.Set;
+import org.matsim.utils.collections.Tuple;
 
-import playground.johannes.graph.SparseGraph;
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.EdgeDecorator;
+import playground.johannes.graph.SparseEdge;
+import playground.johannes.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraph extends SparseGraph {
+public class SampledEdge extends SparseEdge {
 
-	@Override
-	public SampledEdge addEdge(SparseVertex v1, SparseVertex v2) {
-		return (SampledEdge) super.addEdge(v1, v2);
+	private EdgeDecorator<SampledEdge> projection;
+	
+	public SampledEdge(SampledVertex v1, SampledVertex v2) {
+		super(v1, v2);
 	}
 
 	@Override
-	public SampledVertex addVertex() {
-		return (SampledVertex) super.addVertex();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends SampledEdge> getEdges() {
-		return (Set<? extends SampledEdge>) super.getEdges();
+	public SampledVertex getOpposite(Vertex v) {
+		return (SampledVertex) super.getOpposite(v);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends SampledVertex> getVertices() {
-		return (Set<? extends SampledVertex>) super.getVertices();
-	}
-
-	@Override
-	protected SampledEdge newEdge(SparseVertex v1, SparseVertex v2) {
-		if(v1 instanceof SampledVertex && v2 instanceof SampledVertex)
-			return new SampledEdge((SampledVertex)v1, (SampledVertex)v2);
-		else
-			throw new IllegalArgumentException("Vertex must be instance of SampledVertex.");
-	}
-
-	@Override
-	protected SampledVertex newVertex() {
-		return new SampledVertex();
+	public Tuple<SampledVertex, SampledVertex> getVertices() {
+		return (Tuple<SampledVertex, SampledVertex>) super.getVertices();
 	}
 	
-	public void reset() {
-		for(SampledVertex v : getVertices())
-			v.reset();
-		for(SampledEdge e : getEdges())
-			e.reset();
+	void setProjection(EdgeDecorator<SampledEdge> projection) {
+		this.projection = projection;
 	}
-
+	
+	public EdgeDecorator<SampledEdge> getProjection() {
+		return projection;
+	}
+	
+	void reset() {
+		projection = null;
+	}
 }

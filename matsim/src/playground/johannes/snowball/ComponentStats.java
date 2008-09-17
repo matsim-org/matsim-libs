@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledEdge.java
+ * ComponentStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,46 +21,43 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
-import org.matsim.utils.collections.Tuple;
+import java.util.Set;
+import java.util.SortedSet;
 
-import playground.johannes.graph.EdgeDecorator;
-import playground.johannes.graph.SparseEdge;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import playground.johannes.graph.GraphProjection;
+import playground.johannes.graph.GraphStatistics;
 import playground.johannes.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledEdge extends SparseEdge {
+public class ComponentStats extends GraphPropertyEstimator {
 
-	private EdgeDecorator<SampledEdge> projection;
-	
-	public SampledEdge(SampledVertex v1, SampledVertex v2) {
-		super(v1, v2);
+	/**
+	 * @param outputDir
+	 */
+	public ComponentStats(String outputDir) {
+		super(outputDir);
+		openStatsWriters("components");
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.snowball.GraphPropertyEstimator#calculate(playground.johannes.graph.GraphProjection, int)
+	 */
 	@Override
-	public SampledVertex getOpposite(Vertex v) {
-		return (SampledVertex) super.getOpposite(v);
+	public DescriptiveStatistics calculate(
+			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
+			int iteration) {
+		SortedSet<Set<Vertex>> components = GraphStatistics.getComponents(graph);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		stats.addValue(components.size());
+		dumpObservedStatistics(getStatisticsMap(stats), iteration);
+		return stats;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Tuple<SampledVertex, SampledVertex> getVertices() {
-		return (Tuple<SampledVertex, SampledVertex>) super.getVertices();
-	}
-	
-	void setProjection(EdgeDecorator<SampledEdge> projection) {
-		this.projection = projection;
-	}
-	
-	public EdgeDecorator<SampledEdge> getProjection() {
-		return projection;
-	}
-	
-	void reset() {
-		projection = null;
-	}
 }

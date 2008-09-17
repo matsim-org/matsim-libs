@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ClusteringStats.java
+ * DegreeStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,71 +21,50 @@
 /**
  * 
  */
-package playground.johannes.snowball3;
+package playground.johannes.snowball;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.graph.GraphProjection;
-import playground.johannes.graph.Vertex;
 import playground.johannes.graph.VertexDecorator;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class ClusteringStats extends GraphPropertyEstimator {
+public class DegreeStats extends GraphPropertyEstimator {
 
-	private double globalResponseRate;
-	
-	public ClusteringStats(String outputDir, double responseRate) {
+	public DegreeStats(String outputDir) {
 		super(outputDir);
-		this.globalResponseRate = responseRate;
-		openStatsWriters("clustering");
+		openStatsWriters("degree");
 	}
-
+	
 	@Override
-	public DescriptiveStatistics calculate(
-			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
-			int iteration) {
+	public DescriptiveStatistics calculate(GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph, int iteration) {
 		DescriptiveStatistics observed = new DescriptiveStatistics();
-		DescriptiveStatistics estimated = new DescriptiveStatistics();
+		Frequency observedDistr = new Frequency();
 		
-		for (VertexDecorator<SampledVertex> v : graph.getVertices()) {
-			if (!v.getDelegate().isAnonymous()) {
-				int k = v.getEdges().size();
-				if (k == 0 || k == 1) {
-					observed.addValue(0.0);
-					estimated.addValue(0.0);
-				} else {
-					int edgecount = 0;
-					Set<Vertex> n1s = new HashSet<Vertex>(v.getNeighbours());
-					for (Vertex n1 : v.getNeighbours()) {
-						for (Vertex n2 : n1.getNeighbours()) {
-							if (n2 != v) {
-								if (n1s.contains(n2)) {
-									edgecount++;
-								}
-							}
-						}
-						n1s.remove(n1);
-					}
-					observed.addValue(2	* edgecount	/ (double) (k * (k - 1)));
-					double localResponseRate = getLocalResponseRate(v, globalResponseRate);
-//					double localResponseRate = globalResponseRate;
-					if(localResponseRate > 0) {
-						double edgecountCorrected = Math.min(k * (k - 1), edgecount / (2 * localResponseRate - Math.pow(localResponseRate, 2)));
-						estimated.addValue(2 *  edgecountCorrected / (double) (k * (k - 1)) * v.getDelegate().getNormalizedWeight());
-					}
-				}
+		DescriptiveStatistics estimated = new DescriptiveStatistics();
+		Frequency estimatedDistr = new Frequency();
+		
+		for(VertexDecorator<SampledVertex> v : graph.getVertices()) {
+			if(!v.getDelegate().isAnonymous()) {
+				
+				estimated.addValue(v.getEdges().size() * v.getDelegate().getNormalizedWeight());
+				estimatedDistr.addValue(v.getEdges().size() * v.getDelegate().getNormalizedWeight());
+				
+				observed.addValue(v.getEdges().size());
+				observedDistr.addValue(v.getEdges().size());
+				
 			}
 		}
 		
 		dumpObservedStatistics(getStatisticsMap(observed), iteration);
 		dumpEstimatedStatistics(getStatisticsMap(estimated), iteration);
-
+		dumpFrequency(observedDistr, iteration, "observed");
+		dumpFrequency(estimatedDistr, iteration, "estimated");
+		
 		return observed;
 	}
 
