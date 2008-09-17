@@ -146,7 +146,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 			this.time = time;
 		}
 
-	};
+	}
 
 	private class TravelTimeRole {
 		private final double[] timeSum;
@@ -197,6 +197,6 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 			return this.travelTimes[index];
 		}
 
-	};
+	}
 
 }

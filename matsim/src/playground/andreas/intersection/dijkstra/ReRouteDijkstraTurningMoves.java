@@ -25,25 +25,25 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
-
-
 /**
  * @author dgrether
- *
+ * 
  */
 public class ReRouteDijkstraTurningMoves extends MultithreadedModuleA {
 
-
 	TravelCost costCalculator = null;
+
 	TravelTime timeCalculator = null;
+
 	NetworkLayer network = null;
 
-	public ReRouteDijkstraTurningMoves(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public ReRouteDijkstraTurningMoves(final NetworkLayer network, final TravelCost costCalculator,
+			final TravelTime timeCalculator) {
 		this.network = NetworkWrapper.wrapNetwork(network);
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 	}
-	
+
 	/**
 	 * @see org.matsim.replanning.modules.MultithreadedModuleA#getPlanAlgoInstance()
 	 */

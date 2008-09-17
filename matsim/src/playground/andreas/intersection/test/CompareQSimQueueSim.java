@@ -44,8 +44,6 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/bottleneck/config.xml");
 		
-		String signalSystems = null;
-		String groupDefinitions = null;
 		String newLSADef = null;
 		String newLSADefCfg = null;
 		
@@ -56,7 +54,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		try {		
 			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
-			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();
@@ -87,8 +85,6 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
 		
-		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
 		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
 		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
 		
@@ -99,7 +95,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		try {		
 			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
-			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();

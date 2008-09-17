@@ -1,11 +1,8 @@
 package playground.andreas.intersection.sim;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
@@ -13,110 +10,42 @@ import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.trafficlights.data.SignalGroupSettings;
-import org.matsim.trafficlights.data.SignalLane;
-
-import playground.andreas.intersection.tl.NewSignalSystemControlerImpl;
-import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
 public class QNode extends QueueNode{
 
-	private SignalSystemControlerImpl myNodeTrafficLightControler;
-	private NewSignalSystemControlerImpl myNewNodeTrafficLightControler;
-	
 	private boolean isSignalized = false;
 
 	private boolean cacheIsInvalid = true;
-
 	private QLink[] inLinksArrayCache = null;
-
 	private QLink[] tempLinks = null;
 
 	public QNode(Node n, QueueNetwork queueNetwork) {
 		super(n,  queueNetwork);
 	}
 
-	public void setNewSignalSystemControler(NewSignalSystemControlerImpl newLSAControler){
-		this.myNewNodeTrafficLightControler = newLSAControler;
-	}
-
-	public NewSignalSystemControlerImpl getMyNewNodeTrafficLightControler() {
-		return this.myNewNodeTrafficLightControler;
-	}
-	
-	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
-		this.myNodeTrafficLightControler = nodeControler;
-	}
-
-	public SignalSystemControlerImpl getMyNodeTrafficLightControler() {
-		return this.myNodeTrafficLightControler;
-	}
-
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
 	@Override
 	public void moveNode(final double now) {
 
-
-		
-		if(this.isSignalized == true){
+		if (this.isSignalized == true) {
 
 			// Node is traffic light controlled
-			
 			for (Link link : this.getNode().getInLinks().values()) {
 				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
-				
+
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
-					
-					while (pseudoLink.firstVehCouldMove()){
-						
-//						while (!pseudoLink.flowQueueIsEmpty()) {
-							Vehicle veh = pseudoLink.getFirstFromBuffer();
-							if (!moveVehicleOverNode(veh, pseudoLink)) {
-								break;
-							}
-//						}						
-					}			
-
+					while (pseudoLink.firstVehCouldMove()) {
+						Vehicle veh = pseudoLink.getFirstFromBuffer();
+						if (!moveVehicleOverNode(veh, pseudoLink)) {
+							break;
+						}
+					}
 				}
-				
 			}
-
-//			SignalGroupSettings[] greenSignalGroups = this.myNodeTrafficLightControler.getGreenInLinks(now);
-//
-//			if (greenSignalGroups.length != 0){
-//
-//				for (int i = 0; i < greenSignalGroups.length; i++) {
-//					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
-//
-//					Link link = this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
-//					
-//					QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
-//					
-//					List <Link> toLinks = new ArrayList<Link>();
-//					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
-//						toLinks.add(this.getNode().getOutLinks().get(signalLane.getLinkId()));
-//					}
-//
-//					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks(toLinks)) {
-//						
-//						pseudoLink.setThisTimeStepIsGreen(true);
-//						
-//						while (!pseudoLink.flowQueueIsEmpty()) {
-//							Vehicle veh = pseudoLink.getFirstFromBuffer();
-//							if (!moveVehicleOverNode(veh, pseudoLink)) {
-//								break;
-//							}
-//						}
-//					}
-//				}
-//
-//			}
-
-
 
 		} else {
 
-			//Node is NOT traffic light controlled
+			// Node is NOT traffic light controlled
 			if (this.cacheIsInvalid) {
 				buildCache();
 			}
@@ -157,27 +86,7 @@ public class QNode extends QueueNode{
 						break;
 					}
 				}
-			}	
-			
-//			for (Iterator<? extends Link> iter = this.getNode().getInLinks().values().iterator(); iter.hasNext();) {
-//				Link link = iter.next();
-//				
-//				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
-//				
-//
-//				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
-//					
-//					pseudoLink.setThisTimeStepIsGreen(true);
-//					
-//					while (!pseudoLink.flowQueueIsEmpty()) {
-//						Vehicle veh = pseudoLink.getFirstFromBuffer();
-//						if (!moveVehicleOverNode(veh, pseudoLink)) {
-//							break;
-//						}
-//					}
-//				}
-//			}
-//
+			}
 		}
 
 	}

@@ -23,21 +23,16 @@ import org.matsim.controler.Controler;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 
-
 /**
  * @author dgrether
- *
+ * 
  */
 public class SignalSystemRoutePlanStrategy extends PlanStrategy {
 
 	public SignalSystemRoutePlanStrategy(Controler controler) {
 		super(new RandomPlanSelector());
-		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()));
-		
+		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getNetwork(),
+				controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()));
 	}
 
-	
-	
-	
-	
 }

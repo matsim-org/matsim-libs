@@ -39,16 +39,9 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
   		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
-//		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
-//		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
 				
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
-		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
 		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
 		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
-
-//		conf.plans().setInputFile(popFileName);
-//		conf.network().setInputFile(netFileName);
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -102,7 +95,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 			}
 
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions, false, newLSADef, tempFile).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, tempFile).run();
 			results.put(Integer.valueOf(i), this.beginningOfLink2);
 			
 			File delFile = new File(tempFile);
@@ -128,22 +121,15 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
 		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
-//		String popFileName = "src/playground/andreas/intersection/test/data/plans_2a_5000.xml.gz";
-//		String netFileName = "src/playground/andreas/intersection/test/data/net_2a.xml.gz";
-		
-		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
-		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+
 		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
 		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
-
-//		conf.plans().setInputFile(popFileName);
-//		conf.network().setInputFile(netFileName);
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		
-		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
+		new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
 		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		
 		MeasurePoint qSim = this.beginningOfLink2;		
