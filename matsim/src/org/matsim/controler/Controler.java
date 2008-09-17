@@ -67,6 +67,7 @@ import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.counts.CountControlerListener;
+import org.matsim.counts.Counts;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.facilities.Facilities;
@@ -144,6 +145,7 @@ public class Controler {
 	protected final Events events = new Events();
 	protected NetworkLayer network = null;
 	protected Population population = null;
+	private Counts counts = null;
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
@@ -572,7 +574,9 @@ public class Controler {
 
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
-			this.addControlerListener(new CountControlerListener(this.config));
+			CountControlerListener ccl = new CountControlerListener(this.config);
+			this.addControlerListener(ccl);
+			this.counts = ccl.getCounts();
 		}
 	}
 
@@ -1030,6 +1034,13 @@ public class Controler {
 
 	public final Events getEvents() {
 		return this.events;
+	}
+	
+	/**
+	 * @return real-world traffic counts if available, <code>null</code> if no data is available.
+	 */
+	public final Counts getCounts() {
+		return this.counts;
 	}
 
 	public final CalcLinkStats getLinkStats() {
