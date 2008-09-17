@@ -71,7 +71,8 @@
           id             CDATA #REQUIRED
           x              CDATA #IMPLIED
           y              CDATA #IMPLIED
-          freq           CDATA #IMPLIED>
+          freq           CDATA #IMPLIED
+          isPrimary      (yes|no) "no">
 
 <!ELEMENT capacity       EMPTY>
 <!ATTLIST capacity

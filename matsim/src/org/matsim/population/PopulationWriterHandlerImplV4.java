@@ -201,14 +201,35 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <location ... > ... </location>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<location");
+//	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException {
+//		out.write("\t\t\t\t<location");
 //		out.write(" type=\"" + facility.getLayer().getType() + "\"");
-		out.write(" id=\"" + facility.getId() + "\"");
+//		out.write(" id=\"" + facility.getId() + "\"");
+//		out.write(">\n");
+//	}
+
+	public void endLocation(final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t</location>\n");
+	}
+
+	public void startPrimaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<location");
+		out.write(" id=\"" + activity.getFacility().getId() + "\"");
+		out.write(" isPrimary=\"" + "yes" + "\"");
 		out.write(">\n");
 	}
 
-	public void endLocation(final BufferedWriter out) throws IOException {
+	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t</location>\n");
+	}
+
+	public void startSecondaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<location");
+		out.write(" id=\"" + activity.getFacility().getId() + "\"");
+		out.write(">\n");
+	}
+
+	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t</location>\n");
 	}
 

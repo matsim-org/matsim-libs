@@ -231,6 +231,10 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		String x = atts.getValue("x");
 		String y = atts.getValue("y");
 		String freq = atts.getValue("freq");
+		String iP = atts.getValue("isPrimary");
+		boolean isPrimary = false;
+		if ("yes".equals(iP)) { isPrimary = true; }
+
 		if (type != null) { log.info("Attribute type in <location> is deprecated!"); }
 		if (id == null) { Gbl.errorMsg("NEW: location must have an id!"); }
 		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
@@ -240,7 +244,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
 		this.curractivity = this.currfacility.getActivity(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
-		this.currknowledge.addActivity(this.curractivity);
+		this.currknowledge.addActivity(this.curractivity,isPrimary);
 	}
 
 	private void startCapacity(final Attributes atts) {

@@ -187,17 +187,26 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 				while (at_it.hasNext()) {
 					String act_type = at_it.next();
 					this.handler.startActivity(act_type,this.out);
-					// locations
-					Iterator<Activity> a_it = k.getActivities(act_type).iterator();
-					while (a_it.hasNext()) {
-						Facility f = a_it.next().getFacility();
-						this.handler.startLocation(f,this.out);
-						/* TODO [balmermi] Here, usually capacity and opentimes
-						 * are also written. But since it is now already defined by the facilities
-						 * there is no need to write it. the act type and the facilitiy id
-						 * is enough. (well... i think) */
-						this.handler.endLocation(this.out);
+					// locations (primary)
+					for (Activity a : k.getActivities(act_type,true)) {
+						this.handler.startPrimaryLocation(a,this.out);
+						this.handler.endPrimaryLocation(this.out);
 					}
+					// locations (secondary)
+					for (Activity a : k.getActivities(act_type,false)) {
+						this.handler.startSecondaryLocation(a,this.out);
+						this.handler.endSecondaryLocation(this.out);
+					}
+//					Iterator<Activity> a_it = k.getActivities(act_type).iterator();
+//					while (a_it.hasNext()) {
+//						Facility f = a_it.next().getFacility();
+//						this.handler.startLocation(f,this.out);
+//						/* TODO [balmermi] Here, usually capacity and opentimes
+//						 * are also written. But since it is now already defined by the facilities
+//						 * there is no need to write it. the act type and the facilitiy id
+//						 * is enough. (well... i think) */
+//						this.handler.endLocation(this.out);
+//					}
 					this.handler.endActivity(this.out);
 				}
 				this.handler.endKnowledge(this.out);

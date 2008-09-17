@@ -106,9 +106,17 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <location ... > ... </location>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException;
+//	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException;
 
-	public void endLocation(final BufferedWriter out) throws IOException;
+//	public void endLocation(final BufferedWriter out) throws IOException;
+
+	public void startPrimaryLocation(final Activity activity, final BufferedWriter out) throws IOException;
+
+	public void endPrimaryLocation(final BufferedWriter out) throws IOException;
+
+	public void startSecondaryLocation(final Activity activity, final BufferedWriter out) throws IOException;
+
+	public void endSecondaryLocation(final BufferedWriter out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <capacity ... />

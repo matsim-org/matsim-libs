@@ -44,14 +44,16 @@ public class PlansDefineKnowledge {
 	public void run(Population plans) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		// get home and other activities
+		// get home, work and other activities
 		ArrayList<Activity> home_acts = new ArrayList<Activity>();
+		ArrayList<Activity> work_acts = new ArrayList<Activity>();
 		ArrayList<Activity> other_acts = new ArrayList<Activity>();
 		for (Facility f : this.facilities.getFacilities().values()) {
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
 			while (a_it.hasNext()) {
 				Activity a = a_it.next();
 				if (a.getType().equals("home")) { home_acts.add(a); }
+				else if (a.getType().equals("work")) { work_acts.add(a); }
 				else { other_acts.add(a); }
 			}
 		}
@@ -62,10 +64,12 @@ public class PlansDefineKnowledge {
 			Person p = p_it.next();
 			Knowledge k = p.createKnowledge("created by " + this.getClass().getName());
 			int index = this.rand.nextInt(home_acts.size());
-			k.addActivity(home_acts.get(index));
+			k.addActivity(home_acts.get(index),true);
+			index = this.rand.nextInt(work_acts.size());
+			k.addActivity(work_acts.get(index),true);
 			for (int i=0; i<4; i++) {
 				index = this.rand.nextInt(other_acts.size());
-				k.addActivity(other_acts.get(index));
+				k.addActivity(other_acts.get(index),false);
 			}
 		}
 
