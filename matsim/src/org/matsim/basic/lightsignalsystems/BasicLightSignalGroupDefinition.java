@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-
+import org.matsim.trafficlights.control.SignalSystemControler;
 
 /**
  * @author dgrether
@@ -38,7 +38,7 @@ public class BasicLightSignalGroupDefinition {
 	private List<Id> toLinkIds;
 	private Id linkRefId;
 	
-	
+	private SignalSystemControler signalSystemControler;
 
 	public BasicLightSignalGroupDefinition(Id linkRefId, Id id) {
 		this.linkRefId = linkRefId;
@@ -83,6 +83,14 @@ public class BasicLightSignalGroupDefinition {
 	
 	public List<Id> getToLinkIds() {
 		return toLinkIds;
+	}
+
+	public void setResponsibleLSAControler(SignalSystemControler signalSystemControler) {
+		this.signalSystemControler = signalSystemControler;		
+	}
+	
+	public boolean isGreen(){
+		return this.signalSystemControler.givenSignalGroupIsGreen(this);
 	}
 	
 	

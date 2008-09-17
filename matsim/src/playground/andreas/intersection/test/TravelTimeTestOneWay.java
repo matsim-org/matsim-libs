@@ -44,6 +44,8 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 				
 		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
 		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
+		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
+		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
 
 //		conf.plans().setInputFile(popFileName);
 //		conf.network().setInputFile(netFileName);
@@ -64,7 +66,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 				
 				this.beginningOfLink2 = null;
 				
-				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(signalSystems)));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(newLSADefCfg)));
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
 				boolean moveOn = true;
 
@@ -76,8 +78,8 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 
 						if(line.contains("<dropping sec=")){
 							writer.write("<dropping sec=\"" + i + "\" />" + "\n");		
-						} else if (line.contains("<circulationTime sec=")){
-							writer.write("<circulationTime sec=\"" + umlaufzeit + "\" />");
+						} else if (line.contains("<circulationTime seconds=")){
+							writer.write("<circulationTime seconds=\"" + umlaufzeit + "\" />");
 						}
 						
 						else {
@@ -100,7 +102,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 			}
 
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions, false).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), tempFile, groupDefinitions, false, newLSADef, tempFile).run();
 			results.put(Integer.valueOf(i), this.beginningOfLink2);
 			
 			File delFile = new File(tempFile);
@@ -131,6 +133,8 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
 		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
+		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
 
 //		conf.plans().setInputFile(popFileName);
 //		conf.network().setInputFile(netFileName);
@@ -139,7 +143,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		Events events = new Events();
 		events.addHandler(this);
 		
-		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
+		new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
 		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		
 		MeasurePoint qSim = this.beginningOfLink2;		

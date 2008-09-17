@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
@@ -15,12 +16,15 @@ import org.matsim.network.Node;
 import org.matsim.trafficlights.data.SignalGroupSettings;
 import org.matsim.trafficlights.data.SignalLane;
 
+import playground.andreas.intersection.tl.NewSignalSystemControlerImpl;
 import playground.andreas.intersection.tl.SignalSystemControlerImpl;
 
 public class QNode extends QueueNode{
 
 	private SignalSystemControlerImpl myNodeTrafficLightControler;
+	private NewSignalSystemControlerImpl myNewNodeTrafficLightControler;
 	
+	private boolean isSignalized = false;
 
 	private boolean cacheIsInvalid = true;
 
@@ -32,6 +36,14 @@ public class QNode extends QueueNode{
 		super(n,  queueNetwork);
 	}
 
+	public void setNewSignalSystemControler(NewSignalSystemControlerImpl newLSAControler){
+		this.myNewNodeTrafficLightControler = newLSAControler;
+	}
+
+	public NewSignalSystemControlerImpl getMyNewNodeTrafficLightControler() {
+		return this.myNewNodeTrafficLightControler;
+	}
+	
 	public void setSignalSystemControler(SignalSystemControlerImpl nodeControler){
 		this.myNodeTrafficLightControler = nodeControler;
 	}
@@ -44,40 +56,61 @@ public class QNode extends QueueNode{
 	@Override
 	public void moveNode(final double now) {
 
-		if(this.myNodeTrafficLightControler != null){
+
+		
+		if(this.isSignalized == true){
 
 			// Node is traffic light controlled
-
-			SignalGroupSettings[] greenSignalGroups = this.myNodeTrafficLightControler.getGreenInLinks(now);
-
-			if (greenSignalGroups.length != 0){
-
-				for (int i = 0; i < greenSignalGroups.length; i++) {
-					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
-
-					Link link = this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+			
+			for (Link link : this.getNode().getInLinks().values()) {
+				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
+				
+				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 					
-					QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
-					
-					List <Link> toLinks = new ArrayList<Link>();
-					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
-						toLinks.add(this.getNode().getOutLinks().get(signalLane.getLinkId()));
-					}
-
-					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks(toLinks)) {
+					while (pseudoLink.firstVehCouldMove()){
 						
-						pseudoLink.setThisTimeStepIsGreen(true);
-						
-						while (!pseudoLink.flowQueueIsEmpty()) {
+//						while (!pseudoLink.flowQueueIsEmpty()) {
 							Vehicle veh = pseudoLink.getFirstFromBuffer();
 							if (!moveVehicleOverNode(veh, pseudoLink)) {
 								break;
 							}
-						}
-					}
-				}
+//						}						
+					}			
 
+				}
+				
 			}
+
+//			SignalGroupSettings[] greenSignalGroups = this.myNodeTrafficLightControler.getGreenInLinks(now);
+//
+//			if (greenSignalGroups.length != 0){
+//
+//				for (int i = 0; i < greenSignalGroups.length; i++) {
+//					SignalGroupSettings signalGroupSetting = greenSignalGroups[i];
+//
+//					Link link = this.getNode().getInLinks().get((signalGroupSetting.getSignalGroupDefinition().getLinkId()));
+//					
+//					QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
+//					
+//					List <Link> toLinks = new ArrayList<Link>();
+//					for (SignalLane signalLane : signalGroupSetting.getSignalGroupDefinition().getToLanes()) {
+//						toLinks.add(this.getNode().getOutLinks().get(signalLane.getLinkId()));
+//					}
+//
+//					for (PseudoLink pseudoLink : qLink.getNodePseudoLinks(toLinks)) {
+//						
+//						pseudoLink.setThisTimeStepIsGreen(true);
+//						
+//						while (!pseudoLink.flowQueueIsEmpty()) {
+//							Vehicle veh = pseudoLink.getFirstFromBuffer();
+//							if (!moveVehicleOverNode(veh, pseudoLink)) {
+//								break;
+//							}
+//						}
+//					}
+//				}
+//
+//			}
 
 
 
@@ -189,6 +222,11 @@ public class QNode extends QueueNode{
 		});
 		this.tempLinks = new QLink[this.getNode().getInLinks().values().size()];
 		this.cacheIsInvalid = false;
+	}
+
+	public void setIsSignalizedTrue() {
+		this.isSignalized = true;
+		
 	}
 
 }

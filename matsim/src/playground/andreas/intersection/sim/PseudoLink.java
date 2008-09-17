@@ -1,5 +1,6 @@
 package playground.andreas.intersection.sim;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
@@ -30,6 +33,8 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	/** Id of the real link, null if this is not the first/original <code>PseudoLink</code> */
 	private QLink realLink = null;
 	private boolean amIOriginalLink = false;
+	private Id laneLinkIdSpecifiedInFile;
+	private ArrayList<BasicLightSignalGroupDefinition> sgsOnThisSubLink = null;
 
 	/** Hält alle echten Ziellinks, die von diesem Link erreichbar sind, meist 1-3 */
 	private List<Link> destLinks = new LinkedList<Link>();
@@ -83,9 +88,10 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	double length_m = -1;
 
 
-	public PseudoLink(QLink originalLink, boolean amIOriginalLink) {
+	public PseudoLink(QLink originalLink, boolean amIOriginalLink, Id laneLinkIdSpecifiedInFile) {
 		this.realLink = originalLink;
 		this.amIOriginalLink = amIOriginalLink;
+		this.laneLinkIdSpecifiedInFile = laneLinkIdSpecifiedInFile;
 	}
 
 	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, int numberOfLanes, double freeSpeed_m_s, double averageSimulatedFlowCapacityPerLane_Veh_s, double effectiveCellSize){
@@ -113,6 +119,47 @@ public class PseudoLink implements Comparable<PseudoLink>{
 		} else {
 			return true;
 		}
+
+	}
+	
+	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
+		for (Id laneId : basicLightSignalGroupDefinition.getLaneIds()) {
+			if(this.laneLinkIdSpecifiedInFile.equals(laneId)){
+				if(this.sgsOnThisSubLink == null){
+					this.sgsOnThisSubLink = new ArrayList<BasicLightSignalGroupDefinition>();
+				}
+				this.sgsOnThisSubLink.add(basicLightSignalGroupDefinition);
+			}
+		}
+	}
+	
+	public boolean firstVehCouldMove(){
+		
+		
+		
+		if (this.sgsOnThisSubLink == null){
+			log.fatal("This should never happen, since every LaneLink at a signalized intersection should have at least one signal(group)");
+		}
+
+			boolean firstVehInQueueCouldMove = false;
+
+			for (BasicLightSignalGroupDefinition signalGroup : this.sgsOnThisSubLink) {
+
+				boolean sgIsGreen = signalGroup.isGreen();
+				if(sgIsGreen){
+					this.setThisTimeStepIsGreen(true);
+				}
+
+				Vehicle veh = this.getFirstFromBuffer();
+				if(veh != null){
+
+					if(sgIsGreen && signalGroup.getToLinkIds().contains(this.getFirstFromBuffer().getDriver().chooseNextLink().getId())){
+						firstVehInQueueCouldMove = true;
+					}
+				}
+			}
+
+			return firstVehInQueueCouldMove;	
 
 	}
 
@@ -497,5 +544,7 @@ public class PseudoLink implements Comparable<PseudoLink>{
 	public double getFreeSpeedTravelTime() {
 		return this.freeSpeedTravelTime;
 	}
+
+
 
 }

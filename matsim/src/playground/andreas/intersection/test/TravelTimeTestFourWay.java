@@ -44,6 +44,8 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
 		String groupDefinitions = "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
+		String newLSADef = "src/playground/andreas/intersection/test/data/fourways/lsa.xml";
+		String newLSADefCfg = "src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -52,7 +54,7 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		
 		try {		
 			this.writer = IOUtils.getBufferedWriter("temp.txt.gz", true);
-			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
 
 			this.writer.flush();
 			this.writer.close();

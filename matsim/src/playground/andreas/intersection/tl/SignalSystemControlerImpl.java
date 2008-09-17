@@ -3,6 +3,7 @@ package playground.andreas.intersection.tl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.trafficlights.control.SignalSystemControler;
 import org.matsim.trafficlights.data.PlanbasedSignalSystemControlInfoImpl;
 import org.matsim.trafficlights.data.SignalGroupSettings;
@@ -17,7 +18,7 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 		this.signalSystemConfiguration = signalSystemConfiguration;
 	}
 
-	@Override
+//	@Override
 	public SignalGroupSettings[] getGreenInLinks(double time) {
 		
 		if(this.signalSystemConfiguration == null){
@@ -59,6 +60,12 @@ public class SignalSystemControlerImpl extends SignalSystemControler {
 //		}
 	
 		return greenLinks;
+	}
+
+	@Override
+	public boolean givenSignalGroupIsGreen(BasicLightSignalGroupDefinition signalGroup) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -46,6 +46,8 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		String signalSystems = null;
 		String groupDefinitions = null;
+		String newLSADef = null;
+		String newLSADefCfg = null;
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -54,7 +56,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		try {		
 			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
-			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();
@@ -87,6 +89,8 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
 		String groupDefinitions = "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
+		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
+		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -95,7 +99,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		
 		try {		
 			this.writer = new BufferedWriter(new FileWriter(new File("qsim_events.txt")));
-			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false).run();
+			new QSim(events, data.getPopulation(), data.getNetwork(), signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg).run();
 //			new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
 			this.writer.flush();
 			this.writer.close();

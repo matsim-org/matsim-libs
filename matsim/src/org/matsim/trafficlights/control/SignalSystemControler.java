@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.trafficlights.control;
 
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.trafficlights.data.SignalGroupSettings;
 
 
@@ -28,5 +29,5 @@ import org.matsim.trafficlights.data.SignalGroupSettings;
  */
 public abstract class SignalSystemControler {
 
-	public abstract SignalGroupSettings[] getGreenInLinks(double time);
+	public abstract boolean givenSignalGroupIsGreen(BasicLightSignalGroupDefinition signalGroup);
 }

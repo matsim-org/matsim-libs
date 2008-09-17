@@ -40,20 +40,24 @@ public class QControler extends Controler {
 	
 	final String signalSystems;
 	final String groupDefinitions;
+	final String newLSADef;
+	final String newLSADefCfg;
 	
 	static boolean useOTF;
 
-	public QControler(final Config config, String signalSystems, String groupDefinitions, boolean useOTF) {
+	public QControler(final Config config, String signalSystems, String groupDefinitions, boolean useOTF, String newLSADef, String newLSADefCfg) {
 		super(config);
 		this.signalSystems = signalSystems;
 		this.groupDefinitions = groupDefinitions;
+		this.newLSADef = newLSADef;
+		this.newLSADefCfg = newLSADefCfg;
 		this.useOTF = useOTF;
 	}
 
 	@Override
 	protected void runMobSim() {
 		QSim sim = new QSim(this.events, this.population, this.network,
-				this.signalSystems, this.groupDefinitions, useOTF);
+				this.signalSystems, this.groupDefinitions, useOTF, this.newLSADef, this.newLSADefCfg);
 //		QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
 		sim.run();
 	}
@@ -105,25 +109,32 @@ public class QControler extends Controler {
 //			config = Gbl.createConfig(args);
 //		}
 
-//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
-//		final String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
-//		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
+		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
+		final String signalSystems = "./src/playground/andreas/intersection/test/data/fourways/signalSystemConfig.xml";
+		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/fourways/signalGroupDefinition.xml";
+		final String newLSADef = "./src/playground/andreas/intersection/test/data/fourways/lsa.xml";
+		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
 
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
 //		final String signalSystems = "./src/playground/andreas/intersection/test/data/twoways/signalSystemConfig_2lsa.xml";
 //		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/twoways/signalGroupDefinition_2lsa.xml";
+//		final String newLSADef = "./src/playground/andreas/intersection/test/data/twoways/lsa_2.xml";
+//		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/twoways/lsa_2_config.xml";
 
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/oneways/config.xml"});
 //		final String signalSystems = "./src/playground/andreas/intersection/test/data/oneways/signalSystemConfig.xml";
 //		final String groupDefinitions= "./src/playground/andreas/intersection/test/data/oneways/signalGroupDefinition.xml";
-
+//		final String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
+//		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
 		
-		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
+//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
 //		config = Gbl.createConfig(new String[] {"./examples/two-routes/config.xml"});
-		final String signalSystems =  null;
-		final String groupDefinitions = null;
+//		final String signalSystems =  null;
+//		final String groupDefinitions = null;
+//		final String newLSADef = null;
+//		final String newLSADefCfg = null;
 		
-		final QControler controler = new QControler(config, signalSystems, groupDefinitions, false);
+		final QControler controler = new QControler(config, signalSystems, groupDefinitions, false, newLSADef, newLSADefCfg);
 		controler.setOverwriteFiles(true);
 		controler.setWriteEvents(true);
 //		controler.setTraveltimeBinSize(30*60);

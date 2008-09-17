@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLane;
+import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
@@ -15,8 +19,6 @@ import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
-import org.matsim.trafficlights.data.SignalLane;
-import org.matsim.trafficlights.data.TrafficLightsManager;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
@@ -43,8 +45,8 @@ public class QLink extends QueueLink {
 		this.effectiveCelleSize = queueNetwork.getNetworkLayer().getEffectiveCellSize();
 
 		this.freeSpeedTT = this.getLink().getLength() / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
-		// Original LinkErstellen
-		this.originalLink = new PseudoLink(this, true);
+		// Original LinkErstellen, has no LaneId specified in file
+		this.originalLink = new PseudoLink(this, true, null);
 		// Konfigurieren
 		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME),this.effectiveCelleSize)) {
 
@@ -132,8 +134,14 @@ public class QLink extends QueueLink {
 		}
 		return returnPseudoLinkList;
 	}
+	
+	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
+		for (PseudoLink nodePseudoLink : this.nodePseudoLinksList) {
+			nodePseudoLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+		}				
+	}
 
-	public void reconfigure(TrafficLightsManager trafficLightsManager) {
+	public void reconfigure(BasicLanesToLinkAssignment laneToLink, QueueNetwork queueNetwork) {
 
 		if (this.getLink().getLength() < 60){
 			try {
@@ -149,26 +157,24 @@ public class QLink extends QueueLink {
 
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
-		for (SignalLane signalLane : trafficLightsManager.getFromLanes(this.getLink().getId())) {
+		for (BasicLane signalLane : laneToLink.getLanes()) {
 
 			int numberOfLanes_ = signalLane.getNumberOfRepresentedLanes();
 			double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
 //			double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
 
-			//TODO [an] has to be checked, not sure about it
-
 			PseudoLink newNodePseudoLink;
 
 			if(!firstNodeLinkInitialized){
 
-				newNodePseudoLink = new PseudoLink(this, false);
+				newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
 
 				newNodePseudoLink.setFromLink(this.originalLink);
 				this.originalLink.getToLinks().add(newNodePseudoLink);
 
-				for (Link link : trafficLightsManager.getToLinks(signalLane)) {
-					newNodePseudoLink.addDestLink(link);
-					this.originalLink.addDestLink(link);
+				for (Id linkId : signalLane.getToLinkIds()) {
+					newNodePseudoLink.addDestLink(queueNetwork.getQueueLink(linkId).getLink());
+					this.originalLink.addDestLink(queueNetwork.getQueueLink(linkId).getLink());
 				}
 
 				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s, this.effectiveCelleSize);
@@ -204,14 +210,14 @@ public class QLink extends QueueLink {
 					// It is not
 					// New NodePseudoLink will start at originalLink
 
-					newNodePseudoLink = new PseudoLink(this, false);
+					newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
 
 					newNodePseudoLink.setFromLink(this.originalLink);
 					this.originalLink.getToLinks().add(newNodePseudoLink);
 
-					for (Link link : trafficLightsManager.getToLinks(signalLane)) {
-						newNodePseudoLink.addDestLink(link);
-						this.originalLink.addDestLink(link);
+					for (Id linkId : signalLane.getToLinkIds()) {
+						newNodePseudoLink.addDestLink(queueNetwork.getQueueLink(linkId).getLink());
+						this.originalLink.addDestLink(queueNetwork.getQueueLink(linkId).getLink());
 					}
 
 					// Only need to fix properties of new link. Original link hasn't changed
@@ -318,4 +324,5 @@ public class QLink extends QueueLink {
 		}
 
 	}
+
 }
