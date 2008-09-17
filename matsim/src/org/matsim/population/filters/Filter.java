@@ -21,24 +21,20 @@
 package org.matsim.population.filters;
 
 /**
- * this interface offers the basic functions for
- * org.matsim.playground.filters.filter.Filter und its subclasses.
+ * basic interface for implementing Filters
  * 
  * @author ychen
- * 
  */
 public interface Filter {
 	/**
-	 * Counts, how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
+	 * Counts, how many objects (e.g. {@link org.matsim.population.Person}s, 
+	 * {@link org.matsim.events.BasicEvent Events}) were selected by the filter.
 	 */
 	void count();
 
 	/**
-	 * Returns how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
-	 * @return how many persons (org.matsim.demandmodeling.plans.Person) or
-	 * events(org.matsim.demandmodeling.events.BasicEvent) were selected
+	 * @return the number of objects (e.g. {@link org.matsim.population.Person}s, 
+	 * {@link org.matsim.events.BasicEvent Events}) were selected by the filter.
 	 */
 	int getCount();
 }

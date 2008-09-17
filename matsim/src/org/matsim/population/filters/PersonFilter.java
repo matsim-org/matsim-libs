@@ -24,29 +24,23 @@ import org.matsim.population.Person;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
- * This interface extends interface: org.matsim.playground.filters.filter.FilterI,
- * and offers important functions for
- * org.matsim.playground.filters.filter.PersonFilterA
+ * Interface for filtering persons.
  *
  * @author ychen
- *
  */
 public interface PersonFilter extends Filter, PersonAlgorithm {
 	/**
 	 * judges whether the Person will be selected or not
 	 *
-	 * @param person -
-	 *            who is being judged
-	 * @return true if the Person meets the criterion of the PersonFilterA
+	 * @param person person being judged
+	 * @return true if the Person meets the criterion of the filter
 	 */
 	boolean judge(Person person);
 
 	/**
-	 * sends the person to the next PersonFilterA
-	 * (org.matsim.playground.filters.filter.PersonFilterA) or other behavior
+	 * sends the person to the next PersonAlgorithm, which could be another filter.
 	 *
-	 * @param person -
-	 *            a person being run
+	 * @param person person to be handled
 	 */
 	void run(Person person);
 
