@@ -79,10 +79,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-			// save original routes
-			// HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
-			
-			// analyze plan: how many activities do we have?
+			// analyze plan: how many activities and subtours do we have?
 			PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 			planAnalyzeSubtours.run(plan);
 
@@ -110,7 +107,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			population.evolve( Gbl.getConfig().planomat().getJgapMaxGenerations() );
 			IChromosome fittest = population.getFittestChromosome();
 			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
-//			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours, originalRoutes );
 
 		}
 	}
@@ -143,7 +139,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			jgapConfiguration.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			jgapConfiguration.setChromosomePool(new ChromosomePool());
 			jgapConfiguration.addGeneticOperator(new CrossoverOperator(jgapConfiguration));
-			// Different than org.jgap.DefaultConfiguration: use mutation rate which adapts to chromosome size
 			jgapConfiguration.addGeneticOperator(new MutationOperator(jgapConfiguration));
 
 			// elitist selection (DeJong, 1975)
@@ -197,11 +192,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			final IChromosome individual, 
 			final Plan plan, 
 			final PlanAnalyzeSubtours planAnalyzeSubtours ) {
-//		protected void writeChromosome2Plan(
-//				final IChromosome individual, 
-//				final Plan plan, 
-//				final PlanAnalyzeSubtours planAnalyzeSubtours, 
-//				final HashMap<Leg, Route> originalRoutes ) {
 
 		Act activity = null;
 		Leg leg = null;
