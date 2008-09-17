@@ -25,8 +25,8 @@
 		<!-- calibrate the model or just simulate for a given mu -->
 		<param name="calibration" value="false"/>	
 				
-		<!-- Default value for the logit scale parameter. Units are in $
-			compared to travel costs -->
+		<!-- Optional: Default value for the logit scale parameter. Units are in $
+			compared to travel costs. If ommitted then mu is chosen equal to average cost -->
 		<param name="mu" value="5.0" />
 		
 		<!-- Module can be silent/verbose -->
@@ -38,9 +38,9 @@
 		<!-- Below are simulation parameters that can be safely left untouched -->
 		<param name="maxiter" value="100"/> <!-- maximum number of iterative substitutions -->
 		<param name="theta" value="0.5" /> <!-- adaptation factor of Newton method -->
-		<param name="threshold1" value="1E-4" /> <!-- stop criterion for substitutions -->
-		<param name="threshold2" value="1E-6" /> <!-- stop criterion for linear solver -->
-		<param name="threshold3" value="1E-2" /> <!-- stop criterion for calibration loop -->
+		<param name="threshold1" value="1E-3" /> <!-- stop criterion for substitutions -->
+		<param name="threshold2" value="1E-4" /> <!-- stop criterion for linear solver -->
+		<param name="threshold3" value="1E-3" /> <!-- stop criterion for calibration loop -->
 	</module>
 	<!-- ====================================================================== -->
 </config>
