@@ -47,13 +47,12 @@ import org.matsim.population.Population;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialInteractorActsFast;
+import org.matsim.socialnetworks.interactions.SpatialInteractorActs;
+import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
-import org.matsim.socialnetworks.scoring.SocScoringFactoryPlan;
 import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
-import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
@@ -110,7 +109,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
-	SpatialInteractorActsFast plansInteractorS;//spatial (face to face)
+	//InteractorTest
+//	SpatialInteractorActs plansInteractorS;//spatial (face to face)
+	SpatialInteractorEvents plansInteractorS;
 	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
@@ -256,12 +257,19 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
 
-			if (total_spatial_fraction(this.fractionS) > 0) { // only generate the map if spatial meeting is important in this experiment
+			// only generate the map if spatial meeting is important in this experiment
+			if (total_spatial_fraction(this.fractionS) > 0) {
 
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
 				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+				
+				// Agents' actual interactions
+				// TrackEventsOverlap must be passed to initialization of the interactor
+				// timeWindowMap is updated in the scoringListener after the MobSim
+				// this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+				// 
 			} else {
 				this.log.info("     (none)");
 			}
@@ -403,7 +411,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		this.plansInteractorS=new SpatialInteractorActsFast(this.snet);
+		//InteractorTest
+//		this.plansInteractorS=new SpatialInteractorActs(this.snet);
+		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
 		this.log.info("... done");
 
 		this.snIter = this.controler.getFirstIteration();
