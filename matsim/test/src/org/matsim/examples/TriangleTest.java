@@ -205,10 +205,10 @@ public class TriangleTest extends MatsimTestCase {
 		new ConfigWriter(this.config).write();
 		log.info("  done.");
 
-		this.compareOutputPlans();
 		this.compareOutputNetwork();
 		this.checkEnrichedOutputFacilities();
 		this.compareOutputWorld();
+		this.compareOutputPlans();
 
 		log.info("done.");
 	}
