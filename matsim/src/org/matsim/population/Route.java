@@ -22,6 +22,7 @@ package org.matsim.population;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.gbl.Gbl;
@@ -32,6 +33,10 @@ import org.matsim.utils.misc.Time;
 
 public class Route extends BasicRouteImpl<Node> {
 
+	
+	protected ArrayList<Node> route = new ArrayList<Node>();
+
+	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -94,6 +99,26 @@ public class Route extends BasicRouteImpl<Node> {
 		this.cost = Double.NaN;
 	}
 
+	
+	public ArrayList<Node> getRoute() {
+		return this.route;
+	}
+
+	public void setRoute(List<Node> srcRoute) {
+		if (srcRoute == null) {
+			this.route.clear();
+		}
+		else if (srcRoute instanceof ArrayList) {
+			this.route = (ArrayList<Node>) srcRoute;
+		}
+		else {
+			this.route.clear();
+			this.route.addAll(srcRoute);
+		}
+		this.route.trimToSize();
+	}
+
+	
 	public final void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
 		setRoute(route);
 		super.setTravTime(travelTime);
@@ -111,11 +136,6 @@ public class Route extends BasicRouteImpl<Node> {
 		return super.getDist();
 	}
 
-
-	@Override
-	public final ArrayList<Node> getRoute() {
-		return this.route;
-	}
 
 	public final double getTravelCost() {
 		return this.cost;

@@ -20,12 +20,10 @@
 
 package playground.yu.newPlan;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicRoute;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -37,6 +35,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.Route;
 import org.matsim.world.World;
 
 /**
@@ -67,9 +66,9 @@ public class AvoidOldNodes extends NewPlan {
 		for (Plan p : person.getPlans()) {
 			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
 				BasicLeg bl = i.next();
-				BasicRoute<Node> br = bl.getRoute();
+				Route br = (Route) bl.getRoute();
 				if (br != null) {
-					tag: for (final Node n : (ArrayList<Node>) (br.getRoute())) {
+					tag: for (final Node n : br.getRoute()) {
 						final String nId = n.getId().toString();
 						for (String nodeId : nodeIds) {
 							if (nId.equals(nodeId)) {

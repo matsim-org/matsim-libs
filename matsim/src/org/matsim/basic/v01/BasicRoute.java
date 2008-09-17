@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.ArrayList;
-
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 /**
 *
@@ -29,8 +27,6 @@ import org.matsim.interfaces.networks.basicNet.BasicNode;
 */
 
 public interface BasicRoute<T extends BasicNode> {
-
-	public ArrayList<T> getRoute();
 
 	public double getDist();
 
