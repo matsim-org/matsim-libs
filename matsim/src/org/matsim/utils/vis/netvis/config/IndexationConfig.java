@@ -253,7 +253,7 @@ public class IndexationConfig extends DefaultHandler {
 
     public String asXmlSegment(int indentCnt) {
         String indent = ConfigModule.indent(indentCnt);
-        String newline = System.getProperty("line.separator");
+        String newline = "\n";
         String quote = "\"";
 
         StringBuffer result = new StringBuffer();
