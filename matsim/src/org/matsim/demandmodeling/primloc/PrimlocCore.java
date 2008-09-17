@@ -65,11 +65,11 @@ public class PrimlocCore {
 	double threshold3 = 1E-2;
 	DecimalFormat df;
 	boolean verbose;
+
+	PrimlocCalibrationError calib;
 	
 	// Travel Cost statistics
 	double minCost, maxCost, avgCost, stdCost;
-
-	PrimlocCalibrationError calib;
 
 
 	public PrimlocCore(){
@@ -411,82 +411,23 @@ public class PrimlocCore {
 		}
 	}
 
-//	double sumofel( Matrix A ){
-//		double z=0.0;
-//		for( int i=0; i<A.getRowDimension();i++)
-//			for( int j=0; j<A.getColumnDimension();j++)
-//				z+=A.get(i, j);
-//		return z;
-//	}
 
-	double[] getCijScale( int n ){
-		// Return scale of cij
-		double[] vals = new double[ n ];
-		double max=Double.NEGATIVE_INFINITY;
-		double min=Double.POSITIVE_INFINITY;
-		for( int i=0;i<numZ;i++){
-			for( int j=0;j<numZ;j++){
-				double v = cij.get(i, j);
-				if( v>max )
-					max=v;
-				if(v<min)
-					min=v;
+	
+	void setupCostStatistics(){
+		minCost = Double.POSITIVE_INFINITY;
+		maxCost = Double.NEGATIVE_INFINITY;
+		avgCost = stdCost = 0.0;
+		for( int i=0; i<numZ; i++ ){
+			for( int j=0; j<numZ; j++ ){
+				double v=cij.get(i, j);
+				minCost = Math.min(minCost, v);
+				maxCost = Math.max(maxCost, v);
+				avgCost += v;
+				stdCost += v*v;
 			}
 		}
-		for( int i=0; i<n-1; i++)
-			vals[i]=min+(i*(max-min))/n;
-		return vals;
+		avgCost = avgCost/(numZ*numZ);
+		stdCost = Math.sqrt(stdCost/(numZ*numZ) - avgCost*avgCost);
 	}
-
-	double[] histogram( Matrix x, double[] vals){
-		double[] bins = new double[ vals.length ];
-		for( int i=0;i<numZ;i++){
-			for( int j=0;j<numZ;j++){
-				double v = x.get(i, j);
-				int k=1;
-				while( (v>vals[k]) && (k<vals.length-1))
-					k++;
-				bins[k-1] += x.get(i, j);
-			}
-		}
-		return bins;
-	}
-	
-	double getHistogramError( Matrix x, Matrix y ){
-		double error = 0.0;
-		double[] scale = getCijScale( 100 );
-		double[] u = histogram( x, scale );
-		double[] v = histogram( y, scale );
-		for( int i=0;i<scale.length;i++)
-			error += ( u[i] - v[i] )*( u[i] - v[i] );
-		return Math.sqrt( error );
-	}
-	
-//	void setupCostStatistics(){
-//		for( int i=0; i<numZ; i++ ){
-//			double mincij = Double.POSITIVE_INFINITY;
-//			for( int j=0; j<numZ; j++ ){
-//				double v=cij.get(i, j);
-//				if( (v < mincij) && (v>0.0) )
-//					mincij = v;
-//			}
-//			if( cij.get(i, i) == 0.0 )
-//				cij.set(i, i, mincij );
-//		}
-//
-//		maxCost = Double.NEGATIVE_INFINITY;
-//		double meanCost=0.0;
-//		double stdCost=0.0;
-//		for( int i=0; i<numZ; i++ ){
-//			for( int j=0; j<numZ; j++ ){
-//				double v=cij.get(i, j);
-//				meanCost += v;
-//				stdCost += v*v;
-//				if( v > maxCost ){
-//					maxCost = v;
-//				}
-//			}
-//		}
-//	}
 
 }

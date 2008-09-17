@@ -72,6 +72,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 	// Options
 	boolean overwriteKnowledge; // toggle knowledge creation/modification
 	boolean calibration; // toggle calibration/simple simulation
+	boolean unspecifiedMu; // if starting mu is not specified
 	
 	// Utility classes
 	private final static Logger log = Logger.getLogger(PrimlocModule.class);
@@ -140,9 +141,6 @@ public class PrimlocModule  implements PersonAlgorithm {
 		setupNumberJobsPerZone();
 
 		normalizeJobHomeVectors();
-
-		//if( core.calibration )
-		//	loadCalibrationMatrix();
 		
 		// Run the core location choice model
 		if( calibration )
@@ -171,7 +169,10 @@ public class PrimlocModule  implements PersonAlgorithm {
 		overwriteKnowledge = Boolean.parseBoolean( cfg.getParam(module_name, "overwrite knowledge"));
 		calibration = Boolean.parseBoolean( cfg.getParam(module_name, "calibration"));
 			
-		core.mu = Double.parseDouble( cfg.getParam(module_name, "mu") );
+		String muString = cfg.findParam(module_name, "mu");
+		unspecifiedMu = ( muString == null );
+		if( !unspecifiedMu )
+			core.mu = Double.parseDouble( muString );
 		core.theta = Double.parseDouble( cfg.getParam(module_name, "theta") );
 		core.threshold1 = Double.parseDouble( cfg.getParam(module_name, "threshold1") );
 		core.threshold2 = Double.parseDouble( cfg.getParam(module_name, "threshold2") );
@@ -185,8 +186,8 @@ public class PrimlocModule  implements PersonAlgorithm {
 		Config cfg = Gbl.getConfig();
 		
 		// Check / load the aggregation layer
-		if( zoneLayer == null ){		
-			String layerName = cfg.getParam( module_name, "aggregation layer");
+		if( zoneLayer == null ){	
+			String layerName = cfg.findParam( module_name, "aggregation layer");
 			if( layerName == null )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ) );
 			zoneLayer = Gbl.getWorld().getLayer( layerName );
@@ -211,7 +212,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 	
 	void setupTravelCosts(){
 		Config cfg = Gbl.getConfig();
-		String distParam = cfg.getParam(module_name, "euclidean distance costs");
+		String distParam = cfg.findParam(module_name, "euclidean distance costs");
 		if( distParam != null ){
 			if( Boolean.parseBoolean( distParam ) )
 				setEuclideanDistanceImpedances();
@@ -220,6 +221,24 @@ public class PrimlocModule  implements PersonAlgorithm {
 		}
 		else if( travelCostAggregator == null )
 				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
+		
+		
+		// The following is optional but will allow to calibrate against
+		// a given trip distribution if needed
+		core.setupCostStatistics();
+		
+		if( unspecifiedMu ){
+			core.mu = core.avgCost;
+			if( core.verbose )
+				System.out.println("Setting mu = <cost> = "+core.avgCost);
+		}
+			
+		CumulativeDistribution cd = new CumulativeDistribution( 0.0, 300.0, 10 );
+		for( int i=0; i<core.numZ; i++)
+			for( int j=0; j<core.numZ; j++)
+				cd.addObservation( core.cij.get(i, j));	
+		
+		cd.print();
 	}
 
 	void setupNumberHomesPerZone( Population population ){
@@ -285,6 +304,8 @@ public class PrimlocModule  implements PersonAlgorithm {
 		}
 	}
 	
+	
+	
 	void setEuclideanDistanceImpedances(){
 		// Compute a simple Travel Cost matrix
 		// based on the euclidean distance between centroids
@@ -304,4 +325,5 @@ public class PrimlocModule  implements PersonAlgorithm {
 			
 		}
 	}	
+	
 }
