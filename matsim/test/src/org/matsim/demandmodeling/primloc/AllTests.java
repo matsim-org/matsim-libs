@@ -30,6 +30,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(PrimlocLinearSolverTest.class);
 		suite.addTestSuite(PrimlocEngineTest.class);
+		suite.addTestSuite(PrimlocModuleTest.class);
 		//$JUnit-END$
 		return suite;
 	}

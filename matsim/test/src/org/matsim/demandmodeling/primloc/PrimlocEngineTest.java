@@ -112,24 +112,9 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 				core.cij.set(i, i, mincij );
 		}
 
-		core.maxCost = Double.NEGATIVE_INFINITY;
-		double meanCost=0.0;
-		double stdCost=0.0;
-		for( int i=0; i<core.numZ; i++ ){
-			for( int j=0; j<core.numZ; j++ ){
-				double v=core.cij.get(i, j);
-				meanCost += v;
-				stdCost += v*v;
-				if( v > core.maxCost ){
-					core.maxCost = v;
-				}
-			}
-		}
-
-		meanCost = meanCost/(core.numZ*core.numZ);
-		stdCost = stdCost/(core.numZ*core.numZ) - meanCost*meanCost;
+		core.setupCostStatistics();
 		if( core.verbose )
-			System.out.println("PLCM:\tTravel costs: mean="+core.df.format(meanCost)+" std.dev.= "+core.df.format(Math.sqrt(stdCost)));
+			System.out.println("PLCM:\tTravel costs: mean="+core.df.format(core.avgCost)+" std.dev.= "+core.df.format(core.stdCost));
 
 		//
 		// 3) read the homes and jobs files
