@@ -86,9 +86,6 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
 	}
 
-	/* (non-Javadoc)
-	 * @see otfvis.layer.SimpleStaticNetLayer#init(playground.david.vis.data.SceneGraph)
-	 */
 	@Override
 	public void init(SceneGraph graph) {
 		super.init(graph);

@@ -102,9 +102,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 			return scale;
 		}
 
-		/* (non-Javadoc)
-		 * @see playground.david.vis.NetVisScrollPane#scaleNetwork(java.awt.Rectangle, float)
-		 */
 		@Override
 		public float scaleNetwork(Rectangle destrect, float factor) {
 			this.scale = super.scaleNetwork(destrect, factor);

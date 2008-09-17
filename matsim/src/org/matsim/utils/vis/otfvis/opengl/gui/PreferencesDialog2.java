@@ -41,14 +41,8 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5778562849300898138L;
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.gui.PreferencesDialog#initGUI()
-	 */
 	@Override
 	protected void initGUI() {
 		// TODO Auto-generated method stub

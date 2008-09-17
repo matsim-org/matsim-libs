@@ -111,9 +111,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.SimpleSceneLayer#draw()
-	 */
 	@Override
 	public void draw() {
 		GL gl = myDrawer.getGL();
@@ -125,9 +122,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		gl.glCallList(netDisplList);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.DefaultSceneLayer#init(playground.david.vis.data.SceneGraph, playground.david.vis.data.OTFClientQuad)
-	 */
 	@Override
 	public void init(SceneGraph graph) {
 		cellWidth_m = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
@@ -136,9 +130,6 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		else  netDisplListMap.put(myDrawer, -1);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.SimpleSceneLayer#getDrawOrder()
-	 */
 	@Override
 	public int getDrawOrder() {
 		return 1;

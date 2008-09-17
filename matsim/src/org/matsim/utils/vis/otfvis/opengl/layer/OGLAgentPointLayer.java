@@ -292,9 +292,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public void init(SceneGraph graph) {
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.DefaultSceneLayer#newInstance(java.lang.Class)
-	 */
 	@Override
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
 //		AgentPointDrawer drawer = (AgentPointDrawer)clazz.newInstance(this);

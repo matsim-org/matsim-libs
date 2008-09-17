@@ -56,9 +56,6 @@ public class OGLSimpleBackgroundLayer extends DefaultSceneLayer {
 		items.add(drawer);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.david.vis.data.DefaultSceneLayer#draw()
-	 */
 	@Override
 	public void draw() {
 		for(final AbstractBackgroundDrawer item : items) {
