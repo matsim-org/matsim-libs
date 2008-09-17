@@ -184,6 +184,11 @@ public class BellmanFordVertexIntervalls {
 		return nodes;
 	}
 	
+	private LinkedList<Link> findpath(){
+		VertexIntervalls sinkintervalls = _labels.get(_sink);
+		
+		return null;
+	}
 	
 	private boolean isActiveSource(Node node) {
 		// TODO Auto-generated method stub
