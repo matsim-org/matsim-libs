@@ -43,7 +43,7 @@ import org.matsim.socialnetworks.algorithms.CompareActs;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 
-public class SpatialInteractorActsFast {
+public class SpatialInteractorActs {
 
 	SocialNetwork net;
 
@@ -56,7 +56,7 @@ public class SpatialInteractorActsFast {
 	Hashtable<Activity,ArrayList<Person>> activityMap;
 	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
 
-	public SpatialInteractorActsFast(SocialNetwork snet) {
+	public SpatialInteractorActs(SocialNetwork snet) {
 		this.net = snet;
 	}
 	/**
@@ -86,21 +86,8 @@ public class SpatialInteractorActsFast {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-		if(interaction_type.equals("random")||interaction_type.equals("meetall")){
-			// These interactions suggest that agents who visit the same place
-			// for the same purpose might know each other, regardless of whether they are there in
-			// the same time window. They need a list of Activity <-> Persons
-
 			activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
 			activityMap= makeActivityMap(plans);
-		}else if (interaction_type.equals("timewindowrandom")||interaction_type.equals("timewindowall")||interaction_type.equals("MarchalNagelChain")){
-			// These interactions rely on overlapping time windows to determine
-			// whether agents interact, and need a record of acts: Act <-> Persons
-//			actMap = makeActMap(plans);
-			activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
-			activityMap= makeActivityMap(plans);
-		}
-
 
 		// Activity-(facility)-based interactions
 
@@ -324,7 +311,7 @@ public class SpatialInteractorActsFast {
 	 */
 	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability, int iteration) {
 
-		Hashtable<Person,Act> personList=new Hashtable<Person,Act>();
+//		Hashtable<Person,Act> personList=new Hashtable<Person,Act>();
 //		Hashtable<Person,ArrayList<Person>> othersList = new Hashtable<Person,ArrayList<Person>>();
 
 		// First identify the overlapping Acts and the Persons involved
