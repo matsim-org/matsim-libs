@@ -73,7 +73,7 @@ public class CMCFScenarioGenerator {
 	
 	public static String configOut, plansOut;
 
-	private static final boolean isAlternativeRouteEnabled = true;
+	private static final boolean isAlternativeRouteEnabled = false;
 	
 	private static final int iterations = 500;
 	

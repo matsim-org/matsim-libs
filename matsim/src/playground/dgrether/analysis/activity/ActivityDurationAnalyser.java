@@ -56,9 +56,13 @@ public class ActivityDurationAnalyser {
 //	private static final String plansfile2 = runsbase + "run585/run585.it800.plans.xml.gz";
 	
 	//early departure studies plan files
-	private static final String plansfile1 = runsbase + "run495/it.500/500.plans.xml.gz";
+//	private static final String plansfile1 = runsbase + "run495/it.500/500.plans.xml.gz";
 	
-	private static final String plansfile2 = runsbase + "run499/it.500/500.plans.xml.gz";
+//	private static final String plansfile2 = runsbase + "run499/it.500/500.plans.xml.gz";
+//	no early departure studies plan files
+	private static final String plansfile1 = runsbase + "run639/it.1000/1000.plans.xml.gz";
+	
+	private static final String plansfile2 = runsbase + "run640/it.1000/1000.plans.xml.gz";
 	
 	
 	private static final String[] plansFiles = {plansfile1, plansfile2}; //

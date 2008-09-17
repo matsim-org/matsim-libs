@@ -34,5 +34,7 @@ public interface DgPaths {
 	
 	final String IVTCHNET = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
 	
+	final String IVTCHROADPRICING = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
 	
+	final String IVTCHCOUNTS = VSPSVNBASE + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 }
