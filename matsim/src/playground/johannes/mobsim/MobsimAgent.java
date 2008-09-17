@@ -20,6 +20,7 @@
 
 package playground.johannes.mobsim;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 
@@ -38,7 +39,7 @@ public interface MobsimAgent {
 	 * @return the mode of the next trip, or <tt>null</tt> if there is no next
 	 *         trip.
 	 */
-	public String getMode(double time);
+	public BasicLeg.Mode getMode(double time);
 
 	/**
 	 * Returns the desired departure time of the next trip.

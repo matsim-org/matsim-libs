@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -230,7 +231,7 @@ public class PadangPrimActGeneration {
 				}
 				
 				Link link = getRandomLinkWithin(ftW);
-				Leg leg = new Leg("car");
+				Leg leg = new Leg(BasicLeg.Mode.car);
 				leg.setNum(0);
 				leg.setDepTime(Time.UNDEFINED_TIME);
 				leg.setTravTime(Time.UNDEFINED_TIME);

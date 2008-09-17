@@ -20,6 +20,7 @@
 
 package playground.gregor.withinday_evac.controler;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
@@ -58,7 +59,7 @@ public class RoadSignAgentsGenerator {
 			for (Link dest : node.getOutLinks().values()){
 				Plan plan  = new Plan(p);
 				Act actA = new Act("h", link.getCenter().getX(), link.getCenter().getY(), link, Time.UNDEFINED_TIME, 3600 * 3 - 2, 0.0, true);
-				Leg leg = new Leg("car");
+				Leg leg = new Leg(BasicLeg.Mode.car);
 				leg.setNum(0);
 				leg.setDepTime(0.0);
 				leg.setTravTime(0.0);

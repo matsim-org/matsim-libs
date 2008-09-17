@@ -22,6 +22,7 @@ package org.matsim.population.filters;
 
 import java.util.HashMap;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
@@ -31,7 +32,6 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -65,7 +65,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Person person = new Person(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 		plan.createAct("h", (String)null, (String)null, "0", "00:00:00", "08:00:00", null, null);
-		Leg leg = plan.createLeg("car", "08:00:00", "00:02:00", null);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car, "08:00:00", "00:02:00", null);
 		plan.createAct("w", (String)null, (String)null, "5", null, null, null, null);
 		Route route = new Route();
 		leg.setRoute(route);
@@ -104,7 +104,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		assertFalse("test route outside aoi", filter.judge(person));
 
 		// prepare bee-line tests
-		leg.setMode("walk");
+		leg.setMode(BasicLeg.Mode.walk);
 		leg.setRoute(new Route()); // empty route
 
 		// test bee-line without alternative aoi

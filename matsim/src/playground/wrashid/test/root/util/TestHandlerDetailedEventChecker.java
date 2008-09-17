@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.apache.commons.collections.map.HashedMap;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
@@ -272,7 +272,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 			while (iter.hasNext()){
 				Leg leg=(Leg)iter.next();
 				// at the moment only cars are simulated on the road
-				if (leg.getMode().equalsIgnoreCase("car")){
+				if (leg.getMode().equals(BasicLeg.Mode.car)){
 					expected.expectedLinkEnterEvents+=leg.getRoute().getLinkRoute().length+1;
 				}
 			}

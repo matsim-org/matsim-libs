@@ -44,8 +44,8 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 	
-	TreeMap<String, Integer> modeStatistics =
-		new TreeMap<String, Integer>();
+	TreeMap<BasicLeg.Mode, Integer> modeStatistics =
+		new TreeMap<BasicLeg.Mode, Integer>();
 	
 	public ModeChoiceAnalyzer() {
 		super();
@@ -61,7 +61,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 		
 		while (legIt.hasNext()) {
 			BasicLeg leg = legIt.next();
-			String mode = leg.getMode();
+			BasicLeg.Mode mode = leg.getMode();
 			int modeCount = 0;
 			
 			if (modeStatistics.containsKey(mode)) {
@@ -73,7 +73,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 	}
 	
 	public void printInformation() {
-		Iterator<Map.Entry<String, Integer>> modeIt = modeStatistics.entrySet().iterator();
+		Iterator<Map.Entry<BasicLeg.Mode, Integer>> modeIt = modeStatistics.entrySet().iterator();
 		while (modeIt.hasNext()) {
 			Map.Entry entry = modeIt.next();
 			System.out.println("There are " + entry.getValue() + " modes of "
@@ -85,7 +85,7 @@ public class ModeChoiceAnalyzer extends AbstractPersonAlgorithm {
 		BufferedWriter out;
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
-			Iterator<Map.Entry<String, Integer>> modeIt = modeStatistics.entrySet().iterator();
+			Iterator<Map.Entry<BasicLeg.Mode, Integer>> modeIt = modeStatistics.entrySet().iterator();
 			while (modeIt.hasNext()) {
 				Map.Entry entry = modeIt.next();
 				out.write(entry.getKey() + ";" + entry.getValue() + "\n");

@@ -138,7 +138,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 	}
 
 	protected double handleLeg(Leg leg, Act fromAct, Act toAct, double depTime) {
-		String legmode = leg.getMode();
+		String legmode = leg.getMode().toString();
 
 		if (legmode == "car") {
 			return handleCarLeg(leg, fromAct, toAct, depTime);

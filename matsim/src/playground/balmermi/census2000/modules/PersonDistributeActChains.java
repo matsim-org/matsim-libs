@@ -22,6 +22,7 @@ package playground.balmermi.census2000.modules;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
@@ -225,7 +226,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				int end_time = time_sum;
 				try {
 					plan.createAct(type,0.0,0.0,null,start_time,end_time,dur,primary);
-					plan.createLeg(UNDEF,end_time,0,end_time);
+					plan.createLeg(BasicLeg.Mode.undefined,end_time,0,end_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
 			}

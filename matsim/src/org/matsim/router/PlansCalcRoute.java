@@ -22,6 +22,7 @@ package org.matsim.router;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -136,19 +137,19 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @return the estimated travel time for this leg
 	 */
 	public double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
-		String legmode = leg.getMode();
+		BasicLeg.Mode legmode = leg.getMode();
 
-		if (legmode == "car") {
+		if (legmode == BasicLeg.Mode.car) {
 			return handleCarLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == "ride") {
+		} else if (legmode == BasicLeg.Mode.ride) {
 			return handleRideLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == "pt") {
+		} else if (legmode == BasicLeg.Mode.pt) {
 			return handlePtLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == "walk") {
+		} else if (legmode == BasicLeg.Mode.walk) {
 			return handleWalkLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == "bike") {
+		} else if (legmode == BasicLeg.Mode.bike) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
-		} else if (legmode == "undef") {
+		} else if (legmode == BasicLeg.Mode.undefined) {
 			/* TODO balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
 			 *                and no route assigned  */

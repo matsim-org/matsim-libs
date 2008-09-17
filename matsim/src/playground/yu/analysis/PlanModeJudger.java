@@ -12,7 +12,7 @@ import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
  * 
  */
 public class PlanModeJudger {
-	private static boolean useMode(BasicPlan plan, String mode) {
+	private static boolean useMode(BasicPlan plan, BasicLeg.Mode mode) {
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			if (!li.next().getMode().equals(mode)) {
 				return false;
@@ -21,14 +21,14 @@ public class PlanModeJudger {
 		return true;
 	}
 
-	public static String getMode(BasicPlan plan) {
-		String tmpMode = null;
+	public static BasicLeg.Mode getMode(BasicPlan plan) {
+		BasicLeg.Mode tmpMode = null;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
-			String tmpMode2 = li.next().getMode();
+			BasicLeg.Mode tmpMode2 = li.next().getMode();
 			;
 			if (tmpMode != null) {
 				if (!tmpMode.equals(tmpMode2)) {
-					return BasicLeg.UNDEFINEDMODE;
+					return BasicLeg.Mode.undefined;
 				}
 			}
 			tmpMode = tmpMode2;
@@ -37,46 +37,46 @@ public class PlanModeJudger {
 	}
 
 	public static boolean useCar(BasicPlan plan) {
-		return useMode(plan, BasicLeg.CARMODE);
+		return useMode(plan, BasicLeg.Mode.car);
 	}
 
 	public static boolean usePt(BasicPlan plan) {
-		return useMode(plan, BasicLeg.PTMODE);
+		return useMode(plan, BasicLeg.Mode.pt);
 	}
 
 	public static boolean useMiv(BasicPlan plan) {
-		return useMode(plan, BasicLeg.MIVMODE);
+		return useMode(plan, BasicLeg.Mode.miv);
 	}
 
 	public static boolean useRide(BasicPlan plan) {
-		return useMode(plan, BasicLeg.RIDEMODE);
+		return useMode(plan, BasicLeg.Mode.ride);
 	}
 
 	public static boolean useMotorbike(BasicPlan plan) {
-		return useMode(plan, BasicLeg.MOTORBIKEMODE);
+		return useMode(plan, BasicLeg.Mode.motorbike);
 	}
 
 	public static boolean useTrain(BasicPlan plan) {
-		return useMode(plan, BasicLeg.TRAINMODE);
+		return useMode(plan, BasicLeg.Mode.train);
 	}
 
 	public static boolean useBus(BasicPlan plan) {
-		return useMode(plan, BasicLeg.BUSMODE);
+		return useMode(plan, BasicLeg.Mode.bus);
 	}
 
 	public static boolean useTram(BasicPlan plan) {
-		return useMode(plan, BasicLeg.TRAMMODE);
+		return useMode(plan, BasicLeg.Mode.tram);
 	}
 
 	public static boolean useBike(BasicPlan plan) {
-		return useMode(plan, BasicLeg.BIKEMODE);
+		return useMode(plan, BasicLeg.Mode.bike);
 	}
 
 	public static boolean useWalk(BasicPlan plan) {
-		return useMode(plan, BasicLeg.WALKMODE);
+		return useMode(plan, BasicLeg.Mode.walk);
 	}
 
 	public static boolean useUndefined(BasicPlan plan) {
-		return useMode(plan, BasicLeg.UNDEFINEDMODE);
+		return useMode(plan, BasicLeg.Mode.undefined);
 	}
 }

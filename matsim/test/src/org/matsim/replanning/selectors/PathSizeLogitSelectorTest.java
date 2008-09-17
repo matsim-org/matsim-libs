@@ -23,6 +23,7 @@ package org.matsim.replanning.selectors;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.network.Link;
@@ -82,7 +83,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new Plan(person);
 		Act a = new Act("h",0,10,l6,0,0,0,false);
 		Act b = new Act("w",0,0,l7,0,0,0,false);
-		Leg leg = new Leg("car");
+		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -105,7 +106,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// ... test with multiple plans that all have negative score
 		a = new Act("h",0,10,l6,0,0,0,false);
 		b = new Act("w",0,0,l7,0,0,0,false);
-		leg = new Leg("car");
+		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -126,7 +127,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		a = new Act("h",0,10,l6,0,0,0,false);
 		b = new Act("w",0,0,l7,0,0,0,false);
-		leg = new Leg("car");
+		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -156,7 +157,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1 = new Plan(person);
 		a = new Act("h",0,10,l6,0,0,0,false);
 		b = new Act("w",0,0,l7,0,0,0,false);
-		leg = new Leg("car");
+		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -191,7 +192,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new Plan(person);
 		Act a = new Act("h",0,10,l6,0,0,0,false);
 		Act b = new Act("w",0,0,l7,0,0,0,false);
-		Leg leg = new Leg("car");
+		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -227,7 +228,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Plan p1 = new Plan(person);
 		Act a = new Act("h",0,10,l6,0,0,0,false);
 		Act b = new Act("w",0,0,l7,0,0,0,false);
-		Leg leg = new Leg("car");
+		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -246,7 +247,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		a = new Act("h",0,10,l6,0,0,0,false);
 		b = new Act("w",0,0,l7,0,0,0,false);
-		leg = new Leg("car");
+		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
@@ -267,7 +268,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		
 		a = new Act("h",0,10,l6,0,0,0,false);
 		b = new Act("w",0,0,l7,0,0,0,false);
-		leg = new Leg("car");
+		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);

@@ -74,7 +74,7 @@ public class ModeChoicePlan extends NewPlan {
 					Leg cl = new Leg((Leg) o);
 					cl.setMode(
 					// "pt"
-							BasicLeg.PTMODE);
+							BasicLeg.Mode.pt);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}
@@ -92,7 +92,7 @@ public class ModeChoicePlan extends NewPlan {
 					Leg cl = new Leg((Leg) o);
 					cl.setMode(
 					// "car"
-							BasicLeg.CARMODE);
+							BasicLeg.Mode.car);
 					cl.setRoute(null);
 					cp.addLeg(cl);
 				}

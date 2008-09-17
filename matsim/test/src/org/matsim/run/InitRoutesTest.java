@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.File;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
@@ -67,7 +68,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
 		plan.createAct("h", 50, 25, network.getLink(new IdImpl("1")), 0, 3600, 3600, false);
-		plan.createLeg("car", 3600, 100, 3700);
+		plan.createLeg(BasicLeg.Mode.car, 3600, 100, 3700);
 		plan.createAct("w", 50, 25, network.getLink(new IdImpl("20")), 3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		
 		// write person to file

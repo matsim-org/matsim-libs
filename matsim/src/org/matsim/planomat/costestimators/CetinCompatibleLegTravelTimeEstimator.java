@@ -66,7 +66,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 		double legTravelTimeEstimation = Double.MIN_VALUE;
 		
-		if (legIntermediate.getMode().equals(BasicLeg.CARMODE)) {
+		if (legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
 
 			double now = departureTime;
 
@@ -76,7 +76,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 			legTravelTimeEstimation = (now - departureTime);
 
-		} else if (legIntermediate.getMode().equals(BasicLeg.PTMODE)) {
+		} else if (legIntermediate.getMode().equals(BasicLeg.Mode.pt)) {
 			
 			legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
 			

@@ -3,6 +3,7 @@ package playground.wrashid.PHV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -78,9 +79,9 @@ public class CreatePlans {
 			double duration=3600*8;
 
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,depTime,duration,false);
-			plan.createLeg("car",depTime,0.0,depTime);
+			plan.createLeg(BasicLeg.Mode.car,depTime,0.0,depTime);
 			plan.createAct("work",work_facility.getCenter().getX(),work_facility.getCenter().getY(),work_facility.getLink(),depTime,depTime+duration,duration,false);
-			plan.createLeg("car",depTime+duration,0.0,depTime+duration);
+			plan.createLeg(BasicLeg.Mode.car,depTime+duration,0.0,depTime+duration);
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),depTime+duration,3600*24,duration,false);
 			// assign home-work-home activities to each person
 

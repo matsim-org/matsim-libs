@@ -40,7 +40,7 @@ import org.matsim.population.Population;
  */
 public class NewAgentPtPlan2 extends NewPlan {
 	private List<Plan> copyPlans = new ArrayList<Plan>();
-	private List<String> copyPlansModes = new ArrayList<String>();
+	private List<BasicLeg.Mode> copyPlansModes = new ArrayList<BasicLeg.Mode>();
 
 	/**
 	 * Constructor, writes file-head
@@ -60,19 +60,19 @@ public class NewAgentPtPlan2 extends NewPlan {
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
 				Leg firstLeg = (Leg) pl.getActsLegs().get(1);
-				String legMode = firstLeg.getMode();
+				BasicLeg.Mode legMode = firstLeg.getMode();
 				// pl.setType(getPlanType(legMode));//????????????
 
-				if (!legMode.equals(BasicLeg.CARMODE)) {
+				if (!legMode.equals(BasicLeg.Mode.car)) {
 					Plan copyPlan = new Plan(person);
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
-					this.copyPlansModes.add(BasicLeg.CARMODE);
+					this.copyPlansModes.add(BasicLeg.Mode.car);
 				} else if (!legMode.equals("pt")) {
 					Plan copyPlan = new Plan(person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);
-					this.copyPlansModes.add(BasicLeg.PTMODE);
+					this.copyPlansModes.add(BasicLeg.Mode.pt);
 				}
 
 				List actsLegs = pl.getActsLegs();

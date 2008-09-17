@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -80,13 +82,42 @@ public class Plan extends BasicPlanImpl {
 		this.actsLegs.add(a);
 		return a;
 	}
-
-	public final Leg createLeg(final String mode, final String depTime, final String travTime,
+	
+	
+	
+	@Deprecated
+	public final Leg createLeg(final String modestring, final String depTime, final String travTime,
+			 final String arrTime) throws Exception {
+		BasicLeg.Mode mode;
+		if ("miv".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.miv;
+		else if ("car".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.car;
+		else if ("ride".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.ride;
+		else if ("motorbike".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.motorbike;
+		else if ("pt".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.pt;
+		else if ("train".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.train;
+		else if ("bike".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.bike;
+		else if ("walk".equalsIgnoreCase(modestring))
+			mode = BasicLeg.Mode.walk;
+		else {
+			Logger.getLogger(BasicLegImpl.class).warn("Unknown Leg mode: " + modestring);
+			mode = BasicLeg.Mode.undefined;
+		}
+		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
+}
+	@Deprecated
+	public final Leg createLeg(final BasicLeg.Mode mode, final String depTime, final String travTime,
 														 final String arrTime) throws Exception {
 		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
 	}
-
-	public final Leg createLeg(final String mode, final double depTime, final double travTime,
+		
+	public final Leg createLeg(final BasicLeg.Mode mode, final double depTime, final double travTime,
 			 final double arrTime) throws Exception {
 		verifyCreateLeg();
 		// Override leg number with an appropriate value

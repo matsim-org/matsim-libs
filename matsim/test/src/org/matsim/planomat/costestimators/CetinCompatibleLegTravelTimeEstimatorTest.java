@@ -141,7 +141,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 
 		// test public transport mode
 		departureTime = Time.parseTime("06:10:00");
-		testLeg.setMode(BasicLeg.PTMODE);
+		testLeg.setMode(BasicLeg.Mode.pt);
 		legTravelTime = testee.getLegTravelTimeEstimation(
 				new IdImpl(TEST_PERSON_ID),
 				departureTime,

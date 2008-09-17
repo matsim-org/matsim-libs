@@ -26,37 +26,37 @@ package org.matsim.basic.v01;
 
 public interface BasicLeg {
 	
-	public enum Mode {MIV, CAR, RIDE, MOTORBIKE, PT, TRAIN, BUS, TRAM, BIKE, WALK, UNDEFINED};
-	
-	public static final String MIVMODE = "miv";
-
-	public static final String CARMODE = "car";
-
-	public static final String RIDEMODE = "ride";
-
-	public static final String MOTORBIKEMODE = "motorbike";
-
-	public static final String PTMODE = "pt";
-
-	public static final String TRAINMODE = "train";
-
-	public static final String BUSMODE = "bus";
-
-	public static final String TRAMMODE = "tram";
-
-	public static final String BIKEMODE = "bike";
-
-	public static final String WALKMODE = "walk";
-
-	public static final String UNDEFINEDMODE = "undef";
+	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined};
+//	
+//	public static final String MIVMODE = "miv";
+//
+//	public static final String CARMODE = "car";
+//
+//	public static final String RIDEMODE = "ride";
+//
+//	public static final String MOTORBIKEMODE = "motorbike";
+//
+//	public static final String PTMODE = "pt";
+//
+//	public static final String TRAINMODE = "train";
+//
+//	public static final String BUSMODE = "bus";
+//
+//	public static final String TRAMMODE = "tram";
+//
+//	public static final String BIKEMODE = "bike";
+//
+//	public static final String WALKMODE = "walk";
+//
+//	public static final String UNDEFINEDMODE = "undef";
 
 	public int getNum();
 
 	public void setNum(int num);
 
-	public String getMode();
+	public Mode getMode();
 
-	public void setMode(String mode);
+	public void setMode(Mode mode);
 
 	public BasicRoute getRoute();
 

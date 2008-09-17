@@ -38,6 +38,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -203,7 +204,7 @@ public class DistanceAnalysis {
 			dist[2] += person.getSelectedPlan().getScore();
 			Plan plan = new Plan(person);
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
-			Leg ll = new Leg("car");
+			Leg ll = new Leg(BasicLeg.Mode.car);
 			ll.setNum(1);
 			ll.setArrTime(0.0);
 			ll.setDepTime(0.0);

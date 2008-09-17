@@ -22,6 +22,7 @@ package org.matsim.population;
 
 import java.io.IOException;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -156,7 +157,7 @@ public class PopulationReaderKutter implements PopulationReader {
 				8*3600, 8*3600, 9*3600, 1800, 3600+1800, 1800, 1800, /* 6-12 */
 				6*3600, 3*3600, 2*3600, 2*3600, 5*3600 /* 13-17 */
 		};
-		private final String[] legModes = {null, "walk", "bike", "car", "ride", "pt", "pt"};
+		private final BasicLeg.Mode[] legModes = {BasicLeg.Mode.undefined, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.car, BasicLeg.Mode.ride, BasicLeg.Mode.pt, BasicLeg.Mode.pt};
 		private final ZoneLayer tvzLayer;
 		private Person currPerson = null;
 		private Plan currPlan = null;
@@ -201,7 +202,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		}
 
 		private final void handleActivity(final int acttype, final int cellid, final int legmode) {
-			String mode = this.legModes[legmode];
+			BasicLeg.Mode mode = this.legModes[legmode];
 
 			int arrTime = this.currTime;
 			int travTime = 0;

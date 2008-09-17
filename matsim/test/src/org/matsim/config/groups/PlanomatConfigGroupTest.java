@@ -20,6 +20,7 @@
 
 package org.matsim.config.groups;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -39,8 +40,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
 		String actualPossibleModesString = "";
-		for (String expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
-			actualPossibleModesString += expectedPossibleMode;
+		for (BasicLeg.Mode expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
+			actualPossibleModesString += expectedPossibleMode.toString();
 			actualPossibleModesString += " ";
 		}
 		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
@@ -53,8 +54,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		super.loadConfig(this.getInputDirectory() + "config.xml");
 
 		String actualPossibleModesString = "";
-		for (String expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
-			actualPossibleModesString += expectedPossibleMode;
+		for (BasicLeg.Mode expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
+			actualPossibleModesString += expectedPossibleMode.toString();
 			actualPossibleModesString += " ";
 		}
 		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);

@@ -20,6 +20,7 @@
 
 package org.matsim.scoring;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
@@ -85,7 +86,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		Person person1 = new Person(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
 		Act act1a = plan1.createAct("home", 0, 0, null, 0, 7.0*3600, 7*3600, false);
-		Leg leg1 = plan1.createLeg("car", 7*3600, 100, 7*3600+100);
+		Leg leg1 = plan1.createLeg(BasicLeg.Mode.car, 7*3600, 100, 7*3600+100);
 		Act act1b = plan1.createAct("work", 0, 0, null, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		ScoringFunction sf1 = getScoringFunctionInstance(plan1);
 		sf1.startActivity(0, act1a);

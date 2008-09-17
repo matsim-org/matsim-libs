@@ -20,6 +20,7 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -32,17 +33,17 @@ import org.matsim.population.Plan;
  */
 public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private final String[] fromMode;
-	private final String[] toMode;
+	private final BasicLeg.Mode[] fromMode;
+	private final BasicLeg.Mode[] toMode;
 
-	public PlanReplaceLegModes(final String from, final String to) {
-		this.fromMode = new String[1];
+	public PlanReplaceLegModes(final BasicLeg.Mode from, final BasicLeg.Mode to) {
+		this.fromMode = new BasicLeg.Mode[1];
 		this.fromMode[0] = from;
-		this.toMode = new String[1];
+		this.toMode = new BasicLeg.Mode[1];
 		this.toMode[0] = to;
 	}
 
-	public PlanReplaceLegModes(final String[] from, final String to[]) {
+	public PlanReplaceLegModes(final BasicLeg.Mode[] from, final BasicLeg.Mode to[]) {
 		this.fromMode = from.clone();
 		this.toMode = to.clone();
 	}
@@ -57,7 +58,7 @@ public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements Plan
 	public void run(final Plan plan) {
 		for (int i = 1, max = plan.getActsLegs().size(); i < max; i += 2) {
 			Leg leg = (Leg)plan.getActsLegs().get(i);
-			String mode = leg.getMode();
+			BasicLeg.Mode mode = leg.getMode();
 			for (int idx = 1; idx < this.fromMode.length; idx++) {
 				if (this.fromMode[idx].equals(mode)) {
 					leg.setMode(this.toMode[idx]);

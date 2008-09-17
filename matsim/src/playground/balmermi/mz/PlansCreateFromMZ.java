@@ -21,14 +21,13 @@
 package playground.balmermi.mz;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -151,13 +150,13 @@ public class PlansCreateFromMZ {
 
 				// trip mode type
 				int m = Integer.parseInt(entries[12].trim());
-				String mode = null;
-				if (m == 1) { mode = WALK; }
-				else if (m == 2) { mode = BIKE; }
-				else if (m == 3) { mode = CAR; }
-				else if (m == 4) { mode = PT; }
-				else if (m == 5) { mode = RIDE; }
-				else if (m == 6) { mode = UNDF; }
+				BasicLeg.Mode mode = null;
+				if (m == 1) { mode = BasicLeg.Mode.walk; }
+				else if (m == 2) { mode = BasicLeg.Mode.bike; }
+				else if (m == 3) { mode = BasicLeg.Mode.car; }
+				else if (m == 4) { mode = BasicLeg.Mode.pt; }
+				else if (m == 5) { mode = BasicLeg.Mode.ride; }
+				else if (m == 6) { mode = BasicLeg.Mode.undefined; }
 				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
 
 				// micro census person weight

@@ -38,6 +38,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
@@ -57,7 +58,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<String, ModeData> data = new HashMap<String, ModeData>(5, 0.85f);
+	private final Map<BasicLeg.Mode, ModeData> data = new HashMap<BasicLeg.Mode, ModeData>(5, 0.85f);
 	private ModeData allModesData = null;
 
 	/**
@@ -143,7 +144,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 */
 	public void write(final PrintStream stream) {
 		stream.print("time\ttime\tdepartures_all\tarrivals_all\tstuck_all\ten-route_all");
-		for (String legMode : this.data.keySet()) {
+		for (BasicLeg.Mode legMode : this.data.keySet()) {
 			stream.print("\tdepartures_" + legMode + "\tarrivals_" + legMode + "\tstuck_" + legMode + "\ten-route_" + legMode);
 		}
 		stream.print("\n");
@@ -181,8 +182,8 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @return a graphic showing the number of departures, arrivals and vehicles
 	 * en route for all legs with the specified transportation mode
 	 */
-	public JFreeChart getGraphic(final String legMode) {
-		return getGraphic(this.data.get(legMode), legMode);
+	public JFreeChart getGraphic(final BasicLeg.Mode legMode) {
+		return getGraphic(this.data.get(legMode), legMode.toString());
 	}
 
 	private JFreeChart getGraphic(final ModeData modeData, final String modeName) {
@@ -245,7 +246,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	/**
 	 * @return Set of all transportation modes data is available for
 	 */
-	public Set<String> getLegModes() {
+	public Set<BasicLeg.Mode> getLegModes() {
 		return this.data.keySet();
 	}
 
@@ -253,7 +254,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of departures per time-bin, for all legs with the specified mode
 	 */
-	public int[] getDepartures(final String legMode) {
+	public int[] getDepartures(final BasicLeg.Mode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return null;
@@ -265,7 +266,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of all arrivals per time-bin, for all legs with the specified mode
 	 */
-	public int[] getArrivals(final String legMode) {
+	public int[] getArrivals(final BasicLeg.Mode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return null;
@@ -277,7 +278,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param legMode transport mode
 	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
 	 */
-	public int[] getStuck(final String legMode) {
+	public int[] getStuck(final BasicLeg.Mode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			return null;
@@ -311,7 +312,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 *
 	 * @see #getGraphic(String)
 	 */
-	public void writeGraphic(final String filename, final String legMode) {
+	public void writeGraphic(final String filename, final BasicLeg.Mode legMode) {
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
 		} catch (IOException e) {
@@ -329,7 +330,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		return bin;
 	}
 
-	private ModeData getDataForMode(String legMode) {
+	private ModeData getDataForMode(BasicLeg.Mode legMode) {
 		ModeData modeData = this.data.get(legMode);
 		if (modeData == null) {
 			modeData = new ModeData(nofBins + 1); // +1 for all times out of our range

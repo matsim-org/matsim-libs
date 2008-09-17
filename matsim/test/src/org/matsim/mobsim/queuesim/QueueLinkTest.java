@@ -20,6 +20,7 @@
 
 package org.matsim.mobsim.queuesim;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -128,7 +129,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Plan plan = p.createPlan(true);
 		try {
 			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);
-			Leg leg = plan.createLeg("car", 0.0, 1.0, 1.0);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car, 0.0, 1.0, 1.0);
 			Route route = leg.createRoute("1", "00:00:01");
 			route.setRoute("2");
 			leg.setRoute(route);

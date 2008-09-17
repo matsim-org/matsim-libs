@@ -68,16 +68,16 @@ public class NewAgentPtPlan extends NewPlan implements PersonAlgorithm {
 				} else {
 					Leg leg = (Leg) o;
 					Leg copyLeg = new Leg(leg);
-					copyLeg.setMode(BasicLeg.PTMODE);
+					copyLeg.setMode(BasicLeg.Mode.pt);
 					copyLeg.setRoute(null);
 					// -----------------------------------------------
 					// WITHOUT routeSetting!! traveltime of PT can be calculated
 					// automaticly!!
 					// -----------------------------------------------
 					copyPlan.addLeg(copyLeg);
-					if (!leg.getMode().equals(BasicLeg.CARMODE)) {
+					if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 						leg.setRoute(null);
-						leg.setMode(BasicLeg.CARMODE);
+						leg.setMode(BasicLeg.Mode.car);
 					}
 				}
 			}

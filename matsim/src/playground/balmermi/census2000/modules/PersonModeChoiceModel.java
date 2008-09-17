@@ -23,6 +23,7 @@ package playground.balmermi.census2000.modules;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
@@ -117,12 +118,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 		// getting the chosen mode
 		int modechoice = model.calcModeChoice();
-		String mode = null;
-		if (modechoice == 0) { mode = WALK; }
-		else if (modechoice == 1) { mode = BIKE; }
-		else if (modechoice == 2) { mode = CAR; }
-		else if (modechoice == 3) { mode = PT; }
-		else if (modechoice == 4) { mode = UNDEF; }
+		BasicLeg.Mode mode = null;
+		if (modechoice == 0) { mode = BasicLeg.Mode.walk; }
+		else if (modechoice == 1) { mode = BasicLeg.Mode.bike; }
+		else if (modechoice == 2) { mode = BasicLeg.Mode.car; }
+		else if (modechoice == 3) { mode = BasicLeg.Mode.pt; }
+		else if (modechoice == 4) { mode = BasicLeg.Mode.undefined; }
 		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 
 		// setting mode to plan

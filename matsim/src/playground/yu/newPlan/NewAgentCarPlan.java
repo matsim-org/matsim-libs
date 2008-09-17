@@ -70,7 +70,7 @@ public class NewAgentCarPlan extends NewPlan {
 				for (int j = 0; j < actsLegs.size(); j++) {
 					Object o = actsLegs.get(j);
 					if (j % 2 != 0) {
-						((Leg) o).setMode(BasicLeg.CARMODE);
+						((Leg) o).setMode(BasicLeg.Mode.car);
 					}
 				}
 			}

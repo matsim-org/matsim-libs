@@ -26,6 +26,7 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
@@ -75,7 +76,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		double planScore = 0.0;
 		double travelTime;
 		int subtourIndex, modeIndex;
-		String modeName;
+		BasicLeg.Mode modeName;
 		Act origin = null, destination = null;
 		Leg legIntermediate = null;
 		HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);

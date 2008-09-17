@@ -131,7 +131,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			if (
 					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
 					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
-				Gbl.getConfig().planomat().setPossibleModes(BasicLeg.CARMODE + " " + BasicLeg.PTMODE);
+				  Gbl.getConfig().planomat().setPossibleModes(BasicLeg.Mode.car.toString() + " " + BasicLeg.Mode.pt.toString());
 			}
 
 			tTravelEstimator.resetTravelTimes();

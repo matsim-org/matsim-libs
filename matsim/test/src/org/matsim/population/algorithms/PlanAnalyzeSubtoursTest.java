@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -162,7 +163,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 				act.setFacility(facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
 				if (aa != (facIdSequence.length - 1)) {
 					plan.createLeg(
-							"car", 
+							BasicLeg.Mode.car, 
 							Time.parseTime("10:30:00"), 
 							Time.parseTime("00:00:00"), 
 							Time.parseTime("10:30:00"));

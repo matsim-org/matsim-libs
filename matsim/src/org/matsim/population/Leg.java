@@ -30,20 +30,14 @@ public class Leg extends BasicLegImpl {
 		super(mode);
 	}
 
-	public Leg(String mode) {
-		super(mode);
-	}
-
 	/**
 	 * Makes a deep copy of this leg, however only when the Leg has a route which is
 	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * @param leg
 	 */
 	public Leg(final Leg leg) {
-		//FIXME dg 
-		super(BasicLeg.Mode.UNDEFINED);
+		super(leg.getMode());
 		this.num = leg.num;
-		this.stringmode = leg.stringmode;
 		this.setDepTime(leg.getDepTime());
 		this.setTravTime(leg.getTravTime());
 		this.setArrTime(leg.getArrTime());
@@ -82,7 +76,7 @@ public class Leg extends BasicLegImpl {
 	@Override
 	public final String toString() {
 		return "[num=" + this.num + "]" +
-				"[mode=" + this.stringmode + "]" +
+				"[mode=" + this.getMode().toString()  + "]" +
 				"[depTime=" + Time.writeTime(this.getDepTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravTime()) + "]" +
 				"[arrTime=" + Time.writeTime(this.getArrTime()) + "]" +

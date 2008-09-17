@@ -22,6 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
@@ -64,7 +65,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			// first act (= home)
 			Act a = p.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,time,time,false);
 			a.setFacility(home_facility);
-			p.createLeg("car",time,0.0,time);
+			p.createLeg(BasicLeg.Mode.car,time,0.0,time);
 
 			int nof_acts = 1 + MatsimRandom.random.nextInt(3);
 			int dur = 12*3600/nof_acts;
@@ -77,7 +78,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 				a = p.createAct(act.getType(),f.getCenter().getX(),f.getCenter().getY(),f.getLink(),time,(time+dur),dur,false);
 				a.setFacility(f);
 				time += dur;
-				p.createLeg("car",time,0.0,time);
+				p.createLeg(BasicLeg.Mode.car,time,0.0,time);
 			}
 
 			// last act (= home)

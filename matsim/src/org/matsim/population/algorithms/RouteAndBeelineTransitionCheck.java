@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
@@ -86,7 +87,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		ActIterator it = plan.getIteratorAct();
 		beeline.addAct(it.next());
 		while (it.hasNext()) {
-			Leg leg = new Leg("car");
+			Leg leg = new Leg(BasicLeg.Mode.car);
 			leg.setNum(1);
 			leg.setDepTime(0.0);
 			leg.setTravTime(0.0);

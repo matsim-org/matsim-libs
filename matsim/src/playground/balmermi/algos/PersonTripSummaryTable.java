@@ -102,7 +102,7 @@ public class PersonTripSummaryTable extends AbstractPersonAlgorithm implements P
 		LegIterator l_it = plan.getIteratorLeg();
 		while (l_it.hasNext()) {
 			Leg leg = (Leg)l_it.next();
-			String mode = leg.getMode();
+			String mode = leg.getMode().toString();
 			double dist = leg.getRoute().getDist();
 			dist = dist / 1000; // km
 			int ii = (int)dist;

@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -268,12 +269,12 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 			// CALC mode
 			int modechoice = model.calcModeChoice();
-			String mode = null;
-			if (modechoice == 0) { mode = CAR; }
-			else if (modechoice == 1) { mode = PT; }
-			else if (modechoice == 2) { mode = RIDE; }
-			else if (modechoice == 3) { mode = BIKE; }
-			else if (modechoice == 4) { mode = WALK; }
+			BasicLeg.Mode mode = null;
+			if (modechoice == 0) { mode = BasicLeg.Mode.car; }
+			else if (modechoice == 1) { mode = BasicLeg.Mode.pt; }
+			else if (modechoice == 2) { mode = BasicLeg.Mode.ride; }
+			else if (modechoice == 3) { mode = BasicLeg.Mode.bike; }
+			else if (modechoice == 4) { mode = BasicLeg.Mode.walk; }
 			else { Gbl.errorMsg("pid="+person.getId()+": modechoice="+modechoice+" knot known!"); }
 
 			// SET the mode for the legs of the subtour

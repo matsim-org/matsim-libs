@@ -23,6 +23,7 @@ package org.matsim.events.algorithms;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.ActEndEvent;
@@ -139,7 +140,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			if (event.leg != null) {
 				leg = plan.createLeg(event.leg.getMode(), time, Integer.MIN_VALUE, Integer.MIN_VALUE);
 			} else {
-				leg = plan.createLeg("car", time, Integer.MIN_VALUE, Integer.MIN_VALUE); // maybe get the leg mode from oldplans if available?
+				leg = plan.createLeg(BasicLeg.Mode.car, time, Integer.MIN_VALUE, Integer.MIN_VALUE); // maybe get the leg mode from oldplans if available?
 			}
 
 			leg.setDepTime(time);

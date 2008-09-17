@@ -23,6 +23,7 @@ package playground.ciarif.models;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
@@ -42,11 +43,6 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String RIDE = "ride";
-	private static final String PT = "pt";
-	private static final String CAR = "car";
-	private static final String BIKE = "bike";
-	private static final String WALK = "walk";
 	private static final String E = "e";
 	private static final String W = "w";
 	private static final String S = "s";
@@ -141,12 +137,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 
 			// getting the chosen mode
 			int modechoice = model.calcModeChoice();
-			String mode = null;
-			if (modechoice == 0) { mode = WALK; }
-			else if (modechoice == 1) { mode = BIKE; }
-			else if (modechoice == 2) { mode = CAR; }
-			else if (modechoice == 3) { mode = PT; }
-			else if (modechoice == 4) { mode = RIDE; }
+			BasicLeg.Mode mode = null;
+			if (modechoice == 0) { mode = BasicLeg.Mode.walk; }
+			else if (modechoice == 1) { mode = BasicLeg.Mode.bike; }
+			else if (modechoice == 2) { mode = BasicLeg.Mode.car; }
+			else if (modechoice == 3) { mode = BasicLeg.Mode.pt; }
+			else if (modechoice == 4) { mode = BasicLeg.Mode.ride; }
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 
 			// setting mode to plan

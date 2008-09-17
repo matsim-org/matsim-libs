@@ -1,16 +1,13 @@
 package playground.ciarif.models.subtours;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class PersonSubtourHandler {
 	
@@ -81,15 +78,15 @@ public class PersonSubtourHandler {
 				prev = curr;
 				
 				// Getting the main mode at the sub-tour level
-				String mode =((Leg)plan.getActsLegs().get(subtour.get(k)-1)).getMode();
+				BasicLeg.Mode mode =((Leg)plan.getActsLegs().get(subtour.get(k)-1)).getMode();
 				int license = 0;
 				if (plan.getPerson().hasLicense()){license =1;}
 				int modechoice = 0;
-				if (mode == CAR) {modechoice=0;}
-				else if (mode == PT) {modechoice=1;}
-				else if ((mode == CAR) && (license==0)) {modechoice=2;}
-				else if (mode == BIKE) {modechoice=3;}
-				else if (mode == WALK) {modechoice=4;}
+				if (mode == BasicLeg.Mode.car) {modechoice=0;}
+				else if (mode == BasicLeg.Mode.pt) {modechoice=1;}
+				else if ((mode == BasicLeg.Mode.car) && (license==0)) {modechoice=2;}
+				else if (mode == BasicLeg.Mode.bike) {modechoice=3;}
+				else if (mode == BasicLeg.Mode.walk) {modechoice=4;}
 				if (sub.getMode() > modechoice) {sub.setMode(modechoice);}
 			}
 			System.out.println("subtour mode = " + sub.getMode());

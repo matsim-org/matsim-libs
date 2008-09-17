@@ -2,12 +2,11 @@ package playground.wrashid.DES;
 
 import java.util.ArrayList;
 
-import org.matsim.events.BasicEvent;
-import org.matsim.events.AgentArrivalEvent;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.BasicEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 
 public class StartingLegMessage extends EventMessage {
@@ -22,7 +21,7 @@ public class StartingLegMessage extends EventMessage {
 		
 		// attempt to enter street.
 		
-		if (vehicle.getCurrentLeg().getMode().equalsIgnoreCase("car")){
+		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)){
 			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
 			road.enterRequest(vehicle);
 		} else {

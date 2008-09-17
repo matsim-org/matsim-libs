@@ -22,6 +22,7 @@ package org.matsim.roadpricing;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -93,7 +94,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 
 			Leg leg = (Leg)actslegs.get(i-1);
 			Act toAct = (Act)actslegs.get(i);
-			isCarLeg[routeIndex] = "car".equals(leg.getMode());
+			isCarLeg[routeIndex] = BasicLeg.Mode.car.equals(leg.getMode());
 			if (!isCarLeg[routeIndex]) {
 				super.handleLeg(leg, fromAct, toAct, depTimes[NOTOLL_INDEX][routeIndex]);
 			} else {

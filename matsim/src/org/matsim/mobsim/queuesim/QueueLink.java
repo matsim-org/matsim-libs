@@ -28,6 +28,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -241,7 +242,7 @@ public class QueueLink {
 			 */
 			Leg leg = veh.getCurrentLeg();
 
-			if (!leg.getMode().equals("car")) {
+			if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
 				if (leg.getRoute().getRoute().size() != 0) {

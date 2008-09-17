@@ -23,6 +23,7 @@
  */
 package playground.johannes.mobsim;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
@@ -114,7 +115,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the current simulation time.
 	 * @return the mode of the current or next trip.
 	 */
-	public String getMode(double time) {
+	public BasicLeg.Mode getMode(double time) {
 		int index = currentPlanIndex;
 		if (index % 2 == 0) {
 			if (isDone())

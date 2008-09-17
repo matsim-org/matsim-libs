@@ -23,6 +23,7 @@ package playground.gregor.evacuation.scenarioGenerator;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -103,7 +104,7 @@ public class EvacuationPlansGenerator {
 				Gbl.errorMsg("For each initial evacuation plan only one Act is allowed - and no Leg at all");
 			}
 
-			Leg leg = new Leg("car");
+			Leg leg = new Leg(BasicLeg.Mode.car);
 			leg.setNum(1);
 			leg.setDepTime(0.0);
 			leg.setTravTime(0.0);

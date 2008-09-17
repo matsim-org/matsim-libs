@@ -3,6 +3,7 @@ package playground.yu.utils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
@@ -162,12 +163,12 @@ public class CompareSelectedPlansTable {
 				out.write(d1 + ";");
 				out.write(Double.toString(d1 - d0) + ";");
 
-				String mode0 = PlanModeJudger.getMode(person.getSelectedPlan());
+				BasicLeg.Mode mode0 = PlanModeJudger.getMode(person.getSelectedPlan());
 				String tp0 = ((PlanModeJudger.useCar(person.getSelectedPlan()) || PlanModeJudger
 						.usePt(person.getSelectedPlan())) ? mode0 : "-")
 						.toString();
 				out.write(tp0 + ";");
-				String mode1 = PlanModeJudger.getMode(person_comp
+				BasicLeg.Mode mode1 = PlanModeJudger.getMode(person_comp
 						.getSelectedPlan());
 				String tp1 = ((PlanModeJudger.useCar(person_comp
 						.getSelectedPlan()) || PlanModeJudger.usePt(person_comp

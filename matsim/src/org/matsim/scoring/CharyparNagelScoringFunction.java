@@ -23,6 +23,7 @@ package org.matsim.scoring;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
@@ -352,9 +353,9 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			 */
 		}
 
-		if ("car".equals(leg.getMode())) {
+		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
-		} else if ("pt".equals(leg.getMode())) {
+		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
 		} else {
 			// use the same values as for "car"

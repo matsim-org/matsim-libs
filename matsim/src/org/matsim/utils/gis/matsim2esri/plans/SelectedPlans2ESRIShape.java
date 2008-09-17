@@ -33,6 +33,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.jfree.util.Log;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
@@ -178,7 +179,7 @@ public class SelectedPlans2ESRIShape {
 
 	private Feature getLegFeature(final Leg leg, final String id) {
 		Integer num = leg.getNum();
-		String mode = leg.getMode();
+		BasicLeg.Mode mode = leg.getMode();
 		Double depTime = leg.getDepTime();
 		Double travTime = leg.getTravTime();
 		Double arrTime = leg.getArrTime();

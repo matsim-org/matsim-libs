@@ -23,6 +23,7 @@
  */
 package playground.johannes.mobsim;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 
@@ -67,7 +68,7 @@ public abstract class MobsimAgentDecorator<A extends MobsimAgent> implements
 		return agent.getDepartureTime(time);
 	}
 
-	public String getMode(double time) {
+	public BasicLeg.Mode getMode(double time) {
 		return agent.getMode(time);
 	}
 

@@ -20,6 +20,7 @@
 
 package playground.gregor.withinday_evac.controler;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
@@ -56,7 +57,7 @@ public class GuideAgentsGenerator {
 			Person p = new Person(id);
 			Plan plan  = new Plan(p);
 			Act actA = new Act("h", 12000.0, -12000.0, l, Time.UNDEFINED_TIME, 3600 * 3, 0.0, true);
-			Leg leg = new Leg("car");
+			Leg leg = new Leg(BasicLeg.Mode.car);
 			leg.setNum(0);
 			leg.setDepTime(0.0);
 			leg.setTravTime(0.0);

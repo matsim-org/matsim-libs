@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -131,7 +132,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 			}
 			if (j > 0) {
 				Leg leg = (Leg)actsLegs.get(j-1);
-				String legMode = leg.getMode();
+				BasicLeg.Mode legMode = leg.getMode();
 				idx = getLegModeIndex(legMode);
 				if ((idx >= 0) && (dur >= 0)) {
 					this.legModeCnt[idx]++;
@@ -159,7 +160,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		return -1;
 	}
 
-	private final int getLegModeIndex(String legMode) {
+	private final int getLegModeIndex(BasicLeg.Mode legMode) {
 		for (int i = 0; i < this.nLegModes; i++) {
 			if (legMode.equals(this.legModes[i])) {
 				return i;

@@ -22,9 +22,9 @@ package org.matsim.demandmodeling;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -114,9 +114,9 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			String homeEndTimeString = Time.writeTime(homeEndTime, Time.TIMEFORMAT_HHMMSS);
 			try {
 				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, homeEndTimeString, null, "false");
-				plan.createLeg(Leg.CARMODE, 0.0, 0.0, 0.0);
+				plan.createLeg(BasicLeg.Mode.car, 0.0, 0.0, 0.0);
 				plan.createAct(row[5], primaryCoord.getX(), primaryCoord.getY(), null, null, Time.writeTime(WORKDURATION, Time.TIMEFORMAT_HHMMSS), null, "true");
-				plan.createLeg(Leg.CARMODE, 0.0, 0.0, 0.0);
+				plan.createLeg(BasicLeg.Mode.car, 0.0, 0.0, 0.0);
 				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, null, null, "false");
 				this.plans.addPerson(p);
 			} catch (Exception e) {

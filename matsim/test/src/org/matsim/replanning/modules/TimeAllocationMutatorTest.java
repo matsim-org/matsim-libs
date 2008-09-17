@@ -20,6 +20,7 @@
 
 package org.matsim.replanning.modules;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
@@ -119,9 +120,9 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			Person person = new Person(new IdImpl("1"));
 			plan = person.createPlan(true);
 			act1 = plan.createAct("h", 0, 0, link1, 0, 4*3600, 4*3600, false);
-			plan.createLeg("car", 6*3600, 0, Time.UNDEFINED_TIME);
+			plan.createLeg(BasicLeg.Mode.car, 6*3600, 0, Time.UNDEFINED_TIME);
 			act2 = plan.createAct("w", 0, 0, link1, 4*3600, 20*3600, 16*3600, false);
-			plan.createLeg("car", 16*3600, 0, Time.UNDEFINED_TIME);
+			plan.createLeg(BasicLeg.Mode.car, 16*3600, 0, Time.UNDEFINED_TIME);
 			plan.createAct("h", 0, 0, link1, 16*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

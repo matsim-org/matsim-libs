@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
@@ -121,7 +122,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	protected double computeTravelTime(Act fromAct, Act toAct) {	
-		Leg leg = new Leg("car");
+		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(0);
 		leg.setDepTime(0.0);
 		leg.setTravTime(0.0);

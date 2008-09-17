@@ -38,8 +38,8 @@ public class PlanomatConfigGroup extends Module {
 	private int jgapMaxGenerations;
 
 	public static final String POSSIBLE_MODES = "possibleModes";
-	public static final String POSSIBLE_MODES_CAR = BasicLeg.CARMODE;
-	public static final String POSSIBLE_MODES_CAR_PT = BasicLeg.CARMODE + " " + BasicLeg.PTMODE;
+	public static final String POSSIBLE_MODES_CAR = BasicLeg.Mode.car.toString();
+	public static final String POSSIBLE_MODES_CAR_PT = BasicLeg.Mode.car.toString() + " " + BasicLeg.Mode.pt.toString();
 	public static final String DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
 	private String possibleModes;
 
@@ -155,15 +155,20 @@ public class PlanomatConfigGroup extends Module {
 		return this.scoringFunctionFactory;
 	}
 
-	public ArrayList<String> getPossibleModes() {
+	public ArrayList<BasicLeg.Mode> getPossibleModes() {
 
-		ArrayList<String> possibleModes = new ArrayList<String>();
+		ArrayList<BasicLeg.Mode> possibleModes = new ArrayList<BasicLeg.Mode>();
 
 		if (
 				PlanomatConfigGroup.POSSIBLE_MODES_CAR.equals(this.possibleModes) ||
 				PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT.equals(this.possibleModes)) {
 			for (String possibleMode : this.possibleModes.split(" ")) {
-				possibleModes.add(possibleMode);
+				if (possibleMode.equalsIgnoreCase(BasicLeg.Mode.car.toString())) {
+					possibleModes.add(BasicLeg.Mode.car);
+				}
+				else if (possibleMode.equalsIgnoreCase(BasicLeg.Mode.pt.toString())) {
+					possibleModes.add(BasicLeg.Mode.pt);
+				}
 			}
 		} else {
 			throw new RuntimeException("possibleModes value: \"" + this.possibleModes + "\" is not allowed.");

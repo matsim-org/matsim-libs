@@ -38,6 +38,7 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
@@ -243,7 +244,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// set mode to result from optimization
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 				int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-				String modeName = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
+				BasicLeg.Mode modeName = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
 //				System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 				leg.setMode(modeName);
 

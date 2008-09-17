@@ -23,14 +23,11 @@ package playground.ciarif.models.subtours;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
-
 import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
@@ -43,7 +40,6 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -57,11 +53,6 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final String RIDE = "ride";
-	private static final String PT = "pt";
-	private static final String CAR = "car";
-	private static final String BIKE = "bike";
-	private static final String WALK = "walk";
 	private static final String W = "w";
 	private static final String H = "h";
 	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
@@ -216,12 +207,12 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			
 			// getting the chosen mode
 			int modechoice = model.calcModeChoice();
-			String mode = null;
-			if (modechoice == 0) { mode = CAR; }
-			else if (modechoice == 1) { mode = PT; }
-			else if (modechoice == 2) { mode = RIDE; }
-			else if (modechoice == 3) { mode = BIKE; }
-			else if (modechoice == 4) { mode = WALK; }
+			BasicLeg.Mode mode = null;
+			if (modechoice == 0) { mode = BasicLeg.Mode.car; }
+			else if (modechoice == 1) { mode = BasicLeg.Mode.pt; }
+			else if (modechoice == 2) { mode = BasicLeg.Mode.ride; }
+			else if (modechoice == 3) { mode = BasicLeg.Mode.bike; }
+			else if (modechoice == 4) { mode = BasicLeg.Mode.walk; }
 			else { Gbl.errorMsg("Mode choice returns undefined value!"); }
 			System.out.println("modechoice = " + modechoice);
 			System.out.println();

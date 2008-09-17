@@ -62,17 +62,17 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 		// copyPlans: the copy of the plans.
 		for (Plan pl : person.getPlans()) {
 			Leg firstLeg = (Leg) pl.getActsLegs().get(1);
-			String legMode = firstLeg.getMode();
+			BasicLeg.Mode legMode = firstLeg.getMode();
 			//pl.setType(NewAgentPtPlan2.getPlanType(legMode));//???????????????
 
-			if (!legMode.equals("car")) {
+			if (!legMode.equals(BasicLeg.Mode.car)) {
 				if (person.getLicense().equals("yes")) {
 					Plan copyPlan = new Plan(person);
 					//copyPlan.setType(Plan.Type.CAR);//????????????????????????
 					// ??
 					copyPlans.add(copyPlan);
 				}
-			} else if (!legMode.equals("pt")) {
+			} else if (!legMode.equals(BasicLeg.Mode.pt)) {
 				Plan copyPlan = new Plan(person);
 				// copyPlan.setType(Plan.Type.PT);//?????????????????????
 				copyPlans.add(copyPlan);
@@ -111,7 +111,7 @@ public class NewAgentPtPlan3 extends NewPlan implements PersonAlgorithm {
 			for (Plan pl : plans)
 				if (
 				// pl.getType().equals(BasicLeg.CARMODE)
-				PlanModeJudger.getMode(pl).equals(BasicLeg.CARMODE))
+				PlanModeJudger.getMode(pl).equals(BasicLeg.Mode.car))
 					plans.remove(pl);
 		}
 
