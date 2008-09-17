@@ -22,8 +22,6 @@ package org.matsim.population;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.basic.v01.BasicNodeImpl;
-import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl {
@@ -53,8 +51,8 @@ public class Leg extends BasicLegImpl {
 			this.route = new Route((Route) leg.route);
 		}
 		else {
-			this.route = new BasicRouteImpl<BasicNodeImpl>();
-			this.route.setRoute(leg.getRoute().getRoute());
+			this.route = new Route();
+			((Route)this.route).setRoute(leg.getRoute().getRoute());
 		}
 
 	}

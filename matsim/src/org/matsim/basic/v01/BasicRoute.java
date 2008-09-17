@@ -32,12 +32,6 @@ public interface BasicRoute<T extends BasicNode> {
 
 	public ArrayList<T> getRoute();
 
-	/**
-	 * sets the route from a given ArrayList of Nodes
-	 * @param srcRoute an ArrayList containing nodes from the startNode to the endNode of the route, both start and end included
-	 */
-	public void setRoute(ArrayList<T> srcRoute);
-
 	public double getDist();
 
 	public void setDist(final double dist);
