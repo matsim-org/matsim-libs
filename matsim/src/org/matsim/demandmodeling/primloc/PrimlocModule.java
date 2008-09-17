@@ -130,7 +130,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivity(new Activity(primaryActivityName, workplace));
+			knowledge.addActivity(new Activity(primaryActivityName, workplace), true);
 		}
 	}
 
