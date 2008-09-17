@@ -66,8 +66,16 @@ public class PrimlocModule  implements PersonAlgorithm {
 	HashMap<Zone, ArrayList<Facility>> primActFacilitiesPerZone =
 		new HashMap<Zone, ArrayList<Facility>>();
 	
-	// Object responsible for the computation of Travel_cost(Zone #i, Zone #j)
+	// Class responsible for the computation of Travel_cost(Zone #i, Zone #j)
 	PrimlocTravelCostAggregator travelCostAggregator;
+	
+	// Class responsible for the computation of the calibration error/fitness
+	// i.e. comparison with real external data
+	PrimlocCalibrationError errorCalibrationClass;
+	
+	// Class containing the external trip distribution against
+	// which the calibration is performed
+	CumulativeDistribution externalTripDist;
 	
 	// Options
 	boolean overwriteKnowledge; // toggle knowledge creation/modification
@@ -142,6 +150,8 @@ public class PrimlocModule  implements PersonAlgorithm {
 
 		normalizeJobHomeVectors();
 		
+		setupCalibrationData();
+		
 		// Run the core location choice model
 		if( calibration )
 			core.runCalibrationProcess();
@@ -158,6 +168,10 @@ public class PrimlocModule  implements PersonAlgorithm {
 	
 	public void setTravelCost( PrimlocTravelCostAggregator travelCostAggregator ){
 		this.travelCostAggregator = travelCostAggregator;
+	}
+	
+	public void setExternalTripDistribution( CumulativeDistribution tripDist ){
+		externalTripDist = tripDist;
 	}
 	
 	void setupParameters(){
@@ -232,13 +246,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 			if( core.verbose )
 				System.out.println("Setting mu = <cost> = "+core.avgCost);
 		}
-			
-		CumulativeDistribution cd = new CumulativeDistribution( 0.0, 300.0, 10 );
-		for( int i=0; i<core.numZ; i++)
-			for( int j=0; j<core.numZ; j++)
-				cd.addObservation( core.cij.get(i, j));	
-		
-		cd.print();
+	
 	}
 
 	void setupNumberHomesPerZone( Population population ){
@@ -325,5 +333,19 @@ public class PrimlocModule  implements PersonAlgorithm {
 			
 		}
 	}	
+	
+	void setupCalibrationData(){
+		// This example simply illustrate how to calibrate against
+		// a given trip distribution
+		
+		if( errorCalibrationClass == null ){
+			if( externalTripDist == null )
+				return;
+			else{	
+				errorCalibrationClass = new PrimlocTripDistributionError( externalTripDist, core.cij );	
+			}
+		}
+		core.setCalibrationError( errorCalibrationClass );
+	}
 	
 }

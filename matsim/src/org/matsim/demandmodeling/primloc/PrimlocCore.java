@@ -98,6 +98,7 @@ public class PrimlocCore {
 
 		computeTripMatrix();
 		computeFinalRents();
+
 	}
 
 	public void runCalibrationProcess(){
@@ -112,6 +113,7 @@ public class PrimlocCore {
 		
 		runModel();
 		errC = calib.error( trips, X );
+		
 		System.out.println("PLCM:\tCalibration loop. Initial condition run completed");
 		calibrationLoopInfo( mu, errC );
 		
@@ -137,7 +139,12 @@ public class PrimlocCore {
 		}
 
 		double err = Double.POSITIVE_INFINITY;
-		while( Math.min( errR-errC, errL-errC)/errC > threshold3 ){
+		
+		double omuL = muL;
+		double omuC = muC;
+		double omuR = muR;
+		int count=0;
+		while( (count++<maxiter) && (Math.min( errR-errC, errL-errC)/errC > threshold3) ){
 			mu = (muC+muL)/2;
 			runModel();
 			err = calib.error( trips, X );
@@ -166,6 +173,12 @@ public class PrimlocCore {
 				muR = mu;
 				errR = err;
 			}
+			if( (omuL==muL)&&(omuC==muC)&&(omuR==muR)){
+				omuC = muC = (muL+muR)/2+(Math.random()-0.5)*(muR-muL)/10;
+			}
+			omuL = muL;
+			omuC = muC;
+			omuR = muR;
 		}
 	}
 	
