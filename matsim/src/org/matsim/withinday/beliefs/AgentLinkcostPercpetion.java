@@ -20,8 +20,6 @@
 
 package org.matsim.withinday.beliefs;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
@@ -39,8 +37,6 @@ public class AgentLinkcostPercpetion implements TravelTime {
 
 	private double k_2 = 100;
 
-	private Random random;
-
 	private WithindayAgent agent;
 
 	private TravelTime histProvider;
@@ -49,9 +45,9 @@ public class AgentLinkcostPercpetion implements TravelTime {
 
 	private double w_t;
 
-	private double phi_1 = this.random.nextGaussian();
+	private double phi_1 = MatsimRandom.random.nextGaussian();
 
-	private double phi_2 = this.random.nextGaussian();
+	private double phi_2 = MatsimRandom.random.nextGaussian();
 
 	public AgentLinkcostPercpetion(final WithindayAgent agent,
 			final TravelTime histProvider, final TravelTime reactProvider) {
@@ -62,7 +58,6 @@ public class AgentLinkcostPercpetion implements TravelTime {
 		}
 		this.histProvider = histProvider;
 		this.reactProvider = reactProvider;
-		this.random = MatsimRandom.random;
 		init();
 	}
 
