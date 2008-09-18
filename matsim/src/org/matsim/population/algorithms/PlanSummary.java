@@ -50,7 +50,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	private final String[] actTypes;
 	private final int[] actTypeCnt;
 	private final double[] actTypeDurations;
-	private final String[] legModes;
+	private final BasicLeg.Mode [] legModes;
 	private final int[] legModeCnt;
 	private HashMap<Plan.Type, Integer> planTypes = new HashMap<Plan.Type, Integer>();
 
@@ -58,20 +58,20 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlanSummary(final String[] activities, final String[] legmodes) {
+	public PlanSummary(final String[] activities, final BasicLeg.Mode[] legmodes) {
 		super();
 		this.nActTypes = activities.length;
 		this.nLegModes = legmodes.length;
 		this.actTypes = new String[this.nActTypes];
 		this.actTypeCnt = new int[this.nActTypes];
 		this.actTypeDurations = new double[this.nActTypes];
-		this.legModes = new String[this.nLegModes];
+		this.legModes = new BasicLeg.Mode[this.nLegModes];
 		this.legModeCnt = new int[this.nLegModes];
 
 		init(activities, legmodes);
 	}
 
-	private final void init(final String[] activities, final String[] legmodes) {
+	private final void init(final String[] activities, final BasicLeg.Mode[] legmodes) {
 		for (int i = 0; i < this.nActTypes; i++) {
 			this.actTypeCnt[i] = 0;
 			this.actTypeDurations[i] = 0;
@@ -198,7 +198,7 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 		// leg summary
 		System.out.println();
 		for (int i = 0; i < this.nLegModes; i++) {
-			String legMode = this.legModes[i];
+			BasicLeg.Mode legMode = this.legModes[i];
 			if (legMode != null) {
 				int count = this.legModeCnt[i];
 				if (count == 0) {

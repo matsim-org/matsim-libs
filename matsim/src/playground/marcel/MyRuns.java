@@ -47,6 +47,7 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.StuckVehStats;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -605,7 +606,7 @@ public class MyRuns {
 		plans.printPlansCount();
 
 		System.out.println("  processing plans...");
-		new PlansFilterByLegMode("car", false).run(plans);
+		new PlansFilterByLegMode(BasicLeg.Mode.car, false).run(plans);
 
 		System.out.println("  writing plans...");
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
@@ -645,7 +646,7 @@ public class MyRuns {
 		plans.printPlansCount();
 
 		System.out.println("  processing plans...");
-		new PlansFilterByLegMode("pt", true).run(plans);
+		new PlansFilterByLegMode(BasicLeg.Mode.pt, true).run(plans);
 
 		System.out.println("  writing plans...");
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
@@ -1559,7 +1560,7 @@ public class MyRuns {
 
 		plans.addAlgorithm(new PlanCalcType());
 		final String[] activities = {null, "home", "edu", "uni", "work1", "work2", "work3", "shop1", "shop2", "home2", "leisure1", "leisure2"};
-		final String[] legModes = {null, "walk", "bike", "car", "pt", "ride"};
+		final BasicLeg.Mode[] legModes = {BasicLeg.Mode.undefined, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.ride};
 		final PlanSummary summary = new PlanSummary(activities, legModes);
 		plans.addAlgorithm(summary);
 		System.out.println("  done.");

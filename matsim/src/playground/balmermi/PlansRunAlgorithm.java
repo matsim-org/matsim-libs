@@ -22,6 +22,7 @@ package playground.balmermi;
 
 import java.util.Date;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -66,7 +67,7 @@ public class PlansRunAlgorithm {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  running plans module... ");
-		new PlansFilterByLegMode("car",true).run(plans);
+		new PlansFilterByLegMode(BasicLeg.Mode.car,true).run(plans);
 		new XY2Links(network).run(plans);
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		new PlansCalcRoute(network, timeCostCalc, timeCostCalc).run(plans);

@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -43,7 +44,7 @@ public class PlansFilterByLegMode {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-	private String legMode;
+	private BasicLeg.Mode legMode;
 	private boolean exclusiveFilter;
 
 	// optimization: instead of doing a String.equals() every time, we do it once and store the result
@@ -53,7 +54,7 @@ public class PlansFilterByLegMode {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansFilterByLegMode(final String legMode, final boolean exclusiveFilter) {
+	public PlansFilterByLegMode(final BasicLeg.Mode legMode, final boolean exclusiveFilter) {
 		super();
 		this.legMode = legMode;
 		this.exclusiveFilter = exclusiveFilter;
