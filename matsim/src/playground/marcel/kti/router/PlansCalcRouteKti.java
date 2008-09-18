@@ -22,6 +22,7 @@ package playground.marcel.kti.router;
 
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.network.NetworkLayer;
@@ -66,7 +67,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 
 	@Override
 	public double handleLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
-		if ("pt".equals(leg.getMode())) {
+		if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			return handleSwissPtLeg(fromAct, leg, toAct);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);

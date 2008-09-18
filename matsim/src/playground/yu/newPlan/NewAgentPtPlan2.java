@@ -68,7 +68,7 @@ public class NewAgentPtPlan2 extends NewPlan {
 					// copyPlan.setType(Plan.Type.CAR);//????????????
 					this.copyPlans.add(copyPlan);
 					this.copyPlansModes.add(BasicLeg.Mode.car);
-				} else if (!legMode.equals("pt")) {
+				} else if (!legMode.equals(BasicLeg.Mode.pt)) {
 					Plan copyPlan = new Plan(person);
 					// copyPlan.setType(Plan.Type.PT);//??????????????
 					this.copyPlans.add(copyPlan);

@@ -334,7 +334,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
-		} else if ("pt".equals(leg.getMode())) {
+		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			score += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
 		} else {
 			// use the same values as for "car"

@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2.modules;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -119,10 +120,10 @@ public class PlansAnalyse {
 			while (l_it.hasNext()) {
 				Leg l = (Leg)l_it.next();
 				cnt++;
-				if (l.getMode().equals(CAR))       { mtype_cnt[0]++; }
-				else if (l.getMode().equals(PT))   { mtype_cnt[1]++; }
-				else if (l.getMode().equals(BIKE)) { mtype_cnt[2]++; }
-				else if (l.getMode().equals(WALK)) { mtype_cnt[3]++; }
+				if (l.getMode().equals(BasicLeg.Mode.car))       { mtype_cnt[0]++; }
+				else if (l.getMode().equals(BasicLeg.Mode.pt))   { mtype_cnt[1]++; }
+				else if (l.getMode().equals(BasicLeg.Mode.bike)) { mtype_cnt[2]++; }
+				else if (l.getMode().equals(BasicLeg.Mode.walk)) { mtype_cnt[3]++; }
 				else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
 				leg_cnt++;
 			}

@@ -112,11 +112,11 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		Act act = (Act)p.getActsLegs().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
 		Leg leg = (Leg)p.getActsLegs().get(s_act_idx-1);
-		if (leg.getMode().equals(CAR)) { return 0; }
-		else if (leg.getMode().equals(PT)) { return 1; }
-		else if (leg.getMode().equals(RIDE)) { return 2; }
-		else if (leg.getMode().equals(BIKE)) { return 3; }
-		else if (leg.getMode().equals(WALK)) { return 4; }
+		if (leg.getMode().equals(BasicLeg.Mode.car)) { return 0; }
+		else if (leg.getMode().equals(BasicLeg.Mode.pt)) { return 1; }
+		else if (leg.getMode().equals(BasicLeg.Mode.ride)) { return 2; }
+		else if (leg.getMode().equals(BasicLeg.Mode.bike)) { return 3; }
+		else if (leg.getMode().equals(BasicLeg.Mode.walk)) { return 4; }
 		else { Gbl.errorMsg("pid="+p.getPerson().getId()+": leg_mode="+leg.getMode()+" not known!"); return -2; }
 	}
 	

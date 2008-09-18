@@ -23,6 +23,7 @@ package playground.david;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -54,7 +55,7 @@ class FilterPersonsNonCarMode extends AbstractPersonAlgorithm{
 			} else {
 				Leg leg = (Leg)plan.getActsLegs().get(jj);
 				// route
-				if (!leg.getMode().equals("car")  && (this.count < 10)) {
+				if (!leg.getMode().equals(BasicLeg.Mode.car)  && (this.count < 10)) {
 					try {
 						CopyOfFilterBerlinKutter.relevantPopulation.addPerson(person);
 						this.count++;

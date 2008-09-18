@@ -446,7 +446,7 @@ public class PlansCreateFromMZ {
 			LegIterator leg_it = plan.getIteratorLeg();
 			while (leg_it.hasNext()) {
 				Leg leg = (Leg)leg_it.next();
-				if ((leg.getMode().equals(WALK))&&(leg.getRoute().getDist()>10000.0)) {ids.add(p.getId()); }
+				if ((leg.getMode().equals(BasicLeg.Mode.walk))&&(leg.getRoute().getDist()>10000.0)) {ids.add(p.getId()); }
 			}
 		}
 		return ids;
