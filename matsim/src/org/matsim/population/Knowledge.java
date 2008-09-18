@@ -21,8 +21,8 @@
 package org.matsim.population;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -127,7 +127,7 @@ public class Knowledge extends CustomizableImpl {
 	 */
 	public final boolean addActivity(Activity activity, boolean isPrimary) {
 		if (activity == null) { return false; }
-		if (activities == null) { activities = new HashSet<KActivity>(INIT_ACTIVITY_CAPACITY); }
+		if (activities == null) { activities = new LinkedHashSet<KActivity>(INIT_ACTIVITY_CAPACITY); }
 		KActivity ka = new KActivity(activity,isPrimary);
 		return activities.add(ka);
 	}
