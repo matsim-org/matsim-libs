@@ -218,6 +218,7 @@ public class SocialNetworkStatistics {
 						+ myEdge.getUserDatum("type") + " "
 						+ myEdge.getUserDatum("visitNum"));
 				eout.newLine();
+				eout.flush();
 			} catch (IOException ex) {
 			}
 		}
@@ -225,6 +226,7 @@ public class SocialNetworkStatistics {
 			gout.write(" " + smDD.average() + " " + smDur.average() + " "
 					+ smNum.average() / (iter));
 			gout.newLine();
+			gout.flush();
 		} catch (IOException ex) {
 		}
 	}
@@ -374,6 +376,7 @@ public class SocialNetworkStatistics {
 						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
 						+ " " + myPerson.getKnowledge().getActivities().size() + " "+pop);
 				aout.newLine();
+				aout.flush();
 			} catch (IOException e) {
 
 				e.printStackTrace();
