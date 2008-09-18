@@ -172,10 +172,12 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		}		
 	}	
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(@SuppressWarnings("unused") LinkLeaveEvent event) {
+		// Not used in that TestCase
 	}
 
-	public void reset(int iteration) {
+	public void reset(@SuppressWarnings("unused") int iteration) {
+		// Not used in that TestCase
 	}
 	
 	private class MeasurePoint{

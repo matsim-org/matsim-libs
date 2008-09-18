@@ -66,6 +66,39 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		}	
 		
 	}
+	
+	public void testTrafficLightIntersection4armsWithUTurn() {
+		
+		System.setProperty("line.separator", "\n"); // Unix
+//		System.setProperty("line.separator", "\r\n"); // Win
+		
+		Config conf = loadConfig("src/playground/andreas/intersection/test/data/fourways/config.xml");
+		conf.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml.gz");
+		
+		String newLSADef = "src/playground/andreas/intersection/test/data/fourways/lsa.xml";
+		String newLSADefCfg = "src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
+		
+		ScenarioData data = new ScenarioData(conf);
+		Events events = new Events();
+		events.addHandler(this);
+		
+		
+		try {		
+			this.writer = IOUtils.getBufferedWriter("temp.txt.gz", true);
+			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
+
+			this.writer.flush();
+			this.writer.close();
+			
+			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("src/playground/andreas/intersection/test/data/fourways/reference_uturn.txt.gz"));
+			
+			new File("temp.txt.gz").delete();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		
+	}
 
 	public void handleEvent(LinkEnterEvent event) {
 		try {
@@ -85,7 +118,8 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		}
 	}
 	
-	public void reset(int iteration) {
+	public void reset(@SuppressWarnings("unused")int iteration) {
+		// Not used in that TestCase
 	}
 	
 	public void handleEvent(ActEndEvent event) {

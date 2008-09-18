@@ -106,6 +106,7 @@ public class QControler extends Controler {
 		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
 		final String newLSADef = "./src/playground/andreas/intersection/test/data/fourways/lsa.xml";
 		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
+		config.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml");
 
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
 //		final String newLSADef = "./src/playground/andreas/intersection/test/data/twoways/lsa_2.xml";

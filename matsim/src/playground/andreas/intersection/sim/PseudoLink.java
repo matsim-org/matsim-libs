@@ -123,7 +123,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		}
 		return true;
 	}
-
+	
 	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
 		for (Id laneId : basicLightSignalGroupDefinition.getLaneIds()) {
 			if (this.laneLinkIdSpecifiedInFile.equals(laneId)) {
@@ -151,9 +151,14 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 			Vehicle veh = this.getFirstFromBuffer();
 			if (veh != null) {
+				// Necessary signal group is green
 				if (sgIsGreen && signalGroup.getToLinkIds().contains(
 								this.getFirstFromBuffer().getDriver().chooseNextLink().getId())) {
-					firstVehInQueueCouldMove = true;
+					return firstVehInQueueCouldMove = true;
+				} 
+				// Its a Vehicle performing an UTurn
+				else if (sgIsGreen && this.getFirstFromBuffer().getDriver().chooseNextLink().getToNode().equals(this.realLink.getLink().getFromNode())){
+					return firstVehInQueueCouldMove = true;
 				}
 			}
 		}

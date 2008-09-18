@@ -139,7 +139,8 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 
 	
 	
-	public void reset(int iteration) {
+	public void reset(@SuppressWarnings("unused") int iteration) {
+		// Not used in that TestCase
 	}
 
 	public void handleEvent(ActEndEvent event) {

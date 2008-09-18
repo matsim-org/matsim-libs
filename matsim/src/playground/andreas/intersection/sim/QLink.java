@@ -197,29 +197,20 @@ public class QLink extends QueueLink {
 	}
 
 	private void addUTurn(){
-
 		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
 
 			if((outLink.getToNode().equals(this.getLink().getFromNode()))){
-
 				PseudoLink tempPseudoLink = null;
 				for (PseudoLink pseudoLink : this.pseudoLinksList) {
 
 					if( tempPseudoLink == null || (pseudoLink.visualizerLane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
 						tempPseudoLink = pseudoLink;
+						tempPseudoLink.addDestLink(outLink);
+						this.originalLink.addDestLink(outLink);
 					}
-
 				}
-
-				// TODO [an] Test the U-Turn mechanics
-				
-				tempPseudoLink.addDestLink(outLink);
-				this.originalLink.addDestLink(outLink);
-
 			}
 		}
-
-
 	}
 
 	private void findLayout(){
