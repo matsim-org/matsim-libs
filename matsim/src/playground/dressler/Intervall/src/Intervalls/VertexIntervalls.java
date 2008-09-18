@@ -233,6 +233,35 @@ public class VertexIntervalls {
 		
 	}
 	
+	/**
+	 * finds the first intervall within which
+	 *  the node is reachable from the source
+	 * @return specified Intervall or null if none exist
+	 */
+	private VertexIntervall getFirstPossible(){
+		VertexIntervall result = this.getIntervallAt(0);
+		while(!this.isLast(result)){
+			if (result.getDist()){
+				return result;
+			}else{
+				result=this.getNext(result);
+			}
+		}
+		if (result.getDist()){
+			return result;
+		}	
+		return null;
+	}
+	
+	public int firstPossibleTime(){
+		VertexIntervall test =this.getFirstPossible();
+		if(test!=null){
+			return test.getLowBound();
+		}else{
+			return Integer.MAX_VALUE;
+		}
+		
+	}
 	
 	/**
 	 * 
