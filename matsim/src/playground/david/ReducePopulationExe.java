@@ -23,15 +23,14 @@ package playground.david;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
@@ -76,7 +75,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		person.removeWorstPlans(1);
 		Plan plan = person.getSelectedPlan();
 		Leg leg = plan.getNextLeg(plan.getFirstActivity());
-		if(!leg.getMode().equals("car")) {
+		if(!leg.getMode().equals(BasicLeg.Mode.car)) {
 			System.out.print("X");
 			return;
 		}

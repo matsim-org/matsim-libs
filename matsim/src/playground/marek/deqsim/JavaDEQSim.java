@@ -22,6 +22,7 @@ package playground.marek.deqsim;
 
 import java.util.ArrayList;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -60,7 +61,7 @@ public class JavaDEQSim {
 				} else {
 					Leg leg = (Leg)actsLegs.get(i);
 					// the leg the agent performs
-					if ("car".equals(leg.getMode())) { // we only simulate car traffic
+					if (BasicLeg.Mode.car.equals(leg.getMode())) { // we only simulate car traffic
 						Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
 					}
 				}

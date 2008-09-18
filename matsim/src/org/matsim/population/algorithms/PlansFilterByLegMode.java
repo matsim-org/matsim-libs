@@ -58,7 +58,7 @@ public class PlansFilterByLegMode {
 		super();
 		this.legMode = legMode;
 		this.exclusiveFilter = exclusiveFilter;
-		this.legModeIsCar = legMode.equals("car");
+		this.legModeIsCar = legMode.equals(BasicLeg.Mode.car);
 	}
 
 	//////////////////////////////////////////////////////////////////////

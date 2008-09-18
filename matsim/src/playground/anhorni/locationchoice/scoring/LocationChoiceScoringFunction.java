@@ -27,6 +27,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
@@ -331,7 +332,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			 */
 		}
 
-		if ("car".equals(leg.getMode())) {
+		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
 		} else if ("pt".equals(leg.getMode())) {
 			score += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;

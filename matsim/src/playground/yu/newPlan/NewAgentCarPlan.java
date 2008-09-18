@@ -58,7 +58,7 @@ public class NewAgentCarPlan extends NewPlan {
 				for (int i = 0; i < actsLegs.size(); i++) {
 					Object o = actsLegs.get(i);
 					if (i % 2 != 0) {
-						if (((Leg) o).getMode().equals("car")) {
+						if (((Leg) o).getMode().equals(BasicLeg.Mode.car)) {
 							this.haveCar = true;
 							// pl.setType(Plan.Type.CAR);
 							break a;
