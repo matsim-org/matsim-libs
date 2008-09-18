@@ -57,20 +57,14 @@ public class PControler implements FeedbackControler {
 	 * The control algorithm
 	 */
 	public double control(double output) {
-
-		double input;
-
 		//		PID calculations
-
-		input = -1 * K * output;
-
+		double input = -1 * K * output;
 		//		Boundary cuts
-
 		if (input <= 1 && input >= -1) {
 			return input;
 		} else if (input > 1)
-			return input = 1;
+			return 1;
 		else
-			return input = -1;
+			return -1;
 	}
 }
