@@ -21,6 +21,7 @@ package org.matsim.network;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
@@ -89,7 +90,7 @@ public class NetworkFactory {
 			else {
 				throw new IllegalArgumentException(
 						"A prototype must have a public constructor with parameter types: "
-								+ PROTOTYPECONSTRUCTOR);
+								+ Arrays.toString(PROTOTYPECONSTRUCTOR));
 			}
 		} catch (SecurityException e) {
 			e.printStackTrace();
