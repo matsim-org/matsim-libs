@@ -85,7 +85,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * 
 	 */
-	private LinkedList<Link> _sources;
+	private LinkedList<Node> _sources;
 	
 	/**
 	 * 
@@ -117,6 +117,8 @@ public class BellmanFordVertexIntervalls {
 	 */
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
 	
+	private boolean debugmode=false;
+	
 	
 
 	
@@ -143,7 +145,7 @@ public class BellmanFordVertexIntervalls {
 		this._flow = flow;
 		_timeHorizon = Integer.MAX_VALUE;
 		_gamma = Integer.MAX_VALUE;
-		
+		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
 
 	/**
@@ -160,7 +162,7 @@ public class BellmanFordVertexIntervalls {
 	 */
 	public BellmanFordVertexIntervalls(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
-			HashMap<Link, EdgeIntervalls> flow, int timeHorizon) {
+			HashMap<Link, EdgeIntervalls> flow, int timeHorizon,Node sink,LinkedList<Node> sources) {
 
 		this.network = network;
 		this.costFunction = costFunction;
@@ -168,14 +170,30 @@ public class BellmanFordVertexIntervalls {
 
 		this._flow = flow;
 		this._timeHorizon = timeHorizon;
-		_gamma = Integer.MAX_VALUE;
+		this._gamma = Integer.MAX_VALUE;
+		this._sources = sources; 
+		this._sink = sink;
+		this._labels = new HashMap<Node, VertexIntervalls>();
+		
 	}
 	
+	/**
+	 * 
+	 * @param debug
+	 */
+	public void setDebugMode(boolean debug){
+		this.debugmode = debug;
+	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private LinkedList<Node> refreshLabels(){
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		for(Node node: network.getNodes().values()){
-			_labels.put(node, new VertexIntervalls());
+			VertexIntervalls label = new VertexIntervalls();
+			_labels.put(node, label);
 			if(isActiveSource(node)){
 				nodes.add(node);
 				_labels.get(node).getIntervallAt(0).setDist(true);
@@ -184,25 +202,52 @@ public class BellmanFordVertexIntervalls {
 		return nodes;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 */
 	private LinkedList<Link> findpath(){
 		VertexIntervalls sinkintervalls = _labels.get(_sink);
 		
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
 	private boolean isActiveSource(Node node) {
-		// TODO Auto-generated method stub
+		if(this._sources.contains(node)){
+			return true;
+		}
 		return false;
+		
+		//TODO nonactive sources
 	}
-
+	
+	/**
+	 * 
+	 * @param links
+	 */
 	private void augmentFlow(ArrayList<Link> links){
 		// TODO Auto-generated method stub
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private ArrayList<Link> constructRoute(){
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+	 * 
+	 *
+	 */
 	private void findGamma(){
 		// TODO Auto-generated method stub
 	} 
@@ -227,8 +272,10 @@ public class BellmanFordVertexIntervalls {
 			i = labelfrom.getIntervallAt(t);
 			t=i.getHighBound();
 			if(i.getDist()){
+				System.out.println("wir kommen los");
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
+					System.out.println("wir kommen weiter");
 					boolean temp = labelto.setTrue( arrive , over );
 					if(temp){
 						changed = true;
@@ -244,7 +291,7 @@ public class BellmanFordVertexIntervalls {
 	 * 
 	 * @return
 	 */
-	private boolean doCalculations() {
+	public boolean doCalculations() {
 		// outprints
 		/*
 		 * for (Link link : network.getLinks().values()) {
@@ -288,8 +335,44 @@ public class BellmanFordVertexIntervalls {
 					queue.add(w);
 				}
 			}
-		}	
+			if(this.debugmode){
+				printStatus();
+			}
+		}
+		//printStatus();
 		return false; //TODO whatever should be returned
+	}
+
+	
+	/**
+	 * 
+	 *
+	 */
+	private void printStatus() {
+		StringBuilder print = new StringBuilder();
+		for(Node node : network.getNodes().values()){
+			VertexIntervalls inter =_labels.get(node);
+			int t =  inter.firstPossibleTime();
+			if(t==Integer.MAX_VALUE){
+				print.append(node.getId().toString() + " t: "+ "inf." +"\n");
+			}else{
+				VertexIntervall test =inter.getIntervallAt(t);
+				
+				if(test.getPredecessor()==null){
+					print.append(node.getId().toString() + " t: "+ t +"\n");
+				}else{
+					print.append(node.getId().toString() + " t: "+ t +" over: "+ inter.getIntervallAt(t).getPredecessor().getId()+ "\n");
+				}
+			}
+				
+			
+		}
+		print.append("\n");
+		System.out.println(print.toString());
+		
+		//System.out.println("blub");
+		// TODO Auto-generated method stub
+		
 	}
 	
 

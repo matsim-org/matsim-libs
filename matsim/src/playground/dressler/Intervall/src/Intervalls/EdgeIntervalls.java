@@ -233,9 +233,13 @@ public class EdgeIntervalls {
 			throw new IllegalArgumentException("capacity shold be positive");
 		}
 		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
+			System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow());
 			if(((EdgeIntervall)_tree._curr.obj).getFlow()<u){
 				return (EdgeIntervall)_tree._curr.obj;
 			}
+		}
+		if(((EdgeIntervall)_tree._curr.obj).getFlow()<u){
+			return (EdgeIntervall)_tree._curr.obj;
 		}
 		return null;
 	}
@@ -271,11 +275,13 @@ public class EdgeIntervalls {
 		int max =i.getHighBound();
 		if(forward){
 			while(t<max){
+				
 				Intervall j =minPossible(t,u);
 				if(j==null){
 					break;
 				}
 				t=j.getHighBound();
+				System.out.println("kapazitaet frei");
 				if( i.intersects(j)){
 					j=i.Intersection(j).shiftPositive(traveltime);
 					if(j!=null){

@@ -297,6 +297,7 @@ public class VertexIntervalls {
 					test.setDist(true);
 					test.setPredecessor(link);
 					changed=true;
+					System.out.println("blub1");
 				}else{
 					//upper part of test must be relabeld
 					if(test.getLowBound()<arrive.getLowBound()&& test.getHighBound()<=arrive.getHighBound()){
@@ -304,6 +305,7 @@ public class VertexIntervalls {
 						temp.setDist(true);
 						temp.setPredecessor(link);
 						changed=true;
+						System.out.println("blub2");
 					}else{
 						//lower part of test must be relabeld
 						if(test.getLowBound()>=arrive.getLowBound()&& test.getHighBound()>arrive.getHighBound()){
@@ -313,6 +315,7 @@ public class VertexIntervalls {
 							temp.setDist(true);
 							temp.setPredecessor(link);
 							changed=true;
+							System.out.println("blub3");
 							
 						}else{
 							//middle of tet must be relabeld
@@ -324,6 +327,7 @@ public class VertexIntervalls {
 								temp.setDist(true);
 								temp.setPredecessor(link);
 								changed=true;
+								System.out.println("blub4");
 							}
 						}
 					}
@@ -332,6 +336,9 @@ public class VertexIntervalls {
 				
 			}
 			//pick next Intervall
+			if(Integer.MAX_VALUE==t){
+				break;
+			}
 			test= this.getIntervallAt(t);
 		}	
 		return changed;
