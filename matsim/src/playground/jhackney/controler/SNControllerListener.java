@@ -187,9 +187,14 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info("scoring");
 
+		Gbl.printMemoryUsage();
+		
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
+		log.info("SSTEST Clearing and recalculating actStats "+snIter);
 		this.actStats.clear();
-		log.info("SSTEST Recalculating actStats "+snIter);
+		
+		Gbl.printMemoryUsage();
+
 		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap()));
 		log.info("SSTEST Finish Scoring with actStats "+snIter);
 		scoring.finish();
@@ -199,12 +204,16 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info("finishIteration ... "+event.getIteration());
 
+		Gbl.printMemoryUsage();
+		
 		if( event.getIteration()%replan_interval==0){
 			// Removing the social links here rather than before the
 			//replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... done");
+			
+			Gbl.printMemoryUsage();
 
 //			You could forget activities here, after the replanning and assignment
 
@@ -275,6 +284,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			}
 			this.log.info(" ... Spatial interactions done\n");
 
+			Gbl.printMemoryUsage();
+			
 			this.log.info(" Non-Spatial interactions ...");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
@@ -309,6 +320,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			}
 			this.log.info(" ... done");
 
+			Gbl.printMemoryUsage();
+			
 			snIter++;
 		}
 	}
