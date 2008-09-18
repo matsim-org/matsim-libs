@@ -15,6 +15,7 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.mobsim.queuesim.VehicleDepartureTimeComparator;
@@ -34,16 +35,11 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	private QLink realLink = null;
 
 	private boolean amIOriginalLink = false;
-
 	private Id laneLinkIdSpecifiedInFile;
-
 	private ArrayList<BasicLightSignalGroupDefinition> sgsOnThisSubLink = null;
 
 	/** Haelt alle echten Ziellinks, die von diesem Link erreichbar sind, meist 1-3 */
 	private List<Link> destLinks = new LinkedList<Link>();
-
-	/** Next PseudoLink upstream, null if first link */
-	private PseudoLink fromLink = null;
 
 	/** Contains next PseudoLinks downstream, null if last link */
 	private List<PseudoLink> toLinks = new LinkedList<PseudoLink>();
@@ -61,10 +57,8 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	/** Maximum number of vehicle to be stored on the link simultanously */
 	private double storageCapacity = Double.NaN;
 
-	/***************************************************************************
-	 * Buffer responsible for limiting the flow capacity, flowQueue is holding
-	 * all vehicles that are ready to cross the outgoing intersection
-	 **************************************************************************/
+	/** Buffer responsible for limiting the flow capacity, flowQueue is holding
+	 * all vehicles that are ready to cross the outgoing intersection */
 	private Queue<Vehicle> flowQueue = new LinkedList<Vehicle>();
 
 	/** The number of vehicles able to leave the flowQueue in one time step (usually 1 sec). */
@@ -89,18 +83,13 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	// Helper
 	private double flowCapacityCeil = Double.NaN;
-
 	private double flowCapacityFraction = Double.NaN;
-
 	private double flowCapacityFractionalRest = 1.0;
-
 	private double maximumFlowCapacity = 0.;
-
 	private boolean thisTimeStepIsGreen = false;
 
 	/** For Visualization only */
-	int lane = 1;
-
+	int visualizerLane = 1;
 	double length_m = -1;
 
 	public PseudoLink(QLink originalLink, boolean amIOriginalLink, Id laneLinkIdSpecifiedInFile) {
@@ -115,7 +104,6 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 		this.length_m = lengthOfPseudoLink_m;
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
-
 		this.freeSpeedTravelTime = this.length_m / freeSpeed_m_s;
 
 		this.flowCapacity = numberOfLanes * averageSimulatedFlowCapacityPerLane_Veh_s
@@ -123,10 +111,8 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 		this.flowCapacityCeil = (int) Math.ceil(this.flowCapacity);
 		this.flowCapacityFraction = this.flowCapacity - (int) this.flowCapacity;
-
-		this.storageCapacity = (this.length_m * numberOfLanes) / effectiveCellSize
-				* Gbl.getConfig().simulation().getStorageCapFactor();
-
+		this.storageCapacity = (this.length_m * numberOfLanes) / 
+								effectiveCellSize * Gbl.getConfig().simulation().getStorageCapFactor();
 		this.storageCapacity = Math.max(this.storageCapacity, this.flowCapacityCeil);
 
 		this.flowCapacityFractionalRest = (this.flowCapacityFraction == 0.0 ? 0.0 : 1.0);
@@ -134,11 +120,8 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		if (this.storageCapacity < this.freeSpeedTravelTime * this.flowCapacity) {
 			this.storageCapacity = this.freeSpeedTravelTime * this.flowCapacity;
 			return false;
-
-		} else {
-			return true;
 		}
-
+		return true;
 	}
 
 	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
@@ -153,15 +136,14 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	}
 
 	public boolean firstVehCouldMove() {
-
 		if (this.sgsOnThisSubLink == null) {
-			log.fatal("This should never happen, since every LaneLink at a signalized intersection should have at least one signal(group)");
+			log.fatal("This should never happen, since every LaneLink at a signalized" +
+					" intersection should have at least one signal(group)");
 		}
 
 		boolean firstVehInQueueCouldMove = false;
 
 		for (BasicLightSignalGroupDefinition signalGroup : this.sgsOnThisSubLink) {
-
 			boolean sgIsGreen = signalGroup.isGreen();
 			if (sgIsGreen) {
 				this.setThisTimeStepIsGreen(true);
@@ -169,16 +151,13 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 			Vehicle veh = this.getFirstFromBuffer();
 			if (veh != null) {
-
 				if (sgIsGreen && signalGroup.getToLinkIds().contains(
 								this.getFirstFromBuffer().getDriver().chooseNextLink().getId())) {
 					firstVehInQueueCouldMove = true;
 				}
 			}
 		}
-
 		return firstVehInQueueCouldMove;
-
 	}
 
 	public void setThisTimeStepIsGreen(boolean isGreen) {
@@ -186,13 +165,12 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	}
 
 	public void movePseudoLink(final double now) {
-
 		if (this.meterFromLinkEnd == 0.0) {
 			if (this.thisTimeStepIsGreen == true) {
-				updateBufferCapacity(now);
+				updateBufferCapacity();
 			}
 		} else {
-			updateBufferCapacity(now);
+			updateBufferCapacity();
 		}
 
 		this.maximumFlowCapacity = this.flowCapacity;
@@ -207,11 +185,9 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		}
 
 		this.setThisTimeStepIsGreen(false);
-
 	}
 
 	private void moveStorageQueueToFlowQueue(final double now) {
-
 		Vehicle veh;
 		while ((veh = this.storageQueue.peek()) != null) {
 			if (Math.floor(veh.getDepartureTime_s()) > now) {
@@ -219,9 +195,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			}
 
 			if (veh.getDriver().getDestinationLink().getId() == this.realLink.getLink().getId()) {
-
-				QSim.getEvents().processEvent(
-						new AgentArrivalEvent(now, veh.getDriver().getPerson(),
+				QueueSimulation.getEvents().processEvent(new AgentArrivalEvent(now, veh.getDriver().getPerson(),
 								this.realLink.getLink(), veh.getCurrentLeg()));
 				veh.getDriver().reachActivity(now, this.realLink);
 				this.storageQueue.poll();
@@ -233,13 +207,11 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			}
 
 			if (this.maximumFlowCapacity >= 1.0) {
-				// this.maximumFlowCapacity--;
 				addToFlowQueue(veh, now);
 				this.storageQueue.poll();
 				continue;
 
 			} else if (this.flowCapacityFractionalRest >= 1.0) {
-				// this.flowCapacityFractionalRest--;
 				addToFlowQueue(veh, now);
 				this.storageQueue.poll();
 				break;
@@ -249,15 +221,13 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		}
 	}
 
-	private void updateBufferCapacity(final double time) {
-		// this.flowCapacity = this.realLink.getSimulatedFlowCapacity();
+	private void updateBufferCapacity() {
 		if (this.flowCapacityFractionalRest < 1.0) {
 			this.flowCapacityFractionalRest += this.flowCapacityFraction;
 		}
 	}
 
 	private boolean hasFlowQueueSpace() {
-		// return (this.flowQueue.size() < this.flowCapacityCeil);
 		return ((this.flowQueue.size() < this.flowCapacityCeil) && ((this.flowCapacity >= 1.0) || (this.flowCapacityFractionalRest >= 1.0)));
 	}
 
@@ -268,22 +238,20 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		} else if (this.flowCapacityFractionalRest >= 1.0) {
 			this.flowCapacityFractionalRest--;
 		} else {
-			// throw new RuntimeException("Buffer of link " + this.link.getId()
-			// + " has no space left!");
+			// throw new RuntimeException("Buffer of link " + this.link.getId() + " has no space left!");
 		}
 
 		this.flowQueue.add(veh);
 		veh.setLastMovedTime(now);
 	}
 
-	// TODO [an] Berücksichtigt lediglich die StorageQueue nicht aber die
-	// Fahrzeuge in der FlowQueue - Fehler bei David?
+	// Decision to only consider the StorageQueue when calculating hasSpace
+	// Vehicles stored in the FlowQueue are ignored
 	public boolean hasSpace() {
 		if (this.storageQueue.size() < this.storageCapacity) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private void moveFlowQueueToNextPseudoLink() {
@@ -320,40 +288,20 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	public void addVehicle(Vehicle vehicle) {
 		this.storageQueue.add(vehicle);
-
-		// if(this.amIOriginalLink && this.meterFromLinkEnd != 0){
-		// // It's the original link, but there are other pseudo links
-		// // so we need to start with a 'clean' freeSpeedTravelTime
-		// vehicle.setDepartureTime_s(SimulationTimer.getTime() +
-		// this.freeSpeedTravelTime);
-		// } else if (this.amIOriginalLink && this.meterFromLinkEnd == 0){
-		//
-		// } else if(this.meterFromLinkEnd == 0){
-		// // It's not original link, but there are other pseudo links
-		// vehicle.setDepartureTime_s(Math.floor((SimulationTimer.getTime() +
-		// this.freeSpeedTravelTime + vehicle.getDepartureTime_s() -
-		// Math.floor(vehicle.getDepartureTime_s()))));
-		// } else {
-		// vehicle.setDepartureTime_s(SimulationTimer.getTime() +
-		// this.freeSpeedTravelTime + vehicle.getDepartureTime_s() -
-		// Math.floor(vehicle.getDepartureTime_s()));
-		// }
-
 		if (this.amIOriginalLink) {
 			// It's the original link,
 			// so we need to start with a 'clean' freeSpeedTravelTime
 			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime);
 		} else {
-			// It's not original link,
-			// so there is a fractional rest we add to this link's
-			// freeSpeedTravelTime
+			// It's not the original link,
+			// so there is a fractional rest we add to this link's freeSpeedTravelTime
 			vehicle.setDepartureTime_s(SimulationTimer.getTime() + this.freeSpeedTravelTime
 					+ vehicle.getDepartureTime_s() - Math.floor(vehicle.getDepartureTime_s()));
 		}
 
 		if (this.meterFromLinkEnd == 0) {
 			// It's a nodePseudoLink,
-			// so we have floor the freeLinkTravelTime in order the get the same
+			// so we have to floor the freeLinkTravelTime in order the get the same
 			// results compared to the old mobSim
 			vehicle.setDepartureTime_s(Math.floor(vehicle.getDepartureTime_s()));
 		}
@@ -361,25 +309,17 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	private void moveParkingQueueToParkToLinkQueue(final double now) {
 		Vehicle veh;
-
 		while ((veh = this.parkingQueue.peek()) != null) {
-
 			if (veh.getDepartureTime_s() > now) {
 				break;
 			}
-
 			veh.getDriver().leaveActivity(now);
-
-			QSim.getEvents().processEvent(
-					new AgentDepartureEvent(now, veh.getDriver().getPerson(),
+			QueueSimulation.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver().getPerson(),
 							this.realLink.getLink(), veh.getCurrentLeg()));
-
 			Leg actLeg = veh.getCurrentLeg();
-
 			if (actLeg.getRoute().getRoute().size() != 0) {
 				this.parkToLinkQueue.add(veh);
 			}
-
 			this.parkingQueue.poll();
 		}
 	}
@@ -387,26 +327,19 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	/**
 	 * Move as many waiting cars to the link as it is possible
 	 * 
-	 * @param now
-	 *            the current time
+	 * @param now the current time
 	 */
 	private void moveParkToLinkQueueToFlowQueue(final double now) {
 		Vehicle veh;
-
 		while ((veh = this.parkToLinkQueue.peek()) != null) {
-
 			if (!hasFlowQueueSpace()) {
 				break;
 			}
-
 			addToFlowQueue(veh, now);
-
-			QSim.getEvents().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getPerson(),
+			QueueSimulation.getEvents().processEvent(new AgentWait2LinkEvent(now, veh.getDriver().getPerson(),
 							this.realLink.getLink(), veh.getCurrentLeg()));
-
-			this.parkToLinkQueue.poll(); // remove the just handled vehicle
-											// from parkToLinkQueue
+			 // remove the just handled vehicle from parkToLinkQueue
+			this.parkToLinkQueue.poll();
 		}
 	}
 
@@ -414,40 +347,12 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		this.parkingQueue.add(veh);
 	}
 
-	public Queue<Vehicle> getFlowQueue() {
-		return this.flowQueue;
-	}
-
-	public Queue<Vehicle> getStorageQueue() {
-		return this.storageQueue;
-	}
-
-	public Queue<Vehicle> getParkToLinkQueue() {
-		return this.parkToLinkQueue;
-	}
-
-	public Queue<Vehicle> getParkingQueue() {
-		return this.parkingQueue;
-	}
-
 	public double getMeterFromLinkEnd() {
 		return this.meterFromLinkEnd;
 	}
 
-	public PseudoLink getFromLink() {
-		return this.fromLink;
-	}
-
-	public void setFromLink(PseudoLink fromLink) {
-		this.fromLink = fromLink;
-	}
-
 	public List<PseudoLink> getToLinks() {
 		return this.toLinks;
-	}
-
-	public void setToLinks(List<PseudoLink> toLinks) {
-		this.toLinks = toLinks;
 	}
 
 	boolean flowQueueIsEmpty() {
@@ -462,12 +367,15 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		double now = SimulationTimer.getTime();
 		Vehicle veh = this.flowQueue.poll();
 
-		QSim.getEvents().processEvent(
+		QueueSimulation.getEvents().processEvent(
 				new LinkLeaveEvent(now, veh.getDriver().getPerson(), this.realLink.getLink(), veh.getCurrentLeg()));
 
 		return veh;
 	}
 
+	
+	// --- Methods for Visualizers ---
+	
 	double getMaxPossibleNumberOfVehOnLink() {
 		return this.storageCapacity + this.flowCapacityCeil;
 	}
@@ -490,7 +398,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		// put all cars in the buffer one after the other
 		for (Vehicle veh : this.flowQueue) {
 
-			int lane = this.lane;
+			int lane = this.visualizerLane;
 
 			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
@@ -536,14 +444,14 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			}
 			int cmp = (int) (veh.getDepartureTime_s() + (1.0 / this.realLink.getSimulatedFlowCapacity()) + 2.0);
 			double speed = (now > cmp) ? 0.0 : this.realLink.getLink().getFreespeed(now);
-			int lane = this.lane;
+			int lane = this.visualizerLane;
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					distanceOnLink, lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
 			lastDistance = distanceOnLink;
 		}
 
-		int lane = this.lane; // place them next to the link
+		int lane = this.visualizerLane; // place them next to the link
 
 		/*
 		 * Put the vehicles from the waiting list in positions. Their actual
@@ -563,7 +471,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		 * position doesn't matter, so they are just placed to the coordinates
 		 * of the from node
 		 */
-		lane = this.lane; // place them next to the link
+		lane = this.visualizerLane; // place them next to the link
 		for (Vehicle veh : this.parkingQueue) {
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.realLink.getLink(),
 					((NetworkLayer) this.realLink.getLink().getLayer()).getEffectiveCellSize(), lane, 0.0,
@@ -573,8 +481,10 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	}
 
+	// --- Implementation of Comparable interface ---
+	// Sorts SubLinks of a QueueLink 
+	
 	public int compareTo(PseudoLink otherPseudoLink) {
-
 		if (this.meterFromLinkEnd < otherPseudoLink.meterFromLinkEnd) {
 			return -1;
 		} else if (this.meterFromLinkEnd > otherPseudoLink.meterFromLinkEnd) {
@@ -582,10 +492,6 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		} else {
 			return 0;
 		}
-	}
-
-	public double getFreeSpeedTravelTime() {
-		return this.freeSpeedTravelTime;
 	}
 
 }

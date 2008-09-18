@@ -49,10 +49,11 @@ public class NewSignalSystemControlerImpl extends SignalSystemControler {
 			// Debug only
 //			System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
 			return true;			
-		} else {
+		}
+		// else {
 			return false;
 //			System.out.println(" red " + signalGroupSetting.getSignalGroupDefinition().toString());
-		}
+//		}
 		
 	}
 

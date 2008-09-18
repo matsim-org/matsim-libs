@@ -22,13 +22,16 @@ public class QNode extends QueueNode{
 	public QNode(Node n, QueueNetwork queueNetwork) {
 		super(n,  queueNetwork);
 	}
+	
+	public void setIsSignalizedTrue() {
+		this.isSignalized = true;		
+	}
 
 	/** Simple moveNode, Complex one can be found in {@link QueueLink} */
 	@Override
 	public void moveNode(final double now) {
 
 		if (this.isSignalized == true) {
-
 			// Node is traffic light controlled
 			for (Link link : this.getNode().getInLinks().values()) {
 				QLink qLink = (QLink) this.queueNetwork.getQueueLink(link.getId());
@@ -44,7 +47,6 @@ public class QNode extends QueueNode{
 			}
 
 		} else {
-
 			// Node is NOT traffic light controlled
 			if (this.cacheIsInvalid) {
 				buildCache();
@@ -91,8 +93,7 @@ public class QNode extends QueueNode{
 
 	}
 
-	/** Simple moveNode, Complex one can be found in {@link QueueNode}
-	 * @param pseudoLink */
+	/** Simple moveNode, Complex one can be found in {@link QueueNode} */
 	public boolean moveVehicleOverNode(final Vehicle veh, PseudoLink pseudoLink) {
 		// veh has to move over node
 		Link nextLink = veh.getDriver().chooseNextLink();
@@ -108,17 +109,14 @@ public class QNode extends QueueNode{
 			}
 			return false;
 		}
-
 		return true;
 	}
 	
 	private void buildCache() {
-		this.inLinksArrayCache = new QLink[this.getNode().getInLinks().values()
-				.size()];
+		this.inLinksArrayCache = new QLink[this.getNode().getInLinks().values().size()];
 		int i = 0;
 		for (Link l : this.getNode().getInLinks().values()) {
-			this.inLinksArrayCache[i] = (QLink)this.queueNetwork.getLinks().get(
-					l.getId());
+			this.inLinksArrayCache[i] = (QLink)this.queueNetwork.getLinks().get(l.getId());
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
@@ -132,10 +130,5 @@ public class QNode extends QueueNode{
 		this.tempLinks = new QLink[this.getNode().getInLinks().values().size()];
 		this.cacheIsInvalid = false;
 	}
-
-	public void setIsSignalizedTrue() {
-		this.isSignalized = true;
-		
-	}
-
+	
 }

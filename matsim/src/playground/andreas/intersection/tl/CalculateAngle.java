@@ -33,9 +33,8 @@ public class CalculateAngle {
 
 		if (result.size() == 0){
 			return null;
-		} else {
-			return result.get(result.firstKey());
 		}
+		return result.get(result.firstKey());
 	}
 	
 	/**

@@ -16,6 +16,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
@@ -30,26 +31,20 @@ public class QLink extends QueueLink {
 	private static int spaceCapWarningCount = 0;
 
 	private PseudoLink originalLink = null;
+	private double effectiveCelleSize;
 
 	private ArrayList<PseudoLink> pseudoLinksList = new ArrayList<PseudoLink>();
 	private ArrayList<PseudoLink> nodePseudoLinksList;
-
-
-	/** FreeLinkTravelTime */
-	private double freeSpeedTT;
-	private double effectiveCelleSize;
 
 	public QLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		super(l, queueNetwork, toNode);
 
 		this.effectiveCelleSize = queueNetwork.getNetworkLayer().getEffectiveCellSize();
-
-		this.freeSpeedTT = this.getLink().getLength() / this.getLink().getFreespeed(Time.UNDEFINED_TIME);
-		// Original LinkErstellen, has no LaneId specified in file
+		// Create first link (original link), no LaneId specified in file for this one 
 		this.originalLink = new PseudoLink(this, true, null);
-		// Konfigurieren
-		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME),this.effectiveCelleSize)) {
 
+		// Configure it
+		if(! this.originalLink.recalculatePseudoLinkProperties(0., this.getLink().getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), this.getLink().getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME),this.effectiveCelleSize)) {
 			if ( spaceCapWarningCount <=10 ) {
 				log.warn("Link " + this.getLink().getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
 				if ( spaceCapWarningCount == 10 ) {
@@ -57,15 +52,9 @@ public class QLink extends QueueLink {
 				}
 				spaceCapWarningCount++ ;
 			}
-
 		}
 
 		this.pseudoLinksList.add(this.originalLink);
-	}
-
-	/** Adds a vehicle to the parkingQueue */
-	public void addVehicle2ParkingQueue(Vehicle veh) {
-		this.originalLink.addVehicle2ParkingQueue(veh);
 	}
 
 	@Override
@@ -73,14 +62,8 @@ public class QLink extends QueueLink {
 		this.originalLink.addVehicle2ParkingQueue(veh);
 	}
 
-	public double getFreeSpeedTT() {
-		return this.freeSpeedTT;
-	}
-
-	/** Called by QNetworkLayer */
 	@Override
 	protected boolean moveLink(final double now) {
-
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			pseudoLink.movePseudoLink(now);
 		}
@@ -100,15 +83,13 @@ public class QLink extends QueueLink {
 
 	@Override
 	public void add(final Vehicle veh) {
-
 		double now = SimulationTimer.getTime();
 		activateLink();
 		veh.getDriver().setCurrentLink(this.getLink());
 		this.originalLink.addVehicle(veh);
 
-		QSim.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getPerson(),
-						this.getLink(), veh.getCurrentLeg()));
+		QueueSimulation.getEvents().processEvent(
+				new LinkEnterEvent(now, veh.getDriver().getPerson(), this.getLink(), veh.getCurrentLeg()));
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(){
@@ -116,23 +97,6 @@ public class QLink extends QueueLink {
 			return this.pseudoLinksList;
 		}
 			return this.nodePseudoLinksList;
-	}
-
-	public List<PseudoLink> getNodePseudoLinks(List<Link> destLinks){
-
-		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
-			return this.pseudoLinksList;
-		}
-
-		List<PseudoLink> returnPseudoLinkList = new ArrayList<PseudoLink>();
-		for (PseudoLink pseudoLink : this.nodePseudoLinksList) {
-			for (Link destLink : destLinks) {
-				if(pseudoLink.getDestLinks().contains(destLink)){
-					returnPseudoLinkList.add(pseudoLink);
-				}
-			}
-		}
-		return returnPseudoLinkList;
 	}
 	
 	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
@@ -148,28 +112,21 @@ public class QLink extends QueueLink {
 				throw new Exception("Link is signalized by traffic light with a default signal lane length of 45m, but total links length is less than 60m.\n" +
 									"Minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 
 		boolean firstNodeLinkInitialized = false;
-
 		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 
 		for (BasicLane signalLane : laneToLink.getLanes()) {
 
 			int numberOfLanes_ = signalLane.getNumberOfRepresentedLanes();
 			double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
-//			double flowCapacity_Veh_h = this.getSimulatedFlowCapacity();
-
 			PseudoLink newNodePseudoLink;
 
 			if(!firstNodeLinkInitialized){
-
 				newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
-
-				newNodePseudoLink.setFromLink(this.originalLink);
 				this.originalLink.getToLinks().add(newNodePseudoLink);
 
 				for (Id linkId : signalLane.getToLinkIds()) {
@@ -179,12 +136,10 @@ public class QLink extends QueueLink {
 
 				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s, this.effectiveCelleSize);
 				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME), this.getLink().getFreespeed(Time.UNDEFINED_TIME), averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
-
 				this.pseudoLinksList.add(newNodePseudoLink);
 				firstNodeLinkInitialized = true;
 
 			} else {
-
 				// Now we have the original link and one extension pseudo Link
 				// therefore add additional extension links for the rest of the outLinks
 
@@ -195,7 +150,6 @@ public class QLink extends QueueLink {
 					try {
 						throw new Exception("Not Implemented yet: Every PseudoNode in 15m proximity of an old PseudoNode will be ajected to the old one");
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
@@ -211,8 +165,6 @@ public class QLink extends QueueLink {
 					// New NodePseudoLink will start at originalLink
 
 					newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
-
-					newNodePseudoLink.setFromLink(this.originalLink);
 					this.originalLink.getToLinks().add(newNodePseudoLink);
 
 					for (Id linkId : signalLane.getToLinkIds()) {
@@ -222,19 +174,13 @@ public class QLink extends QueueLink {
 
 					// Only need to fix properties of new link. Original link hasn't changed
 					newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_, freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
-
 					this.pseudoLinksList.add(newNodePseudoLink);
-
 				}
-
 			}
-
 		}
 
 		findLayout();
-
 		addUTurn();
-
 		resortPseudoLinks();
 	}
 
@@ -248,10 +194,6 @@ public class QLink extends QueueLink {
 		}
 
 		Collections.sort(this.pseudoLinksList);
-
-//		for (PseudoLink pseudoLink : nodePseudoLinksList){
-//			this.pseudoLinksList.remove(pseudoLink);
-//		}
 	}
 
 	private void addUTurn(){
@@ -263,12 +205,14 @@ public class QLink extends QueueLink {
 				PseudoLink tempPseudoLink = null;
 				for (PseudoLink pseudoLink : this.pseudoLinksList) {
 
-					if( tempPseudoLink == null || (pseudoLink.lane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
+					if( tempPseudoLink == null || (pseudoLink.visualizerLane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
 						tempPseudoLink = pseudoLink;
 					}
 
 				}
 
+				// TODO [an] Test the U-Turn mechanics
+				
 				tempPseudoLink.addDestLink(outLink);
 				this.originalLink.addDestLink(outLink);
 
@@ -279,18 +223,16 @@ public class QLink extends QueueLink {
 	}
 
 	private void findLayout(){
-
 		SortedMap<Double, Link> result = CalculateAngle.getOutLinksSortedByAngle(this.getLink());
 
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			int lane = 1;
 			for (Link link : result.values()) {
 				if (pseudoLink.getDestLinks().contains(link)){
-					pseudoLink.lane = lane;
+					pseudoLink.visualizerLane = lane;
 					break;
-				} else {
-					lane++;
 				}
+				lane++;
 			}
 		}
 	}
@@ -318,11 +260,9 @@ public class QLink extends QueueLink {
 	 */
 	@Override
 	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
-
 		for (PseudoLink pseudoLink : this.pseudoLinksList) {
 			pseudoLink.getVehPositions(positions);
 		}
-
 	}
 
 }
