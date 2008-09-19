@@ -136,7 +136,7 @@ public abstract class Feature extends Object {
 			final String offsetString)
 	throws IOException {
 
-		if (!Feature.DEFAULT_NAME.equals(this.name)) {
+		if (!(this.name == null) && !this.name.equals(Feature.DEFAULT_NAME)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<name>");
 			out.write(this.name);
@@ -144,7 +144,7 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (!Feature.DEFAULT_DESCRIPTION.equals(this.description)) {
+		if (!(this.description == null) && !this.description.equals(Feature.DEFAULT_DESCRIPTION)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<description>");
 			out.write(this.description);
@@ -152,7 +152,7 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (!Feature.DEFAULT_ADDRESS.equals(this.address)) {
+		if (this.address != null && !this.address.equals(Feature.DEFAULT_ADDRESS)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<address>");
 			out.write(this.address);
@@ -160,11 +160,11 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (!Feature.DEFAULT_LOOK_AT.equals(this.lookAt)) {
+		if (this.lookAt != null && !this.lookAt.equals(Feature.DEFAULT_LOOK_AT)) {
 			this.lookAt.writeObject(out, version, offset, offsetString);
 		}
 
-		if (!Feature.DEFAULT_STYLE_URL.equals(this.styleUrl)) {
+		if (this.styleUrl != null && !this.styleUrl.equals(Feature.DEFAULT_STYLE_URL)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<styleUrl>");
 			out.write(this.styleUrl);
