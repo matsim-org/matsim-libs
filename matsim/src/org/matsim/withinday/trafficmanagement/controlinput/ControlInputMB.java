@@ -315,7 +315,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.linkId) + 1;
 			this.numbersPassedOnInAndOutLinks.put(event.linkId, numbersPassed);
 		}
-		else if (this.outLinksAlternativeRoute.contains(event.linkId)) {
+		else if (this.outLinksAlternativeRoute.contains(event.link)) {
 			int numbersPassed = this.numbersPassedOnInAndOutLinks.get(event.linkId) + 1;
 			this.numbersPassedOnInAndOutLinks.put(event.linkId, numbersPassed);
 		}
