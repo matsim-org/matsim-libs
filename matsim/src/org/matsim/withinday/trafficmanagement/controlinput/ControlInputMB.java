@@ -283,7 +283,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 				}
 			}
 		}
-		if (this.updatetimeinoutflow == Double.NaN) {
+		if (Double.isNaN(this.updatetimeinoutflow)) {
 			this.updatetimeinoutflow = getFreeSpeedRouteTravelTime(this.mainRoute);
 		}
 	}
