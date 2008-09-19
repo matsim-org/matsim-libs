@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -166,9 +167,10 @@ public class SocialNetworkStatistics {
 		}
 		// Then fill the graph using the MatSim ego nets
 		fillGraph(this.g, snet, plans);
-
+		
 		log.info("   MatSim social network converted into a JUNG graph for analysis");
 		log.info("     >> See Palla et al for k-clustering calculations or check JUNG");
+		Gbl.printMemoryUsage();
 		// Now you can run whatever statistics you want on g, its vertices, or
 		// its edges
 

@@ -218,10 +218,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //			You could forget activities here, after the replanning and assignment
 
 			if(CALCSTATS && event.getIteration()%10==0){
+				Gbl.printMemoryUsage();
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
 
+				Gbl.printMemoryUsage();
+				
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
 				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
