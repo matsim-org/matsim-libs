@@ -39,7 +39,7 @@ public class TollTravelCostCalculator implements TravelCost {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
 
-		if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_DISTANCE) this.tollCostHandler = new DistanceTollCostBehaviour();
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) this.tollCostHandler = new DistanceTollCostBehaviour();
 		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) this.tollCostHandler = new AreaTollCostBehaviour();
 		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) this.tollCostHandler = new CordonTollCostBehaviour();
 		else {

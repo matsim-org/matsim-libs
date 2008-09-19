@@ -136,7 +136,7 @@ public abstract class Feature extends Object {
 			final String offsetString)
 	throws IOException {
 
-		if (this.name != Feature.DEFAULT_NAME) {
+		if (!Feature.DEFAULT_NAME.equals(this.name)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<name>");
 			out.write(this.name);
@@ -144,7 +144,7 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (this.description != Feature.DEFAULT_DESCRIPTION) {
+		if (!Feature.DEFAULT_DESCRIPTION.equals(this.description)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<description>");
 			out.write(this.description);
@@ -152,7 +152,7 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (this.address != Feature.DEFAULT_ADDRESS) {
+		if (!Feature.DEFAULT_ADDRESS.equals(this.address)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<address>");
 			out.write(this.address);
@@ -160,11 +160,11 @@ public abstract class Feature extends Object {
 			out.newLine();
 		}
 
-		if (this.lookAt != Feature.DEFAULT_LOOK_AT) {
+		if (!Feature.DEFAULT_LOOK_AT.equals(this.lookAt)) {
 			this.lookAt.writeObject(out, version, offset, offsetString);
 		}
 
-		if (this.styleUrl != Feature.DEFAULT_STYLE_URL) {
+		if (!Feature.DEFAULT_STYLE_URL.equals(this.styleUrl)) {
 			out.write(Object.getOffset(offset, offsetString));
 			out.write("<styleUrl>");
 			out.write(this.styleUrl);
@@ -181,7 +181,7 @@ public abstract class Feature extends Object {
 		}
 
 		// regions don't exist in KML version 2.0
-		if (version == XMLNS.V_21) {
+		if (XMLNS.V_21.equals(version)) {
 			if (this.region != Feature.DEFAULT_REGION) {
 				this.region.writeObject(out, version, offset, offsetString);
 			}

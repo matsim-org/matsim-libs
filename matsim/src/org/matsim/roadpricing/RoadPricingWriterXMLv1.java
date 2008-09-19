@@ -61,7 +61,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 		this.writer.write("\t</links>\n");
 
 		// cost
-		if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_DISTANCE) {
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
 			this.writer.write("\t<!-- amount: [monetary unit] / [link length unit] -->\n");
 		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
 			this.writer.write("\t<!-- amount: [monetary unit] / [simulation] -->\n");
