@@ -23,6 +23,7 @@
  */
 package playground.johannes.snowball;
 
+import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.BufferedWriter;
@@ -43,6 +44,7 @@ import org.matsim.utils.io.IOUtils;
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.VertexDecorator;
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * @author illenberger
@@ -108,6 +110,14 @@ public abstract class GraphPropertyEstimator {
 		}
 	}
 	
+	protected BufferedWriter openWriter(String filename) throws IOException {
+		String path = String.format("%1$s/%2$s", outputDir, filename);
+		BufferedWriter writer = IOUtils.getBufferedWriter(path);
+		dumpStatisticsHeader(writer);
+		files.add(path);
+		return writer;
+	}
+	
 	protected List<String> getStatisticsKeys() {
 		if(statsKeys == null) {
 			statsKeys = new LinkedList<String>();
@@ -149,7 +159,7 @@ public abstract class GraphPropertyEstimator {
 		dumpStatistics(statsMap, iteration, estimWriter);
 	}
 	
-	private void dumpStatistics(TObjectDoubleHashMap<String> statsMap, int iteration, BufferedWriter statsWriter) {
+	protected void dumpStatistics(TObjectDoubleHashMap<String> statsMap, int iteration, BufferedWriter statsWriter) {
 		try {
 			statsWriter.write(String.valueOf(iteration));
 			for(String key : statsKeys) {
@@ -171,6 +181,17 @@ public abstract class GraphPropertyEstimator {
 		statsMap.put(VARIANCE_KEY, stats.getVariance());
 		statsMap.put(SKEWNESS_KEY, stats.getSkewness());
 		statsMap.put(KURTOSIS_KEY, stats.getKurtosis());
+		return statsMap;
+	}
+	
+	protected TObjectDoubleHashMap<String> getStatisticsMap(WeightedStatistics stats) {
+		TObjectDoubleHashMap<String> statsMap = new TObjectDoubleHashMap<String>();
+		statsMap.put(MEAN_KEY, stats.mean());
+		statsMap.put(MIN_KEY, stats.min());
+		statsMap.put(MAX_KEY, stats.max());
+		statsMap.put(VARIANCE_KEY, stats.variance());
+		statsMap.put(SKEWNESS_KEY, stats.skewness());
+		statsMap.put(KURTOSIS_KEY, stats.kurtosis());
 		return statsMap;
 	}
 	
@@ -196,6 +217,41 @@ public abstract class GraphPropertyEstimator {
 				nWriter.write(bin.toString());
 				nWriter.write(TAB);
 				nWriter.write(String.format(Locale.US, FLOAT_FORMAT, (float)freq.getPct(bin)));
+				nWriter.newLine();
+			}
+			
+			aWriter.close();
+			nWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void dumpFrequency(WeightedStatistics freq, int iteration, String name) {
+		try {
+			BufferedWriter aWriter = IOUtils.getBufferedWriter(String.format("%1$s/%2$s.%3$s.histogram.absolute.txt", outputDir, iteration, name));
+			BufferedWriter nWriter = IOUtils.getBufferedWriter(String.format("%1$s/%2$s.%3$s.histogram.normalized.txt", outputDir, iteration, name));
+			
+			aWriter.write("bin\tcount");
+			aWriter.newLine();
+			
+			nWriter.write("bin\tpercentage");
+			nWriter.newLine();
+			
+			TDoubleDoubleHashMap aDistr = freq.absoluteDistribution();
+			TDoubleDoubleHashMap nDistr = freq.normalizedDistribution();
+			double[] keys = aDistr.keys();
+			Arrays.sort(keys);
+			
+			for(double key : keys) {
+				aWriter.write(String.format(Locale.US, FLOAT_FORMAT, key));
+				aWriter.write(TAB);
+				aWriter.write(String.format(Locale.US, FLOAT_FORMAT, aDistr.get(key)));
+				aWriter.newLine();
+				
+				nWriter.write(String.format(Locale.US, FLOAT_FORMAT, key));
+				nWriter.write(TAB);
+				nWriter.write(String.format(Locale.US, FLOAT_FORMAT, nDistr.get(key)));
 				nWriter.newLine();
 			}
 			

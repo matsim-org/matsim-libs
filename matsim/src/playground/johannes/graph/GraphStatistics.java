@@ -24,20 +24,14 @@
 package playground.johannes.graph;
 
 
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.random.generators.ErdosRenyiGenerator;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
@@ -47,7 +41,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.utils.collections.Tuple;
 
 /**
  * @author illenberger
@@ -179,21 +172,7 @@ public class GraphStatistics {
 		return components;
 	}
 	
-	public static Tuple<DescriptiveStatistics, DescriptiveStatistics> getCentralityStatistics(Graph g) {
-		Tuple<TObjectDoubleHashMap<Vertex>, TObjectDoubleHashMap<Vertex>> tuple = getCentrality(g);
-		
-		DescriptiveStatistics bc = new DescriptiveStatistics();
-		for(double d : tuple.getFirst().getValues())
-			bc.addValue(d);
-		
-		DescriptiveStatistics cc = new DescriptiveStatistics();
-		for(double d : tuple.getSecond().getValues())
-			cc.addValue(d);
-		
-		return new Tuple<DescriptiveStatistics, DescriptiveStatistics>(bc, cc);
-	}
-	
-	public static Tuple<TObjectDoubleHashMap<Vertex>, TObjectDoubleHashMap<Vertex>> getCentrality(Graph g) {
+	public static GraphDistance getCentrality(Graph g) {
 		logger.info("Initializing graph for centrality calculation...");
 		CentralityGraph<Vertex> cGraph = new CentralityGraph<Vertex>(g);
 		Queue<CentralityVertex<Vertex>> vertexQueue = new ConcurrentLinkedQueue<CentralityVertex<Vertex>>();
@@ -212,25 +191,53 @@ public class GraphStatistics {
 			thread.start();
 		}
 
+		int diameter = 0;
+		int radius = Integer.MAX_VALUE;
 		for (CentralityThread thread : threads) {
 			try {
 				thread.join();
+				diameter = Math.max(diameter, thread.diameter);
+				radius = Math.min(radius, thread.radius);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
 		
+		double meanBc = 0;
+		double meanBcNorm = 0;
+		int size = cGraph.getVertices().size();
+		double norm = (size - 1) * (size - 2);
 		TObjectDoubleHashMap<Vertex> bcMap = new TObjectDoubleHashMap<Vertex>();
-		for(CentralityVertex<Vertex> v : cGraph.getVertices())
+		TObjectDoubleHashMap<Vertex> bcMapNorm = new TObjectDoubleHashMap<Vertex>();
+		for(CentralityVertex<Vertex> v : cGraph.getVertices()) {
 			bcMap.put(v.getDelegate(), v.getBetweenness());
+			bcMapNorm.put(v.getDelegate(), v.getBetweenness()/norm);
+			meanBc += v.getBetweenness();
+			meanBcNorm += v.getBetweenness()/norm;
+		}
+		meanBc /= cGraph.getVertices().size();
+		meanBcNorm /= cGraph.getVertices().size();
 		
+		double meanCc = 0;
 		TObjectDoubleHashMap<Vertex> ccMap = new TObjectDoubleHashMap<Vertex>();
-		for(CentralityVertex<Vertex> v : cGraph.getVertices())
+		for(CentralityVertex<Vertex> v : cGraph.getVertices()) {
 			ccMap.put(v.getDelegate(), v.getCloseness());
+			meanCc += v.getCloseness();
+		}
+		meanCc /= cGraph.getVertices().size();
 		
+		GraphDistance d = new GraphDistance();
+		d.diatmeter = diameter;
+		d.radius = radius;
+		d.vertexCloseness = ccMap;
+		d.vertexBetweenness = bcMap;
+		d.vertexBetweennessNormalized = bcMapNorm;
+		d.graphCloseness = meanCc;
+		d.graphBetweenness = meanBc;
+		d.graphBetweennessNormalized = meanBcNorm;
 		
-		return new Tuple<TObjectDoubleHashMap<Vertex>, TObjectDoubleHashMap<Vertex>>(bcMap, ccMap);
+		return d;
 	}
 	
 	private static int getNumPaths(UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex v, List<CentralityVertex<Vertex>> vertices) {
@@ -303,9 +310,15 @@ public class GraphStatistics {
 		
 		private Queue<CentralityVertex<Vertex>> vertexQueue;
 		
+		private int diameter;
+		
+		private int radius;
+		
 		public CentralityThread(CentralityGraph<Vertex> cGraph, Queue<CentralityVertex<Vertex>> vertexQueue) {
 			this.vertexQueue = vertexQueue;
 			dijkstra = new UnweightedDijkstra<CentralityVertex<Vertex>>(cGraph);
+			diameter = 0;
+			radius = Integer.MAX_VALUE;
 		}
 		
 		public void run() {
@@ -321,7 +334,7 @@ public class GraphStatistics {
 				time = System.currentTimeMillis();
 				int aplsum = 0;
 				int numPaths;
-				
+				int eccentricity = 0;
 				List<CentralityVertex<Vertex>> passedVertices = new ArrayList<CentralityVertex<Vertex>>();
 				int size2 = vertices.size();
 				for(int k = 0; k < size2; k++) {
@@ -340,9 +353,13 @@ public class GraphStatistics {
 					for(int i = 0; i < size; i++) {
 						passedVertices.get(i).addBetweenness(bc);
 					}
-
-					aplsum += (passedVertices.size() + numPaths)/numPaths;
+					
+					int distance = (passedVertices.size() + numPaths)/numPaths; 
+					aplsum += distance;
+					eccentricity = Math.max(eccentricity, distance);
 				}
+				diameter = Math.max(diameter, eccentricity);
+				radius = Math.min(radius, eccentricity);
 				cTime += System.currentTimeMillis() - time;
 
 				if(size2 == 0)
@@ -351,8 +368,11 @@ public class GraphStatistics {
 					v.setCloseness(aplsum/(double)size2);
 				
 				numVProcessed++;
-				if(numVProcessed % 100 == 0) {
-					logger.info(String.format("Processed %1$s vertices (dijkstra %2$s msec/vertex, centrality %3$s msec/vertex).", numVProcessed, dkTime/100, cTime/100));
+				int div = 1000;
+				if(numVProcessed < 1000)
+					div = 100;
+				if(numVProcessed % div == 0) {
+					logger.info(String.format("Processed %1$s vertices (dijkstra %2$s msec/vertex, centrality %3$s msec/vertex).", numVProcessed, dkTime/div, cTime/div));
 					dkTime = 0;
 					cTime = 0;
 				}
@@ -360,31 +380,82 @@ public class GraphStatistics {
 		}
 	}
 	
-	public static void main(String args[]) {
-		ErdosRenyiGenerator generator = new ErdosRenyiGenerator(200, 0.3);
-		edu.uci.ics.jung.graph.ArchetypeGraph g = generator.generateGraph();
-		Map<ArchetypeVertex, Double> apl = edu.uci.ics.jung.statistics.GraphStatistics.averageDistances(g);
-		double sum = 0;
-		for(Double d : apl.values())
-			sum += d;
-		System.out.println("APL with JUNG: " + sum/(double)apl.size());
-		sum = 0;
-		for(Object v : g.getVertices())
-			sum += ((ArchetypeVertex)v).degree();
-		System.out.println("Degree with JUNG: " + sum/(double)g.getVertices().size());
+	public static class GraphDistance {
 		
-		SparseGraph g2 = new SparseGraph();
-		Map<ArchetypeVertex, SparseVertex> vMapping = new HashMap<ArchetypeVertex, SparseVertex>();
-		for(Object v : g.getVertices()) {
-			vMapping.put((ArchetypeVertex) v, g2.addVertex());
+		private TObjectDoubleHashMap<Vertex> vertexCloseness;
+		
+		private double graphCloseness;
+		
+		private TObjectDoubleHashMap<Vertex> vertexBetweenness;
+		
+		private TObjectDoubleHashMap<Vertex> vertexBetweennessNormalized;
+		
+		private double graphBetweenness;
+		
+		private double graphBetweennessNormalized;
+		
+		private int diatmeter;
+		
+		private int radius;
+		
+		public TObjectDoubleHashMap<Vertex> getVertexCloseness() {
+			return vertexCloseness;
 		}
-		for(Object e : g.getEdges()) {
-			Iterator it = ((ArchetypeEdge)e).getIncidentVertices().iterator();
-			SparseVertex v1 = vMapping.get(it.next());
-			SparseVertex v2 = vMapping.get(it.next());
-			g2.addEdge(v1, v2);
+		
+		public double getGraphCloseness() {
+			return graphCloseness;
 		}
-		System.out.println("APL : " + getCentralityStatistics(g2).getSecond().getMean());
-		System.out.println("Degree: " + getDegreeStatistics(g2).getMean());
+		
+		public TObjectDoubleHashMap<Vertex> getVertexBetweennees() {
+			return vertexBetweenness;
+		}
+		
+		public double getGraphBetweenness() {
+			return graphBetweenness;
+		}
+		
+		public TObjectDoubleHashMap<Vertex> getVertexBetweenneesNormalized() {
+			return vertexBetweennessNormalized;
+		}
+		
+		public double getGraphBetweennessNormalized() {
+			return graphBetweennessNormalized;
+		}
+		
+		public int getDiameter() {
+			return diatmeter;
+		}
+		
+		public int getRadius() {
+			return radius;
+		}
 	}
+	
+//	public static void main(String args[]) {
+//		ErdosRenyiGenerator generator = new ErdosRenyiGenerator(200, 0.3);
+//		edu.uci.ics.jung.graph.ArchetypeGraph g = generator.generateGraph();
+//		Map<ArchetypeVertex, Double> apl = edu.uci.ics.jung.statistics.GraphStatistics.averageDistances(g);
+//		double sum = 0;
+//		for(Double d : apl.values())
+//			sum += d;
+//		System.out.println("APL with JUNG: " + sum/(double)apl.size());
+//		sum = 0;
+//		for(Object v : g.getVertices())
+//			sum += ((ArchetypeVertex)v).degree();
+//		System.out.println("Degree with JUNG: " + sum/(double)g.getVertices().size());
+//		
+//		SparseGraph g2 = new SparseGraph();
+//		Map<ArchetypeVertex, SparseVertex> vMapping = new HashMap<ArchetypeVertex, SparseVertex>();
+//		for(Object v : g.getVertices()) {
+//			vMapping.put((ArchetypeVertex) v, g2.addVertex());
+//		}
+//		for(Object e : g.getEdges()) {
+//			Iterator it = ((ArchetypeEdge)e).getIncidentVertices().iterator();
+//			SparseVertex v1 = vMapping.get(it.next());
+//			SparseVertex v2 = vMapping.get(it.next());
+//			g2.addEdge(v1, v2);
+//		}
+//		System.out.println("APL : " + getCentralityStatistics(g2).getSecond().getMean());
+//		System.out.println("Degree: " + getDegreeStatistics(g2).getMean());
+//	}
 }

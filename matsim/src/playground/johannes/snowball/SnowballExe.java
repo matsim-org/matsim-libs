@@ -79,6 +79,9 @@ public class SnowballExe {
 	private static final String COMPONENT_KEY = "components";
 	
 	private static final String MUTUALITY_KEY = "mutuality";
+	
+	private static final String DISTANCE_KEY = "distance";
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -145,6 +148,8 @@ public class SnowballExe {
 				statistics.put(key, new MutualityStats(outputDir + key, responseRate));
 			} else if(COMPONENT_KEY.equalsIgnoreCase(key)) {
 				statistics.put(key, new ComponentStats(outputDir + key));
+			} else if(DISTANCE_KEY.equalsIgnoreCase(key)) {
+				statistics.put(key, new GraphDistanceStats(outputDir + key));
 			} else {
 				logger.warn(String.format("No class found for statistics \"%1$s\"!", key));
 			}

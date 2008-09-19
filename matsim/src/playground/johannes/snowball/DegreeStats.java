@@ -23,11 +23,21 @@
  */
 package playground.johannes.snowball;
 
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.utils.collections.Tuple;
+import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.VertexDecorator;
+import playground.johannes.statistics.PowerLawFit;
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * @author illenberger
@@ -41,29 +51,56 @@ public class DegreeStats extends GraphPropertyEstimator {
 	}
 	
 	@Override
+	protected List<String> getStatisticsKeys() {
+		List<String> keys = super.getStatisticsKeys();
+		if(keys.size() <= 6) { // FIXME!!!
+			keys.add("gamma");
+			keys.add("xmin");
+		}
+		return keys;
+	}
+
+	@Override
 	public DescriptiveStatistics calculate(GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph, int iteration) {
 		DescriptiveStatistics observed = new DescriptiveStatistics();
 		Frequency observedDistr = new Frequency();
 		
-		DescriptiveStatistics estimated = new DescriptiveStatistics();
-		Frequency estimatedDistr = new Frequency();
+		WeightedStatistics estimated = new WeightedStatistics();
+//		WeightedStatistics estimatedDistr = new WeightedStatistics();
 		
+		try {
+		BufferedWriter vWriter = IOUtils.getBufferedWriter(outputDir + "/values.txt");
 		for(VertexDecorator<SampledVertex> v : graph.getVertices()) {
 			if(!v.getDelegate().isAnonymous()) {
-				
-				estimated.addValue(v.getEdges().size() * v.getDelegate().getNormalizedWeight());
-				estimatedDistr.addValue(v.getEdges().size() * v.getDelegate().getNormalizedWeight());
+				vWriter.write(String.valueOf(v.getEdges().size()));
+				vWriter.newLine();
+				estimated.add(v.getEdges().size(), v.getDelegate().getNormalizedWeight());
+//				estimatedDistr.add(v.getEdges().size(), v.getDelegate().getNormalizedWeight());
 				
 				observed.addValue(v.getEdges().size());
 				observedDistr.addValue(v.getEdges().size());
 				
 			}
 		}
+		vWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		dumpObservedStatistics(getStatisticsMap(observed), iteration);
-		dumpEstimatedStatistics(getStatisticsMap(estimated), iteration);
+		TObjectDoubleHashMap<String> statsMap = getStatisticsMap(observed);
+		Tuple<Double, Double> plfit = PowerLawFit.fit(observed.getValues());
+		statsMap.put("xmin", plfit.getFirst());
+		statsMap.put("gamma", plfit.getSecond());
+		dumpObservedStatistics(statsMap, iteration);
+		
+		statsMap = getStatisticsMap(estimated);
+		plfit = PowerLawFit.fit(estimated.getValues(), estimated.getWeights());
+		statsMap.put("xmin", plfit.getFirst());
+		statsMap.put("gamma", plfit.getSecond());
+		dumpEstimatedStatistics(statsMap, iteration);
+		
 		dumpFrequency(observedDistr, iteration, "observed");
-		dumpFrequency(estimatedDistr, iteration, "estimated");
+		dumpFrequency(estimated, iteration, "estimated");
 		
 		return observed;
 	}

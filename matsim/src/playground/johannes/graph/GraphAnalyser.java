@@ -27,11 +27,11 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.io.IOUtils;
+
+import playground.johannes.graph.GraphStatistics.GraphDistance;
 
 /**
  * @author illenberger
@@ -66,9 +66,12 @@ public class GraphAnalyser {
 		double dcorrelation = GraphStatistics.getDegreeCorrelation(g);
 		logger.info(String.format("Degree correlation is %1$s.", dcorrelation));
 		
-		Tuple<DescriptiveStatistics, DescriptiveStatistics> centrality = GraphStatistics.getCentralityStatistics(g);
-		logger.info(String.format("Betweenness centrality is %1$s.", centrality.getFirst()));
-		logger.info(String.format("Closeness centrality is %1$s.", centrality.getSecond()));
+		GraphDistance gDistance = GraphStatistics.getCentrality(g);
+		logger.info(String.format("Betweenness centrality is %1$s.", gDistance.getGraphBetweenness()));
+		logger.info(String.format("Normalized betweenness centrality is %1$s.", gDistance.getGraphBetweennessNormalized()));
+		logger.info(String.format("Closeness centrality is %1$s.", gDistance.getGraphCloseness()));
+		logger.info(String.format("Diameter is %1$s.", gDistance.getDiameter()));
+		logger.info(String.format("Radius is %1$s.", gDistance.getRadius()));
 		
 		if(args.length > 1) {
 			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);
@@ -98,13 +101,24 @@ public class GraphAnalyser {
 			writer.newLine();
 
 			writer.write("betweenness=");
-			writer.write(String.valueOf(centrality.getFirst().getMean()));
-			writer.newLine();
-			
-			writer.write("closeness=");
-			writer.write(String.valueOf(centrality.getSecond().getMean()));
+			writer.write(String.valueOf(gDistance.getGraphBetweenness()));
 			writer.newLine();
 
+			writer.write("betweennessNorm=");
+			writer.write(String.valueOf(gDistance.getGraphBetweennessNormalized()));
+			writer.newLine();
+
+			writer.write("closeness=");
+			writer.write(String.valueOf(gDistance.getGraphCloseness()));
+			writer.newLine();
+			
+			writer.write("diameter=");
+			writer.write(String.valueOf(gDistance.getDiameter()));
+			writer.newLine();
+
+			writer.write("radius=");
+			writer.write(String.valueOf(gDistance.getRadius()));
+			writer.newLine();
 
 			writer.close();
 		}
