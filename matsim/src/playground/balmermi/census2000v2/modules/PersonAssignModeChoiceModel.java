@@ -83,7 +83,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
 			out.write("pid\tsex\tage\tlicense\tcar_avail\temployed\ttickets\thomex\thomey\t");
-			out.write("subtour_id\tsubtour_purpose\tprev_subtour_id\tsubtour_mode\tsubtour_startx\tsubtour_starty\tsubtour_startudeg\tsubtour_distance\tsubtour_trips\n");
+			out.write("subtour_id\tsubtour_purpose\tprev_subtour_mode\tsubtour_mode\tsubtour_startx\tsubtour_starty\tsubtour_startudeg\tsubtour_distance\tsubtour_trips\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -268,7 +268,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			// bike; // bike ownership
 			if (MatsimRandom.random.nextDouble() < 0.54) { model.setBike(true); } else { model.setBike(false); }
 			// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
-			model.setPrevMode(this.getPrevMode(act_indices.get(0),p));
+			int prev_mode = this.getPrevMode(act_indices.get(0),p);
+			model.setPrevMode(prev_mode);
 			// home_coord; //Coordinates of the home facility of the agent
 			model.setHomeCoord(h_coord);
 			// ride; // states if a car lift is possible, to avoid too much ride instead of pt, to check the reason it works like this
@@ -309,7 +310,13 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				int subtourid = pid*100+i;
 				out.write(subtourid+"\t");
 				out.write(mainpurpose+"\t");
-				out.write((subtourid-1)+"\t");
+				if (prev_mode == 0) { out.write(BasicLeg.Mode.car.toString() + "\t"); }
+				else if (prev_mode == 1) { out.write(BasicLeg.Mode.pt.toString() + "\t"); }
+				else if (prev_mode == 2) { out.write(BasicLeg.Mode.ride.toString() + "\t"); }
+				else if (prev_mode == 3) { out.write(BasicLeg.Mode.bike.toString() + "\t"); }
+				else if (prev_mode == 4) { out.write(BasicLeg.Mode.walk.toString() + "\t"); }
+				else if (prev_mode == -1) { out.write(BasicLeg.Mode.undefined.toString() + "\t"); }
+				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
 				Coord start_coord = ((Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0))).getFacility().getCenter();
 				out.write(start_coord.getX()+"\t");
