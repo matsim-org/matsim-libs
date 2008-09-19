@@ -161,7 +161,6 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			try {
 				outputPopulation.addPerson(testPerson);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -257,7 +256,6 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			testChromosome = new Chromosome(jgapConfiguration, testGenes);
 
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -276,7 +274,6 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		try {
 			outputPopulation.addPerson(testPerson);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

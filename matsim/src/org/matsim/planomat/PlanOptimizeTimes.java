@@ -22,26 +22,23 @@ package org.matsim.planomat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
-import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.event.EventManager;
-import org.jgap.impl.BestChromosomesSelector;
-import org.jgap.impl.ChromosomePool;
-import org.jgap.impl.CrossoverOperator;
+import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
-import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -68,10 +65,13 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 
+	private Random seedGenerator = null;
+	
 	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
-
+		this.seedGenerator = MatsimRandom.getLocalInstance();
+		
 	}
 
 	public void run(final Plan plan) {
@@ -86,6 +86,8 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 			org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
 
+			org.jgap.Configuration.reset();
+			
 			IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 			try {
 				jgapConfiguration.setSampleChromosome(sampleChromosome);
@@ -114,7 +116,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	protected org.jgap.Configuration initJGAPConfiguration() {
 
-		Configuration jgapConfiguration = new Configuration();
+		DefaultConfiguration jgapConfiguration = new DefaultConfiguration();
 
 		try {
 			// the following settings are copied from org.jgap.DefaultConfiguration
@@ -122,26 +124,12 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
 			Configuration.reset();
 
-			// use random seed from config file to initialize JGAP random number generator
-			// use fixed random seed in order to reproduce test results as well as
-			// to have deterministic behavior of the simulation system
-			// TODO use different random seed for each run, e.g. using MatsimRandom.getLocalInstance
-			StockRandomGenerator rng = new StockRandomGenerator();
-			rng.setSeed( Gbl.getConfig().global().getRandomSeed() );
-			jgapConfiguration.setRandomGenerator(rng);
-
-			jgapConfiguration.setEventManager(new EventManager());
-			BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 0.95d);
-			//		BestChromosomesSelector bestChromsSelector = new BestChromosomesSelector(jgapConfiguration, 1 - (1 / popSize));
-			bestChromsSelector.setDoubletteChromosomesAllowed(false);
-			jgapConfiguration.addNaturalSelector(bestChromsSelector, true);
-			//jgapConfiguration.setMinimumPopSizePercent(0);
-			jgapConfiguration.setKeepPopulationSizeConstant(true);
-			jgapConfiguration.setFitnessEvaluator(new DefaultFitnessEvaluator());
-			jgapConfiguration.setChromosomePool(new ChromosomePool());
-			jgapConfiguration.addGeneticOperator(new CrossoverOperator(jgapConfiguration));
-			jgapConfiguration.addGeneticOperator(new MutationOperator(jgapConfiguration));
-
+			// JGAP random number generator is initialized for each run
+			// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
+			long seed = this.seedGenerator.nextLong();
+			//System.out.println("Seed: " + Long.toString(seed));
+			((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
+			
 			// elitist selection (DeJong, 1975)
 			jgapConfiguration.setPreservFittestIndividual(true);
 			jgapConfiguration.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
@@ -244,9 +232,9 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// set mode to result from optimization
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 				int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-				BasicLeg.Mode modeName = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
+				Mode mode = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
 //				System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
-				leg.setMode(modeName);
+				leg.setMode(mode);
 
 				// set arrival time to estimation
 				Act origin = ((Act) plan.getActsLegs().get(ii - 1));
