@@ -23,14 +23,14 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.MatsimRandom;
+import org.matsim.facilities.Activity;
+import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
+import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.balmermi.census2000v2.data.CAtts;
 
 public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -39,7 +39,6 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(PersonAssignPrimaryActivities.class);
-	private final ArrayList<String> list = new ArrayList<String>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -47,10 +46,6 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 
 	public PersonAssignPrimaryActivities() {
 		log.info("    init " + this.getClass().getName() + " module...");
-		list.add(CAtts.ACT_W2); list.add(CAtts.ACT_W3);
-		list.add(CAtts.ACT_EKIGA); list.add(CAtts.ACT_EPRIM);
-		list.add(CAtts.ACT_ESECO); list.add(CAtts.ACT_EHIGH);
-		list.add(CAtts.ACT_EOTHR);
 		log.info("    done.");
 	}
 
@@ -64,21 +59,16 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	}
 
 	public void run(Plan plan) {
+		Knowledge k = plan.getPerson().getKnowledge();
+		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
+		if (k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
+		ArrayList<Activity> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
-			String curr_type = ((Act)plan.getActsLegs().get(i)).getType();
-			if (curr_type.equals(CAtts.ACT_HOME)) {
-				((Act)plan.getActsLegs().get(i)).setPrimary(true);
-			}
-			else if (list.contains(curr_type)) {
-				int j;
-				for (j=i+2; j<plan.getActsLegs().size(); j=j+2) {
-					if (!((Act)plan.getActsLegs().get(j)).getType().equals(curr_type)) { break; }
-				}
-				int r = 2*MatsimRandom.random.nextInt((j-i)/2);
-				Act act = (Act)plan.getActsLegs().get(i+r);
-				act.setPrimary(true);
-				i=j-2;
-			}
+			Act act = (Act)plan.getActsLegs().get(i);
+			String curr_type = act.getType();
+			Activity a = act.getFacility().getActivity(curr_type);
+			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }
+			if (!prim_acts.contains(a)) { k.addActivity(a,false); }
 		}
 	}
 }

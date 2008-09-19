@@ -20,6 +20,9 @@
 
 package playground.balmermi.census2000v2.modules;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -63,11 +66,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private static final String W = "w";
 	private static final String S = "s";
 
-	private static final String RIDE = "ride";
-	private static final String PT = "pt";
-	private static final String CAR = "car";
-	private static final String BIKE = "bike";
-	private static final String WALK = "walk";
+	private FileWriter fw = null;
+	private BufferedWriter out = null;
 
 	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours();
 	private final Municipalities municipalities;
@@ -76,9 +76,19 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignModeChoiceModel(final Municipalities municipalities) {
+	public PersonAssignModeChoiceModel(final Municipalities municipalities, String outfile) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.municipalities = municipalities;
+		try {
+			fw = new FileWriter(outfile);
+			out = new BufferedWriter(fw);
+			out.write("pid\tsex\tage\tlicense\tcar_avail\temployed\ttickets\thomex\thomey\t");
+			out.write("subtour_id\tsubtour_purpose\tprev_subtour_id\tsubtour_mode\tsubtour_startx\tsubtour_starty\tsubtour_startudeg\tsubtour_distance\tsubtour_trips\n");
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		log.info("    done.");
 	}
 
@@ -282,9 +292,53 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				Leg l = (Leg)p.getActsLegs().get(leg_indices.get(j));
 				l.setMode(mode);
 			}
+			
+			// write a line
+			try {
+				int pid = Integer.parseInt(person.getId().toString());
+				out.write(pid+"\t");
+				out.write(person.getSex()+"\t");
+				out.write(person.getAge()+"\t");
+				out.write(person.getLicense()+"\t");
+				out.write(person.getCarAvail()+"\t");
+				out.write(person.getEmployed()+"\t");
+				if (person.getTravelcards() != null) {  out.write("yes\t"); }
+				else {  out.write("no\t"); }
+				out.write(h_coord.getX()+"\t");
+				out.write(h_coord.getY()+"\t");
+				int subtourid = pid*100+i;
+				out.write(subtourid+"\t");
+				out.write(mainpurpose+"\t");
+				out.write((subtourid-1)+"\t");
+				out.write(mode.toString()+"\t");
+				Coord start_coord = ((Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0))).getFacility().getCenter();
+				out.write(start_coord.getX()+"\t");
+				out.write(start_coord.getY()+"\t");
+				out.write(this.getUrbanDegree(act_indices,p)+"\t");
+				out.write(this.calcTourDistance(act_indices,p)+"\t");
+				out.write(leg_indices.size()+"\n");
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 	}
 	
 	public void run(Plan plan) {
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// close method
+	//////////////////////////////////////////////////////////////////////
+
+	public final void close() {
+		try {
+			out.flush();
+			out.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 }

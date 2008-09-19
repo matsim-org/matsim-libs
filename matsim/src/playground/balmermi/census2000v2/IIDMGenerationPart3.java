@@ -107,7 +107,8 @@ public class IIDMGenerationPart3 {
 		//////////////////////////////////////////////////////////////////////
 		
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonAssignModeChoiceModel(municipalities));
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt");
+		pop.addAlgorithm(pamcm);
 		pop.addAlgorithm(new PersonAssignPrimaryActivities());
 		log.info("  done.");
 
@@ -118,6 +119,7 @@ public class IIDMGenerationPart3 {
 		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
 		pop.printPlansCount();
 		pop_writer.write();
+		pamcm.close();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
