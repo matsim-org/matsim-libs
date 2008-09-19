@@ -61,7 +61,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	public void run(Plan plan) {
 		Knowledge k = plan.getPerson().getKnowledge();
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
-		if (k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
+		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
 		ArrayList<Activity> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getActsLegs().size(); i=i+2) {
 			Act act = (Act)plan.getActsLegs().get(i);
