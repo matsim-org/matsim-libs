@@ -16,8 +16,9 @@ public class ActivityActReader {
 	private BufferedReader br = null;
 	private int[] iter;
 	private String[] pId;
+	private String[] fId;
 	private String[] acttype;
-	private int[] readActId;
+//	private int[] readActId;
 	private int iteration=-1;
 	private boolean tapeAtStartPosition=false;
 	private String thisLineOfData=null;
@@ -84,8 +85,8 @@ public class ActivityActReader {
 
 				iter[i] = Integer.valueOf(s[0]).intValue();
 				pId[i] = s[1];
-				acttype[i] =s[2];
-				readActId[i] =Integer.valueOf(s[3]).intValue();
+				fId[i] =s[2];
+				acttype[i] =s[3];
 				i++;
 			}
 		} catch (NumberFormatException e) {
@@ -139,9 +140,9 @@ public class ActivityActReader {
 				thisLineOfData=br.readLine();
 			}
 
-			int jjj=Integer.valueOf(thisLineOfData.split(patternStr)[1]).intValue();
+			int jjj=Integer.valueOf(thisLineOfData.split(patternStr)[2]).intValue();
 			myFacId=new IdImpl(jjj);
-			myType=thisLineOfData.split(patternStr)[2];
+			myType=thisLineOfData.split(patternStr)[3];
 			tapeAtStartPosition=false;
 
 		} catch (NumberFormatException e) {
@@ -173,7 +174,7 @@ public class ActivityActReader {
 	public String[] getActivityType(){
 		return acttype;
 	}
-	public int[] actId(){
-		return readActId;
+	public String[] fId(){
+		return fId;
 	}
 }

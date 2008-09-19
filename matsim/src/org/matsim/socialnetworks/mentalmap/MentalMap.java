@@ -101,7 +101,8 @@ public class MentalMap {
 			if(this.knowledge.getActivities(myAct.getType()).size()>0){
 				myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 				myAct.setFacility(myActivity.getFacility());
-				this.knowledge.addActivity(myActivity);
+				//TODO JH add logic to label this activity primary or secondary
+				this.knowledge.addActivity(myActivity, false);
 //				learnActsActivities(myAct,myActivity);
 			}
 
@@ -119,7 +120,8 @@ public class MentalMap {
 				myActivity = f.getActivity(myAct.getType());
 				if(myActivity!=null){
 					myAct.setFacility(myActivity.getFacility());
-					this.knowledge.addActivity(myActivity);
+					//TODO JH add logic to label this activity primary or secondary
+					this.knowledge.addActivity(myActivity,false);
 //					learnActsActivities(myAct,myActivity);
 				}
 			}
@@ -138,11 +140,15 @@ public class MentalMap {
 
 			TreeMap<Id,String> nextFac = aar.getNextPoint();
 			Id myFacilityId = nextFac.firstKey();
-			String myActivityType=nextFac.get(myFacilityId);
+//			String myActivityType=nextFac.get(myFacilityId);
+			String myActivityType=myAct.getType();
 
 			Facility fac = facilities.getFacilities().get(myFacilityId);
-			myAct.setFacility(fac);
-			this.knowledge.addActivity(fac.getActivity(myActivityType));
+//			myAct.setFacility(fac);
+//			this.knowledge.addActivity(fac.getActivity(myActivityType));
+			//TODO JH apply some logic to label this a primary or secondary location
+			Activity myActivity=fac.getActivity(myActivityType);
+			this.knowledge.addActivity(myActivity,false);
 		}
 
 	}
@@ -254,7 +260,8 @@ public class MentalMap {
 
 	public void addActivity(Activity myActivity){
 		// Adds unmapped activity to mental map without associating it with an act
-		this.knowledge.addActivity(myActivity);
+		//TODO JH add logic to label this activity primary or secondary
+		this.knowledge.addActivity(myActivity,false);
 		setActivityScore(myActivity);
 	}
 
