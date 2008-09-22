@@ -103,10 +103,16 @@ public class QSim extends QueueSimulation {
 		}
 		
 		for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
-			basicLightSignalGroupDefinition.setResponsibleLSAControler(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()));
-			QLink qLink = (QLink) this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
-			qLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
-			((QNode) this.network.getNodes().get(qLink.getLink().getToNode().getId())).setIsSignalizedTrue();
+			
+			if(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()) == null){
+				log.warn("Signal group defined, but corresponding controler with Id " + basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId() + " is missing." +
+						"Therefore signal group will be dropped.");
+			} else {
+				basicLightSignalGroupDefinition.setResponsibleLSAControler(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()));
+				QLink qLink = (QLink) this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
+				qLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+				((QNode) this.network.getNodes().get(qLink.getLink().getToNode().getId())).setIsSignalizedTrue();
+			}
 		}
 	}
 

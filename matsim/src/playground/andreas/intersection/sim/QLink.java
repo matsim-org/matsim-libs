@@ -72,8 +72,22 @@ public class QLink extends QueueLink {
 
 	@Override
 	protected boolean bufferIsEmpty() {
-		this.originalLink.setThisTimeStepIsGreen(true);
-		return this.originalLink.flowQueueIsEmpty();
+		for (PseudoLink subLink : this.pseudoLinksList) {
+			subLink.setThisTimeStepIsGreen(true);
+		}
+		
+		if(this.nodePseudoLinksList == null){
+//			this.originalLink.setThisTimeStepIsGreen(true);
+			return this.originalLink.flowQueueIsEmpty();
+		}
+		
+		for (PseudoLink subLink : this.nodePseudoLinksList) {
+			if(!subLink.flowQueueIsEmpty()){
+				return subLink.flowQueueIsEmpty();
+			}
+		}
+		
+		return true;
 	}
 
 	@Override
@@ -108,12 +122,8 @@ public class QLink extends QueueLink {
 	public void reconfigure(BasicLanesToLinkAssignment laneToLink, QueueNetwork queueNetwork) {
 
 		if (this.getLink().getLength() < 60){
-			try {
-				throw new Exception("Link is signalized by traffic light with a default signal lane length of 45m, but total links length is less than 60m.\n" +
-									"Minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended." +
+				"Recommended minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
 		}
 
 		boolean firstNodeLinkInitialized = false;

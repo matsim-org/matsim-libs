@@ -101,8 +101,16 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	public boolean recalculatePseudoLinkProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m,
 			int numberOfLanes, double freeSpeed_m_s, double averageSimulatedFlowCapacityPerLane_Veh_s,
 			double effectiveCellSize) {
-
-		this.length_m = lengthOfPseudoLink_m;
+		
+		if(lengthOfPseudoLink_m < 15){
+			log.warn("Length of one of link " + this.realLink.getLink().getId() + " sublinks is less than 15m." +
+					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
+					" at the original link.");
+			this.length_m = 15.0;
+		} else {
+			this.length_m = lengthOfPseudoLink_m;
+		}
+		
 		this.meterFromLinkEnd = meterFromLinkEnd_m;
 		this.freeSpeedTravelTime = this.length_m / freeSpeed_m_s;
 
