@@ -50,7 +50,7 @@ public class PlanomatControlerTest extends MatsimTestCase {
 	public void testMainCarPt() {
 
 		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
-		
+
 		PlanomatControler.main(args);
 
 		// actual test: compare checksums of the files

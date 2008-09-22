@@ -177,12 +177,20 @@ public class PlanomatConfigGroup extends Module {
 		return possibleModes;
 	}
 
+	public void setPopSize(int popSize) {
+		this.popSize = popSize;
+	}
+
 	public String getLegTravelTimeEstimatorName() {
 		return legTravelTimeEstimatorName;
 	}
 
 	public void setPossibleModes(String possibleModes) {
 		this.possibleModes = possibleModes;
+	}
+
+	public void setJgapMaxGenerations(int jgapMaxGenerations) {
+		this.jgapMaxGenerations = jgapMaxGenerations;
 	}
 
 }
