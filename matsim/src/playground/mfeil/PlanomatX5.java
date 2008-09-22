@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX2.java
+ * PlanomatX5.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -43,6 +43,7 @@ import java.util.ArrayList;
  * PlanomatX2 now includes full TS functionality over more than 1 iteration. Neighbourhood definition is through
  * changing the order of the activities only. Next tasks to implement also changing of type and
  * number of activities. A refined tabu determination and re-calculation is to come up as well.
+ * Like PlanomatX4 but with nonTabuInNeighbourhood array replaced by bestPlan field.
  */
 
 public class PlanomatX5 implements org.matsim.population.algorithms.PlanAlgorithm { 
@@ -67,8 +68,8 @@ public class PlanomatX5 implements org.matsim.population.algorithms.PlanAlgorith
 		router 					= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		scorer 					= new PlanomatXPlanScorer (factory);
 		NEIGHBOURHOOD_SIZE 		= 10;				//TODO @MF: constants to be configured externally, sum must be smaller or equal than 1.0
-		WEIGHT_CHANGE_ORDER 	= 0.5; 
-		WEIGHT_CHANGE_NUMBER 	= 0.5;
+		WEIGHT_CHANGE_ORDER 	= 1.0; 
+		WEIGHT_CHANGE_NUMBER 	= 0.0;
 		//weightChangeType	 	= 0.0;
 		WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
 		MAX_ITERATIONS 			= 80;
