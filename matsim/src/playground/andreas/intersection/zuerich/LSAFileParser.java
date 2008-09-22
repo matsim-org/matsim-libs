@@ -1,4 +1,4 @@
-package playground.andreas.intersection.tl;
+package playground.andreas.intersection.zuerich;
 
 import java.io.BufferedWriter;
 import java.io.File;
