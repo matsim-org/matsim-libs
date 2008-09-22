@@ -87,6 +87,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 	private double flowCapacityFractionalRest = 1.0;
 	private double maximumFlowCapacity = 0.;
 	private boolean thisTimeStepIsGreen = false;
+	private boolean missingSignalGroupWarningWritten = false;
 
 	/** For Visualization only */
 	int visualizerLane = 1;
@@ -145,10 +146,20 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	public boolean firstVehCouldMove() {
 		if (this.sgsOnThisSubLink == null) {
-			log.fatal("This should never happen, since every LaneLink at a signalized" +
-					" intersection should have at least one signal(group)");
+			if(this.missingSignalGroupWarningWritten == false){
+				log.fatal("This should never happen, since every lane link at a signalized intersection" +
+					" should have at least one signal(group). Please check integrity of traffic light data on link " + 
+					this.realLink.getLink().getId() + " lane " + this.laneLinkIdSpecifiedInFile + ". Allowing to move anyway.");
+				this.missingSignalGroupWarningWritten = true;
+			}
+			this.setThisTimeStepIsGreen(true);
+			if(this.getFirstFromBuffer() != null){
+				return true;
+			}
+			return false;
 		}
 
+		// Everything seems to be normal, so proceed
 		boolean firstVehInQueueCouldMove = false;
 
 		for (BasicLightSignalGroupDefinition signalGroup : this.sgsOnThisSubLink) {
