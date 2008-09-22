@@ -3,6 +3,7 @@ package playground.wrashid.PHV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -69,9 +70,9 @@ public class CreatePlans1 {
 
 
 			Knowledge k = person.createKnowledge("");
-			k.addActivity(home);
-			k.addActivity(work);
-			k.addActivity(shop);
+			k.addActivity(home,false);
+			k.addActivity(work,false);
+			k.addActivity(shop,false);
 
 			Plan plan = person.createPlan(true);
 			Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();
@@ -92,11 +93,11 @@ public class CreatePlans1 {
 			// home: 17.30-0:00
 			
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,depTimeHome,depTimeHome,false);
-			plan.createLeg("car",depTimeHome,0.0,depTimeHome);
+			plan.createLeg(BasicLeg.Mode.car,depTimeHome,0.0,depTimeHome);
 			plan.createAct("work",work_facility.getCenter().getX(),work_facility.getCenter().getY(),work_facility.getLink(),depTimeHome,depTimeWork,depTimeWork-depTimeHome,false);
-			plan.createLeg("car",depTimeWork,0.0,depTimeWork);
+			plan.createLeg(BasicLeg.Mode.car,depTimeWork,0.0,depTimeWork);
 			plan.createAct("shop",shop_facility.getCenter().getX(),shop_facility.getCenter().getY(),shop_facility.getLink(),depTimeWork,depTimeShop,depTimeShop-depTimeWork,false);
-			plan.createLeg("car",depTimeShop,0.0,depTimeShop);
+			plan.createLeg(BasicLeg.Mode.car,depTimeShop,0.0,depTimeShop);
 			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),depTimeShop,mitterNacht,mitterNacht-depTimeShop,false);
 			// assign home-work-home activities to each person
 
