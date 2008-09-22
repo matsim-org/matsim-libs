@@ -103,10 +103,13 @@ public class QControler extends Controler {
 //			config = Gbl.createConfig(args);
 //		}
 
-		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
-		final String newLSADef = "./src/playground/andreas/intersection/test/data/fourways/lsa.xml";
-		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
-		config.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml");
+		config = Gbl.createConfig(new String[] {args[0]});
+//		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
+		final String newLSADef = args[1];
+//		final String newLSADef = "./src/playground/andreas/intersection/test/data/fourways/lsa.xml";
+		final String newLSADefCfg = args[2];
+//		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
+//		config.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml");
 
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/twoways/config.xml"});
 //		final String newLSADef = "./src/playground/andreas/intersection/test/data/twoways/lsa_2.xml";
