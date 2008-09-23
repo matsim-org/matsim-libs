@@ -29,9 +29,9 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.balmermi.census2000.models.ModelLicenseOwnership;
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
+import playground.balmermi.census2000v2.models.ModelLicenseOwnershipV2;
 
 public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -46,7 +46,9 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	private static final String MALE = "m";
 	private static final String NO = "no";
 	private static final String YES = "yes";
-	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
+//	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
+	private final ModelLicenseOwnershipV2 model = new ModelLicenseOwnershipV2();
+//	private final ModelLicenseOwnershipV3 model = new ModelLicenseOwnershipV3();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -124,9 +126,9 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		model.setUrbanDegree(hh.getMunicipality().getRegType());
 		
 		// calc and assign license ownership
-		boolean hasLicense = model.calcLicenseOwnership();
+		boolean hasLicense = false;
+		if (person.getAge() >= 18) { hasLicense = model.calcLicenseOwnership(); }
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
-		if ((person.getAge() < 18) && (hasLicense)) { person.setLicence(NO); }
 	}
 
 	public void run(Plan plan) {
