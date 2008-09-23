@@ -20,6 +20,7 @@ public class Vehicle extends SimUnit {
 	private Link currentLink = null;
 	private int linkIndex;
 	private Link[] currentLinkRoute=null;
+	private Link test_previousCurrentLink=null;
 
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
@@ -118,6 +119,7 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void setCurrentLink(Link currentLink) {
+		test_previousCurrentLink=this.currentLink;
 		this.currentLink = currentLink;
 	}
 
@@ -159,6 +161,11 @@ public class Vehicle extends SimUnit {
 			scheduleLeavePreviousRoadMessage(scheduleTime);
 		}
 		
+		if (scheduleTime>47000 && getOwnerPerson().getId().toString().equalsIgnoreCase("483820")){
+			assert(false);
+		}
+		
+		
 		if (isEndingLegMode()) {
 			// attention: as we are not actually entering the road, we need to
 			// give back the promised space to the road
@@ -176,7 +183,6 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
-		
 		Road previousRoad=null;
 		Link previousLink=null;
 		if (this.getLinkIndex()==0){
@@ -190,6 +196,8 @@ public class Vehicle extends SimUnit {
 			//System.out.println("BscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
 			previousRoad=Road.allRoads.get(previousLink.getId().toString());
 		}
+		
+		assert(previousLink.getId().toString().equalsIgnoreCase(test_previousCurrentLink.getId().toString()));
 		
 		scheduleLeaveRoadMessage(scheduleTime, previousRoad);
 		

@@ -14,6 +14,9 @@ public class DeadlockPreventionMessage extends EventMessage {
 			//road.removeFromInterestedInEnteringRoad(vehicle);
 			
 			vehicle.scheduleEnterRoadMessage(messageArrivalTime, road);
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && road.getLink().getId().toString().equalsIgnoreCase("7759")) {
+				System.out.println(road.getLink().getId().toString());
+			}
 			//System.out.println("Deadlock prevention happend");
 		}
 	}

@@ -12,8 +12,8 @@ public class LeaveRoadMessage extends EventMessage {
 		//System.out.println("leave road message");
 		Road road=(Road)this.receivingUnit;
 		synchronized (road){
-			road.simTime=messageArrivalTime;
-			road.leaveRoad(vehicle);
+			//road.simTime=messageArrivalTime;
+			road.leaveRoad(vehicle,messageArrivalTime);
 		}
 		
 		//System.out.println("leave road: " + road.getLink().getId() + "; vehicle: " + vehicle.getOwnerPerson().getId());

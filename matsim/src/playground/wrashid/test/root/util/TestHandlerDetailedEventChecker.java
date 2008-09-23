@@ -15,14 +15,17 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
 import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.PDES2.Road;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
+
 
 public class TestHandlerDetailedEventChecker extends TestHandler {
 
@@ -93,19 +96,34 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		
 		// check, that each enter event is followed by a leave event 
 		// check, that the same road is left, which is entered
+		// TODO: time of leave and enter is the same...
 		for (LinkedList<BasicEvent> list:events.values()){
 			for (int i=0;i<list.size();i++){
 				if (list.get(i) instanceof LinkEnterEvent){
-					assertEquals(true, list.get(i+1) instanceof LinkLeaveEvent);
+					
+					try{
+						assertEquals(true, list.get(i+1) instanceof LinkLeaveEvent);
+					} catch (Exception e){
+						for (int j=0;j<list.size();j++){
+							System.out.println(list.get(j));
+						}
+						e.printStackTrace();
+						System.exit(0);
+					}
+					
 					
 					LinkEnterEvent enterEvent=(LinkEnterEvent)list.get(i);
 					LinkLeaveEvent leaveEvent=(LinkLeaveEvent)list.get(i+1);
 					//System.out.println(enterEvent);
-					//if (enterEvent.link!=leaveEvent.link){
-					//	System.out.println(leaveEvent.link.getId());
-					//	System.out.println(leaveEvent.agentId);
-					//	System.out.println(enterEvent.linkId);
-					//}
+					if (!enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId)){
+						for (int j=0;j<list.size();j++){
+							System.out.println(list.get(j));
+						}
+						System.out.println("===========error===========");
+						System.out.println(enterEvent.toString());
+						System.out.println(leaveEvent.toString());
+					}
+					
 					assertEquals(true, enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId));
 				}				
 			}
@@ -281,6 +299,11 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 			expected.expectedLinkLeaveEvents=expected.expectedLinkEnterEvents;
 			
 			expectedNumberOfMessages.put(p.getId().toString(), expected);
+			
+			if (p.getId().toString().equalsIgnoreCase("483820")){
+				printPlan(plan);
+			}
+			
 		}
 	}
 	
@@ -289,6 +312,17 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		public int expectedLinkLeaveEvents;
 		public int expectedDepartureEvents;
 		public int expectedArrivalEvents; 
+	}
+	
+	private void printPlan(Plan plan){
+		LegIterator iter=plan.getIteratorLeg();
+		while (iter.hasNext()){
+			Leg leg=(Leg)iter.next();
+			for (Link link:leg.getRoute().getLinkRoute()){
+				System.out.print(link.getId() + "("+ Road.allRoads.get(link.getId().toString()).getZoneId() +")" + "-");
+			}
+			System.out.println();
+		}	
 	}
 
 }

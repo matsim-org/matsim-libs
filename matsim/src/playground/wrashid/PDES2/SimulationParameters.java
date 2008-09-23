@@ -12,6 +12,7 @@ import org.matsim.events.handler.EventHandler;
 import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
 import playground.wrashid.PDES.util.PriorityConcurrentListMPDSC;
+import playground.wrashid.PDES.util.SimplePriorityConcurrentListMPDSC;
 import playground.wrashid.test.root.util.PopulationModifier;
 import playground.wrashid.test.root.util.TestHandler;
 
@@ -116,6 +117,7 @@ public class SimulationParameters {
 	}
 
 	synchronized private static void bufferEvent(BasicEvent event, int producerId) {
+		
 		if (event instanceof AgentDepartureEvent
 				|| event instanceof AgentArrivalEvent) {
 			//if (event.agentId.equalsIgnoreCase("2400337")){
@@ -151,7 +153,9 @@ public class SimulationParameters {
 	public static double noOfCarsLeft = 0;
 	public static double noOfCarsRight = 0;
 	public static double noOfCars = 0;
-	public static PriorityConcurrentListMPDSC eventBuffer = new PriorityConcurrentListMPDSC(
+	// does not work properly, needs to be debugged first (must pass test)
+	// TODO: replace again by efficient version, when it works...
+	public static SimplePriorityConcurrentListMPDSC eventBuffer = new SimplePriorityConcurrentListMPDSC(
 			SimulationParameters.numberOfMessageExecutorThreads, 200000,100000);
 
 	public static double test_timer = 0;

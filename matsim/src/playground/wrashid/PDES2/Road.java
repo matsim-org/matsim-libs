@@ -31,7 +31,7 @@ public class Road extends SimUnit {
 	private double timeOfLastEnteringVehicle = Double.MIN_VALUE;
 	private double timeOfLastLeavingVehicle = Double.MIN_VALUE;
 	public RoadEntryHandler roadEntryHandler = null;
-	public double simTime=0;
+	//public double simTime=0;
 	
 	public PriorityQueue<Message> lookahead=new PriorityQueue<Message>();
 	
@@ -180,7 +180,7 @@ public class Road extends SimUnit {
 
 	}
 
-	 public void leaveRoad(Vehicle vehicle) {
+	 public void leaveRoad(Vehicle vehicle, double simTime) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		
 		 if (carsOnTheRoad.isEmpty()){
@@ -231,6 +231,12 @@ public class Road extends SimUnit {
 
 			nextVehicle.scheduleEnterRoadMessage(
 					nextAvailableTimeForEnteringStreet, this);
+			
+			if (nextVehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
+				if (simTime>47000){
+					assert(false);
+				}
+			}
 		} else {
 			if (gap != null) {
 				// as long as the road is not full once, there is no need to
@@ -262,12 +268,14 @@ public class Road extends SimUnit {
 	// returns the time, when the car reaches the end of the road
 	// TODO: instead of returning the scheduling time, just schedule messages
 	// here...
-	public void enterRoad(Vehicle vehicle) {
+	public void enterRoad(Vehicle vehicle, double simTime) {
 
 		// vehicle.leavePreviousRoad();
 
-		if (link.getId().toString().equalsIgnoreCase("110915")) {
-			//System.out.println("enter Road:" + Scheduler.simTime);
+		if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
+			if (simTime>47000){
+				assert(false);
+			}
 		}
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
@@ -308,7 +316,7 @@ public class Road extends SimUnit {
 	// handled later
 	// => TODO: remove the return value. Scheduling the car etc. should be done
 	// by the vehicle
-	public void enterRequest(Vehicle vehicle) {
+	public void enterRequest(Vehicle vehicle,double simTime) {
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 		
 		// attention: do not use in multi thread solution (might return false result)
@@ -361,8 +369,17 @@ public class Road extends SimUnit {
 					simTime), arrivalTimeOfGap);
 
 			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
+			
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
+				if (simTime>47000){
+					assert(false);
+				}
+			}
+			
+			
 			vehicle.scheduleEnterRoadMessage(
 					nextAvailableTimeForEnteringStreet, this);
+			
 		} else {
 
 			if (link.getId().toString().equalsIgnoreCase("110915")) {

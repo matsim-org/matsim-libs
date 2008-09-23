@@ -6,6 +6,25 @@ evtl. zwei bugs (wrong times + wrong order => PriorityConcurrencyList müsste ja 
 machen)
 
 
+=> I must repair PriorityConcurrentListMPDSC (and its associated classes => test it thouroughly
+=> thereafter enable it again in the simulation parameters.
+
+=> I suspect: da alle events vorhanden sind, aber die zeiten einiger events falsch sind, passiert
+   irgendwas mit racecondition beim setzen der zeiten...
+   oder, out of order von den roads...????
+=> es scheint sogar auf dem gleichen cpu  zu passieren...
+=> durcheinander scheint nur mit der zeit zu passieren, aber nicht mit der road order (vehicle.test_previousCurrentLink asserts bestätigen dies)
+
+=> some events are missing (we have enter link event, and then nothing more (not leave event, or arrival...)
+=> not really: departure event is totally out of order (happens at wrong time)
+=> it really seams, that there is a mess with the time stamp
+
+=> aus irgendeinen grund passiert der zweite teil des legs vor dem ersten teil des legs (wieso???)
+    => passiert der zweite teil des legs auf einem anderen cpu als der erste teil?
+    
+
+
+
 - test case: just start one executorThread => expected behaviour: the other exectorTrhead 
   shouldn't be able to continue
 -   
@@ -16,3 +35,13 @@ machen)
 
 - evtl. noch zeit kontrollieren für einen agenten detailliert?
 - ein leg kann nicht schneller zurückgelegt werden als die mindestlänge der strecke
+
+
+
+
+
+
+
+// solved:
+- wieso gibt es soviele events im letzten Bucket?
+  + wieso werden nicht alle buckets gezählt???

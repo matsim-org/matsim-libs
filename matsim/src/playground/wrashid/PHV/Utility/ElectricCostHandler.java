@@ -115,7 +115,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventH
 		double chargingPower=3500; //  in J/s (=Watt) 
 		//default: 3.5KW => 3500 W
 		double costPerJuleAtWork=-1; // in "util"/Euro per Jule
-		// 0.03 Euro / kWh = 3600000J => 8.3333333333333333333333333333333e-10
+		// 0.09 Euro / kWh = 3600000J => 0.000000025 "euro per jule"
 		double costPerJuleAtShop=-1;
 		
 		

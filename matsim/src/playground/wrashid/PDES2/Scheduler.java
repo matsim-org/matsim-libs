@@ -74,7 +74,8 @@ public class Scheduler {
 	
 					//Gbl.printMemoryUsage();
 				
-					SimulationParameters.processEventBuffer();
+					// uncomment, this when eventBuffer is repaired
+					//SimulationParameters.processEventBuffer();
 					Thread.currentThread().sleep(1000);
 				} else {
 					simulationTerminated=true;

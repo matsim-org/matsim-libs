@@ -31,14 +31,16 @@ import playground.wrashid.test.root.util.TestHandlerDetailedEventChecker;
 public class PDESStarter2Test extends MatsimTestCase {
 
 	public void testScenarios() {
-		t_equilPlans1();
+		//t_equilPlans1();
 		Gbl.reset();
 		
-		t_equilEvent();
+		//t_equilEvent();
 		Gbl.reset();
 		
 		t_Berlin();
 		Gbl.reset();
+		// only comment this, when test stabelized again.
+		assertEquals(true, false);
 	}
 	
 	
