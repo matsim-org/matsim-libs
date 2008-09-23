@@ -28,7 +28,6 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 public class PseudoLink implements Comparable<PseudoLink> {
 
 	/** Logger */
-	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QLink.class);
 
 	/** Id of the real link, null if this is not the first/original <code>PseudoLink</code> */
@@ -341,8 +340,12 @@ public class PseudoLink implements Comparable<PseudoLink> {
 			QueueSimulation.getEvents().processEvent(new AgentDepartureEvent(now, veh.getDriver().getPerson(),
 							this.realLink.getLink(), veh.getCurrentLeg()));
 			Leg actLeg = veh.getCurrentLeg();
-			if (actLeg.getRoute().getRoute().size() != 0) {
-				this.parkToLinkQueue.add(veh);
+			if (actLeg.getRoute() != null) {
+				if(actLeg.getRoute().getRoute() != null){
+					this.parkToLinkQueue.add(veh);
+				}
+			} else {
+				log.warn("Veh " + veh.getId() + " in ParkingQueue has no route.");
 			}
 			this.parkingQueue.poll();
 		}

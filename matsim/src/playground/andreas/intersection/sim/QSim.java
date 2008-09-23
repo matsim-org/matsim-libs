@@ -51,7 +51,6 @@ import playground.andreas.intersection.tl.NewSignalSystemControlerImpl;
 
 public class QSim extends QueueSimulation {
 
-	@SuppressWarnings("unused")
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
 	final String newLSADef;
