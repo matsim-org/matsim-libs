@@ -75,7 +75,7 @@ public class PtcheckControler2 extends Controler {
 
 		private LegDistance ld = null;
 
-		private CalcLinkAvgSpeed clas = null;
+		private CalcLinksAvgSpeed clas = null;
 
 		public void notifyStartup(StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -185,7 +185,7 @@ public class PtcheckControler2 extends Controler {
 				es.addHandler(ttms);
 				ld = new LegDistance(300, nl);
 				es.addHandler(ld);
-				clas = new CalcLinkAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
+				clas = new CalcLinksAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
 				es.addHandler(clas);
 				c.getConfig().simulation().setSnapshotPeriod(300);
 			} else if (event.getIteration() == c.getFirstIteration()) {

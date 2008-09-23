@@ -66,7 +66,7 @@ public class PtcheckControler extends Controler {
 		private OnRouteModalSplit orms = null;
 		private TravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
-		private CalcLinkAvgSpeed clas = null;
+		private CalcLinksAvgSpeed clas = null;
 
 		public void notifyStartup(final StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -177,7 +177,7 @@ public class PtcheckControler extends Controler {
 				es.addHandler(ttms);
 				ld = new LegDistance(nl);
 				es.addHandler(ld);
-				clas = new CalcLinkAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
+				clas = new CalcLinksAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
 				es.addHandler(clas);
 				c.getConfig().simulation().setSnapshotPeriod(300);
 			} else if (event.getIteration() == c.getFirstIteration())

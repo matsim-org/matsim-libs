@@ -32,7 +32,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
-import playground.yu.analysis.CalcLinkAvgSpeed;
+import playground.yu.analysis.CalcLinksAvgSpeed;
 
 /**
  * @author yu
@@ -41,7 +41,7 @@ import playground.yu.analysis.CalcLinkAvgSpeed;
 public class AvgSpeed2QGIS implements X2QGIS {
 
 	public static List<Map<Id, Double>> createSpeeds(NetworkLayer net,
-			CalcLinkAvgSpeed clas) {
+			CalcLinksAvgSpeed clas) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++) {
 			speeds.add(i, null);
@@ -78,7 +78,7 @@ public class AvgSpeed2QGIS implements X2QGIS {
 				.readNetwork("test/yu/test/equil_net.xml");
 		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(net);
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);
 		mn2q.readEvents("test/yu/test/events.txt", clas);
 		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {

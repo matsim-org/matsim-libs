@@ -23,8 +23,23 @@
  */
 package playground.yu.utils.qgis;
 
+import org.apache.log4j.Logger;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 /**
- * This class can convert a MATSim-network to a QGIS .shp-file
+ * This class is a copy of main() from
+ * org.matsim.utils.gis.matsim2esri.network.Network2ESRIShape and can convert a
+ * MATSim-network to a QGIS .shp-file (link or polygon)
  * 
  * @author ychen
  * 
@@ -32,15 +47,32 @@ package playground.yu.utils.qgis;
 public class MATSimNet2QGISDemo implements X2QGIS {
 
 	public static void main(final String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		MATSimNet2QGIS.setFlowCapFactor(0.1);
-		// ///////////////////////////////////////////////////
-		// write MATSim-network to Shp-file
-		// ///////////////////////////////////////////////////
-		mn2q.readNetwork("../schweiz-ivtch/network/ivtch.xml");
-		// mn2q.readNetwork("./test/yu/test/equil_net_test.xml");
-		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../schweiz-ivtch/network/ivtch.shp");
-		System.out.println("done.");
+		String netfile = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		String outputFileLs = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Links.shp";
+		String outputFileP = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Polygon.shp";
+		String coordinateSys = ch1903;
+
+		Gbl.createConfig(null);
+		Gbl.getConfig().global().setCoordinateSystem(coordinateSys);
+
+		Logger log = Logger.getLogger(Network2ESRIShape.class);
+		log.info("loading network from " + netfile);
+		final NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netfile);
+		log.info("done.");
+
+		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
+		builder
+				.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
+		builder.setWidthCoefficient(0.5);
+		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+		new Network2ESRIShape(network, outputFileLs, builder).write();
+
+		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSys);
+		builder.setWidthCoefficient(0.001);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+		builder.setCoordinateReferenceSystem(crs);
+		new Network2ESRIShape(network, outputFileP, builder).write();
 	}
 }

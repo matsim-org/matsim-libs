@@ -34,9 +34,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -53,12 +53,12 @@ import org.xml.sax.SAXException;
  * @author ychen
  * 
  */
-public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
+public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	/**
-	 * @param arg0 -
-	 *            a String linkId
-	 * @param arg1 -
-	 *            a SpeedCounter object
+	 * @param arg0
+	 *            - a String linkId
+	 * @param arg1
+	 *            - a SpeedCounter object
 	 */
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
 	private Set<Link> interestLinks = null;
@@ -68,12 +68,12 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 	/**
 	 * @param network
-	 * @param binSize -
-	 *            size of a timeBin e.g. (300s, 3600s)
-	 * @param nofBins -
-	 *            number of bins
+	 * @param binSize
+	 *            - size of a timeBin e.g. (300s, 3600s)
+	 * @param nofBins
+	 *            - number of bins
 	 */
-	public CalcLinkAvgSpeed(final NetworkLayer network, final int binSize,
+	public CalcLinksAvgSpeed(final NetworkLayer network, final int binSize,
 			final int nofBins) {
 		super(network);
 		this.binSize = binSize;
@@ -82,11 +82,11 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		speedsCount = new int[nofBins - 1];
 	}
 
-	public CalcLinkAvgSpeed(final NetworkLayer network, final int binSize) {
+	public CalcLinksAvgSpeed(final NetworkLayer network, final int binSize) {
 		this(network, binSize, 30 * 3600 / binSize + 1);
 	}
 
-	public CalcLinkAvgSpeed(final NetworkLayer network) {
+	public CalcLinksAvgSpeed(final NetworkLayer network) {
 		this(network, 3600);
 	}
 
@@ -94,21 +94,28 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 	 * support the speed calculation only for the links in a circle area
 	 * 
 	 * @param network
-	 * @param x-abscissa
-	 *            of the center of the circle area
-	 * @param y-vertical
-	 *            coordinates of the center of the circle area
-	 * @param radius-radius
-	 *            of the circle
+	 * @param x
+	 *            -abscissa of the center of the circle area
+	 * @param y
+	 *            -vertical coordinates of the center of the circle area
+	 * @param radius
+	 *            -radius of the circle
 	 */
-	public CalcLinkAvgSpeed(final NetworkLayer network, final double x,
+	public CalcLinksAvgSpeed(final NetworkLayer network, final double x,
 			final double y, final double radius) {
 		this(network);
 		interestLinks = new NetworkLinksInCircle(network)
 				.getLinks(x, y, radius);
 	}
 
-	public CalcLinkAvgSpeed(final NetworkLayer network,
+	public CalcLinksAvgSpeed(final NetworkLayer network, int binSize,
+			final double x, final double y, final double radius) {
+		this(network, binSize);
+		interestLinks = new NetworkLinksInCircle(network)
+				.getLinks(x, y, radius);
+	}
+
+	public CalcLinksAvgSpeed(final NetworkLayer network,
 			final RoadPricingScheme toll) {
 		this(network);
 		interestLinks = new HashSet<Link>(toll.getLinks());
@@ -119,16 +126,16 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		private final double[] timeSum;
 		private final double[] freeSpeeds;
 		/**
-		 * @param arg0 -
-		 *            agentId;
-		 * @param arg1 -
-		 *            enterTime;
+		 * @param arg0
+		 *            - agentId;
+		 * @param arg1
+		 *            - enterTime;
 		 */
 		private final HashMap<String, Double> enterTimes = new HashMap<String, Double>();
 
 		/**
-		 * @param nofBins -
-		 *            number of bins.
+		 * @param nofBins
+		 *            - number of bins.
 		 */
 		public SpeedCounter(final int nofBins, final double[] freeSpeeds) {
 			lengthSum = new double[nofBins];
@@ -281,6 +288,13 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 		avgSpeedChart.addSeries("avg. speed of all agents", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
+	public Set<String> getInterestLinkIds(){
+		Set<String> interestLinkIds=new HashSet<String>();
+		for(Link link:this.interestLinks){
+			interestLinkIds.add(link.getId().toString());
+		}
+		return interestLinkIds;
+	}
 
 	/**
 	 * @param arg0
@@ -316,7 +330,7 @@ public class CalcLinkAvgSpeed extends CalcNetAvgSpeed {
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		tollReader.parse(roadPricingFilename);
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, tollReader
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, tollReader
 				.getScheme());
 		events.addHandler(clas);
 

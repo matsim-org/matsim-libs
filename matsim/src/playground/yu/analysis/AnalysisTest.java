@@ -106,7 +106,7 @@ public class AnalysisTest {
 
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
-		CalcLinkAvgSpeed clas = new CalcLinkAvgSpeed(network, 682845.0,
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 682845.0,
 				247388.0, 2000.0);
 		LegDistance ld = new LegDistance(network);
 
