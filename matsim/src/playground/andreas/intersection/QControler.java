@@ -26,9 +26,14 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.vis.netvis.NetVis;
 
+import playground.andreas.intersection.dijkstra.NetworkWrapper;
+import playground.andreas.intersection.dijkstra.PlansCalcRouteDijkstra;
 import playground.andreas.intersection.dijkstra.TravelTimeCalculatorTrafficLight;
 import playground.andreas.intersection.sim.QSim;
 
@@ -64,6 +69,21 @@ public class QControler extends Controler {
 		super.setup();
 	}
 
+	@Override
+	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
+//		synchronized (this) {
+//			if (this.commonRoutingData == null) {
+//				this.commonRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+//				this.commonRoutingData.run(this.network);
+//			}
+//		}
+//
+//		if ((this.roadPricing != null) && (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.roadPricing.getRoadPricingScheme().getType()))) {
+//			return new PlansCalcAreaTollRoute(this.network, this.commonRoutingData, travelCosts, travelTimes, this.roadPricing.getRoadPricingScheme());
+//		}
+		return new PlansCalcRouteDijkstra(NetworkWrapper.wrapNetwork(this.network), travelCosts, travelTimes);
+	}
+	
 	/** Conversion of events -> snapshots */
 	protected void makeVis() {
 
@@ -93,21 +113,34 @@ public class QControler extends Controler {
 		NetVis.main(visargs);
 	}
 
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
 
 		Config config;
-
+		String newLSADef = null;
+		String newLSADefCfg = null;
 //		if (args.length == 0) {
 //			config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/config.xml" });
 //		} else {
 //			config = Gbl.createConfig(args);
 //		}
 
-		config = Gbl.createConfig(new String[] {args[0]});
+//		args = new String[3];
+		
+//		args[0] = "../testData/schweiz-ivtch/ivtch-config.xml";
+		
+		if (args == null || args.length < 1) {
+			config = Gbl.createConfig(null);
+		}
+		else {
+			config = Gbl.createConfig(new String[] {args[0]});
 //		config = Gbl.createConfig(new String[] {"./src/playground/andreas/intersection/test/data/fourways/config.xml"});
-		final String newLSADef = args[1];
+			if (args.length > 1)
+				newLSADef = args[1];
 //		final String newLSADef = "./src/playground/andreas/intersection/test/data/fourways/lsa.xml";
-		final String newLSADefCfg = args[2];
+			if (args.length > 2)
+				newLSADefCfg = args[2];
+		}
+		
 //		final String newLSADefCfg = "./src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
 //		config.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml");
 

@@ -89,29 +89,31 @@ public class QSim extends QueueSimulation {
 		
 		HashMap<Id, NewSignalSystemControlerImpl> sortedLSAControlerMap = new HashMap<Id, NewSignalSystemControlerImpl>();
 
-		// Create a SignalLightControler for every signal system configuration found
-		for (BasicLightSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
-			NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
-			sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
-		}
-		
-		// Set the defaultCirculationTime for every SignalLightControler
-		// depends on the existence of a configuration for every signalsystem specified
-		// TODO [an] defaultSyncronizationOffset and defaultInterimTime still ignored
-		for (BasicLightSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getLightSignalSystemDefinitions()) {
-			sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCirculationTime());
-		}
-		
-		for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
+		if (null != this.newLSADefCfg) {
+			// Create a SignalLightControler for every signal system configuration found
+			for (BasicLightSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
+				NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
+				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
+			}
 			
-			if(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()) == null){
-				log.warn("Signal group defined, but corresponding controler with Id " + basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId() + " is missing." +
-						"Therefore signal group will be dropped.");
-			} else {
-				basicLightSignalGroupDefinition.setResponsibleLSAControler(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()));
-				QLink qLink = (QLink) this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
-				qLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
-				((QNode) this.network.getNodes().get(qLink.getLink().getToNode().getId())).setIsSignalizedTrue();
+			// Set the defaultCirculationTime for every SignalLightControler
+			// depends on the existence of a configuration for every signalsystem specified
+			// TODO [an] defaultSyncronizationOffset and defaultInterimTime still ignored
+			for (BasicLightSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getLightSignalSystemDefinitions()) {
+				sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCirculationTime());
+			}
+			
+			for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
+				
+				if(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()) == null){
+					log.warn("Signal group defined, but corresponding controler with Id " + basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId() + " is missing." +
+					"Therefore signal group will be dropped.");
+				} else {
+					basicLightSignalGroupDefinition.setResponsibleLSAControler(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()));
+					QLink qLink = (QLink) this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
+					qLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+					((QNode) this.network.getNodes().get(qLink.getLink().getToNode().getId())).setIsSignalizedTrue();
+				}
 			}
 		}
 	}
