@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEvent;
@@ -56,7 +57,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected Map<String, Integer> numberOfAgents;
 
-	protected Map<String, Double> ttFreeSpeeds;
+	protected Map<Id, Double> ttFreeSpeeds;
 
 	protected String firstLinkOnMainRoute;
 
@@ -94,7 +95,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.numberOfAgents = new HashMap<String, Integer>();
 		this.enterEvents1 = new HashMap<String, Double>();
 		this.enterEvents2 = new HashMap<String, Double>();
-		this.ttFreeSpeeds = new HashMap<String, Double>();
+		this.ttFreeSpeeds = new HashMap<Id, Double>();
 
 		this.lastTimeMainRoute = 0.0;
 		this.lastTimeAlternativeRoute = 0.0;
@@ -173,7 +174,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
 			double tt = l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);
-			this.ttFreeSpeeds.put(l.getId().toString(), tt);
+			this.ttFreeSpeeds.put(l.getId(), tt);
 			this.ttFreeSpeedAltRoute += tt;
 		}
 		this.lastTimeAlternativeRoute = this.ttFreeSpeedAltRoute;
@@ -197,7 +198,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 				this.numberOfAgents.put(l.getId().toString(), Integer.valueOf(0));
 			}
 			tt = l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);
-			this.ttFreeSpeeds.put(l.getId().toString(), tt);
+			this.ttFreeSpeeds.put(l.getId(), tt);
 			this.ttFreeSpeedMainRoute += tt;
 		}
 		this.lastTimeMainRoute = this.ttFreeSpeedMainRoute;

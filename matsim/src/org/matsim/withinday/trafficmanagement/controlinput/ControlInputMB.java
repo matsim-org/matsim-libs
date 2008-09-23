@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -45,7 +46,6 @@ import org.matsim.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
- *
  * @author abergsten and dzetterberg
  * @author dgrether
  */
@@ -62,7 +62,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * outlinks. Default is to update every 60 seconds. RESETBOTTLENECKINTERVALL The
  * bottleneck flow is used for predictions this many seconds. Then the accident
  * is forgotten and has to be detected again.
- * 
+ *
  * TODO if no accident detection is activated the model takes the first
  * CapacityChangeEvent of the network as accident. The model
  * will thus not be usable with real time dependent networks.
@@ -105,7 +105,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
 
-	private Map<String, Double> capacities = new HashMap<String, Double>();
+	private Map<Id, Double> capacities = new HashMap<Id, Double>();
 
 	// For in/outlinks disturbance check:
 	private Map<String, Double> extraFlowsMainRoute = new HashMap<String, Double>();
@@ -147,7 +147,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 	public ControlInputMB(SimulationConfigGroup simulationConfigGroup) {
 		this.simulationConfig = simulationConfigGroup;
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();
@@ -163,13 +163,13 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 			if (!this.ttMeasured.containsKey(l.getId().toString())) {
 				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
-						.getId().toString()));
+						.getId()));
 			}
 
-			if (!this.capacities.containsKey(l.getId().toString())) {
+			if (!this.capacities.containsKey(l.getId())) {
 				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
-				this.capacities.put(l.getId().toString(), capacity);
+				this.capacities.put(l.getId(), capacity);
 			}
 
 			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
@@ -227,13 +227,13 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 			if (!this.ttMeasured.containsKey(l.getId().toString())) {
 				this.ttMeasured.put(l.getId().toString(), this.ttFreeSpeeds.get(l
-						.getId().toString()));
+						.getId()));
 			}
 
-			if (!this.capacities.containsKey(l.getId().toString())) {
+			if (!this.capacities.containsKey(l.getId())) {
 				double capacity = l.getFlowCapacity(Time.UNDEFINED_TIME) * this.simulationConfig.getFlowCapFactor()
 						/ SimulationTimer.getSimTickTime();
-				this.capacities.put(l.getId().toString(), capacity);
+				this.capacities.put(l.getId(), capacity);
 			}
 
 			if (!this.enterLinkEventTimes.containsKey(l.getId().toString())) {
@@ -294,7 +294,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		Link[] routeLinks = route.getLinkRoute();
 		for (int i = 0; i < routeLinks.length; i++) {
 			Link l = routeLinks[i];
-			ttFS += this.ttFreeSpeeds.get(l.getId().toString());
+			ttFS += this.ttFreeSpeeds.get(l.getId());
 			if (l.getToNode() == node) {
 				break;
 			}
@@ -493,16 +493,17 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 			for (int i = routeLinks.length - 1; i >= 0; i--) {
 				Link link = routeLinks[i];
-				String linkId = link.getId().toString();
+				Id id = link.getId();
+				String linkId = id.toString();
 
-				if ((this.ttMeasured.get(linkId) > (this.ttFreeSpeeds.get(linkId) + this.ignoredQueuingTime))
+				if ((this.ttMeasured.get(linkId) > (this.ttFreeSpeeds.get(id) + this.ignoredQueuingTime))
 						&& searchForBottleNecks) {
 					bottleNeckList.addFirst(link);
 					searchForBottleNecks = false;
 					// queueFound = true;
 					log.trace("Link " + linkId + " was detected as a bottleneck.");
 				}
-				else if (this.ttMeasured.get(linkId) < this.ttFreeSpeeds.get(linkId)
+				else if (this.ttMeasured.get(linkId) < this.ttFreeSpeeds.get(id)
 						+ this.ignoredQueuingTime) {
 					searchForBottleNecks = true;
 				}
@@ -666,8 +667,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		else {
 			for (int i = 0; i < wholeRouteLinks.length; i++) {
 				Link l = wholeRouteLinks[i];
-				ttFreeSpeedToThisRouteSegment += this.ttFreeSpeeds.get(l.getId()
-						.toString());
+				ttFreeSpeedToThisRouteSegment += this.ttFreeSpeeds.get(l.getId());
 				if (l.getToNode() == firstLinkOnRouteSegment.getFromNode()) {
 					break;
 				}
@@ -685,7 +685,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 		Link[] routeLinks = routeSegment.getLinkRoute();
 		double ttFS = 0;
 		for (Link l : routeLinks) {
-			ttFS += this.ttFreeSpeeds.get(l.getId().toString());
+			ttFS += this.ttFreeSpeeds.get(l.getId());
 		}
 		return ttFS;
 	}
@@ -785,8 +785,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 	}
 
 	public double getCapacity(Link link) {
-		double capacity = this.capacities.get(link.getId().toString());
-		return capacity;
+		return this.capacities.get(link.getId());
 	}
 
 	public Link getDetectedBottleNeck(final Route route) {
