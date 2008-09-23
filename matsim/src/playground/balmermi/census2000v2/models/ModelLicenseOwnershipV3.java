@@ -30,18 +30,21 @@ public class ModelLicenseOwnershipV3 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final double B_AGE = -3.2098580e-001;
-	private static final double B_AGE_SEX = +2.4802192e-002;
-	private static final double B_AGE_LN = +1.3171034e+001;
-	private static final double B_CONST_NO = +3.4938370e+001;
-	private static final double B_HH_DIM = +8.1842248e-002;
-	private static final double B_HH_KIDS = +1.2330047e-001;
-	private static final double B_INC = -1.1797102e-001;
-	private static final double B_MUN_TYPE2 = -4.2133766e-001;
-	private static final double B_MUN_TYPE3 = -4.6685856e-001;
-	private static final double B_MUN_TYPE4 = -6.1604473e-001;
-	private static final double B_MUN_TYPE5 = -7.3981510e-001;
-	private static final double B_NAT = +7.9093580e-001;
+	private static final double B_AGE_18_30 = +1.5124103e+000;
+	private static final double B_AGE_60 = +8.0207344e-001;
+	private static final double B_AGE_SEX = +2.9533555e-002;
+	private static final double B_AGE_LN = +1.6506580e+001;
+	private static final double B_CONST_NO = +4.4782306e+001;
+	private static final double B_HH_DIM = +1.1294759e-001;
+	private static final double B_HH_KIDS = -1.4713021e-003;
+	private static final double B_INC = -1.2868986e-001;
+	private static final double B_MUN_TYPE2 = -3.9893725e-001;
+	private static final double B_MUN_TYPE3 = -4.5456051e-001;
+	private static final double B_MUN_TYPE4 = -6.3835678e-001;
+	private static final double B_MUN_TYPE5 = -7.5914814e-001;
+	private static final double B_NAT = +7.7974576e-001;
+	private static final double B_GENDER = -2.4184702e-001;
+	
 
 	private double age; // // 0-[unlimited]
 	private double sex; // male = 1; female = 0
@@ -135,10 +138,16 @@ public class ModelLicenseOwnershipV3 {
 	private final double calcYesUtility() {
 		// B_Age * AGE + B_Age_ln * AGE_LN + B_Age_Sex * AGE_SEX + B_Nat * NATIONALITY
 		double yes_util = 0.0;
-		yes_util += B_AGE * age;
+		if (age >=18 && age < 30 ) {
+			yes_util += B_AGE_18_30;
+		}
+		if (age >=60) {
+			yes_util += B_AGE_60;
+		}
 		yes_util += B_AGE_LN * Math.log(age);
 		yes_util += B_AGE_SEX * (age * sex);
 		yes_util += B_NAT * nat;
+		yes_util += B_GENDER * sex;
 		return yes_util;
 	}
 
