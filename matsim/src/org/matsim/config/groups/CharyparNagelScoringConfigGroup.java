@@ -151,7 +151,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		} else if (WAITING.equals(key)) {
 			setWaiting(Double.parseDouble(value));
 		} else if (NUM_ACTIVITIES.equals(key)) {
-			log.info("The parameter " + NUM_ACTIVITIES + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+			log.warn("The parameter " + NUM_ACTIVITIES + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (key != null && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
@@ -268,6 +268,9 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.pathSizeLogitBeta;
 	}
 	public void setPathSizeLogitBeta(final double beta) {
+		if ( beta != 0. ) {
+			log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
+		}
 		this.pathSizeLogitBeta = beta;
 	}
 	public double getLateArrival() {
@@ -316,6 +319,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		return this.waiting;
 	}
 	public void setWaiting(final double waiting) {
+		if ( earlyDeparture != 0. ) {
+			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
+					"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08");
+		}
 		this.waiting = waiting;
 	}
 
@@ -368,6 +375,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return this.minimalDuration;
 		}
 		public void setMinimalDuration(final double minimalDuration) {
+			if ( minimalDuration != Time.UNDEFINED_TIME  ) {
+				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
+						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08");
+			}
 			this.minimalDuration = minimalDuration;
 		}
 
