@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -28,6 +29,7 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.scoring.*;
+import java.util.ArrayList;
 
 /**
  * @author Matthias Feil
@@ -42,6 +44,7 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 	private final TravelCost 				travelCostCalc;
 	private final TravelTime 				travelTimeCalc;
 	private final ScoringFunctionFactory 	factory;
+	public static ArrayList<String>			actTypes; 
 
 	
 	public PlanomatXInitialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
@@ -54,14 +57,21 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 		travelTimeCalc = controlerTest.getTravelTimeCalculator();
 		//factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
 		factory = new CharyparNagelScoringFunctionFactory();
+		
+		int gblCounter = 0;
+		actTypes = new ArrayList<String>();
+		while (Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter)!=null){
+			actTypes.add(Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter));
+			gblCounter++;
 		}
+	}
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX4 (this.estimator, this.network, this.travelCostCalc, 
+		planomatXAlgorithm =  new PlanomatX6 (this.estimator, this.network, this.travelCostCalc, 
 				this.travelTimeCalc, this.preProcessRoutingData, this.factory);
 
 		return planomatXAlgorithm;
