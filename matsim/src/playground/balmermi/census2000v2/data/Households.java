@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
@@ -44,6 +45,8 @@ public class Households {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(Households.class);
 
 	private final HashMap<Id,Household> households = new HashMap<Id, Household>();
 	private final Municipalities municipalities;
@@ -141,6 +144,8 @@ public class Households {
 						Gbl.errorMsg("hhid="+hh.getId()+", pid="+p.getId()+": person does already have a "+CAtts.HH_Z+" assigned!");
 					}
 				}
+				// progress report
+				if (line_cnt % 100000 == 0) { log.info("      Line " + line_cnt); }
 				line_cnt++;
 			}
 		} catch (IOException e) {
