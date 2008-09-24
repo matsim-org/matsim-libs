@@ -31,7 +31,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
-import playground.balmermi.census2000v2.models.ModelLicenseOwnershipV4;
+import playground.balmermi.census2000v2.models.ModelLicenseOwnershipV5;
 
 public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -49,7 +49,8 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 //	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
 //	private final ModelLicenseOwnershipV2 model = new ModelLicenseOwnershipV2();
 //	private final ModelLicenseOwnershipV3 model = new ModelLicenseOwnershipV3();
-	private final ModelLicenseOwnershipV4 model = new ModelLicenseOwnershipV4();
+//	private final ModelLicenseOwnershipV4 model = new ModelLicenseOwnershipV4();
+	private final ModelLicenseOwnershipV5 model = new ModelLicenseOwnershipV5();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
