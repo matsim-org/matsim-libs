@@ -190,6 +190,7 @@ public class CountsConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (LINKATTS.equals(key)) {
+			log.warn("The parameter " + key + " in module " + GROUP_NAME + " is discouraged."); // remove counts postprocessing option
 			setLinkAttsFile(value.replace('\\', '/'));
 		} else if (OUTPUTFORMAT.equals(key)) {
 			setOutputFormat(value);
@@ -213,6 +214,7 @@ public class CountsConfigGroup extends Module {
 			if (value == null) {
 				setVisibleTimeStep(null);
 			} else {
+				log.warn("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 				setVisibleTimeStep(Integer.valueOf(value));
 			}
 		} else if (ITERATIONNUMBER.equals(key)) {
@@ -220,11 +222,12 @@ public class CountsConfigGroup extends Module {
 				setIterationNumber(null);
 			} else {
 				setIterationNumber(Integer.valueOf(value));
+				log.warn("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 			}
 		} else if (COUNTSINPUTFILENAME.equals(key)) {
 			setCountsFileName(value.replace('\\', '/'));
 		} else if (LOCALINPUTXSD.equals(key) || OUTPUTCOUNTSXSD.equals(key) || OUTPUTVERSION.equals(key)) {
-			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+			log.warn("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
 		} else {
