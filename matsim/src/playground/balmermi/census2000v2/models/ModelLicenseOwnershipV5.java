@@ -30,21 +30,23 @@ public class ModelLicenseOwnershipV5 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final double B_AGE_18_30 = +1.5124103e+000;
-	private static final double B_AGE_60 = +8.0207344e-001;
-	private static final double B_AGE_SEX = +2.9533555e-002;
-	private static final double B_AGE_LN = +1.6506580e+001;
-	private static final double B_CONST_NO = +4.4782306e+001;
-	private static final double B_HH_DIM = +1.1294759e-001;
-	private static final double B_HH_KIDS = -1.4713021e-003;
-	private static final double B_INC = -1.2868986e-001;
-	private static final double B_MUN_TYPE2 = -3.9893725e-001;
-	private static final double B_MUN_TYPE3 = -4.5456051e-001;
-	private static final double B_MUN_TYPE4 = -6.3835678e-001;
-	private static final double B_MUN_TYPE5 = -7.5914814e-001;
-	private static final double B_NAT = +7.7974576e-001;
-	private static final double B_GENDER = -2.4184702e-001;
-	
+	private static final double B_AGE_18_30 = +1.5176749e+000;
+	private static final double B_AGE_60 = +8.0150111e-001;
+	private static final double B_AGE_SEX = +2.7687342e-002;
+	private static final double B_AGE_LN = +1.6465241e+001;
+	private static final double B_CONST_NO = +4.4911009e+001;
+	private static final double B_HH_DIM = -1.3169443e-001;
+	private static final double B_HH_KIDS = +1.8120589e-002;
+	private static final double B_INC = +8.6223183e-002;
+	private static final double B_MUN_TYPE2 = -3.9317806e-001;
+	private static final double B_MUN_TYPE3 = -4.5154129e-001;
+	private static final double B_MUN_TYPE4 = -6.3686464e-001;
+	private static final double B_MUN_TYPE5 = -7.6022115e-001;
+	private static final double B_NAT = +7.7938503e-001;
+	private static final double B_AGE = -3.9042272e-001;
+	private static final double B_INC_SEX = -2.3737650e-002;
+	private static final double B_INC_LN = +2.9467255e-001;
+		
 
 	private double age; // // 0-[unlimited]
 	private double sex; // male = 1; female = 0
@@ -146,8 +148,13 @@ public class ModelLicenseOwnershipV5 {
 		}
 		yes_util += B_AGE_LN * Math.log(age);
 		yes_util += B_AGE_SEX * (age * sex);
+		yes_util += B_INC_LN * Math.log(inc);
+		yes_util += B_INC_SEX * (inc * sex);
 		yes_util += B_NAT * nat;
-		yes_util += B_GENDER * sex;
+		yes_util += B_AGE * age;
+		yes_util += B_HH_DIM * nump;
+		yes_util += B_HH_KIDS * numk;
+		yes_util += B_INC * inc;
 		return yes_util;
 	}
 
@@ -156,9 +163,6 @@ public class ModelLicenseOwnershipV5 {
 		// B_Mun_type3 * MUN_T3 + B_Mun_type4 * MUN_T4 + B_Mun_type5 * MUN_T5
 		double no_util = 0.0;
 		no_util += B_CONST_NO * 1.0;
-		no_util += B_HH_DIM * nump;
-		no_util += B_HH_KIDS * numk;
-		no_util += B_INC * inc;
 		if (udeg == 1) { /* reference type */ }
 		else if (udeg == 2) { no_util += B_MUN_TYPE2 * 1.0; }
 		else if (udeg == 3) { no_util += B_MUN_TYPE3 * 1.0; }
