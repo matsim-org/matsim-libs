@@ -45,9 +45,14 @@ public class Convertor {
 	}
 
 	private Population pop;
+
 	private Map<String, ZoneXY> zoneXYs;
+
 	private String tmpPersonId = "";
+
 	private int tmpEndingTime;
+
+	private String[] tmpTabs = null;
 
 	/**
 	 * 
@@ -81,27 +86,32 @@ public class Convertor {
 						null);
 
 			} else {
-				Plan tmpPl = pop.getPerson(tmpPersonId).getSelectedPlan();
-				tmpPl.createLeg(Mode.car, Time.UNDEFINED_TIME,
-						Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
-				
-				tmpPl.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null, null,
-						(ending / 100 < 10) ? "0" : "" + ending / 100 + ":"
-								+ ending % 100, dur / 100 + ":" + dur % 100,
-						null);
-				
+				if (!pop.getPersons().isEmpty()) {
+					Plan tmpPl = pop.getPerson(tmpPersonId).getSelectedPlan();
+					tmpPl.createLeg(Mode.car, Time.UNDEFINED_TIME,
+							Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+					ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
+					tmpPl.createAct(tmpTabs[10], lastZoneXY.getX(), lastZoneXY
+							.getY(), null, null, null, null, null);
+				}
+
 				Person p = new Person(new IdImpl(personId));
 				pop.addPerson(p);
 				Plan pl = new Plan(p);
 				ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				ending = Integer.parseInt(tabs[3]);
-				pl.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null, null,
-						(ending / 100 < 10) ? "0" : "" + ending / 100 + ":"
-								+ ending % 100, null, null);
+				if (tabs[0].equals("100173"))
+					System.out.println("tabs[3] = " + tabs[3]);
+				pl
+						.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null,
+								null, (((ending / 100 < 10) ? "0" : "")
+										+ ending / 100 + ":" + ending % 100),
+								null, null);
 				p.addPlan(pl);
 			}
 			tmpPersonId = personId;
 			tmpEndingTime = ending;
+			tmpTabs = tabs;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
