@@ -24,14 +24,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.balmermi.census2000.models.ModelLicenseOwnership;
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
-import playground.balmermi.census2000v2.models.ModelLicenseOwnershipV5;
 
 public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -46,11 +47,11 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	private static final String MALE = "m";
 	private static final String NO = "no";
 	private static final String YES = "yes";
-//	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
+	private final ModelLicenseOwnership model = new ModelLicenseOwnership();
 //	private final ModelLicenseOwnershipV2 model = new ModelLicenseOwnershipV2();
 //	private final ModelLicenseOwnershipV3 model = new ModelLicenseOwnershipV3();
 //	private final ModelLicenseOwnershipV4 model = new ModelLicenseOwnershipV4();
-	private final ModelLicenseOwnershipV5 model = new ModelLicenseOwnershipV5();
+//	private final ModelLicenseOwnershipV5 model = new ModelLicenseOwnershipV5();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -129,7 +130,10 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		
 		// calc and assign license ownership
 		boolean hasLicense = false;
-		if (person.getAge() >= 18) { hasLicense = model.calcLicenseOwnership(); }
+		if (person.getAge() >= 18) {
+			hasLicense = model.calcLicenseOwnership();
+			if (!hasLicense && (MatsimRandom.random.nextDouble() < 0.08)) { hasLicense = true; }
+		}
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
 	}
 
