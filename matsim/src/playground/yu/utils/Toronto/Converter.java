@@ -25,7 +25,7 @@ import org.matsim.utils.misc.Time;
  * @author yu
  * 
  */
-public class Convertor {
+public class Converter {
 	public static class ZoneXY {
 		private String zoneId, x, y;
 
@@ -57,7 +57,7 @@ public class Convertor {
 	/**
 	 * 
 	 */
-	public Convertor() {
+	public Converter() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -126,7 +126,7 @@ public class Convertor {
 
 		Gbl.createConfig(null);
 
-		Convertor c = new Convertor();
+		Converter c = new Converter();
 
 		c.zoneXYs = new HashMap<String, ZoneXY>();
 
