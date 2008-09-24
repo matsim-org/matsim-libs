@@ -38,9 +38,9 @@ import org.matsim.world.algorithms.WorldValidation;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.PersonAssignAndNormalizeTimes;
 import playground.balmermi.census2000v2.modules.PersonAssignModeChoiceModel;
+import playground.balmermi.census2000v2.modules.PersonAssignPrimaryActivities;
 import playground.balmermi.census2000v2.modules.PersonAssignShopLeisureLocations;
 import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
-import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
@@ -116,18 +116,6 @@ public class IIDMGenerationPart2 {
 		
 		//////////////////////////////////////////////////////////////////////
 
-//		log.info("  reading mz plans xml file... ");
-//		Population mz_pop = new Population(Population.NO_STREAMING);
-//		new MatsimPopulationReader(mz_pop).readFile(indir+"/mz.plans.xml.gz");
-//		log.info("  done.");
-
-		//////////////////////////////////////////////////////////////////////
-
-//		log.info("  reding plans xml file... ");
-//		Population pop = new Population(Population.NO_STREAMING);
-//		new MatsimPopulationReader(pop).readFile(Gbl.getConfig().plans().getInputFile());
-//		log.info("  done.");
-
 		System.out.println("  setting up population objects...");
 		Population pop = new Population(Population.USE_STREAMING);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
@@ -136,17 +124,13 @@ public class IIDMGenerationPart2 {
 
 		//////////////////////////////////////////////////////////////////////
 		
-//		log.info("  runnning person models... ");
-//		new PersonSetLocationsFromKnowledge().run(pop);
-//		new PersonAssignShopLeisureLocations(facilities).run(pop);
-//		new PersonAssignAndNormalizeTimes().run(pop);
-//		log.info("  done.");
-		
 		System.out.println("  adding person modules... ");
 		pop.addAlgorithm(new PersonSetLocationsFromKnowledge());
 		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
 		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
-//		pop.addAlgorithm(new PersonAssignModeChoiceModel(municipalities));
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt");
+		pop.addAlgorithm(pamcm);
+		pop.addAlgorithm(new PersonAssignPrimaryActivities());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -156,18 +140,10 @@ public class IIDMGenerationPart2 {
 		pop_reader.readFile(Gbl.getConfig().plans().getInputFile());
 		pop.printPlansCount();
 		pop_writer.write();
+		pamcm.close();
 		System.out.println("  done.");
 
-//		log.info("  writing plans xml file... ");
-//		PopulationWriter plans_writer = new PopulationWriter(pop);
-//		plans_writer.write();
-//		log.info("  done.");
-
 		//////////////////////////////////////////////////////////////////////
-
-		log.info("  writing custom attributes of the persons... ");
-		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
-		log.info("  done.");
 
 		log.info("  writing f2z_mapping... ");
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());

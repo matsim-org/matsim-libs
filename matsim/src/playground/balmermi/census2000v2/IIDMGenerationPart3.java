@@ -36,7 +36,6 @@ import org.matsim.world.WorldWriter;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.modules.PersonAssignModeChoiceModel;
 import playground.balmermi.census2000v2.modules.PersonAssignPrimaryActivities;
-import playground.balmermi.census2000v2.modules.PlansWriteCustomAttributes;
 import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
 import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
 
@@ -124,10 +123,6 @@ public class IIDMGenerationPart3 {
 
 		//////////////////////////////////////////////////////////////////////
 
-		log.info("  writing custom attributes of the persons... ");
-		new PlansWriteCustomAttributes(outdir+"/output_persons.txt").run(pop);
-		log.info("  done.");
-
 		log.info("  writing f2z_mapping... ");
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
 		log.info("  done.");
@@ -166,4 +161,3 @@ public class IIDMGenerationPart3 {
 		Gbl.printElapsedTime();
 	}
 }
-
