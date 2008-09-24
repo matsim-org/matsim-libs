@@ -100,8 +100,6 @@ public class Converter {
 				Plan pl = new Plan(p);
 				ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				ending = Integer.parseInt(tabs[3]);
-				if (tabs[0].equals("100173"))
-					System.out.println("tabs[3] = " + tabs[3]);
 				pl
 						.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null,
 								null, (((ending / 100 < 10) ? "0" : "")
