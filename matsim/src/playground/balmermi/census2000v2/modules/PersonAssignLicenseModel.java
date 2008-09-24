@@ -132,7 +132,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		boolean hasLicense = false;
 		if (person.getAge() >= 18) {
 			hasLicense = model.calcLicenseOwnership();
-			if (!hasLicense && (MatsimRandom.random.nextDouble() < 0.08)) { hasLicense = true; }
+			if (!hasLicense && (MatsimRandom.random.nextDouble() < 0.4)) { hasLicense = true; }
 		}
 		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
 	}
