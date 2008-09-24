@@ -41,7 +41,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 import org.matsim.utils.io.IOUtils;
 
-import playground.yu.analysis.CalcLinkAvgSpeed;
+import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
@@ -51,13 +51,13 @@ import playground.yu.analysis.TravelTimeModalSplit;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class PtcheckControlerTest extends Controler {
 
-	public PtcheckControlerTest(String[] configFileName) {
+	public PtcheckControlerTest(final String[] configFileName) {
 		super(configFileName);
 	}
 
@@ -74,9 +74,9 @@ public class PtcheckControlerTest extends Controler {
 		private OnRouteModalSplit orms = null;
 		private TravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
-		private CalcLinkAvgSpeed clas = null;
+		private CalcLinksAvgSpeed clas = null;
 
-		public void notifyStartup(StartupEvent event) {
+		public void notifyStartup(final StartupEvent event) {
 			Controler ctl = event.getControler();
 			Config cf = ctl.getConfig();
 			try {
@@ -85,34 +85,34 @@ public class PtcheckControlerTest extends Controler {
 						ctl.getLastIteration(), cf.getParam("planCalcScore",
 								"traveling"), cf.getParam("planCalcScore",
 								"travelingPt")));
-				ptRateWriter = IOUtils
+				this.ptRateWriter = IOUtils
 						.getBufferedWriter(getOutputFilename("tollPaid.txt"));
-				ptRateWriter
+				this.ptRateWriter
 						.write("Iter\tBetaTraveling\tBetaTravelingPt\tavg. executed score\tavg. triplength\ttraffic persformance\tavg. travel speed\ttoll_amount[�/m]\ttoll_paid[�]\tNumber of Drawees\tavg. tolled triplength\n");
-				ptRateWriter.flush();
+				this.ptRateWriter.flush();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			NetworkLayer network = ctl.getNetwork();
-			cas = new CalcNetAvgSpeed(network);
-			ctpf = new CalcTrafficPerformance(network);
+			this.cas = new CalcNetAvgSpeed(network);
+			this.ctpf = new CalcTrafficPerformance(network);
 			Events events = ctl.getEvents();
-			events.addHandler(cas);
-			events.addHandler(ctpf);
+			events.addHandler(this.cas);
+			events.addHandler(this.ctpf);
 		}
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			int it = event.getIteration();
 			Controler ctl = event.getControler();
 			Config cf = ctl.getConfig();
 			if (it % 10 == 0) {
-				rp = ctl.getRoadPricing();
-				catl = new CalcAverageTripLength();
-				catl.run(event.getControler().getPopulation());
+				this.rp = ctl.getRoadPricing();
+				this.catl = new CalcAverageTripLength();
+				this.catl.run(event.getControler().getPopulation());
 				try {
-					ptRateWriter
+					this.ptRateWriter
 							.write(it
 									+ "\t"
 									+ cf.getParam("planCalcScore", "traveling")
@@ -122,70 +122,70 @@ public class PtcheckControlerTest extends Controler {
 									+ "\t"
 									+ ctl.getScoreStats().getHistory()[3][it]
 									+ "\t"
-									+ catl.getAverageTripLength()
+									+ this.catl.getAverageTripLength()
 									+ "\t"
-									+ ctpf.getTrafficPerformance()
+									+ this.ctpf.getTrafficPerformance()
 									+ "\t"
-									+ cas.getNetAvgSpeed()
+									+ this.cas.getNetAvgSpeed()
 									+ "\t"
-									+ (((rp != null) && (rp
-											.getRoadPricingScheme() != null)) ? rp
+									+ (((this.rp != null) && (this.rp
+											.getRoadPricingScheme() != null)) ? this.rp
 											.getRoadPricingScheme()
 											.getCostArray()[0].amount
 											+ "\t"
-											+ rp.getAllAgentsToll()
+											+ this.rp.getAllAgentsToll()
 											+ "\t"
-											+ rp.getDraweesNr()
+											+ this.rp.getDraweesNr()
 											+ "\t"
-											+ rp.getAvgPaidTripLength()
+											+ this.rp.getAvgPaidTripLength()
 											: "0.0\t0.0\t0\t0.0") + "\n");
-					ptRateWriter.flush();
+					this.ptRateWriter.flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 			if (it == ctl.getLastIteration()) {
-				if (orms != null) {
-					orms.write(getOutputFilename("onRoute.txt.gz"));
-					orms.writeCharts(getOutputFilename("onRoute.png"));
+				if (this.orms != null) {
+					this.orms.write(getOutputFilename("onRoute.txt.gz"));
+					this.orms.writeCharts(getOutputFilename("onRoute.png"));
 				}
-				if (ttms != null) {
-					ttms.write(getOutputFilename("traveltimes.txt.gz"));
-					ttms.writeCharts(getOutputFilename("traveltimes.png"));
+				if (this.ttms != null) {
+					this.ttms.write(getOutputFilename("traveltimes.txt.gz"));
+					this.ttms.writeCharts(getOutputFilename("traveltimes.png"));
 				}
-				if (ld != null) {
-					ld.write(getOutputFilename("legDistances.txt.gz"));
-					ld.writeCharts(getOutputFilename("legDistances.png"));
+				if (this.ld != null) {
+					this.ld.write(getOutputFilename("legDistances.txt.gz"));
+					this.ld.writeCharts(getOutputFilename("legDistances.png"));
 				}
-				if (clas != null) {
-					clas.write(getOutputFilename("avgSpeed.txt.gz"));
-					clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
+				if (this.clas != null) {
+					this.clas.write(getOutputFilename("avgSpeed.txt.gz"));
+					this.clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}
 
-		public void notifyShutdown(ShutdownEvent event) {
+		public void notifyShutdown(final ShutdownEvent event) {
 			try {
-				ptRateWriter.close();
+				this.ptRateWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		public void notifyIterationStarts(IterationStartsEvent event) {
+		public void notifyIterationStarts(final IterationStartsEvent event) {
 			Controler c = event.getControler();
 			Events es = c.getEvents();
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit(300, nl, ps);
-				es.addHandler(orms);
-				ttms = new TravelTimeModalSplit(300, nl, ps);
-				es.addHandler(ttms);
-				ld = new LegDistance(300, nl);
-				es.addHandler(ld);
-				clas = new CalcLinkAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
-				es.addHandler(clas);
+				this.orms = new OnRouteModalSplit(300, nl, ps);
+				es.addHandler(this.orms);
+				this.ttms = new TravelTimeModalSplit(300, nl, ps);
+				es.addHandler(this.ttms);
+				this.ld = new LegDistance(300, nl);
+				es.addHandler(this.ld);
+				this.clas = new CalcLinksAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
+				es.addHandler(this.clas);
 				c.getConfig().simulation().setSnapshotPeriod(300);
 			} else if (event.getIteration() == c.getFirstIteration()) {
 				c.getConfig().simulation().setSnapshotPeriod(300);
