@@ -30,21 +30,22 @@ public class ModelLicenseOwnershipV4 {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final double B_AGE_18_30 = +1.5124103e+000;
-	private static final double B_AGE_60 = +8.0207344e-001;
-	private static final double B_AGE_SEX = +2.9533555e-002;
-	private static final double B_AGE_LN = +1.6506580e+001;
-	private static final double B_CONST_NO = +4.4782306e+001;
-	private static final double B_HH_DIM = +1.1294759e-001;
-	private static final double B_HH_KIDS = -1.4713021e-003;
-	private static final double B_INC = -1.2868986e-001;
-	private static final double B_MUN_TYPE2 = -3.9893725e-001;
-	private static final double B_MUN_TYPE3 = -4.5456051e-001;
-	private static final double B_MUN_TYPE4 = -6.3835678e-001;
-	private static final double B_MUN_TYPE5 = -7.5914814e-001;
-	private static final double B_NAT = +7.7974576e-001;
-	private static final double B_GENDER = -2.4184702e-001;
+	private static final double B_AGE_18_30 = +1.5169599e+000;
+	private static final double B_AGE_60 = +7.8645312e-001;
+	private static final double B_AGE_SEX = +2.5249511e-002;
+	private static final double B_AGE_LN = +1.6540143e+001;
+	private static final double B_CONST_NO = +4.4996863e+001;
+	private static final double B_HH_DIM = +1.0816460e-001;
+	private static final double B_HH_KIDS = +3.0553957e-003;
+	private static final double B_INC = -1.2830322e-001;
+	private static final double B_MUN_TYPE2 = -3.9783502e-001;
+	private static final double B_MUN_TYPE3 = -4.5145308e-001;
+	private static final double B_MUN_TYPE4 = -6.3536682e-001;
+	private static final double B_MUN_TYPE5 = -7.5704744e-001;
+	private static final double B_NAT = +7.8125662e-001;
+	private static final double B_AGE = -3.9070800e-001;
 	
+
 
 	private double age; // // 0-[unlimited]
 	private double sex; // male = 1; female = 0
@@ -147,7 +148,7 @@ public class ModelLicenseOwnershipV4 {
 		yes_util += B_AGE_LN * Math.log(age);
 		yes_util += B_AGE_SEX * (age * sex);
 		yes_util += B_NAT * nat;
-		yes_util += B_GENDER * sex;
+		yes_util += B_AGE * age;
 		return yes_util;
 	}
 
