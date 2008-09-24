@@ -367,6 +367,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //				does this mean that the act.RefId() needs to be unique per act AND plan?
 				k.getMentalMap().initializeActActivityMapRandom(plan);
 				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
+//				Reset activity spaces because they are not read or written correctly
+				k.resetActivitySpaces();
 			}
 		}
 		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){

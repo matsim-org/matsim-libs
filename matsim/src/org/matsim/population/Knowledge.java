@@ -385,6 +385,13 @@ public class Knowledge extends CustomizableImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
+	 * Sets the activitySpaces to null
+	 */
+	public final void resetActivitySpaces(){
+		this.activitySpaces = null;
+	}
+	
+	/**
 	 * Sets the {@code isPrimary} flag for the given {@link Activity}
 	 * @param activity the {@link Activity} to set the flag
 	 * @param isPrimary the flag
