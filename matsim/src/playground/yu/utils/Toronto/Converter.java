@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -97,12 +98,20 @@ public class Converter {
 
 			} else {
 				if (!pop.getPersons().isEmpty()) {
-					Plan tmpPl = pop.getPerson(tmpPersonId).getSelectedPlan();
+					Person p = pop.getPerson(tmpPersonId);
+					Plan tmpPl = p.getSelectedPlan();
 					tmpPl.createLeg(Mode.car, getEndingTimeD(tmpTabs[3]),
 							Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 					ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 					tmpPl.createAct(tmpTabs[10], lastZoneXY.getX(), lastZoneXY
 							.getY(), null, null, null, null, null);
+					Plan nonCarPlan = new Plan(p);
+					nonCarPlan.copyPlan(tmpPl);
+					for (LegIterator li = nonCarPlan.getIteratorLeg(); li
+							.hasNext();) {
+						li.next().setMode(Mode.pt);
+					}
+					p.addPlan(nonCarPlan);
 				}
 
 				Person p = new Person(new IdImpl(personId));
