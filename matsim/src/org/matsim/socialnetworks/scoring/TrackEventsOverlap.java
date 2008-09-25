@@ -127,6 +127,9 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 
 
 	public void reset(final int iteration) {
+//		this.timeWindowMap.clear();
+	}
+	public void clearTimeWindowMap(){
 		this.timeWindowMap.clear();
 	}
 

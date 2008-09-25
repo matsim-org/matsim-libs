@@ -285,6 +285,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			} else {
 				this.log.info("     (none)");
 			}
+			this.teo.clearTimeWindowMap();
 			this.log.info(" ... Spatial interactions done\n");
 
 			Gbl.printMemoryUsage();
