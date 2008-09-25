@@ -61,6 +61,17 @@ public class Converter {
 		// TODO Auto-generated constructor stub
 	}
 
+	public static String getEndingTimeS(String endingS) {
+		int endingI = Integer.parseInt(endingS);
+		return (((endingI / 100) < 10) ? "0" : "") + (endingI / 100) + ":"
+				+ (endingI % 100);
+	}
+
+	public static double getEndingTimeD(String endingS) {
+		int endingI = Integer.parseInt(endingS);
+		return 3600 * (endingI / 100) + 60 * (endingI - endingI / 100 * 100);
+	}
+
 	public void readLine(String line) {
 		String[] tabs = line.split("\t");
 		String personId = tabs[0] + "-" + tabs[1];
@@ -78,17 +89,16 @@ public class Converter {
 					dur = ending - tmpEndingTime;
 				}
 
-				pl.createLeg(Mode.car, Time.UNDEFINED_TIME,
+				pl.createLeg(Mode.car, getEndingTimeD(tmpTabs[3]),
 						Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 				pl.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null, null,
-						(ending / 100 < 10) ? "0" : "" + ending / 100 + ":"
-								+ ending % 100, dur / 100 + ":" + dur % 100,
+						getEndingTimeS(tabs[3]), dur / 100 + ":" + dur % 100,
 						null);
 
 			} else {
 				if (!pop.getPersons().isEmpty()) {
 					Plan tmpPl = pop.getPerson(tmpPersonId).getSelectedPlan();
-					tmpPl.createLeg(Mode.car, Time.UNDEFINED_TIME,
+					tmpPl.createLeg(Mode.car, getEndingTimeD(tmpTabs[3]),
 							Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 					ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 					tmpPl.createAct(tmpTabs[10], lastZoneXY.getX(), lastZoneXY
@@ -100,11 +110,12 @@ public class Converter {
 				Plan pl = new Plan(p);
 				ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				ending = Integer.parseInt(tabs[3]);
-				pl
-						.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null,
-								null, (((ending / 100 < 10) ? "0" : "")
-										+ ending / 100 + ":" + ending % 100),
-								null, null);
+
+				pl.createAct(tabs[7], zoneXY.getX(), zoneXY.getY(), null, null,
+						getEndingTimeS(tabs[3]), null, null);
+				// System.out.println("personId : " + personId
+				// + " | getEndingTimeS(tabs[3]) : "
+				// + getEndingTimeS(tabs[3]) + " | tabs[3] : " + tabs[3]);
 				p.addPlan(pl);
 			}
 			tmpPersonId = personId;
@@ -179,6 +190,7 @@ public class Converter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("done.");
 	}
 
 }
