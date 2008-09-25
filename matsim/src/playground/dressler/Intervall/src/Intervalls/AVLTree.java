@@ -21,9 +21,6 @@
 
 package playground.dressler.Intervall.src.Intervalls ;
 
-//import comaInterfaces.* ;
-
-
 /**
  * class for AVL trees
  *
@@ -32,7 +29,7 @@ package playground.dressler.Intervall.src.Intervalls ;
 
 public class AVLTree
 extends      SearchTree
-//implements   TraversableSortedContainer<T>
+
 {
     /**
      * class for tree nodes with balances
