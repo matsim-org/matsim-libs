@@ -152,7 +152,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			boolean pt = false; // Should be substituted with actual access to pt;
 			double rd3 = MatsimRandom.random.nextDouble (); 
 			if (plan.getPerson().getCarAvail().equals("always")) {
-				if (rd3 < 0.40) {pt = true; System.out.println("random = " + rd3);}
+				if (rd3 < 0.45) {pt = true;}
 				System.out.println("pt = " + pt );
 			}
 			else if (rd3 < 0.90) {pt =true;}
