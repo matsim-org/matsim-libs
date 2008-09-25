@@ -29,12 +29,18 @@ import org.matsim.utils.collections.Tuple;
  * @author illenberger
  *
  */
-public class SparseEdge implements Edge {
+public class SparseEdge<A> implements Edge<A> {
 
 	private Tuple<SparseVertex, SparseVertex> vertices;
 	
+	private A attribute;
+	
 	public SparseEdge(SparseVertex v1, SparseVertex v2) {
 		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
+	}
+	
+	public void setAttribute(A attribute) {
+		this.attribute = attribute;
 	}
 	
 	public SparseVertex getOpposite(Vertex v) {
@@ -48,6 +54,10 @@ public class SparseEdge implements Edge {
 
 	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
 		return vertices;
+	}
+
+	public A getAttribute() {
+		return attribute;
 	}
 
 }

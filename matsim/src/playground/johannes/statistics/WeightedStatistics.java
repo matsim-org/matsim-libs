@@ -169,5 +169,18 @@ public class WeightedStatistics {
 		distr.transformValues(fct);
 		return distr;
 	}
+	
+	public TDoubleDoubleHashMap absoluteDistribution(double binsize) {
+		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
+		int size = values.size();
+		for(int i = 0; i < size; i++) {
+			double val = Math.floor(values.get(i) / binsize) * binsize;
+			double cumWeight = freq.get(val);
+			cumWeight += weights.get(i);
+			 
+			freq.put(val, cumWeight);
+		}
+		return freq;
+	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Edge.java
+ * FreespeedTravelTimeCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.graph;
+package playground.johannes.socialnets;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.network.Link;
+import org.matsim.router.util.TravelMinCost;
+import org.matsim.router.util.TravelTime;
+import org.matsim.utils.misc.Time;
 
-/**
- * @author illenberger
- *
- */
-public interface Edge<T> {
+public class FreespeedTravelTime implements TravelMinCost, TravelTime {
 
-	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
-	
-	public Vertex getOpposite(Vertex v);
-	
-	public T getAttribute();
-	
+	public double getLinkTravelCost(Link link, double time) {
+		return (link.getLength() / link.getFreespeed(time));
+	}
+
+	public double getLinkTravelTime(Link link, double time) {
+		return link.getLength() / link.getFreespeed(time);
+	}
+
+	public double getLinkMinimumTravelCost(Link link) {
+		return (link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME));
+	}
+
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Edge.java
+ * Ego.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,20 +21,29 @@
 /**
  * 
  */
-package playground.johannes.graph;
+package playground.johannes.socialnets;
 
-import org.matsim.utils.collections.Tuple;
+import org.matsim.population.Person;
+
+import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public interface Edge<T> {
+public class Ego extends SparseVertex {
 
-	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
+	private Person person;
 	
-	public Vertex getOpposite(Vertex v);
+	public Ego(Person person) {
+		this.person = person;
+	}
 	
-	public T getAttribute();
+	public Person getPerson() {
+		return person;
+	}
 	
+	public void setPerson(Person person) {
+		this.person = person;
+	}
 }

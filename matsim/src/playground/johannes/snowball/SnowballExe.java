@@ -175,8 +175,10 @@ public class SnowballExe {
 			logger.info(String.format("Running iteration %1$s...", sampler.getIteration() + 1));
 			sampler.runIteration();
 			int samples = sampler.getNumSampledVertices(sampler.getIteration());
+			int detected = sampler.getProjection().getVertices().size();
 			int total = graph.getVertices().size();
 			logger.info(String.format(Locale.US, "Sampled %1$s of %2$s vertices (%3$.4f).", samples, total, samples/(double)total));
+			logger.info(String.format(Locale.US, "Detected %1$s of %2$s vertices (%3$.4f).", detected, total, samples/(double)total));
 			/*
 			 * (b) Calculate statistics
 			 */

@@ -20,6 +20,7 @@
 
 package org.matsim.population;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -51,6 +52,19 @@ public class Person extends BasicPersonImpl<Plan>{
 		return p;
 	}
 	
+	/**
+	 * Dear author of this function,
+	 * I do not know what exact purpose you intended to achieve with this method, however, 
+	 * we can simplify this function to one single line of code:<br>
+	 * <br>
+	 * <code>throw new {@linkplain ConcurrentModificationException()}</code><br>
+	 * <br>
+	 * All the best,
+	 * Johannes
+	 * ;)
+	 * 
+	 * @deprecated
+	 */
 	public final void removeUnselectedPlans() {
 		Iterator<Plan> plan_it = this.plans.iterator();
 		while (plan_it.hasNext()) {

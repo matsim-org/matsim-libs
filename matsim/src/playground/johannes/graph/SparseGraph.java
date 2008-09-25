@@ -30,13 +30,13 @@ import java.util.Set;
  * @author illenberger
  *
  */
-public class SparseGraph implements Graph {
+public class SparseGraph<T> implements Graph {
 
 	private LinkedHashSet<SparseVertex> vertices = new LinkedHashSet<SparseVertex>();
 	
-	private LinkedHashSet<SparseEdge> edges = new LinkedHashSet<SparseEdge>();
+	private LinkedHashSet<SparseEdge<T>> edges = new LinkedHashSet<SparseEdge<T>>();
 	
-	public Set<? extends SparseEdge> getEdges() {
+	public Set<? extends SparseEdge<T>> getEdges() {
 		return edges;
 	}
 
@@ -50,8 +50,8 @@ public class SparseGraph implements Graph {
 		return v;
 	}
 	
-	public SparseEdge addEdge(SparseVertex v1, SparseVertex v2) {
-		SparseEdge e = newEdge(v1, v2);
+	public SparseEdge<T> addEdge(SparseVertex v1, SparseVertex v2) {
+		SparseEdge<T> e = newEdge(v1, v2);
 		v1.addEdge(e);
 		v2.addEdge(e);
 		edges.add(e);
@@ -62,8 +62,8 @@ public class SparseGraph implements Graph {
 		return new SparseVertex();
 	}
 	
-	protected SparseEdge newEdge(SparseVertex v1, SparseVertex v2) {
-		return new SparseEdge(v1, v2);
+	protected SparseEdge<T> newEdge(SparseVertex v1, SparseVertex v2) {
+		return new SparseEdge<T>(v1, v2);
 	}
 	
 	public void optimize() {

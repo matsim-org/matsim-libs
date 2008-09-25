@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Edge.java
+ * SocialNetwork.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,20 +21,47 @@
 /**
  * 
  */
-package playground.johannes.graph;
+package playground.johannes.socialnets;
 
-import org.matsim.utils.collections.Tuple;
+import java.util.Set;
+
+import org.matsim.population.Person;
+
+import playground.johannes.graph.SparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public interface Edge<T> {
+public class SocialNetwork extends SparseGraph {
 
-	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
+	public Ego addEgo(Person person) {
+		Ego e = (Ego)addVertex();
+		e.setPerson(person);
+		return e;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends Ego> getVertices() {
+		return (Set<? extends Ego>) super.getVertices();
+	}
+
+
+	@Override
+	protected Ego newVertex() {
+		return new Ego(null);
+	}
 	
-	public Vertex getOpposite(Vertex v);
-	
-	public T getAttribute();
-	
+	protected Ego newEgo(Person person) {
+		return new Ego(person);
+	}
+
+	/**
+	 * 
+	 */
+	public SocialNetwork() {
+		// TODO Auto-generated constructor stub
+	}
+
 }

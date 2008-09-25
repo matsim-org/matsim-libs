@@ -25,14 +25,11 @@ package playground.johannes.snowball;
 
 import gnu.trove.TObjectDoubleHashMap;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.VertexDecorator;
@@ -66,25 +63,15 @@ public class DegreeStats extends GraphPropertyEstimator {
 		Frequency observedDistr = new Frequency();
 		
 		WeightedStatistics estimated = new WeightedStatistics();
-//		WeightedStatistics estimatedDistr = new WeightedStatistics();
-		
-		try {
-		BufferedWriter vWriter = IOUtils.getBufferedWriter(outputDir + "/values.txt");
+
 		for(VertexDecorator<SampledVertex> v : graph.getVertices()) {
 			if(!v.getDelegate().isAnonymous()) {
-				vWriter.write(String.valueOf(v.getEdges().size()));
-				vWriter.newLine();
 				estimated.add(v.getEdges().size(), v.getDelegate().getNormalizedWeight());
-//				estimatedDistr.add(v.getEdges().size(), v.getDelegate().getNormalizedWeight());
 				
 				observed.addValue(v.getEdges().size());
 				observedDistr.addValue(v.getEdges().size());
 				
 			}
-		}
-		vWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		
 		TObjectDoubleHashMap<String> statsMap = getStatisticsMap(observed);

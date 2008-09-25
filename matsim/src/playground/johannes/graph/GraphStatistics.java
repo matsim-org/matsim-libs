@@ -129,7 +129,7 @@ public class GraphStatistics {
 		double sum = 0;
 		double squareSum = 0;
 
-		for (Edge e : g.getEdges()) {
+		for (Edge<?> e : g.getEdges()) {
 			Vertex v1 = e.getVertices().getFirst();
 			Vertex v2 = e.getVertices().getSecond();
 			int d_v1 = v1.getEdges().size();

@@ -51,6 +51,10 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 	
 	private BufferedWriter bcEstimWriter;
 	
+	private BufferedWriter bcObsNormWriter;
+	
+	private BufferedWriter bcEstimNormWriter;
+	
 	private BufferedWriter diameterWriter;
 	
 	private BufferedWriter radiusWriter;
@@ -65,6 +69,8 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 			ccEstimWriter = openWriter("closeness.estimated.txt");
 			bcObsWriter = openWriter("betweenness.observed.txt");
 			bcEstimWriter = openWriter("betweenness.estimated.txt");
+			bcObsNormWriter = openWriter("betweennessNorm.observed.txt");
+			bcEstimNormWriter = openWriter("betweennessNorm.estimated.txt");
 			diameterWriter = openWriter("diameter.txt");
 			radiusWriter = openWriter("radius.txt");
 		} catch (IOException e) {
@@ -83,6 +89,8 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 		WeightedStatistics ccEstimStats = new WeightedStatistics();
 		WeightedStatistics bcObsStats = new WeightedStatistics();
 		WeightedStatistics bcEstimStats = new WeightedStatistics();
+		WeightedStatistics bcObsNormStats = new WeightedStatistics();
+		WeightedStatistics bcEstimNormStats = new WeightedStatistics();
 		WeightedStatistics diameter = new WeightedStatistics();
 		WeightedStatistics radius = new WeightedStatistics();
 		
@@ -90,12 +98,15 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 			if(v.getDelegate().isSampled()) {
 				double cc = gDistance.getVertexCloseness().get(v);
 				double bc = gDistance.getVertexBetweennees().get(v);
+				double bcNorm = gDistance.getVertexBetweenneesNormalized().get(v);
 				
 				ccObsStats.add(cc);
 				bcObsStats.add(bc);
+				bcObsNormStats.add(bcNorm);
 				
 				ccEstimStats.add(cc, v.getDelegate().getNormalizedWeight());
 				bcEstimStats.add(bc, v.getDelegate().getNormalizedWeight());
+				bcEstimNormStats.add(bcNorm, v.getDelegate().getNormalizedWeight());
 			}
 		}
 		
@@ -106,6 +117,8 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 		dumpStatistics(getStatisticsMap(ccEstimStats), iteration, ccEstimWriter);
 		dumpStatistics(getStatisticsMap(bcObsStats), iteration, bcObsWriter);
 		dumpStatistics(getStatisticsMap(bcEstimStats), iteration, bcEstimWriter);
+		dumpStatistics(getStatisticsMap(bcObsNormStats), iteration, bcObsNormWriter);
+		dumpStatistics(getStatisticsMap(bcEstimNormStats), iteration, bcEstimNormWriter);
 		dumpStatistics(getStatisticsMap(diameter), iteration, diameterWriter);
 		dumpStatistics(getStatisticsMap(radius), iteration, radiusWriter);
 		
@@ -113,6 +126,8 @@ public class GraphDistanceStats extends GraphPropertyEstimator {
 		dumpFrequency(ccEstimStats, iteration, "closeness.estimated");
 		dumpFrequency(bcObsStats, iteration, "betweenness.observed");
 		dumpFrequency(bcEstimStats, iteration, "betweenness.estimated");
+		dumpFrequency(bcObsNormStats, iteration, "betweennessNorm.observed");
+		dumpFrequency(bcEstimNormStats, iteration, "betweennessNorm.estimated");
 		
 		return null;
 	}
