@@ -25,7 +25,7 @@ package playground.dressler.Intervall.src.Intervalls;
 
 /**
  * class representing intervalls in the reals boundary pionts are integral 
- * @author schneider
+ * @author Manuel Schneider
  *
  */
 public class Intervall

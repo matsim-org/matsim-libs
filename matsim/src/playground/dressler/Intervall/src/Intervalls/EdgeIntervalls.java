@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
- * @author manuelschneider
+ * @author Manuel Schneider
  *
  */
 public class EdgeIntervalls {
@@ -281,11 +281,20 @@ public class EdgeIntervalls {
 					break;
 				}
 				t=j.getHighBound();
+				/*
 				System.out.println("kapazitaet frei");
+				System.out.println("old i: " +i);
+				System.out.println("old j: " +j);
+				*/
 				if( i.intersects(j)){
 					j=i.Intersection(j).shiftPositive(traveltime);
 					if(j!=null){
-						result.add(i.Intersection(j));
+						/*
+						System.out.println("i: " +i);
+						System.out.println("j: " +j);
+						System.out.println("tau:" +traveltime);
+						*/
+						result.add(j);
 					}	
 				}	
 			}//TODO implement backwards and comment

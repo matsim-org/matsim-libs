@@ -45,7 +45,7 @@ import org.matsim.router.util.TravelTime;
  * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
  * 1 .. n for all e = (v,w) if l(w) > l(v) + c(e) then l(w) = l(v) + c(e), p(w) =
  * v.
- * 
+ * @author Manuel Schneider
  */
 
 
@@ -117,10 +117,10 @@ public class BellmanFordVertexIntervalls {
 	 */
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
 	
+	/**
+	 * 
+	 */
 	private boolean debugmode=false;
-	
-	
-
 	
 	/**
 	 * Default constructor.
@@ -174,7 +174,6 @@ public class BellmanFordVertexIntervalls {
 		this._sources = sources; 
 		this._sink = sink;
 		this._labels = new HashMap<Node, VertexIntervalls>();
-		
 	}
 	
 	/**
@@ -202,17 +201,6 @@ public class BellmanFordVertexIntervalls {
 		return nodes;
 	}
 	
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private LinkedList<Link> findpath(){
-		VertexIntervalls sinkintervalls = _labels.get(_sink);
-		
-		return null;
-	}
-	
 	/**
 	 * 
 	 * @param node
@@ -229,28 +217,12 @@ public class BellmanFordVertexIntervalls {
 	
 	/**
 	 * 
-	 * @param links
-	 */
-	private void augmentFlow(ArrayList<Link> links){
-		// TODO Auto-generated method stub
-	}
-	
-	/**
-	 * 
 	 * @return
 	 */
-	private ArrayList<Link> constructRoute(){
+	private Path constructRoute(){
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	/**
-	 * 
-	 *
-	 */
-	private void findGamma(){
-		// TODO Auto-generated method stub
-	} 
 	
 	
 	/**
@@ -272,10 +244,16 @@ public class BellmanFordVertexIntervalls {
 			i = labelfrom.getIntervallAt(t);
 			t=i.getHighBound();
 			if(i.getDist()){
-				System.out.println("wir kommen los");
+				//System.out.println("wir kommen los");
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
+					/*
 					System.out.println("wir kommen weiter");
+					for(Intervall inter: arrive){
+						System.out.println(forward);
+						System.out.println(inter);
+					}
+					*/
 					boolean temp = labelto.setTrue( arrive , over );
 					if(temp){
 						changed = true;
@@ -284,14 +262,13 @@ public class BellmanFordVertexIntervalls {
 			}
 		}while(!labelfrom.isLast(i));
 		return changed;
-		
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public boolean doCalculations() {
+	public Path doCalculations() {
 		// outprints
 		/*
 		 * for (Link link : network.getLinks().values()) {
@@ -339,11 +316,11 @@ public class BellmanFordVertexIntervalls {
 				printStatus();
 			}
 		}
-		//printStatus();
-		return false; //TODO whatever should be returned
+		System.out.println("finale labels: \n");
+		printStatus();
+		return null; //TODO whatever should be returned
 	}
 
-	
 	/**
 	 * 
 	 *
@@ -364,15 +341,9 @@ public class BellmanFordVertexIntervalls {
 					print.append(node.getId().toString() + " t: "+ t +" over: "+ inter.getIntervallAt(t).getPredecessor().getId()+ "\n");
 				}
 			}
-				
-			
 		}
 		print.append("\n");
-		System.out.println(print.toString());
-		
-		//System.out.println("blub");
-		// TODO Auto-generated method stub
-		
+		System.out.println(print.toString());	
 	}
 	
 

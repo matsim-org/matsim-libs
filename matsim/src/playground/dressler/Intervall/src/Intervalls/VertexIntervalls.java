@@ -18,35 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-
+/**
+ * 
+ */
 package playground.dressler.Intervall.src.Intervalls;
 
+/**
+ * java imports
+ */
 import java.util.ArrayList;
 
+/**
+ * matsim imports
+ */
 import org.matsim.network.Link;
-
-
-
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
- * @author manuelschneider
+ * @author Manuel Schneider
  *
  */
 public class VertexIntervalls {
 
 //------------------------FIELDS----------------------------------//
+	
 	/**
 	 * internal binary search tree holding distinkt Intervalls
 	 */
 	private AVLTree _tree;
+	
 	/**
 	 * reference to the last Intervall
 	 */
 	private VertexIntervall _last; 
 	
+	/**
+	 * 
+	 */
 	private int _demand=0;
 	
+	/**
+	 * 
+	 */
 	private boolean _source=false;
 	
 	

@@ -26,7 +26,7 @@ package playground.dressler.Intervall.src.Intervalls;
 
 
 /**
- * @author manuelschneider
+ * @author Manuel Schneider
  * class representing an edge in a given timeIntervall in an timeexpanded network
  * carries information on the constant integer flow during that timeframe 
  */

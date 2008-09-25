@@ -24,7 +24,7 @@
  */
 package playground.dressler.ea_flow;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -38,7 +38,7 @@ import org.matsim.router.util.TravelTime;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 
 /**
- * @author schneide
+ * @author Manuel Schneider
  *
  */
 public class MultiSourceEAF {
@@ -67,7 +67,7 @@ public class MultiSourceEAF {
 		// CODE
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
-			System.out.println(link.getId().toString());
+			//System.out.println(link.getId().toString());
 			flow.put(link, new EdgeIntervalls((int)link.getLength()));
 			//TODO achtung cast von double auf int
 		}

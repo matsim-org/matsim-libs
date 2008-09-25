@@ -25,7 +25,7 @@ import java.util.Collection;
 
 
 /**
- * @author manuelschneider
+ * @author Manuel Schneider
  * class representing a node in an time expanded network
  * between two integer Points of time
  * carries a prdecessor node and a min distance for shortest path computation
