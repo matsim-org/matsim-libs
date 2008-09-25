@@ -39,6 +39,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.events.EventControler;
+
 
 public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEventHandler, ActEndEventHandler{
 
@@ -52,7 +54,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	
 	public void handleEvent(ActEndEvent event) {
 		// TODO Auto-generated method stub
-		log.info("KnowledgeReplaner ActEndEvent.................................");
+		log.info("KnowledgeReplaner ActEndEvent....................." + event.agentId);
 		Replanning(event);
 	}
 	
@@ -144,7 +146,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		}
 	}
 	
-	/**
+	/*
 	 * Ansatz:
 	 * Die Router von MATSim generieren jeweils Routen f�r ganze Pl�ne. Da wird nichts
 	 * an den Routern �ndern wollen und auch keine eigenen schreiben wollen, generieren
@@ -187,8 +189,9 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		newPlan.addAct(nextAct);
 		
 		// Route neu planen
-		log.info("Replanning Route...");
-		PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
+//		log.info("Replanning Route...");
+//		PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
+		PlanAlgorithm planAlgorithm = ((EventControler)controler).getReplanningRouter();
 		planAlgorithm.run(newPlan);
 		
 /* Gar nicht n�tig - die �nderungen werden direkt am nextLeg durchgef�hrt und
@@ -206,7 +209,7 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 	}
 	
 	
-	/**
+	/*
 	 * Route am Ende jedes Links neu berechnen.
 	 * Ansatz:
 	 * - Neue Aktivit�t beim aktuellen Link generieren und Zielaktivit�t beibehalten.
@@ -317,7 +320,8 @@ public class KnowledgeReplanner implements AgentReplanEventHandler, LinkLeaveEve
 		
 		// Route neu planen
 		log.info("Replanning Route...");
-		PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
+//		PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
+		PlanAlgorithm planAlgorithm = ((EventControler)controler).getReplanningRouter();
 		planAlgorithm.run(newPlan);
 	
 		

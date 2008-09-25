@@ -62,8 +62,13 @@ public class KnowledgeTravelTimeCalculator implements TravelTime{
 		
 		double travelTime = length / v;
 //		log.info("vehicles " + vehicles + " length " + length + " vmax " + vmax + " v " + v + " traveltime " + travelTime);
-		log.info("Calculating TravelTime! TravelTime is " + travelTime + ", FreeSpeedTravelTime would be " + link.getFreespeedTravelTime(time));
-		
+
+/*		
+		if(java.lang.Math.abs(travelTime - link.getFreespeedTravelTime(time)) > 0.005 )
+		{
+			log.info("Calculating TravelTime! TravelTime is " + travelTime + ", FreeSpeedTravelTime would be " + link.getFreespeedTravelTime(time));
+		}	
+*/	
 		// Ergebnis prüfen
 		if(travelTime < link.getFreespeedTravelTime(time))
 		{

@@ -21,25 +21,18 @@
 package playground.christoph.events;
 
 
-
-import java.util.Iterator;
-import java.util.Map;
-
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.network.Link;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
-
+import org.matsim.router.util.PreProcessLandmarks;
 
 import playground.christoph.events.algorithms.KnowledgeReplanner;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
-import playground.christoph.mobsim.MyAgentFactory;
-import playground.christoph.mobsim.MyQueueNetworkFactory;
-import playground.christoph.mobsim.MyQueueNode;
-import playground.christoph.mobsim.Replanner;
+import playground.christoph.router.CompassRoute;
+import playground.christoph.router.RandomRoute;
 
 
 /**
@@ -51,10 +44,10 @@ import playground.christoph.mobsim.Replanner;
  */
 public class EventControler extends Controler{
 
-
 	protected ReplanningQueueSimulation sim;
 	protected TravelTimeDistanceCostCalculator travelCostCalculator;
 	protected KnowledgeTravelTimeCalculator travelTimeCalculator;
+	protected PlansCalcRoute replanner;
 	
 	private static final String FILENAME_EVENTS = "events.txt.gz";
 
@@ -72,12 +65,40 @@ public class EventControler extends Controler{
 
 		// Replanning klappt so nicht, da der Event erst ausgelöst wird, wenn das
 		// Fahrzeug bereits auf den nächsten Link verschoben wurde!
-		events.addHandler(new KnowledgeReplanner(this));
+//		events.addHandler(new KnowledgeReplanner(this));
 	}
+	
+	// Eigenen ReplanningRouter anlegen und nicht denjenigen des Controlers überschreiben.
+	// Eventuell sollen später mit dem Router auch Iterationen durchgeführt werden.
+	// -> jeweils eigene Router verwenden.
+	// Könnte man auch in die Mobsim packen - würde der Replanner da mehr Sinn machen?
+	protected void initReplanningRouter()
+	{
+		travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+		travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
+	
+		// Dijkstra
+		//replanner = new PlansCalcRouteDijkstra(network, travelCostCalculator, travelTimeCalculator);
 
+		//AStarLandmarks
+		PreProcessLandmarks landmarks = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+		landmarks.run(network);
+		replanner = new PlansCalcRouteLandmarks(network, landmarks, travelCostCalculator, travelTimeCalculator);
+		
+		// BasicReplanners (Random, Tabu, Compass, ...)
+		// arbeiten statisch - müssen also nur 1x je Agent ausgeführt werden
+		replanner = new PlansCalcRoute(new RandomRoute(), new RandomRoute());
+		
+	}
+	
+	public PlanAlgorithm getReplanningRouter()
+	{
+		return replanner;
+	}
+	
 	// Workaround!
 	protected void setup() {
-
+			
 		/*
 		try 
 		{
@@ -91,7 +112,7 @@ public class EventControler extends Controler{
 		 */
 		
 //		this.network.setEffectiveCellSize(100);
-				
+/*				
 		Map<Id, Link> linkMap = this.network.getLinks();
 		Iterator linkIterator = linkMap.values().iterator();
 		while(linkIterator.hasNext())
@@ -102,7 +123,7 @@ public class EventControler extends Controler{
 			
 			//link.setLength(link.getLength()/10);			
 		}
-		
+	*/	
 		super.setup();
 	}
 	
@@ -111,11 +132,14 @@ public class EventControler extends Controler{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		
 		sim.setControler(this);
+		
 		// CostCalculator entsprechend setzen!
-		setCostCalculator();
+//		setCostCalculator();
+		initReplanningRouter();
 		sim.run();
 	}
 	
+/*
 	protected void setCostCalculator()
 	{
 		travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
@@ -124,6 +148,7 @@ public class EventControler extends Controler{
 		// CostCalculator überschreiben!
 		super.travelCostCalculator = travelCostCalculator;
 	}
+*/
 	
 	/* ===================================================================
 	 * main

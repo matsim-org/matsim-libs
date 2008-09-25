@@ -71,7 +71,6 @@ public class BasicSimulation {
 		this.plans = plans;
 
 		this.networkLayer = network;
-		
 	}
 
 	
