@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimplifyPersons.java
+ * PopDensityGrid.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,53 +23,54 @@
  */
 package playground.johannes.socialnets;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.Coord;
 
 /**
  * @author illenberger
  *
  */
-public class SimplifyPersons {
+public class PopDensityGrid {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		
 		ScenarioData data = new ScenarioData(config);
-
-
-		Population pop = data.getPopulation();
-		List<Person> remove = new LinkedList<Person>();
-		for(Person p : pop) {
-			for(int i = 1; i < p.getPlans().size(); i = 1)
-				p.getPlans().remove(i);
-			
-			Plan selected = p.getSelectedPlan();
-			for(int i = 1; i < selected.getActsLegs().size(); i = 1) {
-				selected.getActsLegs().remove(i);
-			}
-			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
-			if(!(c.getX() >= 668000 && c.getX() <= 698000 && c.getY() >= 232000 && c.getY() <= 262000))
-				remove.add(p);
+		/*
+		 * Make grid...
+		 */
+		Population population = data.getPopulation();
+				
+		double maxX = 0;
+		double maxY = 0;
+		double minX = Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE;
+		for(Person person : population) {
+			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
+			maxX = Math.max(maxX, homeLoc.getX());
+			maxY = Math.max(maxY, homeLoc.getY());
+			minX = Math.min(minX, homeLoc.getX());
+			minY = Math.min(minY, homeLoc.getY());
 		}
 		
-		for(Person p : remove)
-			pop.getPersons().remove(p.getId());
+		double resolution = Double.parseDouble(args[1]);
+		SpatialGrid<Double> grid = new SpatialGrid<Double>(minX, minY, maxX, maxY, resolution);
+		for(Person person : population) {
+			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
+			Double count = grid.getValue(homeLoc);
+			if(count == null)
+				count = 0.0;
+			count++;
+			grid.setValue(count, homeLoc);
+		}
+		grid.toFile(args[2], new DoubleStringSerializer());
 		
-		PopulationWriter writer = new PopulationWriter(pop, args[1], "v4", 100);
-		writer.write();
 	}
 
 }

@@ -27,6 +27,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,13 +35,9 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.matsim.config.Config;
-import org.matsim.controler.ScenarioData;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Person;
-import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
@@ -60,28 +57,43 @@ public class TravelTimeHistogram {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
-//		String networkfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/ivtch-osm.xml";
-		String configfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/config.socialNetGenerator.xml";
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+		String networkfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/ivtch-osm.xml";
+//		String configfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/config.socialNetGenerator.xml";
 		String egofile = "/Users/fearonni/vsp-work/socialnets/data-analysis/egos_wgs84.txt";
 		String alterfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/alters_wgs84.txt";
 		String outputfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/traveltimes.txt";
+		String gridfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/popdensity.1000.xml";
 		/*
 		 * Load network...
 		 */
-//		System.out.println("Loading network...");
-//		NetworkLayer network = new NetworkLayer();
-//		new MatsimNetworkReader(network).readFile(networkfile);
-		Config config = Gbl.createConfig(new String[]{configfile});
-		ScenarioData data = new ScenarioData(config);
-		NetworkLayer network = data.getNetwork();
+		System.out.println("Loading network...");
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(networkfile);
+//		Config config = Gbl.createConfig(new String[]{configfile});
+//		ScenarioData data = new ScenarioData(config);
+//		NetworkLayer network = data.getNetwork();
+		/*
+		 * Make grid...
+		 */
+//		Population population = data.getPopulation();
+		SpatialGrid<Double> grid = SpatialGrid.readFromFile(gridfile, new DoubleStringSerializer());		
+		double maxX = grid.getXmax();
+		double maxY = grid.getYmax();
+		double minX = grid.getXmin();
+		double minY = grid.getYmin();
+		double resolution = grid.getResolution();
 		/*
 		 * Load egos...
 		 */
 		System.out.println("Loading egos...");
 		HashMap<String, Ego> egos = new HashMap<String, Ego>();
 		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
+		BufferedWriter writer2 = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/egocoors.txt");
+		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(egofile);
 			String line;
@@ -91,14 +103,22 @@ public class TravelTimeHistogram {
 				ego.id = tokens[0];
 				Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 				ego.homeloc = transform.transform(coord);
-				egos.put(ego.id, ego);
+				writer2.write(String.valueOf(ego.homeloc.getX()));
+				writer2.write("\t");
+				writer2.write(String.valueOf(ego.homeloc.getY()));
+				writer2.newLine();
+				if(ego.homeloc.getX() >= minX && ego.homeloc.getX() <= maxX &&
+						ego.homeloc.getY() >= minY && ego.homeloc.getY() <= maxY)
+					egos.put(ego.id, ego);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		writer2.close();
 		/*
 		 * Load alters...
 		 */
+		BufferedWriter writer3 = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/altercoords.txt");
 		System.out.println("Loading alters...");
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(alterfile);
@@ -110,39 +130,20 @@ public class TravelTimeHistogram {
 					System.err.println("Ego not found!");
 				} else {
 					Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
-					ego.alters.add(transform.transform(coord));
+					coord = transform.transform(coord);
+					writer3.write(String.valueOf(coord.getX()));
+					writer3.write("\t");
+					writer3.write(String.valueOf(coord.getY()));
+					writer3.newLine();
+					if(coord.getX() >= minX && coord.getX() <= maxX &&
+							coord.getY() >= minY && coord.getY() <= maxY)
+						ego.alters.add(coord);
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		/*
-		 * Make grid...
-		 */
-		Population population = data.getPopulation();
-				
-		double maxX = 0;
-		double maxY = 0;
-		double minX = Double.MAX_VALUE;
-		double minY = Double.MAX_VALUE;
-		for(Person person : population) {
-			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
-			maxX = Math.max(maxX, homeLoc.getX());
-			maxY = Math.max(maxY, homeLoc.getY());
-			minX = Math.min(minX, homeLoc.getX());
-			minY = Math.min(minY, homeLoc.getY());
-		}
-		double resolution = 500;
-		SpatialGrid<Double> grid = new SpatialGrid<Double>(new CoordImpl(minX, minY), new CoordImpl(maxX, maxY), resolution);
-		for(Person person : population) {
-			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
-			Double count = grid.getValue(homeLoc);
-			if(count == null)
-				count = 0.0;
-			count++;
-			grid.setValue(count, homeLoc);
-		}
-		
+		writer3.close();
 		/*
 		 * Map coordinates to links and route between links...
 		 */
@@ -155,6 +156,7 @@ public class TravelTimeHistogram {
 		Dijkstra shortestPathRouer = new Dijkstra(network, disttt, disttt);
 		Set<Relation> relations = new HashSet<Relation>();
 		WeightedStatistics stats = new WeightedStatistics();
+		WeightedStatistics stats2 = new WeightedStatistics();
 		for(Ego ego : egos.values()) {
 			Link homelink = network.getNearestLink(ego.homeloc);
 			for(Coord coord : ego.alters) {
@@ -182,8 +184,11 @@ public class TravelTimeHistogram {
 				r.ttShortestPath = shortesRoute.getTravTime();
 				r.distShortestPath = getPathLength(shortesRoute);
 				r.geodesicDistance = coord.calcDistance(ego.homeloc);
+				if(r.geodesicDistance > 0 ) {
 				relations.add(r);
 				stats.add(r.ttFastesPath, w);
+				stats2.add(r.geodesicDistance, w);
+				}
 			}
 		}
 		/*
@@ -211,6 +216,12 @@ public class TravelTimeHistogram {
 			e.printStackTrace();
 		}
 		
+		writeHistogram(stats, "/Users/fearonni/vsp-work/socialnets/data-analysis/tt_fastest", 60);
+		writeHistogram(stats2, "/Users/fearonni/vsp-work/socialnets/data-analysis/geodist", 1000);
+		System.out.println("Done.");
+	}
+	
+	private static void writeHistogram(WeightedStatistics stats, String outputfile, int binsize) {
 		try {
 			BufferedWriter aWriter = IOUtils.getBufferedWriter(String.format("%1$s.absolute.txt", outputfile));
 			BufferedWriter nWriter = IOUtils.getBufferedWriter(String.format("%1$s.normalized.txt", outputfile));
@@ -221,7 +232,7 @@ public class TravelTimeHistogram {
 			nWriter.write("bin\tpercentage");
 			nWriter.newLine();
 			
-			TDoubleDoubleHashMap aDistr = stats.absoluteDistribution(60);
+			TDoubleDoubleHashMap aDistr = stats.absoluteDistribution(binsize);
 			TDoubleDoubleHashMap nDistr = stats.normalizedDistribution();
 			double[] keys = aDistr.keys();
 			Arrays.sort(keys);
@@ -243,9 +254,7 @@ public class TravelTimeHistogram {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Done.");
 	}
-	
 	private static double getPathLength(Route route) {
 		double sum = 0;
 		for(Link link : route.getLinkRoute())
