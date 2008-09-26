@@ -83,7 +83,9 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			fw = new FileWriter(outfile);
 			out = new BufferedWriter(fw);
 			out.write("pid\tsex\tage\tlicense\tcar_avail\temployed\ttickets\thomex\thomey\t");
-			out.write("subtour_id\tsubtour_purpose\tprev_subtour_mode\tsubtour_mode\tsubtour_startx\tsubtour_starty\tsubtour_startudeg\tsubtour_distance\tsubtour_trips\n");
+			out.write("subtour_id\tsubtour_purpose\tprev_subtour_mode\tsubtour_mode\t");
+			out.write("subtour_startx\tsubtour_starty\tsubtour_startudeg\tsubtour_distance\tsubtour_trips\t");
+			out.write("subtour_starttime\tsubtour_endtime\tsubtour_zoneid\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -318,12 +320,18 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				else if (prev_mode == -1) { out.write(BasicLeg.Mode.undefined.toString() + "\t"); }
 				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
-				Coord start_coord = ((Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0))).getFacility().getCenter();
+				Act st_startact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0));
+				Act st_endact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.size()-1);
+				Coord start_coord = st_startact.getFacility().getCenter();
+				Zone zone = (Zone)st_startact.getFacility().getUpMapping().values().iterator().next();
 				out.write(start_coord.getX()+"\t");
 				out.write(start_coord.getY()+"\t");
 				out.write(this.getUrbanDegree(act_indices,p)+"\t");
 				out.write(this.calcTourDistance(act_indices,p)+"\t");
-				out.write(leg_indices.size()+"\n");
+				out.write(leg_indices.size()+"\t");
+				out.write(st_startact.getEndTime()+"\t");
+				out.write(st_endact.getStartTime()+"\t");
+				out.write(zone.getId()+"\n");
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(-1);
