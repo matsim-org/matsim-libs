@@ -8,36 +8,37 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	static final double B0_CONST =	-2.0572160e-001;
-	static final double B0_Car_Always =	+2.6021860e+000;
-	static final double B0_Dist	= +5.3512561e-004;
-	static final double B0_Prev = +2.5299529e+000;
-	static final double B0_T2 =	-3.0125799e-002;
-	static final double B0_T3 = +6.7556349e-001;
-	static final double B0_T4 =	+4.6771852e-001;
-	static final double B0_T5 = +5.3258786e-001;
-	static final double B1_Car_Never = +7.8129405e-001;
-	static final double B1_Dist = +2.4131034e-003;
-	static final double B1_Season =	+1.6012594e+000;
-	static final double B1_T2 =	-2.0484825e+000;
-	static final double B1_T3 =	-9.2157124e-001;
-	static final double B1_T4 =	-1.4718315e+000;
-	static final double B1_T5 =	-2.3202820e+000;
-	static final double B2_18_30 =	+1.1451936e+000;
-	static final double B2_60 =	+9.0287340e-001;
-	static final double B2_CONST =	-1.1470051e+000;
-	static final double B3_CONST =	+1.6106302e+000;
-	static final double B3_Dist =	-2.9325342e-001;
-	static final double B4_CONST =	+5.0715354e+000;
-	static final double B4_Dist =	-1.0751933e+000;
-	static final double B4_Prev_c =	+1.9542669e+000;
-	static final double B4_Prev_w =	+2.0028299e+000;
-	static final double B4_T2 	=-7.8817253e-001;
-	static final double B4_T3 =	-3.7308066e-001;
-	static final double B4_T4 	= -9.2156987e-001;
-	static final double B4_T5 =	-9.6988703e-001;
 	
-		
+	
+	static final double B0_CONST =	-1.7425867e-001;
+	static final double B0_Car_Always= 	+2.5964666e+000;
+	static final double B0_Dist 	=+5.2887294e-004;
+	static final double B0_Prev 	=+9.0154617e-001;
+	static final double B0_T2 	=-4.4683875e-002;
+	static final double B0_T3 	=+6.6593761e-001;
+	static final double B0_T4 	=+4.5793213e-001;
+	static final double B0_T5 	=+5.1553973e-001;
+	static final double B1_Car_Never= 	+8.0236756e-001;
+	static final double B1_Dist 	=+2.3751085e-003;
+	static final double B1_Prev 	=-4.3037695e-001;
+	static final double B1_Season 	=+1.6068180e+000;
+	static final double B1_T2 	=-2.0538065e+000;
+	static final double B1_T3 	=-9.2118071e-001;
+	static final double B1_T4 	=-1.4731152e+000;
+	static final double B1_T5 	=-2.3264020e+000;
+	static final double B2_18_30 =	+1.1270697e+000;
+	static final double B2_60 	=+9.1905687e-001;
+	static final double B2_CONST =	-1.1480115e+000;
+	static final double B3_CONST =	+1.6115502e+000;
+	static final double B3_Dist 	=-2.9306362e-001;
+	static final double B4_CONST 	=+5.1297922e+000;
+	static final double B4_Dist 	=-1.0807955e+000;
+	static final double B4_Prev_w 	=+1.9764835e+000;
+	static final double B4_T2 	=-8.0839457e-001;
+	static final double B4_T3 	=-3.9071510e-001;
+	static final double B4_T4 	=-9.4203042e-001;
+	static final double B4_T5 	=-9.9859149e-001;
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -82,6 +83,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 			double util = 0.0;
 			util += B1_Season * tickets ;
 			util += B1_Dist * dist_subtour;
+			if (prev_mode == 0) {util += B1_Prev * 1.0;}
 			if (car == "never") { util += B1_Car_Never *  1.0; }
 			if (udeg == 1) { util += 0;/* reference type */ }
 			else if (udeg == 2) { util += B1_T2 * 1.0; }
@@ -133,7 +135,7 @@ public class ModelModeChoiceShop18Plus extends ModelModeChoice {
 		double util = 0.0;
 		util += B4_CONST * 1.0;
 		util += B4_Dist * dist_subtour;
-		if (prev_mode == 0) {util += B4_Prev_c * 1.0;}
+		//if (prev_mode == 0) {util += B4_Prev_c * 1.0;}
 		if ((prev_mode == 2) || (prev_mode == 4)|| (prev_mode == 1)) {util += B4_Prev_w * 1.0;}
 		if (udeg == 1) { util += 0;/* reference type */ }
 		else if (udeg == 2) { util += B4_T2 * 1.0; }

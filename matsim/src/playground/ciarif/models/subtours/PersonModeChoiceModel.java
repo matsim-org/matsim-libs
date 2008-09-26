@@ -132,7 +132,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 //			boolean has_bike = true;
 			boolean has_bike = false;
-			if (MatsimRandom.random.nextDouble() < 0.54) { has_bike = true; }			
+			if (MatsimRandom.random.nextDouble() < 0.56) { has_bike = true; }			
 
 			////////////////////////////////////////////////////////////////////////////////
 			// TODO [balmermi]: Check for antoher probability
@@ -141,7 +141,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			double rd2 = MatsimRandom.random.nextDouble ();
 			if (plan.getPerson().hasLicense()) {}
 			else {
-				if (rd2 < 0.54) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
+				if (rd2 < 0.60) {ride_possible = true; System.out.println("random = " + rd2);} // should be substituted with car ownership 
 				// at the houshold level or something similar 
 			}
 			////////////////////////////////////////////////////////////////////////////////
