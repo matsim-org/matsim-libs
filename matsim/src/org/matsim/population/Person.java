@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,7 +20,6 @@
 
 package org.matsim.population;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -53,24 +52,13 @@ public class Person extends BasicPersonImpl<Plan>{
 	}
 	
 	/**
-	 * Dear author of this function,
-	 * I do not know what exact purpose you intended to achieve with this method, however, 
-	 * we can simplify this function to one single line of code:<br>
-	 * <br>
-	 * <code>throw new {@linkplain ConcurrentModificationException()}</code><br>
-	 * <br>
-	 * All the best,
-	 * Johannes
-	 * ;)
-	 * 
-	 * @deprecated
+	 * Removes all plans except the selected one.
 	 */
 	public final void removeUnselectedPlans() {
-		Iterator<Plan> plan_it = this.plans.iterator();
-		while (plan_it.hasNext()) {
-			Plan plan = plan_it.next();
+		for (Iterator<Plan> iter = this.plans.iterator(); iter.hasNext(); ) {
+			Plan plan = iter.next();
 			if (!plan.isSelected()) {
-				this.plans.remove(plan);
+				iter.remove();
 			}
 		}
 	}

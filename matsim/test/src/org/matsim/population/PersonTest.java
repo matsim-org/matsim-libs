@@ -23,6 +23,10 @@ package org.matsim.population;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+/**
+ *
+ * @author cello
+ */
 public class PersonTest extends MatsimTestCase {
 
 	/**
@@ -181,7 +185,6 @@ public class PersonTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Test {@link org.matsim.population.Person#getRandomUnscoredPlan()} when the
 	 * @author mrieser
 	 */
 	public void testGetRandomUnscoredPlan() {
@@ -231,6 +234,24 @@ public class PersonTest extends MatsimTestCase {
 		for (int i = 0; i < plans.length; i++) {
 			assertFalse(plans[i].hasUndefinedScore());
 		}
+	}
+	
+	/**
+	 * @author mrieser 
+	 */
+	public void testRemoveUnselectedPlans() {
+		Person person = new Person(new IdImpl(1));
+		person.createPlan(false);
+		person.createPlan(false);
+		Plan selPlan = person.createPlan(true);
+		person.createPlan(false);
+
+		assertEquals("person should have 4 plans.", 4, person.getPlans().size());
+
+		person.removeUnselectedPlans();
+
+		assertEquals("person should have 1 plan.", 1, person.getPlans().size());
+		assertEquals("remaining plan should be selPlan.", selPlan, person.getPlans().get(0));
 	}
 
 }
