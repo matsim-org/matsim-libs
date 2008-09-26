@@ -28,6 +28,17 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import net.opengis.kml._2.BasicLinkType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
@@ -39,16 +50,16 @@ import org.matsim.utils.misc.Time;
 
 import playground.meisterk.facilities.ShopsOf2005ToFacilities.Day;
 
-import com.google.earth.kml._2.BasicLinkType;
-import com.google.earth.kml._2.DocumentType;
-import com.google.earth.kml._2.FolderType;
-import com.google.earth.kml._2.IconStyleType;
-import com.google.earth.kml._2.KmlType;
-import com.google.earth.kml._2.ObjectFactory;
-import com.google.earth.kml._2.PlacemarkType;
-import com.google.earth.kml._2.PointType;
-import com.google.earth.kml._2.StyleType;
-import com.google.earth.kml._2.TimeSpanType;
+//import com.google.earth.kml._2.BasicLinkType;
+//import com.google.earth.kml._2.DocumentType;
+//import com.google.earth.kml._2.FolderType;
+//import com.google.earth.kml._2.IconStyleType;
+//import com.google.earth.kml._2.KmlType;
+//import com.google.earth.kml._2.ObjectFactory;
+//import com.google.earth.kml._2.PlacemarkType;
+//import com.google.earth.kml._2.PointType;
+//import com.google.earth.kml._2.StyleType;
+//import com.google.earth.kml._2.TimeSpanType;
 
 /**
  * Transforms a MATSim-T facilities.xml file into a Google Earth KML file.
@@ -125,7 +136,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		shopStyle.setIconStyle(shopIconStyle);
 		BasicLinkType shopIconLink = this.kmlJAXBFactory.createBasicLinkType();
 		shopIconStyle.setIcon(shopIconLink);
-		shopIconStyle.setScale(this.iconScale);
+		shopIconStyle.setLiteralScale(this.iconScale);
 		shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 		log.info("Initializing KML...done.");
 

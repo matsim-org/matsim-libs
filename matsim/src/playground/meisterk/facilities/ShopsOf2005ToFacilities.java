@@ -39,6 +39,19 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.AbstractGeometryType;
+import net.opengis.kml._2.BasicLinkType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+
 import org.apache.commons.io.FileUtils;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
@@ -65,18 +78,18 @@ import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.Placemark;
 import org.matsim.utils.vis.kml.Style;
 
-import com.google.earth.kml._2.AbstractFeatureType;
-import com.google.earth.kml._2.AbstractGeometryType;
-import com.google.earth.kml._2.BasicLinkType;
-import com.google.earth.kml._2.DocumentType;
-import com.google.earth.kml._2.FolderType;
-import com.google.earth.kml._2.IconStyleType;
-import com.google.earth.kml._2.KmlType;
-import com.google.earth.kml._2.ObjectFactory;
-import com.google.earth.kml._2.PlacemarkType;
-import com.google.earth.kml._2.PointType;
-import com.google.earth.kml._2.StyleType;
-import com.google.earth.kml._2.TimeSpanType;
+//import com.google.earth.kml._2.AbstractFeatureType;
+//import com.google.earth.kml._2.AbstractGeometryType;
+//import com.google.earth.kml._2.BasicLinkType;
+//import com.google.earth.kml._2.DocumentType;
+//import com.google.earth.kml._2.FolderType;
+//import com.google.earth.kml._2.IconStyleType;
+//import com.google.earth.kml._2.KmlType;
+//import com.google.earth.kml._2.ObjectFactory;
+//import com.google.earth.kml._2.PlacemarkType;
+//import com.google.earth.kml._2.PointType;
+//import com.google.earth.kml._2.StyleType;
+//import com.google.earth.kml._2.TimeSpanType;
 
 /**
  * In April 2005, I collected information on shop facilities of the major
@@ -1724,7 +1737,7 @@ public class ShopsOf2005ToFacilities {
 			shopStyle.setIconStyle(shopIconStyle);
 			BasicLinkType shopIconLink = factory.createBasicLinkType();
 			shopIconStyle.setIcon(shopIconLink);
-			shopIconStyle.setScale(shopIconScales.get(new Integer(dataSetIndex)));
+			shopIconStyle.setLiteralScale(shopIconScales.get(new Integer(dataSetIndex)));
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
