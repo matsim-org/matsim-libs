@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -34,7 +34,6 @@ import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.customize.CustomizableImpl;
 
-
 public class Knowledge extends CustomizableImpl {
 
 	//////////////////////////////////////////////////////////////////////
@@ -45,7 +44,7 @@ public class Knowledge extends CustomizableImpl {
 	private static final int INIT_ACTIVITY_CAPACITY = 5;
 
 	/**
-	 * Contains all known {@link Activity}(ies) of a {@link Person}. Each activity can at most occur
+	 * Contains all known {@link Activity Activities} of a {@link Person}. Each activity can at most occur
 	 * one time, independent of its {@code isPrimary} flag.
 	 */
 	private Set<KActivity> activities = null;
@@ -65,21 +64,27 @@ public class Knowledge extends CustomizableImpl {
 
 	/**
 	 * Internal representation of of a pair consists of an {@link Activity} and its {@code isPrimary} flag.
-	 * Two {@link KActivity}(ies) are equal if the containing {@link Activity}(ies) are equal, independent
+	 * Two {@link KActivity KActivities} are equal if the containing {@link Activity}(ies) are equal, independent
 	 * of their {@code isPrimary} flag.
 	 */
-	private class KActivity {
-		private boolean isPrimary = false;
-		private Activity activity = null;
-		private KActivity(Activity activity, boolean isPrimary) {
+	private static class KActivity {
+		/*default*/ boolean isPrimary;
+		/*default*/ final Activity activity;
+		
+		/*default*/ KActivity(Activity activity, boolean isPrimary) {
 			this.activity = activity;
 			this.isPrimary = isPrimary;
 		}
+
 		@Override
 		public boolean equals(Object obj) {
-			KActivity ka = (KActivity)obj;
-			return ka.activity.equals(this.activity);
+			if (obj instanceof KActivity) {
+				KActivity ka = (KActivity)obj;
+				return ka.activity.equals(this.activity);
+			}
+			return false;
 		}
+
 		@Override
 		public int hashCode() {
 			return this.activity.hashCode();
@@ -139,7 +144,7 @@ public class Knowledge extends CustomizableImpl {
 	 * @param activity The (non primary) {@link Activity} to add to the {@link Person}s {@link Knowledge}.
 	 * @return <code>true</code> if the {@code activity} is not already present in the list.
 	 * @see #addActivity(Activity, boolean)
-	 * @deprecated This method is only exists only for backwards compatibility.
+	 * @deprecated This method only exists only for backwards compatibility.
 	 */
 	public final boolean addActivity(Activity activity) {
 		return this.addActivity(activity,false);
@@ -240,31 +245,10 @@ public class Knowledge extends CustomizableImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Returns the <strong>first occurrence</strong> of an given {@link Activity},
-	 * that is part of a {@link Facility} with the given {@link Id}.
-	 * <p>Use {@link #getActivities(Id facilityId)} to get all occurrences instead of only the first one.</p>
-	 * @param facilityId The {@link Id} of a {@link Facility}
-	 * @return <code>null</code> if no {@link Activity} exists
-	 * or the <strong>first occurrence</strong> of an given {@link Activity}
-	 * @see #getActivities(Id facilityId)
-	 * @deprecated This method should not be use anymore, since it is not defined,
-	 * which {@link Activity} it will return.
-	 */
-	public Activity getActivity(Id facilityId) {
-		if (activities == null) { return null; }
-		for (KActivity ka : activities) {
-			if (ka.activity.getFacility().getId().equals(facilityId)) {
-				return ka.activity;
-			}
-		}
-		return null;
-	}
-	
-	/**
 	 * Returns all occurrences of an given {@link Activity},
 	 * that is part of a {@link Facility} with the given {@link Id}.
 	 * @param facilityId The {@link Id} of a {@link Facility}
-	 * @return The list of {@link Activity}(ies) that are part of the {@link Knowledge} and fulfill the above.
+	 * @return The list of {@link Activity Activities} that are part of the {@link Knowledge} and fulfill the above.
 	 * The list can also be empty.
 	 */
 	public final ArrayList<Activity> getActivities(Id facilityId) {
@@ -279,9 +263,9 @@ public class Knowledge extends CustomizableImpl {
 	}
 
 	/**
-	 * Returns all {@link Activity}(ies) of the given {@code isPrimary} flag.
-	 * @param isPrimary To define which of the {@link Activity}(ies) should be returned
-	 * @return The list of {@link Activity}(ies) of the given flag. The list may be empty
+	 * Returns all {@link Activity Activities} of the given {@code isPrimary} flag.
+	 * @param isPrimary To define which of the {@link Activity Activities} should be returned
+	 * @return The list of {@link Activity Activities} of the given flag. The list may be empty
 	 */
 	public final ArrayList<Activity> getActivities(boolean isPrimary) {
 		if (activities == null) { return new ArrayList<Activity>(0); }
@@ -295,8 +279,8 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 	/**
-	 * Returns all {@link Activity}(ies).
-	 * @return The list of {@link Activity}(ies). The list may be empty.
+	 * Returns all {@link Activity Activities}.
+	 * @return The list of {@link Activity Activities}. The list may be empty.
 	 */
 	public final ArrayList<Activity> getActivities() {
 		if (activities == null) { return new ArrayList<Activity>(0); }
