@@ -321,7 +321,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				else { Gbl.errorMsg("pid="+person.getId()+": prev_mode="+prev_mode+" knot known!"); }
 				out.write(mode.toString()+"\t");
 				Act st_startact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(0));
-				Act st_endact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.size()-1);
+				Act st_endact = (Act)person.getSelectedPlan().getActsLegs().get(act_indices.get(act_indices.size()-1));
 				Coord start_coord = st_startact.getFacility().getCenter();
 				Zone zone = (Zone)st_startact.getFacility().getUpMapping().values().iterator().next();
 				out.write(start_coord.getX()+"\t");
