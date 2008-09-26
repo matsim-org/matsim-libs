@@ -1,6 +1,3 @@
-/**
- * 
- */
 package playground.toronto;
 
 import java.io.BufferedReader;
@@ -29,54 +26,54 @@ import org.matsim.world.ZoneLayer;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Converter {
 	public static class ZoneXY {
-		private String zoneId, x, y;
+		private final String zoneId, x, y;
 
-		public ZoneXY(String zoneId, String x, String y) {
+		public ZoneXY(final String zoneId, final String x, final String y) {
 			this.zoneId = zoneId;
 			this.x = x;
 			this.y = y;
 		}
 
 		public String getX() {
-			return x;
+			return this.x;
 		}
 
 		public String getY() {
-			return y;
+			return this.y;
 		}
 
 		public String getZoneId() {
-			return zoneId;
+			return this.zoneId;
 		}
 	}
 
 	private Population pop;
 
-	public void setPop(Population pop) {
+	public void setPop(final Population pop) {
 		this.pop = pop;
 	}
 
 	private ZoneLayer zones = null;
 
 	public Layer getLayer() {
-		return zones;
+		return this.zones;
 	}
 
-	public void setZones(ZoneLayer zones) {
+	public void setZones(final ZoneLayer zones) {
 		this.zones = zones;
 	}
 
 	private Map<String, ZoneXY> zoneXYs;
 
 	public Map<String, ZoneXY> getZoneXYs() {
-		return zoneXYs;
+		return this.zoneXYs;
 	}
 
-	public void setZoneXYs(Map<String, ZoneXY> zoneXYs) {
+	public void setZoneXYs(final Map<String, ZoneXY> zoneXYs) {
 		this.zoneXYs = zoneXYs;
 	}
 
@@ -89,70 +86,72 @@ public class Converter {
 	private double tmpHomeX = 0, tmpHomeY = 0;
 
 	/**
-	 * 
+	 *
 	 */
 	public Converter() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static String getEndingTimeS(String endingS) {
+	public static String getEndingTimeS(final String endingS) {
 		int endingI = Integer.parseInt(endingS);
 		return (((endingI / 100) < 10) ? "0" : "") + (endingI / 100) + ":"
 				+ (endingI % 100);
 	}
 
-	public static double getEndingTimeD(String endingS) {
+	public static double getEndingTimeD(final String endingS) {
 		int endingI = Integer.parseInt(endingS);
 		return 3600 * (endingI / 100) + 60 * (endingI - endingI / 100 * 100);
 	}
 
-	public void readLine(String line) {
+	public void readLine(final String line) {
 		String[] tabs = line.split("\t");
 		String personId = tabs[0] + "-" + tabs[1];
 		int ending;
 		try {
-			if (tmpPersonId.equals(personId)) {
+			if (this.tmpPersonId.equals(personId)) {
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				Plan pl = pop.getPerson(personId).getSelectedPlan();
+				Plan pl = this.pop.getPerson(personId).getSelectedPlan();
 				ending = Integer.parseInt(tabs[3]);
 				int dur = 0;
-				if (ending % 100 < tmpEndingTime % 100) {
-					dur = 60 + (ending % 100) - (tmpEndingTime % 100) + ending
-							/ 100 * 100 - tmpEndingTime / 100 * 100 - 100;
+				if (ending % 100 < this.tmpEndingTime % 100) {
+					dur = 60 + (ending % 100) - (this.tmpEndingTime % 100) + ending
+							/ 100 * 100 - this.tmpEndingTime / 100 * 100 - 100;
 				} else {
-					dur = ending - tmpEndingTime;
+					dur = ending - this.tmpEndingTime;
 				}
 
-				pl.createLeg(Mode.car, getEndingTimeD(tmpTabs[3]),
+				pl.createLeg(Mode.car, getEndingTimeD(this.tmpTabs[3]),
 						Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
-				double x = getActX(tabs[9]);
-				double y = getActY(tabs[9]);
+				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
+				double x = tmpCoord.getX();
+				double y = tmpCoord.getY();
 				if (tabs[7].equals("H")) {
-					x = tmpHomeX;
-					y = tmpHomeY;
+					x = this.tmpHomeX;
+					y = this.tmpHomeY;
 				}
 				pl.createAct(tabs[7], x, y, null, null,
 						getEndingTimeS(tabs[3]), dur / 100 + ":" + dur % 100,
 						null);
 
 			} else {
-				if (!pop.getPersons().isEmpty()) {
-					Person p = pop.getPerson(tmpPersonId);
+				if (!this.pop.getPersons().isEmpty()) {
+					Person p = this.pop.getPerson(this.tmpPersonId);
 					Plan tmpPl = p.getSelectedPlan();
-					tmpPl.createLeg(Mode.car, getEndingTimeD(tmpTabs[3]),
+					tmpPl.createLeg(Mode.car, getEndingTimeD(this.tmpTabs[3]),
 							Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
-					double x = getActX(tmpTabs[12]);
-					double y = getActY(tmpTabs[12]);
-					if (tmpTabs[10].equals("H")) {
-						x = tmpHomeX;
-						y = tmpHomeY;
+					Coord tmpCoord2 = getRandomCoordInZone(tabs[12]);
+					double x = tmpCoord2.getX();
+					double y = tmpCoord2.getY();
+					if (this.tmpTabs[10].equals("H")) {
+						x = this.tmpHomeX;
+						y = this.tmpHomeY;
 						// System.out.println("tmpHomeX : " + tmpHomeX
 						// + "\t|\ttmpHomeY : " + tmpHomeY + "\nx : " + x
 						// + "\t|\ty : " + y);
 					}
-					tmpPl.createAct(tmpTabs[10], x, y, null, null, null, null,
+					tmpPl.createAct(this.tmpTabs[10], x, y, null, null, null, null,
 							null);
 					Plan nonCarPlan = new Plan(p);
 					nonCarPlan.copyPlan(tmpPl);
@@ -168,50 +167,43 @@ public class Converter {
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				ending = Integer.parseInt(tabs[3]);
 
-				tmpHomeX = getActX(tabs[9]);
-				tmpHomeY = getActY(tabs[9]);
-				pl.createAct(tabs[7], tmpHomeX, tmpHomeY, null, null,
+				Coord coord = getRandomCoordInZone(tabs[9]);
+				this.tmpHomeX = coord.getX();
+				this.tmpHomeY = coord.getY();
+				pl.createAct(tabs[7], this.tmpHomeX, this.tmpHomeY, null, null,
 						getEndingTimeS(tabs[3]), null, null);
 				p.addPlan(pl);
-				pop.addPerson(p);
+				this.pop.addPerson(p);
 			}
-			tmpPersonId = personId;
-			tmpEndingTime = ending;
-			tmpTabs = tabs;
+			this.tmpPersonId = personId;
+			this.tmpEndingTime = ending;
+			this.tmpTabs = tabs;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public double getActX(String zoneId) {
-		return this.getRandomCoordInZone(zoneId).getX();
-	}
-
-	public double getActY(String zoneId) {
-		return this.getRandomCoordInZone(zoneId).getY();
-	}
-
-	private Coord getRandomCoordInZone(String zoneId) {
+	private Coord getRandomCoordInZone(final String zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) zones.getLocation(zoneId), zones);
+				(Zone) this.zones.getLocation(zoneId), this.zones);
 
 	}
 
 	public void createZones() {
-		for (ZoneXY zxy : zoneXYs.values()) {
+		for (ZoneXY zxy : this.zoneXYs.values()) {
 			createZone(zxy);
 		}
-		zoneXYs.clear();// //////////////////////////////////////////////
+		this.zoneXYs.clear();// //////////////////////////////////////////////
 	}
 
-	public void createZone(ZoneXY zxy) {
-		zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null,
+	public void createZone(final ZoneXY zxy) {
+		this.zones.createZone(zxy.getZoneId(), zxy.getX(), zxy.getY(), null, null,
 				null, null, null, null);
 	}
 
 	/**
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		String oldPlansFilename = "input/Toronto/fout_chains210.txt";
 		String newPlansFilename = "output/Toronto/example.xml.gz";
 		String zoneFilename = "input/Toronto/centroids.txt";
@@ -254,7 +246,7 @@ public class Converter {
 		// create zones
 		c.createZones();
 
-		//		
+		//
 		c.setPop(new Population());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
