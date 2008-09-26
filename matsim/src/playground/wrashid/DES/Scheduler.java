@@ -20,7 +20,7 @@ public class Scheduler {
 			//System.out.println("m.getMessageArrivalTime():"+m.getMessageArrivalTime());
 			//System.out.println("simTime:"+simTime);
 			//System.out.println(m.getClass());
-			assert(m.getMessageArrivalTime()>=simTime); // for backtracing, where a wrong message has been scheduled
+			//assert(m.getMessageArrivalTime()>=simTime); // for backtracing, where a wrong message has been scheduled
 		//}
 	}
 	

@@ -61,6 +61,7 @@ public class EndLegMessage extends EventMessage {
 	
 	
 	public void logEvent() {
+		
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.END_LEG)){

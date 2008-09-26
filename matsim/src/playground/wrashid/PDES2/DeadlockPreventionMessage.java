@@ -8,14 +8,18 @@ public class DeadlockPreventionMessage extends EventMessage {
 		if (isAlive()){
 			Road road=(Road)this.receivingUnit;
 			
-			road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
-			road.setTimeOfLastEnteringVehicle(messageArrivalTime);
-			road.removeDeadlockPreventionMessage(this);
+			synchronized (road){
+				road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
+				road.setTimeOfLastEnteringVehicle(messageArrivalTime);
+				road.removeDeadlockPreventionMessage(this);
+			}
 			//road.removeFromInterestedInEnteringRoad(vehicle);
 			
 			vehicle.scheduleEnterRoadMessage(messageArrivalTime, road);
-			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && road.getLink().getId().toString().equalsIgnoreCase("7759")) {
-				System.out.println(road.getLink().getId().toString());
+			
+			
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("deadlock prevention: "+road.getLink().getId().toString());
 			}
 			//System.out.println("Deadlock prevention happend");
 		}

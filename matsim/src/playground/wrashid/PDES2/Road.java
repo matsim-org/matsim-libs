@@ -180,8 +180,14 @@ public class Road extends SimUnit {
 
 	}
 
-	 public void leaveRoad(Vehicle vehicle, double simTime) {
+	synchronized public void leaveRoad(Vehicle vehicle, double simTime) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
+		
+		
+		assert(timeOfLastLeavingVehicle<=simTime);
+		// this would mean, that we have out of order processing of events on this road.
+		assert(timeOfLastEnteringVehicle<=simTime): "timeOfLastEnteringVehicle=" + timeOfLastEnteringVehicle + ", simTime=" + simTime;
+		
 		
 		 if (carsOnTheRoad.isEmpty()){
 			 //System.out.println();
@@ -193,7 +199,9 @@ public class Road extends SimUnit {
 		}
 		assert(carsOnTheRoad.getFirst()==vehicle):"road:"+link.getId()+  " - " + this + " - " + lock; // TODO: uncomment this, and find out, why it produces a problem with test6
 	 	
-		
+		if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+			System.out.println("Road,leave0, linkId=" + link.getId() + ", simTime="+simTime);
+		}
 		
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
@@ -229,14 +237,16 @@ public class Road extends SimUnit {
 
 			noOfCarsPromisedToEnterRoad++;
 
+			
+			if (nextVehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("Road,leave1, t="+nextAvailableTimeForEnteringStreet + ", linkId=" + link.getId() + ", simTime="+simTime);
+				System.out.println("suspect vehicle: " + vehicle.getOwnerPerson().getId().toString());
+			}
+			
 			nextVehicle.scheduleEnterRoadMessage(
 					nextAvailableTimeForEnteringStreet, this);
 			
-			if (nextVehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
-				if (simTime>47000){
-					assert(false);
-				}
-			}
+			assert(nextAvailableTimeForEnteringStreet>=simTime);
 		} else {
 			if (gap != null) {
 				// as long as the road is not full once, there is no need to
@@ -259,8 +269,13 @@ public class Road extends SimUnit {
 			double nextAvailableTimeForLeavingStreet = Math.max(
 					earliestDepartureTimeOfCar.getFirst(),
 					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
+			if (nextVehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("Road,leave2, t="+nextAvailableTimeForLeavingStreet + ", linkId=" + link.getId() + ", simTime="+simTime);
+			}
 			nextVehicle.scheduleEndRoadMessage(
 					nextAvailableTimeForLeavingStreet, this);
+			
+			assert(nextAvailableTimeForLeavingStreet>=simTime);
 		}
 
 	}
@@ -268,15 +283,14 @@ public class Road extends SimUnit {
 	// returns the time, when the car reaches the end of the road
 	// TODO: instead of returning the scheduling time, just schedule messages
 	// here...
-	public void enterRoad(Vehicle vehicle, double simTime) {
-
+	synchronized public void enterRoad(Vehicle vehicle, double simTime) {
+		
+		assert(timeOfLastEnteringVehicle<=simTime): "timeOfLastEnteringVehicle=" + timeOfLastEnteringVehicle + ", simTime=" + simTime;
+		assert(timeOfLastLeavingVehicle<=simTime);
+		
 		// vehicle.leavePreviousRoad();
 
-		if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
-			if (simTime>47000){
-				assert(false);
-			}
-		}
+		
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
 		nextAvailableTimeForLeavingStreet = simTime
@@ -298,8 +312,14 @@ public class Road extends SimUnit {
 			nextAvailableTimeForLeavingStreet = Math.max(
 					nextAvailableTimeForLeavingStreet, timeOfLastLeavingVehicle
 							+ inverseOutFlowCapacity);
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("Road,enter, t="+nextAvailableTimeForLeavingStreet + ", linkId=" + link.getId() + ", simTime="+simTime);
+			}
 			vehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet,
 					this);
+			
+			assert(nextAvailableTimeForLeavingStreet>=simTime);
+			
 		} else {
 			// this car is not the front car in the street queue
 			// when the cars infront of the current car leave the street and
@@ -316,7 +336,7 @@ public class Road extends SimUnit {
 	// handled later
 	// => TODO: remove the return value. Scheduling the car etc. should be done
 	// by the vehicle
-	public void enterRequest(Vehicle vehicle,double simTime) {
+	synchronized public void enterRequest(Vehicle vehicle,double simTime) {
 		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
 		
 		// attention: do not use in multi thread solution (might return false result)
@@ -370,18 +390,21 @@ public class Road extends SimUnit {
 
 			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
 			
-			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820") && link.getId().toString().equalsIgnoreCase("7759")) {
-				if (simTime>47000){
-					assert(false);
-				}
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("Road,enterR, t="+nextAvailableTimeForEnteringStreet + ", linkId=" + link.getId() + ", simTime="+simTime);
 			}
 			
 			
 			vehicle.scheduleEnterRoadMessage(
 					nextAvailableTimeForEnteringStreet, this);
 			
+			assert(nextAvailableTimeForEnteringStreet>=simTime);
+			
 		} else {
-
+			
+			
+			
+			
 			if (link.getId().toString().equalsIgnoreCase("110915")) {
 				//System.out.println("road full: " + Scheduler.simTime);
 			}
@@ -429,11 +452,19 @@ public class Road extends SimUnit {
 				deadlockPreventionMessages.add(dpm);
 				//testDeadlockPreventionMessages.add(dpm);
 				
+				
+				
 			} else {
 				dpm=vehicle.scheduleDeadlockPreventionMessage(simTime+SimulationParameters.stuckTime, this);
 				deadlockPreventionMessages.add(dpm);
 				//testDeadlockPreventionMessages.add(dpm);
 			}
+			
+			if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("483820")) {
+				System.out.println("Road,dpm, t="+dpm.messageArrivalTime + ", linkId=" + link.getId() + ", simTime="+simTime);
+			}
+			assert(dpm.messageArrivalTime>=simTime);
+			
 			//assert(deadlockPreventionMessages.getFirst()==testDeadlockPreventionMessages.peek()):"inconsistency";
 			//assert(deadlockPreventionMessages.size()==testDeadlockPreventionMessages.size()):"inconsistency";
 			//assert(testDeadlockPreventionMessages.contains(dpm)):"inconsistency";
@@ -442,33 +473,33 @@ public class Road extends SimUnit {
 		}
 	}
 
-	public void giveBackPromisedSpaceToRoad() {
+	synchronized public void giveBackPromisedSpaceToRoad() {
 		noOfCarsPromisedToEnterRoad--;
 	}
 	
-	public void incrementPromisedToEnterRoad(){
+	synchronized public void incrementPromisedToEnterRoad(){
 		noOfCarsPromisedToEnterRoad++;
 	}
 	
 	// only use this for look ahead purpose
-	public boolean isRoadEmpty(){
+	synchronized public boolean isRoadEmpty(){
 		if (carsOnTheRoad.size()==0){
 			return false;
 		} 
 		return true;
 	}
 
-	public Link getLink() {
+	synchronized public Link getLink() {
 		return link;
 	}
 
 
 
-	public void setTimeOfLastEnteringVehicle(double timeOfLastEnteringVehicle) {
+	synchronized public void setTimeOfLastEnteringVehicle(double timeOfLastEnteringVehicle) {
 		this.timeOfLastEnteringVehicle = timeOfLastEnteringVehicle;
 	}
 	
-	public void removeDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage){
+	synchronized public void removeDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage){
 		// this causes a problem with test6, as it the message does not exist
 		// TODO: first find out why this happens and then
 		
@@ -527,7 +558,7 @@ public class Road extends SimUnit {
 		this.zoneId = zoneId;
 	}
 	
-	public void initializeZoneId() {
+	synchronized public void initializeZoneId() {
 		int zId=0;
 		double xCoordinate=getXCoordinate();
 		for (int i=0;i<SimulationParameters.numberOfZones-1;i++){
@@ -551,7 +582,7 @@ public class Road extends SimUnit {
 	//	scheduleZoneBorderMessage(linkTravelTime - SimulationParameters.delta);
 	//}
 	
-	public void scheduleNextZoneBorderMessage(double currentTime){
+	synchronized public void scheduleNextZoneBorderMessage(double currentTime){
 		double timeOfNextMessage=currentTime;
 		if (carsOnTheRoad.size()==0){
 			timeOfNextMessage+=linkTravelTime- SimulationParameters.delta;
@@ -565,7 +596,7 @@ public class Road extends SimUnit {
 		}
 	}
 	
-	public void scheduleZoneBorderMessage(Message tm){
+	synchronized public void scheduleZoneBorderMessage(Message tm){
 		double nextMessageTime=tm.messageArrivalTime;
 		assert(isOutBorderRoad);
 			for (Link outLink: getLink().getToNode().getOutLinks().values()){
@@ -586,7 +617,7 @@ public class Road extends SimUnit {
 	
 	// TODO: this can be implemented more efficiently, by storing the effective outgoing
 	// links of this zone into a variable of this class
-	public void scheduleZoneBorderMessage(double nextMessageTime){	
+	synchronized public void scheduleZoneBorderMessage(double nextMessageTime){	
 		
 		
 		//boolean test=false;
@@ -617,11 +648,11 @@ public class Road extends SimUnit {
 		
 	}
 	
-	public void scheduleTimerMessage (double nextMessageTime){
+	synchronized public void scheduleTimerMessage (double nextMessageTime){
 		scheduler.schedule(getTimerMessage(nextMessageTime));
 	}
 	
-	public TimerMessage getTimerMessage(double nextMessageTime){	
+	synchronized public TimerMessage getTimerMessage(double nextMessageTime){	
 		TimerMessage tm=MessageFactory.getTimerMessage();
 		tm.sendingUnit=this;
 		tm.receivingUnit=this;

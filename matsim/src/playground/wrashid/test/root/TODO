@@ -23,6 +23,15 @@ machen)
     => passiert der zweite teil des legs auf einem anderen cpu als der erste teil?
     
 
+=> es ist tatsächlich so, die events passsieren in der richtigen reihenfolge, aber die simulation zeit nimmt plötzlich ab
+   => bin am nachgehen, wieso... (CURRENT).
+   => ein auto, dass die strasse vor uns verlässt, verlässt sie zu einem zeitpunkt lange bevor wir sie betreten wollen,
+      aber trotzdem hat er einen einfluss auf das neue auto, wieso????
+
+
+=> Make hard tests, at least basic scenarios should pass these tests. Then make code clean (refactoring).
+   Then try to run the hard scenarios.
+
 
 
 - test case: just start one executorThread => expected behaviour: the other exectorTrhead 
@@ -38,6 +47,7 @@ machen)
 
 
 
+refactoring later: take synchronized on object road away (Because methods are synchronized now of Road).
 
 
 

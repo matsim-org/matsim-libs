@@ -161,8 +161,8 @@ public class Vehicle extends SimUnit {
 			scheduleLeavePreviousRoadMessage(scheduleTime);
 		}
 		
-		if (scheduleTime>47000 && getOwnerPerson().getId().toString().equalsIgnoreCase("483820")){
-			assert(false);
+		if (getOwnerPerson().getId().toString().equalsIgnoreCase("483820")){
+			System.out.println("Vehicle,165, t="+scheduleTime + ", linkId=" + road.getLink().getId());
 		}
 		
 		
