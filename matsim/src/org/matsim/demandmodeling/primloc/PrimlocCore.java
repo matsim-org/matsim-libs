@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -32,6 +32,8 @@ package org.matsim.demandmodeling.primloc;
  */
 
 import java.text.DecimalFormat;
+
+import org.matsim.gbl.MatsimRandom;
 
 import Jama.Matrix;
 
@@ -174,7 +176,7 @@ public class PrimlocCore {
 				errR = err;
 			}
 			if( (omuL==muL)&&(omuC==muC)&&(omuR==muR)){
-				omuC = muC = (muL+muR)/2+(Math.random()-0.5)*(muR-muL)/10;
+				omuC = muC = (muL+muR)/2+(MatsimRandom.random.nextDouble()-0.5)*(muR-muL)/10;
 			}
 			omuL = muL;
 			omuC = muC;

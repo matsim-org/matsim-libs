@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
@@ -36,7 +37,7 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 /**
  * Converts a TRANSIMS vehicle file into a google earth file.
- * 
+ *
  * @author mrieser
  */
 public class Veh2Kml {
@@ -49,15 +50,15 @@ public class Veh2Kml {
 	private double maxX = Double.POSITIVE_INFINITY;
 	private double maxY = Double.POSITIVE_INFINITY;
 	private CoordinateTransformation coordTransform = new IdentityTransformation();
-	
+
 	private KmlSnapshotWriter writer = null;
-	
+
 	private double lastTime = -1.0;
-	
+
 	private int cntPositions = 0;
 	private int cntTimesteps = 0;
-	
-	public Veh2Kml(String[] args) {
+
+	public Veh2Kml(final String[] args) {
 		parseArguments(args);
 	}
 
@@ -67,7 +68,7 @@ public class Veh2Kml {
 		System.out.println("conversion finished.");
 		System.out.println(" timesteps: " + this.cntTimesteps);
 		System.out.println(" positions: " + this.cntPositions);
-		
+
 	}
 
 	private void printUsage() {
@@ -103,11 +104,11 @@ public class Veh2Kml {
 	}
 
 	/**
-	 * Parses all arguments and sets the corresponding members.  
+	 * Parses all arguments and sets the corresponding members.
 	 *
 	 * @param args
 	 */
-	private void parseArguments(String[] args) {
+	private void parseArguments(final String[] args) {
 		if (args.length == 0) {
 			System.out.println("Too few arguments.");
 			printUsage();
@@ -120,7 +121,7 @@ public class Veh2Kml {
 				ensureNextElement(argIter);
 				arg = argIter.next();
 				try {
-					double percentage = Double.parseDouble(arg);					
+					double percentage = Double.parseDouble(arg);
 					this.percentage = percentage / 100.0;
 				} catch (Exception e) {
 					System.out.println("Cannot understand argument: -p " + arg);
@@ -175,27 +176,27 @@ public class Veh2Kml {
 			}
 		}
 	}
-	
+
 	/**
 	 * Helper function to ensure there is at least one next element in the iterator.
-	 * If not, the program exits with the message "Too few arguments". 
+	 * If not, the program exits with the message "Too few arguments".
 	 *
 	 * @param iter
 	 */
-	private void ensureNextElement(Iterator<String> iter) {
+	private void ensureNextElement(final Iterator<String> iter) {
 		if (!iter.hasNext()) {
 			System.out.println("Too few arguments.");
 			printUsage();
 			System.exit(1);
 		}
 	}
-	
+
 	private void convert() {
 
 		this.writer = new KmlSnapshotWriter(this.kmlFile, this.coordTransform);
 
 		// read and convert data from veh-file
-		
+
 		BufferedReader reader = null;
 		try {
 			reader = IOUtils.getBufferedReader(this.vehfile);
@@ -203,17 +204,17 @@ public class Veh2Kml {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		try {
 			reader.readLine(); // header, we do not use it
 			String line = null;
 			while ( (line = reader.readLine()) != null) {
-	
+
 				String[] result = line.split("\t");
 				if (result.length == 16) {
 					double easting = Double.parseDouble(result[11]);
 					double northing = Double.parseDouble(result[12]);
-					if (easting >= minX && easting <= maxX && northing >= minY && northing <= maxY) {
+					if (easting >= this.minX && easting <= this.maxX && northing >= this.minY && northing <= this.maxY) {
 						String agent = result[0];
 						String time = result[1];
 //					String dist = result[5];
@@ -230,12 +231,12 @@ public class Veh2Kml {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		finish();
 	}
 
-	private void addVehicle(double time, PositionInfo position) {
-		if (Math.random() >= this.percentage) return;
+	private void addVehicle(final double time, final PositionInfo position) {
+		if (MatsimRandom.random.nextDouble() >= this.percentage) return;
 		this.cntPositions++;
 
 		if (time != this.lastTime) {
@@ -246,7 +247,7 @@ public class Veh2Kml {
 			}
 			this.writer.beginSnapshot(time);
 			this.lastTime = time;
-		}			
+		}
 
 		this.writer.addAgent(position);
 //		if (speed == 0.0) {
@@ -257,7 +258,7 @@ public class Veh2Kml {
 //			this.greenMultigeom.addGeometry(point);
 //		}
 	}
-	
+
 	private void finish() {
 		if (this.lastTime >= 0) {
 			this.writer.endSnapshot();
@@ -265,7 +266,7 @@ public class Veh2Kml {
 		this.writer.finish();
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Veh2Kml app = new Veh2Kml(args);
 		app.run();
 	}

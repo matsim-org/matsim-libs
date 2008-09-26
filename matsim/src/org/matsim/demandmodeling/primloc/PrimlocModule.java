@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -40,6 +40,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -107,7 +108,7 @@ public class PrimlocModule  implements PersonAlgorithm {
 			
 			// Compute a random work zone using the trip matrix as a
 			// probability distribution, with home being conditional
-			double epsilon = Math.random();
+			double epsilon = MatsimRandom.random.nextDouble();
 			double cumul=0.0;
 			int workZoneID = 0;
 			while( (cumul < epsilon) && (workZoneID<core.numZ-1) ){
