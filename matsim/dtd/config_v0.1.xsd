@@ -1,0 +1,224 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- This xml schema contains xml definitions used to configure the MATSim  -->
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd" />
+
+<xs:element name="config" type="configType"/>
+
+<xs:complexType name="configType">
+  <xs:annotation>
+    <xs:documentation>By a file conform to this xml schema all modules of the matsim framework can
+    be configured.</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:element name="scenario" type="scenarioType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="simulation" type="simulationType" minOccurs="0" maxOccurs="1"></xs:element>
+    <xs:element name="genericModule" type="genericModuleType" minOccurs="0" maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="scenarioType">
+  <xs:sequence>
+    <xs:element name="coordinateSystem" type="xs:string" />
+    <xs:element name="scenarioScaleFactor" type="xs:decimal" />
+    <xs:element name="network" type="inputFileType" />
+    <xs:element name="population" type="inputFileType" />
+    <xs:element name="counts" type="countsType" />
+    <xs:element name="world" type="inputFileType" />
+    <xs:element name="facilities" type="inputFileType" />  
+    <xs:element name="scoring" type="scoringType" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="inputFileType">
+  <xs:choice>
+    <xs:element name="absolutPath" type="xs:string" />
+    <xs:element name="relativePath" type="xs:string" />
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="countsType">
+  <xs:complexContent>
+    <xs:extension base="inputFileType">
+      <xs:sequence>
+        <xs:element name="outputFormat" type="countsOutputFormatEnumType"></xs:element>
+        <xs:element name="countsScaleFactor" type="xs:decimal" ></xs:element>
+        <xs:element name="distanceFilter">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="centerNode" type="idRefType"></xs:element>
+              <xs:element name="radius">
+                <xs:complexType>
+                  <xs:attribute name="meter" type="xs:decimal"></xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:simpleType name="countsOutputFormatEnumType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="all" />
+    <xs:enumeration value="html" />
+    <xs:enumeration value="kml" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="scoringType">
+  <xs:sequence>
+    <xs:element name="learningRate" type="xs:decimal"></xs:element>
+    <xs:element name="brainExpBeta" type="xs:decimal" ></xs:element>    
+    <xs:element name="performing" type="xs:decimal" ></xs:element>    
+    <xs:element name="traveling" type="xs:decimal" ></xs:element>    
+    <xs:element name="lateArrival" type="xs:decimal" ></xs:element>    
+    <xs:element name="earlyDeparture" type="xs:decimal" ></xs:element>    
+    <xs:element name="waiting" type="xs:decimal" ></xs:element>    
+    <xs:element name="activities">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="activity" type="activityType"></xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>    
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="activityType">
+  <xs:sequence>
+    <xs:element name="id" type="xs:positiveInteger"></xs:element>
+    <xs:element name="type" type="xs:string" />
+    <xs:element name="typicalDuration" type="xs:time" />
+    <xs:element name="priority" type="xs:positiveInteger"></xs:element>
+    <xs:element name="openingTime" type="xs:time"></xs:element>
+    <xs:element name="latestStartTime" type="xs:time"></xs:element>
+    <xs:element name="closingTime" type="xs:time"></xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+
+
+<!-- types for simulation configuration -->
+<xs:complexType name="simulationType">
+  <xs:sequence>
+    <xs:element name="runIdentifier" type="xs:string"/>
+    <xs:element name="runOwner" type="xs:string"/>
+    <xs:element name="runDate" type="xs:date" />
+    <xs:element name="firstIteration" type="xs:nonNegativeInteger"/>
+    <xs:element name="lastIteration" type="xs:nonNegativeInteger"/>
+    <xs:element name="outputDirectory" type="xs:string" />
+    <xs:element name="randomSeed" type="xs:long" />
+    <xs:element name="outputTimeFormat" type="matsimTimeFormatEnumType" />
+    <xs:element name="localDtdBase" type="xs:string" />
+    <xs:element name="mobilitySimulation" type="mobilitySimulationType" />
+    <xs:element name="replanning" type="replanningType" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="matsimTimeFormatEnumType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="HH:mm" />
+    <xs:enumeration value="HH:mm:ss" />
+    <xs:enumeration value="ssss" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="mobilitySimulationType">
+  <xs:sequence>
+    <xs:element name="startTime" type="xs:time"></xs:element>  
+    <xs:element name="endTime" type="xs:time"></xs:element>  
+    <xs:element name="snapshotperiod" type="xs:time"></xs:element>  
+    <xs:element name="snapshotFormat" type="snapshotFormatEnumType"></xs:element>
+    <xs:element name="snapshotStyle" type="snapshotStyleEnumType" />  
+    <xs:element name="flowCapacitiyFactor" type="xs:decimal"></xs:element>  
+    <xs:element name="storageCapacityFactor" type="xs:decimal"></xs:element>  
+    <xs:element name="stuckTime" type="xs:decimal"></xs:element>  
+    <xs:element name="removeStuckVehicles" type="xs:boolean"></xs:element>  
+  </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="snapshotFormatEnumType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="transims" />
+    <xs:enumeration value="googleearth" />
+    <xs:enumeration value="netvis" />
+    <xs:enumeration value="otfvis" />
+    <xs:enumeration value="plansfile" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="snapshotStyleEnumType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="equil" />
+    <xs:enumeration value="queue" />
+  </xs:restriction>
+</xs:simpleType>
+
+<!-- the replanning element is replacing the strategy module -->
+<xs:complexType name="replanningType">
+  <xs:sequence>
+    <xs:element name="agentsMaxPlanMemorySize" type="xs:positiveInteger"></xs:element>
+    <xs:element name="strategy" type="strategyType"></xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="strategyType">
+  <xs:annotation>
+    <xs:documentation>The strategy type defines the structure of one replanning module</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:element name="id" type="xs:positiveInteger"></xs:element>
+    <xs:element name="planSelector" type="planSelectorType"></xs:element>
+    <xs:element name="weight" type="probabilityType"/>
+    <xs:element name="disableAfter" >
+      <xs:complexType>
+        <xs:attribute name="iterationNumber" type="xs:positiveInteger"/>
+      </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="modules">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="module" type="moduleType"></xs:element>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="name" type="xs:string"/>
+</xs:complexType>
+
+<xs:simpleType name="planSelectorType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="RandomPlanSelector" />
+    <xs:enumeration value="SelectExpBeta" />
+    <xs:enumeration value="ChangeExpBeta" />
+    <xs:enumeration value="BestPlanSelector" />
+    <xs:enumeration value="KeepSelected" />
+    <xs:enumeration value="PathSizeLogitSelector" />
+  </xs:restriction>
+</xs:simpleType>
+
+
+<xs:complexType name="moduleType">
+  <xs:sequence>
+    <xs:element name="name" type="xs:string"></xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<!-- generic module type -->
+<xs:complexType name="genericModuleType">
+  <xs:sequence>
+    <xs:element name="param" type="matsimParameterType" > </xs:element>
+  </xs:sequence>
+  <xs:attribute name="name" type="xs:string" />
+</xs:complexType>
+
+</xs:schema>
