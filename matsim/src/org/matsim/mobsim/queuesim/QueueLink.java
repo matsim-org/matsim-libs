@@ -793,6 +793,10 @@ public class QueueLink {
 			if (veh.getDriver().getPerson().getId().equals(id))
 				return veh;
 		}
+		for (Vehicle veh : this.waitingList) {
+			if (veh.getDriver().getPerson().getId().equals(id))
+				return veh;
+		}
 		return null;
 	}
 
