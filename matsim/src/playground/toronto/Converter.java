@@ -204,9 +204,9 @@ public class Converter {
 	/**
 	 */
 	public static void main(final String[] args) {
-		String oldPlansFilename = "input/Toronto/fout_chains210.txt";
-		String newPlansFilename = "output/Toronto/example.xml.gz";
-		String zoneFilename = "input/Toronto/centroids.txt";
+		String oldPlansFilename = "D:\\Test\\UT\\Sep24\\input\\fout_chains210.txt";
+		String newPlansFilename = "D:\\Test\\UT\\Sep24\\output\\example.xml.gz";
+		String zoneFilename = "D:\\Test\\UT\\Sep24\\input\\centroids.txt";
 
 		Converter c = new Converter();
 
@@ -232,9 +232,11 @@ public class Converter {
 							ss.add(zoneLines[i]);
 						}
 					}
-					String zone = ss.get(1);
-					c.getZoneXYs().put(zone,
+					if (ss.size() >= 3) {
+						String zone = ss.get(1);
+						c.getZoneXYs().put(zone,
 							new ZoneXY(zone, ss.get(2), ss.get(3)));
+					}
 				}
 			} while (zoneLine != null);
 			zoneReader.close();
