@@ -68,7 +68,6 @@ public class JavaPDEQSim2 {
 		SimulationParameters.storageCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
 		
 		
-		
 		// allowed testing to hook in here
 		if (SimulationParameters.testEventHandler!=null){
 			events.addHandler(SimulationParameters.testEventHandler);
