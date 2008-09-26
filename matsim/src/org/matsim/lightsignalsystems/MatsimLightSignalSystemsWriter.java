@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lightsignalsystems;
 
 import java.io.FileNotFoundException;
@@ -96,11 +97,11 @@ public class MatsimLightSignalSystemsWriter {
 				}
 
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				lanes.setNumber(new Integer(bl.getNumberOfRepresentedLanes()));
+				lanes.setNumber(Integer.valueOf(bl.getNumberOfRepresentedLanes()));
 				xmllane.setRepresentedLanes(lanes);
 				
 				XMLLaneType.XMLLength length = new XMLLaneType.XMLLength();
-				length.setMeter(bl.getLength());
+				length.setMeter(Double.valueOf(bl.getLength()));
 				xmllane.setLength(length);
 				
 				xmlltla.getLane().add(xmllane);
