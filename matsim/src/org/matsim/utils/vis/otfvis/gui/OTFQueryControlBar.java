@@ -50,6 +50,7 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentId;
+import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentPTBus;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryAgentPlan;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne;
@@ -75,6 +76,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public static QueryEntry[] queries = {
 		new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
 		new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
+		new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
 		new QueryEntry("linkSpinneALL", "show Spinne of ALL traffic", QuerySpinne.class),
 		new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class)
 	};

@@ -28,7 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
+import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.population.Leg;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
@@ -72,7 +76,25 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
 			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
-			out.putInt(pos.getVehicleState()== VehicleState.Parking ? 1:0);
+			if (pos.getVehicleState()== VehicleState.Parking) {
+				// What is the next legs mode?
+				Vehicle veh = src.getVehicle(pos.getAgentId());
+				if (veh == null) {
+					out.putInt(1);
+				} else {
+					PersonAgent driver = veh.getDriver(); 
+					Leg leg = driver.getCurrentLeg();
+					if(leg.getMode() == BasicLeg.Mode.pt) {
+						out.putInt(2);
+					} else if(leg.getMode() == BasicLeg.Mode.bus) {
+						out.putInt(3);
+					} else {
+						out.putInt(1);
+					}
+				}
+			} else {
+				out.putInt(0);
+			}
 			out.putFloat((float)pos.getSpeed());
 		}
 		

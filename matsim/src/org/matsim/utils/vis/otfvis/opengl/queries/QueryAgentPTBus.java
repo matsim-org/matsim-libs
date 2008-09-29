@@ -20,7 +20,6 @@
 
 package org.matsim.utils.vis.otfvis.opengl.queries;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.nio.FloatBuffer;
@@ -50,7 +49,7 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDra
 
 import com.sun.opengl.util.BufferUtil;
 
-public class QueryAgentPlan implements OTFQuery {
+public class QueryAgentPTBus implements OTFQuery {
 	/**
 	 * 
 	 */
@@ -71,16 +70,17 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	public String agentID;
+	private final List<String> allIds = new LinkedList<String>();
+	
 	private float[] vertex = null;
 	private transient FloatBuffer vert;
 	private Object [] acts;
-	private transient InfoText agentText = null;
-	private int lastActivity = -1;
+	private final int lastActivity = -1;
 
 	boolean calcOffset = true;
 
 	public void setId(String id) {
-		this.agentID = id;
+		this.agentID = id ;
 	}
 
 	public static float[] buildRoute(Plan plan) {
@@ -119,19 +119,25 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 	
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(this.agentID);
-		if (person == null) return;
+		//Person person = plans.getPerson(this.agentID);
+		String prefix = agentID + "-";
+		
+		for(Person person : plans) {
+			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
+		}
+		
+		if (allIds.size()==0) return;
 
-		Plan plan = person.getSelectedPlan();
+		Plan plan = plans.getPerson(allIds.get(0)).getSelectedPlan();
 
 		this.acts = new Object [plan.getActsLegs().size()/2];
 
-		for (int i=0;i< this.acts.length; i++) {
-			Act act = (Act)plan.getActsLegs().get(i*2);
-			Link link = net.getQueueLink(act.getLinkId()).getLink();
-			Node node = link.getToNode();
-			this.acts[i] = new MyInfoText( (float)node.getCoord().getX(), (float)node.getCoord().getY(), act.getType());
-		}
+//		for (int i=0;i< this.acts.length; i++) {
+//			Act act = (Act)plan.getActsLegs().get(i*2);
+//			Link link = net.getQueueLink(act.getLinkId()).getLink();
+//			Node node = link.getToNode();
+//			this.acts[i] = new MyInfoText( (float)node.getCoord().getX(), (float)node.getCoord().getY(), act.getType());
+//		}
 		
 		this.vertex = buildRoute(plan);
 
@@ -161,7 +167,6 @@ public class QueryAgentPlan implements OTFQuery {
 		if(this.vertex == null) return;
 
 		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-		Point2D.Double pos = layer.getAgentCoords(this.agentID.toCharArray());
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
@@ -173,24 +178,18 @@ public class QueryAgentPlan implements OTFQuery {
 				this.vertex[i+1] -= north;
 			}
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-			for (int i=0;i< this.acts.length; i++) {
-				MyInfoText inf = (MyInfoText)this.acts[i];
-				this.acts[i] = InfoText.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
-				((InfoText)this.acts[i]).setAlpha(0.5f);
-			}
+//			for (int i=0;i< this.acts.length; i++) {
+//				MyInfoText inf = (MyInfoText)this.acts[i];
+//				this.acts[i] = InfoText.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
+//				((InfoText)this.acts[i]).setAlpha(0.5f);
+//			}
 
-			if (pos != null) {
-				this.agentText = InfoText.showTextPermanent(this.agentID, (float)pos.x, (float)pos.y, -0.0005f );
-				this.agentText.setAlpha(0.7f);
-			}
-			//InfoText.showText("Agent selected...");
 		}
 
 		GL gl = drawer.getGL();
-		Color color = Color.ORANGE;
-		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
-
         gl.glEnable(GL.GL_BLEND);
+		gl.glColor4d(0.6, 0.0,0.2,.2);
+
         gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
@@ -198,35 +197,22 @@ public class QueryAgentPlan implements OTFQuery {
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
         gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
         gl.glDisable(GL.GL_LINE_SMOOTH);
-		if (pos != null) {
+
+        for(String agentId : allIds) {
+			Point2D.Double pos = layer.getAgentCoords(agentId.toCharArray());
+			if (pos == null) continue;
+			
 			//System.out.println("POS: " + pos.x + ", " + pos.y);
-			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
+			gl.glColor4f(0.2f, 0.4f, 0.4f, 0.5f);//Blue
 			gl.glLineWidth(2);
 			gl.glBegin(GL.GL_LINE_STRIP);
 			gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
 			gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 			gl.glEnd();
-			drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
-			if(this.agentText != null) {
-				this.agentText.x = (float)pos.x+ 250;
-				this.agentText.y = (float)pos.y + 250;
-			}
-			// reset any old progressbars
-			if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).fill = 0.0f;
-		} else {
-			QueryAgentActivityStatus query = new QueryAgentActivityStatus();
-			query.setId(this.agentID);
-			query.setNow(drawer.getActGraph().getTime());
-			query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
-			if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
-				InfoText posT = ((InfoText)this.acts[query.activityNr]);
-				posT.color = new Color(255,50,50,180);
-				// draw progressline underneath
-				posT.fill = (float)query.finished;
-				this.lastActivity = query.activityNr;
-			}
-		}
+			drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
+			InfoText.showTextOnce("Bus " + agentID, (float)pos.x+ 250, (float)pos.y+ 250, -0.0007f);
 
+		}
         gl.glDisable(GL.GL_BLEND);
 
 	}
@@ -234,13 +220,12 @@ public class QueryAgentPlan implements OTFQuery {
 	public void remove() {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
-		if (this.acts != null) {
-			for (int i=0;i< this.acts.length; i++) {
-				InfoText inf = (InfoText)this.acts[i];
-				if(inf != null) InfoText.removeTextPermanent(inf);
-			}
-		}
-		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
+//		if (this.acts != null) {
+//			for (int i=0;i< this.acts.length; i++) {
+//				InfoText inf = (InfoText)this.acts[i];
+//				if(inf != null) InfoText.removeTextPermanent(inf);
+//			}
+//		}
 	}
 	
 	public boolean isAlive() {

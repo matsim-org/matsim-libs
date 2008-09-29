@@ -215,7 +215,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public class AgentPointDrawer extends OTFGLDrawableImpl implements OTFDataSimpleAgent.Receiver {
 	
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			drawer.addAgent(id, startX, startY, colorizer.getColor(0.1 + 0.9*color), true);
+			if (user != 2) {
+				drawer.addAgent(id, startX, startY, colorizer.getColor(0.1 + 0.9*color), true);
+			} else {
+				drawer.addAgent(id, startX, startY, Color.BLUE, true);
+			}
 		}
 	
 		@Override
