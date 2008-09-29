@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * MockPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.test;
+package playground.marcel.pt.mocks;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.marcel.pt.interfaces.PassengerAgent;
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
-
-		suite.addTestSuite(VehicleImplTest.class);
-
-		return suite;
-	}
-
+public class MockPassengerAgent implements PassengerAgent {
 
 }

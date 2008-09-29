@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.test.mocks;
+package playground.marcel.pt.mocks;
 
 import playground.marcel.pt.interfaces.DriverAgent;
 
