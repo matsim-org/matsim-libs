@@ -119,7 +119,7 @@ public class PtPlansFileCreator {
 				2763, 2727, 2728, 1915, 1918, 1917, 1867, 1872, 1869, 1865,
 				1000447, 1866, 1854, 1853, 1852, 1863, 1000448, 1859, 1861,
 				1849, 1892, 1893, 1000454, 1906 };
-		createPtPerson("1981", endTime, "7621", getSrcRoute(southNodes));
+		createPtPerson("7622", endTime, "1982", getSrcRoute(southNodes));
 	}
 
 	protected void createNorthBus245Person(String endTime) {
@@ -128,7 +128,7 @@ public class PtPlansFileCreator {
 				1918, 1915, 2728, 2727, 2763, 2765, 1000580, 2768, 1000540,
 				6362, 1000544, 2805, 2787, 6575, 2848, 1000134, 2850, 1000142,
 				2855, 2856, 2857 };
-		createPtPerson("7622", endTime, "1982", getSrcRoute(northNodes));
+		createPtPerson("1981", endTime, "7621", getSrcRoute(northNodes));
 	}
 
 	protected void createPtPerson(String startLinkId, String endTime,
@@ -140,7 +140,7 @@ public class PtPlansFileCreator {
 			p.addPlan(pl);
 			pl.createAct("h", (String) null, null, startLinkId, null, endTime,
 					null, null);
-			Leg leg = pl.createLeg(Mode.pt, Time.parseTime(endTime),
+			Leg leg = pl.createLeg(Mode.car, Time.parseTime(endTime),
 					Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
 			Route route = new Route();
 			leg.setRoute(route);
