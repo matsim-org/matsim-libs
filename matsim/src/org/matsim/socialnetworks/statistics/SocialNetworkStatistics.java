@@ -166,6 +166,8 @@ public class SocialNetworkStatistics {
 			// fillDirectedGraph(g, snet, plans);
 		}
 		// Then fill the graph using the MatSim ego nets
+		log.info("Filling graph object for JUNG, g is instantiated but not filled");
+		Gbl.printMemoryUsage();
 		fillGraph(this.g, snet, plans);
 		
 		log.info("   MatSim social network converted into a JUNG graph for analysis");
@@ -472,6 +474,8 @@ public class SocialNetworkStatistics {
 			// log.info(myLink.getTimeMade()-myLink.getTimeLastUsed());
 			// Add the link to the graph
 			g.addEdge(e);
+			log.info("Adding edge to JUNG graph object, g is being filled");
+			Gbl.printMemoryUsage();
 		}
 	}
 
