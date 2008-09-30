@@ -115,7 +115,8 @@ public class NetworkCleaner {
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
 		// search the biggest cluster of nodes in the network
-		log.info("  checking " + network.getNodes().size() + " nodes for dead-ends...");
+		log.info("  checking " + network.getNodes().size() + " nodes and " + 
+				network.getLinks().size() + " links for dead-ends...");
 		boolean stillSearching = true;
 		Iterator<? extends Node> iter = network.getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
@@ -144,7 +145,8 @@ public class NetworkCleaner {
 				network.removeNode(node);		// removeNode takes care of removing links too in the network
 			}
 		}
-
+		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " + 
+				network.getLinks().size() + " links.");
 		log.info("done.");
 	}
 
@@ -158,8 +160,8 @@ public class NetworkCleaner {
 	}
 
 	static private class DoubleFlagRole {
-		public boolean forwardFlag = false;
-		public boolean backwardFlag = false;
+		protected boolean forwardFlag = false;
+		protected boolean backwardFlag = false;
 		
 		public DoubleFlagRole() {
 			// make constructor public in private class
