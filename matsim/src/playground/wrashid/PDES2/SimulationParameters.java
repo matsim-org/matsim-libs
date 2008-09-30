@@ -13,8 +13,8 @@ import playground.wrashid.PDES.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES.util.ConcurrentListMPSC;
 import playground.wrashid.PDES.util.PriorityConcurrentListMPDSC;
 import playground.wrashid.PDES.util.SimplePriorityConcurrentListMPDSC;
-import playground.wrashid.test.root.util.PopulationModifier;
-import playground.wrashid.test.root.util.TestHandler;
+import playground.wrashid.util.PopulationModifier;
+import playground.wrashid.util.TestHandler;
 
 public class SimulationParameters {
 	// EventHeap

@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.PDESStarter2;
-import playground.wrashid.test.CppEventFileParser;
+import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class Test1 extends TestCase {
 

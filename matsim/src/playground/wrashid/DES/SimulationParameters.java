@@ -7,8 +7,8 @@ import org.matsim.events.handler.EventHandler;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
-import playground.wrashid.test.root.util.PopulationModifier;
-import playground.wrashid.test.root.util.TestHandler;
+import playground.wrashid.util.PopulationModifier;
+import playground.wrashid.util.TestHandler;
 
 public class SimulationParameters {
 	// EventHeap
