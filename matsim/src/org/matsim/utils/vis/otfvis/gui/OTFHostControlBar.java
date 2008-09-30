@@ -20,11 +20,9 @@
 
 package org.matsim.utils.vis.otfvis.gui;
 
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,10 +46,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.SpinnerModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -88,7 +84,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String STEP_B = "step_b";
 	private static final String FULLSCREEN = "fullscreen";
 
-	private static final int SKIP = 30;
 	protected static int DELAYSIM = 30; // time to wait per simstep while play in millisec
 
 	// -------------------- MEMBER VARIABLES --------------------
@@ -104,7 +99,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	String address;
 	protected OTFServerRemote host = null;
 	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
-	private static Class resourceHandler = null;
 
 	private ImageIcon playIcon = null;
 	private ImageIcon pauseIcon = null;
@@ -117,9 +111,9 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	// -------------------- CONSTRUCTION --------------------
 
+	// TODO [MR,DS] make constructor deprecated and use the one without the second argument, as it is not used anymore
 	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
 		openAddress(address);
-		this.resourceHandler = res;
 
 		addButtons();
 	}
@@ -237,10 +231,10 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public class PreloadHelper extends Thread {
-		private final Map<String, OTFDrawer> drawers;
+//		private final Map<String, OTFDrawer> drawers;
 
 		public PreloadHelper(Map<String, OTFDrawer> handlers) {
-			this.drawers = handlers;
+//			this.drawers = handlers;
 		}
 
 		public void preloadCache() {
@@ -361,8 +355,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		button.setActionCommand(actionCommand);
 		button.addActionListener(this);
 	  button.setToolTipText(toolTipText);
-	  button.setBorderPainted(false);
-	  button.setMargin(new Insets(0, 0, 0, 0));
+	  button.setBorder(null);
 
 	  if (imageName != null) {
 	  	// with image
@@ -379,7 +372,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	  return button;
 	}
 
-	public void updateTimeLabel() {
+	protected void updateTimeLabel() {
 		timeField.setText(Time.writeTime(simTime));
 	}
 
@@ -443,11 +436,13 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				simTime = host.getLocalTime();
 				invalidateHandlers();
 				return true;
-			} else {
-				if ( prefTime == OTFServerRemote.TimePreference.EARLIER) System.out.println("No previous timestep found");
-				else System.out.println("No succeeding timestep found");
-				return false;
 			}
+			if (prefTime == OTFServerRemote.TimePreference.EARLIER) {
+				System.out.println("No previous timestep found");
+			} else {
+				System.out.println("No succeeding timestep found");
+			}
+			return false;
 		}
 	}
 
@@ -553,16 +548,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		//networkScrollPane.repaint();
 	}
 
-
-	protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model)
-	{
-		JLabel l = new JLabel(label);
-		c.add(l);
-		JSpinner spinner = new JSpinner(model);
-		l.setLabelFor(spinner);
-		c.add(spinner);
-		return spinner;
-	}
+	// deactivated the method below as it is nowhere used. Marcel, 30sep2008
+//	protected JSpinner addLabeledSpinner(Container c,   String label,  SpinnerModel model)
+//	{
+//		JLabel l = new JLabel(label);
+//		c.add(l);
+//		JSpinner spinner = new JSpinner(model);
+//		l.setLabelFor(spinner);
+//		c.add(spinner);
+//		return spinner;
+//	}
 	private void createCheckBoxes() {
 		if ( liveHost) {
 			JCheckBox SynchBox = new JCheckBox(TOGGLE_SYNCH);
@@ -637,8 +632,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	class MovieTimer extends Thread {
-		boolean isActive = false;
-		boolean terminate = false;
+		private boolean isActive = false;
+		private boolean terminate = false;
 
 		public MovieTimer() {
 			setDaemon(true);
