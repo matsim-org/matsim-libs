@@ -6,9 +6,9 @@ import playground.wrashid.PDES2.ZoneMessageQueue;
 
 public class ZoneMessageQueueTest extends MatsimTestCase {
 	
-	// TODO...
+	
 	public void testPutMessage(){
-		
+		//TODO: continue working here...
 	}
 	
 	public void t_putMessage(int numberOfMessagesToPutIntoQueue){

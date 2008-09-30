@@ -1,4 +1,4 @@
-package playground.wrashid;
+package playground.wrashid.deqsim;
 
 import playground.wrashid.PDES.util.ConcurrentListMPDSCTest;
 import playground.wrashid.PDES.util.MyPriorityQueueTest;
@@ -12,13 +12,14 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				"Test for playground.wrashid");
-		suite.addTest(playground.wrashid.deqsim.AllTests.suite());
-		suite.addTest(playground.wrashid.PDES.util.AllTests.suite());
-		suite.addTest(playground.wrashid.PDES2.AllTests.suite());
-		suite.addTest(playground.wrashid.PHV.Utility.AllTests.suite());
+		TestSuite suite = new TestSuite("Tests for playground.wrashid.deqsim");
+
+		suite.addTestSuite(DEQSimStarterTest.class);
+		suite.addTestSuite(PDESStarter2Test.class);
 		
 		return suite;
 	}
+
+	
+
 }

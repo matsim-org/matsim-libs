@@ -47,7 +47,7 @@ public class DEQSimStarterTest extends MatsimTestCase {
 		
 		t_equilEvent();
 		Gbl.reset();
-		
+		//TODO: continue working here...
 		//t_Berlin();
 		//Gbl.reset();
 	}
