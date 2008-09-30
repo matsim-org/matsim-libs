@@ -26,6 +26,8 @@ import org.matsim.config.Module;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -57,9 +59,10 @@ public abstract class Scenario {
 	//For TRB run analyses of 500 iterations
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB6/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB6/";
-	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
-	private static final String input_directory="output/TRB6/";//AnalyzeScores
-	
+//	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
+//	private static final String input_directory="output/TRB6/";//AnalyzeScores
+	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
+	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
 	
 	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
@@ -102,6 +105,9 @@ public abstract class Scenario {
 		
 		config.counts().setCountsFileName(input_directory + "counts.xml");
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
+		
+		config.events().setInputFile("events.txt");
+		config.events().setOutputFile(output_directory + "output_events.txt");
 		
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
@@ -186,6 +192,17 @@ public abstract class Scenario {
 		
 		System.out.println("  done.");
 		return plans;
+	}
+	
+	public static final Events readEvents(int i) {
+		System.out.println("  reading plans xml file... ");
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
+		Events events = new Events();
+		System.out.println(filename);
+		new MatsimEventsReader(events).readFile(filename);
+
+		System.out.println("  done.");
+		return events;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
