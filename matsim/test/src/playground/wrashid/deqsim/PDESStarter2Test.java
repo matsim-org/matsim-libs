@@ -92,33 +92,8 @@ public class PDESStarter2Test extends MatsimTestCase {
 
 			assertEquals(true, list.get(6) instanceof LinkLeaveEvent);
 
-			assertEquals(true, list.get(7) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(8) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
-
-			assertEquals(true, list.get(3) instanceof LinkEnterEvent);
-
-			assertEquals(true, list.get(4) instanceof LinkLeaveEvent);
+			
+			// TODO: continue here...
 
 			assertEquals(true, list.get(21) instanceof AgentArrivalEvent);
 
