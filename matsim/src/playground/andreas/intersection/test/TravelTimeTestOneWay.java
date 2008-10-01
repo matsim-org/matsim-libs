@@ -13,11 +13,12 @@ import java.util.TreeMap;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -32,6 +33,14 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 	MeasurePoint beginningOfLink2 = null;	
 
 	final static int timeToWaitBeforeMeasure = 498; // Make sure measurement starts with second 0 in signalsystemplan 
+	
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		QueueNetwork.setSimulateAllLinks(true);
+		QueueNetwork.setSimulateAllNodes(true);
+	}
+	
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   		

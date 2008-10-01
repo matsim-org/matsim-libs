@@ -3,10 +3,15 @@ package playground.andreas.intersection.sim;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.matsim.events.AgentStuckEvent;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.mobsim.queuesim.Simulation;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -95,9 +100,9 @@ public class QNode extends QueueNode{
 
 	/** Simple moveNode, Complex one can be found in {@link QueueNode} */
 	public boolean moveVehicleOverNode(final Vehicle veh, PseudoLink pseudoLink) {
+		double now = SimulationTimer.getTime();
 		// veh has to move over node
 		Link nextLink = veh.getDriver().chooseNextLink();
-		
 		if (nextLink != null) {
 			QLink nextQLink = (QLink) this.queueNetwork.getQueueLink(nextLink.getId());
 		
@@ -106,6 +111,27 @@ public class QNode extends QueueNode{
 				veh.getDriver().incCurrentNode();
 				nextQLink.add(veh);
 				return true;
+			}
+			// check if veh is stuck!
+
+			if ((now - veh.getLastMovedTime()) > Simulation.getStuckTime()) {
+				/* We just push the vehicle further after stucktime is over, regardless
+				 * of if there is space on the next link or not.. optionally we let them
+				 * die here, we have a config setting for that!
+				 */
+				if (removeStuckVehicle()) {
+					pseudoLink.pollFirstFromBuffer();
+					Simulation.decLiving();
+					Simulation.incLost();
+					QueueSimulation.getEvents().processEvent(
+							new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg()));
+				}
+				else {
+					pseudoLink.pollFirstFromBuffer();
+					veh.getDriver().incCurrentNode();
+					nextQLink.add(veh);
+					return true;
+				}
 			}
 			return false;
 		}
@@ -130,5 +156,20 @@ public class QNode extends QueueNode{
 		this.tempLinks = new QLink[this.getNode().getInLinks().values().size()];
 		this.cacheIsInvalid = false;
 	}
+	
+
+	static boolean removeVehInitialized = false;
+
+	static boolean removeVehicles = true;
+
+	static boolean removeStuckVehicle() {
+		if (removeVehInitialized) {
+			return removeVehicles;
+		}
+		removeVehicles = Gbl.getConfig().simulation().removeStuckVehicles();
+		removeVehInitialized = true;
+		return removeVehicles;
+	}
+	
 	
 }

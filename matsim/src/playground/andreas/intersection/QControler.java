@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -49,6 +50,8 @@ public class QControler extends Controler {
 
 	public QControler(final Config config, boolean useOTF, String newLSADef, String newLSADefCfg) {
 		super(config);
+		QueueNetwork.setSimulateAllLinks(true);
+		QueueNetwork.setSimulateAllNodes(true);
 		this.newLSADef = newLSADef;
 		this.newLSADefCfg = newLSADefCfg;
 		QControler.useOTF = useOTF;

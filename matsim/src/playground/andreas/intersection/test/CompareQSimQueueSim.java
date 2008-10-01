@@ -23,6 +23,7 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -36,6 +37,12 @@ import playground.andreas.intersection.sim.QSim;
 public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEventHandler, LinkEnterEventHandler, ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler{
 	
 	BufferedWriter writer = null;
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		QueueNetwork.setSimulateAllLinks(true);
+		QueueNetwork.setSimulateAllNodes(true);
+	}
 	
 	public void testCompareBothSims_wo_trafficLight(){
   		  		

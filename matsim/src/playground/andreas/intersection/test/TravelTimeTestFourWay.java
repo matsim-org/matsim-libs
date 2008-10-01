@@ -21,6 +21,7 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.io.IOUtils;
@@ -35,6 +36,13 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 
 	BufferedWriter writer = null;
   
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		QueueNetwork.setSimulateAllLinks(true);
+		QueueNetwork.setSimulateAllNodes(true);
+	}
+	
 	public void testTrafficLightIntersection4arms() {
 		
 		System.setProperty("line.separator", "\n"); // Unix
