@@ -31,6 +31,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.jfree.util.Log;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
@@ -54,8 +55,8 @@ public class QueueNetwork{
 	 * the links are processed influences the order of events within one time step. Thus, just comparing the event-files will not
 	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
 	 */
-	private final static boolean simulateAllLinks = false;
-	private final static boolean simulateAllNodes = false;
+	private static boolean simulateAllLinks = false;
+	private static boolean simulateAllNodes = false;
 
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
@@ -290,5 +291,16 @@ public class QueueNetwork{
 	public QueueNode getQueueNode(final IdImpl id) {
 		return this.nodes.get(id);
 	}
+	
+	public static void setSimulateAllLinks(boolean simulateAll) {
+		Log.warn("ATTENTION: simulateAllLinks is set. Make sure this is not happening while the simulation is running AND ONLY FOR TESTING PURPOSES!!!");
+		simulateAllLinks = simulateAll;
+	}
 
+	public static void setSimulateAllNodes(boolean simulateAll) {
+		Log.warn("ATTENTION: simulateAllNodes is set. Make sure this is not happening while the simulation is running AND ONLY FOR TESTING PURPOSES!!!");
+		simulateAllNodes = simulateAll;
+	}
+
+	
 }
