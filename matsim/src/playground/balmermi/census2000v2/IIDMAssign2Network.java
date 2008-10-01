@@ -56,9 +56,9 @@ public class IIDMAssign2Network {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void createIIDM() {
+	public static void assignNetwork() {
 
-		log.info("MATSim-DB: create iidm.");
+		log.info("MATSim-DB: assignNetwork...");
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ public class IIDMAssign2Network {
 		Gbl.createConfig(args);
 		Gbl.createWorld();
 
-		createIIDM();
+		assignNetwork();
 
 		Gbl.printElapsedTime();
 	}
