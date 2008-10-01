@@ -52,10 +52,22 @@ public class Plan extends BasicPlanImpl {
 		this.person = person;
 	}
 
+	public final Act createAct(final String type, Link link) throws Exception {
+		if (this.actsLegs.size() % 2 != 0) {
+			throw new Exception("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+		}
+		Act a = new Act(type, link);
+		this.actsLegs.add(a);
+		return a;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
-
+	/**
+	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+	 */
+  @Deprecated 
 	public final Act createAct(final String type, final Double x, final Double y, final String link, final String startTime,
 														 final String endTime, final String dur, final String isPrimary) throws Exception {
 		verifyCreateAct(endTime);
@@ -64,6 +76,10 @@ public class Plan extends BasicPlanImpl {
 		return a;
 	}
 
+	/**
+	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+	 */
+  @Deprecated 
 	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
 			 final String endTime, final String dur, final String isPrimary) throws Exception {
 		Double xx = (x == null) ? null : Double.valueOf(x);
@@ -71,6 +87,10 @@ public class Plan extends BasicPlanImpl {
 		return createAct(type, xx, yy, link, startTime, endTime, dur, isPrimary);
 	}
 
+	/**
+	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+	 */
+  @Deprecated 
 	public final Act createAct(final String type, final double x, final double y, final Link link, final double startTime,
 			final double endTime, final double dur, final boolean isPrimary) throws Exception {
 		if (endTime == Time.UNDEFINED_TIME) {
@@ -85,6 +105,9 @@ public class Plan extends BasicPlanImpl {
 	
 	
 	
+  /**
+   * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+   */
 	@Deprecated
 	public final Leg createLeg(final String modestring, final String depTime, final String travTime,
 			 final String arrTime) throws Exception {
@@ -111,23 +134,34 @@ public class Plan extends BasicPlanImpl {
 		}
 		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
 }
+	/**
+	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+	 */
 	@Deprecated
 	public final Leg createLeg(final BasicLeg.Mode mode, final String depTime, final String travTime,
 														 final String arrTime) throws Exception {
 		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
 	}
-		
-	public final Leg createLeg(final BasicLeg.Mode mode, final double depTime, final double travTime,
-			 final double arrTime) throws Exception {
+	
+	public BasicLeg createLeg(BasicLeg.Mode mode) throws Exception {
 		verifyCreateLeg();
+		Leg leg = new Leg(mode);
 		// Override leg number with an appropriate value
 		int legnum = (this.actsLegs.size()-1) /2;
-		Leg leg = new Leg(mode);
 		leg.setNum(legnum);
+		this.actsLegs.add(leg);
+		return leg;
+	} 
+	/**
+	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
+	 */
+  @Deprecated 
+	public final Leg createLeg(final BasicLeg.Mode mode, final double depTime, final double travTime,
+			 final double arrTime) throws Exception {
+		Leg leg = (Leg) createLeg(mode);
 		leg.setDepTime(depTime);
 		leg.setTravTime(travTime);
 		leg.setArrTime(arrTime);
-		this.actsLegs.add(leg);
 		return leg;
 	}
 

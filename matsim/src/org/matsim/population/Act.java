@@ -39,6 +39,16 @@ public class Act extends BasicActImpl {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	public Act(final String type, Link link) {
+		this.type = type.intern();
+		this.setLink(link);
+	}
+	
+	public Act(final String type, Coord coord, Link link) {
+		this(type, link);
+		this.setCoord(coord);
+	}
+	@Deprecated
 	public Act(final String type, final Double x, final Double y, final String link,
 						final String startTime, final String endTime, final String dur, final String isPrimary) {
 		this.type = type.intern();
@@ -67,7 +77,7 @@ public class Act extends BasicActImpl {
 			this.isPrimary = true;
 		}
 	}
-
+  @Deprecated
 	public Act(final String type, final double x, final double y, final Link link,
 			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
 		this.type = type.intern();
