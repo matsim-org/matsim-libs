@@ -36,8 +36,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
@@ -75,11 +73,6 @@ public class IIDMAssign2Network {
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
-
-		log.info("  reading world xml file...");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
-		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
@@ -148,10 +141,6 @@ public class IIDMAssign2Network {
 
 		log.info("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write();
-		log.info("  done.");
-
-		log.info("  writing world xml file... ");
-		new WorldWriter(Gbl.getWorld()).write();
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
