@@ -23,7 +23,7 @@ package playground.marcel;
 public class OTFDemo {
 
 	public static void main(final String[] args) {
-		// WU base cae
+		// WU base case
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run465/500.T.veh.gz", "/Volumes/Data/VSP/cvs/vsp-cvs/studies/schweiz-ivtch/network/ivtch-osm.xml"});
 
 		// WU base case:
@@ -35,14 +35,23 @@ public class OTFDemo {
 		// WU with new roads and with FlaMa
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/ETH/cvs/ivt/studies/switzerland/results/westumfahrung/run374/it.240/T.veh.gz", "/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/ivtch-changed-wu-flama/network.xml"});
 
+		//
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/osm-swiss/200.T.veh.gz", "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run616/it.550/550.events.mvi"});
+
 		// other cases
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/itm3/100.T.veh.gz", "/Volumes/Data/VSP/cvs/vsp-cvs/studies/schweiz-ivtch/network/ivtch-osm.xml"});
-//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng2b/100.visualizer.mvi"});
-		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng-data/config.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng2b/100.visualsizer.mvi"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng-data/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng3/100.visualization.mvi"});
-
-
 //		org.matsim.run.OTFVis.main(new String[] {"-convert", "/Volumes/Data/VSP/runs/gauteng3/100.events.txt.gz", "/Volumes/Data/VSP/runs/gauteng-data/routes_network_1000mplus.xml.gz", "/Volumes/Data/VSP/runs/gauteng3/100.visualization.mvi", "300"});
+		
+		// BVG-Demo
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run487/100.T.veh.gz", "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/zurich/config.xml"});
+		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/berlin/config.xml"});
+
+//		org.matsim.run.OTFVis.main(new String[] {});
 
 	}
 
