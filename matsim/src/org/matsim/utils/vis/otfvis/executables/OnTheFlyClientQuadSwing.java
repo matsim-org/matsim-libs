@@ -46,7 +46,7 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 
 public class OnTheFlyClientQuadSwing{
 
-	static OTFConnectionManager connect2 = new OTFConnectionManager();
+	private static OTFConnectionManager connect2 = new OTFConnectionManager();
 
 
 	public static void main(String[] args) {
@@ -75,7 +75,7 @@ public class OnTheFlyClientQuadSwing{
 		OTFHostControlBar hostControl;
 		try {
 			hostControl = new OTFHostControlBar(arg0, OnTheFlyClientQuadSwing.class);
-			JFrame frame = new JFrame("MATSIM NetVis");
+			JFrame frame = new JFrame("MATSIM OTFVis");
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
 			JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -97,13 +97,10 @@ public class OnTheFlyClientQuadSwing{
 			frame.setSize(screenSize.width/2,screenSize.height/2);
 			frame.setVisible(true);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

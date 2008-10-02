@@ -46,7 +46,7 @@ public class OTFVis   extends Thread {
 		if (config == null) config = new OTFVisConfig();
 	    Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, config);
 
-		frame = new JFrame("MATSIM NetVis" + address);
+		frame = new JFrame("MATSIM OTFVis" + address);
 		hostControl = new OTFHostControlBar(address);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JFrame.setDefaultLookAndFeelDecorated(true);
@@ -63,13 +63,10 @@ public class OTFVis   extends Thread {
 //			client = new OTFVis("rmi:127.0.0.1:4019");
 			client.run();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
