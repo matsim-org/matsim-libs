@@ -47,6 +47,10 @@ public class LocationChoice extends MultithreadedModuleA {
 	public LocationChoice() {
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
+			log.info("Doing constrained location choice");
+		}
+		else {
+			log.info("Doing random location choice on univ. choice set");
 		}
 	}
 
