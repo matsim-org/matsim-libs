@@ -29,17 +29,23 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.apache.log4j.Logger;
 
 
 public class RandomLocationMutator extends LocationMutator {
 
-	boolean ch = false;
+	private boolean ch = false;
+	private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
 
 	public RandomLocationMutator(final NetworkLayer network) {
 		super(network);
 		
 		if (Gbl.getConfig().locationchoice().getArea().equals("ch")) {
 			this.ch = true;
+			log.info("Doing location choice in whole of ch");
+		}
+		else {
+			log.info("Doing location choice in zh region");
 		}
 	}
 
