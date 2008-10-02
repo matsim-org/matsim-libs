@@ -359,7 +359,7 @@ public class Facility extends AbstractLocation {
 			int index = hour*4 + i;
 			hourlyLoad += this.load[index];
 		}
-		return hourlyLoad;
+		return hourlyLoad/4;
 	}
 	
 	
