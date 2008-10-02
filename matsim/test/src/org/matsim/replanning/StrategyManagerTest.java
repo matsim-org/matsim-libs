@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,7 +21,6 @@
 package org.matsim.replanning;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -37,21 +36,13 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 * are called according to their weights.
 	 *
 	 * @author mrieser
+	 * @throws Exception 
 	 */
-	public void testChangeRequests() {
-
-		MatsimRandom.reset(4711);
+	public void testChangeRequests() throws Exception {
 
 		Population population = new Population(Population.NO_STREAMING);
-		try {
-			for (int i = 0; i < 1000; i++) {
-				Person person = new Person(new IdImpl(i));
-
-				population.addPerson(person);
-			}
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
+		for (int i = 0; i < 1000; i++) {
+			population.addPerson(new Person(new IdImpl(i)));
 		}
 
 		// setup StrategyManager
@@ -118,7 +109,62 @@ public class StrategyManagerTest extends MatsimTestCase {
 		assertEquals(0, strategy2.getCounter());
 		assertEquals(0, strategy3.getCounter());
 		assertEquals(498, strategy4.getCounter());
+	}
+	
+	/**
+	 * Tests the removal of strategies. Ensures that after removal, no plan is given to the removed strategy.
+	 * Also checks that the removal of strategies not known to the StrategyManager doesn't have any side-effects.
+	 *
+	 * @author mrieser
+	 * @throws Exception 
+	 */
+	public void testRemoveStrategy() throws Exception {
 
+		Population population = new Population(Population.NO_STREAMING);
+		for (int i = 0; i < 100; i++) {
+			population.addPerson(new Person(new IdImpl(i)));
+		}
+
+		// setup StrategyManager
+		StrategyManager manager = new StrategyManager();
+		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
+		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
+
+		manager.addStrategy(strategy1, 0.10);
+		manager.addStrategy(strategy2, 0.20);
+
+		// run iteration 1
+		manager.run(population, 1);
+
+		// ensure all strategies were called
+		assertEquals(34, strategy1.getCounter());
+		assertEquals(66, strategy2.getCounter());
+
+		strategy1.resetCounter();
+		strategy2.resetCounter();
+		
+		// remove 2nd strategy
+		manager.removeStrategy(strategy2);
+
+		// run iteration 2
+		manager.run(population, 2);
+
+		// ensure only strategy1 got plans to handle
+		assertEquals(100, strategy1.getCounter());
+		assertEquals(0, strategy2.getCounter());
+
+		strategy1.resetCounter();
+		strategy2.resetCounter();
+
+		// try to remove strategy2 again
+		manager.removeStrategy(strategy2);
+
+		// run iteration 3
+		manager.run(population, 3);
+
+		// ensure that strategey1 still gets all plans
+		assertEquals(100, strategy1.getCounter());
+		assertEquals(0, strategy2.getCounter());
 	}
 
 	/**
@@ -127,36 +173,32 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 * with undefined score are chosen before any other plan with defined score.
 	 *
 	 * @author mrieser
+	 * @throws Exception 
 	 */
-	public void testOptimisticBehavior() {
+	public void testOptimisticBehavior() throws Exception {
 
 		Population population = new Population(Population.NO_STREAMING);
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		try {
-			person = new Person(new IdImpl(1));
-			plans[0] = person.createPlan(false);
-			plans[1] = person.createPlan(false);
-			plans[1].setScore(0.0);
-			plans[2] = person.createPlan(false);
-			plans[3] = person.createPlan(false);
-			plans[3].setScore(-50.0);
-			plans[4] = person.createPlan(false);
-			plans[4].setScore(50.0);
-			plans[5] = person.createPlan(false);
-			plans[5].setScore(50.0);
-			plans[6] = person.createPlan(false);
-			plans[6].setScore(60.0);
-			plans[7] = person.createPlan(false);
-			plans[8] = person.createPlan(false);
-			plans[8].setScore(-10.0);
-			plans[9] = person.createPlan(false);
-			population.addPerson(person);
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		person = new Person(new IdImpl(1));
+		plans[0] = person.createPlan(false);
+		plans[1] = person.createPlan(false);
+		plans[1].setScore(0.0);
+		plans[2] = person.createPlan(false);
+		plans[3] = person.createPlan(false);
+		plans[3].setScore(-50.0);
+		plans[4] = person.createPlan(false);
+		plans[4].setScore(50.0);
+		plans[5] = person.createPlan(false);
+		plans[5].setScore(50.0);
+		plans[6] = person.createPlan(false);
+		plans[6].setScore(60.0);
+		plans[7] = person.createPlan(false);
+		plans[8] = person.createPlan(false);
+		plans[8].setScore(-10.0);
+		plans[9] = person.createPlan(false);
+		population.addPerson(person);
 
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy strategy = new PlanStrategy(new TestPlanSelector());
@@ -164,12 +206,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		// in each "iteration", an unscored plans should be selected
 		for (int i = 0; i < 4; i++) {
-			try {
-				manager.run(population, i);
-			}
-			catch (UnsupportedOperationException e) {
-				throw new AssertionError("Did not expect UnsupportedOperationException in iteration " + i);
-			}
+			manager.run(population, i);
 			Plan plan = person.getSelectedPlan();
 			assertTrue("plan has not undefined score in iteration " + i, plan.hasUndefinedScore());
 			plan.setScore(i);
@@ -177,14 +214,13 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		/* There are no more unscored plans now, so in the next "iteration" our
 		 * bad PlanSelector should be called. */
-		boolean gotException = false;
 		try {
 			manager.run(population, 5);
+			fail("expected UnsupportedOperationException.");
 		}
-		catch (UnsupportedOperationException e) {
-			gotException = true;
+		catch (UnsupportedOperationException expected) {
+			// expected Exception catched
 		}
-		assertTrue("Expected: UnsupportedOperationException, but there was none...", gotException);
 
 	}
 
