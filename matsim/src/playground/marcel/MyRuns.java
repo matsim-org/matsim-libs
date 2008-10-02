@@ -1741,38 +1741,6 @@ public class MyRuns {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// planPlotActLocations
-	//////////////////////////////////////////////////////////////////////
-
-	public static void planPlotActLocations(final String[] args) {
-		System.out.println("RUN: planPlotActLocations");
-		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  setting up plans objects...");
-		final Population plans = new Population(Population.USE_STREAMING);
-		final PlanPlotActLocations plotter = new PlanPlotActLocations("locations.T.veh", new String[] {"home", "edu", "uni", "work1", "work2", "work3", "shop1", "shop2", "leisure1", "leisure2", "home2"});
-		plans.addAlgorithm(plotter);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
-		System.out.println("  done.");
-
-		System.out.println("  reading plans and running algorithms...");
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
-		System.out.println("  done.");
-
-		plotter.close();
-
-		System.out.println("RUN: planPlotActLocations finished.");
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// writeVisumRouten
 	//////////////////////////////////////////////////////////////////////
 
@@ -2514,7 +2482,7 @@ public class MyRuns {
 
 		/* ***   DEMAND MODELING   *** */
 
-//		filterSelectedPlans(args);
+		filterSelectedPlans(args);
 //		filterPlansInArea(args, 4582000, 5939000, 4653000, 5850000);  // uckermark
 //		filterPlansInArea(args, 4580000, 5807000, 4617000, 5835000);  // berlin
 //		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
@@ -2558,7 +2526,6 @@ public class MyRuns {
 //		calcTripLength(args); // from plans
 //		calcTolledTripLength(args); // calc avg trip length on tolled links
 //		generateRealPlans(args);
-//		planPlotActLocations(args);
 //		writeVisumRouten_plans(args);
 
 		/* ***   EVENTS   *** */
@@ -2583,7 +2550,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		createQVDiagramm(args);
-		someTest(args);
+//		someTest(args);
 
 //		Gbl.printSystemInfo();
 
