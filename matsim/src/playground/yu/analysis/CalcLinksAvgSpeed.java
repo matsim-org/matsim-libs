@@ -189,7 +189,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
-			for (int i = 0; i < nofBins; i++)
+			for (int i = 0; i < nofBins - 1; i++)
 				freeSpeeds[i] = network.getLink(linkId).getFreespeed(
 						i * 86400.0 / nofBins);
 			sc = new SpeedCounter(nofBins, freeSpeeds);
@@ -234,7 +234,6 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 * @param filename
 	 *            outputfilename (.../*.txt)
 	 */
-	@SuppressWarnings("unchecked")
 	public void write(final String filename) {
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(filename);
@@ -255,7 +254,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 								+ l
 										.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
 				for (int j = 0; j < nofBins - 1; j++) {
-					double speed = getAvgSpeed(linkId, (double) j * 3600);
+					double speed = getAvgSpeed(linkId, (double) j * binSize);
 					line.append("\t" + speed);
 					if (speed > 0) {
 						speeds[j] += speed;
@@ -283,17 +282,60 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		for (int i = 0; i < xsLength; i++)
 			if (speedsCount[i] > 0)
 				ySpeed[i] = speeds[i] / speedsCount[i];
-		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea",
-				"time", "avg. speed [km/h]");
+		XYLineChart avgSpeedChart = new XYLineChart("avg. speed in cityarea", "time",
+				"avg. speed [km/h]");
 		avgSpeedChart.addSeries("avg. speed of all agents", xs, ySpeed);
 		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
 	}
-	public Set<String> getInterestLinkIds(){
-		Set<String> interestLinkIds=new HashSet<String>();
-		for(Link link:this.interestLinks){
+
+	public Set<String> getInterestLinkIds() {
+		Set<String> interestLinkIds = new HashSet<String>();
+		for (Link link : interestLinks == null ? network.getLinks().values()
+				: interestLinks) {
 			interestLinkIds.add(link.getId().toString());
 		}
 		return interestLinkIds;
+	}
+
+	/**
+	 * @param arg0
+	 *            networkFilename;
+	 * @param arg1
+	 *            eventsFilename;
+	 * @param arg2
+	 *            outputpath;
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 */
+
+	public static void run_Gauteng(String[] args) throws SAXException,
+			ParserConfigurationException, IOException {
+		Gbl.startMeasurement();
+		System.out.println("-> begin run_Gauteng!");
+		final String netFilename = args[0];
+		final String eventsFilename = args[1];
+		final String outputPath = args[2];
+
+		Gbl.createConfig(null);
+		World world = Gbl.getWorld();
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+		world.setNetworkLayer(network);
+
+		Events events = new Events();
+		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
+		events.addHandler(clas);
+
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		clas.write(outputPath + "avgSpeed.txt.gz");
+		clas.writeChart(outputPath + "avgSpeed.png");
+
+		System.out.println("-> Done run_Gauteng!");
+		Gbl.printElapsedTime();
+
 	}
 
 	/**
@@ -309,8 +351,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	@SuppressWarnings( { "unchecked", "unchecked" })
-	public static void main(final String[] args) throws SAXException,
+	public static void run_roadpricing(String[] args) throws SAXException,
 			ParserConfigurationException, IOException {
 		Gbl.startMeasurement();
 
@@ -341,6 +382,15 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		System.out.println("-> Done!");
 		Gbl.printElapsedTime();
-		System.exit(0);
+	}
+
+	public static void main(final String[] args) throws SAXException,
+			ParserConfigurationException, IOException {
+		if (args.length == 4) {
+			run_roadpricing(args);
+		} else {
+			run_Gauteng(args);
+		}
+		System.out.println(0);
 	}
 }
