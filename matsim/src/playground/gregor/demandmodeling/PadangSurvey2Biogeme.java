@@ -34,37 +34,37 @@ import org.matsim.utils.misc.Counter;
 
 public class PadangSurvey2Biogeme {
 
-	private static class Zone {
-		public final String zoneId;
-		public final Coord coord;
-		public final int numOpportunities;
+	
+	private final String surveyFilename;
+	private final String zonesFilename;
 
-		public Zone(final String zoneId, final Coord coord, final int numOpportunities) {
-			this.zoneId = zoneId;
-			this.coord = coord;
-			this.numOpportunities = numOpportunities;
-		}
+	private int sumOpportunities;
+	ArrayList<Zone> zones;
+	
+	
+	public PadangSurvey2Biogeme(final String surveyFilename,final String zonesFilename) {
+		this.surveyFilename = surveyFilename;
+		this.zonesFilename = zonesFilename;
+		init();
 	}
-
-	public static void main(String[] args) {
-		final String surveyFilename = "../mystudies/benno/Survey.csv";
-		final String zonesFilename = "../mystudies/benno/Zones.csv";
-		final String biogemeFilename = "../mystudies/benno/biogeme.dat";
-
-		ArrayList<Zone> zones = new ArrayList<Zone>(20);
-		int sumOpportunities = 0;
+	
+	
+	
+	private void init() {
+		this.zones = new ArrayList<Zone>(20);
+		this.sumOpportunities = 0;
 
 		// read zones
 		try {
-			final BufferedReader zonesReader = IOUtils.getBufferedReader(zonesFilename);
+			final BufferedReader zonesReader = IOUtils.getBufferedReader(this.zonesFilename);
 			String header = zonesReader.readLine();
 			String line = zonesReader.readLine();
 			while (line != null) {
 				String[] parts = StringUtils.explode(line, ';');
 				int numOpportunities = Integer.parseInt(parts[3]);
 				Zone zone = new Zone(parts[0], new CoordImpl(parts[1], parts[2]), numOpportunities);
-				zones.add(zone);
-				sumOpportunities += numOpportunities;
+				this.zones.add(zone);
+				this.sumOpportunities += numOpportunities;
 				// --------
 				line = zonesReader.readLine();
 			}
@@ -73,10 +73,16 @@ public class PadangSurvey2Biogeme {
 			e.printStackTrace();
 			return;
 		}
+		
+	}
+
+
+	
+	public void run(final String actType, final String biogemeFilename) {
 
 		// process survey, line by line
 		try {
-			final BufferedReader surveyReader = IOUtils.getBufferedReader(surveyFilename);
+			final BufferedReader surveyReader = IOUtils.getBufferedReader(this.surveyFilename);
 			final BufferedWriter biogemeWriter = IOUtils.getBufferedWriter(biogemeFilename);
 			String header = surveyReader.readLine();
 			biogemeWriter.write("Id\tChoice\tdChosen\td1\td2\td3\td4\td5\td6\td7\td8\td9\n");
@@ -86,12 +92,22 @@ public class PadangSurvey2Biogeme {
 			while (line != null) {
 				counter.incCounter();
 
-				String[] parts = StringUtils.explode(line, ';');
+				String[] parts = StringUtils.explode(line, ',');
 				String id = parts[0];
+				String type = parts[3];
+				
+				if (!type.contains(actType)) {
+					line = surveyReader.readLine();
+					continue;
+				}
+				
+				
 				Coord homeCoord = new CoordImpl(parts[1], parts[2]);
 				Coord primActCoord = new CoordImpl(parts[5], parts[6]);
 				double distance = homeCoord.calcDistance(primActCoord);
-
+				if (distance > 30000) {
+					throw new RuntimeException("this should not happen!!");
+				}
 				Zone[] alternatives = new Zone[9];
 
 				int numShorterTrips = 0;
@@ -104,10 +120,10 @@ public class PadangSurvey2Biogeme {
 				while ( (numShorterTrips + numEqualTrips + numLongerTrips + numMissed) < 9) {
 
 					// draw random zone based on numOpportunities
-					int r = MatsimRandom.random.nextInt(sumOpportunities);
+					int r = MatsimRandom.random.nextInt(this.sumOpportunities);
 					int tmpSum = 0;
 					Zone tmpZone = null;
-					for (Zone zone : zones) {
+					for (Zone zone : this.zones) {
 						tmpSum += zone.numOpportunities;
 						if (r <= tmpSum) {
 							tmpZone = zone;
@@ -154,6 +170,41 @@ public class PadangSurvey2Biogeme {
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	private static class Zone {
+		public final String zoneId;
+		public final Coord coord;
+		public final int numOpportunities;
+
+		public Zone(final String zoneId, final Coord coord, final int numOpportunities) {
+			this.zoneId = zoneId;
+			this.coord = coord;
+			this.numOpportunities = numOpportunities;
+		}
+	}
+
+	public static void main(final String[] args) {
+		final String surveyFilename = "../inputs/padang/referencing/output/working-day_primAct.csv";
+		final String zonesFilename = "/home/laemmel/arbeit/svn/vsp-svn/projects/LastMile/demand_generation/FINAL/biogeme/PadangSurvey2Biogeme_input/Zones.csv";
+		
+		PadangSurvey2Biogeme ps2b = new PadangSurvey2Biogeme(surveyFilename,zonesFilename);
+		
+		String biogemeFilename = "../inputs/padang/referencing/output/working-day_HOME.dat";
+		ps2b.run("HOME", biogemeFilename);
+		
+		biogemeFilename = "../inputs/padang/referencing/output/working-day_HOUSEWORK.dat";
+		ps2b.run("HOUSE", biogemeFilename);
+		
+		biogemeFilename = "../inputs/padang/referencing/output/working-day_WORK.dat";
+		ps2b.run("WORK", biogemeFilename);
+
+		biogemeFilename = "../inputs/padang/referencing/output/working-day_SOC.dat";
+		ps2b.run("SOC", biogemeFilename);
+		
+		biogemeFilename = "../inputs/padang/referencing/output/working-day_EDU.dat";
+		ps2b.run("EDU", biogemeFilename);
+		
 
 	}
 

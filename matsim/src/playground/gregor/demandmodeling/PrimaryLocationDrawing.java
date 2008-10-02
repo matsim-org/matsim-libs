@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class PadangPrimActGeneration {
+public class PrimaryLocationDrawing {
 
 	private static double BETA = 0.0013;
 
@@ -79,9 +79,9 @@ public class PadangPrimActGeneration {
 
 	private int id = 0;
 
-	private static final Logger log = Logger.getLogger(PadangPrimActGeneration.class);
+	private static final Logger log = Logger.getLogger(PrimaryLocationDrawing.class);
 	
-	public PadangPrimActGeneration(final String zonesFile, final String demandFilename, final String districts) {
+	public PrimaryLocationDrawing(final String zonesFile, final String demandFilename, final String districts) {
 		this.network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		this.zonesFilename = zonesFile;
 		this.demandFilename = demandFilename;
@@ -231,11 +231,12 @@ public class PadangPrimActGeneration {
 				}
 				
 				Link link = getRandomLinkWithin(ftW);
-				Leg leg = new Leg(BasicLeg.Mode.car);
+//				Leg leg = new Leg(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
+				Leg leg = new Leg(Mode.car);
 				leg.setNum(0);
+				leg.setArrTime(Time.UNDEFINED_TIME);
 				leg.setDepTime(Time.UNDEFINED_TIME);
 				leg.setTravTime(Time.UNDEFINED_TIME);
-				leg.setArrTime(Time.UNDEFINED_TIME);
 				Act act = new Act("w",link.getCenter().getX(),link.getCenter().getY(),link,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,true);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);
@@ -348,7 +349,7 @@ public class PadangPrimActGeneration {
 
 
 
-		new PadangPrimActGeneration(zonesFilename,demandFilename,districts).run();
+		new PrimaryLocationDrawing(zonesFilename,demandFilename,districts).run();
 
 
 		

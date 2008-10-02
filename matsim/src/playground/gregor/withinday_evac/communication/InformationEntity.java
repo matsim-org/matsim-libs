@@ -25,7 +25,7 @@ package playground.gregor.withinday_evac.communication;
 public class InformationEntity implements Comparable<InformationEntity> {
 	
 	
-	public enum MSG_TYPE {
+	public static enum MSG_TYPE {
 		FOLLOW_ME,
 		MY_NEXT_LINK,
 		MY_NEXT_LINK_W_EST_TRAVELTIME,

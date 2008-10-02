@@ -52,7 +52,12 @@ import com.vividsolutions.jts.geom.Point;
 
 public class TextReferencer {
 
-
+	
+	private static final String HOME_ACT = "activities in the house other than work (if the place of work is at home)";
+	private static final String WORK_ACT = "work";
+	private static final String WORK_REL_ACT = "activities in support of work/business";
+	private static final String SOC_ACT = "other social activities";
+	private static final String HOME_LOCATION = "house (settlement area)";
 
 	private final Collection<Feature> referenced;
 	private final Collection<Feature> classified;
@@ -137,8 +142,8 @@ public class TextReferencer {
 			}
 
 
-			final String activity = line[4];
-			if (!activity.equals("home activity")){
+			final String activity = line[4].toLowerCase();
+			if (!activity.equals(HOME_ACT)){
 				line = tfr.readLine();
 				continue;
 			}
@@ -161,11 +166,12 @@ public class TextReferencer {
 			}
 
 			if (addFt) {
+				Geometry geom = ft.getDefaultGeometry();
 				try {
-					final Feature ftN = this.ftHome.create(new Object [] {ft.getDefaultGeometry(),id,id,location,id}, "home locations");
+					
+					final Feature ftN = this.ftHome.create(new Object [] {geom,id,id,location,id,location}, "home locations");
 					revRef.add(ftN);
 				} catch (final IllegalAttributeException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -221,8 +227,9 @@ public class TextReferencer {
 
 
 		final TextFileReader tfr = new TextFileReader(this.unclassified);
-		final TextFileWriter rfw = new TextFileWriter("./padang/referencing/missing_locations.txt");
-
+		final TextFileWriter rfw = new TextFileWriter("../inputs/padang/referencing/output/missing_locations.txt");
+		final TextFileWriter rdw = new TextFileWriter("../inputs/padang/referencing/output/survey_referenced.csv");
+		
 		String [] line = tfr.readLine();
 
 		while (line != null) {
@@ -244,6 +251,7 @@ public class TextReferencer {
 
 			final Household hh = this.households.get(id);
 
+			final String uid = line[0];
 			final String activity = line[4];
 			final String location = line[6].toLowerCase();
 			final String location2 = line[7].toLowerCase();
@@ -254,9 +262,9 @@ public class TextReferencer {
 //			}
 
 			Feature ft = null;
-			if (activity.equals("home activity")){
+			if (activity.equals(HOME_ACT)){
 				ft = classifyAsHome(id,line);
-			} else if (isHomeRelated(location)|| location2.equals("home or neighbourhood")) {
+			} else if (isHomeRelated(location)|| location2.equals(HOME_LOCATION)) {
 				ft = classifyAsHome(id,line);
 			} else {
 				CaseNode resp = this.crn.getCase(location);
@@ -281,7 +289,13 @@ public class TextReferencer {
 				hh.acts.add(act);
 				this.classified.add(ft);
 				this.ids.add(id);
+				Geometry geo = ft.getDefaultGeometry();
+				double x = geo.getCentroid().getX();
+				double y = geo.getCentroid().getY();
+				rdw.writeLine(new String[] {uid, x+"", y+""});
+				
 			} else {
+				rdw.writeLine(new String[] {uid, "", ""});
 				rfw.writeLine(line);
 			}
 			line = tfr.readLine();
@@ -289,8 +303,9 @@ public class TextReferencer {
 		}
 		System.out.println(this.ids.size());
 		rfw.finish();
+		rdw.finish();
 		try {
-			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/survey.shp");
+			ShapeFileWriter.writeGeometries(this.classified, "../inputs/padang/referencing/output/survey_working-day.shp");
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -342,9 +357,9 @@ public class TextReferencer {
 
 	private Feature getPointFeature(final Coordinate c, final String[] input) {
 
-		final Object [] obj = new Object [input.length+1];
+		final Object [] obj = new Object [20];
 		obj[0] = this.geofac.createPoint(c);
-		for (int i = 1; i < input.length+1; i++) {
+		for (int i = 1; i < 20; i++) {
 			if (input[i-1].equals("")) {
 				obj[i] = "0";
 				continue;
@@ -532,22 +547,22 @@ public class TextReferencer {
 
 
 	public static void main(final String [] args) throws Exception {
-		final String referenced1 =  "./padang/referencing/referenced.shp";
-		final String referenced2 =  "./padang/referencing/referenced2.shp";
-		final String referenced3 =  "./padang/referencing/referenced3.shp";
-		final String referenced4 =  "./padang/referencing/referenced4.shp";
-		final String referenced5 =  "./padang/referencing/referenced5.shp";
-		final String referenced6 =  "./padang/referencing/referenced6.shp";
-		final String referenced7 =  "./padang/referencing/referenced7.shp";
-		final String referenced8 =  "./padang/referencing/referenced8.shp";
-		final String referenced9 =  "./padang/referencing/referenced9.shp";
-		final String referenced10 =  "./padang/referencing/referenced10.shp";
-		final String own =  "./padang/referencing/own.shp";
-		final String zones =  "./padang/referencing/zones.shp";
-		final String zonesKel =  "./padang/referencing/zonesKel.shp";
-		final String homes = "./padang/referencing/homes.shp";
+		final String referenced1 =  "../inputs/padang/referencing/referenced.shp";
+		final String referenced2 =  "../inputs/padang/referencing/referenced2.shp";
+		final String referenced3 =  "../inputs/padang/referencing/referenced3.shp";
+		final String referenced4 =  "../inputs/padang/referencing/referenced4.shp";
+		final String referenced5 =  "../inputs/padang/referencing/referenced5.shp";
+		final String referenced6 =  "../inputs/padang/referencing/referenced6.shp";
+		final String referenced7 =  "../inputs/padang/referencing/referenced7.shp";
+		final String referenced8 =  "../inputs/padang/referencing/referenced8.shp";
+		final String referenced9 =  "../inputs/padang/referencing/referenced9.shp";
+		final String referenced10 =  "../inputs/padang/referencing/referenced10.shp";
+		final String own =  "../inputs/padang/referencing/own.shp";
+		final String zones =  "../inputs/padang/referencing/zones.shp";
+		final String zonesKel =  "../inputs/padang/referencing/zonesKel.shp";
+		final String homes = "../inputs/padang/referencing/homes.shp";
 
-		final String unclassified = "./padang/referencing/input_weekend.csv";
+		final String unclassified = "../inputs/padang/referencing/input_working-day.csv";
 
 
 		final ArrayList<FeatureSource> fts = new ArrayList<FeatureSource>();
@@ -644,7 +659,7 @@ public class TextReferencer {
 			}
 
 			try {
-			ShapeFileWriter.writeGeometries(this.classified, "./padang/referencing/weekend.shp");
+			ShapeFileWriter.writeGeometries(this.classified, "../inputs/padang/referencing/output/working-day.shp");
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

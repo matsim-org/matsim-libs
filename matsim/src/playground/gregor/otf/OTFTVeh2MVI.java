@@ -183,10 +183,10 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 //		String vehFileName = "../../tmp/studies/ivtch/T.veh";
 //		String outFileName = "output/testSWI2.mvi.gz";
 
-		final String netFileName = "./networks/padang_net_v20080618.xml";
-		final String vehFileName = "./output/colorizedT.veh.txt.gz";
+		final String netFileName = "../inputs/networks/padang_net_v20080618.xml";
+		final String vehFileName = "../outputs/output/colorizedT.veh.txt.gz";
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		final String outFileName = "./output/ITERS/it.500/500.movie.mvi";
+		final String outFileName = "../outputs/output/ITERS/it.101/101.movie.mvi";
 		final int intervall_s = 60;
 
 		Gbl.createConfig(null);

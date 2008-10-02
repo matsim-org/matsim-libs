@@ -49,7 +49,7 @@ public class TextFileReader {
 			if (line == null){
 				this.infile.close();
 			} else {
-				tokline = StringUtils.explode(line, '\t', 19);
+				tokline = StringUtils.explode(line, ',', 36);
 			}
 			
 		} catch (IOException e) {
