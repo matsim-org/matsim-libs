@@ -42,16 +42,9 @@ public class LocationChoice extends MultithreadedModuleA {
 	
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	
-	boolean constrained = false;
+	private boolean constrained = false;
 	
 	public LocationChoice() {
-		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
-			this.constrained = true;
-			log.info("Doing constrained location choice");
-		}
-		else {
-			log.info("Doing random location choice on univ. choice set");
-		}
 	}
 
 	public LocationChoice(
@@ -65,6 +58,14 @@ public class LocationChoice extends MultithreadedModuleA {
 	private void init(
 			final NetworkLayer network,
 			final Controler controler) {
+		
+		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
+			this.constrained = true;
+			log.info("Doing constrained location choice");
+		}
+		else {
+			log.info("Doing random location choice on univ. choice set");
+		}
 
 		this.controler = controler;
 		this.network = network;
