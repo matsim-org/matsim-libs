@@ -35,10 +35,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String AREA = "area";
 	
 	// true; false
-	private static final String MODE = "constrained";
+	private static final String CONSTRAINED = "constrained";
 
 	private String area = null;
-	private String mode = null;
+	private String constrained = null;
 
 	public LocationChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -49,7 +49,7 @@ public class LocationChoiceConfigGroup extends Module {
 		if (AREA.equals(key)) {
 			return getArea();
 		}
-		if (MODE.equals(key)) {
+		if (CONSTRAINED.equals(key)) {
 			return getMode();
 		}
 		throw new IllegalArgumentException(key);
@@ -59,7 +59,7 @@ public class LocationChoiceConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (AREA.equals(key)) {
 			setArea(value);
-		} else if (MODE.equals(key)) {
+		} else if (CONSTRAINED.equals(key)) {
 			setMode(value);
 		} else		
 		{
@@ -71,7 +71,7 @@ public class LocationChoiceConfigGroup extends Module {
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		this.addNotNullParameterToMap(map, AREA);
-		this.addNotNullParameterToMap(map, MODE);
+		this.addNotNullParameterToMap(map, CONSTRAINED);
 		return map;
 	}
 
@@ -85,10 +85,10 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	
 	public String getMode() {
-		return this.mode;
+		return this.constrained;
 	}
-	public void setMode(final String mode) {
-		this.area = mode;
+	public void setMode(final String constrained) {
+		this.constrained = constrained;
 	}
 	
 	protected void addParameterToMap(final Map<String, String> map, final String paramName) {
