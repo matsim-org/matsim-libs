@@ -45,7 +45,7 @@ public class LocationChoice extends MultithreadedModuleA {
 	boolean constrained = false;
 	
 	public LocationChoice() {
-		if (Gbl.getConfig().locationchoice().getMode().equals("constrained")) {
+		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
 		}
 	}
