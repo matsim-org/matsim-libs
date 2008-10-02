@@ -96,7 +96,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private boolean synchronizedPlay = true;
 	protected boolean liveHost = false;
 
-	String address;
+	private String address;
 	protected OTFServerRemote host = null;
 	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
 
@@ -111,30 +111,26 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	// -------------------- CONSTRUCTION --------------------
 
-	// TODO [MR,DS] make constructor deprecated and use the one without the second argument, as it is not used anymore
-	public OTFHostControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
-		openAddress(address);
-
-		addButtons();
-	}
-
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
 		openAddress(address);
 		addButtons();
 	}
 
-	protected void openAddress(String address) throws RemoteException, InterruptedException, NotBoundException {
+	protected void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
 		// try to open/connect to host if given a string of form
 		// connection type (rmi or file or tveh)
 		// rmi:ip  [: port]
 		// file:mvi-filename
 		// tveh:T.veh-filename @ netfilename
 		// e.g. "file:../MatsimJ/otfvis.mvi" or "rmi:127.0.0.1:4019" or "tveh:../MatsimJ/output/T.veh@../../studies/wip/network.xml"
-		if(address == null) address = "rmi:127.0.0.1:4019";
+		if (address == null) {
+			this.address = "rmi:127.0.0.1:4019";
+		} else {
+			this.address = address;
+		}
 
-		this.address = address;
-		String type = address.substring(0,address.indexOf(':'));
-		String connection = address.substring(address.indexOf(':')+1, address.length());
+		String type = this.address.substring(0,this.address.indexOf(':'));
+		String connection = this.address.substring(this.address.indexOf(':')+1, this.address.length());
 		if (type.equals("rmi")) {
 			int port = 4019;
 			String [] connparse = connection.split(":");
@@ -203,8 +199,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private OTFServerRemote openTVehFile(String netname, String vehname) {
-		OTFServerRemote host = new OTFTVehServer(netname,vehname);
-		return host;
+		return new OTFTVehServer(netname,vehname);
 	}
 
 	public OTFClientQuad createNewView(String id, OTFNetWriterFactory factory, OTFConnectionManager connect) throws RemoteException {
@@ -275,7 +270,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		handlers.put(id, handler);
 	}
 
-	public OTFDrawer getHandler( String id) {
+	public OTFDrawer getHandler(String id) {
 		return handlers.get(id);
 	}
 
@@ -468,7 +463,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		pressed_PAUSE();
 	}
 
-	int gotoTime = 0;
+	private int gotoTime = 0;
 	private transient OTFAbortGoto progressBar = null;
 	public void gotoTime() {
 		try {
@@ -727,7 +722,5 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			new PreloadHelper (handlers).start();
 		}
 	}
-
-
 
 }

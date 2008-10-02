@@ -122,7 +122,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 //			hostControl = new OTFHostControlBar("file:../MatsimJ/output/OTFQuadfile10p.mvi.gz");
 			System.out.println("Loading file " + this.filename + " ....");
-			this.hostControl = new OTFHostControlBar("file:" + this.filename, this.getClass());
+			this.hostControl = new OTFHostControlBar("file:" + this.filename);
 			JFrame frame = new JFrame("MATSim OTFVis");
 			if (isMac) {
 				frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);

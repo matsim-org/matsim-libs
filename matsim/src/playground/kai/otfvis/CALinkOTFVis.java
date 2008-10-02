@@ -1,7 +1,7 @@
 package playground.kai.otfvis;
 
 import java.awt.BorderLayout;
-import java.awt.Color; 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -427,8 +427,8 @@ public class CALinkOTFVis extends Thread {
 	public static class  MyControlBar extends OTFHostControlBar {
 		JButton verbot;
 
-		public MyControlBar(String address, Class res) throws RemoteException, InterruptedException, NotBoundException {
-			super(address, res);
+		public MyControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
+			super(address);
 			this.DELAYSIM = 20;
 
 			verbot = createButton("�-Verbot ist AUS", "vb", null, "toggle �berholverbot");
@@ -497,7 +497,7 @@ public class CALinkOTFVis extends Thread {
 
 		MyControlBar hostControl;
 		try {
-			hostControl = new MyControlBar("", CALinkOTFVis.class);
+			hostControl = new MyControlBar("");
 			JFrame frame = new JFrame("MATSim OTFVis");
 
 			boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");

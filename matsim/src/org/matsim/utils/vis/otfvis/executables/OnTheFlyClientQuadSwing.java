@@ -74,7 +74,7 @@ public class OnTheFlyClientQuadSwing{
 //		hostControl = new OTFHostControlBar("file:../MatsimJ/output/OTFQuadfile10p.mvi.gz");
 		OTFHostControlBar hostControl;
 		try {
-			hostControl = new OTFHostControlBar(arg0, OnTheFlyClientQuadSwing.class);
+			hostControl = new OTFHostControlBar(arg0);
 			JFrame frame = new JFrame("MATSIM OTFVis");
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
