@@ -99,12 +99,6 @@ public class CountsAnalyser {
 	private String outputFormat;
 
 	/**
-	 * the time filter in h
-	 *  A value in 1..24, 1 for 0 a.m. to 1 a.m., 2 for 1 a.m. to 2 a.m.
-	 */
-	private Integer timeFilter;
-
-	/**
 	 * the distance filter in m
 	 */
 	private Double distanceFilter;
@@ -113,15 +107,6 @@ public class CountsAnalyser {
 	 * the id of the node used as center for the distance filter
 	 */
 	private String distanceFilterCenterNode;
-	/**
-	 * the timestep for which counts are initially drawn in the 3d viewer
-	 *  A value in 1..24, 1 for 0 a.m. to 1 a.m., 2 for 1 a.m. to 2 a.m.
-	 */
-	private Integer visibleTimeStep;
-	/**
-	 * the number of the iteration which can be set in the config file
-	 */
-	private Integer iterationNumber;
 	/**
 	 * the CalcLinkStats read for the analysis
 	 */
@@ -169,13 +154,6 @@ public class CountsAnalyser {
 		System.out.println("  Output format: " + this.outputFormat);
 		this.outputFile = config.getParam(COUNTS, OUTFILE);
 		System.out.println("  Output file: " + this.outputFile);
-		this.timeFilter = config.counts().getTimeFilter();
-		System.out.println("  Time filter: " + this.timeFilter);
-		this.visibleTimeStep = config.counts().getVisibleTimeStep();
-
-		System.out.println("  Visible time step: " + this.visibleTimeStep);
-		this.iterationNumber = config.counts().getIterationNumber();
-		System.out.println("  Iteration Number set to : " + this.iterationNumber);
 		this.distanceFilterCenterNode = config.counts().getDistanceFilterCenterNode();
 		System.out.println("  Distance filter center node: " + this.distanceFilterCenterNode);
 		this.distanceFilter = config.counts().getDistanceFilter();
@@ -221,13 +199,10 @@ public class CountsAnalyser {
 		if (format.compareToIgnoreCase("kml") == 0) {
 			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
 					countsComparisonList, this.network, TransformationFactory.getCoordinateTransformation(this.coordSystem, TransformationFactory.WGS84));
-			kmlWriter.setTimeFilter(this.timeFilter);
-			kmlWriter.setIterationNumber(this.iterationNumber);
 			kmlWriter.writeFile(filename);
 		}
 		else if (format.compareToIgnoreCase("txt") == 0) {
 			CountSimComparisonTableWriter writer = new CountSimComparisonTableWriter(countsComparisonList, Locale.US);
-			writer.setTimeFilter(this.timeFilter);
 			writer.writeFile(filename);
 		}
 		else {
@@ -294,21 +269,13 @@ public class CountsAnalyser {
 	 *
 	 */
 	private static void printHelp() {
-		// String ls = System.getProperty("line.separator");
-		System.out.println("This tool needs one config argument. "
-				+ "The config file must contain the following parameters: ");
-		System.out
-				.println("  - The path to the file with the link attributes (mandatory)");
-		System.out
-				.println("  - The path to the file to which the output is written (mandatory)");
+		System.out.println("This tool needs one config argument. The config file must contain the following parameters: ");
+		System.out.println("  - The path to the file with the link attributes (mandatory)");
+		System.out.println("  - The path to the file to which the output is written (mandatory)");
 		System.out.println("  - The output format, can be kml or txt (mandatory)");
-		System.out
-				.println("  - The time filter (mandatory) 0 for 0 to 1 am, 1 for 1 to 2 am...");
-		System.out
-				.println("  - The distance filter (optional) the distance in km to filter the counts "
-						+ "around a node that must be given in the subsequent argument.");
-		System.out
-				.println("  - The node id for the center of the distance filter (optinal, however mandatory if distance filter is set)");
+		System.out.println("  - The time filter (mandatory) 0 for 0 to 1 am, 1 for 1 to 2 am...");
+		System.out.println("  - The distance filter (optional) the distance in km to filter the counts around a node that must be given in the subsequent argument.");
+		System.out.println("  - The node id for the center of the distance filter (optinal, however mandatory if distance filter is set)");
 	}
 
 	/**
