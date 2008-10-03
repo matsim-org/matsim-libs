@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -97,7 +97,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			}
 			out.write(NEWLINE);
 
-			for (CountSimComparison csc : this.countComparisonFilter.getCountsForHour(this.timeFilter)) {
+			for (CountSimComparison csc : this.countComparisonFilter.getCountsForHour(null)) {
 
 				out.write(csc.getId().toString());
 				out.write(SEPARATOR);
@@ -117,7 +117,9 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException ignored) {}
+				} catch (IOException e) {
+					log.warn("could not close file.", e);
+				}
 			}
 		}
 
@@ -127,14 +129,15 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	}
 
 	private void writeAWTVTable(final String file) {
-		log.info("Writing 'average weekday traffic volume' to " + file.substring(0,file.length()-4)+"AWTV.txt");
+		// output file always ends with ".txt"
+		String filename=file.substring(0,file.length()-4)+"AWTV.txt";
+
+		log.info("Writing 'average weekday traffic volume' to " + filename);
 
 		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(
 				this.countComparisonFilter.getCountsForHour(null));
 
 		BufferedWriter out = null;
-		// output file always ends with ".txt"
-		String filename=file.substring(0,file.length()-4)+"AWTV.txt";
 
 		try {
 			out = new BufferedWriter(new FileWriter(filename));
@@ -160,7 +163,9 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException ignored) {}
+				} catch (IOException e) {
+					log.warn("could not close file.", e);
+				}
 			}
 		}
 	}

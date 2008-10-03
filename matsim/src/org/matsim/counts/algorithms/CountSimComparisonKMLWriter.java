@@ -316,13 +316,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.createCountsLoadCurveGraphs();
 
 		// hourly data...
-		int minHour = 1;
-		int maxHour = 25;
-		if (this.timeFilter != null) {
-			minHour = this.timeFilter.intValue();
-			maxHour = minHour;
-		}
-		for (int h = minHour; h < maxHour; h++) {
+		for (int h = 1; h < 25; h++) {
 			// the timespan for this hour
 			TimeSpan timespan = new TimeSpan(new GregorianCalendar(1999, 0, 1, h - 1, 0, 0), new GregorianCalendar(1999, 0, 1, h, 0, 0));
 
@@ -346,7 +340,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @return a timestep specific standard string
 	 */
 	private String createFolderName(final int timestep) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer(30);
 		buffer.append("Traffic from ");
 		buffer.append(this.timestepToString(timestep - 1));
 		buffer.append(" to ");
@@ -469,7 +463,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @return A String containing the description for each placemark
 	 */
 	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuffer buffer = new StringBuffer(100);
 		buffer.append(NetworkFeatureFactory.STARTCDATA);
 // buffer.append(STARTH1);
 // buffer.append(LINK);
@@ -569,7 +563,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void createCountsLoadCurveGraphs() {
 		CountsLoadCurveGraphCreator cgc = new CountsLoadCurveGraphCreator("");
-		List<CountsGraph> graphs= cgc.createGraphs(this.countComparisonFilter.getCountsForHour(this.timeFilter), this.iterationNumber);
+		List<CountsGraph> graphs= cgc.createGraphs(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber);
 
 		this.countsLoadCurveGraphMap = new HashMap<String, String>(graphs.size());
 		String linkid;
@@ -609,7 +603,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		CountsGraph ep;
 		try {
-			ep = new BoxPlotErrorGraph(this.countComparisonFilter.getCountsForHour(this.timeFilter), this.iterationNumber, null, "error graph");
+			ep = new BoxPlotErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
 			ep.createChart(0);
 		} catch (IllegalArgumentException e) {
 			log.error("Could not create BoxPlot-ErrorGraph.", e);
@@ -643,7 +637,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @return the ScreenOverlay Feature
 	 */
 	private ScreenOverlay createBiasErrorGraph() {
-		CountsGraph ep = new BiasErrorGraph(this.countComparisonFilter.getCountsForHour(this.timeFilter), this.iterationNumber, null, "error graph");
+		CountsGraph ep = new BiasErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
 		ep.createChart(0);
 
 		String filename = "errorGraphErrorBias.png";
