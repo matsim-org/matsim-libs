@@ -42,7 +42,7 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class AnalysisTest {
+public class AnalysisTest_Zurich {
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -84,7 +84,7 @@ public class AnalysisTest {
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
 
-		OnRouteModalSplit orms = null;
+		OnRouteModalSplit_Zurich orms = null;
 		TravelTimeModalSplit ttms = null;
 		CalcAverageTripLength catl = null;
 
@@ -98,7 +98,7 @@ public class AnalysisTest {
 			plansReader.readFile(plansFilename);
 			plans.runAlgorithms();
 
-			orms = new OnRouteModalSplit(network, plans);
+			orms = new OnRouteModalSplit_Zurich(network, plans);
 			ttms = new TravelTimeModalSplit(network, plans);
 		}
 

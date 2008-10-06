@@ -55,7 +55,7 @@ import org.matsim.utils.misc.Time;
  *         Counts the number of vehicles departed, arrived or got stuck per time
  *         bin based on events.
  */
-public class OnRouteModalSplit implements AgentDepartureEventHandler,
+public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	private int iteration = 0;
@@ -76,7 +76,7 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 * @param nofBins
 	 *            The number of time bins for this analysis.
 	 */
-	public OnRouteModalSplit(final int binSize, final int nofBins,
+	public OnRouteModalSplit_Zurich(final int binSize, final int nofBins,
 			NetworkLayer network, Population plans) {
 		super();
 		this.binSize = binSize;
@@ -108,12 +108,12 @@ public class OnRouteModalSplit implements AgentDepartureEventHandler,
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
-	public OnRouteModalSplit(final int binSize, NetworkLayer network,
+	public OnRouteModalSplit_Zurich(final int binSize, NetworkLayer network,
 			Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
-	public OnRouteModalSplit(NetworkLayer network, Population plans) {
+	public OnRouteModalSplit_Zurich(NetworkLayer network, Population plans) {
 		this(300, network, plans);
 	}
 
