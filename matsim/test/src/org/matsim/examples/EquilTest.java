@@ -21,7 +21,7 @@
 package org.matsim.examples;
 
 import org.matsim.events.Events;
-import org.matsim.events.algorithms.EventWriterXML;
+import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
@@ -42,8 +42,8 @@ public class EquilTest extends MatsimTestCase {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
-		String eventsFileName = getOutputDirectory() + "eventsFile.xml";
-		String referenceFileName = getInputDirectory() + "events.xml.gz";
+		String eventsFileName = getOutputDirectory() + "events.txt";
+		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
 		World world = Gbl.createWorld();
 
@@ -56,7 +56,7 @@ public class EquilTest extends MatsimTestCase {
 		plansReader.readFile(popFileName);
 
 		Events events = new Events();
-		EventWriterXML writer = new EventWriterXML(eventsFileName);
+		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
 		SimulationTimer.setTime(0);
@@ -67,8 +67,6 @@ public class EquilTest extends MatsimTestCase {
 
 		final long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
 		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
-		System.out.println("checksum1 = " + checksum1);
-		System.out.println("checksum2 = " + checksum2);
-		assertEquals(checksum1, checksum2);
+		assertEquals("different event files.", checksum1, checksum2);
 	}
 }
