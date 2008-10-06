@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,11 +20,11 @@
 
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class ActStartEvent extends ActEvent {
 
@@ -37,10 +37,10 @@ public class ActStartEvent extends ActEvent {
 	}
 
 	@Override
-	public Attributes getAttributes() {
-		AttributesImpl impl = getAttributesImpl();
-		impl.addAttribute("","","type", "", "actstart");
-		return impl;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(BasicEvent.ATTRIBUTE_TYPE, "actstart");
+		return attr;
 	}
 
 	@Override

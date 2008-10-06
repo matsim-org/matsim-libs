@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,11 +20,11 @@
 
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class LinkEnterEvent extends LinkEvent {
 
@@ -37,11 +37,10 @@ public class LinkEnterEvent extends LinkEvent {
 	}
 
 	@Override
-	public Attributes getAttributes() {
-		AttributesImpl impl = getAttributesImpl();
-		//impl.addAttribute("","","Flag", "", Integer.toString(5));
-		impl.addAttribute("","","type", "", "entered link");
-		return impl;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(BasicEvent.ATTRIBUTE_TYPE, "entered link");
+		return attr;
 	}
 
 	@Override

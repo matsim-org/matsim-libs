@@ -20,10 +20,10 @@
 
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.population.Person;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * This event specifies that an agent has gained some utility (or disutility).
@@ -47,12 +47,10 @@ public final class AgentUtilityEvent extends BasicEvent {
 	}
 
 	@Override
-	public Attributes getAttributes() {
-		AttributesImpl attr = new AttributesImpl();
-		attr.addAttribute("", "", "time", "", Double.toString(this.time));
-		attr.addAttribute("", "", "agent", "", this.agentId);
-		attr.addAttribute("", "", "type", "", "agentUtility");
-		attr.addAttribute("", "", "amount", "", Double.toString(this.amount));
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(BasicEvent.ATTRIBUTE_TYPE, "agentUtility");
+		attr.put("amount", Double.toString(this.amount));
 		return attr;
 	}
 

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,10 +20,11 @@
 
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
-import org.xml.sax.helpers.AttributesImpl;
 
 public abstract class LinkEvent extends BasicEvent {
 
@@ -47,14 +48,10 @@ public abstract class LinkEvent extends BasicEvent {
 		this.linkId = linkId;
 	}
 
-	protected AttributesImpl getAttributesImpl() {
-		AttributesImpl attr = new AttributesImpl();
-
-		long lTime = (long)this.time; // TODO [DS] switch to double for times
-		attr.addAttribute("","","time", "", Long.toString(lTime));
-		attr.addAttribute("","","agent", "", this.agentId);
-		attr.addAttribute("","","link", "", this.linkId);
-		attr.addAttribute("","","leg", "", Integer.toString(this.legId));
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put("link", this.linkId);
+		attr.put("leg", Integer.toString(this.legId));
 		return attr;
 	}
 

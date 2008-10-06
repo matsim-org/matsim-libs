@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,10 +20,11 @@
 
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.xml.sax.helpers.AttributesImpl;
 
 abstract class ActEvent extends BasicEvent {
 
@@ -49,15 +50,12 @@ abstract class ActEvent extends BasicEvent {
 		this.acttype = acttype == null ? "" : acttype;
 	}
 
-	protected AttributesImpl getAttributesImpl() {
-		AttributesImpl attr = new AttributesImpl();
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
 
-		long lTime = (long)this.time; // TODO [DS] output sollte auf "double" umgestellt werden
-		attr.addAttribute("", "", "time", "", Long.toString(lTime));
-		attr.addAttribute("", "", "agent", "", this.agentId);
-		attr.addAttribute("", "", "link", "", this.linkId);
-		attr.addAttribute("", "", "activity", "", Integer.toString(this.actId));
-		attr.addAttribute("", "", "act_type", "", this.acttype);
+		attr.put("link", this.linkId);
+		attr.put("activity", Integer.toString(this.actId));
+		attr.put("act_type", this.acttype);
 		return attr;
 	}
 

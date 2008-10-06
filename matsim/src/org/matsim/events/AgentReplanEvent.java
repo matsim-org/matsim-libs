@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.events;
 
+import java.util.Map;
+
 import org.matsim.population.Route;
-import org.xml.sax.Attributes;
 
 
 /**
  * @author dgrether
- *
  */
 public class AgentReplanEvent extends BasicEvent {
 
@@ -40,8 +40,10 @@ public class AgentReplanEvent extends BasicEvent {
 	 * @see org.matsim.events.BasicEvent#getAttributes()
 	 */
 	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(BasicEvent.ATTRIBUTE_TYPE, "replan");
+		return attr;
 	}
 
 	/**
@@ -51,7 +53,7 @@ public class AgentReplanEvent extends BasicEvent {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(Double.valueOf(this.time));
-		builder.append(" ".intern());
+		builder.append(' ');
 		builder.append(this.agentId);
 
 		return builder.toString();

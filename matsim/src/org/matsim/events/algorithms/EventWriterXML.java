@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,10 +23,10 @@ package org.matsim.events.algorithms;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.handler.BasicEventHandler;
-import org.xml.sax.Attributes;
 
 public class EventWriterXML implements BasicEventHandler {
 	private BufferedWriter out = null;
@@ -64,11 +64,11 @@ public class EventWriterXML implements BasicEventHandler {
 
 	public void handleEvent(final BasicEvent event) {
 		StringBuilder eventXML = new StringBuilder("\t<event ");
-		Attributes attr = event.getAttributes();
-		for (int i = 0; i< attr.getLength(); i++) {
-			eventXML.append(attr.getQName(i));
+		Map<String, String> attr = event.getAttributes();
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			eventXML.append(entry.getKey());
 			eventXML.append("=\"");
-			eventXML.append(attr.getValue(i));
+			eventXML.append(entry.getValue());
 			eventXML.append("\" ");
 		}
 		eventXML.append(" />\n");

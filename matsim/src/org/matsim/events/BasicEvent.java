@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,12 +20,16 @@
 
 package org.matsim.events;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
-import org.xml.sax.Attributes;
 
 public abstract class BasicEvent {
 
+	public final static String ATTRIBUTE_TYPE = "type";
+	
 	public final double time;
 	public final String agentId;
 	public Person agent = null;
@@ -44,7 +48,12 @@ public abstract class BasicEvent {
 		this.agentId = agentId;
 	}
 
-	public abstract Attributes getAttributes();
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = new LinkedHashMap<String, String>();
+		attr.put("time", getTimeString(this.time));
+		attr.put("agent", this.agentId);
+		return attr;
+	}
 
 	/**
 	 * Returns a textual representation of this event used for writing the event to a text file.
