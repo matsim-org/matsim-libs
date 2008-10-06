@@ -183,7 +183,7 @@ public class KMZWriter {
 			while ((bytesRead = data.read(buffer)) != -1) {
 				this.zipOut.write(buffer, 0, bytesRead);
 			}
-			log.info(entry.getName() + " added to kmz.");
+			log.debug(entry.getName() + " added to kmz.");
 		} finally {
 			if (data != null) {
 				data.close();
@@ -202,7 +202,7 @@ public class KMZWriter {
 		ZipEntry entry = new ZipEntry(inZipFilename);
 		this.zipOut.putNextEntry(entry);
 		this.zipOut.write(data);
-		log.info(entry.getName() + " added to kmz.");
+		log.debug(entry.getName() + " added to kmz.");
 	}
 
 	/**
