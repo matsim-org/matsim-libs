@@ -66,7 +66,7 @@ public class PlanomatX3 implements org.matsim.population.algorithms.PlanAlgorith
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		router 					= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		scorer 					= new PlanomatXPlanScorer (factory);
-		NEIGHBOURHOOD_SIZE 		= 20;				//TODO @MF: constants to be configured externally, sum must be smaller or equal than 1.0
+		NEIGHBOURHOOD_SIZE 		= 50;				//TODO @MF: constants to be configured externally, sum must be smaller or equal than 1.0
 		WEIGHT_CHANGE_ORDER 	= 0.5; 
 		WEIGHT_CHANGE_NUMBER 	= 0.5;
 		//weightChangeType	 	= 0.0;
