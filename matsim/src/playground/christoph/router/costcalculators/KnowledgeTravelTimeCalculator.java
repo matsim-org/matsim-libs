@@ -46,7 +46,6 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	}
 	
 	// return travel time without account for the actual traffic
-	@Override
 	public double getLinkTravelTime(Link link, double time)
 	{
 		if(queueNetwork == null)

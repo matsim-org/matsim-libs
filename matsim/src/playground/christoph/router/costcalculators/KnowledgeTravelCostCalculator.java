@@ -53,7 +53,6 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		this.distanceCost = Gbl.getConfig().charyparNagelScoring().getDistanceCost() / 1000.0;
 	}
 	
-	@Override
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
 		ArrayList<Node> knownNodes = null;
