@@ -20,18 +20,10 @@
 
 package org.matsim.events;
 
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
-import org.matsim.events.EventsReaderTXTv1;
-import org.matsim.events.EventsReaderXMLv1;
-import org.matsim.events.MatsimEventsReader;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -41,6 +33,7 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.testcases.MatsimTestCase;
+import org.xml.sax.SAXException;
 
 public class EventsReadersTest extends MatsimTestCase {
 
@@ -119,7 +112,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("9", event.linkId);
 		}
 
-	};
+	}
 
 	public final void testTxtReader() {
 		Events events = new Events();
@@ -130,12 +123,12 @@ public class EventsReadersTest extends MatsimTestCase {
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 
-	public final void testXmlReader() {
+	public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
 		Events events = new Events();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.readFile("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/events.xml");
+		reader.parse("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/events.xml");
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 

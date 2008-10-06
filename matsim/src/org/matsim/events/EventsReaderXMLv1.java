@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,14 +20,10 @@
 
 package org.matsim.events;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
@@ -77,24 +73,6 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			desc = atts.getValue("amount");
 		}
 		EventsReaderTXTv1.createEvent(this.events, time, vehId, legNumber, linkId, flag, desc, activity, acttype);
-	}
-
-	/**
-	 * Parses the specified events file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
