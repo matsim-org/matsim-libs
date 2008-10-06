@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CompassRoute.java
+ * RandomCompassRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,34 +21,37 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
+import org.matsim.population.Knowledge;
 import org.matsim.population.Route;
+import org.matsim.router.util.LeastCostPathCalculator;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
-import playground.christoph.router.util.RouteChecker;
 import playground.christoph.router.util.TabuSelector;
 
-
-public class CompassRoute extends PersonLeastCostPathCalculator {
+public class RandomCompassRoute extends PersonLeastCostPathCalculator {
 
 	protected boolean removeLoops = true;
 	protected boolean tabuSearch = true;
+	protected double compassProbability = 0.8;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
-	private final static Logger log = Logger.getLogger(CompassRoute.class);
+	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
 	
 	/**
 	 * Default constructor.
 	 *                    
 	 */
-	public CompassRoute() 
-	{
-		
+	public RandomCompassRoute() 
+	{	
 	}
 
 	
@@ -67,11 +70,11 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Node> knownNodes = null;
 		
-		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
-		
 		nodes.add(fromNode);
 		
+		// try getting Nodes from the Persons Knowledge
+		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
@@ -84,7 +87,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) links = TabuSelector.getLinks(links, previousNode);
-			
+		
 			if (links.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
@@ -107,18 +110,35 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 						angle = newAngle;
 						nextLink = links[i];
 					}
-/*					else
-					{
-						log.info("Angle " + angle + " newAngle " + newAngle);
-					}
-*/					
+			
 				}
 				else
 				{
 					log.error("Return object was not from type Link! Class " + links[i] + " was returned!");
 				}	
 			}
+
+			// select next Link
+			if(nextLink != null)
+			{
+				double randomDouble = MatsimRandom.random.nextDouble();
 				
+				/*
+				 * Select random number, if the random number is bigger than the compassProbabilty.
+				 * If that's not the case, nothing has to be done - the current nextLink is selected by
+				 * the Compass Algorithm.
+				 */
+				if (randomDouble > compassProbability) nextLink = links[MatsimRandom.random.nextInt(links.length)];
+			}
+			
+			// Compass Algorithm didn't find a link -> only choose randomly
+			else
+			{
+				// choose Link
+				nextLink = links[MatsimRandom.random.nextInt(links.length)];
+			}
+			//nextLink = links[i];
+			
 			
 			// den gewählten Link zum neuen CurrentLink machen
 			if(nextLink != null)
@@ -134,6 +154,9 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 				log.error("Return object was not from type Link! Class " + nextLink + " was returned!");
 				break;
 			}
+			
+			
+			
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
@@ -145,7 +168,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		{
 			log.info("LinkCount " + route.getLinkRoute().length + " distance " + route.getDist());
 		}
-		
+	
 		if (removeLoops) LoopRemover.removeLoops(route);
 				
 		return route;
@@ -182,15 +205,6 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		 * Solution: slightly reduce angles of 180° so one of them is chosen. 
 		 */
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
-		
-		//if (phi == Double.NaN)
-		if(String.valueOf(phi).equals("NaN"))
-		{
-			log.error("v1x " + v1x);
-			log.error("v1y " + v1y);
-			log.error("v2x " + v2x);
-			log.error("v2y " + v2y);
-		}
 		
 		return phi;
 	}

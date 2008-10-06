@@ -20,12 +20,20 @@
 
 package playground.christoph.mobsim;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
+import org.matsim.events.AgentReplanEvent;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Node;
+
+import playground.christoph.events.algorithms.LeaveLinkReplanner;
 
 public class MyQueueNode extends QueueNode{
 	
@@ -39,13 +47,20 @@ public class MyQueueNode extends QueueNode{
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
+	@Override
 	public boolean moveVehicleOverNode(final Vehicle veh, final double now) 
 	{
-		new Replanner(this, veh, now);
+		/*
+		 * This is just a workaround!
+		 * At the moment there is no event, that could be used for replanning, if a
+		 * Person reached the end of it's current link.
+		 * The "LinkLeaveEvents" are thrown when the Person has already been set to 
+		 * a new Link, so it can't be used for Replanning.
+		 */
+		// If replanning flag is set in the Person
+		boolean replanning = (Boolean)veh.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
+		if(replanning) new LeaveLinkReplanner(this, veh, now);
 		
-		// doReplanning here!
-	//	knowledgeReplaner.reset(1);
-//		QueueSimulation.getEvents().processEvent(new AgentReplanEvent(now, veh.getDriver().getPerson(), this.link, veh.getCurrentLeg()));
 		
 		return super.moveVehicleOverNode(veh, now);
 	}

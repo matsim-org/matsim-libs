@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -43,6 +44,8 @@ import playground.christoph.knowledge.utils.GetAllNodes;
 
 
 public class DijkstraForSelectNodes {
+	
+	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
 	
 	// Verkehrsnetz
 	NetworkLayer network;
@@ -58,6 +61,9 @@ public class DijkstraForSelectNodes {
 	
 	// Initiale Länge der PriorityQueue. Wert aus Dijkstra.java übernommen.
 	private static final int INITIAL_CAPACITY = 500;
+	
+	// alle Nodes des Netzwerks
+	ArrayList<Node> networkNodes;
 	
 	
 	// Knoten anhand ihres Abstandes zum Ursprungsknoten sortieren.
@@ -84,32 +90,42 @@ public class DijkstraForSelectNodes {
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
 	
 	
-	public DijkstraForSelectNodes()
+	public DijkstraForSelectNodes(ArrayList<Node> networkNodes)
 	{
+		this.networkNodes = networkNodes;
+		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 	}
 	
-	public DijkstraForSelectNodes(NetworkLayer network)
+	public DijkstraForSelectNodes(NetworkLayer network, ArrayList<Node> networkNodes)
 	{
+		this.network = network;
+		this.networkNodes = networkNodes;
+		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
-		setNetwork(network);	
+		initDijkstraNodes();	
 	}
 	
 	public void setNetwork(NetworkLayer network)
 	{
 		this.network = network;
-		
+	}
+	
+	public void setNetworkNodes(ArrayList<Node> nodes)
+	{
+		this.networkNodes = nodes;
+	}
+	
+	protected void initDijkstraNodes()
+	{		
 		// aufräumen
-		dijkstraNodeMap.clear();
+//		dijkstraNodeMap.clear();
 		
-		// DijkstraNodes und DijkstraNodeMap initialisieren
-		ArrayList<Node> nodes = new GetAllNodes().getAllNodes(network);
-		
-		for(int i = 0; i < nodes.size(); i++)
+		for(int i = 0; i < networkNodes.size(); i++)
 		{
-			Node node = nodes.get(i);
+			Node node = networkNodes.get(i);
 			
 			DijkstraNode dijkstraNode = new DijkstraNode(node);
 			
@@ -119,7 +135,6 @@ public class DijkstraForSelectNodes {
 		
 	}
 
-	
 	// initialisieren
 	private void init(DijkstraNode start)
 	{
@@ -132,10 +147,11 @@ public class DijkstraForSelectNodes {
 	    setMinDistance(start, 0.0);
 	    unvisitedNodes.add(start);
 	}
-	     
+	   
+	
 	// Kürzesten Weg für eine Route suche. Abbrechen, wenn dieser gefunden wurde.
 	public void executeRoute(Node start, Node end)
-	{
+	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
 	        
@@ -161,7 +177,7 @@ public class DijkstraForSelectNodes {
 
 	// Kürzeste Wege zu allen Knoten des Netzwerks suchen.
 	public void executeNetwork(Node start)
-	{
+	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
 		
@@ -173,12 +189,11 @@ public class DijkstraForSelectNodes {
 	    {
 	    	// Fehler abfangen, falls sich falscher Node eingeschlichen hat
 	    	assert !isVisited(node);
-	            
+	    	
 	        node.setVisited(true);
 	           
 	        relaxNode(node);
 	    }
-		
 	}
 	
 	// Map mit den Distanzen zu jedem Knoten zurückgeben.

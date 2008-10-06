@@ -21,21 +21,28 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 
+import playground.christoph.router.util.KnowledgeTools;
+import playground.christoph.router.util.LoopRemover;
+import playground.christoph.router.util.PersonLeastCostPathCalculator;
+import playground.christoph.router.util.RouteChecker;
+import playground.christoph.router.util.TabuSelector;
 
-public class TabuRoute implements LeastCostPathCalculator {
+
+public class TabuRoute extends PersonLeastCostPathCalculator {
 
 	private final static Logger log = Logger.getLogger(TabuRoute.class);
 
-	protected Random random;
-	
+	protected boolean removeLoops = true;
+	protected int maxLinks = 50000; // maximum number of links in a created plan
+	 
 	/**
 	 * Default constructor.
 	 *
@@ -43,14 +50,8 @@ public class TabuRoute implements LeastCostPathCalculator {
 	 * 			  Random number generator. Needed to create reproducible results.           
 	 *            
 	 */
-	public TabuRoute(Random random)
-	{
-		this.random = random;
-	}
-	
 	public TabuRoute() 
 	{
-		this.random = new Random();
 	}
 
 	
@@ -66,7 +67,11 @@ public class TabuRoute implements LeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-	
+		ArrayList<Node> knownNodes = null;
+		
+		// try getting Nodes from the Persons Knowledge
+		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		
 		nodes.add(fromNode);
 	
 		// erster Schleifendurchlauf -> kein vorheriger Node!
@@ -74,44 +79,33 @@ public class TabuRoute implements LeastCostPathCalculator {
 		
 		while(!currentNode.equals(toNode))
 		{
-			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			// stop searching if to many links in the generated Route...
+			if (nodes.size() > maxLinks) break;
 			
-			int linkCount = links.length;
+			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
-			if (linkCount == 0)
+			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
+			links = KnowledgeTools.getKnownLinks(links, knownNodes);
+			
+			/*
+			 * If there are no Links available something may be wrong.
+			 */
+			if (links.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
 			
-			// Link zum vorherigen Node entfernen, falls noch weitere Links verfügbar sind
-			ArrayList<Link> newLinks = new ArrayList<Link>();
-			for(int i = 0; i < links.length; i++)
-			{
-				// Falls der Link nicht zurück zum aktuellen Node führt -> Link übernehmen
-				if (previousNode == null) newLinks.add(links[i]);	// erster Schleifendurchlauf
-				else if(!links[i].getToNode().equals(previousNode)) newLinks.add(links[i]);
-			}
+			// get Links, that do not return to the previous Node
+			Link[] newLinks = TabuSelector.getLinks(links, previousNode);
 			
-			// Falls alle Links zurück zum letzten Node führen -> alle zur Auswahl hinzufügen
-			if (links.length > 0 && newLinks.size() == 0)
-			{
-				for(int i = 0; i < links.length; i++) newLinks.add(links[i]);
-				
-				log.info("All available outgoing links return to the previous node, so choosing one of them!");
-			}
-			
-			// ArrayList wieder in ein Array packen.
-			links = new Link[newLinks.size()];
-			for(int i = 0; i < newLinks.size(); i++) links[i] = newLinks.get(i);
-			
-			// Node wählen
-			int nextLink = random.nextInt(linkCount);
+			// Link wählen
+			int nextLink = MatsimRandom.random.nextInt(newLinks.length);
 			
 			// den gewählten Link zum neuen CurrentLink machen
-			if(links[nextLink] instanceof Link)
+			if(newLinks[nextLink] instanceof Link)
 			{
-				currentLink = links[nextLink];
+				currentLink = newLinks[nextLink];
 				previousNode = currentNode;
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
@@ -127,6 +121,8 @@ public class TabuRoute implements LeastCostPathCalculator {
 		Route route = new Route();
 		route.setRoute(nodes);
 		route.setDist(routeLength);
+		
+		if (removeLoops) LoopRemover.removeLoops(route);
 		
 		return route;
 	}

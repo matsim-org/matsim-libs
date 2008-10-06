@@ -129,7 +129,7 @@ public class KnowledgeControler extends Controler {
 		this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
 			
 		// Eigenen TravenCostCalculator verwenden...
-		this.travelCostCalculator = new KnowledgeTravelCost(this.travelTimeCalculator);
+		this.travelCostCalculator = new OldKnowledgeTravelCost(this.travelTimeCalculator);
 		
 		// ... dieser wird von nun folgenden Setup nicht mehr überschrieben.
 		super.setup();

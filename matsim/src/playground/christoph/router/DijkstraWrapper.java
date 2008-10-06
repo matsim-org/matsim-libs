@@ -1,0 +1,121 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DijkstraWrapper.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.christoph.router;
+
+import org.apache.log4j.Logger;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.network.Node;
+import org.matsim.population.Person;
+import org.matsim.population.Route;
+import org.matsim.router.Dijkstra;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
+
+import playground.christoph.router.util.KnowledgeTools;
+import playground.christoph.router.util.PersonLeastCostPathCalculator;
+import playground.christoph.router.util.KnowledgeTravelCost;
+import playground.christoph.router.util.KnowledgeTravelTime;
+
+/*
+ * This is a Wrapper-Class that is needed to forward the currently replanned Person
+ * to the Cost- and TimeCalculator.
+ */
+
+public class DijkstraWrapper extends PersonLeastCostPathCalculator {
+//public class DijkstraWrapper extends PersonLeastCostPathCalculator, Dijkstra {
+
+	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
+	
+	protected Dijkstra dijkstra;
+	
+	protected TravelCost costFunction;
+	protected TravelTime timeFunction;
+
+	public DijkstraWrapper()
+	{	
+	}
+	
+	/*
+	 * The TravelCost and TravelTime objects have to be those, which were used to initialize
+	 * the Dijkstra Object.
+	 * To be able to hand over the person to them, PersonTravelCost and PersonTravelTime
+	 * Objects should be used.
+	 * If the Calculators need information about the current traffic in the System, the
+	 * QueueNetwork has to be set.
+	 */
+	public DijkstraWrapper(Dijkstra dijkstra, TravelCost costFunction, TravelTime timeFunction)
+	{
+		this.dijkstra = dijkstra;
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+	}
+	
+	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	{
+		return dijkstra.calcLeastCostPath(fromNode, toNode, startTime);
+	}
+	
+	/*
+	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
+	 */
+	@Override
+	public void setPerson(Person person)
+	{
+		this.person = person;
+		
+		if(costFunction instanceof KnowledgeTravelCost)
+		{
+			((KnowledgeTravelCost)costFunction).setPerson(person);
+		}
+		
+		if(timeFunction instanceof KnowledgeTravelTime)
+		{
+			((KnowledgeTravelTime)timeFunction).setPerson(person);
+		}
+
+	}
+	
+	/*
+	 * We have to hand over the queueNetwork to the Cost- and TimeCalculators of the Router.
+	 */
+	@Override
+	public void setQueueNetwork(QueueNetwork queueNetwork)
+	{
+		this.queueNetwork = queueNetwork;
+		
+		if(costFunction instanceof KnowledgeTravelCost)
+		{
+			((KnowledgeTravelCost)costFunction).setQueueNetwork(queueNetwork);
+		}
+		
+		if(timeFunction instanceof KnowledgeTravelTime)
+		{
+			((KnowledgeTravelTime)timeFunction).setQueueNetwork(queueNetwork);
+		}
+	}
+	
+	
+	public Dijkstra getDijkstra()
+	{
+		return dijkstra;
+	}
+	
+}

@@ -23,6 +23,7 @@ package playground.christoph.knowledge.nodeselection;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -40,16 +41,35 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 
 	Node startNode;
 	Node endNode;
-	double maxDist = Double.MAX_VALUE;	
-	TravelCost costCalculator = new FreespeedTravelTimeCost();	// Kostenrechner
-	double time = Time.UNDEFINED_TIME;	// Zeit für den Kostenrechner
+	double costFactor = Double.MAX_VALUE;	
+	TravelCost costCalculator = new FreespeedTravelTimeCost();	// CostCalculator
+	double time = Time.UNDEFINED_TIME;	// time for the CostCalculator
+	ArrayList<Node> networkNodes;
+	DijkstraForSelectNodes dijkstra;
 	
-	public SelectNodesDijkstra(NetworkLayer network, Node startNode, Node endNode, double maxDist)
+	private static final Logger log = Logger.getLogger(SelectNodesDijkstra.class);
+	
+	public SelectNodesDijkstra(NetworkLayer network)
+	{
+		this.network = network;
+		
+		// get all nodes of the network
+		networkNodes = new GetAllNodes().getAllNodes(network);
+		
+		dijkstra = new DijkstraForSelectNodes(this.network, networkNodes);
+	}
+	
+	public SelectNodesDijkstra(NetworkLayer network, Node startNode, Node endNode, double costFactor)
 	{
 		this.network = network;
 		this.startNode = startNode;
 		this.endNode = endNode;
-		this.maxDist = maxDist;
+		this.costFactor = costFactor;
+		
+		// get all nodes of the network
+		networkNodes = new GetAllNodes().getAllNodes(network);
+		
+		dijkstra = new DijkstraForSelectNodes(this.network, networkNodes);
 	}
 	
 	public void setStartNode(Node startNode)
@@ -62,14 +82,15 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.endNode = endNode;
 	}
 	
-	public void setMaxDist(double maxDist)
+	public void setCostFactor(double costFactor)
 	{
-		this.maxDist = maxDist;
+		this.costFactor = costFactor;
 	}
 	
 	public void setCostCalculator(TravelCost calculator)
 	{
 		costCalculator = calculator;
+		dijkstra.setCostCalculator(costCalculator);
 	}
 	
 	public TravelCost getCostCalculator()
@@ -80,6 +101,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	public void setCalculationTime(double time)
 	{
 		this.time = time;
+		dijkstra.setCalculationTime(time);
 	}
 	
 	public double getCalculationTime()
@@ -98,39 +120,37 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 
 	@Override
 	public void getNodes(ArrayList<Node> nodes)
-	{
-		DijkstraForSelectNodes dijkstra = new DijkstraForSelectNodes(this.network);
-		dijkstra.setCostCalculator(costCalculator);
-		dijkstra.setCalculationTime(time);
-		
+	{		
 		dijkstra.executeNetwork(startNode);
 		Map<Node, Double> startMap = dijkstra.getMinDistances();
 		
 		dijkstra.executeNetwork(endNode);
 		Map<Node, Double> endMap = dijkstra.getMinDistances();
 		
-		// Wege berechnen
+		// calculate distances
 		//Map<Node, Double> distances = new HashMap<Node, Double>();
 		
-		System.out.println("Kürzeste Weglänge vom Start zum Ende: " + startMap.get(endNode));
+		//log.info("Minimal costs from start- to endnode: " + startMap.get(endNode));
 		
-		// Alles Nodes des Netzwerks holen
-		ArrayList<Node> networkNodes = new GetAllNodes().getAllNodes(network);
-		
+		// get the minimal costs to get from the start- to the endnode
+		double minCosts = startMap.get(endNode);
+
 		for(int i = 0; i < networkNodes.size(); i++)
 		{
 			Node node = networkNodes.get(i);
 			
-			// Konten in beiden Maps vorhanden?
+			// if the node exists in start- and endMap
 			if (startMap.containsKey(node) && endMap.containsKey(node))
 			{
-				double dist = startMap.get(node) + endMap.get(node);
+				double cost = startMap.get(node) + endMap.get(node);
 				
 				//System.out.println("NodeID..." + node.getId().toString() + " Dist..." + dist);
 				
-				// Distanz kleiner als die zugelassene?
-				//if (dist < maxDist) distances.put(node, dist);
-				if (dist < maxDist && !nodes.contains(node)) nodes.add(node);
+				/* 
+				 * If the costs are smaller than the specified limit and 
+				 * the node isn't already in the nodeslist -> add it.
+				 */
+				if (cost < minCosts*costFactor && !nodes.contains(node)) nodes.add(node);
 			}
 		}
 		//return distances;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgeReplaner.java
+ * LeaveLinkReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim;
+package playground.christoph.events.algorithms;
 
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.controler.Controler;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -36,14 +34,30 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
-import playground.christoph.events.EventControler;
+import playground.christoph.router.KnowledgePlansCalcRoute;
 
+/*
+ * As the ActEndReplanner the LeaveLinkReplanner should be called when a
+ * LeaveLinkEvent is thrown. At the moment this does not work because
+ * such an Event is thrown AFTER a Person left a link and entered a new link.
+ * 
+ * The current solution is to call the method by hand in the MyQueueNode class 
+ * when a Person is at the End of a Link but before leaving the link.
+ * 
+ * MATSim Routers use Plan as Input Data. To be able to use them, we have to create
+ * a new Plan from the current Position to the location of the next Activity.
+ * 
+ * This Replanner is called, if a person is somewhere on a Route between two Activities.
+ * First the current Route is splitted into two parts - the already passed links and
+ * the ones which are still to go. 
+ * Next a new Plan is created with an Activity at the current Position and an Endposition
+ * that is equal to the one from the original plan.
+ * This Plan is handed over to the Router and finally the new route is merged with the
+ * Links that already have been passed by the Person.
+ */
 
-
-public class Replanner{
+public class LeaveLinkReplanner {
 
 	protected Act nextAct;
 	protected Act prevAct;
@@ -56,12 +70,11 @@ public class Replanner{
 	protected QueueNode queueNode;
 	protected Vehicle vehicle;
 	
-	protected Controler controler;
+	protected PlanAlgorithm replanner; 
 	
-	private static final Logger log = Logger.getLogger(Replanner.class);
+	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 	
-	
-	public Replanner(QueueNode queueNode, Vehicle vehicle, double time)
+	public LeaveLinkReplanner(QueueNode queueNode, Vehicle vehicle, double time)
 	{
 		this.queueNode = queueNode;
 		this.node = queueNode.getNode();
@@ -70,13 +83,9 @@ public class Replanner{
 		this.personAgent = vehicle.getDriver();
 		this.person = vehicle.getDriver().getPerson();
 
-		if (queueNode instanceof MyQueueNode) this.controler = ((MyQueueNode)queueNode).getControler();
-		else log.error("No Controler delivered :(");		
-		
-		//new CharyparEtAlCompatibleLegTravelTimeEstimator();
-		//CetinCompatibleLegTravelTimeEstimator estimator = 
-		//	new CetinCompatibleLegTravelTimeEstimator(travelTime, null, controler.getNetwork());
-		
+		replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
+		if (replanner == null) log.error("No Replanner found in Person!");
+			
 		Plan plan = person.getSelectedPlan();
 
 		leg = personAgent.getCurrentLeg();
@@ -84,15 +93,16 @@ public class Replanner{
 		prevAct = (Act)plan.getPreviousActivity(leg);
 		nextAct = (Act)plan.getNextActivity(leg);	
 
-		// Link suchen, von dem der Agent zum aktuellen Node gekommen ist
+		// get the Link from where the Person came
 		Link fromLink = getFromLink();
 		
-		// neue Route berechnen...
+		// if there is a next Activity...
 		if(nextAct != null)
 		{
 			if(fromLink != null)
 			{
-				// neue Route berechnen...
+				log.info("LeaveLinkReplanner....................." + this.person.getId());
+				// create new Route
 				Routing(fromLink);
 			}
 			else
@@ -107,13 +117,12 @@ public class Replanner{
 		}
 		
 	}	// Replanner(...)
-	
-	
+
 	
 	/*
 	 * Route am Ende jedes Links neu berechnen.
 	 * Ansatz:
-	 * - Neue Aktivitïät beim aktuellen Link generieren und Zielaktivität beibehalten.
+	 * - Neue Aktivität beim aktuellen Link generieren und Zielaktivität beibehalten.
 	 * - Route generieren 
 	 * - Alte Route mit neuer Route mergen
 	 *   -> Annahme: ein Link ist in jeder Route nur 1x vorhanden (was auch Sinn macht, da
@@ -211,47 +220,28 @@ public class Replanner{
 		
 		// Route neu planen
 //		log.info("Replanning Route for Person ... " + person.getId() + " who is at Node " + node.getId());
-		//PlanAlgorithm planAlgorithm = controler.getRoutingAlgorithm();
-		PlanAlgorithm planAlgorithm = ((EventControler)controler).getReplanningRouter();
-		planAlgorithm.run(newPlan);
-		
-		//new PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator)
-		
+
+		/*
+		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
+		 *  The router may need their knowledge (activity room, ...).
+		 */
+		if (replanner instanceof KnowledgePlansCalcRoute)
+		{
+			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
+//			((KnowledgePlansCalcRoute)replanner).setQueueNetwork(this.queueNode.queueNetwork);
+		}
+			
+		replanner.run(newPlan);			
 		
 		// neu berechnete Route holen
 		Route newRoute = newLeg.getRoute();
-		
-//		log.info("new - already driven");
-//		for(int i = 0; i < nodeBuffer.size(); i++) log.info(nodeBuffer.get(i));
-		
-		
+			
 		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenführen
 		nodeBuffer.addAll(newRoute.getRoute());
-
-		if(!nodeBuffer.get(nodeBuffer.size()-1).getId().equals(nextAct.getLink().getFromNode().getId()))
-		{
-			for(int i = 0; i < nodeBuffer.size(); i++) System.out.println("NodeId: " + nodeBuffer.get(i).getId());
-			for(int i = 0; i < newRoute.getRoute().size(); i++) System.out.println("NewNodeId: " + newRoute.getRoute().get(i).getId());
-			for(int i = 0; i < nodesRoute.size(); i++) System.out.println("NodesRouteId: " + nodesRoute.get(i).getId());
-			log.info("Last Node: " + nodeBuffer.get(nodeBuffer.size()-1).getId() + " destNode " + nextAct.getLink().getFromNode().getId());
-		}
 		
-		
-//		log.info("new - to be driven");
-//		for(int i = 0; i < newRoute.getRoute().size(); i++) log.info(newRoute.getRoute().get(i));
-		
-//		log.info("merged");
-//		for(int i = 0; i < nodeBuffer.size(); i++) log.info(nodeBuffer.get(i));
-	
-//		log.info("old");
-//		for(int i = 0; i < leg.getRoute().getRoute().size(); i++) log.info(leg.getRoute().getRoute().get(i));
-			
 		Route mergedRoute = new Route();
 		mergedRoute.setRoute(nodeBuffer);
 				
-//		log.info("Old Route: " + leg.getRoute());
-//		log.info("New Route: " + mergedRoute);	
-			
 		// Route ersetzen
 //		leg.setRoute(mergedRoute);
 		leg.getRoute().getRoute().clear();
@@ -261,7 +251,6 @@ public class Replanner{
 		person.setSelectedPlan(currentPlan);
 	}
 	
-
 	// Holt den Link, auf dem der Agent zum aktuellen Node gefahren ist
 	// Eventuell wäre ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
 	// ein Link mehrfach befahren wird :?

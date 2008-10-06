@@ -24,17 +24,23 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 
+import playground.christoph.router.util.KnowledgeTools;
+import playground.christoph.router.util.LoopRemover;
+import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
-public class RandomRoute implements LeastCostPathCalculator {
+
+public class RandomRoute extends PersonLeastCostPathCalculator {
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
-
-	protected Random random;
+	
+	protected boolean removeLoops = true;
+	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	/**
 	 * Default constructor.
@@ -43,14 +49,8 @@ public class RandomRoute implements LeastCostPathCalculator {
 	 * 			  Random number generator. Needed to create reproducible results.           
 	 *            
 	 */
-	public RandomRoute(Random random)
-	{
-		this.random = random;
-	}
-	
 	public RandomRoute() 
 	{
-		this.random = new Random();
 	}
 
 	
@@ -66,23 +66,31 @@ public class RandomRoute implements LeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-	
+		ArrayList<Node> knownNodes = null;
+		
+		// try getting Nodes from the Persons Knowledge
+		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		
 		nodes.add(fromNode);
 		
 		while(!currentNode.equals(toNode))
 		{
-			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			// stop searching if to many links in the generated Route...
+			if (nodes.size() > maxLinks) break;
 			
-			int linkCount = links.length;
+			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+		
+			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
+			links = KnowledgeTools.getKnownLinks(links, knownNodes);
 
-			if (linkCount == 0)
+			if (links.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
 			
 			// Node wählen
-			int nextLink = random.nextInt(linkCount);
+			int nextLink = MatsimRandom.random.nextInt(links.length);
 			
 			// den gewählten Link zum neuen CurrentLink machen
 			if(links[nextLink] instanceof Link)
@@ -102,6 +110,8 @@ public class RandomRoute implements LeastCostPathCalculator {
 		Route route = new Route();
 		route.setRoute(nodes);
 		route.setDist(routeLength);
+		
+		if (removeLoops) LoopRemover.removeLoops(route);
 		
 		return route;
 	}

@@ -29,9 +29,9 @@ import org.matsim.controler.Controler;
 import org.matsim.network.Link;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 
-import playground.christoph.events.KnowledgeTravelTimeCalculator;
-import playground.christoph.events.algorithms.KnowledgeReplanner;
+import playground.christoph.events.algorithms.ActEndReplanner;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
+import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 
 
 

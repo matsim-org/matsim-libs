@@ -35,11 +35,11 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelTime;
 
 //public class KnowledgeTravelCost implements TravelCost{
-public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
+public class OldKnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 
 	Person person;
 	
-	public KnowledgeTravelCost(final TravelTime timeCalculator) {
+	public OldKnowledgeTravelCost(final TravelTime timeCalculator) {
 		super(timeCalculator);
 	}
 	
@@ -59,6 +59,7 @@ public class KnowledgeTravelCost extends TravelTimeDistanceCostCalculator {
 		System.out.println("KnowledgeTravelCost - new aktive PersonID: " + person.getId().toString());
 	}
 	
+	@Override
 	public double getLinkTravelCost(Link link, double time)
 	{
 		//System.out.println("----------------------KnowledgeTravelCost runs!----------------------");

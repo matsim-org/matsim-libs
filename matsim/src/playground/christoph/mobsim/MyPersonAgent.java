@@ -30,19 +30,20 @@ import org.matsim.network.Node;
 import org.matsim.population.Person;
 
 public class MyPersonAgent extends PersonAgent{
-
+	
 	private static final Logger log = Logger.getLogger(MyPersonAgent.class);
 	
 	public MyPersonAgent(Person p)
 	{
 		super(p);
 	}
-	
+
 	public void UpdateCachedNextLink()
 	{
 
 	}
 	
+	@Override
 	public Link chooseNextLink()
 	{	
 		
@@ -87,5 +88,5 @@ public class MyPersonAgent extends PersonAgent{
 		return super.chooseNextLink();
 */	
 	}
-
+	
 }

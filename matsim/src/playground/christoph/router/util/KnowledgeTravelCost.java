@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LimitedKnowledge.java
+ * KnowledgeTravelCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,44 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.knowledge.replanning.modules;
+package playground.christoph.router.util;
 
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plan;
-import org.matsim.replanning.modules.ReRouteDijkstra;
+import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.network.Link;
+import org.matsim.population.Person;
 import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
-import playground.christoph.knowledge.OldKnowledgeTravelCost;
+public abstract class KnowledgeTravelCost implements TravelCost {
 
-public class LimitedKnowledge extends ReRouteDijkstra {		
-
-	OldKnowledgeTravelCost knowledgeCostFunction;
+	protected Person person;
+	protected QueueNetwork queueNetwork;
 	
-	// Erstmal alle Daten weiterleiten... 
-	public LimitedKnowledge(NetworkLayer network, TravelCost travelCostCalc, TravelTime travelTimeCalc)
-	{	
-		super(network, travelCostCalc, travelTimeCalc);
-
-		// Referenz auf die TravelCosts abspeichern - da schicken wir dann die jeweils aktuelle Person hin.
-		knowledgeCostFunction = (OldKnowledgeTravelCost) travelCostCalc;
-		System.out.println("----------------------LimitedKnowledge Router runs!----------------------");
-		
-	}	
-
-	@Override
-	public void handlePlan(Plan plan) {
-		// TODO Auto-generated method stub
-		//Knowledge myKnowledge = plan.getPerson().getKnowledge();
-		
-//		if(plan != null && plan.getPerson() != null) 
-//		{ System.out.println("handlePlan, PersonID: " + plan.getPerson().getId().toString()); }
-		
-		// Person weiterleiten...
-		knowledgeCostFunction.setPerson(plan.getPerson());
-
-		// ... und Plan abarbeiten lassen.
-		super.handlePlan(plan);
+	public double getLinkTravelCost(Link link, double time, Person person)
+	{
+		this.person = person;
+		return getLinkTravelCost(link, time);
+	}
+	
+	public void setPerson(Person person)
+	{
+		this.person = person;
+	}
+	
+	public Person getPerson()
+	{
+		return this.person;
 	}
 
+	public void setQueueNetwork(QueueNetwork queueNetwork)
+	{
+		this.queueNetwork = queueNetwork;
+	}
+	
+	public QueueNetwork getQueueNetwork()
+	{
+		return this.queueNetwork;
+	}
 }
