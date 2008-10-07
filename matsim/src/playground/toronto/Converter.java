@@ -12,6 +12,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -19,14 +21,12 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
 /**
  * @author yu
- *
  */
 public class Converter {
 	public static class ZoneXY {
@@ -79,84 +79,82 @@ public class Converter {
 
 	private String tmpPersonId = "";
 
-	private int tmpEndingTime;
+	private double tmpEndTime;
 
 	private String[] tmpTabs = null;
 
-	private double tmpHomeX = 0, tmpHomeY = 0;
+	private Coord tmpHome = null;
+
+	public Converter() {
+	}
+
+	public static double convertTime(final String endingS) {
+		int endingI = Integer.parseInt(endingS);
+		int hours = endingI / 100;
+		int minutes = endingI % 100;
+		return hours * 3600 + minutes * 60;
+	}
 
 	/**
+	 * The general idea: we read line for line from the file. When reading a new line,
+	 * we compare if it is a new person or the same person as the last line (stored in this.tmpLine
+	 * and this.tmpPersonId). If it is a new person, we add the final home-activity to the last
+	 * person and start a new person. If it is the same person, we just add the activity and the
+	 * leg to the person (this.tmpPersonId).
 	 *
+	 * @param line
 	 */
-	public Converter() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public static String getEndingTimeS(final String endingS) {
-		int endingI = Integer.parseInt(endingS);
-		return (((endingI / 100) < 10) ? "0" : "") + (endingI / 100) + ":"
-				+ (endingI % 100);
-	}
-
-	public static double getEndingTimeD(final String endingS) {
-		int endingI = Integer.parseInt(endingS);
-		return 3600 * (endingI / 100) + 60 * (endingI - endingI / 100 * 100);
-	}
-
 	public void readLine(final String line) {
 		String[] tabs = line.split("\t");
 		String personId = tabs[0] + "-" + tabs[1];
-		int ending;
+		double endTime;
 		try {
 			if (this.tmpPersonId.equals(personId)) {
+				// this line is about the same person as the line before.
+				// "extend" the plan of that person with a Leg and an Act
+
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				Plan pl = this.pop.getPerson(personId).getSelectedPlan();
-				ending = Integer.parseInt(tabs[3]);
-				int dur = 0;
-				if (ending % 100 < this.tmpEndingTime % 100) {
-					dur = 60 + (ending % 100) - (this.tmpEndingTime % 100) + ending
-							/ 100 * 100 - this.tmpEndingTime / 100 * 100 - 100;
-				} else {
-					dur = ending - this.tmpEndingTime;
+				endTime = convertTime(tabs[3]);
+				double dur = endTime - this.tmpEndTime;
+
+				Leg leg = pl.createLeg(Mode.car);
+				leg.setDepTime(convertTime(this.tmpTabs[3]));
+
+				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
+				if (tabs[7].equals("H")) {
+					tmpCoord = this.tmpHome;
 				}
 
-				pl.createLeg(Mode.car, getEndingTimeD(this.tmpTabs[3]),
-						Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
-				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
-				double x = tmpCoord.getX();
-				double y = tmpCoord.getY();
-				if (tabs[7].equals("H")) {
-					x = this.tmpHomeX;
-					y = this.tmpHomeY;
-				}
-				pl.createAct(tabs[7], x, y, null, null,
-						getEndingTimeS(tabs[3]), dur / 100 + ":" + dur % 100,
-						null);
+				Act act = pl.createAct(tabs[7], null);
+				act.setCoord(tmpCoord);
+				act.setEndTime(convertTime(tabs[3]));
+				act.setDur(dur);
 
 			} else {
+				// it is a new person
+				// finish the person from the line before, add final trip back to home
+				// then start the new person
+
 				if (!this.pop.getPersons().isEmpty()) {
 					Person p = this.pop.getPerson(this.tmpPersonId);
 					Plan tmpPl = p.getSelectedPlan();
-					tmpPl.createLeg(Mode.car, getEndingTimeD(this.tmpTabs[3]),
-							Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+
+					Leg leg = tmpPl.createLeg(Mode.car);
+					leg.setDepTime(convertTime(this.tmpTabs[3]));
 					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
 					Coord tmpCoord2 = getRandomCoordInZone(tabs[12]);
-					double x = tmpCoord2.getX();
-					double y = tmpCoord2.getY();
 					if (this.tmpTabs[10].equals("H")) {
-						x = this.tmpHomeX;
-						y = this.tmpHomeY;
-						// System.out.println("tmpHomeX : " + tmpHomeX
-						// + "\t|\ttmpHomeY : " + tmpHomeY + "\nx : " + x
-						// + "\t|\ty : " + y);
+						tmpCoord2 = this.tmpHome;
 					}
-					tmpPl.createAct(this.tmpTabs[10], x, y, null, null, null, null,
-							null);
+					Act lastAct = tmpPl.createAct(this.tmpTabs[10], null);
+					lastAct.setCoord(tmpCoord2);
+					
+					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new Plan(p);
 					nonCarPlan.copyPlan(tmpPl);
-					for (LegIterator li = nonCarPlan.getIteratorLeg(); li
-							.hasNext();) {
+					for (LegIterator li = nonCarPlan.getIteratorLeg(); li.hasNext();) {
 						li.next().setMode(Mode.pt);
 					}
 					p.addPlan(nonCarPlan);
@@ -165,18 +163,19 @@ public class Converter {
 				Person p = new Person(new IdImpl(personId));
 				Plan pl = new Plan(p);
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
-				ending = Integer.parseInt(tabs[3]);
+				endTime = convertTime(tabs[3]);
 
-				Coord coord = getRandomCoordInZone(tabs[9]);
-				this.tmpHomeX = coord.getX();
-				this.tmpHomeY = coord.getY();
-				pl.createAct(tabs[7], this.tmpHomeX, this.tmpHomeY, null, null,
-						getEndingTimeS(tabs[3]), null, null);
+				this.tmpHome = getRandomCoordInZone(tabs[9]);
+				Act homeAct = pl.createAct(tabs[7], null);
+				homeAct.setCoord(this.tmpHome);
+				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);
 			}
+
+			// remember the current data for comparison with next line
 			this.tmpPersonId = personId;
-			this.tmpEndingTime = ending;
+			this.tmpEndTime = endTime;
 			this.tmpTabs = tabs;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -186,14 +185,13 @@ public class Converter {
 	private Coord getRandomCoordInZone(final String zoneId) {
 		return WorldUtils.getRandomCoordInZone(
 				(Zone) this.zones.getLocation(zoneId), this.zones);
-
 	}
 
 	public void createZones() {
 		for (ZoneXY zxy : this.zoneXYs.values()) {
 			createZone(zxy);
 		}
-		this.zoneXYs.clear();// //////////////////////////////////////////////
+		this.zoneXYs.clear();
 	}
 
 	public void createZone(final ZoneXY zxy) {
@@ -201,8 +199,6 @@ public class Converter {
 				null, null, null, null);
 	}
 
-	/**
-	 */
 	public static void main(final String[] args) {
 		String oldPlansFilename = "D:\\Test\\UT\\Sep24\\input\\fout_chains210.txt";
 		String newPlansFilename = "D:\\Test\\UT\\Sep24\\output\\example.xml.gz";
