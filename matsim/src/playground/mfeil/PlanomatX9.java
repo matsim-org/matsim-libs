@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX7.java
+ * PlanomatX9.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -47,12 +47,10 @@ import java.io.*;
  * PlanomatX2 now includes full TS functionality over more than 1 iteration. Neighbourhood definition is through
  * changing the order of the activities only. Next tasks to implement also changing of type and
  * number of activities. A refined tabu determination and re-calculation is to come up as well.
- * Like PlanomatX6 but with improvements in the createNeighbourhood() method (automatic check
- * whether solution not new), in the changeNumber() method (subsequent changing rather than random selection),
- * and a time stopper.
+ * Like PlanomatX8 but neighbourhood definition finally without overlaps.
  */
 
-public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -60,21 +58,19 @@ public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorith
 	private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX7.class);
-	private static int 						position1, position2, positionInsert, positionRemove;
-	private static boolean 					insertDone, removeDone;
+	private static final Logger 			log = Logger.getLogger(PlanomatX9.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX7 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX9 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		router 					= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		scorer 					= new PlanomatXPlanScorer (factory);
-		NEIGHBOURHOOD_SIZE 		= 100;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
+		NEIGHBOURHOOD_SIZE 		= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		WEIGHT_CHANGE_ORDER 	= 0.2; 
 		WEIGHT_CHANGE_NUMBER 	= 0.6;
 		WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
@@ -298,25 +294,29 @@ public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorith
 	
 	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[] notNewInNeighbourhood) {
 		int neighbourPos;
-		position1 = 2;
-		position2 = 4;
+		int [] changePositions = {2,4};
 		for (neighbourPos = 0; neighbourPos<(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeOrder(neighbourhood[neighbourPos]);
+			notNewInNeighbourhood[neighbourPos] = this.changeOrder(neighbourhood[neighbourPos], changePositions);
 		}
-		insertDone = false;
-		removeDone = false;
+		int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
+		int[] actsToBeAdded = new int [(int)(neighbourhood[0].getActsLegs().size()/2)+1];
 		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER);
+			notNewInNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded);
 		}
-	
+		int [] typePosition = {0,1};
+		typePosition[0]=(int)(MatsimRandom.random.nextDouble()*((int)(neighbourhood[0].getActsLegs().size()/2)-1))+1;
+		int [] actsToBeChanged = new int [actsToBeAdded.length];
+		for (int i = 0; i<actsToBeChanged.length;i++){
+			actsToBeChanged[i] = (int)(MatsimRandom.random.nextDouble()* PlanomatXInitialiser.actTypes.size());
+		}
 		for (neighbourPos = (int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
-			this.changeType(neighbourhood[neighbourPos]);
+			notNewInNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged);
 		}
 	}
 			
 	
 	
-	public int changeOrder (PlanomatXPlan basePlan){
+	public int changeOrder (PlanomatXPlan basePlan, int [] positions){
 	
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		
@@ -324,9 +324,9 @@ public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorith
 			return 1;
 		}
 		else {
-			for (int planBasePos = position1; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){			
-				for (int planRunningPos = position2; planRunningPos < actslegs.size()-2; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
-					position2 = position2+2;
+			for (int planBasePos = positions[0]; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){			
+				for (int planRunningPos = positions[1]; planRunningPos < actslegs.size()-2; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
+					positions[1] = positions[1]+2;
 					
 					//Activity swapping				
 					Act act0 = (Act)(actslegs.get(planBasePos));
@@ -338,74 +338,102 @@ public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorith
 						actslegs.set(planBasePos, actslegs.get(planRunningPos));
 						actslegs.set(planRunningPos, actHelp);
 						
-						position1 = planBasePos;
+						positions[0] = planBasePos;
 						return 0;
 					}
 				}
-				position2 = planBasePos+4;
+				positions[1] = planBasePos+4;
 			}
 			return 1;
 		}
 	}
 	
-	public int changeNumber (PlanomatXPlan basePlan, double weight){
+	public int changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded){
 				
-		if(MatsimRandom.random.nextDouble()<weight){
-	
-			//Choose a position where to add the activity, "cycling"			
-			if (!insertDone){
-				positionInsert = (int)(MatsimRandom.random.nextDouble()*(int)(basePlan.getActsLegs().size()/2))+1;
-				this.insertAct(positionInsert, basePlan);
-				
-			}
-			else if (positionInsert<=(int)(basePlan.getActsLegs().size()/2)){
-				log.info("positionInsert: "+positionInsert+" und size: "+basePlan.getActsLegs().size());
-				this.insertAct(positionInsert, basePlan);
-				
-			}
-			else {
-				positionInsert = 1;
-				this.insertAct(positionInsert, basePlan);
-				
-			}
-			positionInsert++;
-			insertDone = true;
-			return 0;
-		}
-		else {
-			if (basePlan.getActsLegs().size()==5){
-				this.removeAct(1, basePlan);
-				return 0;
-			}
-			else if (basePlan.getActsLegs().size()>5){
-				if(!removeDone){
-					positionRemove = (int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getActsLegs().size()/2)-1))+1;
-					this.removeAct(positionRemove, basePlan);
-					
+		if(MatsimRandom.random.nextDouble()>=weight){
+			
+			// removing an activity, "cycling"
+			
+			if (positions[3]<(int)(basePlan.getActsLegs().size()/2)){
+						
+				if (basePlan.getActsLegs().size()==5){
+					this.removeAct(1, basePlan);
+					positions[3]++;
+					return 0;
 				}
-				else if(positionRemove<=(int)(basePlan.getActsLegs().size()/2)-1){
-					this.removeAct(positionRemove, basePlan);
-					
+				else if (basePlan.getActsLegs().size()>5){
+					if(positions[1]==0){
+						positions[1] = (int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getActsLegs().size()/2)-1))+1;
+						this.removeAct(positions[1], basePlan);
+						
+					}
+					else if(positions[1]<=(int)(basePlan.getActsLegs().size()/2)-1){
+						this.removeAct(positions[1], basePlan);
+						
+					}
+					else {
+						positions[1] = 1;
+						this.removeAct(positions[1], basePlan);
+					}
+					positions[1]++;
+					positions[3]++;
+					return 0;
 				}
-				else {
-					positionRemove = 1;
-					this.removeAct(positionRemove, basePlan);
-				}
-				positionRemove++;
-				removeDone = true;
-				return 0;
+				else return 1;
 			}
 			else return 1;
 		}
+		
+		else{	
+			
+			// adding an activity, "cycling"
+			
+			if (positions[2]<=PlanomatXInitialiser.actTypes.size()+(PlanomatXInitialiser.actTypes.size()-1)*((int)(basePlan.getActsLegs().size()/2)-1)){
+			
+				if (positions[0]==0){
+					positions[0] = 1;
+					for (int i = 0; i < actsToBeAdded.length;i++){
+						actsToBeAdded[i] = (int)(MatsimRandom.random.nextDouble()* PlanomatXInitialiser.actTypes.size());
+					}
+					this.insertAct(positions[0], actsToBeAdded, basePlan);
+					
+				}
+				else if (positions[0]<=(int)(basePlan.getActsLegs().size()/2)){
+					this.insertAct(positions[0], actsToBeAdded, basePlan);				
+				}
+				else {
+					positions[0] = 1;
+					this.insertAct(positions[0], actsToBeAdded, basePlan);
+					
+				}
+				positions[0]++;
+				positions[2]++;
+				return 0;
+			}
+			return 1;
+		}
 	}
 	
-	public void changeType (PlanomatXPlan basePlan){
-		Act act = (Act) basePlan.getActsLegs().get(((int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getActsLegs().size()/2)-1))+1)*2);
-		String type;
-		do {
-			type = PlanomatXInitialiser.actTypes.get((int)(MatsimRandom.random.nextDouble()*PlanomatXInitialiser.actTypes.size()));
-		} while (type.equals(act.getType()));
-		act.setType(type);
+	public int changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged){
+		
+		if (position[1]<=(PlanomatXInitialiser.actTypes.size()-1)*(((int)(basePlan.getActsLegs().size()/2))-1)){
+			if (position[0]>basePlan.getActsLegs().size()/2-1)position[0] = 1;		
+			
+			Act act = (Act) basePlan.getActsLegs().get(position[0]*2);
+			String type;
+					
+			do {
+				type = PlanomatXInitialiser.actTypes.get(actsToBeChanged[position[0]]);
+				actsToBeChanged[position[0]]++;
+				if (actsToBeChanged[position[0]]>=PlanomatXInitialiser.actTypes.size()) actsToBeChanged[position[0]] = 0;
+			} while (type.equals(act.getType()));
+			
+			act.setType(type);
+			position[0]++;
+			position[1]++;
+			return 0;
+		}
+		return 1;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -607,13 +635,29 @@ public class PlanomatX7 implements org.matsim.population.algorithms.PlanAlgorith
 		return (acts1.equals(acts2));
 	}	
 	
-	// Inserts an activity of random type at the given position
-	public void insertAct (int position, PlanomatXPlan basePlan){
+	
+	// Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)
+	public void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan){
+		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		Act actHelp = new Act ((Act)(actslegs.get((position*2)-2)));
 		actHelp.setDur(0);
-		actHelp.setType(PlanomatXInitialiser.actTypes.get((int)(MatsimRandom.random.nextDouble()*PlanomatXInitialiser.actTypes.size())));
-		log.info("insertAct: "+position+" und "+actslegs.size());
+		
+		if (actToBeAdded[position]>=PlanomatXInitialiser.actTypes.size()) actToBeAdded[position] = 0;
+		
+		if (position!=1){
+			if (PlanomatXInitialiser.actTypes.get(actToBeAdded[position]).toString().equals(((Act)(basePlan.getActsLegs().get(position*2-2))).getType().toString())){
+				if (actToBeAdded[position]+1>=PlanomatXInitialiser.actTypes.size()){
+					actToBeAdded[position] = 0;
+				}
+				else {
+					actToBeAdded[position]++;
+				}
+			}
+		}
+		actHelp.setType(PlanomatXInitialiser.actTypes.get(actToBeAdded[position]));
+		actToBeAdded[position]++;
+
 		Leg legHelp = new Leg ((Leg)(actslegs.get((position*2)-1)));
 		actslegs.add(position*2, legHelp);
 		actslegs.add(position*2, actHelp);

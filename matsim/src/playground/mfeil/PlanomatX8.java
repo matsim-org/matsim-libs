@@ -379,7 +379,9 @@ public class PlanomatX8 implements org.matsim.population.algorithms.PlanAlgorith
 		}
 		
 		else{	
-			//Choose a position where to add the activity, "cycling"			
+			
+			// adding an activity, "cycling"
+			
 			if (positions[0]==0){
 				positions[0] = (int)(MatsimRandom.random.nextDouble()*(int)(basePlan.getActsLegs().size()/2))+1;
 				this.insertAct(positions[0], basePlan);
