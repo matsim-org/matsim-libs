@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicLocationImpl;
+import org.matsim.basic.v01.BasicPerson;
+import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicRoute;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicLeg.Mode;
+
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public interface PopulationBuilder {
 
-public interface BasicRoute<T extends BasicNode> {
+	BasicPerson createPerson(Id id) throws Exception;
 
-	public double getDist();
+	BasicPlan createPlan(BasicPerson currentPerson);
 
-	public void setDist(final double dist);
+	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocationImpl currentlocation);
 
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
-	public List<Id> getLinkIds();
-	
+	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
+
+	BasicRoute createRoute(List<Id> currentRouteLinkIds);
+
+	BasicPlan createPlan(BasicPerson person, boolean selected);
+
 }

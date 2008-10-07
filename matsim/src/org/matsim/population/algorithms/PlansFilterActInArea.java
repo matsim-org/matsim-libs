@@ -20,9 +20,9 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -50,7 +50,7 @@ public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		ActIterator it = person.getSelectedPlan().getIteratorAct();
 		while (it.hasNext()){
-			BasicAct act = it.next();
+			Act act = (Act) it.next();
 			String type = act.getType();
 			if (type.contains(this.actType)) {
 				if(this.network.getLink(act.getLink().getId().toString()) != null) {

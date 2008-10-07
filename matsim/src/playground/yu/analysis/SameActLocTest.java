@@ -91,7 +91,7 @@ public class SameActLocTest {
 				if (p != null) {
 					// Plan.Type planType = p.getType();
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLink().getId().toString();
+						nextTmpLinkId = ai.next().getLinkId().toString();
 						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (tmpLinkId.equals(nextTmpLinkId)) {
 								actLocCount++;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.population;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.basic.v01.BasicPopulationReaderMatsimV5;
+import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.population.Household;
+import org.matsim.network.NetworkLayer;
+
+
 /**
-*
-* @author dgrether
-*
-*/
-
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+ * @author dgrether
+ *
+ */
+public class PopulationReaderMatsimV5 extends BasicPopulationReaderMatsimV5 {
 	
-	public void setTravTime(final double travTime);
+
+	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, List<Household> households, Facilities fac) {
+		super();
+		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
+		super.setHouseholdBuilder(new HouseholdBuilderImpl(households));
+	}
+
 	
-	public List<Id> getLinkIds();
+	
 	
 }

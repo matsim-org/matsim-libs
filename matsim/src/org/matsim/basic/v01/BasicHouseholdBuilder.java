@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,23 +21,32 @@ package org.matsim.basic.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.HouseholdBuilder;
+
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public class BasicHouseholdBuilder implements HouseholdBuilder {
 
-public interface BasicRoute<T extends BasicNode> {
+	private List<BasicHousehold> households;
 
-	public double getDist();
+	public BasicHouseholdBuilder(List<BasicHousehold> households) {
+		this.households = households;
+	}
 
-	public void setDist(final double dist);
+	public List<BasicHousehold> getHouseholds() {
+		return this.households;
+	}
 
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
-	public List<Id> getLinkIds();
-	
+	public BasicHouseholdImpl createHousehold(Id householdId,
+			List<Id> membersPersonIds) {
+		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
+		hh.setMemberIds(membersPersonIds);
+		this.households.add(hh);
+		return hh;
+	}
+
 }

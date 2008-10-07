@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<households
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/households_v1.00.xsd">
+  
+  <household id="23">
+    <members>
+      <personId refId="42" />
+      <personId refId="43" />
+    </members>
+    
+    <location>
+      <coordinate>
+        <xCoord>48.28</xCoord>
+        <yCoord>7.56</yCoord>
+      </coordinate>
+    </location>
+    <income currency="eur" period="month">
+      50000
+    </income>
+    <language name="Schwitzerdütsch" /> 
+  </household>
+
+  <household id="24">
+    <members>
+      <personId refId="44" />
+      <personId refId="45" />
+    </members>
+    <location>
+      <actLocation>
+        <facilityId refId="666" />
+      </actLocation>
+    </location>
+    <income currency="eur" period="day">
+      1000
+    </income>    
+  </household>
+</households>

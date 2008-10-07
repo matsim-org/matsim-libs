@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.interfaces.population;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.population.Person;
+
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public interface Household extends BasicHousehold {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+	public List<Person> getMembers();
 	
-	public void setTravTime(final double travTime);
 	
-	public List<Id> getLinkIds();
+	
 	
 }

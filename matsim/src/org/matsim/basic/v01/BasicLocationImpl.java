@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,45 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.List;
+import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.utils.geometry.Coord;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public class BasicLocationImpl implements BasicLocation {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+	private Coord coordinate = null;
 	
-	public void setTravTime(final double travTime);
+	private Id locationId;
 	
-	public List<Id> getLinkIds();
+	private boolean isFacilityId;
+
 	
+	public void setCoord(Coord coord) {
+		this.coordinate = coord;
+	}
+	
+	public void setLocationId(Id id, boolean isFacilityId) {
+		this.locationId = id;
+		this.isFacilityId = isFacilityId;
+	}
+
+	public Coord getCoord() {
+		return this.coordinate;
+	}
+
+	public Id getLocationId() {
+		return this.locationId;
+	}
+
+	public boolean isFacilityId() {
+		return isFacilityId;
+	}
+
+	public boolean isLinkId() {
+		return !isFacilityId;
+	}
 }

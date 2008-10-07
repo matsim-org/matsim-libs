@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.population;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.basic.v01.BasicHouseholdImpl;
+import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.HouseholdBuilder;
+import org.matsim.interfaces.population.Household;
+
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public class HouseholdBuilderImpl implements HouseholdBuilder {
 
-public interface BasicRoute<T extends BasicNode> {
+	private List<Household> households;
 
-	public double getDist();
+	public HouseholdBuilderImpl(List<Household> households) {
+		this.households = households;
+	}
 
-	public void setDist(final double dist);
+	public List<BasicHousehold> getHouseholds() {
+		return (List)this.households;
+	}
 
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
-	public List<Id> getLinkIds();
-	
+	public BasicHouseholdImpl createHousehold(Id householdId,
+			List<Id> membersPersonIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

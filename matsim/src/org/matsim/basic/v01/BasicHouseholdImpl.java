@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,23 +21,69 @@ package org.matsim.basic.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.BasicIncome;
+import org.matsim.interfaces.basic.v01.BasicLocation;
+
+
+
+
 /**
-*
-* @author dgrether
-*
-*/
-
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+ * @author dgrether
+ *
+ */
+public class BasicHouseholdImpl implements BasicHousehold {
 	
-	public void setTravTime(final double travTime);
+
+	private Id id;
+	private List<Id> memberIds = null;
+	private BasicLocation location;
+	private List<Id> vehicleDefinitionIds = null;
+	private BasicIncome income;
+	private String language;
 	
-	public List<Id> getLinkIds();
+	public BasicHouseholdImpl(Id id) {
+		this.id = id;
+	}
+
+	public Id getId() {
+		return this.id;
+	}
+
+	public BasicIncome getIncome() {
+		return this.income;
+	}
+
+	public String getLanguage() {
+		return this.language;
+	}
+
+	public BasicLocation getBasicLocation() {
+		return this.location;
+	}
 	
+	public List<Id> getMemberIds() {
+		return this.memberIds;
+	}
+
+	public List<Id> getVehicleDefinitionIds() {
+		return this.vehicleDefinitionIds;
+	}
+
+	public void setMemberIds(List<Id> memberIds) {
+		this.memberIds = memberIds;
+	}
+
+	public void setLocation(BasicLocation locationImpl) {
+		this.location = locationImpl;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public void setIncome(BasicIncome income) {
+		this.income = income;
+	}
+
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,34 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public interface PopulationSchemaV5Names {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
-	public List<Id> getLinkIds();
-	
+	public static String PERSON = "person";
+	public static String PLAN = "plan";
+	public static String ACT = "act";
+	public static String LOCATION = "location";
+	public static String COORDINATE = "coordinate";
+	public static String XCOORD = "xCoord";
+	public static String YCOORD = "yCoord";
+	public static String LEG = "leg";
+	public static String MODE = "mode";
+	public static String ROUTE = "route";
+	public static String LINK = "link";
+	public static String REFID = "refId";
+	public static String TYPE = "type";
+	public static String DURATION = "duration";
+	public static String STARTTIME = "startTime";
+	public static String ENDTIME = "endTime";
+	public static String ID = "id";
+	public static String DISTANCE = "distance";
+	public static String TRAVELTIME = "travelTime";
+	public static String FACILITYID = "facilityId";
+	public static String LINKID = "linkId";
+	public static String SELECTED = "selected";
+	public static String POPULATION = "population";
 }

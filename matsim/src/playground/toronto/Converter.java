@@ -126,8 +126,7 @@ public class Converter {
 					tmpCoord = this.tmpHome;
 				}
 
-				Act act = pl.createAct(tabs[7], null);
-				act.setCoord(tmpCoord);
+				Act act = pl.createAct(tabs[7], tmpCoord);
 				act.setEndTime(convertTime(tabs[3]));
 				act.setDur(dur);
 
@@ -148,8 +147,7 @@ public class Converter {
 					if (this.tmpTabs[10].equals("H")) {
 						tmpCoord2 = this.tmpHome;
 					}
-					Act lastAct = tmpPl.createAct(this.tmpTabs[10], null);
-					lastAct.setCoord(tmpCoord2);
+					Act lastAct = tmpPl.createAct(this.tmpTabs[10], tmpCoord2);
 					
 					// make a copy of the just finished plan and set it to use public transit mode
 					Plan nonCarPlan = new Plan(p);
@@ -166,8 +164,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 
 				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				Act homeAct = pl.createAct(tabs[7], null);
-				homeAct.setCoord(this.tmpHome);
+				Act homeAct = pl.createAct(tabs[7], tmpHome);
 				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);

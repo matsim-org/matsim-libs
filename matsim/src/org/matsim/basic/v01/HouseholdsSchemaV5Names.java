@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,30 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public interface HouseholdsSchemaV5Names {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
-	public List<Id> getLinkIds();
+	public static String HOUSEHOLDS = "households";
+	public static String HOUSEHOLD = "household";
+	public static String ID = "id";
+	public static String MEMBERS = "members";
+	public static String PERSONID = "personId";
+	public static String REFID = "refId";
+	public static String LOCATION  = "location";
+  public static String COORDINATE = "coordinate";
+	public static String XCOORD = "xCoord";
+	public static String YCOORD = "yCoord";
+	public static String VALUE = "value";
+	public static String INCOME = "income";
+	public static String CURRENCY = "currency";
+	public static String LANGUAGE = "language";
+	public static String NAME = "name";
+	public static String FACILITYID = "facilityId";
+	public static String LINKID = "linkId";
+	public static String PERIOD = "period";
 	
 }

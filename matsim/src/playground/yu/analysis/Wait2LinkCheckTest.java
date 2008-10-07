@@ -75,7 +75,7 @@ public class Wait2LinkCheckTest {
 				Plan p = person.getSelectedPlan();
 				if (p != null)
 					for (ActIterator ai = p.getIteratorAct(); ai.hasNext();) {
-						nextTmpLinkId = ai.next().getLink().getId().toString();
+						nextTmpLinkId = ai.next().getLinkId().toString();
 						if (tmpLinkId != null && nextTmpLinkId != null)
 							if (!tmpLinkId.equals(nextTmpLinkId))
 								try {

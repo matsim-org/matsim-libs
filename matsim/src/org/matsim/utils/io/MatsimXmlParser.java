@@ -274,6 +274,11 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	}
 
 	private String getInputSource(final SAXParseException ex) {
+		System.out.println(ex.getPublicId());
+		System.out.println(ex.getSystemId());
+		System.out.println(ex.getCause());
+		System.out.println(ex.getLocalizedMessage());
+		System.out.println(ex.getMessage());
 		if (ex.getSystemId() != null) {
 			return ex.getSystemId();
 		}

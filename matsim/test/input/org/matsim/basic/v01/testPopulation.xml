@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<population
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.00.xsd">
+
+<person id="23">
+	<plan selected="true">
+		<act type="h" endTime="06:00:00">
+      <location>
+        <coordinate>
+          <xCoord>48.28</xCoord>
+          <yCoord>7.56</yCoord>
+        </coordinate>
+      </location>
+    </act>
+		<leg mode="car">
+    	<route distance="45.5" travelTime="24.3">
+			  <link refId="23"/>
+			  <link refId="24"/>
+			</route>
+		</leg>
+ 		<act type="w" endTime="12:10:00" >
+      <location>
+        <actLocation>
+          <facilityId refId="666" />
+        </actLocation>
+      </location>
+    </act>
+    <leg mode="car">
+      <route>
+        <link refId="23" />
+      </route>
+    </leg>
+    <act type="w" >
+      <location>
+        <actLocation>
+          <facilityId refId="666" />
+        </actLocation>
+    </location>
+    </act>
+    <leg mode="pt">
+      
+    </leg>
+    <act type="h">
+      <location>
+        <coordinate>
+          <xCoord>48.28</xCoord>
+          <yCoord>7.56</yCoord>
+        </coordinate>
+      </location>
+    </act>
+	</plan>
+</person>
+
+<household id="23">
+    <members>
+      <personId refId="42" />
+      <personId refId="43" />
+    </members>
+    
+    <location>
+      <coordinate>
+        <xCoord>48.28</xCoord>
+        <yCoord>7.56</yCoord>
+      </coordinate>
+    </location>
+    <income currency="eur" period="month">
+      50000
+    </income>
+    <language name="Schwitzerdütsch" /> 
+  </household>
+
+  <household id="24">
+    <members>
+      <personId refId="44" />
+      <personId refId="45" />
+    </members>
+    <location>
+      <actLocation>
+        <facilityId refId="666" />
+      </actLocation>
+    </location>
+    <income currency="eur" period="day">
+      1000
+    </income>    
+  </household>
+
+</population>

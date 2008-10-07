@@ -20,8 +20,6 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.facilities.Facility;
-import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 
@@ -29,15 +27,18 @@ public class BasicActImpl implements BasicAct {
 
 	// TODO: should be private but needs refactoring in derived classes
 	protected double endTime = Time.UNDEFINED_TIME;
-	protected String type;
-	protected BasicLink link = null;
-	protected Facility facility = null;
-
-	private Coord coord = null;
-
 	protected double startTime = Time.UNDEFINED_TIME;
 	protected double dur = Time.UNDEFINED_TIME;
 
+	private String type;
+	private Coord coord = null;
+	private Id linkId;
+	private Id facilityId;
+
+	public BasicActImpl(String type) {
+		this.type = type;
+	}
+	
 	public final double getEndTime() {
 		return this.endTime;
 	}
@@ -45,14 +46,14 @@ public class BasicActImpl implements BasicAct {
 	public final String getType() {
 		return this.type;
 	}
+//
+//	public BasicLink getLink() {
+//		return this.link;
+//	}
 
-	public BasicLink getLink() {
-		return this.link;
-	}
-
-	public Facility getFacility() {
-		return this.facility;
-	}
+//	public Facility getFacility() {
+//		return this.facility;
+//	}
 
 	public final void setEndTime(final double endTime) {
 		this.endTime = endTime;
@@ -62,13 +63,6 @@ public class BasicActImpl implements BasicAct {
 		this.type = type.intern();
 	}
 
-	public final void setLink(final BasicLink link) {
-		this.link = link;
-	}
-
-	public final void setFacility(final Facility facility) {
-		this.facility = facility;
-	}
 
 	public final Coord getCoord() {
 		return this.coord;
@@ -88,8 +82,23 @@ public class BasicActImpl implements BasicAct {
 
 	@Override
 	public int hashCode() {
-		return this.type.hashCode() ^ this.link.getId().toString().hashCode(); // XOR of two hashes
+		return this.type.hashCode() ^ this.linkId.toString().hashCode(); // XOR of two hashes
 	}
 
+	public void setFacilityId(Id locationId) {
+		this.facilityId = locationId;
+	}
+	
+	public void setLinkId(Id linkid) {
+		this.linkId = linkid;
+	}
+
+	public Id getLinkId() {
+		return this.linkId;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
 
 }

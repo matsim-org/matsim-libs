@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
-import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 /**
-*
-* @author dgrether
-*
-*/
-
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+ * @author dgrether
+ *
+ */
+public interface BasicIncome {
 	
-	public void setTravTime(final double travTime);
+	public enum IncomePeriod {year, month, day, hour, second};
+
+	public String getCurrency();
 	
-	public List<Id> getLinkIds();
+	public IncomePeriod getIncomePeriod();
 	
+  public double getIncome();	
+
 }

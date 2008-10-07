@@ -20,6 +20,8 @@
 
 package org.matsim.basic.v01;
 
+import java.util.List;
+
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.misc.Time;
 
@@ -29,6 +31,8 @@ public class BasicRouteImpl <T extends BasicNode> implements BasicRoute<T>{
 	private double dist = Double.NaN;
 
 	private double travTime = Time.UNDEFINED_TIME;
+
+	private List<Id> linkIds;
 
 	public double getDist() {
 		return dist;
@@ -44,6 +48,14 @@ public class BasicRouteImpl <T extends BasicNode> implements BasicRoute<T>{
 	
 	public final void setTravTime(final double travTime) {
 		this.travTime = travTime;
+	}
+
+	public void setLinkIds(List<Id> linkids){
+		this.linkIds = linkids;
+	}
+	
+	public List<Id> getLinkIds() {
+		return this.linkIds;
 	}
 
 }

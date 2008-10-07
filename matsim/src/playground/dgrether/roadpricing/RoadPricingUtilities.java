@@ -36,7 +36,7 @@ public class RoadPricingUtilities {
 			RoadPricingScheme roadPricingScheme) {
 		for (Iterator<BasicActImpl> it = plan1.getIteratorAct(); it.hasNext(); ) {
 			BasicActImpl act = it.next();
-			if (roadPricingScheme.getLinkIds().contains(act.getLink().getId())){
+			if (roadPricingScheme.getLinkIds().contains(act.getLinkId())){
 				return true;
 			}
 		}

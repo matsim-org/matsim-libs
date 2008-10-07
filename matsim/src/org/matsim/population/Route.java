@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicRouteImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -103,6 +104,18 @@ public class Route extends BasicRouteImpl<Node> {
 	public ArrayList<Node> getRoute() {
 		return this.route;
 	}
+	
+	public void setLinkRoute(List<Link> srcRoute) {
+		this.route.clear();
+		if (srcRoute != null) {
+			Link l = srcRoute.get(0);
+			this.route.add(l.getFromNode());
+			for (int i = 0; i < srcRoute.size(); i++) {
+				l = srcRoute.get(i);
+				this.route.add(l.getToNode());
+			}
+		}	
+	}
 
 	public void setRoute(List<Node> srcRoute) {
 		if (srcRoute == null) {
@@ -141,6 +154,15 @@ public class Route extends BasicRouteImpl<Node> {
 		return this.cost;
 	}
 
+	@Override
+	public List<Id> getLinkIds() {
+		List<Id> ret = new ArrayList<Id>(this.route.size()-1);
+		for (Link l : getLinkRoute()) {
+			ret.add(l.getId());
+		}
+		return ret;
+	}
+	
 	/**
 	 * Returns the list of links that build the route. The links where the route
 	 * starts and ends (the links where the activities are on) are <b>not</b>

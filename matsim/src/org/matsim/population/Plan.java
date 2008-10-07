@@ -27,9 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.stats.algorithms.PlanStats;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 
 public class Plan extends BasicPlanImpl {
@@ -52,6 +54,25 @@ public class Plan extends BasicPlanImpl {
 		this.person = person;
 	}
 
+	public final Act createAct(final String type, Coord coord) throws IllegalArgumentException {
+		if (this.actsLegs.size() % 2 != 0) {
+			throw new IllegalArgumentException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+		}
+		Act a = new Act(type, coord);
+		this.actsLegs.add(a);
+		return a;
+	}
+
+	public final Act createAct(final String type, Facility fac) throws IllegalArgumentException {
+		if (this.actsLegs.size() % 2 != 0) {
+			throw new IllegalArgumentException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+		}
+		Act a = new Act(type, fac);
+		this.actsLegs.add(a);
+		return a;
+	}
+
+	
 	public final Act createAct(final String type, final Link link) throws Exception {
 		if (this.actsLegs.size() % 2 != 0) {
 			throw new Exception("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
+package org.matsim.interfaces.basic.v01;
 
-import java.util.List;
+import org.matsim.basic.v01.Id;
+import org.matsim.utils.geometry.Coord;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public interface BasicLocation {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
 	
-	public void setTravTime(final double travTime);
+	public Coord getCoord();
 	
-	public List<Id> getLinkIds();
+	public Id getLocationId();
+	
+	public boolean isFacilityId();
+	
+	public boolean isLinkId();
 	
 }

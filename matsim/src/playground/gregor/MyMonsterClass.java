@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -311,11 +310,11 @@ public class MyMonsterClass {
 			nperson.setCarAvail(person.getCarAvail());
 			nperson.setEmployed(person.getEmployed());
 
-			BasicAct act = new BasicActImpl();
+			Act act = null;
 			Iterator it = person.getPlans().get(0).getIteratorAct();
 
 			while (it.hasNext()){
-				act  = (BasicAct) it.next();
+				act  = (Act) it.next();
 				if (act.getType().contains("w")) break;
 			}
 

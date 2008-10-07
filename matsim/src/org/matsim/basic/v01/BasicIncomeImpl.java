@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,25 +19,41 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.List;
+import org.matsim.interfaces.basic.v01.BasicIncome;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+
 /**
-*
-* @author dgrether
-*
-*/
+ * @author dgrether
+ *
+ */
+public class BasicIncomeImpl implements BasicIncome {
 
-public interface BasicRoute<T extends BasicNode> {
-
-	public double getDist();
-
-	public void setDist(final double dist);
-
-	public double getTravTime();
+	private String currency;
+	private IncomePeriod period;
+	private double income;
 	
-	public void setTravTime(final double travTime);
+	public BasicIncomeImpl(IncomePeriod period) {
+		this.period = period;
+	}
 	
-	public List<Id> getLinkIds();
+	public String getCurrency() {
+		return this.currency;
+	}
+
+	public double getIncome() {
+		return this.income;
+	}
+
+	public IncomePeriod getIncomePeriod() {
+		return this.period;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public void setIncome(double income) {
+		this.income = income;
+	}
 	
 }

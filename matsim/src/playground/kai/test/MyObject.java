@@ -3,21 +3,21 @@ package playground.kai.test;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicActImpl;
-import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.network.LinkImpl;
+import org.matsim.population.Act;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
 public class MyObject implements BasicLink,BasicAct {
 	
-	BasicLinkImpl basicLink = new BasicLinkImpl(null, null, null, null) ;
+	LinkImpl basicLink = new LinkImpl(null, null, null, null, 0, 0, 0, 0) ;
 	
-	BasicActImpl basicAct = new BasicActImpl();
+	Act basicAct = new Act("h", basicLink);
 
 	public final void addDownMapping(Location other) {
 		basicLink.addDownMapping(other);
@@ -181,6 +181,14 @@ public class MyObject implements BasicLink,BasicAct {
 
 	public final void setType(String type) {
 		basicAct.setType(type);
+	}
+
+	public Id getFacilityId() {
+		return basicAct.getFacilityId();
+	}
+
+	public Id getLinkId() {
+		return basicAct.getLinkId();
 	}
 
 

@@ -25,6 +25,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
@@ -35,14 +36,30 @@ public class Act extends BasicActImpl {
 
 	private boolean isPrimary = false;
 
+	protected BasicLink link = null;
+	protected Facility facility = null;
+
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public Act(final String type, Link link) {
-		this.type = type.intern();
+		super(type.intern());
 		this.setLink(link);
 	}
+	
+	public Act(final String type, Coord coord) {
+		super(type.intern());
+		this.setCoord(coord);
+	}
+	
+	public Act(String type, Facility fac) {
+		super(type.intern());
+		this.setFacility(fac);
+	}
+
+	
 	
 	public Act(final String type, Coord coord, Link link) {
 		this(type, link);
@@ -51,7 +68,7 @@ public class Act extends BasicActImpl {
 	@Deprecated
 	public Act(final String type, final Double x, final Double y, final String link,
 						final String startTime, final String endTime, final String dur, final String isPrimary) {
-		this.type = type.intern();
+		super(type);
 		// check if either coord and/or link are set
 		if (((x==null) && (y!=null)) || ((x!=null) && (y==null))) {
 			Gbl.errorMsg(this + "[either both or non of the coordinates must exist.]");
@@ -80,8 +97,8 @@ public class Act extends BasicActImpl {
   @Deprecated
 	public Act(final String type, final double x, final double y, final Link link,
 			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
-		this.type = type.intern();
-		this.setCoord(new CoordImpl(x, y));
+  	super(type);
+  	this.setCoord(new CoordImpl(x, y));
 		this.link = link;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -90,7 +107,7 @@ public class Act extends BasicActImpl {
 	}
 
 	public Act(final Act act) {
-		this.type = act.type;
+		super(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
 		this.setCoord(c);
@@ -106,6 +123,7 @@ public class Act extends BasicActImpl {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
+
 	public final boolean isPrimary() {
 		return this.isPrimary;
 	}
@@ -114,6 +132,14 @@ public class Act extends BasicActImpl {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	public void setFacility(final Facility facility) {
+		this.facility = facility;
+	}
+	
+	public void setLink(final BasicLink link) {
+		this.link = link;
+	}
+	
 	public final void setPrimary(boolean isPrimary) {
 		this.isPrimary = isPrimary;
 	}
@@ -143,7 +169,7 @@ public class Act extends BasicActImpl {
 
 	@Override
 	public final String toString() {
-		return "[type=" + this.type + "]" +
+		return "[type=" + this.getType() + "]" +
 				"[coord=" + this.getCoord() + "]" +
 				"[link=" + this.link + "]" +
 				"[startTime=" + Time.writeTime(this.startTime) + "]" +
@@ -160,16 +186,29 @@ public class Act extends BasicActImpl {
 		this.dur = dur;
 	}
 
-	@Override // here to return correct link type
+	// here to return correct link type
 	public final Link getLink() {
 		return (Link)this.link;
 	}
 
-
-	public final Id getLinkId() { // convenience method
-		return this.link.getId();
+	public Facility getFacility() {
+		return this.facility;
 	}
 
+	@Override
+	public final Id getLinkId() { // convenience method
+		if (this.link != null)
+			return this.link.getId();
+		return null;
+	}
+
+	@Override
+	public final Id getFacilityId() {
+		if (this.facility != null)
+			return this.facility.getId();
+		return null;
+	}
+	
 
 	/**
 	 * This method calculates the duration of the activity from the start and endtimes if set.

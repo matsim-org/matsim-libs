@@ -22,6 +22,7 @@ package org.matsim.population.algorithms;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 
@@ -44,7 +45,7 @@ public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements
 		//		 loop over all <act>s, remove link-information
 		ActIterator actIter = plan.getIteratorAct();
 		while (actIter.hasNext()) {
-			actIter.next().setLink(null);
+			((Act)actIter.next()).setLink(null);
 		}
 
 		//		 loop over all <leg>s, remove route-information

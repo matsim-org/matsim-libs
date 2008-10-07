@@ -5,8 +5,8 @@ xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
 xmlns:xml="http://www.w3.org/XML/1998/namespace" 
 xml:lang="en">
 
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
+<!--  <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+--><xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/households_v1.00.xsd" />
 
 <xs:annotation>
@@ -72,12 +72,9 @@ xml:lang="en">
 </xs:complexType>
 
 <xs:complexType name="planType" >
-  <xs:sequence>
-    <xs:sequence>
-      <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
-      <xs:element name="leg" type="legType" minOccurs="1" maxOccurs="1"/>      
-    </xs:sequence>
-    <xs:element name="act" type="actType" minOccurs="1" maxOccurs="1" />
+  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="act" type="actType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="leg" type="legType" minOccurs="0" maxOccurs="1"/>      
   </xs:sequence>
   <xs:attribute name="score" type="xs:decimal" use="optional" />
   <xs:attribute name="selected" type="xs:boolean" default="false" />
