@@ -200,7 +200,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// currently: calc route in empty street network, use twice the traveltime
 		// TODO [MR] later: use special pt-router
 
-		double travTime = 0;
+		int travTime = 0;
 		Link fromLink = fromAct.getLink();
 		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
@@ -217,7 +217,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
 			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + route.getTravTime());
-			travTime = (route.getTravTime() + travelTimeLastLink) * 2.0;
+			travTime = (int) ((route.getTravTime() + travelTimeLastLink) * 2.0);
 			route.setTravTime(travTime);
 			leg.setRoute(route);
 		} else {
