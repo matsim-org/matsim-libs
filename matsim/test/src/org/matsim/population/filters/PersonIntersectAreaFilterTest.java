@@ -28,6 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -64,9 +65,16 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		// create a test person
 		Person person = new Person(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
-		plan.createAct("h", (String)null, (String)null, "0", "00:00:00", "08:00:00", null, null);
-		Leg leg = plan.createLeg(BasicLeg.Mode.car, "08:00:00", "00:02:00", null);
-		plan.createAct("w", (String)null, (String)null, "5", null, null, null, null);
+
+		Act act1 = plan.createAct("h", link0);
+		act1.setEndTime(8.0*3600);
+
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		leg.setDepTime(8.0*3600);
+		leg.setTravTime(2.0*60);
+
+		plan.createAct("w", link5);
+
 		Route route = new Route();
 		leg.setRoute(route);
 

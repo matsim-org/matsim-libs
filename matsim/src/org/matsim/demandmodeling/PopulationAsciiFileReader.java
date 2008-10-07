@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.demandmodeling;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -33,48 +35,46 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-
 /**
- * Reads a simple initial demand from a tab seperated ascii file
+ * Reads a simple initial demand from a tab separated ascii file
  * that has to contain the following columns:
  * PersonId	HomeLocation	Age	Gender	Income	PrimaryActivityType	PrimaryActivityLocation
- * 
- * A simple example of such a table can be seen in: 
- * test/input/org/matsim/demandmodeling/PopulationAsciiFileReader/asciipopulation.txt
- * @author dgrether
  *
+ * A simple example of such a table can be seen in:
+ * test/input/org/matsim/demandmodeling/PopulationAsciiFileReader/asciipopulation.txt
+ *
+ * @author dgrether
  */
 public class PopulationAsciiFileReader implements TabularFileHandler {
 
 	private static final Logger log = Logger.getLogger(PopulationAsciiFileReader.class);
-	
+
 	private static final String[] HEADER = {"PersonId", "HomeLocation", "Age", "IsFemale", "Income", "PrimaryActivityType", "PrimaryActivityLocation"};
-	
+
 	private static final double SIXOCLOCK = 6.0 * 3600.0;
 	private static final double TWOHOURS = 2.0  * 3600.0;
 	private static final double WORKDURATION = 8.0 * 3600.0;
+	private static final String ACTTYPE_HOME = "h";
 
-	
-	private TabularFileParserConfig tabFileParserConfig;
-	
-	private Population plans;
-	
+	private final TabularFileParserConfig tabFileParserConfig;
+
+	private final Population plans;
+
 	private boolean isFirstLine = true;
-	
-	private ZoneLayer zoneLayer;
-	
-	public PopulationAsciiFileReader(ZoneLayer zoneLayer) {
+
+	private final ZoneLayer zoneLayer;
+
+	public PopulationAsciiFileReader(final ZoneLayer zoneLayer) {
 		this.zoneLayer = zoneLayer;
 		this.tabFileParserConfig = new TabularFileParserConfig();
-		plans = new Population(Population.NO_STREAMING);
+		this.plans = new Population(Population.NO_STREAMING);
 	}
 
-	public void startRow(String[] row) throws IllegalArgumentException {
-		if (isFirstLine) {
+	public void startRow(final String[] row) throws IllegalArgumentException {
+		if (this.isFirstLine) {
 			boolean equalsHeader = true;
 			int i = 0;
 			for (String s : row) {
@@ -111,24 +111,31 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));
 			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + MatsimRandom.random.nextDouble() * TWOHOURS;
-			String homeEndTimeString = Time.writeTime(homeEndTime, Time.TIMEFORMAT_HHMMSS);
 			try {
-				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, homeEndTimeString, null, "false");
-				plan.createLeg(BasicLeg.Mode.car, 0.0, 0.0, 0.0);
-				plan.createAct(row[5], primaryCoord.getX(), primaryCoord.getY(), null, null, Time.writeTime(WORKDURATION, Time.TIMEFORMAT_HHMMSS), null, "true");
-				plan.createLeg(BasicLeg.Mode.car, 0.0, 0.0, 0.0);
-				plan.createAct("h", homeCoord.getX(), homeCoord.getY(), null, null, null, null, "false");
+				Act act1 = plan.createAct(ACTTYPE_HOME, null);
+				act1.setCoord(homeCoord);
+				act1.setEndTime(homeEndTime);
+
+				plan.createLeg(BasicLeg.Mode.car);
+
+				Act act2 = plan.createAct(row[5], null);
+				act2.setCoord(primaryCoord);
+				act2.setDur(WORKDURATION);
+				act2.setPrimary(true);
+
+				plan.createLeg(BasicLeg.Mode.car);
+
+				Act act3 = plan.createAct(ACTTYPE_HOME, null);
+				act3.setCoord(homeCoord);
 				this.plans.addPerson(p);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new IllegalArgumentException(e);
 			}
 		}
-		
 	}
-	
-	
-	public Population readFile(String filename) throws IOException {
+
+	public Population readFile(final String filename) throws IOException {
 		log.warn("#######################################################################");
 		log.warn("This tool is not able to check the semantical correctness of data a better solution would be usage of xml.");
 		log.warn("The correctnes of the resulting plans file depends on the correct usage of the input format, that will not be checked by this tool, please take care");
@@ -138,6 +145,5 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 		new TabularFileParser().parse(this.tabFileParserConfig, this);
 		return this.plans;
 	}
-	
 
 }
