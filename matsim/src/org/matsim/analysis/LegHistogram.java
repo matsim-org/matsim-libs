@@ -310,7 +310,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	 * @param filename
 	 * @param legMode
 	 *
-	 * @see #getGraphic(String)
+	 * @see #getGraphic(BasicLeg.Mode)
 	 */
 	public void writeGraphic(final String filename, final BasicLeg.Mode legMode) {
 		try {
