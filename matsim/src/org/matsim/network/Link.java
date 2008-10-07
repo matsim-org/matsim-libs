@@ -34,7 +34,7 @@ public interface Link extends BasicLink, Location {
 	public double getFlowCapacity(double time);
 
 	public void setRole(final int idx, final Object role);
-	
+
 	public void setMaxRoleIndex(final int index);
 	/**
 	 * Get the the freespeed travel time on this links in seconds.
@@ -46,10 +46,5 @@ public interface Link extends BasicLink, Location {
 	public void setType(String type);
 
 	public void setOrigId(String origid);
-	
-	/**
-	 * @deprecated
-	 */
-	public void calcFlowCapacity();
 
 }

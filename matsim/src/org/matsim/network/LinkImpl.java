@@ -31,46 +31,45 @@ import org.matsim.utils.misc.Time;
 /**
  * @author laemmel
  * @author illenberger
- *
  */
 public class LinkImpl extends BasicLinkImpl implements Link {
-	
+
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private double flowCapacity;
-	
-	private double freespeedTravelTime;
-	
+	private final double flowCapacity;
+
+	private final double freespeedTravelTime;
+
 	protected String type = null;
 
 	protected String origid = null;
-	
+
 	protected double euklideanDist;
-	
+
 	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public LinkImpl(Id id, BasicNode from, BasicNode to,
-			NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+	public LinkImpl(final Id id, final BasicNode from, final BasicNode to,
+			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id, from, to);
-		
+
 		super.length = length;
 		super.freespeed = freespeed;
 		super.capacity = capacity;
 		super.permlanes = lanes;
-		
+
 		this.freespeedTravelTime = this.getLength()	/ this.getFreespeed(Time.UNDEFINED_TIME);
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-	
+
 		this.euklideanDist = this.from.getCoord().calcDistance(this.to.getCoord());
-		
+
 		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn("[from=to=" + this.to + " link is a loop]"); }
 		/*
@@ -79,16 +78,13 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		 */
 		if (this.freespeed <= 0.0) { log.warn("[freespeed="+this.freespeed+" not allowed]"); }
 		if (this.capacity <= 0.0) { log.warn("[capacity="+this.capacity+" not allowed]"); }
-		if (this.permlanes < 1) { log.warn("[permlanes="+this.permlanes+" not allowed]"); }		
+		if (this.permlanes < 1) { log.warn("[permlanes="+this.permlanes+" not allowed]"); }
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#calcDistance(org.matsim.utils.geometry.CoordI)
-	 */
 	@Override
 	public final double calcDistance(final Coord coord) {
 		Coord fc = this.from.getCoord();
@@ -116,67 +112,37 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 			return Math.sqrt(tmp);
 		}
 	}
-	
-	/**
-	 * @deprecated
-	 */
-	public void calcFlowCapacity() {
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-		
-		this.flowCapacity = this.capacity / capacityPeriod;
-	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	// DS TODO try to remove these and update references
-	// (for the time being, they are here because otherwise the returned type is wrong. kai)
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFromNode()
-	 */
 	@Override
 	public final Node getFromNode() {
 		return (Node)this.from;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getToNode()
-	 */
 	@Override
 	public final Node getToNode() {
 		return (Node)this.to;
 	}
-	
-	public double getFreespeedTravelTime(double time) {
+
+	public double getFreespeedTravelTime(final double time) {
 		return this.freespeedTravelTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getFlowCapacity()
-	 */
-	public double getFlowCapacity(double time) {
+	public double getFlowCapacity(final double time) {
 		return this.flowCapacity;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getOrigId()
-	 */
 	public final String getOrigId() {
 		return this.origid;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getType()
-	 */
 	public final String getType() {
 		return this.type;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getRole(int)
-	 */
 	public final Object getRole(final int idx) {
 		if (idx < this.roles.size() ) {
 			return this.roles.get(idx);
@@ -184,9 +150,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#getEuklideanDistance()
-	 */
 	public final double getEuklideanDistance() {
 		return this.euklideanDist;
 	}
@@ -199,9 +162,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		this.origid = id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.network.Link#setRole(int, java.lang.Object)
-	 */
 	public final void setRole(final int idx, final Object role) {
 		if (idx > this.roles.size()) {
 			this.roles.resize(idx+1);
@@ -213,10 +173,11 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		this.roles.resize(index+1);
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
-	
+
+	@Override
 	public String toString() {
 		return super.toString() +
 		"[from_id=" + this.from.getId() + "]" +

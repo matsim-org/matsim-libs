@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.network;
 
 import java.util.LinkedList;
@@ -116,6 +117,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @param time - the time in seconds.
 	 * @return the freespeed travel time at time <tt>time</tt>.
 	 */
+	@Override
 	public double getFreespeedTravelTime(double time) {
 		return getLength()/getFreespeed(time);
 	}
@@ -124,6 +126,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @param time - the time in seconds.
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
+	@Override
 	public double getFlowCapacity(double time) {
 		if (this.flowCapacityValues == null)
 			initFlowCapacityValueMap();
@@ -264,10 +267,4 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		}
 	}
 		
-	/**
-	 * @deprecated
-	 */
-	public void calcFlowCapacity() {
-		initFlowCapacityValueMap();
-	}
 }
