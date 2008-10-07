@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * PersonEntersVehicleEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel.pt.events;
 
-import java.util.Collection;
+import java.util.Map;
 
-public interface Vehicle {
+import org.matsim.events.BasicEvent;
+import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.population.Person;
 
-	public void setDriver(final DriverAgent driver);
+public class PersonLeavesVehicleEvent extends BasicEvent {
 
-	public DriverAgent getDriver();
+	final private Vehicle vehicle;
+	
+	public PersonLeavesVehicleEvent(final double time, final Person person, final Vehicle vehicle) {
+		super(time, person);
+		this.vehicle = vehicle;
+	}
 
-	/**
-	 * Adds a passenger to this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
-	 */
-	public boolean addPassenger(final PassengerAgent passenger);
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attrs = super.getAttributes();
+		attrs.put("vehicle", vehicle.getId().toString());
+		attrs.put("type", "PersonLeavesVehicleEvent");
+		return attrs;
+	}
 
-	/**
-	 * Removes the passenger from this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
-	 */
-	public boolean removePassenger(final PassengerAgent passenger);
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+	
+	@Override
+	public String toString() {
+		return "[PersonLeavesVehicle: agent: " + this.agentId + "; vehicle: " + vehicle.getId() + "]";
+	}
 
-	public Collection<PassengerAgent> getPassengers();
-
-	/**
-	 * TODO [MR] not sure if passengerCapacity or general capacity (including driver) is better
-	 *
-	 * @return number of passengers this vehicle can transport
-	 */
-	public int getPassengerCapacity();
 }

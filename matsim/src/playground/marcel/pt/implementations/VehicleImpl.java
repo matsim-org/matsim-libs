@@ -56,7 +56,11 @@ public class VehicleImpl implements Vehicle {
 	}
 
 	public boolean removePassenger(final PassengerAgent passenger) {
-		return this.passengers.remove(passenger);
+		boolean removed = this.passengers.remove(passenger);
+		if (removed) {
+			// create Event, but where to?
+		}
+		return removed;
 	}
 
 	public void setDriver(final DriverAgent driver) {

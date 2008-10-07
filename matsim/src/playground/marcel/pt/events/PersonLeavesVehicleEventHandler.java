@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * PersonLeavesVehicleEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.interfaces;
+package playground.marcel.pt.events;
 
-import java.util.Collection;
+import org.matsim.events.handler.EventHandler;
 
-public interface Vehicle {
-
-	public void setDriver(final DriverAgent driver);
-
-	public DriverAgent getDriver();
-
-	/**
-	 * Adds a passenger to this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
-	 */
-	public boolean addPassenger(final PassengerAgent passenger);
-
-	/**
-	 * Removes the passenger from this vehicle.
-	 * 
-	 * @param passenger
-	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
-	 */
-	public boolean removePassenger(final PassengerAgent passenger);
-
-	public Collection<PassengerAgent> getPassengers();
-
-	/**
-	 * TODO [MR] not sure if passengerCapacity or general capacity (including driver) is better
-	 *
-	 * @return number of passengers this vehicle can transport
-	 */
-	public int getPassengerCapacity();
+public interface PersonLeavesVehicleEventHandler extends EventHandler {
+	public void handleEvent(PersonLeavesVehicleEvent event);
 }
