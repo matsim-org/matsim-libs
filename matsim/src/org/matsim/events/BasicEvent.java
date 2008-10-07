@@ -37,7 +37,7 @@ public abstract class BasicEvent {
 	private static String timeString = null;
 	private static double timeCache = Time.UNDEFINED_TIME;
 
-	BasicEvent(final double time, final Person agent) {
+	protected BasicEvent(final double time, final Person agent) {
 		this.time = time;
 		this.agent = agent;
 		this.agentId = agent.getId().toString();
