@@ -136,19 +136,6 @@ public class Knowledge extends CustomizableImpl {
 		KActivity ka = new KActivity(activity,isPrimary);
 		return activities.add(ka);
 	}
-	
-	/**
-	 * Adds an {@link Activity} to the {@link Knowledge} calling {@link #addActivity(Activity, boolean)}
-	 * while {@code isPrimary} is set to {@code false}.
-	 * 
-	 * @param activity The (non primary) {@link Activity} to add to the {@link Person}s {@link Knowledge}.
-	 * @return <code>true</code> if the {@code activity} is not already present in the list.
-	 * @see #addActivity(Activity, boolean)
-	 * @deprecated This method only exists only for backwards compatibility.
-	 */
-	public final boolean addActivity(Activity activity) {
-		return this.addActivity(activity,false);
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// remove methods

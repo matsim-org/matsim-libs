@@ -67,8 +67,8 @@ public class CreatePlans {
 
 
 			Knowledge k = person.createKnowledge("");
-			k.addActivity(home);
-			k.addActivity(work);
+			k.addActivity(home, false);
+			k.addActivity(work, false);
 
 			Plan plan = person.createPlan(true);
 			Facility home_facility = person.getKnowledge().getActivities("home").get(0).getFacility();

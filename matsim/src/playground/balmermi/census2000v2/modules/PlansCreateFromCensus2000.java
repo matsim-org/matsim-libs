@@ -213,7 +213,7 @@ public class PlansCreateFromCensus2000 {
 				for (Activity a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
 				Activity act = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
 				if (act == null) { Gbl.errorMsg("That should not happen!"); }
-				p.getKnowledge().addActivity(act); // set activity in given zone
+				p.getKnowledge().addActivity(act, false); // set activity in given zone
 			}
 			else {
 				log.debug("        pid="+p.getId()+", act_type="+act_type+", zone="+zone.getId()+": no facilities for educ found in that zone!");
@@ -235,7 +235,7 @@ public class PlansCreateFromCensus2000 {
 						}
 						Activity act = acts.get(MatsimRandom.random.nextInt(acts.size()));
 						if (act == null) { Gbl.errorMsg("That should not happen!"); }
-						p.getKnowledge().addActivity(act); // set activity in expanded given zone
+						p.getKnowledge().addActivity(act, false); // set activity in expanded given zone
 					}
 				}
 			}
@@ -244,7 +244,7 @@ public class PlansCreateFromCensus2000 {
 			log.debug("        pid="+p.getId()+", act_type="+act_type+": no educ zone defined! Assigning according act_type!");
 			Activity act = this.chooseEducActBasedOnSchoolType(p,act_type);
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
-			p.getKnowledge().addActivity(act);
+			p.getKnowledge().addActivity(act, false);
 			p.getKnowledge().setDesc(p.getKnowledge().getDesc()+"("+CAtts.P_SGDE+":"+sgde+")");
 		}
 	}
@@ -381,7 +381,7 @@ public class PlansCreateFromCensus2000 {
 		}
 		log.trace("        pid="+p.getId()+", jobnr="+job+", acts_weighted size="+acts_weighted.size());
 		Activity act_choosen = acts_weighted.get(MatsimRandom.random.nextInt(acts_weighted.size()));
-		p.getKnowledge().addActivity(act_choosen);
+		p.getKnowledge().addActivity(act_choosen, false);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -407,21 +407,21 @@ public class PlansCreateFromCensus2000 {
 		if (wkat == 1) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME));
+			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME), false);
 
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME));
+			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 3) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME));
+			k.addActivity(hh_w.getFacility().getActivity(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 4) {
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME));
+			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME), false);
 		}
 		else { Gbl.errorMsg("that should not happen!"); }
 		k.setDesc(k.getDesc()+desc);
