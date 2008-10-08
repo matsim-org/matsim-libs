@@ -42,7 +42,7 @@ import org.matsim.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class AnalysisTest_Zurich {
+public class AnalysisTest {
 	private static void printUsage() {
 		System.out.println();
 		System.out.println("AnalysisTest:");
@@ -54,37 +54,33 @@ public class AnalysisTest_Zurich {
 		System.out
 				.println(" arg 0: name incl. path to net file (.xml[.gz])(required)");
 		System.out
-				.println(" arg 1: name incl. to events file (.txt[.gz])(required)");
+				.println(" arg 1: name incl. path to events file (.txt[.gz])(required)");
 		System.out.println(" arg 2: path to output file (required)");
 		System.out
 				.println(" arg 3: name incl. path to plans file (.xml[.gz])(optional)");
+		System.out
+				.println(" arg 4: name of scenario (optional, for Zurich required)");
 		System.out.println("----------------");
 	}
 
 	private static BufferedWriter writer;
 
-	/**
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-		if (args.length < 3) {
-			printUsage();
-			System.exit(0);
-		}
-
+	private static void runIntern(String[] args, String scenario) {
 		final String netFilename = args[0];
 		final String eventsFilename = args[1];
 		final String outputpath = args[2];
 		String plansFilename = null;
-		if (args.length == 4)
-			plansFilename = args[3];
+		if (args.length >= 4) {
+			if (args[3].endsWith("xml") || args[3].endsWith("xml.gz"))
+				plansFilename = args[3];
+		}
 
 		Gbl.createConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
 
-		OnRouteModalSplit_Zurich orms = null;
+		OnRouteModalSplit orms = null;
 		TravelTimeModalSplit ttms = null;
 		CalcAverageTripLength catl = null;
 
@@ -98,7 +94,7 @@ public class AnalysisTest_Zurich {
 			plansReader.readFile(plansFilename);
 			plans.runAlgorithms();
 
-			orms = new OnRouteModalSplit_Zurich(network, plans);
+			orms = new OnRouteModalSplit(scenario,network, plans);
 			ttms = new TravelTimeModalSplit(network, plans);
 		}
 
@@ -106,8 +102,12 @@ public class AnalysisTest_Zurich {
 
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network);
-		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 682845.0,
-				247388.0, 2000.0);
+		CalcLinksAvgSpeed clas = null;
+		if (!scenario.equals("Zurich")) {
+			clas = new CalcLinksAvgSpeed(network);
+		} else if (scenario.equals("Zurich")) {
+			clas = new CalcLinksAvgSpeed(network, 682845.0, 247388.0, 2000.0);
+		}
 		LegDistance ld = new LegDistance(network);
 
 		events.addHandler(ctpf);
@@ -153,5 +153,27 @@ public class AnalysisTest_Zurich {
 			e.printStackTrace();
 		}
 		System.out.println("done.");
+	}
+
+	public static void run(String[] args) {
+		runIntern(args, "normal");
+	}
+
+	public static void runZurich(String[] args) {
+		runIntern(args, "Zurich");
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		if (args.length < 3) {
+			printUsage();
+			System.exit(0);
+		} else if (args[3].equals("Zurich") || args[4].equals("Zurich")) {
+			runZurich(args);
+		} else {
+			run(args);
+		}
 	}
 }

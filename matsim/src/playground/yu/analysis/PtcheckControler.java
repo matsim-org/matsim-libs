@@ -48,9 +48,15 @@ import org.matsim.utils.io.IOUtils;
  * 
  */
 public class PtcheckControler extends Controler {
+	private String scenario;
 
-	public PtcheckControler(final String[] configFileName) {
+	public String getScenario() {
+		return scenario;
+	}
+
+	public PtcheckControler(final String[] configFileName, String scenario) {
 		super(configFileName);
+		this.scenario = scenario;
 	}
 
 	public static class PtCheckListener implements StartupListener,
@@ -59,14 +65,20 @@ public class PtcheckControler extends Controler {
 		 * internal bufferedWriter
 		 */
 		private BufferedWriter ptRateWriter;
+		private String scenario;
+
 		private CalcAverageTripLength catl = null;
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
-		private OnRouteModalSplit_Zurich orms = null;
+		private OnRouteModalSplit orms = null;
 		private TravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
+
+		public PtCheckListener(String scenario) {
+			this.scenario = scenario;
+		}
 
 		public void notifyStartup(final StartupEvent event) {
 			Controler ctl = event.getControler();
@@ -171,7 +183,7 @@ public class PtcheckControler extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				orms = new OnRouteModalSplit_Zurich(nl, ps);
+				orms = new OnRouteModalSplit(scenario, nl, ps);
 				es.addHandler(orms);
 				ttms = new TravelTimeModalSplit(nl, ps);
 				es.addHandler(ttms);
@@ -189,13 +201,14 @@ public class PtcheckControler extends Controler {
 
 	// -------------------------MAIN FUNCTION--------------------
 	/**
-	 * @param args -
-	 *            the path of config-file
+	 * @param args
+	 *            - the path of config-file
 	 */
 	public static void main(final String[] args) {
 		final PtcheckControler controler;
-		controler = new PtcheckControler(args);
-		controler.addControlerListener(new PtCheckListener());
+		controler = new PtcheckControler(args, "Zurich");
+		controler.addControlerListener(new PtCheckListener(controler
+				.getScenario()));
 		controler.run();
 		System.exit(0);
 	}

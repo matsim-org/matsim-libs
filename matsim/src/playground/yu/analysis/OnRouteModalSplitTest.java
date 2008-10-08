@@ -65,7 +65,7 @@ public class OnRouteModalSplitTest {
 
 		Events events = new Events();
 
-		OnRouteModalSplit_Zurich mlh = new OnRouteModalSplit_Zurich(300, network, population);
+		OnRouteModalSplit mlh = new OnRouteModalSplit("normal",300, network, population);
 		events.addHandler(mlh);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

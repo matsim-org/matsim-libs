@@ -55,15 +55,16 @@ import org.matsim.utils.misc.Time;
  *         Counts the number of vehicles departed, arrived or got stuck per time
  *         bin based on events.
  */
-public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
+public class OnRouteModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
-
+	private String scenario;
 	private int iteration = 0;
 	private final int binSize;
 	private final int[] dep, arr, stuck, onRoute;
 	private final int[] carDep, carArr, carStuck, carOnRoute;
 	private final int[] ptDep, ptArr, ptOnRoute;
-	private final int[] otherDep, otherArr, otherStuck, otherOnRoute;
+	private int[] otherDep = null, otherArr = null, otherStuck = null,
+			otherOnRoute = null;
 	private final NetworkLayer network;
 	private final Population plans;
 
@@ -76,9 +77,10 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 	 * @param nofBins
 	 *            The number of time bins for this analysis.
 	 */
-	public OnRouteModalSplit_Zurich(final int binSize, final int nofBins,
-			NetworkLayer network, Population plans) {
+	public OnRouteModalSplit(String scenario, final int binSize,
+			final int nofBins, NetworkLayer network, Population plans) {
 		super();
+		this.scenario = scenario;
 		this.binSize = binSize;
 		this.dep = new int[nofBins + 1]; // +1 for all times out of our
 		// range
@@ -92,10 +94,12 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 		this.onRoute = new int[nofBins + 1];
 		this.carOnRoute = new int[nofBins + 1];
 		this.ptOnRoute = new int[nofBins + 1];
-		this.otherDep = new int[nofBins + 1];
-		this.otherArr = new int[nofBins + 1];
-		this.otherOnRoute = new int[nofBins + 1];
-		this.otherStuck = new int[nofBins + 1];
+		if (this.scenario.equals("Zurich")) {
+			this.otherDep = new int[nofBins + 1];
+			this.otherArr = new int[nofBins + 1];
+			this.otherOnRoute = new int[nofBins + 1];
+			this.otherStuck = new int[nofBins + 1];
+		}
 		reset(0);
 		this.network = network;
 		this.plans = plans;
@@ -108,13 +112,14 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 	 * @param binSize
 	 *            The size of a time bin in seconds.
 	 */
-	public OnRouteModalSplit_Zurich(final int binSize, NetworkLayer network,
-			Population plans) {
-		this(binSize, 30 * 3600 / binSize + 1, network, plans);
+	public OnRouteModalSplit(String scenario, final int binSize,
+			NetworkLayer network, Population plans) {
+		this(scenario, binSize, 30 * 3600 / binSize + 1, network, plans);
 	}
 
-	public OnRouteModalSplit_Zurich(NetworkLayer network, Population plans) {
-		this(300, network, plans);
+	public OnRouteModalSplit(String scenario, NetworkLayer network,
+			Population plans) {
+		this(scenario, 300, network, plans);
 	}
 
 	/* Implementation of eventhandler-Interfaces */
@@ -146,17 +151,33 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 
 		// Plan.Type planType = ae.agent.getSelectedPlan().getType();
 		Plan selectedPlan = ae.agent.getSelectedPlan();
-		if (Integer.parseInt(ae.agentId) > 1000000000)
-			otherCount[binIdx]++;
-		if (
-		// planType.equals(Plan.Type.CAR)
-		PlanModeJudger.useCar(selectedPlan)) {
-			carCount[binIdx]++;
-		} else if (
-		// planType.equals(Plan.Type.PT)
-		PlanModeJudger.usePt(selectedPlan)) {
-			if (ptCount != null)
-				ptCount[binIdx]++;
+
+		if (otherCount != null)
+			if (Integer.parseInt(ae.agentId) > 1000000000)
+				otherCount[binIdx]++;
+			else {
+				if (
+				// planType.equals(Plan.Type.CAR)
+				PlanModeJudger.useCar(selectedPlan)) {
+					carCount[binIdx]++;
+				} else if (
+				// planType.equals(Plan.Type.PT)
+				PlanModeJudger.usePt(selectedPlan)) {
+					if (ptCount != null)
+						ptCount[binIdx]++;
+				}
+			}
+		else {
+			if (
+			// planType.equals(Plan.Type.CAR)
+			PlanModeJudger.useCar(selectedPlan)) {
+				carCount[binIdx]++;
+			} else if (
+			// planType.equals(Plan.Type.PT)
+			PlanModeJudger.usePt(selectedPlan)) {
+				if (ptCount != null)
+					ptCount[binIdx]++;
+			}
 		}
 	}
 
@@ -186,8 +207,9 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 		this.onRoute[0] = this.dep[0] - this.arr[0] - this.stuck[0];
 		this.carOnRoute[0] = this.carDep[0] - this.carArr[0] - this.carStuck[0];
 		this.ptOnRoute[0] = this.ptDep[0] - this.ptArr[0];
-		this.otherOnRoute[0] = this.otherDep[0] - this.otherArr[0]
-				- this.otherStuck[0];
+		if (otherOnRoute != null)
+			this.otherOnRoute[0] = this.otherDep[0] - this.otherArr[0]
+					- this.otherStuck[0];
 		for (int i = 1; i < this.dep.length; i++) {
 			this.onRoute[i] = this.onRoute[i - 1] + this.dep[i] - this.arr[i]
 					- this.stuck[i];
@@ -195,8 +217,10 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 					- this.carArr[i] - this.carStuck[i];
 			this.ptOnRoute[i] = this.ptOnRoute[i - 1] + this.ptDep[i]
 					- this.ptArr[i];
-			this.otherOnRoute[i] = this.otherOnRoute[i - 1] + this.otherDep[i]
-					- this.otherArr[i] - this.otherStuck[i];
+			if (otherOnRoute != null)
+				this.otherOnRoute[i] = this.otherOnRoute[i - 1]
+						+ this.otherDep[i] - this.otherArr[i]
+						- this.otherStuck[i];
 		}
 	}
 
@@ -216,16 +240,38 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 							+ "\totherDepartures\totherArrivals\totherStuck\totherOnRoute"
 							+ "\n");
 			for (int i = 0; i < this.dep.length; i++) {
-				bw.write(Time.writeTime(i * this.binSize) + "\t"
-						+ i * this.binSize + "\t" + this.dep[i] + "\t"
-						+ this.arr[i] + "\t" + this.stuck[i] + "\t"
-						+ this.onRoute[i] + "\t" + this.carDep[i] + "\t"
-						+ this.carArr[i] + "\t" + this.carStuck[i] + "\t"
-						+ this.carOnRoute[i] + "\t" + this.ptDep[i] + "\t"
-						+ this.ptArr[i] + "\t" + 0 + "\t" + this.ptOnRoute[i]
-						+ "\t" + this.otherDep[i] + "\t" + this.otherArr[i]
-						+ "\t" + this.otherStuck[i] + "\t"
-						+ this.otherOnRoute[i] + "\n");
+				bw.write(Time.writeTime(i * this.binSize)
+						+ "\t"
+						+ i * this.binSize
+						+ "\t"
+						+ this.dep[i]
+						+ "\t"
+						+ this.arr[i]
+						+ "\t"
+						+ this.stuck[i]
+						+ "\t"
+						+ this.onRoute[i]
+						+ "\t"
+						+ this.carDep[i]
+						+ "\t"
+						+ this.carArr[i]
+						+ "\t"
+						+ this.carStuck[i]
+						+ "\t"
+						+ this.carOnRoute[i]
+						+ "\t"
+						+ this.ptDep[i]
+						+ "\t"
+						+ this.ptArr[i]
+						+ "\t"
+						+ 0
+						+ "\t"
+						+ this.ptOnRoute[i]
+						+ "\t"
+						+ ((otherOnRoute != null) ? (this.otherDep[i] + "\t"
+								+ this.otherArr[i] + "\t" + this.otherStuck[i]
+								+ "\t" + this.otherOnRoute[i]) : (0 + "\t" + 0
+								+ "\t" + 0 + "\t" + 0)) + "\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -310,7 +356,8 @@ public class OnRouteModalSplit_Zurich implements AgentDepartureEventHandler,
 			onRoute[i] = this.onRoute[i];
 			carOnRoute[i] = this.carOnRoute[i];
 			ptOnRoute[i] = this.ptOnRoute[i];
-			otherOnRoute[i] = this.otherOnRoute[i];
+			otherOnRoute[i] = (this.otherOnRoute != null) ? this.otherOnRoute[i]
+					: 0;
 		}
 		onRouteChart.addSeries("all agents on route", category, onRoute);
 		onRouteChart.addSeries("drivers on route", category, carOnRoute);

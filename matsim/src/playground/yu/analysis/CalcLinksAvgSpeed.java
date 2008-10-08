@@ -87,7 +87,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	public CalcLinksAvgSpeed(final NetworkLayer network) {
-		this(network, 3600);
+		this(network, 300);
 	}
 
 	/**
