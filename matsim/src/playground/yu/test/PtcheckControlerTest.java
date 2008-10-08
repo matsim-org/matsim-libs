@@ -45,15 +45,15 @@ import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
 import playground.yu.analysis.CalcTrafficPerformance;
 import playground.yu.analysis.LegDistance;
-import playground.yu.analysis.OnRouteModalSplit_Zurich;
+import playground.yu.analysis.OnRouteModalSplit;
 import playground.yu.analysis.PtRate;
 import playground.yu.analysis.TravelTimeModalSplit;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
- *
+ * 
  * @author ychen
- *
+ * 
  */
 public class PtcheckControlerTest extends Controler {
 
@@ -71,7 +71,7 @@ public class PtcheckControlerTest extends Controler {
 		private CalcNetAvgSpeed cas = null;
 		private CalcTrafficPerformance ctpf = null;
 		private RoadPricing rp = null;
-		private OnRouteModalSplit_Zurich orms = null;
+		private OnRouteModalSplit orms = null;
 		private TravelTimeModalSplit ttms = null;
 		private LegDistance ld = null;
 		private CalcLinksAvgSpeed clas = null;
@@ -159,7 +159,8 @@ public class PtcheckControlerTest extends Controler {
 				}
 				if (this.clas != null) {
 					this.clas.write(getOutputFilename("avgSpeed.txt.gz"));
-					this.clas.writeChart(getOutputFilename("avgSpeedCityArea.png"));
+					this.clas
+							.writeChart(getOutputFilename("avgSpeedCityArea.png"));
 				}
 			}
 		}
@@ -178,13 +179,14 @@ public class PtcheckControlerTest extends Controler {
 			NetworkLayer nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
-				this.orms = new OnRouteModalSplit_Zurich(300, nl, ps);
+				this.orms = new OnRouteModalSplit("Zurich", 300, nl, ps);
 				es.addHandler(this.orms);
 				this.ttms = new TravelTimeModalSplit(300, nl, ps);
 				es.addHandler(this.ttms);
 				this.ld = new LegDistance(300, nl);
 				es.addHandler(this.ld);
-				this.clas = new CalcLinksAvgSpeed(nl, 682845.0, 247388.0, 2000.0);
+				this.clas = new CalcLinksAvgSpeed(nl, 682845.0, 247388.0,
+						2000.0);
 				es.addHandler(this.clas);
 				c.getConfig().simulation().setSnapshotPeriod(300);
 			} else if (event.getIteration() == c.getFirstIteration()) {
@@ -197,8 +199,8 @@ public class PtcheckControlerTest extends Controler {
 
 	// -------------------------MAIN FUNCTION--------------------
 	/**
-	 * @param args -
-	 *            the path of config-file
+	 * @param args
+	 *            - the path of config-file
 	 */
 	public static void main(final String[] args) {
 		final PtcheckControlerTest controler;
