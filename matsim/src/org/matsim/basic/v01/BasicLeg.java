@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.basic.v01;
-/**
-*
-* @author dgrether
-*
-*/
 
+package org.matsim.basic.v01;
+
+/**
+* @author dgrether
+*/
 public interface BasicLeg {
 	
-	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined};
-//	
-//	public static final String MIVMODE = "miv";
-//
-//	public static final String CARMODE = "car";
-//
-//	public static final String RIDEMODE = "ride";
-//
-//	public static final String MOTORBIKEMODE = "motorbike";
-//
-//	public static final String PTMODE = "pt";
-//
-//	public static final String TRAINMODE = "train";
-//
-//	public static final String BUSMODE = "bus";
-//
-//	public static final String TRAMMODE = "tram";
-//
-//	public static final String BIKEMODE = "bike";
-//
-//	public static final String WALKMODE = "walk";
-//
-//	public static final String UNDEFINEDMODE = "undef";
-
+	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
+	
 	public int getNum();
 
 	public void setNum(int num);

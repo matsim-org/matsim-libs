@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-/**
-*
-* @author dgrether
-*
-*/
 
+/**
+* @author dgrether
+*/
 public interface BasicPlan {
 
 	/**
@@ -37,7 +36,7 @@ public interface BasicPlan {
 	 */
 	public static final double UNDEF_SCORE = Double.NaN;
 
-	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED};
+	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
 	
 	public double getScore();
 
@@ -68,4 +67,3 @@ public interface BasicPlan {
 	
 	public Type getType();
 }
-
