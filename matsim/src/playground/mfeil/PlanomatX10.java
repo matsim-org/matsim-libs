@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX9.java
+ * PlanomatX10.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -44,12 +44,11 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * This is the current standard version. It features 
- * Storing of all calculated solutions so that they can be retrieved in later iterations without recalculation
- * Prevention from creating same solutions within the same neighbourhood by cycling neighbourhood creation
+ * Like PlanomatX9 but without the recovering of previous version. To compare runtime performance
+ * 
  */
 
-public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX10 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -57,13 +56,13 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 	private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX9.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX10.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX9 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX10 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
@@ -98,13 +97,13 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 		int [] scoredInNeighbourhood					= new int [NEIGHBOURHOOD_SIZE];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood 	= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> tabuList			 	= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution3 				= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution5 				= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution7 				= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution9 				= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution11 			= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
-		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution3 				= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution5 				= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution7 				= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution9 				= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution11 			= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
+		//ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningNoNew, warningTabu;
 		double [] xs;
 		double [] ys = new double [MAX_ITERATIONS];
@@ -168,8 +167,7 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 			}
 			
 			// Check whether a non-tabu solution has been scored in a previous iteration			
-			this.checkForScoredSolution(neighbourhood, tabuInNeighbourhood, scoredInNeighbourhood, solution3, solution5, solution7, solution9,
-					solution11, solution13, solutionLong, nonTabuNeighbourhood);
+			this.checkForScoredSolution(neighbourhood, tabuInNeighbourhood, scoredInNeighbourhood);
 			
 			// Route, optimize and score all non-tabu/non-scored plans, write them into list nonTabuNeighbourhood and sort the list
 			for (int x=0; x<NEIGHBOURHOOD_SIZE;x++){
@@ -189,16 +187,16 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
 					// Write the solution into a list so that it can be retrieved for later iterations
-					PlanomatXPlan solution = new PlanomatXPlan (neighbourhood[x].getPerson());
-					solution.copyPlan(neighbourhood[x]);
+					//PlanomatXPlan solution = new PlanomatXPlan (neighbourhood[x].getPerson());
+					//solution.copyPlan(neighbourhood[x]);
 					
-					if (solution.getActsLegs().size()==3) solution3.add(solution);
-					else if (solution.getActsLegs().size()==5) solution5.add(solution);
-					else if (solution.getActsLegs().size()==7) solution7.add(solution);
-					else if (solution.getActsLegs().size()==9) solution9.add(solution);
-					else if (solution.getActsLegs().size()==11) solution11.add(solution);
-					else if (solution.getActsLegs().size()==13) solution13.add(solution);
-					else solutionLong.add(solution);
+					//if (solution.getActsLegs().size()==3) solution3.add(solution);
+					//else if (solution.getActsLegs().size()==5) solution5.add(solution);
+					//else if (solution.getActsLegs().size()==7) solution7.add(solution);
+					//else if (solution.getActsLegs().size()==9) solution9.add(solution);
+					//else if (solution.getActsLegs().size()==11) solution11.add(solution);
+					//else if (solution.getActsLegs().size()==13) solution13.add(solution);
+					//else solutionLong.add(solution);
 				}
 				stream.print(neighbourhood[x].getScore()+"\t");
 				stream.print(notNewInNeighbourhood[x]+"\t");
@@ -480,105 +478,12 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 		return warningOuter;
 	}
 	
-	public void checkForScoredSolution (PlanomatXPlan [] neighbourhood, int [] tabuInNeighbourhood, int [] scoredInNeighbourhood,
-				ArrayList<PlanomatXPlan> solution3, ArrayList<PlanomatXPlan> solution5, ArrayList<PlanomatXPlan> solution7,
-				ArrayList<PlanomatXPlan> solution9, ArrayList<PlanomatXPlan> solution11, ArrayList<PlanomatXPlan> solution13,
-				ArrayList<PlanomatXPlan> solutionLong, ArrayList<PlanomatXPlan> nonTabuNeighbourhood){
+	public void checkForScoredSolution (PlanomatXPlan [] neighbourhood, int [] tabuInNeighbourhood, int [] scoredInNeighbourhood){
 		for (int x = 0; x<scoredInNeighbourhood.length; x++){
 			if (tabuInNeighbourhood[x]==1){
 				scoredInNeighbourhood[x]=1;
 			}
-			else {
-				if (neighbourhood[x].getActsLegs().size()==3){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution3.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution3.get(solution3.size()-1-i))){
-							nonTabuNeighbourhood.add(solution3.get(solution3.size()-1-i));
-							neighbourhood[x].setScore(solution3.get(solution3.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution3 recycled!");
-							break;
-						}
-					}					
-				}
-				else if (neighbourhood[x].getActsLegs().size()==5){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution5.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution5.get(solution5.size()-1-i))){
-							nonTabuNeighbourhood.add(solution5.get(solution5.size()-1-i));
-							neighbourhood[x].setScore(solution5.get(solution5.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution5 recycled!");
-							break;
-						}
-					}
-					
-				}
-				else if (neighbourhood[x].getActsLegs().size()==7){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution7.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution7.get(solution7.size()-1-i))){
-							nonTabuNeighbourhood.add(solution7.get(solution7.size()-1-i));
-							neighbourhood[x].setScore(solution7.get(solution7.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution7 recycled!");
-							break;
-						}
-					}
-					
-				}
-				else if (neighbourhood[x].getActsLegs().size()==9){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution9.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution9.get(solution9.size()-1-i))){
-							nonTabuNeighbourhood.add(solution9.get(solution9.size()-1-i));
-							neighbourhood[x].setScore(solution9.get(solution9.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution9 recycled!");
-							break;
-						}
-					}
-					
-				}
-				else if (neighbourhood[x].getActsLegs().size()==11){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution11.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution11.get(solution11.size()-1-i))){
-							nonTabuNeighbourhood.add(solution11.get(solution11.size()-1-i));
-							neighbourhood[x].setScore(solution11.get(solution11.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution11 recycled!");
-							break;
-						}
-					}
-					
-				}
-				else if (neighbourhood[x].getActsLegs().size()==13){
-					scoredInNeighbourhood[x]=0;
-					for (int i = 0; i<solution13.size();i++) {
-						if (checkForEquality3(neighbourhood[x], solution13.get(solution13.size()-1-i))){
-							nonTabuNeighbourhood.add(solution13.get(solution13.size()-1-i));
-							neighbourhood[x].setScore(solution13.get(solution13.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("Solution13 recycled!");
-							break;
-						}
-					}
-					
-				}
-				else {
-					for (int i = 0; i<solutionLong.size();i++) {
-						scoredInNeighbourhood[x]=0;
-						if (checkForEquality(neighbourhood[x], solutionLong.get(solutionLong.size()-1-i))){
-							nonTabuNeighbourhood.add(solutionLong.get(solutionLong.size()-1-i));
-							neighbourhood[x].setScore(solutionLong.get(solutionLong.size()-1-i).getScore());
-							scoredInNeighbourhood[x]=1;
-							log.info("SolutionLong recycled!");
-							break;
-						}
-					}
-				}
-			}
+			else scoredInNeighbourhood[x]=0;
 		}
 	}
 	
