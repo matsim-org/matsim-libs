@@ -36,7 +36,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -93,13 +92,16 @@ public class ScenarioData {
 		this.populationFileName = populationFileName;
 	}
 
-	public World getWorld() {
+	public World getWorld() throws RuntimeException {
 		if (!this.worldLoaded) {
 			if (this.worldFileName != null) {
 				log.info("loading world from " + this.worldFileName);
 				this.world = Gbl.getWorld();
-				final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
-				worldReader.readFile(this.worldFileName);
+				try {
+					new MatsimWorldReader(this.world).parse(this.worldFileName);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 			} else {
 				this.world = Gbl.getWorld();
 			}
@@ -108,7 +110,7 @@ public class ScenarioData {
 		return this.world;
 	}
 
-	public NetworkLayer getNetwork() {
+	public NetworkLayer getNetwork() throws RuntimeException {
 		if (!this.networkLoaded) {
 			getWorld(); // make sure the world is loaded
 			log.info("loading network from " + this.networkFileName);
@@ -118,7 +120,11 @@ public class ScenarioData {
 			}
 			this.network = new NetworkLayer(nf);	
 			
-			new MatsimNetworkReader(this.network).readFile(this.networkFileName);
+			try {
+				new MatsimNetworkReader(this.network).parse(this.networkFileName);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 			this.world.setNetworkLayer(this.network);
 			this.world.complete();
 			
@@ -142,13 +148,17 @@ public class ScenarioData {
 		return this.network;
 	}
 	
-	public Facilities getFacilities() {
+	public Facilities getFacilities() throws RuntimeException {
 		if (!this.facilitiesLoaded) {
 			if (this.facilitiesFileName != null) {
 				getWorld(); // make sure the world is loaded
 				log.info("loading facilities from " + this.facilitiesFileName);
 				this.facilities = (Facilities)this.world.createLayer(Facilities.LAYER_TYPE, null);
-				new MatsimFacilitiesReader(this.facilities).readFile(this.facilitiesFileName);
+				try {
+					new MatsimFacilitiesReader(this.facilities).parse(this.facilitiesFileName);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 			} else {
 				this.facilities = (Facilities)this.world.createLayer(Facilities.LAYER_TYPE, null);
 			}
@@ -158,7 +168,7 @@ public class ScenarioData {
 		return this.facilities;
 	}
 
-	public Population getPopulation() {
+	public Population getPopulation() throws RuntimeException {
 		if (!this.populationLoaded) {
 			this.population = new Population(Population.NO_STREAMING);
 			// make sure that world, facilities and network are loaded as well
@@ -167,8 +177,11 @@ public class ScenarioData {
 			getFacilities();
 
 			log.info("loading population from " + this.populationFileName);
-			PopulationReader plansReader = new MatsimPopulationReader(this.population);
-			plansReader.readFile(this.populationFileName);
+			try {
+				new MatsimPopulationReader(this.population).parse(this.populationFileName);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 			this.population.printPlansCount();
 
 			this.populationLoaded = true;
