@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.ArrayList;
@@ -35,16 +36,13 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicPopulationReaderV5Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testPopulation.xml";
 	
-
   private final Id id23 = new IdImpl("23");
   private final Id id24 = new IdImpl("24");
 //  private final Id id42 = new IdImpl("42");
@@ -55,7 +53,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
   private final Coord coord = new CoordImpl(0.0, 0.0);
   
 	public void testBasicParser() {
-		BasicPopulation population = new BasicPopulationImpl();
+		BasicPopulation<BasicPerson<BasicPlan>> population = new BasicPopulationImpl<BasicPerson<BasicPlan>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
 		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
@@ -75,6 +73,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		parser.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(pop);
 		BasicHouseholdsReaderV100Test hhTest = new BasicHouseholdsReaderV100Test();
+		hhTest.checkContent(households);
 	}
 	
 	private void createNetwork(NetworkLayer n) {
@@ -103,16 +102,16 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 				assertNull(act.getFacilityId());
 				assertNull(act.getLinkId());
 				assertNotNull(act.getCoord());
-				assertEquals(48.28d, act.getCoord().getX());
-				assertEquals(7.56d, act.getCoord().getY());
-				assertEquals(6.0*3600.0d, act.getEndTime());
+				assertEquals(48.28d, act.getCoord().getX(), EPSILON);
+				assertEquals(7.56d, act.getCoord().getY(), EPSILON);
+				assertEquals(6.0*3600.0d, act.getEndTime(), EPSILON);
 			}
 			else if (i == 1) {
 				assertEquals("w", act.getType());
 				assertNotNull(act.getFacilityId());
 				assertNull(act.getLinkId());
 				assertNull(act.getCoord());
-				assertEquals(12.0*3600.0d + 10.0 * 60.0d, act.getEndTime());
+				assertEquals(12.0*3600.0d + 10.0 * 60.0d, act.getEndTime(), EPSILON);
 			}
 			else if (i == 2) {
 				assertEquals("w", act.getType());
@@ -126,8 +125,8 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 				assertNull(act.getFacilityId());
 				assertNull(act.getLinkId());
 				assertNotNull(act.getCoord());
-				assertEquals(48.28d, act.getCoord().getX());
-				assertEquals(7.56d, act.getCoord().getY());
+				assertEquals(48.28d, act.getCoord().getX(), EPSILON);
+				assertEquals(7.56d, act.getCoord().getY(), EPSILON);
 			}
 			i++;
 		}
@@ -142,8 +141,8 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 				assertEquals(BasicLeg.Mode.car, leg.getMode());
 				assertNotNull(leg.getRoute());
 				route = leg.getRoute();
-				assertEquals(45.5d, route.getDist());
-				assertEquals(24.3d, route.getTravTime());
+				assertEquals(45.5d, route.getDist(), EPSILON);
+				assertEquals(24.3d, route.getTravTime(), EPSILON);
 				assertEquals(2, route.getLinkIds().size());
 				assertEquals(id23, route.getLinkIds().get(0));
 				assertEquals(id24, route.getLinkIds().get(1));
@@ -165,20 +164,3 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

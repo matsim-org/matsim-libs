@@ -19,7 +19,7 @@
     <income currency="eur" period="month">
       50000
     </income>
-    <language name="Schwitzerdütsch" /> 
+    <language name="german" /> 
   </household>
 
   <household id="24">

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.ArrayList;
@@ -26,10 +27,8 @@ import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.BasicIncome.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 
@@ -43,8 +42,6 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
   private final Id id45 = new IdImpl("45");
   private final Id id666 = new IdImpl("666");
   
-  
-  
 	public void testParser() {
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
 		BasicHouseholdsReaderV5 reader = new BasicHouseholdsReaderV5(households);
@@ -53,8 +50,7 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 		checkContent(households);
 	}
 
-
-	public void checkContent(List<BasicHousehold> households) {
+	public void checkContent(List<? extends BasicHousehold> households) {
 		assertEquals(2, households.size());
 		BasicHousehold hh = households.get(0);
 		assertNotNull(hh);
@@ -66,17 +62,17 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 		assertNotNull(hh.getBasicLocation());
 		assertNotNull(hh.getBasicLocation().getCoord());
 		assertNull(hh.getBasicLocation().getLocationId());
-		assertEquals(48.28d, hh.getBasicLocation().getCoord().getX());
-		assertEquals(7.56d, hh.getBasicLocation().getCoord().getY());
+		assertEquals(48.28d, hh.getBasicLocation().getCoord().getX(), EPSILON);
+		assertEquals(7.56d, hh.getBasicLocation().getCoord().getY(), EPSILON);
 	
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.month, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(50000.0d, hh.getIncome().getIncome());
+		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
 		
 		assertNotNull(hh.getLanguage());
-		assertEquals("Schwitzerdütsch", hh.getLanguage());
+		assertEquals("german", hh.getLanguage());
 		
 	
 		hh = households.get(1);
@@ -96,8 +92,8 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.day, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
-		assertEquals(1000.0d, hh.getIncome().getIncome());
-		
+		assertEquals(1000.0d, hh.getIncome().getIncome(), EPSILON);
+
 		assertNull(hh.getLanguage());
 	}
 }
