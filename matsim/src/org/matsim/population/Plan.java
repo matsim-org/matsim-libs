@@ -32,6 +32,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class Plan extends BasicPlanImpl {
@@ -54,28 +55,28 @@ public class Plan extends BasicPlanImpl {
 		this.person = person;
 	}
 
-	public final Act createAct(final String type, Coord coord) throws IllegalArgumentException {
+	public final Act createAct(final String type, final Coord coord) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalArgumentException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
 		}
 		Act a = new Act(type, coord);
 		this.actsLegs.add(a);
 		return a;
 	}
 
-	public final Act createAct(final String type, Facility fac) throws IllegalArgumentException {
+	public final Act createAct(final String type, final Facility fac) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalArgumentException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
 		}
 		Act a = new Act(type, fac);
 		this.actsLegs.add(a);
 		return a;
 	}
 
-	
-	public final Act createAct(final String type, final Link link) throws Exception {
+
+	public final Act createAct(final String type, final Link link) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new Exception("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
 		}
 		Act a = new Act(type, link);
 		this.actsLegs.add(a);
@@ -91,7 +92,7 @@ public class Plan extends BasicPlanImpl {
 	 */
   @Deprecated
 	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
-			 final String endTime, final String dur, final String isPrimary) throws Exception {
+			 final String endTime, final String dur, final String isPrimary) throws IllegalStateException {
 		Double xx = (x == null) ? null : Double.valueOf(x);
 		Double yy = (y == null) ? null : Double.valueOf(y);
 		verifyCreateAct(endTime);
@@ -105,13 +106,18 @@ public class Plan extends BasicPlanImpl {
 	 */
   @Deprecated
 	public final Act createAct(final String type, final double x, final double y, final Link link, final double startTime,
-			final double endTime, final double dur, final boolean isPrimary) throws Exception {
+			final double endTime, final double dur, final boolean isPrimary) throws IllegalStateException {
 		if (endTime == Time.UNDEFINED_TIME) {
 			verifyCreateAct(null);
 		} else {
 			verifyCreateAct(Double.toString(endTime));
 		}
-		Act a = new Act(type, x, y, link, startTime, endTime, dur, isPrimary);
+		Act a = new Act(type, link);
+		a.setCoord(new CoordImpl(x, y));
+		a.setStartTime(startTime);
+		a.setEndTime(endTime);
+		a.setDur(dur);
+		a.setPrimary(isPrimary);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -123,7 +129,7 @@ public class Plan extends BasicPlanImpl {
    */
 	@Deprecated
 	public final Leg createLeg(final String modestring, final String depTime, final String travTime,
-			 final String arrTime) throws Exception {
+			 final String arrTime) throws IllegalStateException {
 		BasicLeg.Mode mode;
 		if ("miv".equalsIgnoreCase(modestring))
 			mode = BasicLeg.Mode.miv;
@@ -148,7 +154,7 @@ public class Plan extends BasicPlanImpl {
 		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
 	}
 
-	public Leg createLeg(final BasicLeg.Mode mode) throws Exception {
+	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException {
 		verifyCreateLeg();
 		Leg leg = new Leg(mode);
 		// Override leg number with an appropriate value
@@ -162,7 +168,7 @@ public class Plan extends BasicPlanImpl {
 	 */
   @Deprecated
 	public final Leg createLeg(final BasicLeg.Mode mode, final double depTime, final double travTime,
-			 final double arrTime) throws Exception {
+			 final double arrTime) throws IllegalStateException {
 		Leg leg = createLeg(mode);
 		leg.setDepTime(depTime);
 		leg.setTravTime(travTime);
@@ -170,21 +176,18 @@ public class Plan extends BasicPlanImpl {
 		return leg;
 	}
 
-	private final void verifyCreateLeg() throws Exception {
+	private final void verifyCreateLeg() throws IllegalStateException {
 		if (this.actsLegs.size() % 2 == 0) {
-			throw new Exception("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
-		}
-		if ((this.actsLegs.size() > 1) && (((Act)this.actsLegs.get(this.actsLegs.size()-1)).getDur() == Integer.MIN_VALUE)) {
-			throw new Exception("All but the first and last 'act' must have a duration.");
+			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
 
-	private final void verifyCreateAct(final String end_time) throws Exception {
+	private final void verifyCreateAct(final String end_time) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new Exception("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
 		}
 		if ((this.actsLegs.size() == 0) && (end_time == null)) {
-			throw new Exception("The first 'act' has to have an end time.");
+			throw new IllegalStateException("The first 'act' has to have an end time.");
 		}
 	}
 
@@ -378,16 +381,16 @@ public class Plan extends BasicPlanImpl {
 	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.
 	 * @param leg the leg to insert
 	 * @param act the act to insert, following the leg
-	 * @throws Exception If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
+	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Act act) throws Exception {
+	public void insertLegAct(final int pos, final Leg leg, final Act act) throws IllegalArgumentException {
 		if (pos < this.actsLegs.size()) {
 			Object o = this.actsLegs.get(pos);
-			if ((o == null) || !(o instanceof Leg)) {
-				throw new Exception("Position to insert leg and act is not valid (act instead of leg at position).");
+			if (!(o instanceof Leg)) {
+				throw new IllegalArgumentException("Position to insert leg and act is not valid (act instead of leg at position).");
 			}
 		} else if (pos > this.actsLegs.size()) {
-			throw new Exception("Position to insert leg and act is not valid.");
+			throw new IllegalArgumentException("Position to insert leg and act is not valid.");
 		}
 
 		this.actsLegs.add(pos, act);
@@ -410,6 +413,18 @@ public class Plan extends BasicPlanImpl {
 		return null;
 	}
 
+	/**
+	 * Returns the leg following the specified act. <b>Important Note: </b> This method (together with
+	 * {@link #getNextActivity(Leg)}) has a very bad performance if it is used to iterate over all Acts and
+	 * Legs of a plan. In that case, it is advised to use one of the special iterators.
+	 *
+	 * @param act
+	 * @return The Leg following <tt>act</tt> in the plan, null if <tt>act</tt> is the last Act in the plan.
+	 *
+	 * @see #getIterator()
+	 * @see #getIteratorAct()
+	 * @see #getIteratorLeg()
+	 */
 	public Leg getNextLeg(final Act act) {
 		int index = this.getActLegIndex(act);
 		if ((index < this.actsLegs.size() - 1) && (index != -1)) {
@@ -418,6 +433,18 @@ public class Plan extends BasicPlanImpl {
 		return null;
 	}
 
+	/**
+	 * Returns the activity following the specified leg. <b>Important Note: </b> This method (together with
+	 * {@link #getNextLeg(Act)}) has a very bad performance if it is used to iterate over all Acts and Legs of
+	 * a plan. In that case, it is advised to use one of the special iterators.
+	 *
+	 * @param leg
+	 * @return The Act following <tt>leg</tt> in the plan.
+	 *
+	 * @see #getIterator()
+	 * @see #getIteratorAct()
+	 * @see #getIteratorLeg()
+	 */
 	public Act getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
