@@ -27,8 +27,8 @@ public class CoordImpl implements Serializable, Coord {
 
 	private static final long serialVersionUID = 1L;
 
-	private double x = 0.0;
-	private double y = 0.0;
+	private double x;
+	private double y;
 
 	public CoordImpl(final double x, final double y) {
 		this.x = x;
