@@ -21,22 +21,15 @@
 package playground.dressler.ea_flow;
 
 //java imports
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ListIterator;
 
 // other imports
-import playground.dressler.Intervall.src.Intervalls.*;
 
 // matsim imports
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.router.util.LeastCostPathCalculator;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
+
 /**
  * Class representing a path with flow over time on an network
  * @author Manuel Schneider
@@ -52,10 +45,16 @@ public class Path {
 	/**
 	 * the actual path in order from the sink
 	 */
-	private ArrayList<PathEdge> _edges;
+	private LinkedList<PathEdge> _edges;
 	
 	/**
-	 * Class representing a path with flow over time on an network
+	 * class variable to turn on debug mode, default is off
+	 */
+	@SuppressWarnings("unused")
+	private static boolean _debug = false;
+	
+	/**
+	 * Class representing an edge in a path with flow over time on an network
 	 * @author Manuel Schneider
 	 *
 	 */
@@ -76,11 +75,160 @@ public class Path {
 		 */
 		boolean forward;
 		
+		/**
+		 * default Constructor setting the Arguments
+		 * @param edge Link used
+		 * @param time starting time
+		 * @param forward flag if edge is forward or backward
+		 */
 		PathEdge(Link edge,int time, boolean forward){
 			this.time = time;
 			this.edge = edge;
 			this.forward = forward;
 		}
+		
+		/**
+		 * Mehtod returning a String representation of the PathEdge
+		 */
+		public String toString(){
+			if(!this.forward){
+				return (edge.getId().toString() + "time: " + this.time + "backwards!");
+			}
+			return (edge.getId().toString() + "time: " + this.time );
+		}
 	}
+	
+	/**
+	 * Default Constuctor creating a Path with flow value 0 and no edges
+	 */
+	public Path(){
+		this._flow = 0;
+		this._edges = new LinkedList<PathEdge>();
+	}
+	
+	/**
+	 * Method to append a new Edge to the end of the path with the specified input
+	 * @param edge Link used
+	 * @param time starting time
+	 * @param forward flag if edge is forward or backward
+	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te last edge in the path
+	 */
+	public void append(Link edge, int time, boolean forward){
+		//adding first PathEdge
+		if(this._edges.isEmpty()){
+			PathEdge temp =new PathEdge(edge, time, forward);
+			this._edges.addLast(temp);
+		}else{
+			PathEdge old = this._edges.getLast();
+			PathEdge temp =new PathEdge(edge, time, forward);
+			if(checkPair(old,temp)){
+				this._edges.addLast(temp);
+			}else{
+				throw new IllegalArgumentException("non adjacent last PathEdge: ... " + old.toString() + temp.toString() ); 
+			}
+		}
+	}
+	
+	/**
+	 * Method to push a new Edge to the beginning of the path with the specified input
+	 * @param edge Link used
+	 * @param time starting time
+	 * @param forward flag if edge is forward or backward
+	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
+	 */
+	public void push(Link edge, int time, boolean forward){
+		if(this._edges.isEmpty()){
+			PathEdge temp =new PathEdge(edge, time, forward);
+			this._edges.addFirst(temp);
+		}else{
+			PathEdge old = this._edges.getFirst();
+			PathEdge temp =new PathEdge(edge, time, forward);
+			if(checkPair(temp,old)){
+				this._edges.addFirst(temp);
+			}else{
+				throw new IllegalArgumentException("non adjacent first PathEdge:" + temp.toString() + old.toString()+"..." ); 
+			}
+		}
+	}
+	
+	/**
+	 * checks weather two edges are adjacent with respect to their direction used
+	 * does not account for valid times
+	 * @param first first edge in order traversion of the path
+	 * @param second second edge in order traversion of the path
+	 * @return true iff a path could go over first and over second immediatly after
+	 */
+	private static boolean checkPair(PathEdge first, PathEdge second){
+		Node node;
+		if(first.forward){
+			node = first.edge.getToNode();
+		}else{
+			node = first.edge.getFromNode();
+		}
+		if(second.forward){
+			return(node.equals(second.edge.getFromNode()));
+		}else{
+			return(node.equals(second.edge.getToNode()));
+		}
+	}
+	
+	/**
+	 * checks weather a path is consistent with respect to adjacency of its edges in the specified order, 
+	 * does not acount for valid times 
+	 * @return true iff refrenced Object describes a path
+	 */
+	public boolean check(){
+		ListIterator<PathEdge> iter = this._edges.listIterator();
+		PathEdge last = iter.next();
+		while(iter.hasNext()){
+			PathEdge next = iter.next();
+			if(!checkPair(last,next)){
+				return false;
+			}
+			last=next;
+		}
+		return true;
+	}
+	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(boolean debug){
+		Path._debug=debug;
+	}
+	
+	/**
+	 * returns a string representation of the Path
+	 */
+	public String toString(){
+		StringBuilder strb = new StringBuilder();
+		strb.append("flow:"+this._flow+" over: \n");
+		for (PathEdge edge : this._edges){
+			strb.append(" |" + edge.toString() + "| ");
+		}	
+		return strb.toString();
+	}
+	
+	/**
+	 * Setter for the ammount of flow on the path
+	 * @param flow nonnegative flow on the path
+	 * @exception throws an IllegalArgumentException iff flow is negative
+	 */
+	public void setFlow(int flow){
+		if(flow<0){
+			throw new IllegalArgumentException("negative flow value!");
+		}
+		this._flow = flow;
+	}
+	
+	/**
+	 * getter for the ammount of flow on a Path
+	 * @return flow on the Path
+	 */
+	public int getFlow(){
+		 return this._flow;
+	 }
+	
 
 }

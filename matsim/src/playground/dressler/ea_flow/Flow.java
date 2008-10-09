@@ -51,57 +51,65 @@ public class Flow {
 	 * between runs!
 	 */
 	private NetworkLayer network;
-
-	/**
-	 * The cost calculator. Provides the cost for each link and time step.
-	 */
-	private TravelCost costFunction;
-
-	/**
-	 * The travel time calculator. Provides the travel time for each link and
-	 * time step. This is ignored.
-	 */
-	 private TravelTime timeFunction;
 	
 	/**
-	 * Datastructure to to represent the flow on a network  
+	 * Edgerepresentation of flow on the network  
 	 */
 	private HashMap<Link, EdgeIntervalls> _flow;
 	
 	/**
-	 * Datastructure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
+	 * Pathrepresentation of flow on the network
 	 */
-	private HashMap<Node, VertexIntervalls> _labels;
+	private ArrayList _paths;
+	
 
 	/**
-	 * 
+	 * list of all sources
 	 */
 	private LinkedList<Node> _sources;
 	
 	/**
-	 * 
+	 * stores unsatisfied demands for each source
 	 */
 	private HashMap<Node,Integer> _demands;
-	
+
 	/**
-	 * 
+	 * the sink, to which all flow is directed
 	 */
-	private ArrayList _paths;
+	private Node _sink;
 	
 	/**
-	 * 
+	 * maximal time Horizon for the flow
 	 */
 	private int _timeHorizon;
 	
 	/**
 	 * 
+	 * @param network
+	 * @param flow
+	 * @param sources
+	 * @param demands
+	 * @param sink
+	 * @param horizon
 	 */
-	private int _gamma;
-	
+	public Flow(NetworkLayer network, HashMap<Link, EdgeIntervalls> flow, LinkedList<Node> sources, HashMap<Node, Integer> demands, Node sink, int horizon) {
+		this.network = network;
+		this._flow = flow;
+		this._paths = new ArrayList<Path>();
+		this._sources = _sources;
+		this._demands = demands;
+		this._sink = sink;
+		_timeHorizon = horizon;
+	}
+
 	/**
 	 * 
+	 * @param path
 	 */
-	private Node _sink;
-
+	public void augment(Path path){
+		
+	}
+	
+	
 	
 }
