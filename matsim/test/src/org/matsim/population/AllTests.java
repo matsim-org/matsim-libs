@@ -28,9 +28,10 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.population");
 
-		suite.addTestSuite(PersonTest.class);
 		suite.addTestSuite(ActTest.class);
 		suite.addTestSuite(DesiresTest.class);
+		suite.addTestSuite(PersonTest.class);
+		suite.addTestSuite(PlanTest.class);
 		suite.addTestSuite(KnowledgeTest.class);
 		suite.addTest(org.matsim.population.algorithms.AllTests.suite());
 		suite.addTest(org.matsim.population.filters.AllTests.suite());
