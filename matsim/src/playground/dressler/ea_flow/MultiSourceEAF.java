@@ -43,6 +43,8 @@ import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
  */
 public class MultiSourceEAF {
 	
+	
+	private boolean _debug = false;
 	/**
 	 * @param args blub
 	 */
@@ -83,7 +85,7 @@ public class MultiSourceEAF {
 			}
 		}*/
 		Node sink = network.getNode("5_zweite_sink");
-		
+		Path result;
 		if (source == null || sink == null) {
 			System.out.println("nicht da");
 		} else {
@@ -91,9 +93,11 @@ public class MultiSourceEAF {
 			TravelTime traveltime = (TravelTime) travelcost;
 
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(network, travelcost, traveltime, flow, timeHorizon,sink, sources);
-			routingAlgo.setDebugMode(true);
-			routingAlgo.doCalculations();
+			BellmanFordVertexIntervalls.debug(true);
+			result = routingAlgo.doCalculations();
+			System.out.println("path: " +  result);
 		}
+		
    	    System.out.println("... immer noch!\n");
 	}
 

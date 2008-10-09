@@ -23,14 +23,9 @@
  */
 package playground.dressler.Intervall.src.Intervalls;
 
-/**
- * java imports
- */
+
 import java.util.ArrayList;
 
-/**
- * matsim imports
- */
 import org.matsim.network.Link;
 
 /**
@@ -53,14 +48,9 @@ public class VertexIntervalls {
 	private VertexIntervall _last; 
 	
 	/**
-	 * 
+	 * flag for debug mode
 	 */
-	private int _demand=0;
-	
-	/**
-	 * 
-	 */
-	private boolean _source=false;
+	private static boolean _debug = false;
 	
 	
 	
@@ -81,18 +71,6 @@ public class VertexIntervalls {
 		_last = intervall;
 	}
 	
-	/**
-	 * Default Constructor Constructs an object containing only 
-	 * one EdgeIntervall [0,Integer.MAX_VALUE) with flow equal to 0
-	 */
-	public VertexIntervalls(int demand, boolean source){
-		VertexIntervall intervall = new VertexIntervall(0,Integer.MAX_VALUE);
-		_tree = new AVLTree();
-		_tree.insert(intervall);
-		_last = intervall;
-		_demand=demand;
-		_source=source;
-	}
 
 //------------------------SPLITTING--------------------------------//	
 	
@@ -223,6 +201,13 @@ public class VertexIntervalls {
 		return (_last.equals(o));
 	}
 	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(boolean debug){
+		VertexIntervalls._debug=debug;
+	}
 	
 	/**
 	 * gives the next VertexIntervall with respect ot the order contained 
@@ -258,6 +243,7 @@ public class VertexIntervalls {
 				return result;
 			}else{
 				result=this.getNext(result);
+				//TODO more effcient
 			}
 		}
 		if (result.getDist()){
@@ -266,6 +252,10 @@ public class VertexIntervalls {
 		return null;
 	}
 	
+	/**
+	 * calculates the where it is reachable 
+	 * @return min time or Integer.MAX_VALUE if it is not reachable at all
+	 */
 	public int firstPossibleTime(){
 		VertexIntervall test =this.getFirstPossible();
 		if(test!=null){
@@ -277,7 +267,7 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @param arrive
 	 * @return
 	 */
@@ -291,9 +281,9 @@ public class VertexIntervalls {
 		}
 		return changed;
 	}
-	//TODO comments
+	
 	/**
-	 * 
+	 * TODO
 	 * @param arrive
 	 * @param link
 	 * @return
@@ -310,7 +300,9 @@ public class VertexIntervalls {
 					test.setDist(true);
 					test.setPredecessor(link);
 					changed=true;
-					System.out.println("blub1");
+					if(VertexIntervalls._debug){
+						System.out.println("blub1");
+					}	
 				}else{
 					//upper part of test must be relabeld
 					if(test.getLowBound()<arrive.getLowBound()&& test.getHighBound()<=arrive.getHighBound()){
@@ -318,7 +310,9 @@ public class VertexIntervalls {
 						temp.setDist(true);
 						temp.setPredecessor(link);
 						changed=true;
-						System.out.println("blub2");
+						if(VertexIntervalls._debug){
+							System.out.println("blub2");
+						}
 					}else{
 						//lower part of test must be relabeld
 						if(test.getLowBound()>=arrive.getLowBound()&& test.getHighBound()>arrive.getHighBound()){
@@ -328,7 +322,9 @@ public class VertexIntervalls {
 							temp.setDist(true);
 							temp.setPredecessor(link);
 							changed=true;
-							System.out.println("blub3");
+							if(VertexIntervalls._debug){
+								System.out.println("blub3");
+							}
 							
 						}else{
 							//middle of tet must be relabeld
@@ -340,13 +336,13 @@ public class VertexIntervalls {
 								temp.setDist(true);
 								temp.setPredecessor(link);
 								changed=true;
-								System.out.println("blub4");
+								if(VertexIntervalls._debug){
+									System.out.println("blub4");
+								}
 							}
 						}
 					}
-					
 				}
-				
 			}
 			//pick next Intervall
 			if(Integer.MAX_VALUE==t){

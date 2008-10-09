@@ -43,7 +43,10 @@ public class EdgeIntervalls {
 	 */
 	private EdgeIntervall _last; 
 	
-	final int traveltime;
+	private final int _traveltime;
+	
+	@SuppressWarnings("unused")
+	private static boolean _debug =false;
 	
 	
 	
@@ -62,7 +65,7 @@ public class EdgeIntervalls {
 		_tree = new AVLTree();
 		_tree.insert(intervall);
 		_last = intervall;
-		this.traveltime=traveltime;
+		this._traveltime=traveltime;
 	}
 
 //------------------------SPLITTING--------------------------------//	
@@ -112,7 +115,9 @@ public class EdgeIntervalls {
 
 //------------------------------GETTER-----------------------//
 	
-	
+	public int getTravelTime(){
+		return _traveltime;
+	}
 
 	/**
 	 * Finds the EdgeIntervall containing t in the collection
@@ -194,7 +199,13 @@ public class EdgeIntervalls {
 		return (_last.equals(o));
 	}
 	
-	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(boolean debug){
+		EdgeIntervalls._debug=debug;
+	}
 	/**
 	 * gives the next EdgeIntervall with respect ot the order contained 
 	 * @param o schould be contained
@@ -252,7 +263,7 @@ public class EdgeIntervalls {
 	 * @return Edge Intervall [a,b] with f>0 a>=t-traveltime
 	 */
 	public EdgeIntervall minPossibleResidual(int t){
-		t=t-traveltime;
+		t=t-_traveltime;
 		t=Math.max(0, t);
 		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
 			if(((EdgeIntervall)_tree._curr.obj).getFlow()>0){
@@ -263,7 +274,7 @@ public class EdgeIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @param i
 	 * @param u
 	 * @param forward
@@ -287,7 +298,7 @@ public class EdgeIntervalls {
 				System.out.println("old j: " +j);
 				*/
 				if( i.intersects(j)){
-					j=i.Intersection(j).shiftPositive(traveltime);
+					j=i.Intersection(j).shiftPositive(_traveltime);
 					if(j!=null){
 						/*
 						System.out.println("i: " +i);
@@ -297,7 +308,7 @@ public class EdgeIntervalls {
 						result.add(j);
 					}	
 				}	
-			}//TODO implement backwards and comment
+			}//TODO comment
 		}
 		if(!forward){
 			while(t<max){
@@ -315,6 +326,7 @@ public class EdgeIntervalls {
 			}
 			
 		}
+		//unify different flow intervalls with positive capacity
 		if(!result.isEmpty()){
 			ArrayList<Intervall> temp= new ArrayList<Intervall>();
 			Intervall part= result.get(0);
@@ -331,7 +343,7 @@ public class EdgeIntervalls {
 			result=temp; 
 		}
 		return result;
-		//TODO unify different flow intervalls with positive capacity
+		
 	}
 	
 //------------------------Augmentation--------------------------------//

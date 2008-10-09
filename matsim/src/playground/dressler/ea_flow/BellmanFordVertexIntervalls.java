@@ -25,21 +25,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-// other imports
-import playground.dressler.Intervall.src.Intervalls.*;
-
-// matsim imports
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
-// import org.apache.log4j.Logger;
-// import org.matsim.utils.identifiers.IdI;
-// import org.matsim.basic.v01.Id;
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
+import playground.dressler.Intervall.src.Intervalls.Intervall;
+import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
+import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
+
 
 /**
  * Implementation of the Moore-Bellman-Ford Algorithm for a static network! i =
@@ -50,13 +46,9 @@ import org.matsim.router.util.TravelTime;
 
 
 public class BellmanFordVertexIntervalls {
-	// private final static Logger log =
-	// Logger.getLogger(MooreBellmanFord.class);
-
-	/* avoid numerical problems when doing comparisons ... */
-	// private double ACCURACY = 0.001;
+	
 	/**
-	 * The network on which we find routes. We expect the network to change
+	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
 	 */
 	final NetworkLayer network;
@@ -100,7 +92,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * 
 	 */
-	private int _timeHorizon;
+	private int _timehorizon;
 	
 	/**
 	 * 
@@ -120,7 +112,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * 
 	 */
-	private boolean debugmode=false;
+	private static boolean _debug=false;
 	
 	/**
 	 * Default constructor.
@@ -143,7 +135,7 @@ public class BellmanFordVertexIntervalls {
 		this.timeFunction = timeFunction;
 
 		this._flow = flow;
-		_timeHorizon = Integer.MAX_VALUE;
+		_timehorizon = Integer.MAX_VALUE;
 		_gamma = Integer.MAX_VALUE;
 		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
@@ -169,7 +161,7 @@ public class BellmanFordVertexIntervalls {
 		this.timeFunction = timeFunction;
 
 		this._flow = flow;
-		this._timeHorizon = timeHorizon;
+		this._timehorizon = timeHorizon;
 		this._gamma = Integer.MAX_VALUE;
 		this._sources = sources; 
 		this._sink = sink;
@@ -177,11 +169,11 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
-	 * @param debug
+	 * Setter for debug mode
+	 * @param debug true is debug mode is on
 	 */
-	public void setDebugMode(boolean debug){
-		this.debugmode = debug;
+	public static void debug(boolean debug){
+		BellmanFordVertexIntervalls._debug = debug;
 	}
 	
 	/**
@@ -212,16 +204,56 @@ public class BellmanFordVertexIntervalls {
 		}
 		return false;
 		
-		//TODO nonactive sources
+		//TODO nonactive sources or move to flow
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	private Path constructRoute(){
-		// TODO Auto-generated method stub
-		return null;
+	private Path constructRoute()throws BFException{
+		Node to = _sink;
+		VertexIntervalls tolabels = this._labels.get(to);
+		int totime = tolabels.firstPossibleTime();
+		//check if path can be constructed
+		if(Integer.MAX_VALUE==totime){
+			throw new BFException("sink can not be reached!");
+		}
+		//start constructing the path
+		Path path = new Path();
+		path.setArrival(totime);
+		VertexIntervall tolabel = tolabels.getIntervallAt(totime);
+		while(tolabel.getPredecessor()!=null){
+			Link edge = tolabel.getPredecessor();
+			//findout weather forward or backwards edge is used
+			boolean forward;
+			if(edge.getFromNode().equals(to)){
+				forward = false;
+			}else{
+				if(edge.getToNode().equals(to)){
+					forward = true;
+				}else{
+					throw new IllegalArgumentException("edge: " + edge.getId().toString()+ " is not incident to node: "+ to.getId().toString());
+				}
+			}
+			//find next node and edge
+			int fromtime;
+			if(forward){
+				fromtime = (totime-_flow.get(edge).getTravelTime());
+				path.push(edge, fromtime, forward);
+				to= edge.getFromNode();
+			}else{
+				fromtime = (totime+_flow.get(edge).getTravelTime());
+				path.push(edge, fromtime, forward);
+				to =edge.getToNode();
+			}
+			tolabels = this._labels.get(to);
+			totime= fromtime;
+			tolabel = tolabels.getIntervallAt(totime);
+		}
+		
+		
+		return path;
 	}
 	
 	
@@ -244,16 +276,18 @@ public class BellmanFordVertexIntervalls {
 			i = labelfrom.getIntervallAt(t);
 			t=i.getHighBound();
 			if(i.getDist()){
-				//System.out.println("wir kommen los");
+				if(_debug){
+					System.out.println("wir kommen los");
+				}	
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
-					/*
-					System.out.println("wir kommen weiter");
-					for(Intervall inter: arrive){
-						System.out.println(forward);
-						System.out.println(inter);
+					if(_debug){
+						System.out.println("wir kommen weiter");
+						for(Intervall inter: arrive){
+							System.out.println(forward);
+							System.out.println(inter);
+						}
 					}
-					*/
 					boolean temp = labelto.setTrue( arrive , over );
 					if(temp){
 						changed = true;
@@ -269,15 +303,6 @@ public class BellmanFordVertexIntervalls {
 	 * @return
 	 */
 	public Path doCalculations() {
-		// outprints
-		/*
-		 * for (Link link : network.getLinks().values()) {
-		 * System.out.println("(" + link.getFromNode().getId() + ", " +
-		 * link.getToNode().getId() + ") hat Laenge " +
-		 * length.getLinkTravelCost(link, 0.)); }
-		 */
-
-		
 		// queue to save nodes we have to scan
 		Queue<Node> queue = new LinkedList<Node>();
 		//set the startLabels and add active sources to to the queue
@@ -312,13 +337,21 @@ public class BellmanFordVertexIntervalls {
 					queue.add(w);
 				}
 			}
-			if(this.debugmode){
+			if(_debug){
 				printStatus();
 			}
 		}
 		System.out.println("finale labels: \n");
 		printStatus();
-		return null; //TODO whatever should be returned
+		Path path = null;
+		try{ 
+			path = constructRoute();
+		}catch (BFException e){
+			System.out.println(e.getMessage());
+			//TODO better handling
+		}
+		return path;
+		
 	}
 
 	/**

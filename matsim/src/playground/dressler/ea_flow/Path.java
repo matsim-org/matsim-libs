@@ -47,9 +47,12 @@ public class Path {
 	 */
 	private LinkedList<PathEdge> _edges;
 	
+	private int _arrival;
+	
 	/**
 	 * class variable to turn on debug mode, default is off
 	 */
+	
 	@SuppressWarnings("unused")
 	private static boolean _debug = false;
 	
@@ -92,9 +95,9 @@ public class Path {
 		 */
 		public String toString(){
 			if(!this.forward){
-				return (edge.getId().toString() + "time: " + this.time + "backwards!");
+				return (edge.getId().toString() + " t: " + this.time + "backwards!");
 			}
-			return (edge.getId().toString() + "time: " + this.time );
+			return (edge.getId().toString() + " t: " + this.time );
 		}
 	}
 	
@@ -124,7 +127,7 @@ public class Path {
 			if(checkPair(old,temp)){
 				this._edges.addLast(temp);
 			}else{
-				throw new IllegalArgumentException("non adjacent last PathEdge: ... " + old.toString() + temp.toString() ); 
+				throw new IllegalArgumentException("non adjacent last PathEdge: ... " + old.toString() +" "+ temp.toString() ); 
 			}
 		}
 	}
@@ -166,10 +169,11 @@ public class Path {
 			node = first.edge.getFromNode();
 		}
 		if(second.forward){
-			return(node.equals(second.edge.getFromNode()));
+			return(node==second.edge.getFromNode());
 		}else{
-			return(node.equals(second.edge.getToNode()));
+			return(node==second.edge.getToNode());
 		}
+		
 	}
 	
 	/**
@@ -199,14 +203,15 @@ public class Path {
 	}
 	
 	/**
-	 * returns a string representation of the Path
+	 * returns a String representation of the Path
 	 */
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
-		strb.append("flow:"+this._flow+" over: \n");
+		strb.append("f: "+this._flow+" on: ");
 		for (PathEdge edge : this._edges){
 			strb.append(" |" + edge.toString() + "| ");
 		}	
+		strb.append("arrivaltime: " + _arrival);
 		return strb.toString();
 	}
 	
@@ -230,5 +235,20 @@ public class Path {
 		 return this._flow;
 	 }
 	
+	/**
+	 * setting the arrival time at the final node
+	 * @param time
+	 */
+	public void setArrival(int time){
+		this._arrival = time;
+	}
+	
+	/**
+	 * getter for arrival time if it is set
+	 * @return arrivel time
+	 */
+	public int getArrival(){
+		return this._arrival;
+	}
 
 }

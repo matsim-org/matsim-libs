@@ -60,7 +60,7 @@ public class Flow {
 	/**
 	 * Pathrepresentation of flow on the network
 	 */
-	private ArrayList _paths;
+	private LinkedList _paths;
 	
 
 	/**
@@ -83,6 +83,8 @@ public class Flow {
 	 */
 	private int _timeHorizon;
 	
+	private static boolean _debug = false;
+	
 	/**
 	 * 
 	 * @param network
@@ -95,7 +97,7 @@ public class Flow {
 	public Flow(NetworkLayer network, HashMap<Link, EdgeIntervalls> flow, LinkedList<Node> sources, HashMap<Node, Integer> demands, Node sink, int horizon) {
 		this.network = network;
 		this._flow = flow;
-		this._paths = new ArrayList<Path>();
+		this._paths = new LinkedList<Path>();
 		this._sources = _sources;
 		this._demands = demands;
 		this._sink = sink;
@@ -110,6 +112,12 @@ public class Flow {
 		
 	}
 	
-	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(boolean debug){
+		Flow._debug=debug;
+	}
 	
 }
