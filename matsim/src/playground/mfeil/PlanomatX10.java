@@ -68,11 +68,11 @@ public class PlanomatX10 implements org.matsim.population.algorithms.PlanAlgorit
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		router 					= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		scorer 					= new PlanomatXPlanScorer (factory);
-		NEIGHBOURHOOD_SIZE 		= 20;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
+		NEIGHBOURHOOD_SIZE 		= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		WEIGHT_CHANGE_ORDER 	= 0.2; 
 		WEIGHT_CHANGE_NUMBER 	= 0.6;
 		WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		MAX_ITERATIONS 			= 100;
+		MAX_ITERATIONS 			= 10;
 	}
 	
 		

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX9.java
+ * PlanomatX11.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -44,12 +44,13 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * This is the current standard version. It features 
- * Storing of all calculated solutions so that they can be retrieved in later iterations without recalculation
- * Prevention from creating same solutions within the same neighbourhood by cycling neighbourhood creation
+ * This is the current standard version and identical to PlanomatX9 except for that 
+ * the notNewInNeighbourhood check is dropped as this case can apparently happen 
+ * only in very rare and special cases but not in realistic ones. Runtime performance
+ * is not affected within measurable scale.
  */
 
-public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX11 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -57,13 +58,13 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 	private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX9.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX11.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX9 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX11 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
 		planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
@@ -73,7 +74,7 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 		WEIGHT_CHANGE_ORDER 	= 0.2; 
 		WEIGHT_CHANGE_NUMBER 	= 0.6;
 		WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		MAX_ITERATIONS 			= 10;
+		MAX_ITERATIONS 			= 100;
 	}
 	
 		
@@ -105,7 +106,7 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 		ArrayList<PlanomatXPlan> solution11 			= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
-		boolean warningNoNew, warningTabu;
+		boolean warningTabu;
 		double [] xs;
 		double [] ys = new double [MAX_ITERATIONS];
 		
@@ -151,14 +152,6 @@ public class PlanomatX9 implements org.matsim.population.algorithms.PlanAlgorith
 			
 			// Define the neighbourhood
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood);	
-			
-			// Check whether neighbourhood plans differ from current plan
-			warningNoNew = this.checkForNoNewSolutions(notNewInNeighbourhood);
-
-			if (warningNoNew) {
-				log.info("No new solutions availabe for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
-				break; 
-			}
 			
 			// Check whether differing plans are tabu
 			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, notNewInNeighbourhood, tabuInNeighbourhood);

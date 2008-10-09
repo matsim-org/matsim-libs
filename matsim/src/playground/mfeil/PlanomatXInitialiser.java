@@ -71,7 +71,7 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX9 (this.estimator, this.network, this.travelCostCalc, 
+		planomatXAlgorithm =  new PlanomatX11 (this.estimator, this.network, this.travelCostCalc, 
 				this.travelTimeCalc, this.preProcessRoutingData, this.factory);
 
 		return planomatXAlgorithm;
