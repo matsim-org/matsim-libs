@@ -26,7 +26,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.ResizableArray;
-import org.matsim.utils.misc.Time;
 
 /**
  * @author laemmel
@@ -40,9 +39,11 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+
 	private final double flowCapacity;
 
 	private final double freespeedTravelTime;
+
 
 	protected String type = null;
 
@@ -65,7 +66,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		super.capacity = capacity;
 		super.permlanes = lanes;
 
-		this.freespeedTravelTime = this.getLength()	/ this.getFreespeed(Time.UNDEFINED_TIME);
+		this.freespeedTravelTime = length / freespeed;
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
 
 		this.euklideanDist = this.from.getCoord().calcDistance(this.to.getCoord());

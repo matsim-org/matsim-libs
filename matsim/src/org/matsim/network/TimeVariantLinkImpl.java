@@ -20,13 +20,12 @@
 
 package org.matsim.network;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.utils.collections.gnuclasspath.TreeMap;
 
 /**
  * @author laemmel
@@ -39,27 +38,33 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private List<NetworkChangeEvent> changeEvents;
 	
-	private TreeMap<Double, Double> freespeedValues;
+	private TreeMap<Double,NetworkChangeEvent> changeEvents;
 	
-	private TreeMap<Double, Double> flowCapacityValues;
 	
-	private TreeMap<Double, Double> lanesValues;
 	
-	/* TODO [MR,GL] instead of these "foreign" TreeMap's, why not use two simple arrays of doubles per
-	 * TreeMap, one to store the time ("key"), the other to store the actual values. Then, one could
-	 * access the value-array with Arrays.binarySearch(). BinarySearch and TreeMap both use O(log n) for
-	 * finding the corresponding value, but for the TreeMap, a multitude of auto-boxing- and -unboxing-
-	 * operations need to be executed, making it probably slow. One needs to test/benchmark this first,
-	 * but it could be a possibility for further optimizations. -marcel/06may2008 
-	 */
+	private int aFreespeedEvents = 1;
+	private double [] aFreespeedValues;
+	private double [] aFreespeedTimes;
+	
+	private int aFlowCapacityEvents = 1;
+	private double [] aFlowCapacityValues;
+	private double [] aFlowCapacityTimes;
+	
+	
+	
+	private int aLanesEvents = 1;
+	private double [] aLanesValues;
+	private double [] aLanesTimes;
+	
+	
+	
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeVariantLinkImpl(Id id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes) {
+	public TimeVariantLinkImpl(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
@@ -68,37 +73,41 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 *
 	 * @param event a network change event.
 	 */
-	protected void applyEvent(NetworkChangeEvent event) {
-		if(changeEvents == null)
-			this.changeEvents = new LinkedList<NetworkChangeEvent>();
+	protected void applyEvent(final NetworkChangeEvent event) {
+		if(this.changeEvents == null)
+			this.changeEvents = new TreeMap<Double,NetworkChangeEvent>();
 		
-		this.changeEvents.add(event);
+		this.changeEvents.put(event.getStartTime(), event);
+		
+		
 		/*
-		 * Invalidate all value maps, so that they will be re-initialized on
+		 * Increment the arrays size, so that they will be re-initialized on
 		 * next access.
 		 */
 		if (event.getFreespeedChange() != null) {
-			this.freespeedValues = null;
+			this.aFreespeedEvents++;
 		}
 		if (event.getFlowCapacityChange() != null) {
-			this.flowCapacityValues = null;
+			this.aFlowCapacityEvents++;
 		}
 		if (event.getLanesChange() != null) {
-			this.lanesValues = null;
+			this.aLanesEvents++;
 		}
 	}
+
+
 
 	/**
 	 * Removes all NetworkChangeEvents so that the link's attributes will be
 	 * reset to their initial values.
 	 */
 	protected void clearEvents() {
-		if(changeEvents != null)
+		if(this.changeEvents != null)
 			this.changeEvents.clear();
 	
-		freespeedValues = null;
-		flowCapacityValues = null;
-		lanesValues = null;
+		this.aFreespeedEvents = 1;
+		this.aFlowCapacityEvents = 1;
+		this.aLanesEvents = 1;
 	}
 	
 	/**
@@ -107,18 +116,26 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the freespeed at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFreespeed(double time) {
-		if (freespeedValues == null)
-			initFreespeedValueMap();
-		return freespeedValues.floorEntry(time).getValue();
+	public double getFreespeed(final double time) {
+		
+		if (this.aFreespeedTimes == null || this.aFreespeedTimes.length != this.aFreespeedEvents) {
+			initFreespeedEventsArrays();
+		}
+		
+		int key = Arrays.binarySearch(this.aFreespeedTimes, time);
+		key = key >= 0 ? key : -key - 2;
+		return this.aFreespeedValues[key];
+		
 	}
+
+
 
 	/**
 	 * @param time - the time in seconds.
 	 * @return the freespeed travel time at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFreespeedTravelTime(double time) {
+	public double getFreespeedTravelTime(final double time) {
 		return getLength()/getFreespeed(time);
 	}
 
@@ -127,11 +144,16 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
 	@Override
-	public double getFlowCapacity(double time) {
-		if (this.flowCapacityValues == null)
-			initFlowCapacityValueMap();
-
-		return this.flowCapacityValues.floorEntry(time).getValue();
+	public double getFlowCapacity(final double time) {
+		
+		if (this.aFlowCapacityTimes == null || this.aFlowCapacityTimes.length != this.aFlowCapacityEvents) {
+			initFlowCapacityEventsArrays();
+		}
+		
+		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
+		key = key >= 0 ? key : -key - 2;
+		return this.aFlowCapacityValues[key];
+		
 	}
 	
 	
@@ -143,12 +165,19 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the capacity per network's capperiod timestep
 	 */
 	@Override
-	public double getCapacity(double time) {
-		if (this.flowCapacityValues == null) {
-			initFlowCapacityValueMap();
+	public double getCapacity(final double time) {
+	
+		if (this.aFlowCapacityTimes == null || this.aFlowCapacityTimes.length != this.aFlowCapacityEvents) {
+			initFlowCapacityEventsArrays();
 		}
+		
+		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
+		key = key >= 0 ? key : -key - 2;
+		
 		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-		return this.flowCapacityValues.floorEntry(time).getValue() * capacityPeriod;
+		return this.aFlowCapacityValues[key] * capacityPeriod;
+
+		
 	}
 
 
@@ -163,11 +192,17 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * encode the (min) width of the link to calculate the flow capacity - [GL] 13may08
 	 */
 	@Override
-	public double getLanes(double time) {
-		if (this.lanesValues == null)
-			initLanesValueMap();
+	public double getLanes(final double time) {
 		
-		return this.lanesValues.floorEntry(time).getValue();
+		
+		if (this.aLanesTimes == null || this.aLanesTimes.length != this.aLanesEvents) {
+			initLanesEventsArrays();
+		}
+		
+		int key = Arrays.binarySearch(this.aLanesTimes, time);
+		key = key >= 0 ? key : -key - 2;
+		return this.aLanesValues[key];
+		
 	}
 
 	/**
@@ -180,91 +215,110 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * could mark this method as deprecated [GL] - 13may2008   
 	 */
 	@Override
-	public int getLanesAsInt(double time) {
-		if (this.lanesValues == null)
-			initLanesValueMap();
+	public int getLanesAsInt(final double time) {
 		
-		return Math.round((float)Math.max(this.lanesValues.floorEntry(time).getValue(),1.0d));
+		if (this.aLanesTimes == null || this.aLanesTimes.length != this.aLanesEvents) {
+			initLanesEventsArrays();
+		}
+		
+		int key = Arrays.binarySearch(this.aLanesTimes, time);
+		key = key >= 0 ? key : -key - 2;
+		return Math.round((float)Math.max(this.aLanesValues[key],1.0d));
+		
 	}
 
-	private void initFreespeedValueMap() {
-		freespeedValues = new TreeMap<Double, Double>();
-		/*
-		 * Make sure that there is at least the initial value in the map. Use
-		 * Double.NEGATIVE_INFINITY to be sure that the initial value is ALWAYS
-		 * associated with the lowest key!
-		 */
-		freespeedValues.put(Double.NEGATIVE_INFINITY, this.freespeed);
+	
+	
+	private void initFreespeedEventsArrays() {
 		
-		if (changeEvents != null) {
-			for (NetworkChangeEvent event : changeEvents) {
+		this.aFreespeedTimes = new double [this.aFreespeedEvents];
+		this.aFreespeedValues = new double [this.aFreespeedEvents];
+		this.aFreespeedTimes[0] = Double.NEGATIVE_INFINITY;
+		this.aFreespeedValues[0] = this.freespeed;
+
+		int numEvent = 0;
+		if (this.changeEvents != null) {
+			for (NetworkChangeEvent event : this.changeEvents.values()) {
 				ChangeValue value = event.getFreespeedChange();
 				if (value != null) {
 					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = getFreespeed(event.getStartTime());
-						this.freespeedValues.put(event.getStartTime(),
-								currentValue * value.getValue());
+						double currentValue = this.aFreespeedValues[numEvent]; 
+						this.aFreespeedValues[++numEvent] = currentValue * value.getValue();
+						this.aFreespeedTimes[numEvent] = event.getStartTime();
 					} else {
-						this.freespeedValues.put(event.getStartTime(), value
-								.getValue());
+						this.aFreespeedValues[++numEvent] = value.getValue();
+						this.aFreespeedTimes[numEvent] = event.getStartTime();
 					}
 				}
 			}
 		}
+		
+		if (numEvent != this.aFreespeedEvents - 1) {
+			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
+		}
+		
 	}
 	
-	private void initFlowCapacityValueMap() {
-		flowCapacityValues = new TreeMap<Double, Double>();
-		/*
-		 * Make sure that there is at least the initial value in the map. Use
-		 * Double.NEGATIVE_INFINITY to be sure that the initial value is ALWAYS
-		 * associated with the lowest key!
-		 */
-
-		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
-		flowCapacityValues.put(Double.NEGATIVE_INFINITY, capacity / capacityPeriod);
+	private void initFlowCapacityEventsArrays() {
 		
-		if (changeEvents != null) {
-			for (NetworkChangeEvent event : changeEvents) {
+		this.aFlowCapacityTimes = new double [this.aFlowCapacityEvents];
+		this.aFlowCapacityValues = new double [this.aFlowCapacityEvents];
+		this.aFlowCapacityTimes[0] = Double.NEGATIVE_INFINITY;
+		int capacityPeriod = ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		this.aFlowCapacityValues[0] = this.capacity / capacityPeriod;
+
+		int numEvent = 0;
+		if (this.changeEvents != null) {
+			for (NetworkChangeEvent event : this.changeEvents.values()) {
 				ChangeValue value = event.getFlowCapacityChange();
 				if (value != null) {
 					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = getFlowCapacity(event.getStartTime());
-						this.flowCapacityValues.put(event.getStartTime(),
-								currentValue * value.getValue());
+						double currentValue = this.aFlowCapacityValues[numEvent]; 
+						this.aFlowCapacityValues[++numEvent] = currentValue * value.getValue();
+						this.aFlowCapacityTimes[numEvent] = event.getStartTime();
 					} else {
-						this.flowCapacityValues.put(event.getStartTime(), value
-								.getValue());
+						this.aFlowCapacityValues[++numEvent] = value.getValue();
+						this.aFlowCapacityTimes[numEvent] = event.getStartTime();
 					}
 				}
 			}
 		}
+		
+		if (numEvent != this.aFlowCapacityEvents - 1) {
+			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
+		}
+		
 	}
 	
-	private void initLanesValueMap() {
-		lanesValues = new TreeMap<Double, Double>();
-		/*
-		 * Make sure that there is at least the initial value in the map. Use
-		 * Double.NEGATIVE_INFINITY to be sure that the initial value is ALWAYS
-		 * associated with the lowest key!
-		 */
-		lanesValues.put(Double.NEGATIVE_INFINITY, permlanes);
+	private void initLanesEventsArrays() {
 		
-		if (changeEvents != null) {
-			for (NetworkChangeEvent event : changeEvents) {
+		this.aLanesTimes = new double [this.aLanesEvents];
+		this.aLanesValues = new double [this.aLanesEvents];
+		this.aLanesTimes[0] = Double.NEGATIVE_INFINITY;
+		this.aLanesValues[0] = this.permlanes;
+
+		int numEvent = 0;
+		if (this.changeEvents != null) {
+			for (NetworkChangeEvent event : this.changeEvents.values()) {
 				ChangeValue value = event.getLanesChange();
 				if (value != null) {
 					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = getLanes(event.getStartTime());
-						this.lanesValues.put(event.getStartTime(),
-								currentValue * value.getValue());
+						double currentValue = this.aLanesValues[numEvent]; 
+						this.aLanesValues[++numEvent] = currentValue * value.getValue();
+						this.aLanesTimes[numEvent] = event.getStartTime();
 					} else {
-						this.lanesValues.put(event.getStartTime(), value
-								.getValue());
+						this.aLanesValues[++numEvent] = value.getValue();
+						this.aLanesTimes[numEvent] = event.getStartTime();
 					}
 				}
 			}
 		}
-	}
 		
+		if (numEvent != this.aLanesEvents - 1) {
+			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
+		}
+		
+	}
+
 }
+

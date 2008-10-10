@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.utils.collections.Tuple;
-import org.matsim.utils.collections.gnuclasspath.TreeMap;
 
+import playground.gregor.collections.gnuclasspath.TreeMap;
 import playground.johannes.graph.GraphProjection;
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.VertexDecorator;
@@ -52,94 +52,94 @@ public class Sampler {
 	
 	private Set<SampledVertex> egos;
 	
-	private GraphProjection<SampledGraph, SampledVertex, SampledEdge> projection;
+	private final GraphProjection<SampledGraph, SampledVertex, SampledEdge> projection;
 	
-	private Random random;
+	private final Random random;
 	
-	private SampledGraph graph;
+	private final SampledGraph graph;
 	
 	private double responseRate;
 	
-	private TIntArrayList numSampledVertices;
+	private final TIntArrayList numSampledVertices;
 	
 	private int maxNumSamples;
 	
-	public Sampler(SampledGraph g, long randomSeed) {
-		graph = g;
-		random = new Random(randomSeed);
-		graph.reset();
-		iteration = -1;
-		egos = new HashSet<SampledVertex>();
-		projection = new GraphProjection<SampledGraph, SampledVertex, SampledEdge>(g);
-		numSampledVertices = new TIntArrayList();
-		responseRate = 1;
-		maxNumSamples = Integer.MAX_VALUE;
+	public Sampler(final SampledGraph g, final long randomSeed) {
+		this.graph = g;
+		this.random = new Random(randomSeed);
+		this.graph.reset();
+		this.iteration = -1;
+		this.egos = new HashSet<SampledVertex>();
+		this.projection = new GraphProjection<SampledGraph, SampledVertex, SampledEdge>(g);
+		this.numSampledVertices = new TIntArrayList();
+		this.responseRate = 1;
+		this.maxNumSamples = Integer.MAX_VALUE;
 	}
 	
-	public void setResponseRate(double p) {
-		responseRate = p;
+	public void setResponseRate(final double p) {
+		this.responseRate = p;
 	}
 	
-	public void setNumMaxSamples(int maxNumSamples) {
+	public void setNumMaxSamples(final int maxNumSamples) {
 		this.maxNumSamples = maxNumSamples;
 	}
 	
 	public double getResponseRate() {
-		return responseRate;
+		return this.responseRate;
 	}
 	
 	public int getIteration() {
-		return iteration;
+		return this.iteration;
 	}
 	
 	public GraphProjection<SampledGraph, SampledVertex, SampledEdge> getProjection() {
-		return projection;
+		return this.projection;
 	}
 	
 	public Set<SampledVertex> getEgos() {
-		return egos;
+		return this.egos;
 	}
 	
-	public int getNumSampledVertices(int it) {
-		if (numSampledVertices.size() <= it || it < 0) {
+	public int getNumSampledVertices(final int it) {
+		if (this.numSampledVertices.size() <= it || it < 0) {
 			return 0;
 		}
-		return numSampledVertices.get(it);
+		return this.numSampledVertices.get(it);
 	}
 	
-	public Set<SampledVertex> drawRandomSeedVertices(int numSeeds) {
-		for(SampledVertex v : graph.getVertices()) {
-			random.nextDouble();
-			if(random.nextDouble() > responseRate) {
+	public Set<SampledVertex> drawRandomSeedVertices(final int numSeeds) {
+		for(SampledVertex v : this.graph.getVertices()) {
+			this.random.nextDouble();
+			if(this.random.nextDouble() > this.responseRate) {
 				v.setIsNonResponding(true);
 			}
 		}
 		
-		List<SampledVertex> vertices = new LinkedList<SampledVertex>(graph.getVertices());
-		Collections.shuffle(vertices, random);
-		egos = new HashSet<SampledVertex>();
+		List<SampledVertex> vertices = new LinkedList<SampledVertex>(this.graph.getVertices());
+		Collections.shuffle(vertices, this.random);
+		this.egos = new HashSet<SampledVertex>();
 		for(SampledVertex v : vertices) {
 			if(!v.isNonResponding()) {
-				egos.add(v);
-				if(egos.size() == numSeeds)
+				this.egos.add(v);
+				if(this.egos.size() == numSeeds)
 					break;
 			}
 		}
-		for(SampledVertex v : egos) {
+		for(SampledVertex v : this.egos) {
 			v.detect(0);
-			v.setProjection(projection.addVertex(v));
+			v.setProjection(this.projection.addVertex(v));
 		}
-		return egos;
+		return this.egos;
 	}
 	
 	public void runIteration() {
-		int n = getNumSampledVertices(iteration);
-		iteration++;
+		int n = getNumSampledVertices(this.iteration);
+		this.iteration++;
 		Set<SampledVertex> alters = new HashSet<SampledVertex>();
 		
 		
-		for(SampledVertex v : egos) {
-			if(iteration == 0) {
+		for(SampledVertex v : this.egos) {
+			if(this.iteration == 0) {
 				alters.addAll(expand(v));
 				n++;
 			} else {
@@ -149,36 +149,36 @@ public class Sampler {
 					n++;
 				}
 			}
-			if(n >= maxNumSamples)
+			if(n >= this.maxNumSamples)
 				break;
 		}
 		
-		egos = alters;
+		this.egos = alters;
 		
 //		int n = 0;
 //		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
 //			if (v.getDelegate().isSampled())
 //				n++;
 //		}
-		numSampledVertices.add(n);
+		this.numSampledVertices.add(n);
 		
 		calcNormalizedVertexWeights();
 	}
 	
-	private Set<SampledVertex> expand(SampledVertex ego) {
-		ego.sample(iteration);
+	private Set<SampledVertex> expand(final SampledVertex ego) {
+		ego.sample(this.iteration);
 		
 		HashSet<SampledVertex> alters = new HashSet<SampledVertex>();
 		for(SampledEdge e : ego.getEdges()) {
 			SampledVertex alter = e.getOpposite(ego);
 			if(alter.isSampled() || alter.isDetected()) {
 				if(e.getProjection() == null) {
-					e.setProjection(projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+					e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
 				}	
 			} else {
-				alter.detect(iteration);
-				alter.setProjection(projection.addVertex(alter));
-				e.setProjection(projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+				alter.detect(this.iteration);
+				alter.setProjection(this.projection.addVertex(alter));
+				e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
 				alters.add(alter);
 			}
 		}
@@ -191,16 +191,16 @@ public class Sampler {
 		
 		double wsum = 0;
 		double frac = 0;
-		if(iteration == 0 )
-			frac = egos.size() / (double)graph.getVertices().size();
+		if(this.iteration == 0 )
+			frac = this.egos.size() / (double)this.graph.getVertices().size();
 		else
-			frac = getNumSampledVertices(iteration - 1)/(double)graph.getVertices().size();
+			frac = getNumSampledVertices(this.iteration - 1)/(double)this.graph.getVertices().size();
 		
-		for(VertexDecorator<SampledVertex> v : projection.getVertices()) {
+		for(VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
 			if(v.getDelegate().isSampled()) {
 				vList.add(v.getDelegate());
 				double p = 1;
-				if(iteration == 0)
+				if(this.iteration == 0)
 					p = frac; 
 				else {
 					p = 1 - Math.pow(1 - frac, v.getEdges().size());
@@ -212,7 +212,7 @@ public class Sampler {
 		double norm = vList.size() / wsum;
 		for(SampledVertex v : vList) {
 			double p = 1;
-			if(iteration == 0)
+			if(this.iteration == 0)
 				p = frac;
 			else
 				p = 1 - Math.pow(1 - frac, v.getEdges().size());
@@ -231,18 +231,18 @@ public class Sampler {
 		int n_sampled = 0;
 		TreeMap<Integer, Integer> n_neighbour_k = getNumNeighbourK();
 		TreeMap<Tuple<Integer, Integer>, Integer> neighbourMatrix = getNeighbourMatrix();
-		double N = graph.getVertices().size();
-		int n = getNumSampledVertices(iteration - 1);
+		double N = this.graph.getVertices().size();
+		int n = getNumSampledVertices(this.iteration - 1);
 		
-		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
+		for (VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
 			if (v.getDelegate().isSampled()) {
 				int k1 = v.getEdges().size();
-				if (iteration == 0) {
-					p = egos.size() / (double) graph.getVertices().size();
+				if (this.iteration == 0) {
+					p = this.egos.size() / (double) this.graph.getVertices().size();
 				} else {
 					double sum = 0;
-					for(Integer k2 : p_k.keySet()) {
-						double p_k2 = getVal(k2, p_k);
+					for(Integer k2 : this.p_k.keySet()) {
+						double p_k2 = getVal(k2, this.p_k);
 //						double p_k1 = getVal(k1, p_k);
 //						sum += p_k2 * (1 - Math.pow(1 - p_k1, k2));
 						int n_k2_k1 = getVal(new Tuple<Integer, Integer>(k2, k1), neighbourMatrix);						
@@ -277,33 +277,33 @@ public class Sampler {
 		
 		
 		double norm = n_sampled / wsum;
-		p_k = new TreeMap<Integer, Double>();
-		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
+		this.p_k = new TreeMap<Integer, Double>();
+		for (VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
 			if (v.getDelegate().isSampled()) {
 				int k = v.getEdges().size();
-				Double p_k_i = p_k.get(k);
+				Double p_k_i = this.p_k.get(k);
 				if(p_k_i == null)
 					p_k_i = 0.0;
 				p = v.getDelegate().getSampleProbability();
 				p_k_i += 1 / p * norm;
-				p_k.put(k, p_k_i);
+				this.p_k.put(k, p_k_i);
 				
 				v.getDelegate().setNormalizedWeight(1 / p * norm);
 			}
 		}
 		
 		double sum = 0;
-		for(Double d : p_k.values()) {
+		for(Double d : this.p_k.values()) {
 			sum += d;
 		}
-		for(Integer k : p_k.keySet()) {
-			Double d = p_k.get(k);
+		for(Integer k : this.p_k.keySet()) {
+			Double d = this.p_k.get(k);
 			d = d/sum;
-			p_k.put(k, d);
+			this.p_k.put(k, d);
 		}
 		
 	}
-	private double getVal(int k, TreeMap<Integer, Double> map) {
+	private double getVal(final int k, final TreeMap<Integer, Double> map) {
 		Double d = map.get(k);
 		if(d == null)
 			return 0;
@@ -327,7 +327,7 @@ public class Sampler {
 //		}
 	}
 	
-	private int getVal(int k, TreeMap<Integer, Integer> map) {
+	private int getVal(final int k, final TreeMap<Integer, Integer> map) {
 		Entry<Integer, Integer> floor = map.floorEntry(k);
 		Entry<Integer, Integer> ceiling = map.ceilingEntry(k);
 		if(floor == null && ceiling == null)
@@ -346,7 +346,7 @@ public class Sampler {
 		}
 	}
 	
-	private int getVal(Tuple<Integer, Integer> key, TreeMap<Tuple<Integer, Integer>, Integer> map) {
+	private int getVal(final Tuple<Integer, Integer> key, final TreeMap<Tuple<Integer, Integer>, Integer> map) {
 		Integer e = map.get(key);
 		if(e == null)
 			return 0;
@@ -375,7 +375,7 @@ public class Sampler {
 	
 	private TIntHashSet getDegrees() {
 		TIntHashSet k = new TIntHashSet();
-		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
+		for (VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
 			if(v.getDelegate().isSampled()) {
 				k.add(v.getEdges().size());
 			}
@@ -385,15 +385,15 @@ public class Sampler {
 	
 	private TreeMap<Integer, Integer> getNumNeighbourK() {
 		TreeMap<Integer, Integer> n_k = new TreeMap<Integer, Integer>();
-		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
-			if(v.getDelegate().isSampled() && v.getDelegate().getIterationSampled() <= (iteration - 1)) {
+		for (VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
+			if(v.getDelegate().isSampled() && v.getDelegate().getIterationSampled() <= (this.iteration - 1)) {
 				int k = v.getEdges().size();
 				Integer n = n_k.get(k);
 				if(n == null)
 					n = 0;
 				
 				for(Vertex v2 : v.getNeighbours()) {
-					if(((VertexDecorator<SampledVertex>)v2).getDelegate().isSampled() && ((VertexDecorator<SampledVertex>)v2).getDelegate().getIterationSampled() <= (iteration - 1))
+					if(((VertexDecorator<SampledVertex>)v2).getDelegate().isSampled() && ((VertexDecorator<SampledVertex>)v2).getDelegate().getIterationSampled() <= (this.iteration - 1))
 						n++;
 				}
 				if(n > 0)
@@ -405,13 +405,13 @@ public class Sampler {
 	
 	private TreeMap<Tuple<Integer, Integer>, Integer> getNeighbourMatrix() {
 		TreeMap<Tuple<Integer, Integer>, Integer> matrix = new TreeMap<Tuple<Integer, Integer>, Integer>(new TupleComparator());
-		for (VertexDecorator<SampledVertex> v : projection.getVertices()) {
-			if(v.getDelegate().isSampled() && v.getDelegate().getIterationSampled() <= (iteration - 1)) {
+		for (VertexDecorator<SampledVertex> v : this.projection.getVertices()) {
+			if(v.getDelegate().isSampled() && v.getDelegate().getIterationSampled() <= (this.iteration - 1)) {
 				int k = v.getEdges().size();
 				Set<Tuple<Integer, Integer>> keys = new HashSet<Tuple<Integer,Integer>>();
 				for(Vertex v2 : v.getNeighbours()) {
 					if (((VertexDecorator<SampledVertex>) v2).getDelegate().isSampled()
-							&& ((VertexDecorator<SampledVertex>) v2).getDelegate().getIterationSampled() <= (iteration - 1)) {
+							&& ((VertexDecorator<SampledVertex>) v2).getDelegate().getIterationSampled() <= (this.iteration - 1)) {
 						int k2 = v2.getEdges().size();
 						Tuple<Integer, Integer> key = new Tuple<Integer, Integer>(k, k2);
 						keys.add(key);
@@ -432,8 +432,8 @@ public class Sampler {
 	
 	private static class TupleComparator implements Comparator<Tuple<Integer, Integer>> {
 
-		public int compare(Tuple<Integer, Integer> o1,
-				Tuple<Integer, Integer> o2) {
+		public int compare(final Tuple<Integer, Integer> o1,
+				final Tuple<Integer, Integer> o2) {
 //			int result = o1.getFirst() - o2.getFirst();
 //			if(result == 0)
 //				result = o1.getSecond() - o2.getSecond();
