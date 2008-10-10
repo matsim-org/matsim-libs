@@ -96,7 +96,7 @@ public class Plan extends BasicPlanImpl {
 		Double xx = (x == null) ? null : Double.valueOf(x);
 		Double yy = (y == null) ? null : Double.valueOf(y);
 		verifyCreateAct(endTime);
-		Act a = new Act(type, xx, yy, link, startTime, endTime, dur, isPrimary);
+		Act a = new Act(type, xx, yy, link, startTime, endTime, dur);
 		this.actsLegs.add(a);
 		return a;
 	}
@@ -117,12 +117,9 @@ public class Plan extends BasicPlanImpl {
 		a.setStartTime(startTime);
 		a.setEndTime(endTime);
 		a.setDur(dur);
-		a.setPrimary(isPrimary);
 		this.actsLegs.add(a);
 		return a;
 	}
-
-
 
   /**
    * @deprecated use method with less arguments and make use of the appropriate setters afterwards
@@ -163,6 +160,7 @@ public class Plan extends BasicPlanImpl {
 		this.actsLegs.add(leg);
 		return leg;
 	}
+
 	/**
 	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
 	 */

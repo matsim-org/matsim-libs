@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
@@ -215,8 +214,6 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
-		if (act.isPrimary())
-			out.write(" primary=\"" + "true" + "\"");
 		out.write(" />\n");
 //		Gbl.debugMsg(DEBUG_LEVEL,this.getClass(),"startRoute(...)","there's no 'zone' info at the moment!");
 	}

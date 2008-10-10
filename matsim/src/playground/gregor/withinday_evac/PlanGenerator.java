@@ -120,7 +120,7 @@ System.out.println(count);
 //		pers.removeWorstPlans(this.maxPlans-1);
 		Plan plan = new Plan(pers);
 		Act oldA = pers.getSelectedPlan().getFirstActivity();
-		Act a = new Act("h",oldA.getCoord().getX(),oldA.getCoord().getY(),oldA.getLink(),oldA.getStartTime(),oldA.getEndTime(), oldA.getDur(),oldA.isPrimary());
+		Act a = new Act("h",oldA.getCoord().getX(),oldA.getCoord().getY(),oldA.getLink(),oldA.getStartTime(),oldA.getEndTime(), oldA.getDur(), false);
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
 		Leg l = new Leg(oldLeg.getMode());
 		l.setNum(oldLeg.getNum());
@@ -129,7 +129,7 @@ System.out.println(count);
 		l.setArrTime(oldLeg.getArrTime());
 		
 		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
-		Act b = new Act(oldB.getType(),oldB.getCoord().getX(),oldB.getCoord().getY(),oldB.getLink(),oldB.getStartTime(),oldB.getEndTime(),oldB.getDur(),oldB.isPrimary());
+		Act b = new Act(oldB.getType(),oldB.getCoord().getX(),oldB.getCoord().getY(),oldB.getLink(),oldB.getStartTime(),oldB.getEndTime(),oldB.getDur(), false);
 		plan.addAct(a);
 		Route route = new Route();
 		route.setRoute(nodes);

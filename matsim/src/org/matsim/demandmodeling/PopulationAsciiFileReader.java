@@ -119,11 +119,10 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 
 				Act act2 = plan.createAct(row[5], primaryCoord);
 				act2.setDur(WORKDURATION);
-				act2.setPrimary(true);
 
 				plan.createLeg(BasicLeg.Mode.car);
 
-				Act act3 = plan.createAct(ACTTYPE_HOME, homeCoord);
+				/*Act act3 = */plan.createAct(ACTTYPE_HOME, homeCoord);
 				this.plans.addPerson(p);
 			} catch (Exception e) {
 				e.printStackTrace();

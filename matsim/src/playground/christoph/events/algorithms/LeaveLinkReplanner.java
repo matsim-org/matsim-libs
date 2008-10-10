@@ -103,7 +103,7 @@ public class LeaveLinkReplanner {
 			{
 				log.info("LeaveLinkReplanner....................." + this.person.getId());
 				// create new Route
-				Routing(fromLink);
+				routing(fromLink);
 			}
 			else
 			{
@@ -122,16 +122,16 @@ public class LeaveLinkReplanner {
 	/*
 	 * Route am Ende jedes Links neu berechnen.
 	 * Ansatz:
-	 * - Neue Aktivität beim aktuellen Link generieren und Zielaktivität beibehalten.
+	 * - Neue Aktivitï¿½t beim aktuellen Link generieren und Zielaktivitï¿½t beibehalten.
 	 * - Route generieren 
 	 * - Alte Route mit neuer Route mergen
 	 *   -> Annahme: ein Link ist in jeder Route nur 1x vorhanden (was auch Sinn macht, da
-	 *      "Rundfahrten" wohl kaum die kürzesten Wege von A nach B darstellen.
-	 *   -> Könnte doch noch Probleme hervorrufen. Agenten könnten an Stellen gelangen, wo
+	 *      "Rundfahrten" wohl kaum die kï¿½rzesten Wege von A nach B darstellen.
+	 *   -> Kï¿½nnte doch noch Probleme hervorrufen. Agenten kï¿½nnten an Stellen gelangen, wo
 	 *      z.B. aufgrund von Staus umkehren sinnvoller wï¿½re, was wiederum duplizierte Links
-	 *      in den Routen hervorrufen würde :?
+	 *      in den Routen hervorrufen wï¿½rde :?
 	 */
-	protected void Routing(Link fromLink)
+	protected void routing(Link fromLink)
 	{	
 
 		// Nodes der derzeit geplanten Route mit dem aktuellen Node vergleichen
@@ -141,7 +141,7 @@ public class LeaveLinkReplanner {
 			//System.exit(0);
 		}
 		
-		// Daten für die neue Aktivität generieren
+		// Daten fï¿½r die neue Aktivitï¿½t generieren
 		String type = "w";
 		
 		Node toNode = fromLink.getToNode();
@@ -152,9 +152,8 @@ public class LeaveLinkReplanner {
 		String startTime = String.valueOf(time);
 		String endTime = String.valueOf(time);
 		String dur = String.valueOf(0.0);
-		String isPrimary = "false";
 		
-		Act newFromAct = new Act(type, x, y, link, startTime, endTime, dur, isPrimary);
+		Act newFromAct = new Act(type, x, y, link, startTime, endTime, dur);
 		
 		Route route = leg.getRoute();
 		
@@ -166,12 +165,12 @@ public class LeaveLinkReplanner {
 		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
 		Node newStartNode = fromLink.getToNode();
 		
-		// Alle Nodes aus der Route löschen, die bereits "befahren" wurden
-		// Die gelöschten gleichzeitig in einer ArrayList ablegen - diese werden
-		// anschliessend mit der neue generierten Subroute wieder zusammengefügt!
+		// Alle Nodes aus der Route lï¿½schen, die bereits "befahren" wurden
+		// Die gelï¿½schten gleichzeitig in einer ArrayList ablegen - diese werden
+		// anschliessend mit der neue generierten Subroute wieder zusammengefï¿½gt!
 		
-		// Achtung: derzeit kï¿½nnen so keine "Schlaufen" gefahren werden, hierfür
-		// würde ein Counter oder dergleichen benötigt werden!
+		// Achtung: derzeit kï¿½nnen so keine "Schlaufen" gefahren werden, hierfï¿½r
+		// wï¿½rde ein Counter oder dergleichen benï¿½tigt werden!
 		while(nodesRoute.size() > 0)
 		{
 			Node node = nodesRoute.get(0);
@@ -202,7 +201,7 @@ public class LeaveLinkReplanner {
 		newLeg.setRoute(subRoute);
 		newLeg.setRoute(subRoute);
 			
-		// aktuell gewählter Plan
+		// aktuell gewï¿½hlter Plan
 		Plan currentPlan = person.getSelectedPlan();
 		
 		// neuen Plan generieren und selektieren
@@ -236,7 +235,7 @@ public class LeaveLinkReplanner {
 		// neu berechnete Route holen
 		Route newRoute = newLeg.getRoute();
 			
-		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenführen
+		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenfï¿½hren
 		nodeBuffer.addAll(newRoute.getRoute());
 		
 		Route mergedRoute = new Route();
@@ -252,10 +251,10 @@ public class LeaveLinkReplanner {
 	}
 	
 	// Holt den Link, auf dem der Agent zum aktuellen Node gefahren ist
-	// Eventuell wäre ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
+	// Eventuell wï¿½re ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
 	// ein Link mehrfach befahren wird :?
-	// Replanning sollte mit der aktuellen Lösung funktionieren, allerdings wird der gefahrene
-	// Weg allenfalls nicht voll übernommen (Schlaufen werden rausgeschnitten).
+	// Replanning sollte mit der aktuellen Lï¿½sung funktionieren, allerdings wird der gefahrene
+	// Weg allenfalls nicht voll ï¿½bernommen (Schlaufen werden rausgeschnitten).
 	protected Link getFromLink()
 	{		
 		if (prevAct.getLink().getToNode().equals(node)) return prevAct.getLink();

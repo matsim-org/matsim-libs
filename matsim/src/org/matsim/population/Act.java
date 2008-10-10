@@ -34,40 +34,38 @@ import org.matsim.utils.misc.Time;
 
 public class Act extends BasicActImpl {
 
-	private boolean isPrimary = false;
-
 	protected BasicLink link = null;
 	protected Facility facility = null;
 
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Act(final String type, Link link) {
+	public Act(final String type, final Link link) {
 		super(type.intern());
 		this.setLink(link);
 	}
-	
-	public Act(final String type, Coord coord) {
+
+	public Act(final String type, final Coord coord) {
 		super(type.intern());
 		this.setCoord(coord);
 	}
-	
-	public Act(String type, Facility fac) {
+
+	public Act(final String type, final Facility fac) {
 		super(type.intern());
 		this.setFacility(fac);
 	}
 
-	
-	
-	public Act(final String type, Coord coord, Link link) {
+
+
+	public Act(final String type, final Coord coord, final Link link) {
 		this(type, link);
 		this.setCoord(coord);
 	}
 	@Deprecated
 	public Act(final String type, final Double x, final Double y, final String link,
-						final String startTime, final String endTime, final String dur, final String isPrimary) {
+						final String startTime, final String endTime, final String dur) {
 		super(type);
 		// check if either coord and/or link are set
 		if (((x==null) && (y!=null)) || ((x!=null) && (y==null))) {
@@ -90,11 +88,9 @@ public class Act extends BasicActImpl {
 		if (dur != null) {
 			this.dur = Time.parseTime(dur);
 		}
-		if (isPrimary != null) {
-			this.isPrimary = true;
-		}
 	}
-  @Deprecated
+
+	@Deprecated
 	public Act(final String type, final double x, final double y, final Link link,
 			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
   	super(type);
@@ -103,7 +99,6 @@ public class Act extends BasicActImpl {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.dur = dur;
-		this.isPrimary = isPrimary;
 	}
 
 	public Act(final Act act) {
@@ -115,17 +110,7 @@ public class Act extends BasicActImpl {
 		this.startTime = act.startTime;
 		this.endTime = act.endTime;
 		this.dur = act.dur;
-		this.isPrimary = act.isPrimary;
 		this.setFacility(act.getFacility());
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// query methods
-	//////////////////////////////////////////////////////////////////////
-
-
-	public final boolean isPrimary() {
-		return this.isPrimary;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -135,15 +120,11 @@ public class Act extends BasicActImpl {
 	public void setFacility(final Facility facility) {
 		this.facility = facility;
 	}
-	
+
 	public void setLink(final BasicLink link) {
 		this.link = link;
 	}
-	
-	public final void setPrimary(boolean isPrimary) {
-		this.isPrimary = isPrimary;
-	}
-	
+
 	protected void setFacility(final String f_id) {
 		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 		if (facilities == null) { throw new RuntimeException("Facilities Layer does not exist!"); }
@@ -174,8 +155,7 @@ public class Act extends BasicActImpl {
 				"[link=" + this.link + "]" +
 				"[startTime=" + Time.writeTime(this.startTime) + "]" +
 				"[endTime=" + Time.writeTime(this.endTime) + "]" +
-				"[dur=" + Time.writeTime(this.dur) + "]" +
-				"[isPrimary=" + this.isPrimary + "]";
+				"[dur=" + Time.writeTime(this.dur) + "]";
 	}
 
 	public final double getDur() {
@@ -208,7 +188,7 @@ public class Act extends BasicActImpl {
 			return this.facility.getId();
 		return null;
 	}
-	
+
 
 	/**
 	 * This method calculates the duration of the activity from the start and endtimes if set.
