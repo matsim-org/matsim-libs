@@ -28,8 +28,9 @@ import org.geotools.feature.Feature;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.collections.gnuclasspath.TreeMap;
 import org.matsim.utils.geometry.geotools.MGC;
+
+import playground.gregor.collections.gnuclasspath.TreeMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

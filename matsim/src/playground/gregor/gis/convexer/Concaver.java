@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class Concaver {
 	
-	private final static double MAX_DIST_CRIT = 2.;
+	private final static double MAX_DIST_CRIT = 0.8;
 	
 	private final GeometryFactory geofac;
 	private QuadTree<Coordinate> mpQuad;

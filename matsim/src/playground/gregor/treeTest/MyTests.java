@@ -98,7 +98,7 @@ public class MyTests {
 	
 	public static long  testClasspathTreeMap(){
 //		Double dummy = 0.;
-		org.matsim.utils.collections.gnuclasspath.TreeMap<Integer, Double> map = new org.matsim.utils.collections.gnuclasspath.TreeMap<Integer,Double>();
+		playground.gregor.collections.gnuclasspath.TreeMap<Integer, Double> map = new playground.gregor.collections.gnuclasspath.TreeMap<Integer,Double>();
 //		log.info("starting TreeMap test");
 		Double dbl = 10.0;
 		

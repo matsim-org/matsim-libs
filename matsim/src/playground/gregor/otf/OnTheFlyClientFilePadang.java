@@ -113,7 +113,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, null, connect1);
 
 		final OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-//		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
 //		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
 //			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);

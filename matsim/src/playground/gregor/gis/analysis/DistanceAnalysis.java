@@ -83,7 +83,7 @@ public class DistanceAnalysis {
 	private GeometryFactory geofac;
 	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
-	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
+	playground.gregor.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
 
 
 
@@ -146,7 +146,7 @@ public class DistanceAnalysis {
 
 	private void iteratePolygons(){
 
-		this.ft_tree =  new org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature>();
+		this.ft_tree =  new playground.gregor.collections.gnuclasspath.TreeMap<Double, Feature>();
 		int id = 0;
 
 		int toGo = this.polygons.size();

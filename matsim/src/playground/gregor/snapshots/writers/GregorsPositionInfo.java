@@ -24,8 +24,9 @@ import java.util.Map.Entry;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
-import org.matsim.utils.collections.gnuclasspath.TreeMap;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
+
+import playground.gregor.collections.gnuclasspath.TreeMap;
 
 import com.vividsolutions.jts.geom.LineSegment;
 

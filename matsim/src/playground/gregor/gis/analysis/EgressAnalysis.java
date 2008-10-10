@@ -80,7 +80,7 @@ public class EgressAnalysis {
 	private GeometryFactory geofac;
 	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
-	org.matsim.utils.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
+	playground.gregor.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
 	private GTH gth;
 	private Map<Id, EgressNode> egressNodes;
 

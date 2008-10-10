@@ -22,11 +22,13 @@ package playground.gregor.snapshots.postprocessor.processors;
 
 import java.util.HashMap;
 
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 
 
-public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {
+public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler, AgentArrivalEventHandler {
 
 	private final static int NUM_OF_COLOR_SLOTS = 256;
 	
@@ -40,18 +42,18 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //	}
 
 	
-	public String[] processEvent(String[] event) {
+	public String[] processEvent(final String[] event) {
 		String id = event[0];
 		String color = getColor(id);
 		event[15] = color;
 		return event;
 	}
 
-	public String getColor(String id) {
-		if(!destNodeMapping.containsKey(id)){
+	public String getColor(final String id) {
+		if(!this.destNodeMapping.containsKey(id)){
 			return "0";
 		}
-		return destNodeMapping.get(id);
+		return this.destNodeMapping.get(id);
 	}
 
 //	private synchronized void addMapping(Id id) {
@@ -67,7 +69,7 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //		
 //	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		if (event.linkId.contains("el")) {
 			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
 		}
@@ -75,9 +77,15 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 		
 		
 	}
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	public void handleEvent(final AgentArrivalEvent event) {
+		
+		if (event.linkId.contains("el")) {
+			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
+		}
+	}
 }
