@@ -68,6 +68,7 @@ public class Facility extends AbstractLocation {
 	
 	private final double baseCapacity24 = 1.5*225.61;
 	
+	// comes from microcensus: only share factor
 	private final double capacitiesPerHour[] = {
 			0.0000,
 			0.0000,
