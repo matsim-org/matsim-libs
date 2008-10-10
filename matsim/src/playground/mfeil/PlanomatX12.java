@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX11.java
+ * PlanomatX12.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,6 +22,8 @@ package playground.mfeil;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.locationchoice.RandomLocationMutator;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
@@ -44,13 +46,12 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * This is the current standard version and identical to PlanomatX9 except for that 
- * the notNewInNeighbourhood check is dropped as this case can apparently happen 
- * only in very rare and special cases but not in realistic ones. Runtime performance
- * must be better but is not measurable.
+ * This is the current standard version but preparing to include the location choice.
+ * Some stuff in the locationChoiceAlgorithms is not working when executing so needs 
+ * clarification with Andreas Horni.
  */
 
-public class PlanomatX11 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -58,19 +59,23 @@ public class PlanomatX11 implements org.matsim.population.algorithms.PlanAlgorit
 	private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX11.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX12.class);
+	private final PlanAlgorithm				locationChoiceAlgorithm;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX11 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX12 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, 
 			boolean constrained, Controler controler) {
 
 		this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanomatXPlanScorer (factory);
+		
+		if (constrained) locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
+		else locationChoiceAlgorithm = new RandomLocationMutator(network);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 

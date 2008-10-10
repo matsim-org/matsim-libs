@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatXInitialiser.java
+ * PlanomatX12Initialiser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.apache.log4j.Logger;
+import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.LocationChoice;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -30,13 +33,15 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.scoring.*;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @author Matthias Feil
  * Replacing the PlanomatOptimizeTimes class to initialise the PlanomatX module.
  */
 
-public class PlanomatXInitialiser extends MultithreadedModuleA{
+public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	
 	private final LegTravelTimeEstimator 	estimator;
 	private final PreProcessLandmarks 		preProcessRoutingData;
@@ -45,9 +50,13 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 	private final TravelTime 				travelTimeCalc;
 	private final ScoringFunctionFactory 	factory;
 	public static ArrayList<String>			actTypes; 
+	private final Controler					controler;
+	private List<PlanAlgorithm>  			planAlgoInstances;
+	private boolean 						constrained;
+	private static final Logger 			log = Logger.getLogger(LocationChoice.class);
 
 	
-	public PlanomatXInitialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
+	public PlanomatX12Initialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
 		
 		this.estimator = estimator;
 		this.preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -65,6 +74,28 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 			actTypes.add(Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter));
 			gblCounter++;
 		}
+		
+		this.planAlgoInstances = new Vector<PlanAlgorithm>();
+		this.controler = controlerTest;
+		this.init(network, controler);
+		
+	}
+	
+	private void init(
+			final NetworkLayer network,
+			final Controler controler) {
+		
+		//if (Gbl.getConfig().locationchoice().getMode().toString().equals("true")) {
+			//this.constrained = true;
+			//log.info("Doing constrained location choice");
+		//}
+		//else {
+			//this.constrained = false;
+			//log.info("Doing random location choice on univ. choice set");
+		//}
+		this.constrained = false; //replaces above code 
+		
+		this.network.connect();
 	}
 
 	
@@ -73,8 +104,8 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 		
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX13 (this.estimator, this.network, this.travelCostCalc, 
-				this.travelTimeCalc, this.preProcessRoutingData, this.factory);
+		planomatXAlgorithm =  new PlanomatX11 (this.estimator, this.network, this.travelCostCalc, 
+				this.travelTimeCalc, this.preProcessRoutingData, this.factory, this.constrained, this.controler);
 
 		return planomatXAlgorithm;
 	}
