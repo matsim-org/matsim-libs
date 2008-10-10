@@ -51,58 +51,45 @@ public class BellmanFordVertexIntervalls {
 	 * The network on which we find routes. We expect the network not to change
 	 * between runs!
 	 */
-	final NetworkLayer network;
+	private final NetworkLayer network;
 
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelCost costFunction;
+	private final TravelCost costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and
 	 * time step. This is ignored.
 	 */
-	final TravelTime timeFunction;
+	private final TravelTime timeFunction;
 	
 	/**
 	 * Datastructure to to represent the flow on a network  
 	 */
-	private HashMap<Link, EdgeIntervalls> _flow;
+	private HashMap<Link, EdgeIntervalls> _flowlabels;
 	
 	/**
 	 * Datastructure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
 	 */
 	private HashMap<Node, VertexIntervalls> _labels;
+	
+	private Flow _flow;
 
 	/**
 	 * 
 	 */
 	private LinkedList<Node> _sources;
+
+	/**
+	 * 
+	 */
+	private final int _timehorizon;
 	
 	/**
 	 * 
 	 */
-	private HashMap<Node,Integer> _demands;
-	
-	/**
-	 * 
-	 */
-	private ArrayList _paths;
-	
-	/**
-	 * 
-	 */
-	private int _timehorizon;
-	
-	/**
-	 * 
-	 */
-	private int _gamma;
-	
-	/**
-	 * 
-	 */
-	private Node _sink;
+	private final Node _sink;
 
 	/**
 	 * 
@@ -113,32 +100,6 @@ public class BellmanFordVertexIntervalls {
 	 * 
 	 */
 	private static boolean _debug=false;
-	
-	/**
-	 * Default constructor.
-	 * 
-	 * @param network
-	 *            The network on which to route.
-	 * @param costFunction
-	 *            Determines the link cost defining the cheapest route. Note,
-	 *            comparisons are only made with accuraracy 0.001 due to
-	 *            numerical problems otherwise.
-	 * @param timeFunction
-	 *            Determines the travel time on links. This is ignored!
-	 */
-	public BellmanFordVertexIntervalls(final NetworkLayer network,
-			final TravelCost costFunction, final TravelTime timeFunction,
-			HashMap<Link, EdgeIntervalls> flow) {
-
-		this.network = network;
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
-
-		this._flow = flow;
-		_timehorizon = Integer.MAX_VALUE;
-		_gamma = Integer.MAX_VALUE;
-		this._labels = new HashMap<Node, VertexIntervalls>();
-	}
 
 	/**
 	 * Default constructor.
@@ -160,13 +121,32 @@ public class BellmanFordVertexIntervalls {
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
-		this._flow = flow;
+		this._flowlabels = flow;
 		this._timehorizon = timeHorizon;
-		this._gamma = Integer.MAX_VALUE;
 		this._sources = sources; 
 		this._sink = sink;
 		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
+	
+	/**
+	 * 
+	 * @param costFunction
+	 * @param timeFunction
+	 * @param flow
+	 */
+	public BellmanFordVertexIntervalls(final TravelCost costFunction, final TravelTime timeFunction, Flow flow) {
+		this._flow = flow;
+		this.network = flow.getNetwork();
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+		this._flowlabels = flow.getFlow();
+		this._timehorizon = flow.getTimeHorizon();
+		this._sources = flow.getSources() ; 
+		this._sink = flow.getSink();
+		this._labels = new HashMap<Node, VertexIntervalls>();
+	}
+	
+	
 	
 	/**
 	 * Setter for debug mode
@@ -239,11 +219,11 @@ public class BellmanFordVertexIntervalls {
 			//find next node and edge
 			int fromtime;
 			if(forward){
-				fromtime = (totime-_flow.get(edge).getTravelTime());
+				fromtime = (totime-_flowlabels.get(edge).getTravelTime());
 				path.push(edge, fromtime, forward);
 				to= edge.getFromNode();
 			}else{
-				fromtime = (totime+_flow.get(edge).getTravelTime());
+				fromtime = (totime+_flowlabels.get(edge).getTravelTime());
 				path.push(edge, fromtime, forward);
 				to =edge.getToNode();
 			}
@@ -268,7 +248,7 @@ public class BellmanFordVertexIntervalls {
 	private boolean relabel(Node from, Node to, Link over,boolean forward){
 		VertexIntervalls labelfrom = _labels.get(from);
 		VertexIntervalls labelto = _labels.get(to);
-		EdgeIntervalls	flowover = _flow.get(over);
+		EdgeIntervalls	flowover = _flowlabels.get(over);
 		boolean changed=false;
 		int t=0;
 		VertexIntervall i;
@@ -278,7 +258,7 @@ public class BellmanFordVertexIntervalls {
 			if(i.getDist()){
 				if(_debug){
 					System.out.println("wir kommen los");
-				}	
+				}	//TODO cas auf int!!!
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
 					if(_debug){

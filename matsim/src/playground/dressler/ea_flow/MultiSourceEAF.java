@@ -70,7 +70,8 @@ public class MultiSourceEAF {
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
 			//System.out.println(link.getId().toString());
-			flow.put(link, new EdgeIntervalls((int)link.getLength()));
+			int l = (int)link.getLength()/(int)link.getFreespeed(1.);
+			flow.put(link, new EdgeIntervalls(l));
 			//TODO achtung cast von double auf int
 		}
 		
@@ -92,10 +93,15 @@ public class MultiSourceEAF {
 			TravelCost travelcost = new FakeTravelTimeCost();
 			TravelTime traveltime = (TravelTime) travelcost;
 
-			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(network, travelcost, traveltime, flow, timeHorizon,sink, sources);
-			BellmanFordVertexIntervalls.debug(true);
-			result = routingAlgo.doCalculations();
-			System.out.println("path: " +  result);
+			Flow fluss = new Flow(network, flow, sources, null, sink, timeHorizon);
+			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(travelcost, traveltime,fluss);
+			BellmanFordVertexIntervalls.debug(false);
+			for (int i=0; i<10; i++){
+				result = routingAlgo.doCalculations();
+				System.out.println("path: " +  result);
+				fluss.augment(result);
+				System.out.println(fluss);
+			}
 		}
 		
    	    System.out.println("... immer noch!\n");

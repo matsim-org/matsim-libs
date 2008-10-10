@@ -165,7 +165,7 @@ public class EdgeIntervalls {
 		StringBuilder str = new StringBuilder();
 		for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
 			EdgeIntervall i= (EdgeIntervall) _tree._curr.obj;
-			str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" f:"+i.getFlow()+"\n");
+			str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" f:"+i.getFlow()+" || ");
 		}
 			
 		return str.toString();
@@ -325,8 +325,8 @@ public class EdgeIntervalls {
 				}	
 			}
 			
-		}
-		//unify different flow intervalls with positive capacity
+		}//TODO repair and debug!!!!!
+		/*//unify different flow intervalls with positive capacity
 		if(!result.isEmpty()){
 			ArrayList<Intervall> temp= new ArrayList<Intervall>();
 			Intervall part= result.get(0);
@@ -341,7 +341,7 @@ public class EdgeIntervalls {
 			}
 			temp.add(part);
 			result=temp; 
-		}
+		}*/
 		return result;
 		
 	}
@@ -379,7 +379,7 @@ public class EdgeIntervalls {
 	 * @param t raising time
 	 * @param f aumount of flow to reduce
 	 */
-	public void augmentrverse(int t, int f){
+	public void augmentreverse(int t, int f){
 		if (t<0){
 			throw new IllegalArgumentException("negative time : "+ t);
 		}

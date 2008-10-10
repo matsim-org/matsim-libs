@@ -452,7 +452,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			dist = Dists.getDistance(tmpLink.getFromNode());
 			// backward edge
 			if (tmpNode.equals(tmpLink.getToNode())) {
-				newFlow.get(tmpLink).augmentrverse(dist, gamma);
+				newFlow.get(tmpLink).augmentreverse(dist, gamma);
 				node = tmpLink.getFromNode();
 			}
 			// forward edge
@@ -553,7 +553,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 			// backward edge
 			if (tmpNode.equals(tmpLink.getToNode())) {
 				tmp += waited.get(tmpLink.getFromNode());
-				newFlow.get(tmpLink).augmentrverse(tmp, gamma);
+				newFlow.get(tmpLink).augmentreverse(tmp, gamma);
 				tmp -= length.getLinkTravelCost(tmpLink, 0.);
 				node = tmpLink.getFromNode();
 			}

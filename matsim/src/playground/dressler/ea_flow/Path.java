@@ -47,6 +47,9 @@ public class Path {
 	 */
 	private LinkedList<PathEdge> _edges;
 	
+	/**
+	 * 
+	 */
 	private int _arrival;
 	
 	/**
@@ -61,22 +64,22 @@ public class Path {
 	 * @author Manuel Schneider
 	 *
 	 */
-	private class PathEdge {
+	class PathEdge {
 		
 		/**
 		 * Edge in a path
 		 */
-		Link edge;
+		private final Link edge;
 		
 		/**
 		 * time upon wich the flow enters the dge
 		 */
-		int time;
+		private final int time;
 		
 		/**
 		 * reminder if this is a forward edge or not
 		 */
-		boolean forward;
+		private final boolean forward;
 		
 		/**
 		 * default Constructor setting the Arguments
@@ -98,6 +101,30 @@ public class Path {
 				return (edge.getId().toString() + " t: " + this.time + "backwards!");
 			}
 			return (edge.getId().toString() + " t: " + this.time );
+		}
+
+		/**
+		 * TODO
+		 * @return the edge
+		 */
+		public Link getEdge() {
+			return edge;
+		}
+
+		/**
+		 * TODO
+		 * @return the forward
+		 */
+		public boolean isForward() {
+			return forward;
+		}
+
+		/**
+		 * TODO
+		 * @return the time
+		 */
+		public int getTime() {
+			return time;
 		}
 	}
 	
@@ -195,11 +222,18 @@ public class Path {
 	}
 	
 	/**
-	 * setter for debug mode
-	 * @param debug debug mode true is on
+	 * TODO
+	 * @return
 	 */
-	public static void debug(boolean debug){
-		Path._debug=debug;
+	public Node getSource(){
+		PathEdge firstedge = this._edges.getFirst();
+		Node result;
+		if(firstedge.isForward()){
+			result = firstedge.getEdge().getFromNode();
+		}else{
+			result = firstedge.getEdge().getToNode();
+		}
+		return result;
 	}
 	
 	/**
@@ -213,6 +247,14 @@ public class Path {
 		}	
 		strb.append("arrivaltime: " + _arrival);
 		return strb.toString();
+	}
+	
+	/**
+	 * TODO
+	 * @return
+	 */
+	public LinkedList<PathEdge> getPathEdges(){
+		return this._edges;
 	}
 	
 	/**
@@ -250,5 +292,14 @@ public class Path {
 	public int getArrival(){
 		return this._arrival;
 	}
+	
+	/**
+	 * setter for debug mode
+	 * @param debug debug mode true is on
+	 */
+	public static void debug(boolean debug){
+		Path._debug=debug;
+	}
+	
 
 }
