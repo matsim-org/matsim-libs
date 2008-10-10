@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PersonAlgorithm;

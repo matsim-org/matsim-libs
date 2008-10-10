@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.writer.WriterHandler;
 

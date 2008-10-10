@@ -24,25 +24,12 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
 public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	//private static final int DEBUG_LEVEL = 0;
-
-	//////////////////////////////////////////////////////////////////////
-	//
-	// interface implementation
-	//
-	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
 	// <plans ... > ... </plans>
@@ -207,10 +194,10 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 //		out.write(" id=\"" + facility.getId() + "\"");
 //		out.write(">\n");
 //	}
-
-	public void endLocation(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t</location>\n");
-	}
+//
+//	public void endLocation(final BufferedWriter out) throws IOException {
+//		out.write("\t\t\t\t</location>\n");
+//	}
 
 	public void startPrimaryLocation(final Activity activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<location");

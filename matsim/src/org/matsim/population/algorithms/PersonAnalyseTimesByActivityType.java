@@ -20,7 +20,6 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.population.Act;
@@ -56,7 +55,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 			return position;
 		}
 
-	};
+	}
 
 	private static final int ALL_POS = Activities.valueOf("all").getPosition();
 
