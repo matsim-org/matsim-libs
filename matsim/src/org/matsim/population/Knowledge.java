@@ -64,14 +64,14 @@ public class Knowledge extends CustomizableImpl {
 
 	/**
 	 * Internal representation of of a pair consists of an {@link Activity} and its {@code isPrimary} flag.
-	 * Two {@link KActivity KActivities} are equal if the containing {@link Activity}(ies) are equal, independent
+	 * Two {@link KActivity KActivities} are equal if the containing {@link Activity Activities} are equal, independent
 	 * of their {@code isPrimary} flag.
 	 */
 	private static class KActivity {
-		/*default*/ boolean isPrimary;
-		/*default*/ final Activity activity;
+		/*package*/ boolean isPrimary;
+		/*package*/ final Activity activity;
 		
-		/*default*/ KActivity(Activity activity, boolean isPrimary) {
+		/*package*/ KActivity(Activity activity, boolean isPrimary) {
 			this.activity = activity;
 			this.isPrimary = isPrimary;
 		}
@@ -120,7 +120,7 @@ public class Knowledge extends CustomizableImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * <p>Adds an {@link Activity} to a {@link Person}s {@link Knowledge}.
+	 * <p>Adds an {@link Activity} to a {@link Person Persons} {@link Knowledge}.
 	 * It leaves the list of activities unchanged, if the given {@link Activity} is already present,
 	 * independent of the {@code isPrimary} flag.</p>
 	 * 
@@ -177,8 +177,8 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 	/**
-	 * Removes all {@link Activity}(ies) that are equal to the given {@code isPrimary}
-	 * @param isPrimary To define which of the {@link Activity}(ies) should be removed
+	 * Removes all {@link Activity Activities} that are equal to the given {@code isPrimary}
+	 * @param isPrimary To define which of the {@link Activity Activities} should be removed
 	 * @return <code>true</code> only if the was at least one {@link Activity} with given {@code isPrimary} to remove.
 	 */
 	public final boolean removeActivities(boolean isPrimary) {
@@ -197,7 +197,7 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 	/**
-	 * Removes all existing {@link Activity}(ies).
+	 * Removes all existing {@link Activity Activities}.
 	 * @return <code>true</code> if there was at least one {@link Activity} given.
 	 */
 	public final boolean removeAllActivities() {
@@ -208,8 +208,8 @@ public class Knowledge extends CustomizableImpl {
 	}
 
 	/**
-	 * Removes all existing {@link Activity}(ies) of a given {@code act_type}
-	 * @param act_type The activity type of {@link Activity}(ies) to remove.
+	 * Removes all existing {@link Activity Activities} of a given {@code act_type}
+	 * @param act_type The activity type of {@link Activity Activities} to remove.
 	 * @return <code>true</code> if there was at least one {@link Activity} of the given {@code act_type} removed.
 	 */
 	public final boolean removeActivities(final String act_type) {
@@ -279,10 +279,10 @@ public class Knowledge extends CustomizableImpl {
 	}
 
 	/**
-	 * Returns all {@link Activity}(ies) of a given activity type and a given flag
-	 * @param act_type The activity type of the {@link Activity}(ies) should be returned
-	 * @param isPrimary To define which of the {@link Activity}(ies) should be returned
-	 * @return The list of {@link Activity}(ies). The list may be empty.
+	 * Returns all {@link Activity Activities} of a given activity type and a given flag
+	 * @param act_type The activity type of the {@link Activity Activities} should be returned
+	 * @param isPrimary To define which of the {@link Activity Activities} should be returned
+	 * @return The list of {@link Activity Activities}. The list may be empty.
 	 */
 	public final ArrayList<Activity> getActivities(String act_type, boolean isPrimary) {
 		if (activities == null) { return new ArrayList<Activity>(0); }
@@ -296,9 +296,9 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 	/**
-	 * Returns all {@link Activity}(ies) of a given activity type
-	 * @param act_type The activity type of the {@link Activity}(ies) should be returned
-	 * @return The list of {@link Activity}(ies). The list may be empty.
+	 * Returns all {@link Activity Activities} of a given activity type
+	 * @param act_type The activity type of the {@link Activity Activities} should be returned
+	 * @return The list of {@link Activity Activities}. The list may be empty.
 	 */
 	public final ArrayList<Activity> getActivities(final String act_type) {
 		if (activities == null) { return new ArrayList<Activity>(0); }
@@ -312,7 +312,7 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 	/**
-	 * Returns the set of activity types of the {@link Activity}(ies) with the given flag.
+	 * Returns the set of activity types of the {@link Activity Activities} with the given flag.
 	 * @param isPrimary To define which of the activity types should be returned
 	 * @return a set of activity types. The set may be empty.
 	 */
@@ -328,7 +328,7 @@ public class Knowledge extends CustomizableImpl {
 	}
 
 	/**
-	 * Returns the set of activity types of the {@link Activity}(ies).
+	 * Returns the set of activity types of the {@link Activity Activities}.
 	 * @return a set of activity types. The set may be empty.
 	 */
 	public final Set<String> getActivityTypes() {
@@ -381,9 +381,9 @@ public class Knowledge extends CustomizableImpl {
 	}
 
 	/**
-	 * Sets the {@code isPrimary} flag for all existing {@link Activity}
+	 * Sets the {@code isPrimary} flag for all existing {@link Activity Activities}
 	 * @param isPrimary the flag
-	 * @return <code>false</code> only if no {@link Activity}(ies) exist.
+	 * @return <code>false</code> only if no {@link Activity Activities} exist.
 	 */
 	public final boolean setPrimaryFlag(boolean isPrimary) {
 		if (activities == null) { return false; }
