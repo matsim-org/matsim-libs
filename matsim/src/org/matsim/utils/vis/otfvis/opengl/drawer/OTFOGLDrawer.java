@@ -58,10 +58,8 @@ import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
-import org.matsim.utils.vis.otfvis.caching.SceneLayer;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
-import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -75,29 +73,6 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
-abstract class OGLSceneLayerImpl implements SceneLayer{
-	private final List<OTFGLDrawable> items = new ArrayList<OTFGLDrawable>();
-
-	public void addItem(Receiver item) {
-		this.items.add((OTFGLDrawable)item);
-	}
-
-	public void draw() {
-		for (OTFGLDrawable item : this.items) item.draw();
-	}
-
-	public void finish() {
-	}
-
-	public void init(SceneGraph graph) {
-	}
-
-	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
-		return null;
-	}
-
-}
-
 public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
@@ -106,7 +81,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private int agentDisplList = 0;
 
 	//private boolean isValid = false;
-	public boolean isActiveNet = false;
+//	public boolean isActiveNet = false;
 	private GL gl = null;
 	private GLCanvas canvas = null;
 	private VisGUIMouseHandler mouseMan = null;
