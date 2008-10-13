@@ -37,7 +37,9 @@ public class CarRouteParser implements RouteParser {
 		Id arrLink = null;//new IdImpl(parts[1]);
 		List<Id> links = new ArrayList<Id>();
 		for (int i = 0/*2*/, n = parts.length; i < n; i++) {
-			links.add(new IdImpl(parts[i]));
+			if (parts[i].length() > 0) {
+				links.add(new IdImpl(parts[i]));
+			}
 		}
 		
 		CarRoute carRoute = new CarRouteImpl(depLink, links, arrLink, travelTime);

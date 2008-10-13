@@ -40,7 +40,7 @@ public class CarRouteParserTest extends MatsimTestCase {
 		assertEquals(new IdImpl(7), route1.getLinkIds().get(1));
 		assertEquals(new IdImpl(4), route1.getLinkIds().get(2));
 	}
-	
+
 	public void testCreateRoute_withAdditionalSpaces() {
 		final CarRouteParser parser = new CarRouteParser();
 		
@@ -52,5 +52,15 @@ public class CarRouteParserTest extends MatsimTestCase {
 		assertEquals(new IdImpl(3), route1.getLinkIds().get(0));
 		assertEquals(new IdImpl(7), route1.getLinkIds().get(1));
 		assertEquals(new IdImpl(4), route1.getLinkIds().get(2));
+	}
+
+	public void testCreateRoute_EmptyRoute() {
+		final CarRouteParser parser = new CarRouteParser();
+		
+		final CarRoute route1 = parser.createRoute(" \n \t ", 8.5*3600);
+		assertEquals(8.5*3600.0, route1.getTravelTime(), EPSILON);
+		assertEquals(null, route1.getDepartureLinkId());
+		assertEquals(null, route1.getArrivalLinkId());
+		assertEquals(0, route1.getLinkIds().size());
 	}
 }
