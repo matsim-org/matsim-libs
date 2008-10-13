@@ -60,7 +60,7 @@ public class Flow {
 	/**
 	 * list of all sources
 	 */
-	private LinkedList<Node> _sources;
+	private final LinkedList<Node> _sources;
 	
 	/**
 	 * stores unsatisfied demands for each source
@@ -75,12 +75,12 @@ public class Flow {
 	/**
 	 * the sink, to which all flow is directed
 	 */
-	private Node _sink;
+	private final  Node _sink;
 	
 	/**
 	 * maximal time Horizon for the flow
 	 */
-	private int _timeHorizon;
+	private final  int _timeHorizon;
 	
 	/**
 	 * flag for debug mode
@@ -102,7 +102,7 @@ public class Flow {
 	 * @param sink the sink for al the flow
 	 * @param horizon the timehorizon in which flow is admittable
 	 */
-	public Flow(NetworkLayer network, LinkedList<Node> sources, HashMap<Node, Integer> demands, Node sink, int horizon) {
+	public Flow(final NetworkLayer network,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
@@ -129,7 +129,7 @@ public class Flow {
 	 * @param sink the sink for al the flow
 	 * @param horizon the timehorizon in which flow is admittable
 	 */
-	public Flow(NetworkLayer network, HashMap<Link, EdgeIntervalls> flow, LinkedList<Node> sources, HashMap<Node, Integer> demands, Node sink, int horizon) {
+	public Flow(final NetworkLayer network, HashMap<Link, EdgeIntervalls> flow,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
 		this._flow = flow;
 		this._paths = new LinkedList<Path>();
@@ -146,7 +146,7 @@ public class Flow {
 	 * @param node Node that is checked
 	 * @return true iff Node is a Source and has positive demand
 	 */
-	public boolean isActiveSource(Node node) {
+	public boolean isActiveSource(final Node node) {
 		Integer i = _demands.get(node);
 		if (i== null){
 			return false;
@@ -165,7 +165,7 @@ public class Flow {
 	 * @param path
 	 * @return
 	 */
-	private int bottleNeckCapacity(Path path){
+	private int bottleNeckCapacity(final Path path){
 		Node source = path.getSource();
 		if(!this._demands.containsKey(source)){
 			throw new IllegalArgumentException("Startnode is no source " + path);
@@ -213,7 +213,7 @@ public class Flow {
 	 * Reduces the demand of the first node in the path by the flow value of the Path
 	 * @param path path used to determine flow and Source Node
 	 */
-	private void reduceDemand(Path path) {
+	private void reduceDemand(final Path path) {
 		Node source = path.getSource();
 		if(!this._demands.containsKey(source)){
 			throw new IllegalArgumentException("Startnode is no source" + path);
@@ -234,7 +234,7 @@ public class Flow {
 	 * @param node Node to check for	
 	 * @return true iff node is a Source with demand 0
 	 */
-	public boolean isNonActiveSource(Node node){
+	public boolean isNonActiveSource(final Node node){
 		return this._nonactives.get(node);
 	}
 	
@@ -307,13 +307,6 @@ public class Flow {
 	}
 
 	/**
-	 * @param _sink the _sink to set
-	 */
-	public void setSink(Node sink) {
-		this._sink = sink;
-	}
-
-	/**
 	 * @return the _sources
 	 */
 	public LinkedList<Node> getSources() {
@@ -321,24 +314,10 @@ public class Flow {
 	}
 
 	/**
-	 * @param _sources the _sources to set
-	 */
-	public void setSources(LinkedList<Node> sources) {
-		this._sources = sources;
-	}
-
-	/**
 	 * @return the _timeHorizon
 	 */
 	public int getTimeHorizon() {
 		return this._timeHorizon;
-	}
-
-	/**
-	 * @param horizon the _timeHorizon to set
-	 */
-	public void setTimeHorizon(int horizon) {
-		_timeHorizon = horizon;
 	}
 
 	/**
