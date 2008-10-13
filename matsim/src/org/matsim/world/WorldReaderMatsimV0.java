@@ -20,16 +20,12 @@
 
 package org.matsim.world;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for world files of MATSim according to <code>world_v0.dtd</code>.
@@ -77,24 +73,6 @@ public class WorldReaderMatsimV0 extends MatsimXmlParser {
 		} else if (MUNICIPALITY.equals(name)) {
 			this.currZone = null;
 			this.currLayer = null;
-		}
-	}
-
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

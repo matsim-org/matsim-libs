@@ -20,16 +20,12 @@
 
 package org.matsim.world;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for world files of MATSim according to <code>world_v1.dtd</code>.
@@ -76,24 +72,6 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 		}
 	}
 
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private void startWorld(final Attributes atts) {
 		this.world.setName(atts.getValue("name"));
 	}
@@ -109,7 +87,7 @@ public class WorldReaderMatsimV1 extends MatsimXmlParser {
 																 atts.getValue("max_x"), atts.getValue("max_y"), atts.getValue("area"), atts.getValue("name"));
 	}
 
-	public void startRef(final Attributes meta) {
+	private void startRef(final Attributes meta) {
 		ZoneLayer other_layer = (ZoneLayer)this.world.getLayer(meta.getValue("type"));
 		if (other_layer != null) {
 			// that layer was already read in. so the zone of that layer must exist
