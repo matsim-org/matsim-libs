@@ -37,8 +37,10 @@ public class StandaloneSimTest {
 	public static void main(final String[] args) {
 //		String netFileName = "test/simple/equil_net.xml";
 //		String popFileName = "test/simple/equil_plans.xml";
-		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
-		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
+//		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
+//		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
+		String netFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans100p.xml";
 
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
