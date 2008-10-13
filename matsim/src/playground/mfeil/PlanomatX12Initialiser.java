@@ -104,7 +104,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX11 (this.estimator, this.network, this.travelCostCalc, 
+		planomatXAlgorithm =  new PlanomatX12 (this.estimator, this.network, this.travelCostCalc, 
 				this.travelTimeCalc, this.preProcessRoutingData, this.factory, this.constrained, this.controler);
 
 		return planomatXAlgorithm;

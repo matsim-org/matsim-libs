@@ -65,8 +65,7 @@ public class PlanomatX11 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 		
 	public PlanomatX11 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
-			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, 
-			boolean constrained, Controler controler) {
+			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
 		this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
@@ -236,6 +235,8 @@ public class PlanomatX11 implements org.matsim.population.algorithms.PlanAlgorit
 		java.util.Collections.sort(tabuList);
 		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		ArrayList<Object> al = plan.getActsLegs();
+		
+		log.info("Finale actslegs für Person "+tabuList.get(tabuList.size()-1).getPerson().getId()+": "+tabuList.get(tabuList.size()-1).getActsLegs());
 		
 		xs = new double [currentIteration];
 		for (int i = 0;i<xs.length;i++)xs[i]=i+1;
