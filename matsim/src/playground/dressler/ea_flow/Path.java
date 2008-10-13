@@ -48,7 +48,7 @@ public class Path {
 	private LinkedList<PathEdge> _edges;
 	
 	/**
-	 * 
+	 * arrivaltime of a path
 	 */
 	private int _arrival;
 	
@@ -104,7 +104,7 @@ public class Path {
 		}
 
 		/**
-		 * TODO
+		 * Getter for the Link used
 		 * @return the edge
 		 */
 		public Link getEdge() {
@@ -112,7 +112,7 @@ public class Path {
 		}
 
 		/**
-		 * TODO
+		 * checks weather the link is used in forward direction
 		 * @return the forward
 		 */
 		public boolean isForward() {
@@ -120,7 +120,7 @@ public class Path {
 		}
 
 		/**
-		 * TODO
+		 * getter for the tim at which an edge is entered
 		 * @return the time
 		 */
 		public int getTime() {
@@ -222,8 +222,8 @@ public class Path {
 	}
 	
 	/**
-	 * TODO
-	 * @return
+	 * Method to find the First node in a path
+	 * @return first Node 
 	 */
 	public Node getSource(){
 		PathEdge firstedge = this._edges.getFirst();
@@ -250,8 +250,8 @@ public class Path {
 	}
 	
 	/**
-	 * TODO
-	 * @return
+	 * Getter for the List of PathEdges of which the Path consitst 
+	 * @return List of PathEdges in order of thier traversal
 	 */
 	public LinkedList<PathEdge> getPathEdges(){
 		return this._edges;
