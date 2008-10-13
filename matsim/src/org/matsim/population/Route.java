@@ -77,19 +77,8 @@ public class Route extends BasicRouteImpl<Node> {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}
 
-		String[] parts = route.split("[ \t\n]+");
-		// IMPORTANT NOTE:
-		// split does not always work as one would expect!
-		// if a string starts with one of the delimiters, then
-		// parts[0] is equal to ""!!! if not, then parts[0] holds the first
-		// string one is intended to keep.
-		// Example:
-		// route=" 0 1   2 " -> parts = ["","0","1","2"]
-		// route="0 1   2 "  -> parts = ["0","1","2"]
-		int min = 0;
-		if ((parts.length > 0) && (parts[0].equals(""))) { min = 1; }
-
-		for (int i = min; i < parts.length; i++) {
+		String[] parts = route.trim().split("[ \t\n]+");
+		for (int i = 0; i < parts.length; i++) {
 			Node n = layer.getNode(parts[i]);
 			if (n == null) {
 				throw new RuntimeException("Node not found in network. node id = " + parts[i]);
