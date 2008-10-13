@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
 
 		suite.addTestSuite(VehicleImplTest.class);
+		suite.addTest(playground.marcel.pt.routes.AllTests.suite());
 
 		return suite;
 	}

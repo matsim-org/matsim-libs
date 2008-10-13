@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CarRouteParser.java
+ * CarRouteParserTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.implementations.routes;
+package playground.marcel.pt.routes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestCase;
 
+import playground.marcel.pt.implementations.routes.CarRouteParser;
 import playground.marcel.pt.interfaces.routes.CarRoute;
-import playground.marcel.pt.interfaces.routes.RouteParser;
 
-public class CarRouteParser implements RouteParser {
+public class CarRouteParserTest extends MatsimTestCase {
 
-	public CarRoute createRoute(String stringRepresentation, final double travelTime) {
-		String[] parts = stringRepresentation.trim().split("[ \t\n]+");
-		Id depLink = null;//new IdImpl(parts[0]);
-		Id arrLink = null;//new IdImpl(parts[1]);
-		List<Id> links = new ArrayList<Id>();
-		for (int i = 0/*2*/, n = parts.length; i < n; i++) {
-			links.add(new IdImpl(parts[i]));
-		}
+	public void testCreateRoute_simple() {
+		final CarRouteParser parser = new CarRouteParser();
 		
-		CarRoute carRoute = new CarRouteImpl(depLink, links, arrLink, travelTime);
-		return carRoute;
+		final CarRoute route1 = parser.createRoute("3 7 4", 7.5*3600);
+		assertEquals(7.5*3600.0, route1.getTravelTime(), EPSILON);
+		assertEquals(null, route1.getDepartureLinkId());
+		assertEquals(null, route1.getArrivalLinkId());
+		assertEquals(3, route1.getLinkIds().size());
+		assertEquals(new IdImpl(3), route1.getLinkIds().get(0));
+		assertEquals(new IdImpl(7), route1.getLinkIds().get(1));
+		assertEquals(new IdImpl(4), route1.getLinkIds().get(2));
+	}
+	
+	public void testCreateRoute_withAdditionalSpaces() {
+		final CarRouteParser parser = new CarRouteParser();
+		
+		final CarRoute route1 = parser.createRoute(" \t3\n 7\t \t4\n\t \n", 8.5*3600);
+		assertEquals(8.5*3600.0, route1.getTravelTime(), EPSILON);
+		assertEquals(null, route1.getDepartureLinkId());
+		assertEquals(null, route1.getArrivalLinkId());
+		assertEquals(3, route1.getLinkIds().size());
+		assertEquals(new IdImpl(3), route1.getLinkIds().get(0));
+		assertEquals(new IdImpl(7), route1.getLinkIds().get(1));
+		assertEquals(new IdImpl(4), route1.getLinkIds().get(2));
 	}
 }

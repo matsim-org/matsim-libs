@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CarRouteParser.java
+ * RouteParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.implementations.routes;
+package playground.marcel.pt.interfaces.routes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-
-import playground.marcel.pt.interfaces.routes.CarRoute;
-import playground.marcel.pt.interfaces.routes.RouteParser;
-
-public class CarRouteParser implements RouteParser {
-
-	public CarRoute createRoute(String stringRepresentation, final double travelTime) {
-		String[] parts = stringRepresentation.trim().split("[ \t\n]+");
-		Id depLink = null;//new IdImpl(parts[0]);
-		Id arrLink = null;//new IdImpl(parts[1]);
-		List<Id> links = new ArrayList<Id>();
-		for (int i = 0/*2*/, n = parts.length; i < n; i++) {
-			links.add(new IdImpl(parts[i]));
-		}
-		
-		CarRoute carRoute = new CarRouteImpl(depLink, links, arrLink, travelTime);
-		return carRoute;
-	}
+public interface RouteParser {
+	public BRoute createRoute(final String stringRepresentation, final double travelTime);
 }

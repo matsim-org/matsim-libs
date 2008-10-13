@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.events.Events;
+
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
 import playground.marcel.pt.interfaces.Vehicle;
@@ -34,9 +36,11 @@ public class VehicleImpl implements Vehicle {
 	private final int passengerCapacity;
 	private DriverAgent driver = null;
 	private final List<PassengerAgent> passengers;
+	private final Events events;
 
-	public VehicleImpl(final int passengerCapacity) {
+	public VehicleImpl(final int passengerCapacity, final Events events) {
 		this.passengerCapacity = passengerCapacity;
+		this.events = events;
 		this.passengers = new ArrayList<PassengerAgent>(this.passengerCapacity);
 	}
 

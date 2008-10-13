@@ -22,18 +22,22 @@ package playground.marcel.pt.implementations.routes;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.utils.misc.Time;
 
 import playground.marcel.pt.interfaces.routes.PtRoute;
+import playground.marcel.pt.interfaces.routes.RouteParser;
 
-public class PtRouteParser {
+public class PtRouteParser implements RouteParser {
 
-	public PtRoute createPtRoute(final String stringRepresentation) {
-		// TODO [MR] continue work here
-		final Id departureId = new IdImpl(1);
-		final Id arrivalId = new IdImpl(2);
-		final Id lineId = new IdImpl(3);
-		final double travelTime = Time.UNDEFINED_TIME;
+	public PtRoute createRoute(final String stringRepresentation, final double travelTime) {
+		String[] parts = stringRepresentation.trim().split("[ \t\n]+");
+
+		if (parts.length != 3) {
+			throw new IllegalArgumentException("Error parsing pt-route: " + stringRepresentation);
+		}
+
+		final Id departureId = new IdImpl(parts[0]);
+		final Id arrivalId = new IdImpl(parts[1]);
+		final Id lineId = new IdImpl(parts[2]);
 		PtRoute ptRoute = new PtRouteImpl(lineId, departureId, arrivalId, travelTime);
 
 		return ptRoute;

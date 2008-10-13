@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CarRouteParser.java
+ * RouteFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,27 +20,31 @@
 
 package playground.marcel.pt.implementations.routes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicLeg.Mode;
 
-import playground.marcel.pt.interfaces.routes.CarRoute;
+import playground.marcel.pt.interfaces.routes.BRoute;
 import playground.marcel.pt.interfaces.routes.RouteParser;
 
-public class CarRouteParser implements RouteParser {
+public class RouteFactory {
 
-	public CarRoute createRoute(String stringRepresentation, final double travelTime) {
-		String[] parts = stringRepresentation.trim().split("[ \t\n]+");
-		Id depLink = null;//new IdImpl(parts[0]);
-		Id arrLink = null;//new IdImpl(parts[1]);
-		List<Id> links = new ArrayList<Id>();
-		for (int i = 0/*2*/, n = parts.length; i < n; i++) {
-			links.add(new IdImpl(parts[i]));
+	private final HashMap<BasicLeg.Mode, RouteParser> parsers = new HashMap<BasicLeg.Mode, RouteParser>(5);
+
+	public void registerRouteParser(final Mode mode, final RouteParser parser) {
+		parsers.put(mode, parser);
+	}
+	
+	public RouteParser getRouteParserForMode(final Mode mode) {
+		return parsers.get(mode);
+	}
+	
+	public BRoute createRouteForMode(final Mode mode, final String stringRepresentation, final double travelTime) {
+		RouteParser parser = getRouteParserForMode(mode);
+		if (parser == null) {
+			throw new IllegalArgumentException("No RouteParser registered for mode " + mode);
 		}
-		
-		CarRoute carRoute = new CarRouteImpl(depLink, links, arrLink, travelTime);
-		return carRoute;
+		return parser.createRoute(stringRepresentation, travelTime);
 	}
 }

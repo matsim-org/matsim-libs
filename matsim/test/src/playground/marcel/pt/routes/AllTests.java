@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CarRouteParser.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,29 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.implementations.routes;
+package playground.marcel.pt.routes;
 
-import java.util.ArrayList;
-import java.util.List;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
+public class AllTests {
 
-import playground.marcel.pt.interfaces.routes.CarRoute;
-import playground.marcel.pt.interfaces.routes.RouteParser;
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for playground.marcel.pt.routes");
 
-public class CarRouteParser implements RouteParser {
+		suite.addTestSuite(CarRouteParserTest.class);
+		suite.addTestSuite(PtRouteParserTest.class);
+		suite.addTestSuite(RouteFactoryTest.class);
 
-	public CarRoute createRoute(String stringRepresentation, final double travelTime) {
-		String[] parts = stringRepresentation.trim().split("[ \t\n]+");
-		Id depLink = null;//new IdImpl(parts[0]);
-		Id arrLink = null;//new IdImpl(parts[1]);
-		List<Id> links = new ArrayList<Id>();
-		for (int i = 0/*2*/, n = parts.length; i < n; i++) {
-			links.add(new IdImpl(parts[i]));
-		}
-		
-		CarRoute carRoute = new CarRouteImpl(depLink, links, arrLink, travelTime);
-		return carRoute;
+		return suite;
 	}
+	
 }

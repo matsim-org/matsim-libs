@@ -20,6 +20,7 @@
 
 package playground.marcel.pt;
 
+import org.matsim.events.Events;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.marcel.pt.implementations.VehicleImpl;
@@ -31,7 +32,7 @@ public class VehicleImplTest extends MatsimTestCase {
 	public void testAddPassenger() {
 		MockPassengerAgent passenger1 = new MockPassengerAgent();
 		MockPassengerAgent passenger2 = new MockPassengerAgent();
-		Vehicle vehicle = new VehicleImpl(3);
+		Vehicle vehicle = new VehicleImpl(3, new Events());
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -47,7 +48,7 @@ public class VehicleImplTest extends MatsimTestCase {
 		MockPassengerAgent passenger1 = new MockPassengerAgent();
 		MockPassengerAgent passenger2 = new MockPassengerAgent();
 		MockPassengerAgent passenger3 = new MockPassengerAgent();
-		Vehicle vehicle = new VehicleImpl(3);
+		Vehicle vehicle = new VehicleImpl(3, new Events());
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);
