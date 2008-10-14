@@ -49,7 +49,7 @@ import org.matsim.router.util.TravelTime;
  * For every router, there exists a class which computes some preprocessing data
  * and is passed to the router class constructor in order to accelerate the
  * routing procedure. The one used for Dijkstra is
- * org.matsim.demandmodeling.router.util.PreProcessDijkstra.
+ * {@link org.matsim.router.util.PreProcessDijkstra}.
  * </p>
  * <br>
  *
@@ -127,7 +127,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	protected ComparatorDijkstraCost comparator;
 
-	boolean doGatherInformation = true;
+	boolean doGatherInformation = false;
 
 	double avgRouteLength = 0;
 
@@ -481,18 +481,15 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	public void printInformation() {
 		if (this.doGatherInformation) {
-			System.out.println("Avg revisited count per route: "
+			log.info("Avg revisited count per route: "
 					+ (double) this.revisitNodeCount / this.routeCnt);
-			System.out.println("Avg visited count per route: "
+			log.info("Avg visited count per route: "
 					+ (double) this.visitNodeCount / this.routeCnt);
-			System.out.println("Number of routes: " + this.routeCnt);
-			System.out.println("Average route length: " + this.avgRouteLength);
-			System.out.println("Average travel time per route: "
+			log.info("Number of routes: " + this.routeCnt);
+			log.info("Average route length: " + this.avgRouteLength);
+			log.info("Average travel time per route: "
 					+ this.avgTravelTime);
 		}
-	}
-
-	public void cleanUp() {
 	}
 
 	/**

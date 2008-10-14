@@ -135,6 +135,10 @@ public class RoutingTest extends MatsimTestCase {
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
 		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
+		if (routingAlgo instanceof Dijkstra) {
+			((Dijkstra) routingAlgo).doGatherInformation = true;
+		}
+		
 		PlansCalcRoute router = null;
 		router = new PlansCalcRoute(routingAlgo, routingAlgo);
 		long now = System.currentTimeMillis();
