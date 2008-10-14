@@ -74,12 +74,10 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private HashMap<Node, VertexIntervalls> _labels;
 	
-	private Flow _flow;
-
 	/**
 	 * 
 	 */
-	private LinkedList<Node> _sources;
+	private Flow _flow;
 
 	/**
 	 * 
@@ -115,7 +113,7 @@ public class BellmanFordVertexIntervalls {
 	 */
 	public BellmanFordVertexIntervalls(final NetworkLayer network,
 			final TravelCost costFunction, final TravelTime timeFunction,
-			HashMap<Link, EdgeIntervalls> flow, int timeHorizon,Node sink,LinkedList<Node> sources) {
+			HashMap<Link, EdgeIntervalls> flow, int timeHorizon,Node sink) {
 
 		this.network = network;
 		this.costFunction = costFunction;
@@ -123,7 +121,6 @@ public class BellmanFordVertexIntervalls {
 
 		this._flowlabels = flow;
 		this._timehorizon = timeHorizon;
-		this._sources = sources; 
 		this._sink = sink;
 		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
@@ -140,8 +137,7 @@ public class BellmanFordVertexIntervalls {
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 		this._flowlabels = flow.getFlow();
-		this._timehorizon = flow.getTimeHorizon();
-		this._sources = flow.getSources() ; 
+		this._timehorizon = flow.getTimeHorizon(); 
 		this._sink = flow.getSink();
 		this._labels = new HashMap<Node, VertexIntervalls>();
 	}
@@ -179,12 +175,7 @@ public class BellmanFordVertexIntervalls {
 	 * @return
 	 */
 	private boolean isActiveSource(Node node) {
-		if(this._sources.contains(node)){
-			return true;
-		}
-		return false;
-		
-		//TODO nonactive sources or move to flow
+		return this._flow.isActiveSource(node);
 	}
 	
 	/**
