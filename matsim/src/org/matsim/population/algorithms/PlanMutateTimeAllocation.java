@@ -22,7 +22,6 @@ package org.matsim.population.algorithms;
 
 import java.util.Random;
 
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
@@ -42,10 +41,6 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final int mutationRange;
 	private final Random random;
-
-	public PlanMutateTimeAllocation(final int mutationRange) {
-		this(mutationRange, MatsimRandom.random);
-	}
 
 	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
