@@ -519,8 +519,8 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		}
 	}
 
-	public void addNetStateWriter(final BasicNet network, final String networkFileName,
-			final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
+	public void addNetStateWriter(final String networkFileName, final VisConfig visConfig,
+			final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 		NetStateWriter netStateWriter = new NetStateWriter(this.network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		netStateWriter.open();
 		this.addSnapshotWriter(netStateWriter);

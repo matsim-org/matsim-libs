@@ -225,7 +225,7 @@ public class Events2Snapshot {
 			}
 			int buffers = this.network.getLinks().size();
 			buffers = Math.max(5, Math.min(5000000/buffers, 1000));
-			this.visualizer.addNetStateWriter(this.network, networkFile.getAbsolutePath(), visConfig, snapshotFile, (int)this.config.simulation().getSnapshotPeriod(), buffers);
+			this.visualizer.addNetStateWriter(networkFile.getAbsolutePath(), visConfig, snapshotFile, (int)this.config.simulation().getSnapshotPeriod(), buffers);
 		}
 	}
 
