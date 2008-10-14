@@ -23,7 +23,6 @@ package org.matsim.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
 
 public abstract class BasicEvent {
@@ -31,27 +30,17 @@ public abstract class BasicEvent {
 	public final static String ATTRIBUTE_TYPE = "type";
 	
 	public final double time;
-	public final String agentId;
-	public Person agent = null;
 
 	private static String timeString = null;
 	private static double timeCache = Time.UNDEFINED_TIME;
 
-	protected BasicEvent(final double time, final Person agent) {
+	public BasicEvent(final double time) {
 		this.time = time;
-		this.agent = agent;
-		this.agentId = agent.getId().toString();
-	}
-
-	BasicEvent(final double time, final String agentId) {
-		this.time = time;
-		this.agentId = agentId;
 	}
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put("time", getTimeString(this.time));
-		attr.put("agent", this.agentId);
 		return attr;
 	}
 

@@ -26,7 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 
-abstract class ActEvent extends BasicEvent {
+abstract class ActEvent extends PersonEvent {
 
 	public String linkId;
 	private int actId;

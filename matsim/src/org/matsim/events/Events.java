@@ -41,6 +41,7 @@ import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.events.handler.PersonEventHandler;
 
 /**
  * EventHandling
@@ -230,23 +231,17 @@ public class Events {
 		return cache;
 	}
 
-	// these method is purely for performance reasons and need not be implemented
+	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Class<?> klass, final BasicEvent ev, final EventHandler handler) {
 
-		if (klass == BasicEvent.class) {
-			((BasicEventHandler)handler).handleEvent(ev);
-			return true;
-		} else if (klass == LinkLeaveEvent.class) {
+		if (klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
 		} else if (klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
 			return true;
-		} else if (klass == ActEndEvent.class) {
-			((ActEndEventHandler)handler).handleEvent((ActEndEvent)ev);
-			return true;
-		} else if (klass == ActStartEvent.class) {
-			((ActStartEventHandler)handler).handleEvent((ActStartEvent)ev);
+		} else if (klass == AgentWait2LinkEvent.class) {
+			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
 			return true;
 		} else if (klass == AgentArrivalEvent.class) {
 			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);
@@ -254,18 +249,26 @@ public class Events {
 		} else if (klass == AgentDepartureEvent.class) {
 			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
 			return true;
+		} else if (klass == ActEndEvent.class) {
+			((ActEndEventHandler)handler).handleEvent((ActEndEvent)ev);
+			return true;
+		} else if (klass == ActStartEvent.class) {
+			((ActStartEventHandler)handler).handleEvent((ActStartEvent)ev);
+			return true;
 		} else if (klass == AgentStuckEvent.class) {
 			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
-			return true;
-		} else if (klass == AgentWait2LinkEvent.class) {
-			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
 			return true;
 		} else if (klass == AgentUtilityEvent.class) {
 			((AgentUtilityEventHandler)handler).handleEvent((AgentUtilityEvent)ev);
 			return true;
-		}
-		else if (klass == AgentReplanEvent.class) {
+		} else if (klass == AgentReplanEvent.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
+			return true;
+		} else if (klass == BasicEvent.class) {
+			((BasicEventHandler)handler).handleEvent(ev);
+			return true;
+		} else if (klass == PersonEvent.class) {
+			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
 			return true;
 		}
 		return false;

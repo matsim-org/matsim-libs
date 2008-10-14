@@ -14,9 +14,9 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.PersonEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -31,7 +31,7 @@ import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerDetailedEventChecker extends TestHandler {
 
-	protected HashMap<String, LinkedList<BasicEvent>> events = new HashMap<String, LinkedList<BasicEvent>>();
+	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 	private boolean printEvent = true;
 	private Population population;
@@ -43,7 +43,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 	public void checkAssertions() {
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
-		for (LinkedList<BasicEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : events.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
 				if (lastTimeStamp > list.get(i).time) {
@@ -142,7 +142,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		
 		// compare plan and events for each agent
 		// compare: type of events, linkId
-		for (LinkedList<BasicEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : events.values()) {
 			Person p = population.getPersons().get(new IdImpl(list.get(0).agentId));
 			
 			Plan plan = p.getSelectedPlan();
@@ -201,7 +201,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(ActEndEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -215,7 +215,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(AgentDepartureEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -225,7 +225,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(AgentWait2LinkEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -235,7 +235,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(LinkLeaveEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -245,7 +245,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(LinkEnterEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -255,7 +255,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(AgentArrivalEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -265,7 +265,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(ActStartEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {
@@ -275,7 +275,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	public void handleEvent(AgentStuckEvent event) {
 		if (!events.containsKey(event.agentId)) {
-			events.put(event.agentId, new LinkedList<BasicEvent>());
+			events.put(event.agentId, new LinkedList<PersonEvent>());
 		}
 		events.get(event.agentId).add(event);
 		if (printEvent) {

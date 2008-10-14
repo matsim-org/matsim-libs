@@ -9,6 +9,7 @@ import java.util.Set;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.BasicEvent;
+import org.matsim.events.PersonEvent;
 
 /**
  * A EventFilterPersonSpecific lets the events, whose agentId belong to the
@@ -18,7 +19,7 @@ import org.matsim.events.BasicEvent;
  *
  * @author ychen
  */
-public class EventFilterPersonSpecific extends EventFilterA implements EventFilterI {
+public class EventFilterPersonSpecific extends EventFilterA {
 	/*-----------------------MEMBER VARIABLE-----------------*/
 	/**
 	 * Every EventFilterPersonSpecific must have a Set of Person-IDs
@@ -59,6 +60,9 @@ public class EventFilterPersonSpecific extends EventFilterA implements EventFilt
 	 */
 	@Override
 	public boolean judge(BasicEvent event) {
-		return this.personIds.contains(new IdImpl(event.agentId));
+		if (event instanceof PersonEvent) {
+			return this.personIds.contains(new IdImpl(((PersonEvent) event).agentId));
+		}
+		return false;
 	}
 }

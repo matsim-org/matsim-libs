@@ -22,11 +22,11 @@ package playground.marcel.pt.events;
 
 import java.util.Map;
 
-import org.matsim.events.BasicEvent;
+import org.matsim.events.PersonEvent;
 import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.population.Person;
 
-public class PersonLeavesVehicleEvent extends BasicEvent {
+public class PersonLeavesVehicleEvent extends PersonEvent {
 
 	final private Vehicle vehicle;
 	

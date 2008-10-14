@@ -16,7 +16,7 @@ import org.matsim.events.BasicEvent;
 public interface EventFilterI extends FilterI {
 	/**
 	 * judges whether the BasicEvent
-	 * (org.matsim.demandmodeling.events.BasicEvent) will be selected or not
+	 * (org.matsim.events.BasicEvent) will be selected or not
 	 * 
 	 * @param event -
 	 *            which is being judged

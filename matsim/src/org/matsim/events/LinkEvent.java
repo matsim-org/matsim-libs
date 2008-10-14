@@ -26,7 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 
-public abstract class LinkEvent extends BasicEvent {
+public abstract class LinkEvent extends PersonEvent {
 
 	public String linkId;
 	public transient Link link;

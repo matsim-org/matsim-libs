@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
+ * PersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.events.filters;
 
-import org.matsim.events.PersonEvent;
+package org.matsim.events;
 
+import java.util.Map;
+
+import org.matsim.population.Person;
 
 /**
- * @author dgrether
- *
+ * @author mrieser
  */
-public interface EventFilter {
-	/**
-	 * judges whether the PersonEvent
-	 * ({@link org.matsim.events.PersonEvent}) will be processed or not
-	 *
-	 * @param event -
-	 *            which is being judged
-	 * @return true if the event meets the criterion of the implementation
-	 */
-	boolean judge(PersonEvent event);
+public abstract class PersonEvent extends BasicEvent {
 
+	public Person agent;
+	public final String agentId;
+
+	public PersonEvent(final double time, final Person person) {
+		super(time);
+		this.agent = person;
+		this.agentId = person.getId().toString();
+	}
+	
+	public PersonEvent(final double time, final String personId)	{
+		super(time);
+		this.agentId = personId;
+	}
+	
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put("agent", this.agentId);
+		return attr;
+	}
 
 }

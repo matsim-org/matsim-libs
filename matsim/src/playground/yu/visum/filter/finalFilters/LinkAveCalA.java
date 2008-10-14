@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 import org.matsim.utils.misc.Time;
@@ -112,17 +111,17 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see org.matsim.demandmodeling.BasicEventHandler.handler.BasicEventHandlerI#handleEvent(
-	 *      org.matsim.demandmodeling.events.BasicEvent)
+	 * @see org.matsim.events.handler.BasicEventHandlerI#handleEvent(
+	 *      org.matsim.events.BasicEvent)
 	 */
 	@Override
 	public void handleEvent(BasicEvent event) {
 		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
 												// {
-			this.enters.put(event.agentId, (LinkEnterEvent) event);
+			this.enters.put(((LinkEnterEvent) event).agentId, (LinkEnterEvent) event);
 		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
 														// {
-			String agentId = event.agentId;
+			String agentId = ((LinkLeaveEvent) event).agentId;
 			if (this.enters.containsKey(agentId))
 				if (this.enters.get(agentId).linkId
 						.equals(((LinkLeaveEvent) event).linkId)) {

@@ -31,7 +31,8 @@ import javax.media.opengl.GL;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
-import org.matsim.events.handler.BasicEventHandler;
+import org.matsim.events.PersonEvent;
+import org.matsim.events.handler.PersonEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Person;
@@ -50,22 +51,19 @@ import com.sun.opengl.util.BufferUtil;
 
 public class QueryAgentEvents implements OTFQuery {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7388598935268835323L;
 
-	public static class MyEventsHandler implements BasicEventHandler, Serializable{
+	public static class MyEventsHandler implements PersonEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
-		public static List<BasicEvent> events = new ArrayList<BasicEvent>();
+		public final static List<PersonEvent> events = new ArrayList<PersonEvent>();
 		private final String agentID;
 		
 		public MyEventsHandler(String agentID) {
 			this.agentID = agentID;
 		}
 
-		public void handleEvent(BasicEvent event) {
+		public void handleEvent(PersonEvent event) {
 			if(event.agentId.equals(this.agentID)){
 				events.add(event);
 			}
@@ -150,14 +148,14 @@ public class QueryAgentEvents implements OTFQuery {
 		Color color = Color.ORANGE;
 		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
 
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
-        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
 		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
-        gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-        gl.glDisable(GL.GL_LINE_SMOOTH);
+		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glDisable(GL.GL_LINE_SMOOTH);
 		if (pos != null) {
 			//System.out.println("POS: " + pos.x + ", " + pos.y);
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
@@ -171,17 +169,15 @@ public class QueryAgentEvents implements OTFQuery {
 				this.agentText.x = (float)pos.x+ 250;
 				this.agentText.y = (float)pos.y + 250;
 			}
-			
+
 			int offset = 0;
 			for(BasicEvent event : MyEventsHandler.events) {
 				this.texts.add(InfoText.showTextPermanent(event.toString(),(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
 			}
 			MyEventsHandler.events.clear();
-			
-		} else {
-		}
 
-        gl.glDisable(GL.GL_BLEND);
+		}
+		gl.glDisable(GL.GL_BLEND);
 
 	}
 

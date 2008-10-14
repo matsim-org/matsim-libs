@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
+ * BasicEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,59 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.events;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.events.handler;
 
-import org.matsim.events.BasicEvent;
-import org.matsim.events.Events;
 import org.matsim.events.PersonEvent;
 
-import playground.dgrether.events.filters.EventFilter;
-
-
-/**
- * @author dgrether
- *
- */
-public class FilteredEvents extends Events {
-
-	private List<EventFilter> filters = new ArrayList<EventFilter>();
-
-
-	public void addFilter(EventFilter filter) {
-		this.filters.add(filter);
-	}
-
-	/**
-	 * Delegates to List.remove() and returns the appropriate value
-	 * @param filter
-	 * @return the value of List.remove() see interface
-	 */
-	public boolean removeFilter(EventFilter filter) {
-		return this.filters.remove(filter);
-	}
-
-	/**
-	 * If all filters set in this class are returning true on the
-	 * event given as parameter the Events.processEvent() method is called.
-	 * Otherwise nothing is done at all.
-	 */
-	@Override
-	public void processEvent(final BasicEvent event) {
-		if (event instanceof PersonEvent) {
-			boolean doProcess = true;
-			for (EventFilter f : this.filters) {
-				if (!f.judge((PersonEvent)event)) {
-					doProcess = false;
-					break;
-				}
-			}
-			if (doProcess) {
-				super.processEvent(event);
-			}
-		}
-	}
-
+public interface PersonEventHandler extends EventHandler {
+	public void handleEvent (PersonEvent event);
 }

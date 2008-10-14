@@ -32,7 +32,7 @@ import org.matsim.population.Person;
  *
  * @author mrieser
  */
-public final class AgentUtilityEvent extends BasicEvent {
+public final class AgentUtilityEvent extends PersonEvent {
 
 	public final double amount;
 

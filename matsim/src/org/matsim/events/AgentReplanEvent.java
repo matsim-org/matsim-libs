@@ -27,7 +27,7 @@ import org.matsim.population.Route;
 /**
  * @author dgrether
  */
-public class AgentReplanEvent extends BasicEvent {
+public class AgentReplanEvent extends PersonEvent {
 
 	public Route replannedRoute;
 

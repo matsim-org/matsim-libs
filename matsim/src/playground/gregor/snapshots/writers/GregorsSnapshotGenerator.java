@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
@@ -134,7 +134,7 @@ public class GregorsSnapshotGenerator implements AgentDepartureEventHandler, Age
 		this.lastSnapshotIndex = -1;
 	}
 
-	private EventAgent getEventAgent(final BasicEvent event) {
+	private EventAgent getEventAgent(final PersonEvent event) {
 		EventAgent agent = this.eventAgents.get(event.agentId);
 		if (agent == null) {
 			agent = new EventAgent(event.agentId, event.time);

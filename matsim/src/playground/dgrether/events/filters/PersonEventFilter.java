@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEvent;
+import org.matsim.events.PersonEvent;
 
 
 /**
@@ -40,9 +40,9 @@ public class PersonEventFilter implements EventFilter {
 
 
 	/**
-	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.events.BasicEvent)
+	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.events.PersonEvent)
 	 */
-	public boolean judge(BasicEvent event) {
+	public boolean judge(PersonEvent event) {
 		return this.personIds.contains(new IdImpl(event.agentId));
 	}
 }

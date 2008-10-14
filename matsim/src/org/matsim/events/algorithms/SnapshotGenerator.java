@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.PersonEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
@@ -122,7 +122,7 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.lastSnapshotIndex = -1;
 	}
 
-	private EventAgent getEventAgent(final BasicEvent event) {
+	private EventAgent getEventAgent(final PersonEvent event) {
 		EventAgent agent = this.eventAgents.get(event.agentId);
 		if (agent == null) {
 			agent = new EventAgent(event.agentId, event.time);
@@ -260,7 +260,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		 * @param time The current timestep
 		 */
 		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions, final double time) {
-			int cnt = 0;
 			double queueEnd = this.link.getLength(); // the length of the queue jammed vehicles build at the end of the link
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double vehLen = Math.min(	// the length of a vehicle in visualization
@@ -281,7 +280,6 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 						lane, speed, PositionInfo.VehicleState.Driving,null);
 				agent.linkPosition = queueEnd * this.radioLengthToEuklideanDist;
 				positions.add(position);
-				cnt++;
 				queueEnd -= vehLen;
 			}
 
