@@ -20,15 +20,11 @@
 
 package org.matsim.matrices;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for matrices files of MATSim according to <code>matrices_v1.dtd</code>.
@@ -70,24 +66,6 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 			this.currMatrix = null;
 		} else if (ENTRY.equals(name)) {
 
-		}
-	}
-
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

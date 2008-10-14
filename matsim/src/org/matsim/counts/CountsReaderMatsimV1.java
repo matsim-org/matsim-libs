@@ -20,17 +20,13 @@
 
 package org.matsim.counts;
 
-import java.io.IOException;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * A reader for counts-files of MATSim according to <code>counts_v1.xsd</code>.
@@ -93,25 +89,6 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 	private void startVolume(final Attributes meta) {
 		if (this.currcount != null) {
 			this.currcount.createVolume(Integer.parseInt(meta.getValue("h")), Double.parseDouble(meta.getValue("val")));
-		}
-	}
-
-
-	/**
-	 * Parses the specified counts file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		try {
-			parse(filename);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
