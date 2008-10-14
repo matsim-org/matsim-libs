@@ -24,9 +24,12 @@
 package playground.yu.analysis;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -36,6 +39,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -43,37 +47,84 @@ import org.matsim.utils.io.IOUtils;
  * 
  */
 public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
+	private Map<Double, Double> carLegs = new TreeMap<Double, Double>(),
+			ptLegs = new TreeMap<Double, Double>();
+
+	private String outputFilePath;
+
+	private BufferedWriter out;
+
+	public ModeChoiceByDistance(String outputFilePath) throws Exception {
+		out = IOUtils.getBufferedWriter(outputFilePath + ".txt");
+		this.outputFilePath = outputFilePath;
+	}
 
 	/**
-	 * @param args
+	 * @param args[0] -
+	 *            netFilename
+	 * @param args[1] -
+	 *            planFilename
+	 * @param args[2] -
+	 *            outputFilepath
 	 */
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../runs/run628/it.500/500.plans.xml.gz";
-		// final String eventsFilename =
-		// "../runs/run628/it.500/500.events.txt.gz";
-		final String outputFilename = "../runs/run628/it.500/500.carDeparture.txt";
+		final String netFilename = args[0];
+		final String plansFilename = args[1];
+		final String outputFilePath = args[2];
 
 		Gbl.createConfig(null);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
-		Population ppl = new Population();
 
+		Population ppl = new Population();
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl).readFile(plansFilename);
-
+		ModeChoiceByDistance mcbd;
 		try {
-			BufferedWriter out = IOUtils.getBufferedWriter(outputFilename);
-			out.write("network :\t" + netFilename + "\n");
-			out.write("plansfile :\t" + plansFilename + "\n");
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+			mcbd = new ModeChoiceByDistance(outputFilePath);
+			mcbd.run(ppl);
+			mcbd.write("network :\t" + netFilename + "\n");
+			mcbd.write("plansfile :\t" + plansFilename + "\n");
+			mcbd.write("car : dist\tn_legs\n");
+			XYLineChart chart = new XYLineChart("mode choice by distance",
+					"distance [m]", "n_legs");
+			Map<Double, Double> carLegs = mcbd.getCarLegs();
+			double[] xCar = new double[carLegs.size()];
+			double[] yCar = new double[carLegs.size()];
+			int i = 0;
+			for (Entry<Double, Double> e : carLegs.entrySet()) {
+				double dist = e.getKey();
+				double n_carlegs = e.getValue();
+				mcbd.write(dist + "\t" + n_carlegs + "\n");
+				xCar[i] = dist;
+				yCar[i] = n_carlegs;
+				i++;
+			}
+			chart.addSeries("car legs", xCar, yCar);
+
+			mcbd.write("pt : dist\tn_legs\n");
+			Map<Double, Double> ptLegs = mcbd.getPtLegs();
+			double[] xPt = new double[ptLegs.size()];
+			double[] yPt = new double[ptLegs.size()];
+			int j = 0;
+			for (Entry<Double, Double> e : ptLegs.entrySet()) {
+				double dist = e.getKey();
+				double n_ptlegs = e.getValue();
+				mcbd.write(dist + "\t" + n_ptlegs + "\n");
+				xPt[j] = dist;
+				yPt[j] = n_ptlegs;
+				j++;
+			}
+			chart.addSeries("pt legs", xPt, yPt);
+
+			mcbd.close();
+
+			chart.saveAsPng(outputFilePath + ".png", 800, 600);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("-> Done!");
@@ -86,9 +137,45 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		for (LegIterator li = person.getSelectedPlan().getIteratorLeg(); li
 				.hasNext();) {
 			Leg l = (Leg) li.next();
-			li.next().getMode();
-			li.next().getRoute().getDist();
+			double dist = (double) (((int) l.getRoute().getDist()) / 5000 * 5000);
+			if (l.getMode().equals(Mode.car)) {
+				Double carLegsCounter = carLegs.get(dist);
+				if (carLegsCounter == null) {
+					carLegsCounter = Double.valueOf(0.0);
+					carLegs.put(dist, carLegsCounter);
+				}
+				carLegsCounter = carLegsCounter + 1.0;
+			} else if (l.getMode().equals(Mode.pt)) {
+				Double ptLegsCounter = ptLegs.get(dist);
+				if (ptLegsCounter == null) {
+					ptLegsCounter = Double.valueOf(0.0);
+					ptLegs.put(dist, ptLegsCounter);
+				}
+				ptLegsCounter = ptLegsCounter + 1.0;
+			}
 		}
 	}
 
+	public void write(String args) {
+		try {
+			out.write(args);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void close() {
+		try {
+			out.close();
+		} catch (IOException e) {
+		}
+	}
+
+	public Map<Double, Double> getCarLegs() {
+		return carLegs;
+	}
+
+	public Map<Double, Double> getPtLegs() {
+		return ptLegs;
+	}
 }
