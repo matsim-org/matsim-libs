@@ -44,6 +44,7 @@ public class AllTests {
 
 		// run unit tests
 		suite.addTest(playground.marcel.AllTests.suite());
+		suite.addTest(playground.wrashid.AllTests.suite());
 
 		//$JUnit-END$
 		return suite;
