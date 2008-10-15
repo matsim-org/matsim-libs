@@ -15,7 +15,7 @@ public class PTTravelCost implements TravelCost {
 		double cost =0;
 		if (link.getType().equals("Transfer")){
 			cost= ptTimeTable.GetTransferTime(link, time);
-			cost=1;
+			//cost=1;
 		}else if (link.getType().equals("Walking")){
 			cost=0;
 		}else if (link.getType().equals("Standard")){

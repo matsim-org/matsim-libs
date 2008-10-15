@@ -29,15 +29,18 @@ public class PTControler2 {
 	//private static final String ZURICHPTN="C://Users/manuel/Desktop/TU/Zuerich/network.xml";
 
 	//Only Tram lines
-	//private static final String ZURICHPTN="C://Users/manuel/Desktop/TU/Zuerich/TRAMnetwork.xml";
-	//private static final String ZURICHPTTIMETABLE="C://Users/manuel/Desktop/TU/Zuerich/PTTimetable.xml";
-	//private static final String ZURICHPTPLANS="C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	private static final String ZURICHPTN="C://Users/manuel/Desktop/TU/Zuerich/TRAMnetwork.xml";
+	private static final String ZURICHPTTIMETABLE="C://Users/manuel/Desktop/TU/Zuerich/PTTimetable.xml";
+	private static final String ZURICHPTPLANS="C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	private static final String CONFIG="C://Users/manuel/Desktop/berlinOEV/OhneCity/config.xml";
 	
+	/*
 	//Variables for the net 5x5
 	private static final String ZURICHPTN="C://Users/manuel/Desktop/berlinOEV/OhneCity/5x5Network.xml";
 	private static final String ZURICHPTTIMETABLE="C://Users/manuel/Desktop/berlinOEV/OhneCity/5x5Timetable.xml";
 	private static final String ZURICHPTPLANS="C://Users/manuel/Desktop/berlinOEV/OhneCity/5x5plans.xml";
 	private static final String CONFIG="C://Users/manuel/Desktop/berlinOEV/OhneCity/config.xml";
+	 */	
 	
 	//Case ivtch
 	//private static final String ZURICHPTN="C://Users/manuel/Eclipseworkspace/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
@@ -48,11 +51,11 @@ public class PTControler2 {
 		NetworkLayer ptNetworkLayer = ptNetworkFactory.createNetwork(ZURICHPTN, ptTimeTable);
 		PTRouter2 ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
 
-		int option =1;
+		int option =2;
 		switch (option){
 	    	case 0: 
-	    		Node ptNode = ptNetworkLayer.getNode("100046");
-	    		Node ptNode2 = ptNetworkLayer.getNode("100047");
+	    		Node ptNode = ptNetworkLayer.getNode("100821");
+	    		Node ptNode2 = ptNetworkLayer.getNode("100917");
 	    		
 	    		//Node ptNode = ptNetworkLayer.getNode("103041b");
 	    		//Node ptNode2 = ptNetworkLayer.getNode("100872");
@@ -63,10 +66,10 @@ public class PTControler2 {
 	            ptRouter2.PrintRoute(ptRouter2.findRoute(ptNode, ptNode2, 10));
 	    		break;
 	    	case 1:
-    			
-    			Coord coord1= new CoordImpl(682074,247783);
-    			Coord coord2= new CoordImpl(682317,248132);
-	    		Route route = ptRouter2.findRoute(coord1, coord2,31680);
+	    		
+    			Coord coord1= new CoordImpl(680407, 247013);
+    			Coord coord2= new CoordImpl(682264, 248263);
+	    		Route route = ptRouter2.findRoute(coord1, coord2,100);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
 	    		ptRouter2.PrintRoute(route);
 	    		//System.out.println(route.getRoute().toString());
@@ -79,9 +82,6 @@ public class PTControler2 {
 	    		Gbl.setConfig(config);
 	    		Gbl.getWorld().setNetworkLayer(ptNetworkLayer);
 	
-	    		
-	    		
-	    		
 	    		org.matsim.population.Population plans = new org.matsim.population.Population(false);
 	    		org.matsim.population.PopulationReaderMatsimV4 plansReader = new org.matsim.population.PopulationReaderMatsimV4(plans);
 	    		plansReader.readFile(ZURICHPTPLANS);
@@ -96,87 +96,59 @@ public class PTControler2 {
 	    		//org.matsim.population.Leg firstLeg = plan.getNextLeg(firstAct);
 	    		//org.matsim.population.Act secondAct = plan.getNextActivity(firstLeg);
 	    		
-	    		
+	    		int x=0;
 	    		for (Person person: plans.getPersons().values()) {
+	    			System.out.println(++x + " person: " + person.getId());
+	    			
 	    			Plan plan = person.getPlans().get(0);
+	    			plan.setSelected(false);
 	    			Plan newPlan = new Plan(person);
 	    			
-	    			// Iterate in plans  of the person
+	    			//Iterate in plans  of the person and insert the new ptActs - ptlegs in the new ptPlan
 		    		boolean val =false;
 		    		Act firstAct = null;
-		    		int pos=1;
 		    		for (Iterator iter= plan.getIteratorAct(); iter.hasNext();) {
 		    			Act act= (Act)iter.next();
-
-		    			//newPlan.addAct(act);
-		    			/*
-		    			Leg leg = new Leg(Leg.Mode.pt);
-						leg.setDepTime(act.getEndTime()); 
-						leg.setTravTime(0);
-						leg.setArrTime(act.getEndTime()); 
-						leg.setNum(0); 		
-						//leg.setRoute(legRoute);
-						newPlan.addLeg(leg);		
-		    			*/
 		    			
-		    			System.out.println("\n New act");
-						
 		    			if (val) {
 		    				Act secondAct = act;	
-		    				
-		    				/*
-		    				if (secondAct==null){
-			    	    		System.out.println("el secondAct es null");
-		    	    		}
-		    	    		*/
-		    				/////////////////Verified code
 		    				Coord c1 = firstAct.getCoord();
 		    	    		Coord c2 = secondAct.getCoord();
 		    	    		
-		    	    		Route myRoute = ptRouter2.findRoute(c1, c2, firstAct.getEndTime());
-		    	    		if(myRoute!=null){
-			    	    		Link[] routeLinkArray= myRoute.getLinkRoute();
+		    	    		Route legRoute = ptRouter2.findRoute(c1, c2, firstAct.getEndTime());
+		    	    		if(legRoute!=null){
 			    	    		List<Object> listLegAct = new ArrayList<Object>();
-			    	    		listLegAct=ptRouter2.findLegActs(myRoute, firstAct.getEndTime());
+			    	    		listLegAct=ptRouter2.findLegActs(legRoute, firstAct.getEndTime());
 			    	    		for (Iterator<Object> iter2 = listLegAct.iterator(); iter2.hasNext();) {
-			    	    			Object LegAct = iter2.next();	
-			    	    			Act ptAct= null;
-			    	    			Leg ptLeg= null;
-			    	    			if(LegAct.getClass().toString().equals("class org.matsim.population.Act")){
-			    	    				ptAct= (Act)LegAct;
-			    	    				System.out.println(ptAct.toString());
-			    	    				//System.out.println(LegAct.getClass().toString() + " it is an act");
-			    	    				//newPlan.addAct(ptAct);
+			    	    			Object legAct = iter2.next();	
+			    	    			// use "instanceOf" instead of this
+			    	    			if(Act.class.isInstance(legAct)){
+			    	    			//if(LegAct.getClass().toString().equals("class org.matsim.population.Act")){
+			    	    				newPlan.addAct((Act)legAct);
 			    	    			}else{
-			    	    				ptLeg= (Leg)LegAct; 
-			    	    				System.out.println(ptLeg.toString());
-			    	    				//System.out.println(LegAct.getClass().toString() + " it is a leg");
-			    	    				//newPlan.addLeg(ptLeg);
+			    	    				newPlan.addLeg((Leg)legAct);
 			    	    			}
-			    	    			
-			    	    			
-			    	    			plan.insertLegAct(pos, ptLeg, ptAct);
-			    	    			pos = pos + 2;
 			    	    		}
-		    	    		}// if my route!==
-			    	    	///////////////////////////////////////////////////////
-		    			}// if val
+		    	    		}//if legRoute
+		    			}else{
+		    				newPlan.addAct(act);
+		    				val=true;
+		    			}//if val
 	    				firstAct = act;
-		    			val=true;
-		    			pos = pos + 2;
-		    		}// for iterator iter 
+		    		}//for iterator iter 
 	    		
-		    		
-		    		//////////////////////////////////////
-		    		//Write outplan XML
-		    		Gbl.getConfig().plans().setOutputFile("c://@output_plans.xml"); 
-		    		Gbl.getConfig().plans().setOutputVersion("v4");
-		    		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		    		plans.addAlgorithm(plansWriter);
-		    		plansWriter.write();
-		    		////////////////////////////////////////
+		    		person.exchangeSelectedPlan(newPlan, true);
+		    		person.removeUnselectedPlans();
+
 	    		}//for Person person
-		    	break;
+	    		//Write outplan XML
+	    		Gbl.getConfig().plans().setOutputFile("c://@output_plans.xml"); 
+	    		Gbl.getConfig().plans().setOutputVersion("v4");
+	    		final PopulationWriter plansWriter = new PopulationWriter(plans);
+	    		plans.addAlgorithm(plansWriter);
+	    		plansWriter.write();
+
+	    		break;
 	    }//switch
 	}//main
 		
