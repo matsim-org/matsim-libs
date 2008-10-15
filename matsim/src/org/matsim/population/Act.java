@@ -57,37 +57,9 @@ public class Act extends BasicActImpl {
 		this.setFacility(fac);
 	}
 
-
-
 	public Act(final String type, final Coord coord, final Link link) {
 		this(type, link);
 		this.setCoord(coord);
-	}
-	@Deprecated
-	public Act(final String type, final Double x, final Double y, final String link,
-						final String startTime, final String endTime, final String dur) {
-		super(type);
-		// check if either coord and/or link are set
-		if (((x==null) && (y!=null)) || ((x!=null) && (y==null))) {
-			Gbl.errorMsg(this + "[either both or non of the coordinates must exist.]");
-		} else if ((x!=null) && (y!=null)) {
-			this.setCoord(new CoordImpl(x.doubleValue(), y.doubleValue())); // set the coord, because they are defined
-		} else if (link == null) { // both coords are == null, therefore link MUST exist
-			Gbl.errorMsg(this + "[the coord AND the link is not defined! forbidden!]");
-		}
-		if (link != null) {
-			setLinkFromString(link);
-		}
-
-		if (startTime != null) {
-			this.startTime = Time.parseTime(startTime);
-		}
-		if (endTime != null) {
-			this.endTime = Time.parseTime(endTime);
-		}
-		if (dur != null) {
-			this.dur = Time.parseTime(dur);
-		}
 	}
 
 	@Deprecated

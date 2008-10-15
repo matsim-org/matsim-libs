@@ -141,19 +141,13 @@ public class LeaveLinkReplanner {
 			//System.exit(0);
 		}
 		
-		// Daten f�r die neue Aktivit�t generieren
+		// Daten fuer die neue Aktivitaet generieren
 		String type = "w";
 		
-		Node toNode = fromLink.getToNode();
-		double x = toNode.getCoord().getX();
-		double y = toNode.getCoord().getY();
-		
-		String link = fromLink.getId().toString();
-		String startTime = String.valueOf(time);
-		String endTime = String.valueOf(time);
-		String dur = String.valueOf(0.0);
-		
-		Act newFromAct = new Act(type, x, y, link, startTime, endTime, dur);
+		Act newFromAct = new Act(type, fromLink.getToNode().getCoord(), fromLink);
+		newFromAct.setStartTime(time);
+		newFromAct.setEndTime(time);
+		newFromAct.setDur(0);
 		
 		Route route = leg.getRoute();
 		

@@ -93,10 +93,26 @@ public class Plan extends BasicPlanImpl {
   @Deprecated
 	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
 			 final String endTime, final String dur, final String isPrimary) throws IllegalStateException {
-		Double xx = (x == null) ? null : Double.valueOf(x);
-		Double yy = (y == null) ? null : Double.valueOf(y);
 		verifyCreateAct(endTime);
-		Act a = new Act(type, xx, yy, link, startTime, endTime, dur);
+		Coord coord = null;
+		if ((x != null) && (y != null)) {
+			coord = new CoordImpl(Double.parseDouble(x), Double.parseDouble(y));
+		}
+		Act a = new Act(type, coord);
+		if (link != null) {
+			a.setLinkFromString(link);
+		} else if (coord == null) {
+			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
+		}
+		if (startTime != null) {
+			a.setStartTime(Time.parseTime(startTime));
+		}
+		if (endTime != null) {
+			a.setEndTime(Time.parseTime(endTime));
+		}
+		if (dur != null) {
+			a.setDur(Time.parseTime(dur));
+		}
 		this.actsLegs.add(a);
 		return a;
 	}
