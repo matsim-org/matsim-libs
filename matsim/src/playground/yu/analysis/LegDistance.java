@@ -143,7 +143,7 @@ public class LegDistance implements LinkEnterEventHandler,
 	protected void write(final BufferedWriter bw) {
 		try {
 			bw
-					.write("time\ttimeBin\tlegistances [m]\tn._Legs\tavg. legDistance [m]\n");
+					.write("time\ttimeBin\tlegDistances [m]\tn._Legs\tavg. legDistance [m]\n");
 
 			for (int i = 0; i < this.legDistances.length; i++) {
 				bw.write(Time.writeTime(i * this.binSize) + "\t" + i

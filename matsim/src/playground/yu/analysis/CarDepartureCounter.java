@@ -27,9 +27,11 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
+import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -43,10 +45,15 @@ import org.matsim.utils.io.IOUtils;
  * @author yu
  * 
  */
-public class CarDepartureCounter implements AgentDepartureEventHandler {
+public class CarDepartureCounter implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	private Population ppl;
 
-	private int cdc = 0;
+	private int cdc = 0, cac = 0;
+
+	public int getCac() {
+		return cac;
+	}
 
 	public CarDepartureCounter(Population ppl) {
 		this.ppl = ppl;
@@ -58,10 +65,10 @@ public class CarDepartureCounter implements AgentDepartureEventHandler {
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-		final String netFilename = "../data/ivtch/input/network.xml";
-		final String plansFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.plans.xml.gz";
-		final String eventsFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.events.txt.gz";
-		final String outputFilename = "../data/ivtch/....carDeparture.txt";
+		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		final String plansFilename = "../runs/run628/it.500/500.plans.xml.gz";
+		final String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
+		final String outputFilename = "../runs/run628/it.500/500.carDeparture.txt";
 
 		Gbl.createConfig(null);
 
@@ -85,6 +92,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler {
 			out.write("plansfile :\t" + plansFilename + "\n");
 			out.write("events :\t" + eventsFilename + "\n");
 			out.write("car departure :\t" + cdc.getCdc() + "\n");
+			out.write("car arrival :\t" + cdc.getCac() + "\n");
 			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -104,10 +112,18 @@ public class CarDepartureCounter implements AgentDepartureEventHandler {
 
 	public void reset(int iteration) {
 		cdc = 0;
+		cac = 0;
 	}
 
 	public int getCdc() {
 		return cdc;
+	}
+
+	public void handleEvent(AgentArrivalEvent event) {
+		Person p = ppl.getPerson(event.agentId);
+		if (PlanModeJudger.useCar(p.getSelectedPlan()))
+			cac++;
+
 	}
 
 }

@@ -60,12 +60,12 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 	}
 
 	/**
-	 * @param args[0] -
-	 *            netFilename
-	 * @param args[1] -
-	 *            planFilename
-	 * @param args[2] -
-	 *            outputFilepath
+	 * @param args
+	 *            [0] - netFilename
+	 * @param args
+	 *            [1] - planFilename
+	 * @param args
+	 *            [2] - outputFilepath
 	 */
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
@@ -137,21 +137,25 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 		for (LegIterator li = person.getSelectedPlan().getIteratorLeg(); li
 				.hasNext();) {
 			Leg l = (Leg) li.next();
-			double dist = (double) (((int) l.getRoute().getDist()) / 5000 * 5000);
-			if (l.getMode().equals(Mode.car)) {
-				Double carLegsCounter = carLegs.get(dist);
-				if (carLegsCounter == null) {
-					carLegsCounter = new Double(0.0);
+			double dist = (double) (((int) l.getRoute().getDist()) / 1000 * 1000);
+			if (dist < 320000) {
+				if (l.getMode().equals(Mode.car)) {
+					Double carLegsCounter = carLegs.get(dist);
+					if (carLegsCounter == null) {
+						carLegsCounter = new Double(0.0);
+					}
+					carLegsCounter = new Double(
+							carLegsCounter.doubleValue() + 1.0);
+					carLegs.put(dist, carLegsCounter);
+				} else if (l.getMode().equals(Mode.pt)) {
+					Double ptLegsCounter = ptLegs.get(dist);
+					if (ptLegsCounter == null) {
+						ptLegsCounter = new Double(0.0);
+					}
+					ptLegsCounter = new Double(
+							ptLegsCounter.doubleValue() + 1.0);
+					ptLegs.put(dist, ptLegsCounter);
 				}
-				carLegsCounter = new Double(carLegsCounter.doubleValue() + 1.0);
-				carLegs.put(dist, carLegsCounter);
-			} else if (l.getMode().equals(Mode.pt)) {
-				Double ptLegsCounter = ptLegs.get(dist);
-				if (ptLegsCounter == null) {
-					ptLegsCounter = new Double(0.0);
-				}
-				ptLegsCounter = new Double(ptLegsCounter.doubleValue() + 1.0);
-				ptLegs.put(dist, ptLegsCounter);
 			}
 		}
 	}
