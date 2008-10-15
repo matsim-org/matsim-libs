@@ -141,17 +141,17 @@ public class ModeChoiceByDistance extends AbstractPersonAlgorithm {
 			if (l.getMode().equals(Mode.car)) {
 				Double carLegsCounter = carLegs.get(dist);
 				if (carLegsCounter == null) {
-					carLegsCounter = Double.valueOf(0.0);
-					carLegs.put(dist, carLegsCounter);
+					carLegsCounter = new Double(0.0);
 				}
-				carLegsCounter = carLegsCounter + 1.0;
+				carLegsCounter = new Double(carLegsCounter.doubleValue() + 1.0);
+				carLegs.put(dist, carLegsCounter);
 			} else if (l.getMode().equals(Mode.pt)) {
 				Double ptLegsCounter = ptLegs.get(dist);
 				if (ptLegsCounter == null) {
-					ptLegsCounter = Double.valueOf(0.0);
-					ptLegs.put(dist, ptLegsCounter);
+					ptLegsCounter = new Double(0.0);
 				}
-				ptLegsCounter = ptLegsCounter + 1.0;
+				ptLegsCounter = new Double(ptLegsCounter.doubleValue() + 1.0);
+				ptLegs.put(dist, ptLegsCounter);
 			}
 		}
 	}
