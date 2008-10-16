@@ -21,10 +21,12 @@
 package org.matsim.scoring;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
@@ -43,9 +45,6 @@ import org.matsim.population.Plan;
  * @author mrieser
  */
 public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
-
-	/** Specifies how exact the calculated scores have to be when compared against the test-values */
-	private static final double epsilon = 1e-10;
 
 	private Config config = null;
 	private NetworkLayer network = null;
@@ -82,23 +81,23 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		this.network.createNode("4",  "6000.0", "0.0", null);
 		this.network.createNode("5", "11000.0", "0.0", null);
 		this.network.createNode("6", "11500.0", "0.0", null);
-		this.network.createLink("1", "1", "2", "500", "25", "3600", "1", null, null);
+		Link link1 = this.network.createLink("1", "1", "2", "500", "25", "3600", "1", null, null);
 		this.network.createLink("2", "2", "3", "5000", "50", "3600", "1", null, null);
-		this.network.createLink("3", "3", "4", "500", "25", "3600", "1", null, null);
+		Link link3 = this.network.createLink("3", "3", "4", "500", "25", "3600", "1", null, null);
 		this.network.createLink("4", "4", "5", "5000", "50", "3600", "1", null, null);
-		this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
+		Link link5 = this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
 		Gbl.getWorld().setNetworkLayer(this.network);
 
 		this.person = new Person(new IdImpl(1));
 		this.plan = this.person.createPlan(true);
 		try {
-			this.plan.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", null);
-			Leg leg = this.plan.createLeg("car", "07:00:00", "00:30:00", null);
+			this.plan.createAct("h", link1);
+			Leg leg = this.plan.createLeg(Mode.car);
 			leg.createRoute("25000", "00:30:00");
-			this.plan.createAct("w", (String)null, null, "3", "07:30:00", "16:00:00", "08:30:00", null);
-			leg = this.plan.createLeg("pt", "16:00:00", "00:15:00", null);
+			this.plan.createAct("w", link3);
+			leg = this.plan.createLeg(Mode.pt);
 			leg.createRoute("20000", "00:15:00");
-			this.plan.createAct("h", (String)null, null, "5", "16:15:00", null, null, null);
+			this.plan.createAct("h", link5);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -154,30 +153,30 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
 
 		ActUtilityParameters params = new ActUtilityParameters("w", 1.0, 8.0 * 3600);
-		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), epsilon);
+		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), EPSILON);
 
 		params = new ActUtilityParameters("h", 1.0, 16.0 * 3600);
-		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), epsilon);
+		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), EPSILON);
 
 		params = new ActUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
-		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), epsilon);
+		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), EPSILON);
 	}
 
 	/**
 	 * Test the scoring function when all parameters are set to 0.
 	 */
 	public void testZero() {
-		assertEquals(0.0, calcScore(), epsilon);
+		assertEquals(0.0, calcScore(), EPSILON);
 	}
 
 	public void testTraveling() {
 		this.config.charyparNagelScoring().setTraveling(-6.0);
-		assertEquals(-3.0, calcScore(), epsilon);
+		assertEquals(-3.0, calcScore(), EPSILON);
 	}
 
 	public void testTravelingPt() {
 		this.config.charyparNagelScoring().setTravelingPt(-9.0);
-		assertEquals(-2.25, calcScore(), epsilon);
+		assertEquals(-2.25, calcScore(), EPSILON);
 	}
 
 	/**
@@ -190,14 +189,13 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 		this.config.charyparNagelScoring().setPerforming(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
-				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
+				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		perf = +3.0;
 		this.config.charyparNagelScoring().setPerforming(perf);
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
-				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
+				+ perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
-
 
 	/**
 	 * Test the performing part of the scoring function when an activity has an OpeningTime set.
@@ -212,7 +210,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		double score = calcScore();
 
 		// check the difference between 8.5 and 8.0 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 8.0), initialScore - score, epsilon);
+		assertEquals(perf * 8.0 * Math.log(8.5 / 8.0), initialScore - score, EPSILON);
 	}
 
 	/**
@@ -228,7 +226,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		double score = calcScore();
 
 		// check the difference between 8.5 and 7.5 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 7.5), initialScore - score, epsilon);
+		assertEquals(perf * 8.0 * Math.log(8.5 / 7.5), initialScore - score, EPSILON);
 	}
 
 	/**
@@ -248,7 +246,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		double score = calcScore();
 
 		// check the difference between 8.5 and 7.0 hours of performing an activity
-		assertEquals(perf * 8.0 * Math.log(8.5 / 7.0), initialScore - score, epsilon);
+		assertEquals(perf * 8.0 * Math.log(8.5 / 7.0), initialScore - score, EPSILON);
 
 		// test 2: agents has to wait all the time, because work place opens later
 
@@ -256,7 +254,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setClosingTime(21*3600.0);
 
 		// only the home-activity should add to the score
-		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
+		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
 		// test 3: agents has to wait all the time, because work place opened earlier
 
@@ -264,7 +262,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setClosingTime(2*3600.0);
 
 		// only the home-activity should add to the score
-		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), epsilon);
+		assertEquals(perf * 16.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 	}
 
 	/**
@@ -279,7 +277,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 
 		// the agent spends 1.5h waiting at the work place
-		assertEquals(waiting * 1.5, calcScore(), epsilon);
+		assertEquals(waiting * 1.5, calcScore(), EPSILON);
 	}
 
 	/**
@@ -293,7 +291,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setEarliestEndTime(16.75 * 3600.0); // require the agent to work until 16:45
 
 		// the agent left 45mins too early
-		assertEquals(disutility * 0.75, calcScore(), epsilon);
+		assertEquals(disutility * 0.75, calcScore(), EPSILON);
 	}
 
 	/**
@@ -307,7 +305,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setMinimalDuration(10 * 3600.0); // require the agent to be 10 hours at work
 
 		// the agent left 1.5h too early
-		assertEquals(disutility * 1.5, calcScore(), epsilon);
+		assertEquals(disutility * 1.5, calcScore(), EPSILON);
 	}
 
 	/**
@@ -321,7 +319,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		wParams.setLatestStartTime(7 * 3600.0); // agent should start at 7 o'clock
 
 		// the agent arrived 30mins late
-		assertEquals(disutility * 0.5, calcScore(), epsilon);
+		assertEquals(disutility * 0.5, calcScore(), EPSILON);
 	}
 
 	/**
@@ -345,7 +343,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		testee.finish();
 		testee.getScore();
 
-		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), epsilon); // stuck penalty + 30min travelling
+		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 
 		// test 2 where traveling has the biggest impact
 		this.config.charyparNagelScoring().setLateArrival(-3.0);
@@ -363,12 +361,12 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		testee.finish();
 		testee.getScore();
 
-		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), epsilon); // stuck penalty + 30min travelling
+		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min travelling
 	}
 
 	public void testDistanceCost() {
 		this.config.charyparNagelScoring().setDistanceCost(0.01);
-		assertEquals(-0.45, calcScore(), epsilon);
+		assertEquals(-0.45, calcScore(), EPSILON);
 	}
 
 	/**
@@ -390,8 +388,6 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 
 		assertEquals(perf * 8.0 * Math.log(8.5 / zeroUtilDurW)
 				+ Math.max(0.0, perf * 16.0 * Math.log(7.0 / zeroUtilDurH))
-				+ perf *  8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), epsilon);
-
-
+				+ perf *  8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
 	}
 }

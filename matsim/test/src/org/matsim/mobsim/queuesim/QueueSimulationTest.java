@@ -35,13 +35,13 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 public class QueueSimulationTest extends MatsimTestCase {
@@ -77,12 +77,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(true);
-			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car, 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Act a1 = plan.createAct("h", link1);
+			a1.setEndTime(6*3600 - 500);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
-			plan.createAct("w", 99.0, 0.0, link3, 6*3600-390, 24*36000, Time.UNDEFINED_TIME, true);
+			plan.createAct("w", link3);
 			plans.addPerson(person);
 
 			// add a lot of other persons with legs from link1 to link3, starting at 6:30
@@ -99,12 +100,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 				 * to start 1 + 100 + 1 = 102 secs earlier.
 				 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
 				 */
-				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600-1902, 7*3600-1902, false);
-				leg = plan.createLeg(BasicLeg.Mode.car, 7*3600-1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				Act a = plan.createAct("h", link1);
+				a.setEndTime(7*3600 - 1902);
+				leg = plan.createLeg(BasicLeg.Mode.car);
 				route = new Route();
 				route.setRoute("2 3");
 				leg.setRoute(route);
-				plan.createAct("w", 99.0, 0.0, link3, 7*3600-1790, 24*36000, Time.UNDEFINED_TIME, true);
+				plan.createAct("w", link3);
 				plans.addPerson(person);
 			}
 		} catch (Exception e) {
@@ -164,24 +166,26 @@ public class QueueSimulationTest extends MatsimTestCase {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(true);
-			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car, 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Act a1 = plan.createAct("h", link1);
+			a1.setEndTime(6*3600 - 500);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
-			plan.createAct("w", 99.0, 0.0, link3, 6*3600-390, 24*36000, Time.UNDEFINED_TIME, true);
+			plan.createAct("w", link3);
 			plans.addPerson(person);
 
 			// add a lot of persons with legs from link2 to link3
 			for (int i = 1; i <= 10000; i++) {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(true);
-				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
-				leg = plan.createLeg(BasicLeg.Mode.car, 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				Act a2 = plan.createAct("h", link2);
+				a2.setEndTime(7*3600 - 1801);
+				leg = plan.createLeg(BasicLeg.Mode.car);
 				route = new Route();
 				route.setRoute("3");
 				leg.setRoute(route);
-				plan.createAct("w", 99.0, 0.0, link3, 7*3600-1790, 24*36000, Time.UNDEFINED_TIME, true);
+				plan.createAct("w", link3);
 				plans.addPerson(person);
 			}
 		} catch (Exception e) {
@@ -240,36 +244,39 @@ public class QueueSimulationTest extends MatsimTestCase {
 			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(true);
-			plan.createAct("h", 199.0, 0.0, link1, 0, 6*3600-500, 6*3600-500, false);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car, 6*3600-500, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Act a1 = plan.createAct("h", link1);
+			a1.setEndTime(6*3600 - 500);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
-			plan.createAct("w", 99.0, 0.0, link3, 6*3600-390, 24*36000, Time.UNDEFINED_TIME, true);
+			plan.createAct("w", link3);
 			plans.addPerson(person);
 
 			// add a lot of persons with legs from link2 to link3
 			for (int i = 1; i <= 5000; i++) {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(true);
-				plan.createAct("h", 99.0, 0.0, link2, 0, 7*3600 - 1801, 7*3600 - 1801, false);
-				leg = plan.createLeg(BasicLeg.Mode.car, 7*3600 - 1801, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				Act a2 = plan.createAct("h", link2);
+				a2.setEndTime(7*3600 - 1801);
+				leg = plan.createLeg(BasicLeg.Mode.car);
 				route = new Route();
 				route.setRoute("3");
 				leg.setRoute(route);
-				plan.createAct("w", 99.0, 0.0, link3, 7*3600-1790, 24*36000, Time.UNDEFINED_TIME, true);
+				plan.createAct("w", link3);
 				plans.addPerson(person);
 			}
 			// add a lot of persons with legs from link1 to link3
 			for (int i = 5001; i <= 10000; i++) {
 				person = new Person(new IdImpl(i));
 				plan = person.createPlan(true);
-				plan.createAct("h", 99.0, 0.0, link1, 0, 7*3600 - 1902, 7*3600 - 1902, false);
-				leg = plan.createLeg(BasicLeg.Mode.car, 7*3600 - 1902, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+				Act a2 = plan.createAct("h", link1);
+				a2.setEndTime(7*3600 - 1902);
+				leg = plan.createLeg(BasicLeg.Mode.car);
 				route = new Route();
 				route.setRoute("2 3");
 				leg.setRoute(route);
-				plan.createAct("w", 99.0, 0.0, link3, 7*3600-1790, 24*36000, Time.UNDEFINED_TIME, true);
+				plan.createAct("w", link3);
 				plans.addPerson(person);
 			}
 		} catch (Exception e) {
@@ -390,17 +397,19 @@ public class QueueSimulationTest extends MatsimTestCase {
 			// create a person with a car-leg from link1 to link5, but an incomplete route
 			Person person = new Person(new IdImpl(0));
 			Plan plan = person.createPlan(true);
-			plan.createAct("h", 199.0, 0.0, link1, 0, 8*3600, 8*3600, false);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car, 8*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Act a1 = plan.createAct("h", link1);
+			a1.setEndTime(8*3600);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = new Route();
 			route.setRoute(nodes);
 			leg.setRoute(route);
-			plan.createAct("w", 99.0, 0.0, link5, 8*3600, 9*3600, Time.UNDEFINED_TIME, true);
-			leg = plan.createLeg(BasicLeg.Mode.car, 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Act a2 = plan.createAct("w", link5);
+			a2.setEndTime(9*3600);
+			leg = plan.createLeg(BasicLeg.Mode.car);
 			route = new Route();
 			route.setRoute("6");
 			leg.setRoute(route);
-			plan.createAct("h", 3299.0, 0.0, link6, 9*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+			plan.createAct("h", link6);
 			plans.addPerson(person);
 		} catch (Exception e) {
 			e.printStackTrace();

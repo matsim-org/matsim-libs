@@ -28,6 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -89,17 +90,17 @@ public class PlansCreateTripsFromODMatrix {
 							}
 						}
 
-						plan.createAct("work", coord.getX(), coord.getY(), null, 0/*startTime*/, endTime/*endTime*/, endTime/*dur*/, true/*isPrimary*/);
-						plan.createLeg(BasicLeg.Mode.car, endTime/*depTime*/, 0/*travTime*/, Integer.MIN_VALUE/*arrTime*/);
-						plan.createAct("work", coord.getX(), coord.getY(), null, Integer.MIN_VALUE/*startTime*/, 24*3600/*endTime*/, Integer.MIN_VALUE/*duration*/, false/*isPrimary*/);
+						Act a = plan.createAct("work", coord);
+						a.setEndTime(endTime);
+						plan.createLeg(BasicLeg.Mode.car);
+						a = plan.createAct("work", coord);
 
 						plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.
 					}
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException(e);
 		}
 
 		System.out.println("    done.");

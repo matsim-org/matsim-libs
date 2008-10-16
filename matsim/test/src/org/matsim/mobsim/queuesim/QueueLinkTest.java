@@ -37,13 +37,10 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class QueueLinkTest extends MatsimTestCase {
 
-	private NetworkLayer network;
-
-	private Link link;
-
-	private QueueNetwork queueNetwork;
-
-	private QueueLink qlink;
+	private NetworkLayer network = null;
+	private Link link = null;
+	private QueueNetwork queueNetwork = null;
+	private QueueLink qlink = null;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -128,27 +125,23 @@ public class QueueLinkTest extends MatsimTestCase {
 		Person p = new Person(new IdImpl("1"));
 		Plan plan = p.createPlan(true);
 		try {
-			plan.createAct("h", 0.0, 0.0, link1, 0.0, 0.0, 0.0, false);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car, 0.0, 1.0, 1.0);
+			plan.createAct("h", link1);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = leg.createRoute("1", "00:00:01");
 			route.setRoute("2");
 			leg.setRoute(route);
-			plan.createAct("w", 0.0, 0.0, link2, 0.0, 0.0, 0.0, false);
+			plan.createAct("w", link2);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		PersonAgent pa1 = new PersonAgent(p);
 		v1.setDriver(pa1);
-//		v1.setActLegs(p.getPlans().get(0).getActsLegs());
-//		v1.initVeh();
 		pa1.setVehicle(v1);
 		pa1.initialize();
 		
 		Vehicle v2 = new Vehicle();
 		PersonAgent pa2 = new PersonAgent(p);
 		v2.setDriver(pa2);
-//		v2.setActLegs(p.getPlans().get(0).getActsLegs());
-//		v2.initVeh();
 		pa2.setVehicle(v2);
 		pa2.initialize();
 

@@ -62,8 +62,6 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 			if (i % 2 == 0) {
 				Act act = (Act)(plan.getActsLegs().get(i));
-				// invalidate previous activity times because durations will change
-				act.setStartTime(Time.UNDEFINED_TIME);
 
 				// handle first activity
 				if (i == 0) {

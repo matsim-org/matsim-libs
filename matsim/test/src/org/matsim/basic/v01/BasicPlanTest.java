@@ -26,7 +26,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -50,14 +50,14 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNextLeg());
 
 		// add one act, no legs yet, test again
-		Act act1 = plan.createAct("h", 0.0, 0.0, null, 0.0, 8.0*3600.0, 8.0*3600.9, false);
+		Act act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertFalse(iter.hasNextLeg());
 
 		// add leg + act, test again
-		Leg leg1 = plan.createLeg(BasicLeg.Mode.car, 8.0*3600.0, 60, Time.UNDEFINED_TIME);
-		Act act2 = plan.createAct("w", 100.0, 100.0, null, 8.0*3600.0, 16.0*3600.9, Time.UNDEFINED_TIME, false);
+		Leg leg1 = plan.createLeg(BasicLeg.Mode.car);
+		Act act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertTrue(iter.hasNextLeg());
@@ -67,8 +67,8 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNextLeg());
 
 		// add leg + act, test again. Now we have a generic plan with real first act, real last act, and real middle acts.
-		Leg leg2 = plan.createLeg(BasicLeg.Mode.car, 16.0*3600.0, 60, Time.UNDEFINED_TIME);
-		Act act3 = plan.createAct("h", 0.0, 0.0, null, 16.0*3600.0, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Leg leg2 = plan.createLeg(BasicLeg.Mode.car);
+		Act act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIterator();
 		assertEquals(act1, iter.nextAct());
 		assertTrue(iter.hasNextLeg());
@@ -129,21 +129,21 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNext());
 
 		// add one act, no legs yet, test again
-		plan.createAct("h", 0.0, 0.0, null, 0.0, 8.0*3600.0, 8.0*3600.9, false);
+		plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorLeg();
 		assertFalse(iter.hasNext());
 
 		// add leg + act, test again
-		Leg leg1 = plan.createLeg(BasicLeg.Mode.car, 8.0*3600.0, 60, Time.UNDEFINED_TIME);
-		plan.createAct("w", 100.0, 100.0, null, 8.0*3600.0, 16.0*3600.9, Time.UNDEFINED_TIME, false);
+		Leg leg1 = plan.createLeg(BasicLeg.Mode.car);
+		plan.createAct("w", new CoordImpl(100.0, 100.0));
 		iter = plan.getIteratorLeg();
 		assertTrue(iter.hasNext());
 		assertEquals(leg1, iter.next());
 		assertFalse(iter.hasNext());
 
 		// add leg + act, test again. Now we have a generic plan with real first act, real last act, and real middle acts.
-		Leg leg2 = plan.createLeg(BasicLeg.Mode.car, 16.0*3600.0, 60, Time.UNDEFINED_TIME);
-		plan.createAct("h", 0.0, 0.0, null, 16.0*3600.0, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Leg leg2 = plan.createLeg(BasicLeg.Mode.car);
+		plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorLeg();
 		assertTrue(iter.hasNext());
 		assertEquals(leg1, iter.next());
@@ -186,14 +186,14 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNext());
 
 		// add one act, no legs yet, test again
-		Act act1 = plan.createAct("h", 0.0, 0.0, null, 0.0, 8.0*3600.0, 8.0*3600.9, false);
+		Act act1 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertFalse(iter.hasNext());
 
 		// add leg + act, test again
-		plan.createLeg(BasicLeg.Mode.car, 8.0*3600.0, 60, Time.UNDEFINED_TIME);
-		Act act2 = plan.createAct("w", 100.0, 100.0, null, 8.0*3600.0, 16.0*3600.9, Time.UNDEFINED_TIME, false);
+		plan.createLeg(BasicLeg.Mode.car);
+		Act act2 = plan.createAct("w", new CoordImpl(100.0, 100.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertTrue(iter.hasNext());
@@ -201,8 +201,8 @@ public class BasicPlanTest extends MatsimTestCase {
 		assertFalse(iter.hasNext());
 
 		// add leg + act, test again. Now we have a generic plan with real first act, real last act, and real middle acts.
-		plan.createLeg(BasicLeg.Mode.car, 16.0*3600.0, 60, Time.UNDEFINED_TIME);
-		Act act3 = plan.createAct("h", 0.0, 0.0, null, 16.0*3600.0, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		plan.createLeg(BasicLeg.Mode.car);
+		Act act3 = plan.createAct("h", new CoordImpl(0.0, 0.0));
 		iter = plan.getIteratorAct();
 		assertEquals(act1, iter.next());
 		assertTrue(iter.hasNext());

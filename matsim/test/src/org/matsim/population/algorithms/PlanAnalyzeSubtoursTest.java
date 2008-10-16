@@ -21,6 +21,7 @@
 package org.matsim.population.algorithms;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
@@ -32,7 +33,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -131,10 +131,9 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		testedActChainLocations = "1 2 3 4";
 		expectedSubtourIndexations.put(
 				testedActChainLocations, 
-				new String(
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
 						Integer.toString(PlanAnalyzeSubtours.UNDEFINED) + " " + 
-						Integer.toString(PlanAnalyzeSubtours.UNDEFINED)));
+						Integer.toString(PlanAnalyzeSubtours.UNDEFINED));
 		expectedNumSubtours.put(testedActChainLocations, 0);
 
 		testedActChainLocations = "1 2 2 3 2 2 2 1 4 1";
@@ -145,39 +144,30 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		expectedSubtourIndexations.put(testedActChainLocations, "1 1 0 0 1");
 		expectedNumSubtours.put(testedActChainLocations, 2);
 		
-		for (String facString : expectedSubtourIndexations.keySet()) {
-
+		for (Entry<String, String> entry: expectedSubtourIndexations.entrySet()) {
+			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
 
 			Plan plan = new Plan(person);
 
 			String[] facIdSequence = facString.split(" ");
 			for (int aa=0; aa < facIdSequence.length; aa++) {
-				Act act = plan.createAct(
-						"actOnLink" + facIdSequence[aa], 
-						100.0, 100.0, null,
-						Time.parseTime("10:00:00"), 
-						Time.parseTime("10:00:00"), 
-						Time.parseTime("00:00:00"), 
-						false);
+				Act act = plan.createAct("actOnLink" + facIdSequence[aa], facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
+				act.setEndTime(10*3600);
 				act.setFacility(facilities.getFacilities().get(new IdImpl(facIdSequence[aa])));
 				if (aa != (facIdSequence.length - 1)) {
-					plan.createLeg(
-							BasicLeg.Mode.car, 
-							Time.parseTime("10:30:00"), 
-							Time.parseTime("00:00:00"), 
-							Time.parseTime("10:30:00"));
+					plan.createLeg(BasicLeg.Mode.car);
 				}
 			}
 			testee.run(plan);
 			
-			String actualSubtourIndexation = new String("");
+			StringBuilder builder = new StringBuilder();
 			for (int value : testee.getSubtourIndexation()) {
-				actualSubtourIndexation += Integer.toString(value);
-				actualSubtourIndexation += " ";
+				builder.append(Integer.toString(value));
+				builder.append(' ');
 			}
-			actualSubtourIndexation = actualSubtourIndexation.substring(0, actualSubtourIndexation.length() - 1);
-			assertEquals(expectedSubtourIndexations.get(facString), actualSubtourIndexation);
+			String actualSubtourIndexation = builder.substring(0, builder.length() - 1);
+			assertEquals(entry.getValue(), actualSubtourIndexation);
 			
 			assertEquals(expectedNumSubtours.get(facString).intValue(), testee.getNumSubtours());
 		}

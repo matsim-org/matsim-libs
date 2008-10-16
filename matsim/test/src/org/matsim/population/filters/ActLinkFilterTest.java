@@ -27,7 +27,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 
 public class ActLinkFilterTest extends MatsimTestCase {
 
@@ -63,15 +62,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 				linkId = "2";
 				actType = NINETEEN_HOUR_HOME_ACT_TYPE;
 			}
-			plan.createAct(
-					actType,
-					10.0,
-					10.0,
-					network.getLink(linkId),
-					Time.parseTime("08:00:00"),
-					Time.parseTime("10:00:00"),
-					Time.parseTime("02:00:00"),
-					false);
+			plan.createAct(actType, network.getLink(linkId));
 			persons.put(personId, person);
 		}
 

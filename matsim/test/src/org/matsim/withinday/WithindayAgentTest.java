@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -42,7 +43,6 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
-import org.matsim.utils.misc.Time;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
@@ -53,25 +53,15 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControle
  */
 public class WithindayAgentTest extends TestCase {
 	
-	private static final Logger log = Logger.getLogger(WithindayAgentTest.class);
-	
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
-	private NetworkLayer network;
+	private NetworkLayer network = null;
+	private Route route1 = null;
+	private Route route2 = null;
+	private Route agentRoute = null;
+	private Plan plan = null;
+	private Leg leg = null;
 
-	private Route route1;
-
-	private Route route2;
-
-	private Route agentRoute;
-
-	private Plan plan;
-
-	private Leg leg;
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -119,7 +109,6 @@ public class WithindayAgentTest extends TestCase {
 		list.add(this.network.getNode("32"));
 		list.add(this.network.getNode("4"));
 		this.agentRoute.setRoute(list);
-
 	}
 
 	private VDSSign createSign() {
@@ -153,9 +142,9 @@ public class WithindayAgentTest extends TestCase {
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {
-			this.plan.createAct("h", 0.0, 0.0, homeLink, Time.parseTime("00:00"), Time.parseTime("00:00"), Time.parseTime("00:00"), false);
-			this.leg = this.plan.createLeg("car", "00:00", "00:00", "00:00");
-			this.plan.createAct("work", 0.0, 0.0, workLink, Time.parseTime("00:00"), Time.parseTime("00:00"), Time.parseTime("00:00"), false);
+			this.plan.createAct("h", homeLink);
+			this.leg = this.plan.createLeg(Mode.car);
+			this.plan.createAct("work", workLink);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -176,10 +165,6 @@ public class WithindayAgentTest extends TestCase {
 		CoopersAgentLogicFactory factory = new CoopersAgentLogicFactory(
 				this.network, scoringFunctionConfig, signs);
 		//create the vehicle
-//		WithindayAgentTestOccupiedVehicle v = new WithindayAgentTestOccupiedVehicle(
-//				this.leg, this.network.getLink("2"), this.network
-//						.getLink("7"), this.plan.getActsLegs());
-//		
 		Vehicle v = new Vehicle();
 		
 		//create the agent
@@ -191,11 +176,6 @@ public class WithindayAgentTest extends TestCase {
 		pa.initialize();
 		pa.setCurrentLink(this.network.getLink("2"));
 		
-		
-//		v.init();
-//		v.setCurrentLink(this.network.getLink("2"));
-
-//		WithindayAgent agent = new WithindayAgent(p, v, sightDistance, factory);
 	  return pa;
 	}
 
@@ -205,7 +185,7 @@ public class WithindayAgentTest extends TestCase {
 	 */
 	public void testReplan() {
 		Events events = new Events();
-		QueueSimulation withindaySim = new QueueSimulation(this.network, null, events);
+		new QueueSimulation(this.network, null, events); // needed to initialize static QueueSimulation.events...
 		
 		WithindayAgent agent = createAgent(this.network.getLink(new IdImpl("2")), this.network.getLink(new IdImpl("7")));
 		agent.replan();

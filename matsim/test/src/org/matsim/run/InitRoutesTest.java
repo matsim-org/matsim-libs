@@ -29,6 +29,7 @@ import org.matsim.config.ConfigWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
@@ -37,7 +38,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 /**
@@ -67,9 +67,10 @@ public class InitRoutesTest extends MatsimTestCase {
 		Person person = new Person(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		plan.createAct("h", 50, 25, network.getLink(new IdImpl("1")), 0, 3600, 3600, false);
-		plan.createLeg(BasicLeg.Mode.car, 3600, 100, 3700);
-		plan.createAct("w", 50, 25, network.getLink(new IdImpl("20")), 3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Act a1 = plan.createAct("h", network.getLink(new IdImpl("1")));
+		a1.setEndTime(3600);
+		plan.createLeg(BasicLeg.Mode.car);
+		plan.createAct("w", network.getLink(new IdImpl("20")));
 		
 		// write person to file
 		new PopulationWriter(population, PLANS_FILE_TESTINPUT, "v4").write();

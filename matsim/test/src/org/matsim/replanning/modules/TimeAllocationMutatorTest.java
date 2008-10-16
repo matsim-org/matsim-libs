@@ -31,7 +31,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.misc.Time;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutator}, mainly that the
@@ -112,18 +111,20 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// setup person
 		Plan plan;
-		Act act1, act2;
+		Act act1, act2, act3;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
 			Person person = new Person(new IdImpl("1"));
 			plan = person.createPlan(true);
-			act1 = plan.createAct("h", 0, 0, link1, 0, 4*3600, 4*3600, false);
-			plan.createLeg(BasicLeg.Mode.car, 6*3600, 0, Time.UNDEFINED_TIME);
-			act2 = plan.createAct("w", 0, 0, link1, 4*3600, 20*3600, 16*3600, false);
-			plan.createLeg(BasicLeg.Mode.car, 16*3600, 0, Time.UNDEFINED_TIME);
-			plan.createAct("h", 0, 0, link1, 16*3600, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+			act1 = plan.createAct("h", link1);
+			act1.setEndTime(4*3600);
+			plan.createLeg(BasicLeg.Mode.car);
+			act2 = plan.createAct("w", link1);
+			act2.setDur(14*3600);
+			plan.createLeg(BasicLeg.Mode.car);
+			plan.createAct("h", link1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -132,7 +133,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		mutator.init();
 
 		// run test
-		double act1Dur = act1.getDur();
+		double act1Dur = act1.getEndTime();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
 		double act2Dur = act2.getDur();

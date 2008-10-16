@@ -120,7 +120,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 				// use last used time + fromAct.duration as time for routing
 				now += dur;
 			} else {
-				throw new RuntimeException("act " + j + " has neither end-time nor duration.");
+				throw new RuntimeException("act " + (j-2) + " of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration.");
 			}
 
 			handleLeg(leg, fromAct, toAct, now);

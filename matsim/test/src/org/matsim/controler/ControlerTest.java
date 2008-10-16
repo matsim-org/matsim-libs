@@ -21,6 +21,7 @@
 package org.matsim.controler;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.config.Module;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -67,9 +68,9 @@ public class ControlerTest extends MatsimTestCase {
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
 		Node node4 = network.createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
-		network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
+		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
 		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
-		network.createLink(new IdImpl(3), node3, node4, 100, 10, 7200, 1);
+		Link link3 = network.createLink(new IdImpl(3), node3, node4, 100, 10, 7200, 1);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
@@ -78,20 +79,22 @@ public class ControlerTest extends MatsimTestCase {
 		try {
 			person1 = new Person(new IdImpl(1));
 			Plan plan1 = person1.createPlan(true);
-			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			Leg leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
+			Act a1 = plan1.createAct("h", link1);
+			a1.setEndTime(7.0*3600);
+			Leg leg1 = plan1.createLeg(Mode.car);
 			Route route1 = leg1.createRoute(null, null);
 			route1.setRoute("2 3");
-			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
+			plan1.createAct("h", link3);
 			population.addPerson(person1);
 
 			Person person2 = new Person(new IdImpl(2));
 			Plan plan2 = person2.createPlan(true);
-			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			Leg leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
+			Act a2 = plan2.createAct("h", link1);
+			a2.setEndTime(7.0*3600);
+			Leg leg2 = plan2.createLeg(Mode.car);
 			Route route2 = leg2.createRoute(null, null);
 			route2.setRoute("2 3");
-			plan2.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
+			plan2.createAct("h", link3);
 			population.addPerson(person2);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -186,9 +189,9 @@ public class ControlerTest extends MatsimTestCase {
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 		Node node3 = network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
 		Node node4 = network.createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
-		network.createLink(new IdImpl(1), node1, node2,  100, 10, 7200, 1);
+		Link link1 = network.createLink(new IdImpl(1), node1, node2,  100, 10, 7200, 1);
 		network.createLink(new IdImpl(2), node2, node3, 1000, 10,   36, 1);
-		network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
+		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);
@@ -199,16 +202,19 @@ public class ControlerTest extends MatsimTestCase {
 			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(true);
-			plan1.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
+			Act a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+			a1.setEndTime(7.0*3600);
+			leg1 = plan1.createLeg(Mode.car);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			plan1.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
+			plan1.createAct("h", link3);
 			// --- plan 2 ---
 			Plan plan2 = person1.createPlan(true);
-			plan2.createAct("h", (String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
+			Act a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+			a2.setEndTime(7.0*3600);
+			
+			leg2 = plan2.createLeg(Mode.car);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			plan2.createAct("h", (String)null, null, "3", "07:00:00", null, null, "no");
+			plan2.createAct("h", link3);
 			population.addPerson(person1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -278,16 +284,18 @@ public class ControlerTest extends MatsimTestCase {
 			person1 = new Person(new IdImpl(1));
 			// --- plan 1 ---
 			Plan plan1 = person1.createPlan(true);
-			act1a = plan1.createAct("h", "-50.0", "10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
-			leg1 = plan1.createLeg("car", "07:00:00", "00:00:00", null);
+			act1a = plan1.createAct("h", new CoordImpl(-50.0, 10.0));
+			act1a.setEndTime(7.0*3600);
+			leg1 = plan1.createLeg(Mode.car);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			act1b = plan1.createAct("h", "1075.0", "-10.0", null, "07:00:00", null, null, "no");
+			act1b = plan1.createAct("h", new CoordImpl(1075.0, -10.0)); 
 			// --- plan 2 ---
 			Plan plan2 = person1.createPlan(true);
-			act2a = plan2.createAct("h", "-50.0", "-10.0", null, "00:00:00", "07:00:00", "07:00:00", "no");
-			leg2 = plan2.createLeg("car", "07:00:00", "00:00:00", null);
+			act2a = plan2.createAct("h", new CoordImpl(-50.0, -10.0));
+			act2a.setEndTime(7.9*3600);
+			leg2 = plan2.createLeg(Mode.car);
 			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			act2b = plan2.createAct("h", "1111.1", "10.0", null, "07:00:00", null, null, "no");
+			act2b = plan2.createAct("h", new CoordImpl(1111.1, 10.0));
 			population.addPerson(person1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

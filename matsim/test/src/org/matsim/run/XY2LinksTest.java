@@ -35,6 +35,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 
 /**
@@ -64,7 +65,8 @@ public class XY2LinksTest extends MatsimTestCase {
 		Person person = new Person(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
-		plan.createAct("h", 50, 25, null, 0, 3600, 3600, false);
+		Act a1 = plan.createAct("h", new CoordImpl(50, 25));
+		a1.setEndTime(3600);
 		
 		// write person to file
 		new PopulationWriter(population, PLANS_FILE_TESTINPUT, "v4").write();

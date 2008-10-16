@@ -178,16 +178,16 @@ public class PopulationReaderKutter implements PopulationReader {
 			return this.sum;
 		}
 
-		public final void setPersonGroup(final int pg) {
+		public void setPersonGroup(final int pg) {
 			this.pg_ = pg;
 		}
 
-		public final void resetCounters() {
+		public void resetCounters() {
 			this.sum = 0.0;
 			this.cnt = 0;
 		}
 
-		private final Person parsePerson() {
+		private Person parsePerson() {
 			String id = Long.toString(this.idCnt);
 			this.idCnt++;
 			this.cnt++;
@@ -201,7 +201,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			return p;
 		}
 
-		private final void handleActivity(final int acttype, final int cellid, final int legmode) {
+		private void handleActivity(final int acttype, final int cellid, final int legmode) {
 			BasicLeg.Mode mode = this.legModes[legmode];
 
 			int arrTime = this.currTime;
@@ -229,16 +229,22 @@ public class PopulationReaderKutter implements PopulationReader {
 				}
 
 				if (!skipActivity) {
-					this.currPlan.createLeg(mode, this.currTime, travTime, arrTime);
+					Leg l = this.currPlan.createLeg(mode);
+					l.setDepTime(this.currTime);
+					l.setTravTime(travTime);
+					l.setArrTime(arrTime);
 					this.currTime = this.currTime + duration;
-					this.currPlan.createAct(activity, coord.getX(), coord.getY(), null/*link*/, arrTime, this.currTime, duration, false);
+					Act a = this.currPlan.createAct(activity, coord);
+					a.setStartTime(arrTime);
+					a.setEndTime(this.currTime);
+					a.setDur(duration);
 				}
 			} catch (Exception e) {
 				Gbl.errorMsg(e);
 			}
 		}
 
-		private final void parsePlan(final String[] row) {
+		private void parsePlan(final String[] row) {
 			this.currPlan = this.currPerson.createPlan(true);
 
 			String homeCell = row[1];
@@ -251,48 +257,45 @@ public class PopulationReaderKutter implements PopulationReader {
 			int legmode = Integer.parseInt(row[4]);
 
 			// create home activity based on the next (first real) activity
-			try {
-				String activity = "";
-				if (acttype < 18) {
-					activity = this.activities[acttype];
-				} else if (acttype == 99) {
-					activity = "home";
-				}
-				long duration; // this is the duration of the first (home) activity, and equals to the end-time of the first act
-
-				if (activity.equals("home")) {
-					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
-				} else if (activity.equals("edu")) {
-					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
-				} else if (activity.equals("uni")) {
-					duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:30 - 10:30
-				} else if (activity.equals("work1")) {
-					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*1*3600); // 07:30 - 08:30
-				} else if (activity.equals("work2")) {
-					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
-				} else if (activity.equals("work3")) {
-					duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2.5*3600); // 07:30 - 10:00
-				} else if (activity.equals("shop1")) {
-					duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*3*3600); // 08:30 - 11:30
-				} else if (activity.equals("shop2")) {
-					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
-				} else if (activity.equals("home2")) {
-					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
-				} else if (activity.equals("leisure1")) {
-					duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*3*3600); // 09:00 - 12:00
-				} else if (activity.equals("leisure2")) {
-					duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
-				} else {
-					// well, this case should never happen, but just to be sure
-					duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
-				}
-
-
-				this.currPlan.createAct("home", this.currHome.getX(), this.currHome.getY(), null/*link*/, 0, (int)duration, (int)duration, false);
-				this.currTime = (int)duration;
-			} catch (Exception e) {
-				Gbl.errorMsg(e);
+			String activity = "";
+			if (acttype < 18) {
+				activity = this.activities[acttype];
+			} else if (acttype == 99) {
+				activity = "home";
 			}
+			long duration; // this is the duration of the first (home) activity, and equals to the end-time of the first act
+
+			if (activity.equals("home")) {
+				duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
+			} else if (activity.equals("edu")) {
+				duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
+			} else if (activity.equals("uni")) {
+				duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:30 - 10:30
+			} else if (activity.equals("work1")) {
+				duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*1*3600); // 07:30 - 08:30
+			} else if (activity.equals("work2")) {
+				duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2*3600); // 07:30 - 09:30
+			} else if (activity.equals("work3")) {
+				duration = Math.round(7.5*3600 + MatsimRandom.random.nextDouble()*2.5*3600); // 07:30 - 10:00
+			} else if (activity.equals("shop1")) {
+				duration = Math.round(8.5*3600 + MatsimRandom.random.nextDouble()*3*3600); // 08:30 - 11:30
+			} else if (activity.equals("shop2")) {
+				duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
+			} else if (activity.equals("home2")) {
+				duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*2*3600); // 09:00 - 11:00
+			} else if (activity.equals("leisure1")) {
+				duration = Math.round(9*3600 + MatsimRandom.random.nextDouble()*3*3600); // 09:00 - 12:00
+			} else if (activity.equals("leisure2")) {
+				duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
+			} else {
+				// well, this case should never happen, but just to be sure
+				duration = Math.round(8*3600 + MatsimRandom.random.nextDouble()*2*3600); // 08:00 - 10:00
+			}
+
+
+			Act a = this.currPlan.createAct("home", this.currHome);
+			a.setEndTime(duration);
+			this.currTime = (int)duration;
 
 			handleActivity(acttype, cellid, legmode);
 
@@ -334,7 +337,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			handleActivity(99, cellid, legmode); // cellid will be ignored, because the person goes home (there is only one home!)
 		}
 
-		public final void startRow(final String[] row) {
+		public void startRow(final String[] row) {
 			if (row == null) {
 				throw new RuntimeException("row is null");
 			}

@@ -39,6 +39,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -198,12 +199,15 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			Person person = new Person(new IdImpl(i + (int)depTime));
 			Plan plan1 = person.createPlan(true);
-			plan1.createAct("h", 0, 0, depLink, 0.0, depTime, depTime, false);
-			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car, depTime, 10, depTime + 10);
+			Act a1 = plan1.createAct("h", depLink);
+			a1.setEndTime(depTime);
+			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
+			leg1.setDepTime(depTime);
+			leg1.setTravTime(10);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg1.setRoute(route);
-			plan1.createAct("w", 300, 0, destLink, depTime+10, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, true);
+			plan1.createAct("w", destLink);
 
 			persons.add(person);
 			depTime++;
