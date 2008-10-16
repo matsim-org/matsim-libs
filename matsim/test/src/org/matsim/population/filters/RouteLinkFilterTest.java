@@ -21,17 +21,18 @@
 package org.matsim.population.filters;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.filters.RouteLinkFilter;
-import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 
@@ -58,6 +59,9 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 		world.setNetworkLayer(network);
 
+		Link link1 = network.getLink(new IdImpl(1));
+		Link link20 = network.getLink(new IdImpl(20));
+		
 		Population population = new Population(Population.NO_STREAMING);
 
 		Person person;
@@ -67,32 +71,35 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		try {
 			person = new Person(new IdImpl("1"));
 			plan = person.createPlan(true);
-			plan.createAct("h", (String)null, null, "1", null, "07:00:00", null, null);
-			leg = plan.createLeg("car", "07:00:00", null, null);
+			Act a = plan.createAct("h", link1);
+			a.setEndTime(7.0 * 3600);
+			leg = plan.createLeg(Mode.car);
 			route = new Route();
 			route.setRoute("2 7 12");
 			leg.setRoute(route);
-			plan.createAct("w", (String)null, null, "20", "08:00:00", null, null, null);
+			plan.createAct("w", link20);
 			population.addPerson(person);
 
 			person = new Person(new IdImpl("2"));
 			plan = person.createPlan(true);
-			plan.createAct("h", (String)null, null, "1", null, "07:05:00", null, null);
-			leg = plan.createLeg("car", "07:05:00", null, null);
+			Act a2 = plan.createAct("h", link1);
+			a2.setEndTime(7.0 * 3600 + 5.0 * 60);
+			leg = plan.createLeg(Mode.car);
 			route = new Route();
 			route.setRoute("2 7 12");
 			leg.setRoute(route);
-			plan.createAct("w", (String)null, null, "20", "08:05:00", null, null, null);
+			plan.createAct("w", link20);
 			population.addPerson(person);
 
 			person = new Person(new IdImpl("3"));
 			plan = person.createPlan(true);
-			plan.createAct("h", (String)null, null, "1", null, "07:10:00", null, null);
-			leg = plan.createLeg("car", "07:10:00", null, null);
+			Act a3 = plan.createAct("h", link1);
+			a3.setEndTime(7.0 * 3600 + 10.0 * 60);
+			leg = plan.createLeg(Mode.car);
 			route = new Route();
 			route.setRoute("2 6 12");
 			leg.setRoute(route);
-			plan.createAct("w", (String)null, null, "20", "08:10:00", null, null, null);
+			plan.createAct("w", link20);
 			population.addPerson(person);
 
 		} catch (Exception e) {

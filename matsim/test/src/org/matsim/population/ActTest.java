@@ -17,21 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
-
 
 /**
  * Test for convenience methods of Act.
+ * 
  * @author dgrether
- *
  */
 public class ActTest extends MatsimTestCase {
 
 	public void testCalculateDuration() {
-		Act testee = new Act("h", 0.0, 0.0, null, 0.0, 0.0, 0.0, false);
+		Act testee = new Act("h", new CoordImpl(0, 0));
+		testee.setStartTime(0.0);
+		testee.setDur(0.0);
+		testee.setEndTime(0.0);
 
 		assertNotNull(testee);
 		assertEquals(0.0, testee.calculateDuration(), EPSILON);
@@ -52,7 +56,5 @@ public class ActTest extends MatsimTestCase {
 		testee.setStartTime(17 * 3600.0);
 		assertEquals(7 * 3600.0, testee.calculateDuration(), EPSILON);
 	}
-
-
 
 }

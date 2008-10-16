@@ -23,9 +23,11 @@ package org.matsim.population.algorithms;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class PersonSetActChains extends AbstractPersonAlgorithm {
 
@@ -225,18 +227,15 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 
 		String [] acttypes = chain.split("");
 		// note: by splitting, the string[0] is always = ""!
-		int leg_cnt = 0;
 		for (int j=1; j<acttypes.length; j++) {
 			try {
 				if (j != 1) {
-					p.createLeg("car",null,null,null);
-					leg_cnt++;
+					p.createLeg(BasicLeg.Mode.car);
 				}
-				p.createAct(acttypes[j],"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
+				p.createAct(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
+				throw new RuntimeException(e);
 			}
 		}
 

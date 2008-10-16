@@ -172,7 +172,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 			RoadPricingScheme scheme = reader.getScheme();
 			assertEquals(tollType, scheme.getType());
 
-			Population population = Fixture.createPopulation1();
+			Population population = Fixture.createPopulation1(network);
 			runTollSimulation(network, population, scheme);
 			return population;
 		} catch (Exception e) {

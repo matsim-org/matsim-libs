@@ -23,8 +23,10 @@ package org.matsim.roadpricing;
 import junit.framework.TestCase;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
@@ -35,6 +37,7 @@ import org.matsim.population.Route;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 
 /**
@@ -126,55 +129,68 @@ public class Fixture {
 		return network;
 	}
 
-	/** @return a population for network1 */
-	public static Population createPopulation1() throws Exception {
+	/**
+	 * @param network the network returned by {@link #createNetwork1()}
+	 * @return a population for network1
+	 * @throws Exception 
+	 **/
+	public static Population createPopulation1(final NetworkLayer network) throws Exception {
 		Population population = new Population(Population.NO_STREAMING);
 
-		population.addPerson(Fixture.createPerson1( 1, "07:00"   , "0", "2 3 4 5", "4")); // toll in 1st time slot
-		population.addPerson(Fixture.createPerson1( 2, "11:00"   , "0", "2 3 4 5", "4")); // toll in 2nd time slot
-		population.addPerson(Fixture.createPerson1( 3, "16:00"   , "0", "2 3 4 5", "4")); // toll in 3rd time slot
-		population.addPerson(Fixture.createPerson1( 4, "09:59:50", "0", "2 3 4 5", "4")); // toll in 1st and 2nd time slot
-		population.addPerson(Fixture.createPerson1( 5, "08:00:00", "1", "3 4 5", "4")); // starts on the 2nd link
-		population.addPerson(Fixture.createPerson1( 6, "09:00:00", "0", "2 3 4", "3")); // ends not on the last link
-		population.addPerson(Fixture.createPerson1( 7, "08:30:00", "1", "3 4", "3")); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 8, "08:35:00", "1", "3", "2")); // starts and ends not on the first/last link
-		population.addPerson(Fixture.createPerson1( 9, "08:40:00", "1", "", "1")); // two acts on the same link
-		population.addPerson(Fixture.createPerson1(10, "08:45:00", "2", "4", "3"));
+		Link link0 = network.getLink(new IdImpl(0));
+		Link link1 = network.getLink(new IdImpl(1));
+		Link link2 = network.getLink(new IdImpl(2));
+		Link link3 = network.getLink(new IdImpl(3));
+		Link link4 = network.getLink(new IdImpl(4));
+		population.addPerson(Fixture.createPerson1( 1, "07:00"   , link0, "2 3 4 5", link4)); // toll in 1st time slot
+		population.addPerson(Fixture.createPerson1( 2, "11:00"   , link0, "2 3 4 5", link4)); // toll in 2nd time slot
+		population.addPerson(Fixture.createPerson1( 3, "16:00"   , link0, "2 3 4 5", link4)); // toll in 3rd time slot
+		population.addPerson(Fixture.createPerson1( 4, "09:59:50", link0, "2 3 4 5", link4)); // toll in 1st and 2nd time slot
+		population.addPerson(Fixture.createPerson1( 5, "08:00:00", link1, "3 4 5", link4)); // starts on the 2nd link
+		population.addPerson(Fixture.createPerson1( 6, "09:00:00", link0, "2 3 4", link3)); // ends not on the last link
+		population.addPerson(Fixture.createPerson1( 7, "08:30:00", link1, "3 4", link3)); // starts and ends not on the first/last link
+		population.addPerson(Fixture.createPerson1( 8, "08:35:00", link1, "3", link2)); // starts and ends not on the first/last link
+		population.addPerson(Fixture.createPerson1( 9, "08:40:00", link1, "", link1)); // two acts on the same link
+		population.addPerson(Fixture.createPerson1(10, "08:45:00", link2, "4", link3));
 
 		return population;
 	}
 
-	/** @return a population for network2 */
-	public static Population createPopulation2() throws Exception {
+	/**
+	 * @param network the network returned by {@link #createNetwork2()} 
+	 * @return a population for network2
+	 * @throws Exception 
+	 **/
+	public static Population createPopulation2(final NetworkLayer network) throws Exception {
 		Population population = new Population(Population.NO_STREAMING);
 
-		population.addPerson(Fixture.createPerson2( 1, "07:00", "1", "7", "13"));
+		population.addPerson(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")));
 
 		return population;
 	}
 
-	private static Person createPerson1(final int personId, final String startTime, final String homeLink, final String routeNodes, final String workLeg) throws Exception {
+	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) throws Exception {
 		Person person = new Person(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
-		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");
-		Leg leg = plan.createLeg("car", startTime, "00:01", null);
+		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
+		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
 		Route route = new Route();
 		route.setRoute(routeNodes);
 		leg.setRoute(route);
-		plan.createAct("w", (String)null, null, workLeg, null, "24:00", null, "yes");
+		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
 		return person;
 	}
 
-	private static Person createPerson2(final int personId, final String startTime, final String homeLink, final String workLink, final String finishLink) throws Exception {
+	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) throws Exception {
 		Person person = new Person(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
-		plan.createAct("h", (String)null, null, homeLink, "00:00", startTime, startTime, "no");
-		plan.createLeg("car", startTime, "00:01", null);
-		plan.createAct("w", (String)null, null, workLink, null, "16:00", "08:00", "no");
-		plan.createLeg("car", "16:00", null, null);
-		plan.createAct("h", (String)null, null, finishLink, null, "24:00", "00:00", "no");
+		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));//, "00:00", startTime, startTime, "no");
+		plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
+		plan.createAct("w", workLink).setDur(8.0 * 3600);//, null, "16:00", "08:00", "no");
+		plan.createLeg(Mode.car);//"car", "16:00", null, null);
+		plan.createAct("h", finishLink);//, null, "24:00", "00:00", "no");
 		return person;
 	}
 
@@ -183,7 +199,7 @@ public class Fixture {
 		try {
 			NetworkLayer network = createNetwork1();
 			world.setNetworkLayer(network);
-			Population referencePopulation = Fixture.createPopulation1();
+			Population referencePopulation = Fixture.createPopulation1(network);
 			Events events = new Events();
 			EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());
 			events.addHandler(scoring);

@@ -62,7 +62,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 			 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
 			 */
 
-			Population population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2(network);
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
@@ -120,7 +120,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 			toll.addLink("7");
 			toll.addCost(6*3600, 10*3600, 0.06);
 
-			Population population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2(network);
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
@@ -153,7 +153,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 			toll.addLink("5");
 			toll.addCost(6*3600, 10*3600, 0.06);
 
-			Population population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2(network);
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
@@ -182,7 +182,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 			toll.addLink("11");
 			toll.addCost(8*3600, 10*3600, 1.0); // high costs!
 
-			Population population = Fixture.createPopulation2();
+			Population population = Fixture.createPopulation2(network);
 			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 
 			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
