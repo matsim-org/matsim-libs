@@ -37,7 +37,6 @@ public class Act extends BasicActImpl {
 	protected BasicLink link = null;
 	protected Facility facility = null;
 
-
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -68,6 +67,7 @@ public class Act extends BasicActImpl {
   	super(type);
   	this.setCoord(new CoordImpl(x, y));
 		this.link = link;
+		this.setLinkId(link.getId());
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.dur = dur;
@@ -96,6 +96,9 @@ public class Act extends BasicActImpl {
 
 	public void setLink(final BasicLink link) {
 		this.link = link;
+		if (link != null) {
+			this.setLinkId(link.getId());
+		}
 	}
 
 	protected void setFacility(final String f_id) {
@@ -116,10 +119,6 @@ public class Act extends BasicActImpl {
 			throw new RuntimeException("link=" + link +" does not exist");
 		}
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
@@ -152,7 +151,7 @@ public class Act extends BasicActImpl {
 	public final Id getLinkId() { // convenience method
 		if (this.link != null)
 			return this.link.getId();
-		return null;
+		return null; // TODO [MR,DG] why not delegate to super.getLinkId()? And shouldn't setLinkId() also be overwritten to prevent nonmatching link/linkId?
 	}
 
 	@Override
