@@ -113,6 +113,9 @@ public class Plan extends BasicPlanImpl {
 		if (dur != null) {
 			a.setDur(Time.parseTime(dur));
 		}
+		if( link != null) {
+			a.setLinkId(a.getLink().getId());
+		}
 		this.actsLegs.add(a);
 		return a;
 	}
