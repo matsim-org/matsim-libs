@@ -149,6 +149,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					if(newAct.getType() == plan.getFirstActivity().getType() && newAct.getLink() == plan.getFirstActivity().getLink()){
 						Act lastAct = (Act) newPlan.getActsLegs().get(newPlan.getActsLegs().size()-1);
 						lastAct.setLink(fFromFacilities.getLink());
+						lastAct.setLinkId(fFromFacilities.getLink().getId());
 						lastAct.setCoord(fFromFacilities.getCenter());
 						lastAct.setFacility(fFromFacilities);
 					}
@@ -156,12 +157,14 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					if(newAct.getType() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getType() && newAct.getLink() == ((Act)plan.getActsLegs().get(plan.getActsLegs().size()-1)).getLink()){
 						Act firstAct = (Act) newPlan.getFirstActivity();
 						firstAct.setLink(fFromFacilities.getLink());
+						firstAct.setLinkId(fFromFacilities.getLink().getId());
 						firstAct.setCoord(fFromFacilities.getCenter());
 						firstAct.setFacility(fFromFacilities);
 					}
 					// Change the activity
 //					System.out.println("  ##### Act at "+newAct.getFacility().getId()+" of type "+newAct.getType()+" ID "+newAct.getLink().getId()+" was changed for person "+plan.getPerson().getId()+" to "+fFromKnowledge.getLink().getId());
 					newAct.setLink(fFromFacilities.getLink());
+					newAct.setLinkId(fFromFacilities.getLink().getId());
 					newAct.setCoord(fFromFacilities.getCenter());
 					newAct.setFacility(fFromFacilities);
 					changed = true;

@@ -59,7 +59,10 @@ public class CompareTimeWindows {
 			for(int i=0; i<visits.size();i++){
 				tw1 = visits.get(i);
 				p1 = visits.get(i).person;
-
+// DEBUG
+				if(p1.getId().toString().equals("21923040")){
+					log.info(p1.getId()+" "+tw1.act.getType()+" "+tw1.startTime+" "+tw1.endTime);
+				}
 				for(int j=i+1;j<visits.size();j++){
 					p2 = visits.get(j).person;
 					tw2 = visits.get(j);
@@ -119,7 +122,24 @@ public class CompareTimeWindows {
 		}
 		return overlap;
 	}
-
+	public static boolean overlapTimePlaceTypeFriend(TimeWindow tw1, TimeWindow tw2){
+//		System.out.println("Checking overlap "+act1.getType()+" "+act1.getFacility().getId()+": "+act2.getType()+" "+act2.getFacility().getId());
+		if(tw1.act.getFacility().getActivity(tw2.act.getType())==null){
+			System.out.println("It's act2 "+tw2.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+		}
+		if(tw1.act.getFacility().getActivity(tw1.act.getType())==null){
+			System.out.println("It's act1 "+tw1.act.getType()+" "+tw1.act.getFacility().getId()+": "+tw2.act.getType()+" "+tw2.act.getFacility().getId());
+		}
+		Act act1=tw1.act;
+		Act act2=tw2.act;
+		boolean overlap=false;
+		if(act2.getFacility().getActivity(act2.getType()).equals(act1.getFacility().getActivity(act1.getType()))){
+			if(act2.getEndTime() >=act1.getStartTime() && act2.getStartTime()<=act1.getEndTime() && tw1.person.getKnowledge().getEgoNet().knows(tw2.person)){
+				overlap=true;
+			}
+		}
+		return overlap;
+	}
 	public static double getTimeWindowOverlapDuration(TimeWindow tw1, TimeWindow tw2) {
 		double duration = Math.min(tw1.endTime,tw2.endTime)-Math.max(tw1.startTime,tw2.startTime);
 		if(duration<0) duration=0.;

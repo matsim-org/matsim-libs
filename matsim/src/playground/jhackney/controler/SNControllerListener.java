@@ -46,12 +46,14 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
+import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActs;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
+import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
 import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -59,6 +61,7 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
+import playground.jhackney.scoring.TrackEventsOverlapII;
 
 
 
@@ -117,8 +120,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	//SSTEST private SpatialScorer spatialScorer=null;
-	private TrackEventsOverlap teo=null;
+//	private TrackEventsOverlap teo=null;
+	private EventsPostProcess epp=null;
+	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private EventsToScore scoring =null;
 
@@ -160,14 +164,15 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
-		//SSTEST this.spatialScorer = new SpatialScorer();
-		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
+
+		//teo = new TrackEventsOverlap();
+		epp=new EventsPostProcess(this.controler.getPopulation());
+
+//		this.controler.getEvents().addHandler(this.teo);
+		this.controler.getEvents().addHandler(this.epp);
 		
-		//SSTEST SNScoringGeneralFactory factory = new SNScoringGeneralFactory
-		//SSTEST ("leisure", this.spatialScorer, controler.getScoringFunctionFactory());
-		// SSTEST
-		teo = new TrackEventsOverlap();
-		this.controler.getEvents().addHandler(this.teo);
+		teo=new MakeTimeWindowsFromEvents(epp);
+		
 		this.log.info(" ... Instantiation of events overlap tracking done");
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
@@ -186,7 +191,11 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-
+		
+		//TODO: put in the spatial interactions here. The TimeWindowMap was updated in MobSim and is current, here.
+		// Do not call the teo.clear method. Instead, let
+		// the controler clear the teo in the notifyIterationStarts method
+		
 		Gbl.printMemoryUsage();
 		
 		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
@@ -194,7 +203,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.actStats.clear();
 		
 		Gbl.printMemoryUsage();
-
+		teo=new MakeTimeWindowsFromEvents(epp);
 		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap()));
 		log.info("SSTEST Finish Scoring with actStats "+snIter);
 		scoring.finish();
@@ -207,6 +216,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		Gbl.printMemoryUsage();
 		
 		if( event.getIteration()%replan_interval==0){
+			
 			// Removing the social links here rather than before the
 			//replanning and assignment lets you use the actual encounters in a social score
 			this.log.info(" Removing social links ...");
@@ -285,6 +295,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			} else {
 				this.log.info("     (none)");
 			}
+			this.epp.reset(snIter);
 			this.teo.clearTimeWindowMap();
 			this.log.info(" ... Spatial interactions done\n");
 

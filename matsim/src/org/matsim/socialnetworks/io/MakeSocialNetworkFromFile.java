@@ -24,6 +24,7 @@ public class MakeSocialNetworkFromFile {
 		this.snet=snet;
 	}
 	public void read(String fileName, int iterToLoad){
+		log.info("Reading social network for iteration "+iterToLoad);
 		BufferedReader br = null;
 
 		try // If an error occurs, go to the "catch" block

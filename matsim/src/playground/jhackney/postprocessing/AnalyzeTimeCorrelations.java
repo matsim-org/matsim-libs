@@ -41,10 +41,11 @@ import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
+import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
+import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.TrackActsOverlap;
-import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.utils.charts.XYScatterChart;
@@ -57,6 +58,7 @@ import playground.jhackney.algorithms.PlansPlotScoreDistance;
 import playground.jhackney.algorithms.TimeWindowCalcTimeCorrelations;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.kml.EgoNetPlansMakeKML;
+import playground.jhackney.scoring.TrackEventsOverlapII;
 
 public class AnalyzeTimeCorrelations {
 
@@ -84,20 +86,22 @@ public class AnalyzeTimeCorrelations {
 
 		// read in events
 		Events events = new Events();
-		TrackEventsOverlap teo = new TrackEventsOverlap();
+//		TrackEventsOverlap teo = new TrackEventsOverlap();
+		EventsPostProcess epp=new EventsPostProcess(plans);
 		//Fill timeWindowMap
-		events.addHandler(teo);
 
 		System.out.println(" Initializing the events ...");
-		events = Scenario.readEvents(i);
+		events = Scenario.readEvents(i, epp);
 		System.out.println("... done");
 
-		System.out.println(" ... Instantiation of events overlap tracking done");
+		System.out.println("  Handling events");
+		
+		System.out.println(" ... done");
 
 		//read in social network
 		config.socnetmodule().setInitIter(Integer.toString(i));
 		System.out.println(" Initializing the social network ...");
-		SocialNetwork snet=new SocialNetwork(plans);
+		//SocialNetwork snet=new SocialNetwork(plans);
 		System.out.println("... done");
 
 //		double totaliterationfriendscore=0;
@@ -107,9 +111,10 @@ public class AnalyzeTimeCorrelations {
 //		Hashtable<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 // loop through timeWindowMap
 		// for each Activity 
-
-		new TimeWindowCalcTimeCorrelations(teo.getTimeWindowMap());
-		
+//		new MakeTimeWindowsFromEvents(epp);
+		String out2=Scenario.getOut2();
+		String out1=Scenario.getOut1();
+		new TimeWindowCalcTimeCorrelations(new MakeTimeWindowsFromEvents(epp).getTimeWindowMap(), out2, out1);
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();
 	}

@@ -474,8 +474,8 @@ public class SocialNetworkStatistics {
 			// log.info(myLink.getTimeMade()-myLink.getTimeLastUsed());
 			// Add the link to the graph
 			g.addEdge(e);
-			log.info("Adding edge to JUNG graph object, g is being filled");
-			Gbl.printMemoryUsage();
+//			log.info("Adding edge to JUNG graph object, g is being filled");
+//			Gbl.printMemoryUsage();
 		}
 	}
 

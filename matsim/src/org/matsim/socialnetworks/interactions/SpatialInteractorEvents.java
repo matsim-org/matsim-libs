@@ -12,7 +12,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
+import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 /**
@@ -33,10 +33,12 @@ public class SpatialInteractorEvents {
 //	Hashtable<Activity,ArrayList<Person>> activityMap;
 //	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
 	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap;
-	TrackEventsOverlap teo;
+//	TrackEventsOverlap teo;
+	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
 
-	public SpatialInteractorEvents(SocialNetwork snet, TrackEventsOverlap teo) {
+//	public SpatialInteractorEvents(SocialNetwork snet, TrackEventsOverlap teo) {
+	public SpatialInteractorEvents(SocialNetwork snet, MakeTimeWindowsFromEvents teo) {
 		this.net = snet;
 		this.teo=teo;
 		log.warn("Methods are only for Undirected social interactions");

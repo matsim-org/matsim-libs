@@ -42,9 +42,12 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
+import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
+
+import playground.jhackney.scoring.TrackEventsOverlapII;
 
 public abstract class Scenario {
 
@@ -57,12 +60,17 @@ public abstract class Scenario {
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
 	
 	//For TRB run analyses of 500 iterations
-//	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/TRB6/";
-//	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB6/";
+	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/Config1/";
+	private static final String input_directory = "D:/SocialNetsFolder/TRB/Config1/";
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
 //	private static final String input_directory="output/TRB6/";//AnalyzeScores
-	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
-	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
+//	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
+//	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
+
+//	private static final String output_directory="D:/SocialNetsFolder/EventsInteract/EventsInt2_10/all/";//AnalyzeTimeCorrelation
+//	private static final String input_directory="D:/SocialNetsFolder/EventsInteract/EventsInt2_10/";//AnalyzeTimeCorrelation	
+	private static final String out1 = "AgentsAtActivities1.out";
+	private static final String out2 = "1.out";
 	
 	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
@@ -194,10 +202,11 @@ public abstract class Scenario {
 		return plans;
 	}
 	
-	public static final Events readEvents(int i) {
+	public static final Events readEvents(int i, EventsPostProcess epp) {
 		System.out.println("  reading plans xml file... ");
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		Events events = new Events();
+		events.addHandler(epp);
 		System.out.println(filename);
 		new MatsimEventsReader(events).readFile(filename);
 
@@ -258,6 +267,12 @@ public abstract class Scenario {
 	}
 	public static String getSNInDir(){
 		return input_directory;
+	}
+	public static String getOut1(){
+		return output_directory + out1;
+	}
+	public static String getOut2(){
+		return output_directory + out2;
 	}
 }
 
