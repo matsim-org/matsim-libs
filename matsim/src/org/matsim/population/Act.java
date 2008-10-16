@@ -83,6 +83,7 @@ public class Act extends BasicActImpl {
 		this.endTime = act.endTime;
 		this.dur = act.dur;
 		this.setFacility(act.getFacility());
+		this.setLinkId(this.link.getId());
 	}
 
 	//////////////////////////////////////////////////////////////////////
