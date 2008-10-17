@@ -30,20 +30,23 @@
 
 package playground.christoph.knowledge.nodeselection;
 
-import java.util.ArrayList;
+import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Node;
 
-public interface SelectNodes {
+public interface SelectNodes extends Cloneable {
 
 	/**
-	 * Some Links are selected and added to the ArrayList< Node > nodeList.
+	 * New Nodes are selected and added to the Map< Id, Node > nodesMap.
 	 */
-	public void getNodes(ArrayList<Node> nodeList);
+	public void addNodesToMap(Map<Id, Node> nodesMap);
 	
 	/**
-	 * @return A new created ArrayList of Nodes.
+	 * @return A new created Map of Nodes.
 	 */
-	public ArrayList<Node> getNodes();
+	public Map<Id, Node> getNodes();
+	
+	public SelectNodes clone();
 	
 }

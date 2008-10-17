@@ -24,8 +24,10 @@ package playground.christoph.events;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.controler.Controler;
 import org.matsim.network.Node;
@@ -40,6 +42,8 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 
 import playground.christoph.events.algorithms.ActEndReplanner;
+import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
+import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
@@ -71,6 +75,7 @@ public class EventControler extends Controler{
 	protected ArrayList<SelectNodes> nodeSelectors;
 	
 	private static final Logger log = Logger.getLogger(EventControler.class);
+	
 	
 //	private static final String FILENAME_EVENTS = "events.txt.gz";
 
@@ -153,38 +158,6 @@ public class EventControler extends Controler{
 	}
 	
 	
-	// Workaround!
-	@Override
-	protected void setup() {
-			
-		/*
-		try 
-		{
-			// ask currently executing Thread to sleep for 1000ms
-			Thread.sleep(5000); 
-		}
-		catch(InterruptedException e)   
-		{      
-			System.out.println("Sleep interrupted:"+e);      
-		}
-		 */
-		
-//		this.network.setEffectiveCellSize(100);
-/*				
-		Map<Id, Link> linkMap = this.network.getLinks();
-		Iterator linkIterator = linkMap.values().iterator();
-		while(linkIterator.hasNext())
-		{
-			Link link = (Link)linkIterator.next();
-			//link.setCapacity(link.getCapacity(0.0)/10);
-//			link.setFreespeed(0.50);
-			
-			//link.setLength(link.getLength()/10);			
-		}
-	*/	
-		super.setup();
-	}
-	
 	@Override
 	protected void runMobSim() 
 	{
@@ -207,11 +180,11 @@ public class EventControler extends Controler{
 		log.info("Initialize Node Selectors");
 		initNodeSelectors();
 		
-		log.info("Set NodeSelectors");
+		log.info("Set Node Selectors");
 		setNodeSelectors();
 		
-		log.info("Set Nodes");
-		setNodes();
+		log.info("Create known Nodes Maps");
+		createKnownNodes();
 
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
@@ -229,17 +202,6 @@ public class EventControler extends Controler{
 		
 		sim.run();
 	}
-	
-/*
-	protected void setCostCalculator()
-	{
-		travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
-		travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator);
-		
-		// CostCalculator überschreiben!
-		super.travelCostCalculator = travelCostCalculator;
-	}
-*/
 	
 
 	/* Add three boolean variables to each Person.
@@ -261,7 +223,7 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 			
 			counter++;
-			if(counter < 50)
+			if(counter < 5000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
 				customAttributes.put("initialReplanning", new Boolean(false));
@@ -323,17 +285,26 @@ public class EventControler extends Controler{
 		}
 	}
 	
-	protected void setNodes()
+	protected void createKnownNodes()
 	{
+		// use only one of these two - they should produce the same results... 
+		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
+
+		// non multi-core calculation
+		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);
+		
+		
+/*		// remove this part, if the methods from above work as expected
+
 		Iterator<Person> PersonIterator = this.getPopulation().iterator();
 		
 		int counter = 1;
 		
 		while (PersonIterator.hasNext())
 		{
-			if (counter == 50) break;
+			if (counter == 5000) break;
 			
-			if (counter % 500 == 0) log.info("creaded Acivityrooms for " + counter + " persons.");
+			if (counter % 500 == 0) log.info("created Acivityrooms for " + counter + " persons.");
 			counter++;
 			
 			Person p = PersonIterator.next();
@@ -342,7 +313,8 @@ public class EventControler extends Controler{
 			
 			Plan plan = p.getSelectedPlan();
 					
-			ArrayList<Node> nodes = new ArrayList<Node>();	
+			//ArrayList<Node> nodes = new ArrayList<Node>();
+			Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 			
 			ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)p.getCustomAttributes().get("NodeSelectors");
 			
@@ -366,14 +338,25 @@ public class EventControler extends Controler{
 						((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 						((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
 						
-						nodeSelector.getNodes(nodes);
+						//nodeSelector.getNodes(nodes);
+						nodeSelector.addNodesToMap(nodesMap);
 					}
 				}	//if instanceof SelectNodesDijkstra
+				
+				else if(nodeSelector instanceof SelectNodesCircular)
+				{
+					// do something here...
+				}
+				
+				else
+				{
+					log.error("Unkown NodeSelector!");
+				}
 			}
 
 			// add the selected Nodes to the knowledge of the person
 			Map<String,Object> customKnowledgeAttributes = p.getKnowledge().getCustomAttributes();
-			customKnowledgeAttributes.put("Nodes", nodes);
+			customKnowledgeAttributes.put("Nodes", nodesMap);
 
 			// remove Dead Ends from the Person's Activity Room
 			DeadEndRemover.removeDeadEnds(p);
@@ -381,8 +364,9 @@ public class EventControler extends Controler{
 //			log.info("created Activityroom for person..." + p.getId());
 		}
 		//ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("IncludedLinkIDs");
-
+*/
 	}	// setNodes()
+
 	
 	protected void doInitialReplanning()
 	{

@@ -21,8 +21,10 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -67,14 +69,14 @@ public class TabuRoute extends PersonLeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 	
-		// erster Schleifendurchlauf -> kein vorheriger Node!
+		// first loop -> there is no previous node
 		Node previousNode = null;
 		
 		while(!currentNode.equals(toNode))
@@ -85,7 +87,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator {
 			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodes);
+			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
 			
 			/*
 			 * If there are no Links available something may be wrong.
@@ -99,10 +101,10 @@ public class TabuRoute extends PersonLeastCostPathCalculator {
 			// get Links, that do not return to the previous Node
 			Link[] newLinks = TabuSelector.getLinks(links, previousNode);
 			
-			// Link wählen
+			// choose link
 			int nextLink = MatsimRandom.random.nextInt(newLinks.length);
 			
-			// den gewählten Link zum neuen CurrentLink machen
+			// make the chosen link to the new current link
 			if(newLinks[nextLink] instanceof Link)
 			{
 				currentLink = newLinks[nextLink];

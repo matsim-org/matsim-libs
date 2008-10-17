@@ -20,8 +20,10 @@
 
 package playground.christoph.knowledge.nodeselection;
 
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
@@ -29,24 +31,34 @@ import org.matsim.network.Node;
 public class BasicSelectNodesImpl implements SelectNodes {
 
 	NetworkLayer network;
-
-	public void getNodes(ArrayList<Node> nodeList) {
+ 
+	public void addNodesToMap(Map<Id, Node> nodeList)
+	{
 		// TODO Auto-generated method stub
 	}
 
-	public ArrayList<Node> getNodes() {
+	public Map<Id, Node> getNodes()
+	{
 		// TODO Auto-generated method stub
-		return new ArrayList<Node>();
+		//return new ArrayList<Node>();
+		return new TreeMap<Id, Node>();
 	}
 
-	public NetworkLayer getNetwork() {
+	public NetworkLayer getNetwork() 
+	{
 		return network;
 	}
 
-	public void setNetwork(NetworkLayer network) {
+	public void setNetwork(NetworkLayer network) 
+	{
 		this.network = network;
 	}
 
-
+	@Override
+	public SelectNodes clone()
+	{
+		BasicSelectNodesImpl clone = new BasicSelectNodesImpl();
+		return clone;
+	}
 
 }

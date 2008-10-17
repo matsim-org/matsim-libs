@@ -47,26 +47,26 @@ public class DijkstraForSelectNodes {
 	
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
 	
-	// Verkehrsnetz
+	// Traffic network
 	NetworkLayer network;
 	
-	// Verbindung zwischen Nodes und den zugehörigen DijkstraNodes herstellen.
+	// mapping between nodes and dijkstraNodes
 	HashMap<Node, DijkstraNode> dijkstraNodeMap;
 	
-	// Kostenrechner
+	// CostCalculator for the Dijkstra Algorithm
 	TravelCost costCalculator = new FreespeedTravelTimeCost();
 
-	// Zeit für den Kostenrechner
+	// time for the cost calculator
 	double time = Time.UNDEFINED_TIME;
 	
-	// Initiale Länge der PriorityQueue. Wert aus Dijkstra.java übernommen.
+	// initial length of the priority queue - value taken from Dijkstra.java
 	private static final int INITIAL_CAPACITY = 500;
 	
-	// alle Nodes des Netzwerks
-	ArrayList<Node> networkNodes;
+	// all nodes of the network
+	Map<Id, Node> networkNodesMap;
 	
 	
-	// Knoten anhand ihres Abstandes zum Ursprungsknoten sortieren.
+	// List of nodes, sorted by their distance to the startnode.
 	private final Comparator<DijkstraNode> shortestDistanceComparator = new Comparator<DijkstraNode>()
 	{
 		public int compare(DijkstraNode a, DijkstraNode b)
@@ -74,34 +74,34 @@ public class DijkstraForSelectNodes {
 			// note that this trick doesn't work for huge distances, close to Integer.MAX_VALUE
 	        double diff = a.getMinDist() - b.getMinDist();
 	        
-	        // dist von b grösser als dist von a
+	        // distance from b is bigger than distance from a
 	        if (diff < 0) return -1;
 
-	        // dist von a grösser als dist von b
+	        // distance from a is bigger than distance from b
 	        else if (diff > 0) return 1;
 	        
-	        // also dieselbe Distanz
+	        // same distance
 	        else return 0;
 	    }
 	};
 	    
 	   
-	// Liste von Knoten, sortiert nach ihrer Distanz zum Ursprungsknoten.
+	// List of nodes, sorted by their distance to the startnode.
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
 	
 	
-	public DijkstraForSelectNodes(ArrayList<Node> networkNodes)
+	public DijkstraForSelectNodes(Map<Id, Node> networkNodesMap)
 	{
-		this.networkNodes = networkNodes;
+		this.networkNodesMap = networkNodesMap;
 		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 	}
 	
-	public DijkstraForSelectNodes(NetworkLayer network, ArrayList<Node> networkNodes)
+	public DijkstraForSelectNodes(NetworkLayer network, Map<Id, Node> networkNodesMap)
 	{
 		this.network = network;
-		this.networkNodes = networkNodes;
+		this.networkNodesMap = networkNodesMap;
 		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
@@ -113,32 +113,31 @@ public class DijkstraForSelectNodes {
 		this.network = network;
 	}
 	
-	public void setNetworkNodes(ArrayList<Node> nodes)
+	public void setNetworkNodes(Map<Id, Node> networkNodesMap)
 	{
-		this.networkNodes = nodes;
+		this.networkNodesMap = networkNodesMap;
 	}
 	
 	protected void initDijkstraNodes()
 	{		
-		// aufräumen
-//		dijkstraNodeMap.clear();
+		// clear map
+		dijkstraNodeMap.clear();
 		
-		for(int i = 0; i < networkNodes.size(); i++)
-		{
-			Node node = networkNodes.get(i);
-			
+		// iterate over Array or Iteratable 
+		for (Node node : networkNodesMap.values())
+		{		
 			DijkstraNode dijkstraNode = new DijkstraNode(node);
 			
-			// DijkstraNodeMap füllen
+			// fill DijkstraNodeMap
 			dijkstraNodeMap.put(node, dijkstraNode);
 		}
 		
 	}
 
-	// initialisieren
+	// initialize
 	private void init(DijkstraNode start)
 	{
-		// Knoten zurücksetzen
+		// reset nodes
 		resetDijkstraNodes();
 
 	    unvisitedNodes.clear();
@@ -149,7 +148,7 @@ public class DijkstraForSelectNodes {
 	}
 	   
 	
-	// Kürzesten Weg für eine Route suche. Abbrechen, wenn dieser gefunden wurde.
+	// Search shortest Path for a Route. Break if distance has been found.
 	public void executeRoute(Node start, Node end)
 	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
@@ -163,10 +162,10 @@ public class DijkstraForSelectNodes {
 	    // extract the node with the shortest distance
 	    while ((node = unvisitedNodes.poll()) != null)
 	    {
-	    	// Fehler abfangen, falls sich falscher Node eingeschlichen hat
+	    	// catch possible error
 	    	assert !isVisited(node);
 	            
-	        // Ziel erreicht -> abbrechen
+	        // reached destination node -> break
 	        if (node.getNode().equals(endNode.getNode())) break;
 	            
 	        node.setVisited(true);
@@ -175,7 +174,7 @@ public class DijkstraForSelectNodes {
 	    }
 	}
 
-	// Kürzeste Wege zu allen Knoten des Netzwerks suchen.
+	// Search shortest Paths to all nodes within the network.
 	public void executeNetwork(Node start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
@@ -187,7 +186,7 @@ public class DijkstraForSelectNodes {
 	    // extract the node with the shortest distance
 	    while ((node = unvisitedNodes.poll()) != null)
 	    {
-	    	// Fehler abfangen, falls sich falscher Node eingeschlichen hat
+	    	// catch possible error
 	    	assert !isVisited(node);
 	    	
 	        node.setVisited(true);
@@ -196,23 +195,18 @@ public class DijkstraForSelectNodes {
 	    }
 	}
 	
-	// Map mit den Distanzen zu jedem Knoten zurückgeben.
-	// Wird von ausserhalb ausgerufen, darum Rückgabe von
-	// Nodes statt DijkstraNodes.
+	/*
+	 * Return Map with the distances to every node.
+	 * Is called from outside this class, so return nodes instead of
+	 * DijkstraNodes.
+	 */
 	public Map<Node, Double> getMinDistances()
 	{
 		Map<Node, Double> minDistances = new HashMap<Node, Double>();
 		
-		//for(int i = 0; i < DijkstraNodeMap.)
-//		Map<Id, Node> myMap = (Map<Id, Node>)startNode.getOutNodes();
-		
-		Iterator nodeIterator = dijkstraNodeMap.values().iterator();
-		while(nodeIterator.hasNext())
+		for (DijkstraNode node : dijkstraNodeMap.values()) 
 		{
-			// Den DijkstraNode holen...
-			DijkstraNode node = (DijkstraNode)nodeIterator.next();
-			
-			// ... dieser enthält den zugrundeliegenden Node und dessen kürzeste Wegdistanz
+			// add the node and its shortest path to the map
 			minDistances.put(node.getNode(), node.getMinDist());
 		}
 		
@@ -220,32 +214,30 @@ public class DijkstraForSelectNodes {
 	}
 	
 	
-	// Knoten expandieren
+	// expand node
 	private void relaxNode(DijkstraNode node)
 	{		
 		ArrayList<Link> outgoingLinks = node.outgoingLinks();
 		for (int i = 0; i < outgoingLinks.size(); i++)
 		{
-			// aktuellen Link holen
+			// get current link
 			Link link = outgoingLinks.get(i);
 			
-			// Zielknoten holen
+			// get destination node
 			DijkstraNode toNode = dijkstraNodeMap.get(link.getToNode());
 			
-			// Falls Knoten noch nicht besucht wurde...
+			// if node has not been visited
 			if (!toNode.isVisited())
 			{			
-				double shortDist = node.getMinDist() + getLinkDist(link, time); 
+				double shortDist = node.getMinDist() + getLinkCost(link, time); 
 	            
-				// neue kürzeste Route zum Zielknoten gefunden?
+				// Found new shortest path to the destination node?
 				if (shortDist < toNode.getMinDist())
 				{
-					// neue "kürzeste" Distanz hinterlegen
-					//toNode.setMinDist(shortDist);
+					// store new "shortest" distance
 					setMinDistance(toNode, shortDist);
 		                                
-					// neuen "vorherigen" Knoten hinterlegen
-					//toNode.setPrevNode(node);
+					// store new "previous" node
 					setPreviousNode(toNode, node);
 				}
 
@@ -258,34 +250,33 @@ public class DijkstraForSelectNodes {
 		return node.isVisited();
 	}
 
-	// für externen Aufruf
+	// for external call
 	public double getMinDistance(DijkstraNode node)
 	{
 		return node.getMinDist(); 
 	}
 
-	// Die "kürzeste" Distanz zu einem Knoten hinterlegen.
-	// In diesem Zuge auch die Queue aktualisieren 
-	// (Knoten entfernen und neu hinzufügen -> neu einordnen).
-	// Fall der Knonten noch nicht in der Queue war -> neu hinzugefügt.
+	/*
+	 * Store the "shortest" distances to every node.
+	 * Also actualize the Queue (remove node and add it again to put it at the right place in the Queue).
+	 * If the node was not already in the queue: add it.
+	 */
 	private void setMinDistance(DijkstraNode node, double distance)
 	{
 		unvisitedNodes.remove(node);
 
 		node.setMinDist(distance);
 
-		// Knoten neu in der Queue einordnen
+		// add node to the queue
 		unvisitedNodes.add(node);
 	}
 	
-	// "Distanz" des übergebenen Links holen.
-	// Dies kann z.B. dessen Länge oder die Fahrzeit auf dem Link sein.
-	// Eventuell einen matsim CostCalculator verwenden, den man dann auch extern setzen kann?
-	protected double getLinkDist(Link link, double time)
+	/*
+	 * Get cost of the given link. This can be for example its length or the time to pass the link.
+	 */
+	protected double getLinkCost(Link link, double time)
 	{   
 		return costCalculator.getLinkTravelCost(link, time);
-		//return link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
-		//return link.getLength();
 	}
 
 	public void setCostCalculator(TravelCost calculator)
@@ -319,15 +310,16 @@ public class DijkstraForSelectNodes {
 		a.setPrevNode(b);
 	}
 	
-	// Knoten reseten: visited -> false; mindist -> Double.MAX_DOUBLE
+
+	/* 
+	 * Reset nodes.
+	 * visited -> false
+	 * mindist -> Double.MAX_DOUBLE
+	 */
 	private void resetDijkstraNodes()
 	{
-		Iterator nodeIterator = dijkstraNodeMap.values().iterator();
-		while(nodeIterator.hasNext())
-		{
-			// Den DijkstraNode holen...
-			DijkstraNode node = (DijkstraNode)nodeIterator.next();
-			
+		for (DijkstraNode node : dijkstraNodeMap.values()) 
+		{	
 			node.reset();
 		}
 	}	// resetDijkstraNodes
@@ -335,8 +327,9 @@ public class DijkstraForSelectNodes {
 }	// class DijkstraForSelectNodes
 
 
-// Internes Datenkonstrukt, das Informationen über einen Knoten, 
-// die Distanz zu diesem und seinen Vorgängerknoten enthält.
+/*
+ * Internal data structure with information about a node, the "distance" to it and its previous node.
+ */
 class DijkstraNode
 {
 	static private HashMap<Node, DijkstraNode> dijkstraNodeMap;
@@ -387,7 +380,6 @@ class DijkstraNode
 
 	public void setMinDist(double minDist) 
 	{
-		//System.out.println("Setting minDist..." + minDist + " for ID..." + node.getId().toString());
 		this.minDist = minDist;
 	}
 	

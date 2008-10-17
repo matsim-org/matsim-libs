@@ -50,155 +50,94 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 
 public class GetAllNodes {
-	
-	public ArrayList<Node> getAllNodes(NetworkLayer n)
+
+	public Map<Id, Node> getAllNodes(NetworkLayer n)
 	{
 		return getNodes(n);
 	}
 	
-	public void getAllNodes(NetworkLayer n, ArrayList<Node> nodes)
+	public void getAllNodes(NetworkLayer n, Map<Id, Node> nodesMap)
 	{	
-		getNodes(n, nodes);
+		getNodes(n, nodesMap);
 	}
 	
-	public ArrayList<Node> getAllNodes(Person p)
+	public Map<Id, Node> getAllNodes(Person p)
 	{
-		//return getNodes(getLinks(p));
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(Person p, ArrayList<Node> nodes)
+	public void getAllNodes(Person p, Map<Id, Node> nodesMap)
 	{
-		//getNodes(getLinks(p), nodes);
-		getNodes(new GetAllLinks().getAllLinks(p), nodes);
+		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}
 	
-	public ArrayList<Node> getAllNodes(Plan p)
+	public Map<Id, Node> getAllNodes(Plan p)
 	{
-		//return getNodes(getLinks(p));
 		return getNodes(new GetAllLinks().getAllLinks(p));
 	}
 	
-	public void getAllNodes(Plan p, ArrayList<Node> nodes)
+	public void getAllNodes(Plan p, Map<Id, Node> nodesMap)
 	{
-		//getNodes(getLinks(p), nodes);
-		getNodes(new GetAllLinks().getAllLinks(p), nodes);
+		getNodes(new GetAllLinks().getAllLinks(p), nodesMap);
 	}
 	
-
-/*
-	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der übergebenen Person sind.
-	protected ArrayList<Link> getLinks(Person person)
-	{
-		Plan plan = person.getSelectedPlan();
-
-		return getLinks(plan);
-	} //getLinks(Person)
-*/
 	
-/*
-	// Liefert eine ArryList aller Links, die Teil übergebenen Plans sind.
-	protected ArrayList<Link> getLinks(Plan plan)
-	{	
-		ArrayList<Link> links = new ArrayList<Link>();
-	
-		// Links holen, an denen Acts stattfinden
-		ActIterator actIterator = plan.getIteratorAct();
-		while (actIterator.hasNext())
-		{
-			Act act = (Act)actIterator.next();
-			
-			// Hinzufügen, falls neues Element
-			if(!links.contains(act.getLink())) links.add(act.getLink());
-			
-		}	// while actIterator.hasNext()
-
-		// Routen holen, die die Acts verbinden
-		LegIterator legIterator = plan.getIteratorLeg();
-		while (legIterator.hasNext())
-		{
-			Leg leg = (Leg)legIterator.next();
-
-			Route route = leg.getRoute();
-				
-			Link[] linkArray = route.getLinkRoute(); 
-			
-			for(int i = 0; i < linkArray.length; i++)
-			{
-				Link link = linkArray[i];
-			
-				// Hinzufügen, falls neues Element
-				if(!links.contains(link)) links.add(link);
-				
-			}
-		}	// while legIterator.hasNext()
-
-		return links;
-	} // getLinks(Plan)
-*/
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
 	// Da keine ArrayList mit bereits selektieren Nodes übergeben wurde, wird diese neu erstellt. 
-	protected ArrayList<Node> getNodes(ArrayList<Link> links)
+	protected Map<Id, Node> getNodes(ArrayList<Link> links)
 	{
-		ArrayList<Node> nodes = new ArrayList<Node>();
+		Map <Id, Node> nodesMap = new TreeMap<Id, Node>();
 		
-		getNodes(links, nodes);
+		getNodes(links, nodesMap);
 		
-		return nodes; 
+		return nodesMap; 
 	} // getNodes(ArrayList<Link>)
 	
 	
 	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
-	protected void getNodes(ArrayList<Link> links, ArrayList<Node> nodes)
+	protected void getNodes(ArrayList<Link> links, Map<Id, Node> nodesMap)
 	{
 		Iterator<Link> linksIterator = links.iterator();
 		
 		while(linksIterator.hasNext())
 		{
 			Link link = linksIterator.next();
-
-			//nodes.add(link.getFromNode());
-			//nodes.add(link.getToNode());
 			
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			if (!nodes.contains(fromNode)) nodes.add(fromNode);
-			if (!nodes.contains(toNode)) nodes.add(toNode);
+			if (!nodesMap.containsKey(fromNode.getId())) nodesMap.put(fromNode.getId(), fromNode);
+			if (!nodesMap.containsKey(toNode.getId())) nodesMap.put(toNode.getId(), toNode);
 		}
 
 	}
 	
 	
-	protected ArrayList<Node> getNodes(NetworkLayer n)
+	protected Map<Id, Node> getNodes(NetworkLayer n)
 	{
-		ArrayList<Node> nodes = new ArrayList<Node>();
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 
-		getNodes(n, nodes);
+		getNodes(n, nodesMap);
 		
-		return nodes;		
+		return nodesMap;
 	} //getNodes(NetworkLayer n)
 	
 	
-	protected void getNodes(NetworkLayer n, ArrayList<Node> nodes)
+	protected void getNodes(NetworkLayer n, Map<Id, Node> nodesMap)
 	{
-		// Alle Nodes des Netzwerks holen
-		TreeMap<Id, Node> nodeMap = (TreeMap<Id, Node>)n.getNodes();
-		
-		Iterator nodeIterator = nodeMap.entrySet().iterator();
-		
-		while(nodeIterator.hasNext())
+		// get all nodes of the network
+		Map<Id, Node> networkNodesMap = n.getNodes();
+				
+		// iterate over Array or Iteratable
+		for (Node node : networkNodesMap.values()) 
 		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
-			Map.Entry<Id, Node> nextNode = (Map.Entry<Id, Node>)nodeIterator.next();
-
-			Node node = nextNode.getValue();
-						
-			// Prüfen, ob der Node bereits in der Liste enthalten ist
-			if(!nodes.contains(node)) nodes.add(node);	
-		}	// while nodeIterator.hasNext()
-		
+			// Which one is faster / better?
+			if(!nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);
+			
+			//if(!nodesMap.containsValue(node)) nodesMap.put(node.getId(), node);
+		}
+	
 	} //getNodes(NetworkLayer n, ArrayList<Node) nodes)
 	
 }

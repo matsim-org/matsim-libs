@@ -21,8 +21,10 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
@@ -65,10 +67,10 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 		
@@ -80,7 +82,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodes);
+			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
 	
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) links = TabuSelector.getLinks(links, previousNode);
@@ -120,7 +122,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			}
 				
 			
-			// den gewählten Link zum neuen CurrentLink machen
+			// make the chosen link to the current link
 			if(nextLink != null)
 			{
 				currentLink = nextLink;

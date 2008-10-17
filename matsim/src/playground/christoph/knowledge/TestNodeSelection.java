@@ -21,7 +21,10 @@
 package playground.christoph.knowledge;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -35,14 +38,16 @@ import playground.christoph.knowledge.utils.GetAllNodes;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	ArrayList<Node> selectedNodes;
+	//ArrayList<Node> selectedNodes;
+	Map<Id, Node> selectedNodesMap;
 	
 	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
 	final String kmzFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/kmzFile.kmz";
 	
 	protected void init()
 	{
-		selectedNodes = new ArrayList<Node>();
+		//selectedNodes = new ArrayList<Node>();
+		selectedNodesMap = new TreeMap<Id, Node>();
 	}
 	
 	protected void loadNetwork()
@@ -62,8 +67,8 @@ public class TestNodeSelection {
 		// Weg als Massstab
 		//SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 275000);
 		// anderer Startpunkt: 2484		
-		snd.getNodes(selectedNodes);
-		System.out.println("Found ... included Nodes: " + selectedNodes.size());
+		snd.addNodesToMap(selectedNodesMap);
+		System.out.println("Found ... included Nodes: " + selectedNodesMap.size());
 	}
 	
 	protected void testCircularSelector()
@@ -73,26 +78,33 @@ public class TestNodeSelection {
 		//snc.getNodes(network.getNode("545"), 20000, selectedNodes);
 		//snc.getNodes(network.getNode("4058"), 20000, selectedNodes);
 		
-		snc.getNodes(network.getNode("9582"), 20000, selectedNodes);
-		System.out.println("Found ... included Nodes: " + selectedNodes.size());
+		snc.getNodes(network.getNode("9582"), 20000, selectedNodesMap);
+		System.out.println("Found ... included Nodes: " + selectedNodesMap.size());
 	}
 	
 	// nicht selektierte Nodes aus dem Netzwerk entfernen
 	protected void removeOtherNodes()
 	{
-		ArrayList<Node> allNodes = new GetAllNodes().getAllNodes(network);
+		//ArrayList<Node> allNodes = new GetAllNodes().getAllNodes(network);
+		Map<Id, Node> allNodesMap = new GetAllNodes().getAllNodes(network);
 		
-		for(int i = 0; i < allNodes.size(); i++)
+/*		for(int i = 0; i < allNodes.size(); i++)
 		{
 			if(!selectedNodes.contains(allNodes.get(i))) network.removeNode(allNodes.get(i));
 		}
+*/
+		// iterate over Array or Iteratable 
+		for (Node node : allNodesMap.values())
+		{
+			if(!selectedNodesMap.containsKey(node.getId())) network.removeNode(node);
+		}
+
 	}
 	
 	protected void getIncludedLinks()
 	{
 		GetAllIncludedLinks gail = new GetAllIncludedLinks();
-		gail.getAllLinks(network, selectedNodes);
-		
+		gail.getAllLinks(network, selectedNodesMap);
 	}
 	
 	protected void createKMLFile()

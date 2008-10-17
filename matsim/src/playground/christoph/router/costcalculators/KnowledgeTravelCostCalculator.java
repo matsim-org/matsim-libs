@@ -21,8 +21,10 @@
 package playground.christoph.router.costcalculators;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -55,13 +57,13 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	
 	public double getLinkTravelCost(final Link link, final double time) 
 	{
-		ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
-		// if the Person doesn't know the link -> return max costs
-		if (!KnowledgeTools.knowsLink(link, knownNodes)) 
+		// if the Person doesn't know the link -> return max costs 
+		if (!KnowledgeTools.knowsLink(link, knownNodesMap))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;

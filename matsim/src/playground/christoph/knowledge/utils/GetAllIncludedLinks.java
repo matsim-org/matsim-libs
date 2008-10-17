@@ -58,6 +58,21 @@ public class GetAllIncludedLinks {
 		getAllLinks(network, includedNodes, includedLinks);
 		return includedLinks;
 	}
+
+	/**
+	 * Returns an ArrayList of Links.
+	 * @param NetworkLayer network
+	 * @param Map< Id, Node > includedNodesMap
+	 *  
+	 * @return A link from the network is included in the returned ArrayList, if its
+	 * start- and end node are included in the includedNodes ArrayList.
+	 */
+	public ArrayList<Link> getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap)
+	{
+		ArrayList<Link> includedLinks = new ArrayList<Link>();
+		getAllLinks(network, includedNodesMap, includedLinks);
+		return includedLinks;
+	}
 	
 	/**
 	 * A link from the network is added to the includedLinks ArrayList, if its
@@ -69,31 +84,52 @@ public class GetAllIncludedLinks {
 	 */
 	public void getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes, ArrayList<Link> includedLinks)
 	{		
-		// Alle Links des Netzwerks holen
-		TreeMap<Id, Link> linkMap = (TreeMap<Id, Link>)network.getLinks();
+		// get all links of the network
+		Map<Id, Link> linkMap = network.getLinks();
 		
-		Iterator linkIterator = linkMap.entrySet().iterator();
-		
-		while(linkIterator.hasNext())
+		for (Link link : linkMap.values()) 
 		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
-			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
-			//Id id = nextLink.getKey();
-			Link link = nextLink.getValue();
-			
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			// Prüfen, ob der Node in der übergebenen Liste enthalten ist
+			// check, if the node is contained in the given list
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))
 			{
-				//... also beide Nodes enthalten -> Link enthalten
+				//... both nodes contained -> link contained -> add link to list
 				includedLinks.add(link);
 			}		
 			
-		}	// while nodeIterator.hasNext()
-		
+		}		
 		//return includedLinks;
 	}
+	
+	/**
+	 * A link from the network is added to the includedLinks ArrayList, if its
+	 * start- and end node are included in the includedNodes ArrayList.
+	 *  
+	 * @param NetworkLayer network
+	 * @param Map< Id, Node > includedNodesMap
+	 * @param ArrayList< Link > includedLinks
+	 */
+	public void getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
+	{	
+		// get all links of the network
+		Map<Id, Link> linkMap = network.getLinks();
+		
+		for (Link link : linkMap.values()) 
+		{
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
+			
+			// check, if the node is contained in the given list
+			if(includedNodesMap.containsKey(fromNode.getId()) && includedNodesMap.containsKey(toNode.getId()))
+			{
+				//... both nodes contained -> link contained -> add link to list
+				includedLinks.add(link);
+			}		
+			
+		}
+		
+	} //return includedLinks;
 	
 }

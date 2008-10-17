@@ -52,7 +52,7 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		distance = 0.0;
 	}
 	
-	public ArrayList<Node> getNodes(Node center, double dist)
+	public Map<Id, Node> getNodes(Node center, double dist)
 	{
 		distance = dist;
 		centerNode = center;
@@ -60,15 +60,15 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(Node center, double dist, ArrayList<Node> nodeList)
+	public void getNodes(Node center, double dist, Map<Id, Node> nodesMap)
 	{
 		distance = dist;
 		centerNode = center;
 		centerLink = null;
-		getNodes(nodeList);
+		addNodesToMap(nodesMap);
 	}
 	
-	public ArrayList<Node> getNodes(Link link, double dist)
+	public Map<Id, Node> getNodes(Link link, double dist)
 	{
 		distance = dist;
 		centerLink = link;
@@ -76,43 +76,36 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 		return getNodes();
 	}
 	
-	public void getNodes(Link link, double dist, ArrayList<Node> nodeList)
+	public void getNodes(Link link, double dist, Map<Id, Node> nodesMap)
 	{
 		distance = dist;
 		centerLink = link;
 		centerNode = null;
-		getNodes(nodeList);
+		addNodesToMap(nodesMap);
 	}
 	
 	@Override
-	public ArrayList<Node> getNodes()
+	public Map<Id, Node> getNodes()
 	{
-		ArrayList<Node> nodeList = new ArrayList<Node>();
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+		addNodesToMap(nodesMap);
 		
-		getNodes(nodeList);
-		
-		return nodeList;
+		return nodesMap;
 	}
 	
 	@Override
-	public void getNodes(ArrayList<Node> nodeList) {
-		
+	public void addNodesToMap(Map<Id, Node> nodesMap) 
+	{	
 		if(centerNode != null || centerLink != null)
 		{
-			if(nodeList == null) nodeList = new ArrayList<Node>();
+			if(nodesMap == null) nodesMap = new TreeMap<Id, Node>();
 			
-			// Alle Knoten des Netzwerks holen
-			TreeMap<Id, Node> nodeMap = (TreeMap<Id, Node>)network.getNodes();
+			// get all nodes of the network
+			Map<Id, Node> networkNodesMap = network.getNodes();
 			
-			Iterator nodeIterator = nodeMap.entrySet().iterator();
-			
-			while(nodeIterator.hasNext())
+			// iterate over Array or Iteratable 
+			for (Node node : networkNodesMap.values())
 			{
-				// Wir wissen ja, was für Elemente zurückgegeben werden :)
-				Map.Entry<Id, Node> nextNode = (Map.Entry<Id, Node>)nodeIterator.next();
-				//Id id = nextLink.getKey();
-				Node node = nextNode.getValue();
-				
 				Coord coord = node.getCoord();
 	
 				double dist;
@@ -120,14 +113,14 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 				if(centerNode != null) dist = centerNode.getCoord().calcDistance(coord);
 				else dist = centerLink.calcDistance(coord);
 					
-				// Innerhalb des Bereichs?
+				// within the distance?
 				if (dist <= distance)
 				{
-					// Knoten in Liste speichern, falls dort noch nicht hinterlegt
-					if (!nodeList.contains(node)) nodeList.add(node);
+					// add node to the Map, if he is not already included
+					if (!nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);
 				}
 				
-			}	// while nodeIterator.hasNext()	
+			}	// for iterator
 		
 		}	// if 
 	}
@@ -156,6 +149,14 @@ public class SelectNodesCircular extends BasicSelectNodesImpl{
 	public void setLink(Link centerLink) {
 		centerNode = null;
 		this.centerLink = centerLink;
+	}
+	
+	@Override
+	public SelectNodesCircular clone()
+	{
+		SelectNodesCircular clone = new SelectNodesCircular(this.network);
+	
+		return clone;
 	}
 	
 }

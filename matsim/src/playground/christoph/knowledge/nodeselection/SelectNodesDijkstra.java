@@ -20,10 +20,11 @@
 
 package playground.christoph.knowledge.nodeselection;
 
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -36,6 +37,8 @@ import playground.christoph.knowledge.utils.GetAllNodes;
  * Selects Nodes by using a Dijkstra Algorithm. Nodes are included, if
  * they lie on routes that an agent can use to get from the start node to 
  * the end node within a given cost limit.
+ * 
+ *  @author Christoph Dobler
  */
 public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 
@@ -44,7 +47,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	double costFactor = Double.MAX_VALUE;	
 	TravelCost costCalculator = new FreespeedTravelTimeCost();	// CostCalculator
 	double time = Time.UNDEFINED_TIME;	// time for the CostCalculator
-	ArrayList<Node> networkNodes;
+	Map<Id, Node> networkNodesMap;
 	DijkstraForSelectNodes dijkstra;
 	
 	private static final Logger log = Logger.getLogger(SelectNodesDijkstra.class);
@@ -54,9 +57,23 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.network = network;
 		
 		// get all nodes of the network
-		networkNodes = new GetAllNodes().getAllNodes(network);
+		this.networkNodesMap = new GetAllNodes().getAllNodes(network);
 		
-		dijkstra = new DijkstraForSelectNodes(this.network, networkNodes);
+		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
+	}
+	
+	/* 
+	 * Uses already existing Map of the networks nodes.
+	 * For examples used when creating a clone. 
+	 * In general these maps are static, so it is no problem to share the map.
+	 */
+	public SelectNodesDijkstra(NetworkLayer network, Map<Id, Node> networkNodesMap)
+	{
+		this.network = network;
+
+		this.networkNodesMap = networkNodesMap;
+		
+		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
 	}
 	
 	public SelectNodesDijkstra(NetworkLayer network, Node startNode, Node endNode, double costFactor)
@@ -67,9 +84,9 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.costFactor = costFactor;
 		
 		// get all nodes of the network
-		networkNodes = new GetAllNodes().getAllNodes(network);
+		this.networkNodesMap = new GetAllNodes().getAllNodes(network);
 		
-		dijkstra = new DijkstraForSelectNodes(this.network, networkNodes);
+		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
 	}
 	
 	public void setStartNode(Node startNode)
@@ -110,16 +127,17 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	}
 	
 	@Override
-	public ArrayList<Node> getNodes() {
+	//public ArrayList<Node> getNodes() {
+	public Map<Id, Node> getNodes() {
 		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		getNodes(nodes);
+		Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+		addNodesToMap(nodesMap);
 		
-		return nodes;
+		return nodesMap;
 	}
 
 	@Override
-	public void getNodes(ArrayList<Node> nodes)
+	public void addNodesToMap(Map<Id, Node> nodesMap)
 	{		
 		dijkstra.executeNetwork(startNode);
 		Map<Node, Double> startMap = dijkstra.getMinDistances();
@@ -127,33 +145,34 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		dijkstra.executeNetwork(endNode);
 		Map<Node, Double> endMap = dijkstra.getMinDistances();
 		
-		// calculate distances
-		//Map<Node, Double> distances = new HashMap<Node, Double>();
-		
-		//log.info("Minimal costs from start- to endnode: " + startMap.get(endNode));
-		
 		// get the minimal costs to get from the start- to the endnode
 		double minCosts = startMap.get(endNode);
 
-		for(int i = 0; i < networkNodes.size(); i++)
-		{
-			Node node = networkNodes.get(i);
-			
+		// iterate over Array or Iteratable 
+		for (Node node : networkNodesMap.values())
+		{			
 			// if the node exists in start- and endMap
 			if (startMap.containsKey(node) && endMap.containsKey(node))
 			{
 				double cost = startMap.get(node) + endMap.get(node);
-				
-				//System.out.println("NodeID..." + node.getId().toString() + " Dist..." + dist);
-				
+
 				/* 
 				 * If the costs are smaller than the specified limit and 
 				 * the node isn't already in the nodeslist -> add it.
 				 */
-				if (cost < minCosts*costFactor && !nodes.contains(node)) nodes.add(node);
+				if (cost < minCosts*costFactor && !nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);
 			}
 		}
 		//return distances;
 	}
 	
+	@Override
+	public SelectNodesDijkstra clone()
+	{
+		SelectNodesDijkstra clone = new SelectNodesDijkstra(this.network, networkNodesMap);
+		clone.setCostFactor(this.costFactor);
+		clone.setCostCalculator(this.costCalculator);
+		
+		return clone;
+	}
 }

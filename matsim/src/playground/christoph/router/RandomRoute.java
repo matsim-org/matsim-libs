@@ -21,9 +21,11 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -66,10 +68,10 @@ public class RandomRoute extends PersonLeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 		
@@ -81,7 +83,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator {
 			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 		
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodes);
+			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
 
 			if (links.length == 0)
 			{
@@ -89,10 +91,10 @@ public class RandomRoute extends PersonLeastCostPathCalculator {
 				break;
 			}
 			
-			// Node wählen
+			// choose node
 			int nextLink = MatsimRandom.random.nextInt(links.length);
 			
-			// den gewählten Link zum neuen CurrentLink machen
+			// make the chosen link to the new current link
 			if(links[nextLink] instanceof Link)
 			{
 				currentLink = links[nextLink];

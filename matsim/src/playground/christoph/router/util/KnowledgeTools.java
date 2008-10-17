@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
@@ -33,12 +34,11 @@ public class KnowledgeTools {
 	private final static Logger log = Logger.getLogger(KnowledgeTools.class);	
 	
 	/*
-	 * Returns an ArrayList of Nodes, if the Person has Knowledge about known Nodes. 
-	 * 
+	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public static ArrayList<Node> getKnownNodes(Person person)
+	public static Map<Id, Node> getKnownNodes(Person person)
 	{
-		ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// Try getting knowledge from the current Person.
 		if(person != null)
@@ -49,7 +49,7 @@ public class KnowledgeTools {
 				
 				if(customAttributes.containsKey("Nodes"))
 				{
-					knownNodes = (ArrayList<Node>)customAttributes.get("Nodes");
+					knownNodesMap = (Map<Id, Node>)customAttributes.get("Nodes");
 				}
 				else
 				{
@@ -66,23 +66,24 @@ public class KnowledgeTools {
 			log.error("person = null!");
 		}
 		
-		return knownNodes;
+		//return knownNodes;
+		return knownNodesMap;
 	}
 	
 	/*
-	 * Return only those links, where Start- and Endnode are contained in the ArrayList.
+	 * Return only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
-	public static Link[] getKnownLinks(Link[] links, ArrayList<Node> knownNodes)
+	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
 	{
 		// If the current Person has knowledge about known Nodes
-		if(knownNodes != null)
+		if(knownNodesMap != null)
 		{
 			ArrayList<Link> knownLinks = new ArrayList<Link>();
 			
 			for(int i = 0; i < links.length; i++)
 			{
-				if ( knownNodes.contains(links[i].getFromNode()) && knownNodes.contains(links[i].getToNode()) )
+				if ( knownNodesMap.containsKey(links[i].getFromNode().getId()) && knownNodesMap.containsKey(links[i].getToNode().getId()) )
 				{
 					knownLinks.add(links[i]);
 				}
@@ -100,13 +101,14 @@ public class KnowledgeTools {
 	}
 
 	/*
-	 * Returns true, if the Start- and Endnode of the Link are included in the ArrayList.
+	 * Returns true, if the Start- and Endnode of the Link are included in the Map.
 	 * Returns true, if no known nodes are stored in the current Person.
 	 */
-	public static boolean knowsLink(Link link, ArrayList<Node> knownNodes)
+	//public static boolean knowsLink(Link link, ArrayList<Node> knownNodes)
+	public static boolean knowsLink(Link link, Map<Id, Node> knownNodesMap)
 	{
-		if ( knownNodes == null ) return true;
-		if ( knownNodes.contains(link.getFromNode()) && knownNodes.contains(link.getToNode()) ) return true;
+		if ( knownNodesMap == null ) return true;
+		if ( knownNodesMap.containsKey(link.getFromNode().getId()) && knownNodesMap.containsKey(link.getToNode().getId()) ) return true;
 		else return false;
 	}
 	

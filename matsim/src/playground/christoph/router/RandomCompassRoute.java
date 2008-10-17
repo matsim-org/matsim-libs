@@ -68,12 +68,13 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Node> knownNodes = null;
+		//ArrayList<Node> knownNodes = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		nodes.add(fromNode);
 		
 		// try getting Nodes from the Persons Knowledge
-		knownNodes = KnowledgeTools.getKnownNodes(this.person);
+		knownNodesMap = KnowledgeTools.getKnownNodes(this.person);
 
 		while(!currentNode.equals(toNode))
 		{
@@ -83,7 +84,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator {
 			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodes);
+			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
 	
 			// if a route should not return to the previous node from the step before
 			if (tabuSearch) links = TabuSelector.getLinks(links, previousNode);
