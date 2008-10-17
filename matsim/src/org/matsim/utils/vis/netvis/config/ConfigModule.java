@@ -37,8 +37,6 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     // -------------------- CLASS VARIABLES --------------------
 
-  public static final String MODULE_CLASS_ATTR = "class";
-
     public static final String PARAM_ELEM = "param";
 
     public static final String PARAM_NAME_ATTR = "name";
@@ -61,7 +59,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     public ConfigModule(String moduleName, String fileName) {
         this.moduleName = moduleName;
-        File cfgfile = new File(fileName);
+//        File cfgfile = new File(fileName);
 //        this.setRootFile(cfgfile.getParent());
         read(fileName);
         completeCache();
@@ -101,7 +99,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
     }
 
     /**
-     * To be overriden by subclasses that do caching. Initializes cache with
+     * To be overridden by subclasses that do caching. Initializes cache with
      * default values. This function is called at last by the constructor of
      * this class. Does nothing by default.
      */
@@ -126,34 +124,6 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
         return content.get(name.toLowerCase());
     }
 
-    public String getString(String name) {
-        return get(name);
-    }
-
-    public long getLong(String name) {
-        return Long.parseLong(get(name));
-    }
-
-    public int getInt(String name) {
-        return Integer.parseInt(get(name));
-    }
-
-    public double getDouble(String name) {
-        return Double.parseDouble(get(name));
-    }
-
-    public boolean getBool(String name) {
-        return Boolean.parseBoolean(get(name));
-    }
-
-    public double[] getDoubleArray(String name) {
-        final String[] values = get(name).trim().split("\\s");
-        final double[] result = new double[values.length];
-        for (int i = 0; i < values.length; i++)
-            result[i] = Double.parseDouble(values[i]);
-        return result;
-    }
-
     public String getPath(String name) {
         String value = get(name);
         if (value != null) {
@@ -164,9 +134,8 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
                 return rootFile + File.separator + value;
             } else
                 return value;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public boolean containsKey(String name) {
