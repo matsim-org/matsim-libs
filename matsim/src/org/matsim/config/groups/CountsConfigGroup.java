@@ -125,12 +125,12 @@ public class CountsConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		this.addNotNullParameterToMap(map, OUTPUTFORMAT);
-		this.addNotNullParameterToMap(map, OUTFILE);
-		this.addNotNullParameterToMap(map, DISTANCEFILTER);
-		this.addNotNullParameterToMap(map, DISTANCEFITLERCENTERNODE);
-		this.addNotNullParameterToMap(map, COUNTSINPUTFILENAME);
-		this.addNotNullParameterToMap(map, COUNTSSCALEFACTOR);
+		this.addParameterToMap(map, OUTPUTFORMAT);
+		this.addParameterToMap(map, OUTFILE);
+		this.addParameterToMap(map, DISTANCEFILTER);
+		this.addParameterToMap(map, DISTANCEFITLERCENTERNODE);
+		this.addParameterToMap(map, COUNTSINPUTFILENAME);
+		this.addParameterToMap(map, COUNTSSCALEFACTOR);
 		return map;
 	}
 

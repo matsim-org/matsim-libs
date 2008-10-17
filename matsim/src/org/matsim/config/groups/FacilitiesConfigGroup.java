@@ -72,8 +72,8 @@ public class FacilitiesConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		addNotNullParameterToMap(map, INPUT_FILE);
-		addNotNullParameterToMap(map, OUTPUT_FILE);
+		addParameterToMap(map, INPUT_FILE);
+		addParameterToMap(map, OUTPUT_FILE);
 		return map;
 	}
 

@@ -84,9 +84,9 @@ public class GlobalConfigGroup extends Module {
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
-		addNotNullParameterToMap(map, LOCAL_DTD_BASE);
-		addNotNullParameterToMap(map, COORDINATE_SYSTEM);
-		addNotNullParameterToMap(map, NUMBER_OF_THREADS);
+		addParameterToMap(map, LOCAL_DTD_BASE);
+		addParameterToMap(map, COORDINATE_SYSTEM);
+		addParameterToMap(map, NUMBER_OF_THREADS);
 		return map;
 	}
 

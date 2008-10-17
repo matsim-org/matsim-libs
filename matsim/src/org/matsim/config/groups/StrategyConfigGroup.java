@@ -141,11 +141,11 @@ public class StrategyConfigGroup extends Module {
 			} else {
 				map.put(MODULE_DISABALE_AFTER_ITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableAfter()));
 			}
-			this.addNotNullParameterToMap(map, MODULE_EXE_PATH + entry.getKey());
+			this.addParameterToMap(map, MODULE_EXE_PATH + entry.getKey());
 		}
-		this.addNotNullParameterToMap(map, EXTERNAL_EXE_CONFIG_TEMPLATE);
-		this.addNotNullParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
-		this.addNotNullParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
+		this.addParameterToMap(map, EXTERNAL_EXE_CONFIG_TEMPLATE);
+		this.addParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
+		this.addParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
 		return map;
 	}
 

@@ -94,9 +94,9 @@ public class PlansConfigGroup extends Module {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(SWITCH_OFF_PLANS_STREAMING, getValue(SWITCH_OFF_PLANS_STREAMING));
 		map.put(OUTPUT_SAMPLE, getValue(OUTPUT_SAMPLE));
-		addNotNullParameterToMap(map, INPUT_FILE);
-		addNotNullParameterToMap(map, OUTPUT_FILE);
-		addNotNullParameterToMap(map, OUTPUT_VERSION);
+		addParameterToMap(map, INPUT_FILE);
+		addParameterToMap(map, OUTPUT_FILE);
+		addParameterToMap(map, OUTPUT_VERSION);
 		return map;
 	}
 

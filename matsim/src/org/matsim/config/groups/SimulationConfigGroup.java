@@ -302,13 +302,13 @@ public class SimulationConfigGroup extends Module {
 	}
 
 	/** Sets the way the vehicles should be positioned on the links. Currently known and supported styles are
-	 * <code>queue</code> (the default) and <code>equil</code>.
+	 * <code>queue</code> (the default) and <code>equiDist</code>.
 	 *
 	 * @param style
 	 */
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
-		if (this.snapshotStyle != "equil" && this.snapshotStyle != "equiDist" && this.snapshotStyle != "queue") {
+		if (!"equil".equals(this.snapshotStyle) && !"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
 			Logger.getLogger(this.getClass()).warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
 		}
 		if (style.equals("equil")) {

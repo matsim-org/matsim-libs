@@ -20,7 +20,6 @@
 
 package org.matsim.config.groups;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.config.Module;
@@ -70,8 +69,8 @@ public class LocationChoiceConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		this.addNotNullParameterToMap(map, AREA);
-		this.addNotNullParameterToMap(map, CONSTRAINED);
+		this.addParameterToMap(map, AREA);
+		this.addParameterToMap(map, CONSTRAINED);
 		return map;
 	}
 
@@ -89,15 +88,6 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setMode(final String constrained) {
 		this.constrained = constrained;
-	}
-	
-	protected void addParameterToMap(final Map<String, String> map, final String paramName) {
-		String value = this.getValue(paramName);
-		if (!((value == null) || value.equalsIgnoreCase("null"))) {
-			map.put(paramName, value);
-		} else {
-			map.put(paramName, "null");
-		}
 	}
 	
 }

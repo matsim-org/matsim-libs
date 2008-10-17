@@ -167,29 +167,22 @@ public class ControlerConfigGroup extends Module {
 	}
 	
 	public TravelTimeCalculator getTravelTimeCalculator(NetworkLayer network, int endTime) {
-		
 		TravelTimeCalculatorFactory factory = new TravelTimeCalculatorFactory();
 		
-		if ("TravelTimeCalculatorArray".equals(this.travelTimeCalculator)){
-		
-		} else if ("TravelTimeCalculatorHashMap".equals(this.travelTimeCalculator)){
+		if ("TravelTimeCalculatorHashMap".equals(this.travelTimeCalculator)) {
 			factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
-		} else {
+		} else if (!"TravelTimeCalculatorArray".equals(this.travelTimeCalculator)) {
 			throw new RuntimeException(this.travelTimeCalculator + " is unknown!");
 		}
 		
-		if ("optimistic".equals(this.travelTimeAggregator)) {
-			//using default aggregator
-		}else if ("experimental_LastMile".equals(this.travelTimeAggregator)){
+		if ("experimental_LastMile".equals(this.travelTimeAggregator)) {
 			factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intendet please remove the travelTimeAggregator entry in the controler section in your config.xml!");
-		} else {
+		} else if (!"optimistic".equals(this.travelTimeAggregator)) {
 			throw new RuntimeException(this.travelTimeAggregator + " is unknown!");
 		}
-		
-		
-		return new TravelTimeCalculator(network, this.traveltimeBinSize, endTime, factory);
-		
+
+		return new TravelTimeCalculator(network, this.traveltimeBinSize, endTime, factory);		
 	}
 	
 }

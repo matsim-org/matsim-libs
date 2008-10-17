@@ -69,8 +69,7 @@ public class Module {
 	 * @param map
 	 * @param paramName
 	 */
-	protected void addNotNullParameterToMap(final Map<String, String> map, final String paramName) {
-		// TODO should be renamed to something like "addParameterToMap()"
+	protected void addParameterToMap(final Map<String, String> map, final String paramName) {
 		String value = this.getValue(paramName);
 		if (!((value == null) || value.equalsIgnoreCase("null"))) {
 			map.put(paramName, value);

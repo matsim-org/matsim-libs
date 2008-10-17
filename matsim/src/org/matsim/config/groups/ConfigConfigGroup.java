@@ -63,7 +63,7 @@ public class ConfigConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		addNotNullParameterToMap(map, OUTPUT_FILE);
+		addParameterToMap(map, OUTPUT_FILE);
 		return map;
 	}
 
