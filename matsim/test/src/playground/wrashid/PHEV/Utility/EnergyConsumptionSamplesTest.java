@@ -1,7 +1,7 @@
-package playground.wrashid.PHV.Utility;
+package playground.wrashid.PHEV.Utility;
 
-import playground.wrashid.PHV.Utility.AverageSpeedEnergyConsumption;
-import playground.wrashid.PHV.Utility.EnergyConsumptionSamples;
+import playground.wrashid.PHEV.Utility.AverageSpeedEnergyConsumption;
+import playground.wrashid.PHEV.Utility.EnergyConsumptionSamples;
 import junit.framework.TestCase;
 
 public class EnergyConsumptionSamplesTest extends TestCase {
