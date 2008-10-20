@@ -44,11 +44,13 @@ public class SpatialInteractorEvents {
 		log.warn("Methods are only for Undirected social interactions");
 	}
 
-	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration,
+			Hashtable<Facility,ArrayList<TimeWindow>> twm) {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-		this.timeWindowMap=teo.getTimeWindowMap();
+//		this.timeWindowMap=teo.getTimeWindowMap();
+		this.timeWindowMap=twm;
 
 		// Activity-(facility)-based interactions
 

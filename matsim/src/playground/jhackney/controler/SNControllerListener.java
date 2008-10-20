@@ -38,6 +38,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
@@ -53,6 +54,7 @@ import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
+import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
 import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
@@ -124,6 +126,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	private EventsPostProcess epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
+	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
@@ -172,9 +175,11 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.controler.getEvents().addHandler(this.epp);
 		
 		teo=new MakeTimeWindowsFromEvents(epp);
+		twm=teo.getTimeWindowMap();
 		
 		this.log.info(" ... Instantiation of events overlap tracking done");
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
+//		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
 		
 		this.controler.setScoringFunctionFactory(factory);
@@ -204,7 +209,9 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		
 		Gbl.printMemoryUsage();
 		teo=new MakeTimeWindowsFromEvents(epp);
-		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap()));
+		twm= teo.getTimeWindowMap();
+
+		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 		log.info("SSTEST Finish Scoring with actStats "+snIter);
 		scoring.finish();
 	}
@@ -227,7 +234,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //			You could forget activities here, after the replanning and assignment
 
-			if(CALCSTATS && event.getIteration()%10==0){
+			if(CALCSTATS && event.getIteration()%1==0){
 				Gbl.printMemoryUsage();
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
@@ -244,7 +251,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info(" ... done");
 			}
 
-			if(event.getIteration()%10==0){
+			if(event.getIteration()%1==0){
 				this.log.info(" Writing out social network for iteration " + snIter + " ...");
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
@@ -285,7 +292,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				// Agents' planned interactions
 				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
 				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
-				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
+				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
 				
 				// Agents' actual interactions
 				// TrackEventsOverlap must be passed to initialization of the interactor

@@ -311,7 +311,7 @@ public class SocialNetwork {
 	 */
 	void initReadInNetwork(Population plans){
 
-		String filename = socnetConfig.getInDirName()+ "edge.txt";
+		String filename = socnetConfig.getInDirName()+ "socialnets/stats/edge.txt";
 		new MakeSocialNetworkFromFile(this, plans).read(filename, Integer.valueOf(socnetConfig.getInitIter()).intValue());
 
 	}

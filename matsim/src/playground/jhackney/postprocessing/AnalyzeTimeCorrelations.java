@@ -101,7 +101,7 @@ public class AnalyzeTimeCorrelations {
 		//read in social network
 		config.socnetmodule().setInitIter(Integer.toString(i));
 		System.out.println(" Initializing the social network ...");
-		//SocialNetwork snet=new SocialNetwork(plans);
+		SocialNetwork snet=new SocialNetwork(plans);
 		System.out.println("... done");
 
 //		double totaliterationfriendscore=0;

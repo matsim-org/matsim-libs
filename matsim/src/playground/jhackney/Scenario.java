@@ -60,17 +60,17 @@ public abstract class Scenario {
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
 	
 	//For TRB run analyses of 500 iterations
-	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/Config1/";
-	private static final String input_directory = "D:/SocialNetsFolder/TRB/Config1/";
+	//private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/Config1/";
+	//private static final String input_directory = "D:/SocialNetsFolder/TRB/Config1/";
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
 //	private static final String input_directory="output/TRB6/";//AnalyzeScores
 //	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
 //	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
 
-//	private static final String output_directory="D:/SocialNetsFolder/EventsInteract/EventsInt2_10/all/";//AnalyzeTimeCorrelation
-//	private static final String input_directory="D:/SocialNetsFolder/EventsInteract/EventsInt2_10/";//AnalyzeTimeCorrelation	
-	private static final String out1 = "AgentsAtActivities1.out";
-	private static final String out2 = "1.out";
+	private static final String output_directory="D:/SocialNetsFolder/EventsInteractNew/EventsInt6_10/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="D:/SocialNetsFolder/EventsInteractNew/EventsInt6_10/";//AnalyzeTimeCorrelation	
+	private static final String out1 = "AgentsAtActivities6.out";
+	private static final String out2 = "6.out";
 	
 	private static final Config config= Gbl.createConfig(null);;
 	//////////////////////////////////////////////////////////////////////
