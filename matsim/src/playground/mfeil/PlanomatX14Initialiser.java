@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.basic.v01.Id;
+import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -30,13 +32,16 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.scoring.*;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import org.matsim.facilities.Facilities;
 
 /**
  * @author Matthias Feil
- * Replacing the PlanomatOptimizeTimes class to initialise the PlanomatX module.
+ * Like PlanomatXInitialiser but with facilities reader.
  */
 
-public class PlanomatXInitialiser extends MultithreadedModuleA{
+public class PlanomatX14Initialiser extends MultithreadedModuleA{
 	
 	private final LegTravelTimeEstimator 	estimator;
 	private final PreProcessLandmarks 		preProcessRoutingData;
@@ -47,7 +52,7 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 	public static ArrayList<String>			actTypes; 
 
 	
-	public PlanomatXInitialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
+	public PlanomatX14Initialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
 		
 		this.estimator = estimator;
 		this.preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
@@ -65,6 +70,11 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 			actTypes.add(Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter));
 			gblCounter++;
 		}
+		
+		Map<Id, ? extends Facility> facilities = new TreeMap<Id, Facility> ();
+		Facilities fac = new Facilities();
+		facilities = fac.getFacilities();
+		System.out.println("facilities: "+facilities.entrySet().toString());
 	}
 
 	
@@ -73,7 +83,7 @@ public class PlanomatXInitialiser extends MultithreadedModuleA{
 		
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX15 (this.estimator, this.network, this.travelCostCalc, 
+		planomatXAlgorithm =  new PlanomatX11 (this.estimator, this.network, this.travelCostCalc, 
 				this.travelTimeCalc, this.preProcessRoutingData, this.factory);
 
 		return planomatXAlgorithm;

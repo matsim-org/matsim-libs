@@ -70,11 +70,11 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanomatXPlanScorer (factory);
 		
-		this.NEIGHBOURHOOD_SIZE 	= 20;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
+		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		this.MAX_ITERATIONS 		= 10;
+		this.MAX_ITERATIONS 		= 20;
 		this.POPULATION_SIZE		= 2;
 		
 	}
@@ -160,7 +160,7 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 			stream.println("Iteration "+currentIteration);
 			
 			for (int i = 0;i<population.size();i++){
-				stream.print("Population "+i+"\t\t\t");
+				stream.print("Population "+i+"\t"+population.get(i).getScore()+"\t\t");
 				for (int z= 0;z<population.get(i).getActsLegs().size();z=z+2){
 					stream.print(((Act)population.get(i).getActsLegs().get(z)).getType()+"\t");
 				}
@@ -235,12 +235,14 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 			// Find best non-tabu plan. Becomes this iteration's solution.
 			java.util.Collections.sort(nonTabuNeighbourhood);
+			log.info("Best score für Person "+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson().getId()+": "+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getActsLegs());
 			//PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
 			//bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
 			//tabuList.add(bestIterSolution);
 			
 			// Statistics
-			stream.println("Iteration "+currentIteration+"\t"+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore());
+			stream.println("Best score\t"+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore());
+			if (nonTabuNeighbourhood.size()>1) stream.println("Secondbest score\t"+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-2).getScore());
 			//streamOverview.println(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore());
 			ys[currentIteration-1]=nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore();
 			
@@ -249,14 +251,14 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			outerLoop:
 			for (int m = 0;m<Math.min(nonTabuNeighbourhood.size(),POPULATION_SIZE); m++){
-				for (int k = m;k<POPULATION_SIZE; k++){
+				for (int k = m;k<population.size(); k++){
 					if ((nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-(m+1)).getScore())<=population.get(k).getScore()){
 						break outerLoop;
 					}
 					else {
 						population.add(k, new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-(m+1)).getPerson()));
 						population.get(k).copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-(m+1)));
-						population.removeLast();
+						if (population.size()>POPULATION_SIZE) population.removeLast();
 						break;
 					}
 				}
@@ -348,14 +350,31 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 			child0.remove(i);
 		}
 		for (int i = breakpoint;i<population.getLast().getActsLegs().size();i++){
-			child0.add(population.getLast().getActsLegs().get(i));
+			
 			if (i%2==0) {
-				((Act)child0.get(i)).setStartTime(((Act)child0.get(breakpoint-2)).getStartTime());
-				((Act)child0.get(i)).setDur(0);
+				Act actHelp = new Act ((Act)population.getLast().getActsLegs().get(i));
+				child0.add(actHelp);
+			}
+			else {
+				Leg legHelp = new Leg ((Leg)population.getLast().getActsLegs().get(i));
+				child0.add(legHelp);
+			}
+		
+			if (i%2==0) {
+				((Act)child0.get(i)).setStartTime(((Leg)child0.get(breakpoint-1)).getArrTime());
+				if (i!=population.getLast().getActsLegs().size()-1){
+					((Act)child0.get(i)).setDur(0);
+					((Act)child0.get(i)).setEndTime(((Leg)child0.get(breakpoint-1)).getArrTime());
+				}
+			}
+			else {
+				((Leg)child0.get(i)).setDepTime(((Leg)child0.get(breakpoint-1)).getArrTime());
+				((Leg)child0.get(i)).setArrTime(((Leg)child0.get(breakpoint-1)).getArrTime());
+				((Leg)child0.get(i)).setTravTime(0);
 			}
 		}
-		this.router.run(offspring[0][0]);
-		this.planomatAlgorithm.run(offspring[0][0]);
+		//this.router.run(offspring[0][0]);
+		//this.planomatAlgorithm.run(offspring[0][0]);
 		log.info("Nach crossover 1 für Person "+offspring[0][0].getPerson().getId()+": "+offspring[0][0].getActsLegs());
 		
 		ArrayList<Object> child1 = offspring[1][0].getActsLegs();
@@ -363,14 +382,31 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 			child1.remove(i);
 		}
 		for (int i = breakpoint;i<population.getFirst().getActsLegs().size();i++){
-			child1.add(population.getFirst().getActsLegs().get(i));
+			
 			if (i%2==0) {
-				((Act)child1.get(i)).setStartTime(((Act)child1.get(breakpoint-2)).getStartTime());
-				((Act)child1.get(i)).setDur(0);
+				Act actHelp = new Act ((Act)population.getFirst().getActsLegs().get(i));
+				child1.add(actHelp);
+			}
+			else {
+				Leg legHelp = new Leg ((Leg)population.getFirst().getActsLegs().get(i));
+				child1.add(legHelp);
+			}
+				
+			if (i%2==0) {
+				((Act)child1.get(i)).setStartTime(((Leg)child1.get(breakpoint-1)).getArrTime());
+				if (i!=population.getFirst().getActsLegs().size()-1){
+					((Act)child1.get(i)).setDur(0);
+					((Act)child1.get(i)).setEndTime(((Leg)child1.get(breakpoint-1)).getArrTime());
+				}
+			}
+			else {
+				((Leg)child1.get(i)).setDepTime(((Leg)child1.get(breakpoint-1)).getArrTime());
+				((Leg)child1.get(i)).setArrTime(((Leg)child1.get(breakpoint-1)).getArrTime());
+				((Leg)child1.get(i)).setTravTime(0);
 			}
 		}
-		this.router.run(offspring[1][0]);
-		this.planomatAlgorithm.run(offspring[1][0]);
+		//this.router.run(offspring[1][0]);
+		//this.planomatAlgorithm.run(offspring[1][0]);
 		log.info("Nach crossover 2 für Person "+offspring[1][0].getPerson().getId()+": "+offspring[1][0].getActsLegs());
 		
 		for (int i = 0;i<offspring.length;i++){
@@ -421,9 +457,7 @@ public class PlanomatX13 implements org.matsim.population.algorithms.PlanAlgorit
 					positions[1] = positions[1]+2;
 					
 					//Activity swapping				
-					Act act0 = (Act)(actslegs.get(planBasePos));
-					Act act1 = (Act)(actslegs.get(planRunningPos));
-					if (act0.getType()!=act1.getType()){
+					if (!((Act)(actslegs.get(planBasePos))).getType().toString().equals(((Act)(actslegs.get(planRunningPos))).getType().toString())){
 							
 						Act actHelp = new Act ((Act)(actslegs.get(planBasePos)));
 					
