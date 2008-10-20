@@ -343,7 +343,7 @@ public class QueueLink {
 	// ////////////////////////////////////////////////////////////////////
 	// called from framework, do everything related to link movement here
 	// ////////////////////////////////////////////////////////////////////
-	/*package*/  protected boolean moveLink(final double now) {
+	protected boolean moveLink(final double now) {
 		updateBufferCapacity();
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -355,7 +355,7 @@ public class QueueLink {
 		return updateActiveStatus();
 	}
 
-	/*package*/  boolean moveLinkWaitFirst(final double now) {
+	/*package*/ boolean moveLinkWaitFirst(final double now) {
 		updateBufferCapacity();
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -443,6 +443,10 @@ public class QueueLink {
 
 	Vehicle getFirstFromBuffer() {
 		return this.buffer.peek();
+	}
+	
+	public Queue<Vehicle> getVehiclesInBuffer() {
+		return this.buffer;
 	}
 
 	protected boolean bufferIsEmpty() {
@@ -544,7 +548,6 @@ public class QueueLink {
 	 */
 	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 		double now = SimulationTimer.getTime();
-		int cnt = 0;
 		double queueEnd = this.link.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 		double vehLen = Math.min( // the length of a vehicle in visualization
@@ -562,7 +565,6 @@ public class QueueLink {
 			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, queueEnd,
 					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
 			positions.add(position);
-			cnt++;
 			queueEnd -= vehLen;
 		}
 
