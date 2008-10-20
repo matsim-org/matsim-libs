@@ -33,7 +33,7 @@ import org.matsim.writer.Writer;
 
 public class PopulationWriter extends Writer implements PersonAlgorithm {
 
-	private final double write_person_percentage;
+	private final double write_person_fraction;
 	private boolean fileOpened = false;
 
 	private PopulationWriterHandler handler = null;
@@ -76,14 +76,14 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param population the population to write to file
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
-	 * @param percentage of persons to write to the plans file
+	 * @param fraction of persons to write to the plans file
 	 */
 	public PopulationWriter(final Population population, final String filename, final String version,
-			final double percentage) {
+			final double fraction) {
 		super();
 		this.population = population;
 		this.outfile = filename;
-		this.write_person_percentage = percentage;
+		this.write_person_fraction = fraction;
 		createHandler(version);
 
 		if (this.population.isStreaming()) {
@@ -131,7 +131,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	public final void writePerson(final Person p) {
 		//	 write only the defined fraction
-		if (MatsimRandom.random.nextDouble() >= this.write_person_percentage) {
+		if (MatsimRandom.random.nextDouble() >= this.write_person_fraction) {
 			return;
 		}
 		try {
