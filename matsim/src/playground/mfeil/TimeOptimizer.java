@@ -19,18 +19,18 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.gbl.MatsimRandom;
-import org.matsim.planomat.PlanOptimizeTimes;
+import org.matsim.controler.Controler;
 import org.matsim.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.population.Act;
+import org.matsim.population.Leg;
 
 
 
@@ -43,11 +43,9 @@ import org.matsim.population.Act;
 
 public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
-	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
-	//private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
-	//private final double 					WEIGHT_INC_NUMBER;
+	private final int						MAX_ITERATIONS, OFFSET;
 	private final PlanScorer 				scorer;
-	private static final Logger log = Logger.getLogger(TimeOptimizer.class);
+	private static final Logger 			log = Logger.getLogger(TimeOptimizer.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -56,12 +54,9 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 	public TimeOptimizer (ScoringFunctionFactory factory){
 		
 		this.scorer 				= new PlanomatXPlanScorer (factory);
-		
-		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
-		//this.WEIGHT_CHANGE_ORDER 	= 0.2; 
-		//this.WEIGHT_CHANGE_NUMBER 	= 0.6;
-		//this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		this.MAX_ITERATIONS 		= 10;
+		this.OFFSET					= 1800;
+		//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
+		this.MAX_ITERATIONS 		= 30;
 	}
 	
 		
@@ -79,9 +74,29 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 		}
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [neighbourhood_size];
 		int [] notNewInNeighbourhood 					= new int [neighbourhood_size];
-		int [] tabuInNeighbourhood 						= new int [neighbourhood_size];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood 	= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> tabuList			 	= new ArrayList<PlanomatXPlan>();
+		
+		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
+		Counter.timeOptCounter++;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.print(plan.getScore()+"\t\t\t");
+		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+			Act act = (Act)plan.getActsLegs().get(z);
+			stream.print(act.getType()+"\t");
+		}
+		stream.print(plan.getScore()+"\t\t\t");
+		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+			stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
+		}
+		stream.println();
+		
 		
 		// Copy the plan into all fields of the array neighbourhood
 		for (int i = 0; i < neighbourhood.length; i++){
@@ -90,21 +105,62 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 		}
 		
 		// Write the given plan into the tabuList
-		tabuList.add((PlanomatXPlan)plan);
+		tabuList.add(new PlanomatXPlan (((PlanomatXPlan)plan).getPerson()));
+		tabuList.get(0).copyPlan((PlanomatXPlan)plan);
+		
 		
 		// Do Tabu Search iterations
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
+			stream.println("Iteration "+currentIteration);
+			
 			// Define the neighbourhood
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood);	
 			
 			// Check whether plans are tabu
-			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood);
+			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood, stream);
+			if (warningTabu) {
+				log.info("No non-tabu solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
+				break;
+			}
+			
 			
 		
+			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
+			java.util.Collections.sort(nonTabuNeighbourhood);
+			PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
+			bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
+			tabuList.add(bestIterSolution);
+			stream.println("Best score \t"+bestIterSolution.getScore());
+			
+			if (this.MAX_ITERATIONS==currentIteration){
+				log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
+			}
+			else {
+				// Write this iteration's solution into all neighbourhood fields for the next iteration
+				for (int initialisationOfNextIteration = 0;initialisationOfNextIteration<neighbourhood_size; initialisationOfNextIteration++){
+					neighbourhood[initialisationOfNextIteration] = new PlanomatXPlan (bestIterSolution.getPerson());
+					neighbourhood[initialisationOfNextIteration].copyPlan(bestIterSolution);
+				}
+				// Reset the nonTabuNeighbourhood list
+				nonTabuNeighbourhood.clear();
+			}				
 		}
 		
+		// Update the plan with the final solution 		
+		java.util.Collections.sort(tabuList);
+		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+		ArrayList<Object> al = plan.getActsLegs();
+		
+		//log.info("Finale actslegs für Person "+tabuList.get(tabuList.size()-1).getPerson().getId()+": "+tabuList.get(tabuList.size()-1).getActsLegs());
+		
+
+		for (int i = 0; i<al.size();i++){
+			al.remove(i);
+			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+		}
+		log.info("Person "+plan.getPerson().getId()+" runtime: "+(System.currentTimeMillis()-runStartTime));
 		
 	}
 	
@@ -116,7 +172,7 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 		
 		int pos = 0;
 		for (int outer=0;outer<neighbourhood[0].getActsLegs().size()-2;outer=outer+2){
-			for (int inner=outer+2;outer<neighbourhood[0].getActsLegs().size();inner=inner+2){
+			for (int inner=outer+2;inner<neighbourhood[0].getActsLegs().size();inner=inner+2){
 				
 				notNewInNeighbourhood[pos]=this.increaseTime(neighbourhood[pos], outer, inner);
 				pos++;
@@ -132,18 +188,23 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 	
 	public int increaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
-		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=900){
+		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=OFFSET){
 			
-			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+900);
-			((Act)(basePlan.getActsLegs().get(inner))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur()-900);
+			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
+			((Act)(basePlan.getActsLegs().get(inner))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur()-OFFSET);
 			
-			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+900);
-			((Act)(basePlan.getActsLegs().get(inner))).setStartTime(((Act)(basePlan.getActsLegs().get(inner))).getStartTime()+900);
+			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET);
+			((Act)(basePlan.getActsLegs().get(inner))).setStartTime(((Act)(basePlan.getActsLegs().get(inner))).getStartTime()+OFFSET);
 			
 			for (int i=outer+2;i<=inner-2;i=i+2){
-				((Act)(basePlan.getActsLegs().get(i))).setEndTime(((Act)(basePlan.getActsLegs().get(i))).getEndTime()+900);
-				((Act)(basePlan.getActsLegs().get(i))).setStartTime(((Act)(basePlan.getActsLegs().get(i))).getStartTime()+900);
+				((Act)(basePlan.getActsLegs().get(i))).setEndTime(((Act)(basePlan.getActsLegs().get(i))).getEndTime()+OFFSET);
+				((Act)(basePlan.getActsLegs().get(i))).setStartTime(((Act)(basePlan.getActsLegs().get(i))).getStartTime()+OFFSET);
 			}
+			for (int i=outer+1;i<=inner-1;i=i+2){
+				((Leg)(basePlan.getActsLegs().get(i))).setDepTime(((Leg)(basePlan.getActsLegs().get(i))).getDepTime()+OFFSET);
+				((Leg)(basePlan.getActsLegs().get(i))).setArrTime(((Leg)(basePlan.getActsLegs().get(i))).getArrTime()+OFFSET);
+			}
+			
 			basePlan.setScore(scorer.getScore(basePlan));
 			return 0;
 		}
@@ -152,17 +213,21 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 	
 	
 	public int decreaseTime(PlanomatXPlan basePlan, int outer, int inner){
-		if (((Act)(basePlan.getActsLegs().get(outer))).getDur()>=900){
+		if (((Act)(basePlan.getActsLegs().get(outer))).getDur()>=OFFSET){
 			
-			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()-900);
-			((Act)(basePlan.getActsLegs().get(inner))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur()+900);
+			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()-OFFSET);
+			((Act)(basePlan.getActsLegs().get(inner))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur()+OFFSET);
 			
-			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(((Act)(basePlan.getActsLegs().get(outer))).getEndTime()-900);
-			((Act)(basePlan.getActsLegs().get(inner))).setStartTime(((Act)(basePlan.getActsLegs().get(inner))).getStartTime()-900);
+			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(((Act)(basePlan.getActsLegs().get(outer))).getEndTime()-OFFSET);
+			((Act)(basePlan.getActsLegs().get(inner))).setStartTime(((Act)(basePlan.getActsLegs().get(inner))).getStartTime()-OFFSET);
 			
 			for (int i=outer+2;i<=inner-2;i=i+2){
-				((Act)(basePlan.getActsLegs().get(i))).setEndTime(((Act)(basePlan.getActsLegs().get(i))).getEndTime()-900);
-				((Act)(basePlan.getActsLegs().get(i))).setStartTime(((Act)(basePlan.getActsLegs().get(i))).getStartTime()-900);
+				((Act)(basePlan.getActsLegs().get(i))).setEndTime(((Act)(basePlan.getActsLegs().get(i))).getEndTime()-OFFSET);
+				((Act)(basePlan.getActsLegs().get(i))).setStartTime(((Act)(basePlan.getActsLegs().get(i))).getStartTime()-OFFSET);
+			}
+			for (int i=outer+1;i<=inner-1;i=i+2){
+				((Leg)(basePlan.getActsLegs().get(i))).setDepTime(((Leg)(basePlan.getActsLegs().get(i))).getDepTime()-OFFSET);
+				((Leg)(basePlan.getActsLegs().get(i))).setArrTime(((Leg)(basePlan.getActsLegs().get(i))).getArrTime()-OFFSET);
 			}
 			basePlan.setScore(scorer.getScore(basePlan));
 			return 0;
@@ -177,12 +242,51 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 	
 	
 	public boolean checkForTabuSolutions (PlanomatXPlan [] neighbourhood, int [] notNewInNeighbourhood, 
-			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood){
+			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood, PrintStream stream){
 		
-		
-		
-		return false;
+		boolean warningOuter = true;
+		boolean warningInner = true;
+		for (int i=0;i<neighbourhood.length;i++){
+			stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
+			if (notNewInNeighbourhood[i]==0){
+				for (int j=0;j<tabuList.size();j++){
+					warningInner = checkForEquality (neighbourhood[i].getActsLegs(), tabuList.get(tabuList.size()-1-j).getActsLegs());
+					if (warningInner) {
+						stream.print("1\t");
+						break;
+					}
+				}
+				if (!warningInner) {
+					stream.print("0\t");
+					warningOuter = false;
+					nonTabuNeighbourhood.add(neighbourhood[i]);
+				}
+			}
+			else stream.print("1\t");
+			for (int z= 0;z<neighbourhood[i].getActsLegs().size();z=z+2){
+				stream.print(((Act)(neighbourhood[i].getActsLegs().get(z))).getDur()+"\t");
+			}
+			stream.println();
+		}
+		return warningOuter;
 	}
+	
+	
+	public boolean checkForEquality (ArrayList<Object> list1, ArrayList<Object> list2){
+		
+		if (list1.size()!=list2.size()){
+			return false;
+		}
+		else{
+			for (int i=0;i<list1.size()-2;i=i+2){
+				if (((Act)(list1.get(i))).getDur()!=((Act)(list2.get(i))).getDur()){
+					return false;
+				}
+			}
+			return true;
+		}
+	}	
+
 	
 }
 	

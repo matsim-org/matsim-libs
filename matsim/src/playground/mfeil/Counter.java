@@ -25,4 +25,5 @@ package playground.mfeil;
  */
 public class Counter {
 	static int counter = 1;
+	static int timeOptCounter = 1;
 }
