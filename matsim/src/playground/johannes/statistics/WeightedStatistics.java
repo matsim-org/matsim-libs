@@ -23,7 +23,14 @@
  */
 package playground.johannes.statistics;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Locale;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.utils.io.IOUtils;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
@@ -183,4 +190,18 @@ public class WeightedStatistics {
 		return freq;
 	}
 
+	public static void writeHistogram(TDoubleDoubleHashMap distr, String filename) throws FileNotFoundException, IOException {
+		BufferedWriter aWriter = IOUtils.getBufferedWriter(filename);
+		aWriter.write("bin\tcount");
+		aWriter.newLine();
+		double[] keys = distr.keys();
+		Arrays.sort(keys);
+		for(double key : keys) {
+			aWriter.write(String.valueOf(key));
+			aWriter.write("\t");
+			aWriter.write(String.valueOf(distr.get(key)));
+			aWriter.newLine();
+		}
+		aWriter.close();
+	}
 }

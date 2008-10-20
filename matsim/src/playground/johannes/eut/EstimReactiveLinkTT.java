@@ -67,8 +67,8 @@ public class EstimReactiveLinkTT implements
 
 	private double lastTravelTime;
 
-	public EstimReactiveLinkTT(QueueNetwork network) {
-//		queueNetwork = network;
+	public EstimReactiveLinkTT(double scenarioScale) {
+		capacityFactor = scenarioScale;
 	}
 	
 	public void reset(int iteration) {
@@ -76,22 +76,22 @@ public class EstimReactiveLinkTT implements
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		increaseCount(event.link, event.agent, event.time);
+		increaseCount(event.link, event.agent, (int) event.time);
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		decreaseCount(event.link, event.agent, event.time);
+		decreaseCount(event.link, event.agent, (int) event.time);
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
-		decreaseCount(event.link, event.agent, event.time);
+		decreaseCount(event.link, event.agent, (int) event.time);
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		increaseCount(event.link, event.agent, event.time);
+		increaseCount(event.link, event.agent, (int) event.time);
 	}
 
-	private void increaseCount(Link link, Person person, double time) {
+	private void increaseCount(Link link, Person person, int time) {
 		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		if(f == null) {
 			f = new LinkTTCalculator(link);
@@ -100,13 +100,13 @@ public class EstimReactiveLinkTT implements
 		f.enterLink(person, time);
 	}
 
-	private void decreaseCount(Link link, Person person, double time) {
+	private void decreaseCount(Link link, Person person, int time) {
 		LinkTTCalculator f = this.linkTTCalculators.get(link);
 		f.leaveLink(person, time);
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		double simtime = SimulationTimer.getTime();
+		int simtime = (int) SimulationTimer.getTime();
 		if ((simtime == this.lastQueryTime) && (link == this.lastQueriedLink))
 			return this.lastTravelTime;
 		else {
@@ -115,7 +115,7 @@ public class EstimReactiveLinkTT implements
 
 			LinkTTCalculator f = this.linkTTCalculators.get(link);
 			if (f == null)
-				this.lastTravelTime = link.getFreespeed(Time.UNDEFINED_TIME);
+				this.lastTravelTime = link.getFreespeedTravelTime(simtime);
 			else
 				/*
 				 * TODO: This is ugly!
@@ -130,13 +130,13 @@ public class EstimReactiveLinkTT implements
 
 		private final Link link;
 
-		private final double freeFlowTravTime;
+//		private final double freeFlowTravTime;
 
 		private int outCount = 0;
 
-		private double lastEvent = 0;
+		private int lastEvent = 0;
 
-		private double lastCall = 0;
+		private int lastCall = 0;
 
 		private double currentTravelTime;
 
@@ -150,20 +150,20 @@ public class EstimReactiveLinkTT implements
 //			this.qLink = queueNetwork.getQueueLink(link.getId());
 			this.link = link;
 			this.samples = new TreeSet<Sample>();
-			this.freeFlowTravTime = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
-			this.currentTravelTime = this.freeFlowTravTime;
+//			this.freeFlowTravTime = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
+//			this.currentTravelTime = this.freeFlowTravTime;
 			this.feasibleOutFlow = link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
 			this.currentOutFlow = this.feasibleOutFlow;
 		}
 
-		public void enterLink(Person person, double time) {
-			this.samples.add(new Sample(person, time + this.freeFlowTravTime));
+		public void enterLink(Person person, int time) {
+			this.samples.add(new Sample(person, (int) Math.ceil(time + link.getFreespeedTravelTime(time))));
 		}
 
-		public void leaveLink(Person person, double time) {
+		public void leaveLink(Person person, int time) {
 			this.outCount++;
 
-//			Sample sample = null;
+			Sample sample = null;
 			/*
 			 * Since we can expect that the person is near the head of the set,
 			 * this should not be that expensive...
@@ -171,41 +171,43 @@ public class EstimReactiveLinkTT implements
 			for(Sample s : this.samples) {
 				if(s.person.equals(person)) {
 					this.samples.remove(s);
-//					sample = s;
+					sample = s;
 					break;
 				}
 			}
 //			this.samples.remove(sample);
 
-			double deltaT = time - this.lastEvent;
+			int deltaT = time - this.lastEvent;
 			if(deltaT > 0) {
-				this.currentOutFlow = this.outCount/deltaT;
+				this.currentOutFlow = this.outCount/(double)deltaT;
 				this.lastEvent = time;
 				this.outCount = 0;
 
 				if(this.samples.isEmpty())
-					this.feasibleOutFlow = this.link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
-				else if(this.samples.first().linkLeaveTime > time)
-					this.feasibleOutFlow = this.link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
+					this.feasibleOutFlow = this.link.getFlowCapacity(time) * capacityFactor;
+//				else if(this.samples.first().linkLeaveTime > time)
+				else if(sample.linkLeaveTime >= time)
+					this.feasibleOutFlow = this.link.getFlowCapacity(time) * capacityFactor;
 				else
 					this.feasibleOutFlow = this.currentOutFlow;
 			}
 		}
 
-		public double getLinkTravelTime(double time) {
+		public double getLinkTravelTime(int time) {
 			if (time > this.lastCall) {
 				this.lastCall = time;
-
-				if (this.samples.isEmpty())
-					this.currentTravelTime = link.getLength() /
-											 link.getFreespeed(time);
-				else {
+				double traveltime;
+//				if (this.samples.isEmpty())
+//					traveltime = link.getLength() /
+//											 link.getFreespeed(time);
+//				else {
 					double tt = this.samples.size() / this.feasibleOutFlow;
-					this.currentTravelTime = Math.max(this.freeFlowTravTime, tt);
-				}
+					traveltime = Math.max(link.getFreespeedTravelTime(time), tt);
+//				}
+				currentTravelTime = traveltime;
 			}
 
-			return this.currentTravelTime;
+			return currentTravelTime;
 		}
 	}
 
@@ -213,9 +215,9 @@ public class EstimReactiveLinkTT implements
 
 		public Person person;
 
-		public double linkLeaveTime;
+		public int linkLeaveTime;
 
-		public Sample(Person person, double linkLeaveTime) {
+		public Sample(Person person, int linkLeaveTime) {
 			this.person = person;
 			this.linkLeaveTime = linkLeaveTime;
 		}
@@ -234,17 +236,4 @@ public class EstimReactiveLinkTT implements
 
 
 	}
-
-//	private class TupleComparator implements Comparator<Tuple<Person, Double>> {
-//
-//		public int compare(Tuple<Person, Double> o1, Tuple<Person, Double> o2) {
-//			if(o1 == null)
-//				return -1;
-//			else if(o2 == null)
-//				return 1;
-//			else
-//				return o1.getSecond().compareTo(o2.getSecond());
-//		}
-//
-//	}
 }

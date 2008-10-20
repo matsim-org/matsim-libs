@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimplifyPersons.java
+ * DistanceDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,62 +23,73 @@
  */
 package playground.johannes.socialnets;
 
-import java.util.LinkedList;
-import java.util.List;
+import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationWriter;
 import org.matsim.utils.geometry.Coord;
+
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * @author illenberger
  *
  */
-public class SimplifyPersons {
+public class DistanceDistribution {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		
 		ScenarioData data = new ScenarioData(config);
-
-		double centerX = 683000;
-		double centerY = 247000;
-		double radius = Double.parseDouble(args[2]);
+		Population population = data.getPopulation();
 		
-		double halfradius = (radius/2.0);
-		double minX = centerX - halfradius;
-		double maxX = centerX + halfradius;
-		double minY = centerY - halfradius;
-		double maxY = centerY + halfradius;
-		
-		Population pop = data.getPopulation();
-		List<Person> remove = new LinkedList<Person>();
-		for(Person p : pop) {
-			for(int i = 1; i < p.getPlans().size(); i = 1)
-				p.getPlans().remove(i);
-			
-			Plan selected = p.getSelectedPlan();
-			for(int i = 1; i < selected.getActsLegs().size(); i = 1) {
-				selected.getActsLegs().remove(i);
-			}
-			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
-			if(!(c.getX() >= minX && c.getX() <= maxX && c.getY() >= minY && c.getY() <= maxY))
-				remove.add(p);
+		Collection<Person> persons2 = new HashSet<Person>();
+		double xmin = 678000;
+		double ymin = 243000;
+		double xmax = 687000;
+		double ymax = 254000;
+		for(Person p : population) {
+			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
+			if(c.getX() >= xmin && c.getX() <= xmax && c.getY() >= ymin && c.getY() <= ymax)
+				persons2.add(p);
 		}
 		
-		for(Person p : remove)
-			pop.getPersons().remove(p.getId());
+		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
+		double binsize = 1000;
+		int count = 0;
+		for(Person p1 : population) {
+			persons2.remove(p1);
+			for(Person p2 : persons2) {
+				Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
+				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
+				double d = c1.calcDistance(c2);
+				double bin = Math.floor(d/binsize);
+				double val = hist.get(bin);
+				val++;
+				hist.put(bin, val);
+			}
+			count++;
+			if(count % 1000 == 0) {
+				System.out.println(String.format(
+						"Processed %1$s of %2$s persons. (%3$s )", count,
+						population.getPersons().size(), count
+								/ (double) population.getPersons().size()));
+			}
+		}
 		
-		PopulationWriter writer = new PopulationWriter(pop, args[1], "v4", 100);
-		writer.write();
+		WeightedStatistics.writeHistogram(hist, args[1]);
 	}
 
 }

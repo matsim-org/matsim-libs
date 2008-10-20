@@ -214,7 +214,7 @@ public class EUTController extends WithindayControler {
 		 * Initialize the reactive travel times.
 		 */
 //		this.reactTTs = new EstimReactiveLinkTT(sim.getQueueNetworkLayer());
-		this.reactTTs = new EstimReactiveLinkTT(null); // FIXME
+		this.reactTTs = new EstimReactiveLinkTT(1); // TODO: Think about that!!!
 		this.events.addHandler(this.reactTTs);
 		this.reactTTs.reset(getIteration());
 		

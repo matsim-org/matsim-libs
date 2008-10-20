@@ -94,14 +94,14 @@ public class SpatialGrid<T> {
 	@SuppressWarnings("unchecked")
 	public T getValue(Coord coord) {
 		if(isInBounds(coord))
-			return (T)matrix[getXIndex(coord.getX())][getYIndex(coord.getY())];
+			return (T)matrix[getRow(coord.getX())][getColumn(coord.getY())];
 		else
 			return null;
 	}
 	
 	public boolean setValue(T value, Coord coord) {
 		if(isInBounds(coord)) {
-			matrix[getXIndex(coord.getX())][getYIndex(coord.getY())] = value;
+			matrix[getRow(coord.getX())][getColumn(coord.getY())] = value;
 			return true;
 		} else
 			return false;
@@ -127,11 +127,11 @@ public class SpatialGrid<T> {
 			return false;
 	}
 	
-	private int getXIndex(double xCoord) {
+	public int getRow(double xCoord) {
 		return (int)Math.floor((xCoord - minX) / resolution);
 	}
 	
-	private int getYIndex(double yCoord) {
+	public int getColumn(double yCoord) {
 		return (int)Math.floor((yCoord - minY) / resolution);
 	}
 	

@@ -24,6 +24,7 @@
 package playground.johannes.graph;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -44,8 +45,13 @@ public class UnweightedDijkstra<V extends Vertex> {
 	}
 	
 	public List<DijkstraVertex> run(V source) {
+		return run(source);
+	}
+	
+	public List<DijkstraVertex> run(V source, V target) {
 		List<DijkstraVertex> reachedVertices = new ArrayList<DijkstraVertex>();
 		DijkstraVertex dsource = projection.getVertex(source); 
+		DijkstraVertex dtarget = projection.getVertex(target);
 		unsettledVertices = new PriorityQueue<DijkstraVertex>(projection.getVertices().size());
 		for(VertexDecorator<V> dvertex : projection.getVertices())
 			((DijkstraVertex)dvertex).reset();
@@ -56,6 +62,9 @@ public class UnweightedDijkstra<V extends Vertex> {
 		DijkstraVertex dvertex;
 	
 		while((dvertex = unsettledVertices.poll()) != null) {
+			if(dvertex == dtarget)
+				break;
+			
 			if(!dvertex.isSettled()) {
 				dvertex.setSettled(true);
 				reachedVertices.add(dvertex);
@@ -86,6 +95,24 @@ public class UnweightedDijkstra<V extends Vertex> {
 		
 		reachedVertices.remove(dsource);
 		return reachedVertices;
+	}
+	
+	public List<V> getPath(V source, V target) {
+		LinkedList<V> path = new LinkedList<V>();
+		
+		if(source == target)
+			return path;
+		
+		DijkstraVertex v = projection.getVertex(target);
+		if(v.getPredecessors().length == 0)
+			return null;
+		
+		DijkstraVertex dsource = projection.getVertex(source);
+		while(v != dsource) {
+			path.addFirst(v.getDelegate());
+			v = v.getPredecessors()[0];
+		}
+		return path;
 	}
 	
 	public class DijkstraGraph extends GraphProjection<Graph, V, Edge> {

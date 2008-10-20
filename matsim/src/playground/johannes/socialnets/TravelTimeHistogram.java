@@ -35,9 +35,13 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.matsim.config.Config;
+import org.matsim.controler.ScenarioData;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Person;
+import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
@@ -62,7 +66,7 @@ public class TravelTimeHistogram {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String networkfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/ivtch-osm.xml";
-//		String configfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/config.socialNetGenerator.xml";
+		String configfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/config.socialNetGenerator.xml";
 		String egofile = "/Users/fearonni/vsp-work/socialnets/data-analysis/egos_wgs84.txt";
 		String alterfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/alters_wgs84.txt";
 		String outputfile = "/Users/fearonni/vsp-work/socialnets/data-analysis/traveltimes.txt";
@@ -71,15 +75,16 @@ public class TravelTimeHistogram {
 		 * Load network...
 		 */
 		System.out.println("Loading network...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkfile);
-//		Config config = Gbl.createConfig(new String[]{configfile});
-//		ScenarioData data = new ScenarioData(config);
-//		NetworkLayer network = data.getNetwork();
+//		NetworkLayer network = new NetworkLayer();
+//		new MatsimNetworkReader(network).readFile(networkfile);
+		Config config = Gbl.createConfig(new String[]{configfile});
+		ScenarioData data = new ScenarioData(config);
+		Population population = data.getPopulation();
+		NetworkLayer network = data.getNetwork();
 		/*
 		 * Make grid...
 		 */
-//		Population population = data.getPopulation();
+//		
 		SpatialGrid<Double> grid = SpatialGrid.readFromFile(gridfile, new DoubleStringSerializer());		
 		double maxX = grid.getXmax();
 		double maxY = grid.getYmax();
@@ -103,9 +108,9 @@ public class TravelTimeHistogram {
 				ego.id = tokens[0];
 				Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 				ego.homeloc = transform.transform(coord);
-				writer2.write(String.valueOf(ego.homeloc.getX()));
+				writer2.write(String.valueOf(ego.homeloc.getX() + Math.random()*100 - 50));
 				writer2.write("\t");
-				writer2.write(String.valueOf(ego.homeloc.getY()));
+				writer2.write(String.valueOf(ego.homeloc.getY() + Math.random()*100 - 50));
 				writer2.newLine();
 				if(ego.homeloc.getX() >= minX && ego.homeloc.getX() <= maxX &&
 						ego.homeloc.getY() >= minY && ego.homeloc.getY() <= maxY)
@@ -131,9 +136,9 @@ public class TravelTimeHistogram {
 				} else {
 					Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 					coord = transform.transform(coord);
-					writer3.write(String.valueOf(coord.getX()));
+					writer3.write(String.valueOf(coord.getX() + Math.random()*100 - 50));
 					writer3.write("\t");
-					writer3.write(String.valueOf(coord.getY()));
+					writer3.write(String.valueOf(coord.getY() + Math.random()*100 - 50));
 					writer3.newLine();
 					if(coord.getX() >= minX && coord.getX() <= maxX &&
 							coord.getY() >= minY && coord.getY() <= maxY)
@@ -144,6 +149,42 @@ public class TravelTimeHistogram {
 			e.printStackTrace();
 		}
 		writer3.close();
+		/*
+		 * Load dist distribution
+		 */
+//		BufferedReader reader = IOUtils.getBufferedReader("/Volumes/math-work/socialnets/distanceDistribution2.txt");
+//		String line;
+//		TDoubleDoubleHashMap distDistr = new TDoubleDoubleHashMap();
+//		reader.readLine();
+//		while((line = reader.readLine()) != null) {
+//			String[] tokens = line.split("\t");
+//			double bin = Double.parseDouble(tokens[0]);
+//			double count = Double.parseDouble(tokens[1]);
+//			distDistr.put(bin, count);
+//		}
+		HashMap<Ego, TDoubleDoubleHashMap> egoHist = new HashMap<Ego, TDoubleDoubleHashMap>();
+		double binsize = 1000;
+		int count = 0;
+		for(Ego ego : egos.values()) {
+			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
+			for(Person p2 : population) {
+				Coord c1 = ego.homeloc;
+				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
+				double d = c1.calcDistance(c2);
+				double bin = Math.floor(d/binsize);
+				double val = hist.get(bin);
+				val++;
+				hist.put(bin, val);
+			}
+			egoHist.put(ego, hist);
+			WeightedStatistics.writeHistogram(hist, "/Users/fearonni/vsp-work/socialnets/data-analysis/egohists/" + count + ".txt");
+			count++;
+			if(count % 10 == 0) {
+				System.out.println(String.format(
+						"Processed %1$s of %2$s persons. (%3$s )", count,
+						egos.size(), count / (double) egos.size()));
+			}
+		}
 		/*
 		 * Map coordinates to links and route between links...
 		 */
@@ -157,27 +198,61 @@ public class TravelTimeHistogram {
 		Set<Relation> relations = new HashSet<Relation>();
 		WeightedStatistics stats = new WeightedStatistics();
 		WeightedStatistics stats2 = new WeightedStatistics();
+		int egocount = 0;
 		for(Ego ego : egos.values()) {
 			Link homelink = network.getNearestLink(ego.homeloc);
+			TDoubleDoubleHashMap hist = egoHist.get(ego);
+			
+//			double pEgo = getPersons(ego.homeloc, 250, population);
 			for(Coord coord : ego.alters) {
 				Relation r = new Relation();
 				Link alterlink = network.getNearestLink(coord);
 				Route fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				Route shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				
-				Double value = grid.getValue(homelink.getCenter());
-				if(value == null)
-					value = 0.0;
-				double pEgo = value / (resolution * resolution);
+//				double sumOpportunities = 0;
+//				int sumCells = 0;
+//				double d = coord.calcDistance(ego.homeloc);
+//				boolean[][] selected = new boolean[grid.getNumRows()+1][grid.getNumCols(0)+2];
+//				for (int alpha = 0; alpha < 360; alpha++) {
+//					double x = Math.sin(alpha) * d + ego.homeloc.getX();
+//					double y = Math.cos(alpha) * d + ego.homeloc.getY();
+//					int row = grid.getRow(x);
+//					int col = grid.getColumn(y);
+//					if (row >= 0 && row < selected.length && col >= 0 && col < selected[row].length) {
+//						if (selected[row][col] == false) {
+//							Double v = grid.getValue(new CoordImpl(x, y));
+//							if (v == null)
+//								v = 0.0;
+//							sumOpportunities += v;
+//							sumCells++;
+//							selected[row][col] = true;
+//						}
+//					}
+//				}
+//				Double value = grid.getValue(ego.homeloc);
+//				if(value == null)
+//					value = 0.0;
+//				double pEgo = value;
 				
-				value = grid.getValue(alterlink.getCenter());
-				if(value == null)
-					value = 0.0;
-				double pAlter = value / (resolution * resolution);
 				
-				double w = 1 / ((pEgo + pAlter) - (pEgo * pAlter));
-				if(Double.isInfinite(w))
-						w = 1.0;
+//				value = grid.getValue(coord);
+//				if(value == null)
+//					value = 0.0;
+//				double pAlter = value;// / (resolution * resolution);
+//				double pAlter = sumOpportunities / (double)sumCells;
+//				double pAlter = getPersons(coord, 250, population);
+				
+//				double w = 1 / ((pEgo + pAlter) - (pEgo * pAlter));
+//				double w = 1 / (pEgo * pAlter);
+//				double w = 1 / pAlter;
+				double bin = Math.floor(coord.calcDistance(ego.homeloc)/1000.0);
+				double w = 1/hist.get(bin);
+//				double w = 1/distDistr.get(bin);
+				if(Double.isInfinite(w)) {
+						w = 0.0;
+						System.err.println("pAlter = 0");
+				} else {
 				
 				r.ttFastesPath = fastestRoute.getTravTime();
 				r.distFastestPath = getPathLength(fastestRoute);
@@ -189,7 +264,11 @@ public class TravelTimeHistogram {
 				stats.add(r.ttFastesPath, w);
 				stats2.add(r.geodesicDistance, w);
 				}
+				}
+				
 			}
+			egocount++;
+			System.out.println("Processed " +egocount +" egos...");
 		}
 		/*
 		 * Dump distances...
@@ -296,5 +375,15 @@ public class TravelTimeHistogram {
 			return link.getLength();
 		}
 		
+	}
+	
+	private static int getPersons(Coord ego, double radius, Population pop) {
+		int count = 0;
+		for(Person p : pop.getPersons().values()) {
+			double r = ego.calcDistance(p.getSelectedPlan().getFirstActivity().getCoord());
+			if(r <= radius)
+				count++;
+		}
+		return count;
 	}
 }
