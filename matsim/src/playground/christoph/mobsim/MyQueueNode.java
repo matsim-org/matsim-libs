@@ -56,11 +56,12 @@ public class MyQueueNode extends QueueNode{
 		 * Person reached the end of it's current link.
 		 * The "LinkLeaveEvents" are thrown when the Person has already been set to 
 		 * a new Link, so it can't be used for Replanning.
+		 * 
+		 * Replanning moved to the MyQueueNetwork Class!
 		 */
 		// If replanning flag is set in the Person
-		boolean replanning = (Boolean)veh.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
-		if(replanning) new LeaveLinkReplanner(this, veh, now);
-		
+//		boolean replanning = (Boolean)veh.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
+//		if(replanning) new LeaveLinkReplanner(this, veh, now);	
 		
 		return super.moveVehicleOverNode(veh, now);
 	}

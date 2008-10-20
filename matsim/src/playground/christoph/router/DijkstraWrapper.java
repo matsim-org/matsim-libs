@@ -22,6 +22,7 @@ package playground.christoph.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.QueueNetwork;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.Route;
@@ -29,6 +30,8 @@ import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
+import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
+import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 import playground.christoph.router.util.KnowledgeTravelCost;
@@ -116,6 +119,41 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	public Dijkstra getDijkstra()
 	{
 		return dijkstra;
+	}
+	
+	public DijkstraWrapper clone()
+	{
+		TravelCost costFunctionClone;
+		TravelTime timeFunctionClone;
+		NetworkLayer networkClone = this.queueNetwork.getNetworkLayer();
+		
+		if(this.costFunction instanceof KnowledgeTravelCost)
+		{
+			costFunctionClone = ((KnowledgeTravelCost)costFunction).clone();
+		}
+		else
+		{
+			log.error("Could not clone the Cost Function - use reference to the existing Function and hope the best...");
+			costFunctionClone = costFunction;
+		}
+		
+		if(this.timeFunction instanceof KnowledgeTravelTime)
+		{
+			timeFunctionClone = ((KnowledgeTravelTime)timeFunction).clone();
+		}
+		else
+		{
+			log.error("Could not clone the Time Function - use reference to the existing Function and hope the best...");
+			timeFunctionClone = timeFunction;
+		}
+		
+		
+		// how to handle an A*- Algorithm???
+		Dijkstra dijkstraClone = new Dijkstra(networkClone, costFunctionClone, timeFunctionClone);
+		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone);
+		clone.queueNetwork = this.queueNetwork;
+	
+		return clone; 
 	}
 	
 }

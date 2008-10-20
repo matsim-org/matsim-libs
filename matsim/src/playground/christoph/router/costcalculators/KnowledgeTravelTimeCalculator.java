@@ -121,4 +121,15 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		return this.calcFreeSpeedTravelTimes;
 	}
 	
+	public KnowledgeTravelTimeCalculator clone()
+	{
+		//KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator();
+		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.queueNetwork);
+		//clone.queueNetwork = this.queueNetwork;
+		clone.tbuffer = this.tbuffer;
+		clone.vehicleLength = this.vehicleLength;
+		clone.calcFreeSpeedTravelTimes = this.calcFreeSpeedTravelTimes;
+		
+		return clone;
+	}
 }

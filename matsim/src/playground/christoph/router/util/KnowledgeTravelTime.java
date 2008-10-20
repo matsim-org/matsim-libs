@@ -25,7 +25,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.router.util.TravelTime;
 
-public abstract class KnowledgeTravelTime implements TravelTime {
+public abstract class KnowledgeTravelTime implements TravelTime, Cloneable {
 
 	protected Person person;
 	protected QueueNetwork queueNetwork;
@@ -54,5 +54,11 @@ public abstract class KnowledgeTravelTime implements TravelTime {
 	public QueueNetwork getQueueNetwork()
 	{
 		return this.queueNetwork;
+	}
+	
+	@Override
+	public KnowledgeTravelTime clone()
+	{
+		return this;
 	}
 }

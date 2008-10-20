@@ -25,7 +25,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.router.util.TravelCost;
 
-public abstract class KnowledgeTravelCost implements TravelCost {
+public abstract class KnowledgeTravelCost implements TravelCost, Cloneable {
 
 	protected Person person;
 	protected QueueNetwork queueNetwork;
@@ -54,5 +54,11 @@ public abstract class KnowledgeTravelCost implements TravelCost {
 	public QueueNetwork getQueueNetwork()
 	{
 		return this.queueNetwork;
+	}
+	
+	@Override
+	public KnowledgeTravelCost clone()
+	{
+		return this;
 	}
 }

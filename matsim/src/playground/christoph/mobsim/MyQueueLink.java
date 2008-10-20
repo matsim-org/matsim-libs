@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyQueueNetworkFactory.java
+ * MyQueueLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,28 +20,29 @@
 
 package playground.christoph.mobsim;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.QueueNetworkFactory;
 import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.Vehicle;
 import org.matsim.network.Link;
-import org.matsim.network.Node;
 
-public class MyQueueNetworkFactory implements QueueNetworkFactory<QueueNode, QueueLink> {
-
+public class MyQueueLink extends QueueLink {
+	
 	/**
-	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueLink(org.matsim.network.Link, org.matsim.mobsim.queuesim.QueueNetwork)
+	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	public QueueLink newQueueLink(Link link, QueueNetwork queueNetwork, QueueNode toQueueNode) {
-		return new QueueLink(link, queueNetwork, toQueueNode);
-		//return new MyQueueLink(link, queueNetwork, toQueueNode);
+	private final Queue<Vehicle> buffer = new LinkedList<Vehicle>();
+	
+	public MyQueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) 
+	{
+		super(l, queueNetwork, toNode);
 	}
-
-	/**
-	 * @see org.matsim.mobsim.queuesim.QueueNetworkFactory#newQueueNode(org.matsim.network.Node, org.matsim.mobsim.queuesim.QueueNetwork)
-	 */
-	public MyQueueNode newQueueNode(Node node, QueueNetwork queueNetwork) {
-		return new MyQueueNode(node, queueNetwork);
+	
+	public Queue<Vehicle> getBuffer()
+	{
+		return buffer;
 	}
-
 }

@@ -124,7 +124,7 @@ public class ParallelCreateKnownNodesMap {
 	{
 		public final int threadId;
 		private final ArrayList<SelectNodes> nodeSelectors;
-		private final SelectNodes nodeSelectorArray[][];
+		private final SelectNodes[][] nodeSelectorArray;
 		private final List<Person> persons = new LinkedList<Person>();
 
 		public SelectNodesThread(final int i, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)

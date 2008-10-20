@@ -26,7 +26,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Route;
 import org.matsim.router.util.LeastCostPathCalculator;
 
-public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator{
+public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalculator, Cloneable{
 	
 	protected Person person;
 	protected QueueNetwork queueNetwork;
@@ -58,4 +58,9 @@ public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalc
 		return this.queueNetwork;
 	}
 	
+	@Override
+	public PersonLeastCostPathCalculator clone()
+	{
+		return this;
+	}
 }

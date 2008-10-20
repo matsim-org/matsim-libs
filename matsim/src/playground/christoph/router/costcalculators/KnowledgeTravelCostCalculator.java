@@ -32,6 +32,8 @@ import org.matsim.router.util.TravelTime;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
+import playground.christoph.router.util.KnowledgeTravelTime;
+import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 
 /*
@@ -81,6 +83,27 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			return travelTime * this.travelCostFactor;
 		}
 		return travelTime * this.travelCostFactor + this.distanceCost * link.getLength();
+	}
+	
+	public KnowledgeTravelCostCalculator clone()
+	{
+		TravelTime timeCalculatorClone;
+		
+		if(this.timeCalculator instanceof KnowledgeTravelTime)
+		{
+			timeCalculatorClone = ((KnowledgeTravelTime)timeCalculator).clone();
+		}
+		else
+		{
+			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
+			timeCalculatorClone = timeCalculator;
+		}
+		
+		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);
+		clone.distanceCost = this.distanceCost;
+		clone.travelCostFactor = this.travelCostFactor;
+		
+		return clone;
 	}
 
 }

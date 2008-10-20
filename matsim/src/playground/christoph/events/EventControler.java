@@ -42,6 +42,7 @@ import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 
 import playground.christoph.events.algorithms.ActEndReplanner;
+import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
 import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -64,7 +65,7 @@ import playground.christoph.router.util.DeadEndRemover;
  * the initialization of all required data, running the iterations and
  * the replanning, analyses, etc.
  *
- * @author mrieser
+ * @author Christoph Dobler
  */
 public class EventControler extends Controler{
 
@@ -130,7 +131,7 @@ public class EventControler extends Controler{
 		// Dijkstra for Replanning
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
 		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
-		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTimeCalculator);
+		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
@@ -142,6 +143,18 @@ public class EventControler extends Controler{
 	{
 		return replanners;
 	}
+
+	/*
+	 * Hands over the ArrayList to the ParallelReplanner
+	 */
+	protected void initParallelReplanningModules()
+	{
+		ParallelLeaveLinkReplanner.init(replanners);
+		ParallelLeaveLinkReplanner.setNumberOfThreads(2);
+		
+		// more Modules to come...
+	}
+	
 	/*
 	 * Initializes the NodeSeletors that are used to create the Activity Spaces of the
 	 * Persons of a Population.
@@ -170,6 +183,9 @@ public class EventControler extends Controler{
 		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
+		
+		log.info("Initialize Parallel Replanning Modules");
+		initParallelReplanningModules();
 		
 		log.info("Set Replanning flags");
 		setReplanningFlags();
@@ -223,12 +239,12 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 			
 			counter++;
-			if(counter < 5000)
+			if(counter < 50)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
 				customAttributes.put("initialReplanning", new Boolean(false));
-				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning", new Boolean(true));
+				customAttributes.put("leaveLinkReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
 			}
 			else
 			{
@@ -271,24 +287,30 @@ public class EventControler extends Controler{
 	 */
 	protected void setNodeSelectors()
 	{
+		int counter = 0;
+		
 		Iterator<Person> PersonIterator = this.getPopulation().iterator();
 		while (PersonIterator.hasNext())
-		{
+		{			
 			Person p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
-			personNodeSelectors.add(nodeSelectors.get(1));
+			
+			if (counter++ < 50) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
 		}
 	}
 	
+	/*
+	 * Creates the Maps of Nodes that each Agents "knows".
+	 */
 	protected void createKnownNodes()
 	{
 		// use only one of these two - they should produce the same results... 
-		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
+		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 1);
 
 		// non multi-core calculation
 		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);

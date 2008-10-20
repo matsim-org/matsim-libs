@@ -22,7 +22,6 @@ package playground.christoph.router;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -30,14 +29,13 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
-import org.matsim.router.util.LeastCostPathCalculator;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 
-public class RandomRoute extends PersonLeastCostPathCalculator {
+public class RandomRoute extends PersonLeastCostPathCalculator{
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
 	
@@ -116,6 +114,16 @@ public class RandomRoute extends PersonLeastCostPathCalculator {
 		if (removeLoops) LoopRemover.removeLoops(route);
 		
 		return route;
+	}
+	
+	@Override
+	public RandomRoute clone()
+	{
+		RandomRoute clone = new RandomRoute();
+		clone.removeLoops = this.removeLoops;
+		clone.maxLinks = this.maxLinks;
+		
+		return clone;
 	}
 	
 }

@@ -37,7 +37,7 @@ import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 import playground.christoph.router.util.TabuSelector;
 
-public class RandomCompassRoute extends PersonLeastCostPathCalculator {
+public class RandomCompassRoute extends PersonLeastCostPathCalculator implements Cloneable{
 
 	protected boolean removeLoops = true;
 	protected boolean tabuSearch = true;
@@ -208,5 +208,16 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator {
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		
 		return phi;
+	}
+	
+	public RandomCompassRoute clone()
+	{
+		RandomCompassRoute clone = new RandomCompassRoute();
+		clone.compassProbability = this.compassProbability;
+		clone.maxLinks = this.maxLinks;
+		clone.removeLoops = this.removeLoops;
+		clone.tabuSearch = this.tabuSearch;
+		
+		return clone;
 	}
 }

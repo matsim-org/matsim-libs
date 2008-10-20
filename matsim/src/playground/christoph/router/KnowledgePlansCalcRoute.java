@@ -20,6 +20,7 @@
 
 package playground.christoph.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
@@ -28,12 +29,15 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
+import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
-public class KnowledgePlansCalcRoute extends PlansCalcRoute {
+public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
 	protected Person person;
 	protected QueueNetwork queueNetwork;
+	
+	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
 	
 	public KnowledgePlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) 
 	{
@@ -86,5 +90,36 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute {
 	public QueueNetwork QueueNetwork()
 	{
 		return this.queueNetwork;
+	}
+	
+	public KnowledgePlansCalcRoute clone()
+	{
+		LeastCostPathCalculator routeAlgoClone;
+		LeastCostPathCalculator routeAlgoFreeflowClone;
+		
+		if(this.routeAlgo instanceof PersonLeastCostPathCalculator)
+		{
+			routeAlgoClone = ((PersonLeastCostPathCalculator)routeAlgo).clone();
+		}
+		else
+		{
+			log.error("Could not clone the Route Algorithm - use reference to the existing Algorithm and hope the best...");
+			routeAlgoClone = routeAlgo;
+		}
+		
+		if(this.routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		{
+			routeAlgoFreeflowClone = ((PersonLeastCostPathCalculator)routeAlgoFreeflow).clone();
+		}
+		else
+		{
+			log.error("Could not clone the Freeflow Route Algorithm - use reference to the existing Algorithm and hope the best...");
+			routeAlgoFreeflowClone = routeAlgoFreeflow;
+		}
+		
+		KnowledgePlansCalcRoute clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoFreeflowClone); 
+		clone.queueNetwork = this.queueNetwork;
+		
+		return clone;
 	}
 }

@@ -38,7 +38,7 @@ import playground.christoph.router.util.RouteChecker;
 import playground.christoph.router.util.TabuSelector;
 
 
-public class TabuRoute extends PersonLeastCostPathCalculator {
+public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneable{
 
 	private final static Logger log = Logger.getLogger(TabuRoute.class);
 
@@ -127,6 +127,16 @@ public class TabuRoute extends PersonLeastCostPathCalculator {
 		if (removeLoops) LoopRemover.removeLoops(route);
 		
 		return route;
+	}
+	
+	@Override
+	public TabuRoute clone()
+	{
+		TabuRoute clone = new TabuRoute();
+		clone.removeLoops = this.removeLoops;
+		clone.maxLinks = this.maxLinks;
+		
+		return clone;
 	}
 	
 }

@@ -74,6 +74,19 @@ public class LeaveLinkReplanner {
 	
 	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 	
+	public LeaveLinkReplanner(QueueNode queueNode, Vehicle vehicle, double time, PlanAlgorithm replanner)
+	{
+		this.queueNode = queueNode;
+		this.node = queueNode.getNode();
+		this.time = time;
+		this.vehicle = vehicle;
+		this.personAgent = vehicle.getDriver();
+		this.person = vehicle.getDriver().getPerson();
+		this.replanner = replanner;
+		
+		init();
+	}
+	
 	public LeaveLinkReplanner(QueueNode queueNode, Vehicle vehicle, double time)
 	{
 		this.queueNode = queueNode;
@@ -85,7 +98,13 @@ public class LeaveLinkReplanner {
 
 		replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
 		if (replanner == null) log.error("No Replanner found in Person!");
-			
+		
+		init();
+		
+	}	// Replanner(...)
+
+	protected void init()
+	{
 		Plan plan = person.getSelectedPlan();
 
 		leg = personAgent.getCurrentLeg();
@@ -115,9 +134,8 @@ public class LeaveLinkReplanner {
 		{
 			log.error("An agents next activity is null - this should not happen!");
 		}
-		
-	}	// Replanner(...)
-
+	}
+	
 	
 	/*
 	 * Route am Ende jedes Links neu berechnen.
