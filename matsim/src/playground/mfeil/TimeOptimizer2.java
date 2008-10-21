@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX11.java
+ * TimeOptimizer2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -41,18 +41,18 @@ import org.matsim.population.Leg;
  * TS algorithm to optimize time. Similar to Planomat.
  */
 
-public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, OFFSET;
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
-	private static final Logger 			log = Logger.getLogger(TimeOptimizer.class);
+	private static final Logger 			log = Logger.getLogger(TimeOptimizer2.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer (ScoringFunctionFactory factory, LegTravelTimeEstimator estimator){
+	public TimeOptimizer2 (ScoringFunctionFactory factory, LegTravelTimeEstimator estimator){
 		
 		this.scorer 				= new PlanomatXPlanScorer (factory);
 		this.estimator				= estimator;
@@ -194,18 +194,26 @@ public class TimeOptimizer implements org.matsim.population.algorithms.PlanAlgor
 		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=OFFSET){
 			
 			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
-			((Act)(basePlan.getActsLegs().get(inner))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur()-OFFSET);
+			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET;
+			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
 			
-			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET);
-			((Act)(basePlan.getActsLegs().get(inner))).setStartTime(((Act)(basePlan.getActsLegs().get(inner))).getStartTime()+OFFSET);
-			
-			for (int i=outer+2;i<=inner-2;i=i+2){
-				((Act)(basePlan.getActsLegs().get(i))).setEndTime(((Act)(basePlan.getActsLegs().get(i))).getEndTime()+OFFSET);
-				((Act)(basePlan.getActsLegs().get(i))).setStartTime(((Act)(basePlan.getActsLegs().get(i))).getStartTime()+OFFSET);
-			}
+			double travelTime;
 			for (int i=outer+1;i<=inner-1;i=i+2){
-				((Leg)(basePlan.getActsLegs().get(i))).setDepTime(((Leg)(basePlan.getActsLegs().get(i))).getDepTime()+OFFSET);
-				((Leg)(basePlan.getActsLegs().get(i))).setArrTime(((Leg)(basePlan.getActsLegs().get(i))).getArrTime()+OFFSET);
+				((Leg)(basePlan.getActsLegs().get(i))).setDepTime(now);
+				travelTime = this.estimator.getLegTravelTimeEstimation(basePlan.getPerson().getId(), now, (Act)(basePlan.getActsLegs().get(i-1)), (Act)(basePlan.getActsLegs().get(i+1)), (Leg)(basePlan.getActsLegs().get(i)));
+				((Leg)(basePlan.getActsLegs().get(i))).setArrTime(now+travelTime);
+				((Leg)(basePlan.getActsLegs().get(i))).setTravTime(travelTime);
+				now+=travelTime;
+				
+				if (i!=inner-1){
+					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					now+=((Act)(basePlan.getActsLegs().get(i+1))).getDur();
+					((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
+				}
+				else {
+					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getDur()-((Act)(basePlan.getActsLegs().get(i+1))).getStartTime());
+				}
 			}
 			
 			basePlan.setScore(scorer.getScore(basePlan));
