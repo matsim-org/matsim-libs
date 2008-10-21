@@ -115,6 +115,16 @@ public class Facility extends AbstractLocation {
 	private double attrFactor = 1.0;
 	private double sumCapacityPenaltyFactor = 0.0;
 
+	private String desc = null;
+	
+	//////////////////////////////////////////////////////////////////////
+	// constructor
+	//////////////////////////////////////////////////////////////////////
+
+	protected Facility(final Facilities layer, final Id id, final Coord center, final String desc) {
+		this(layer,id,center);
+		this.desc = desc.intern();
+	}
 
 	protected Facility(final Facilities layer, final Id id, final Coord center) {
 		super(layer,id,center);
@@ -219,6 +229,12 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
+
+	public void setDesc(String desc) {
+		if (desc == null) { this.desc = null; }
+		else { this.desc = desc.intern(); }
+	}
+	
 	public void setNumberOfVisitorsPerDay(int numberOfVisitorsPerDay) {
 		this.numberOfVisitorsPerDay = numberOfVisitorsPerDay;
 	}
@@ -271,6 +287,10 @@ public class Facility extends AbstractLocation {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
+	public final String getDesc() {
+		return this.desc;
+	}
+	
 	public final TreeMap<String,Activity> getActivities() {
 		return this.activities;
 	}

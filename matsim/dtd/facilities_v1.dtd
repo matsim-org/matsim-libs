@@ -19,7 +19,8 @@
 <!ATTLIST facility
           id         CDATA #REQUIRED
           x          CDATA #REQUIRED
-          y          CDATA #REQUIRED>
+          y          CDATA #REQUIRED
+          desc       CDATA #IMPLIED>
 
 <!ELEMENT activity   (capacity?,opentime*)>
 <!ATTLIST activity

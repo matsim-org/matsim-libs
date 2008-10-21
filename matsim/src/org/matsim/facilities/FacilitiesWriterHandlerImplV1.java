@@ -63,6 +63,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 		out.write(" id=\"" + facility.getId() + "\"");
 		out.write(" x=\"" + facility.getCenter().getX() + "\"");
 		out.write(" y=\"" + facility.getCenter().getY() + "\"");
+		if (facility.getDesc() != null) { out.write(" desc=\"" + facility.getDesc() + "\""); }
 		out.write(">\n");
 	}
 
