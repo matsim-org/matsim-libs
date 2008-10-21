@@ -20,6 +20,10 @@
 
 package playground.gregor;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.gbl.Gbl;
@@ -32,6 +36,7 @@ import org.matsim.trafficmonitoring.OptimisticTravelTimeAggregator;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.trafficmonitoring.TravelTimeRoleArray;
+import org.matsim.utils.io.IOUtils;
 
 public class TravelTimeCalculatorTiming {
 	
@@ -44,7 +49,7 @@ public class TravelTimeCalculatorTiming {
 
 
 
-	public TravelTimeCalculatorTiming(String network, String events, Class<? extends LinkImpl> clazz) {
+	public TravelTimeCalculatorTiming(final String network, final String events, final Class<? extends LinkImpl> clazz) {
 		this.netfile = network;
 		this.eventsfile = events;
 		Gbl.createConfig(null);
@@ -58,7 +63,7 @@ public class TravelTimeCalculatorTiming {
 		Gbl.getWorld().complete();
 	}
 	
-	public void readEvents() {
+	public void readEvents(final int binSize, final BufferedWriter writer) {
 		
 		long start,stop;
 		System.out.println("Reading events ...");
@@ -71,13 +76,25 @@ public class TravelTimeCalculatorTiming {
 		factory.setTravelTimeAggregatorPrototype(OptimisticTravelTimeAggregator.class);
 		factory.setTravelTimeRolePrototype(TravelTimeRoleArray.class);
 		
-		this.ttcalc = new TravelTimeCalculator(network, 15 * 60, 30*3600, factory);
-		events.addHandler(ttcalc);
+		this.ttcalc = new TravelTimeCalculator(this.network, binSize * 60, 30*3600, factory);
+		events.addHandler(this.ttcalc);
 		// read events
 		start = System.currentTimeMillis();
 		eventsReader.readFile(this.eventsfile);
 		stop =  System.currentTimeMillis();
+//		this.ttcalc.counter.printCounter();
+		System.gc();
 		System.out.println("elapsed time: " + (stop - start));
+		try {
+			long totalMem = Runtime.getRuntime().totalMemory();
+			long freeMem = Runtime.getRuntime().freeMemory();
+			long usedMem = totalMem - freeMem;
+			writer.write((stop - start) + "," + usedMem + ",");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Gbl.printMemoryUsage();
 		events.printEventsCount();
 		
@@ -102,7 +119,7 @@ public class TravelTimeCalculatorTiming {
 //		
 //	}
 	
-	public void readTT() {
+	public void readTT(final BufferedWriter writer) {
 		long start,stop;
 		long elapsed = 0;
 		double oatt = 0;
@@ -120,17 +137,57 @@ public class TravelTimeCalculatorTiming {
 		}
 		stop = System.currentTimeMillis();
 		elapsed += (stop - start);		
-		System.out.println("elapsed time: " + elapsed + " oatt:" + oatt);		
-	}
+		try {
+			writer.write((int) elapsed + "\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+			System.out.println("elapsed time: " + elapsed + " oatt:" + oatt);		
+//			try {
+//				Thread.sleep(20000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+		}
 	
 	
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 		
-		String network = "./networks/padang_net_evac_v20080618.xml";
-		String events = "./output/ITERS/it.50/50.events.txt.gz";
+		BufferedWriter writer = null;
+		try {
+			 writer = IOUtils.getBufferedWriter("arrayTT.csv", false);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			writer.write("binSize,storageTime,Mem,readTime\n");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
+		String events = "../outputs/output/ITERS/it.201/201.events.txt.gz";
 		TravelTimeCalculatorTiming timer = new TravelTimeCalculatorTiming(network, events, LinkImpl.class);
-		timer.readEvents();
-		timer.readTT();
+		
+		for (int i = 15; i > 0; i--) {
+			try {
+				writer.write(i + ",");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			timer.readEvents(15,writer);
+			timer.readTT(writer);
+		}
+		try {
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		timer.reReadEvents();
 //		timer.readTT();
 	}
