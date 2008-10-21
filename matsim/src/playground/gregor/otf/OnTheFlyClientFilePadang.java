@@ -113,12 +113,12 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, null, connect1);
 
 		final OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-//		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+//		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
-//			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
-//			loadFeatureLayer(this.NODES_FILE,linksColor);
-//			loadFeatureLayer(this.LINKS_FILE,nodesColor);
+			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
+			loadFeatureLayer(this.NODES_FILE,linksColor);
+			loadFeatureLayer(this.LINKS_FILE,nodesColor);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -134,9 +134,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.100/100.movie.mvi";
-		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-//		final String filename =  "./output/ITERS/it.350/350.movie.mvi";
+//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.200/200.movie.mvi";
+//		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
+		final String filename =  "../outputs/output/ITERS/it.200/200.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
