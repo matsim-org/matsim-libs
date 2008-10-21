@@ -17,7 +17,7 @@ public class StreetParking {
 			
 			
 			FileReader fr = new FileReader(
-					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhäuser\\facilities\\material\\streetParking2007_1.txt");
+					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhäuser\\facilities\\input\\streetParking2007_1.txt");
 			BufferedReader br = new BufferedReader(fr);
 			String line = null;
 			StringTokenizer tokenizer = null;
@@ -44,8 +44,8 @@ public class StreetParking {
 			}
 			
 			Facility.finalizeFacilities();
-			Facility.printFacilities();
-			Facility.writeToXml(""); // TODO: continue here
+			//Facility.printFacilities();
+			Facility.writeToXml("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhäuser\\facilities\\output\\streetpark_facilities.xml"); 
 			
 
 		} catch (Exception ex) {
