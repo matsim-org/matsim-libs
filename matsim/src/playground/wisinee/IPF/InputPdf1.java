@@ -9,21 +9,21 @@ import java.io.IOException;
 
 public class InputPdf1 {
 	
-	public void inputAgeSexDistribution(int z){
-			GlobalVars.fixedC = new double[42];
-			GlobalVars.fixedC = inputData(z);	
-			for (int i = 0;i<42;i++){
+	public void inputDistribution(int z, int nCol, String spt){
+			GlobalVars.fixedC = new double[nCol];
+			GlobalVars.fixedC = inputData(z,nCol,spt);	
+			for (int i=0;i<nCol;i++){
 				System.out.println(GlobalVars.fixedC[i]);
 			}
 	}
 		
-		private double[] inputData(int z){
-			double[] fixedPdf = new double[42];
+		private double[] inputData(int z, int nCol, String spt){
+			double[] fixedPdf = new double[nCol];
 			try{
 				String s1, value;
 				int col = 0;
 							
-				File inFile = new File("./input/sex_age_Distb_Head.csv");			
+				File inFile = new File("./input/Pdf.txt");			
 				BufferedReader in = new BufferedReader(new FileReader(inFile));			
 				s1= in.readLine();		//read out the data heading	
 				for (int n = 1; n < z; n++){
@@ -32,7 +32,7 @@ public class InputPdf1 {
 					s1 = in.readLine();
 					int found = -2 ;
 					while (found != -1){
-						found = s1.indexOf(",");
+						found = s1.indexOf(spt);
 						if (found != -1) {
 							value = s1.substring(0,found);
 							s1 = s1.substring(found+1);						
@@ -41,7 +41,7 @@ public class InputPdf1 {
 							value = s1;
 						}
 						col = col+1;
-						if (col >= 3 && col <= 44)fixedPdf[col-3] = Double.parseDouble(value);					
+						if (col >= 3 && col <= nCol+2) fixedPdf[col-3] = Double.parseDouble(value);					
 					}		
 				in.close();	
 			} catch(EOFException e){

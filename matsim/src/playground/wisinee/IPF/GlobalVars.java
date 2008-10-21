@@ -2,17 +2,17 @@ package playground.wisinee.IPF;
 import java.util.ArrayList;
 
 public class GlobalVars {
-//	input and output variables for matrix 1
-	public static double[] fixedR; // fixed row	
-	public static double[] fixedC; // fixed column	
-	public static double[][] intialRij;	//initial matrix	
-	public static double[][] finalRij; //final matrix
-//	input and output variables for matrix 2	
-	public static double[] fixedR1; // fixed row
-	public static double[] fixedC1; // fixed column
-	public static double[][] intialRij1;	//initial matrix
-	public static double[][] finalRij1; //final matrix
+//	input and output variables for calculation matrix
+	public static double[] fixedR; 				// fixed row	
+	public static double[] fixedC; 				// fixed column	
+	public static double[][] initialRij;		//initial matrix	
+	public static double[][] finalRij; 			//final matrix
 	
-	public static ArrayList<OriginalData> orgn; //original data from Insee
-	public static String[] finalData; //final data to write to new file
+	public static ArrayList<OriginalData> orgn; //to keep information from original data
+	public static String[] finalData; 			//final data to write to new file
+	
+//	for random people to each decided group
+	public static double[] totalPP;					//to keep total number of people, 
+	public static double[] usedPP;						//to keep total number of people that have already assigned
+	public static double[][] countUsedPP;				//
 }
