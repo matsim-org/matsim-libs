@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * Analyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.analyzer;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public interface Analyzer {
 
-public class AllTests {
-
-	public static Test suite() {
-
+	public void setCoefficient(double coef);
 	
-
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
-	}
-
+	public Option getAction(final double now);
 }

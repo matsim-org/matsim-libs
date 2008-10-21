@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * InformationStorage.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.communication;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Collection;
+import java.util.PriorityQueue;
 
-public class AllTests {
-
-	public static Test suite() {
-
+public class InformationStorage {
 	
-
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+	private final PriorityQueue<InformationEntity> infos;
+	private double lastUpdate = 0.;
+	
+	public InformationStorage() {
+		this.infos = new PriorityQueue<InformationEntity>();
+	}
+	
+	public void addInformationEntity(final InformationEntity ie) {
+		this.infos.add(ie);
+	}
+	
+	private synchronized void update(final double now) {
+		
+		while (this.infos.size() > 0 && this.infos.peek().getEndTime() < now) {
+			this.infos.poll();
+		}
+		this.lastUpdate = now;
+	}
+	
+	public Collection<InformationEntity> getInformation(final double now) {
+		if (now > this.lastUpdate) {
+			update(now);
+		}
+		return this.infos;
 	}
 
 }

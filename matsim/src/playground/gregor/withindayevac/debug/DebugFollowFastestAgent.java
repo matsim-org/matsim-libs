@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DebugFollowFastestAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.debug;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-public class AllTests {
-
-	public static Test suite() {
-
+public class DebugFollowFastestAgent {
 	
-
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+	private static int GREEDY = 0;
+	private static int ALTERNATIVES = 0;
+	private static int CALLS = 0;
+	private static int NULL = 0;
+	
+	public static void updateAlt(final int alt) {
+		CALLS++;
+		ALTERNATIVES += alt;
 	}
+	
+	public static void incrGreedy(){
+		GREEDY++;
+	}
+	
+	public static void increNull() {
+		NULL++;
+	}
+	public static void reset(){
+		GREEDY = 0;
+		ALTERNATIVES = 0;
+		CALLS = 0;
+		NULL  = 0;
+	}
+	
+	public static void print() {
+		System.out.println("================D E B U G  I N F O (FollowFastest)================");
+		System.out.println("non-Greedy:");
+		System.out.println("\ttotal: " + GREEDY);
+		System.out.println("\tperc: " +  (double)GREEDY / (double)CALLS);
+		System.out.println();
+		System.out.println("Alternatives:");
+		System.out.println("\taverage: " + (double)ALTERNATIVES / (double)CALLS);
+		System.out.println("Null:");
+		System.out.println("\ttotal: " + NULL);
+		System.out.println("================D E B U G  I N F O (FollowFastest)================");
+	}
+
 
 }

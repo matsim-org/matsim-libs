@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * InformationExchanger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.communication;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.HashMap;
+import java.util.Map;
 
-public class AllTests {
+import org.matsim.basic.v01.Id;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 
-	public static Test suite() {
-
+public class InformationExchanger {
 	
+	
+	private final NetworkLayer network;
+	private final Map<Id, InformationStorage> informationStorages;
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+	public InformationExchanger(NetworkLayer network) {
+		this.network = network;
+		this.informationStorages = new HashMap<Id,InformationStorage>();
+		init();
 	}
 
+	private void init() {
+		for(Node node : this.network.getNodes().values()) {
+			this.informationStorages.put(node.getId(), new InformationStorage());
+		}
+	}
+
+	public InformationStorage getInformationStorage(Id id) {
+		return this.informationStorages.get(id);
+	}
+	
 }
+;

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ChooseRandomLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.analyzer;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.gbl.MatsimRandom;
+import org.matsim.network.Link;
 
-public class AllTests {
+import playground.gregor.withindayevac.Beliefs;
 
-	public static Test suite() {
+public class ChooseRandomLinkAnalyzer implements Analyzer {
 
+	private double coef;
+	private final Beliefs beliefs;
+	public ChooseRandomLinkAnalyzer(final Beliefs beliefs) {
+		this.beliefs = beliefs;
+	}
 	
+	
+	
+	public NextLinkOption getAction(final double now) {
+		Link link = this.beliefs.getCurrentLink();
+		double selnum = link.getToNode().getOutLinks().size() * MatsimRandom.random.nextDouble();
+		double coef = this.coef;
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+		for (Link l : link.getToNode().getOutLinks().values()) {
+			selnum -= 1.0;
+			if (selnum <= 0) {
+//				this.coef = 0;//allow only one time to select a random link
+				return new NextLinkOption(l,1 * coef);
+			}
+			
+			
+		}
+		
+		return null;
+	}
+	
+	public void setCoefficient(final double coef) {
+		this.coef = coef;
+		
 	}
 
 }

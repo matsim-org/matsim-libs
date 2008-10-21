@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.withindayevac.mobsim;
 
-package playground;
+import org.matsim.mobsim.queuesim.AgentFactory;
+import org.matsim.mobsim.queuesim.PersonAgent;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.Person;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.gregor.withindayevac.BDIAgent;
+import playground.gregor.withindayevac.communication.InformationExchanger;
 
-public class AllTests {
 
-	public static Test suite() {
+/**
+ * @author dgrether
+ *
+ */
+public class WithindayAgentFactory extends AgentFactory {
 
-	
+	private final InformationExchanger informationExchanger;
+	private final NetworkLayer network;
+	private final int iteration;
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+	public WithindayAgentFactory(final InformationExchanger informationExchanger,
+			final NetworkLayer networkLayer, final int iteration) {
+		this.informationExchanger = informationExchanger;
+		this.network = networkLayer;
+		this.iteration = iteration;
 	}
+
+	@Override
+	public PersonAgent createPersonAgent(final Person p) {
+		return new BDIAgent(p, this.informationExchanger, this.network, this.iteration);
+	}
+	
+	
+	
 
 }

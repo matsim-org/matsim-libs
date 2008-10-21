@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DestinationReachedAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.gregor.withindayevac.analyzer;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import playground.gregor.withindayevac.Beliefs;
+import playground.gregor.withindayevac.Intentions;
 
-public class AllTests {
+public class DestinationReachedAnalyzer implements Analyzer {
 
-	public static Test suite() {
+	private final Beliefs beliefs;
+	private final Intentions intentions;
+	private double coef;
 
+	public DestinationReachedAnalyzer(final Beliefs beliefs, final Intentions intentions) {
+		this.beliefs = beliefs;
+		this.intentions = intentions;
+	}
 	
+	public NextLinkOption getAction(final double now) {
+		if (this.beliefs.getCurrentLink().getToNode().getId() == this.intentions.getDestination().getId()) {
+			return new NextLinkOption(null,1);
+		}
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
+		return null;
+	}
 
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-
-		//$JUnit-END$
-		return suite;
+	public void setCoefficient(final double coef) {
+		this.coef = coef;
 	}
 
 }
