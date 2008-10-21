@@ -22,13 +22,11 @@ package playground.gregor.snapshots.postprocessor.processors;
 
 import java.util.HashMap;
 
-import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 
 
-public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler, AgentArrivalEventHandler {
+public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {
 
 	private final static int NUM_OF_COLOR_SLOTS = 256;
 	
@@ -82,10 +80,10 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 		
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
-		
-		if (event.linkId.contains("el")) {
-			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
-		}
-	}
+//	public void handleEvent(final AgentArrivalEvent event) {
+//		
+//		if (event.linkId.contains("el")) {
+//			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
+//		}
+//	}
 }
