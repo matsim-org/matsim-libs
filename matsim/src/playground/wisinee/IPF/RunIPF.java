@@ -37,12 +37,9 @@ import java.util.ArrayList;
 			int zoneCol=2;						//identify which column in the household and survey data
 												//for indicating zone where the household is located
 //			----------------------------------------------------------------------
-			int nRow = 75; 						//total rows; for example:5*5*3 = 75
-//			----------------------------------------------------------------------
 //			identify which column in the survey data for the variable to be generated
 			int yCol=6;							
 //			----------------------------------------------------------------------
-			int[] bin = new int[nRow];	
 //			number of categories of the generated variable
 			int nCol = 10;
 //			identify how many rows in the Household/Person list (not include heading)
@@ -55,6 +52,11 @@ import java.util.ArrayList;
 			double sValue=0.1;
 //--------------------------------------------------------------------------------	
 //================================================================================		
+			int nRow=1; 						
+			for (int i=0;i<nx;i++){
+				nRow = nRow*ncx[i];
+			}
+			int[] bin = new int[nRow];			
 			
 			System.out.println("===============================================");
 			System.out.println("+++++SETTING PARAMETERS+++++");
