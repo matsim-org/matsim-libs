@@ -23,7 +23,6 @@ package org.matsim.utils.vis.otfvis.opengl.gui;
 import static javax.media.opengl.GL.GL_BLEND;
 import static javax.media.opengl.GL.GL_MODELVIEW;
 import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
-import static javax.media.opengl.GL.GL_ONE;
 import static javax.media.opengl.GL.GL_PROJECTION;
 import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
 import static javax.media.opengl.GL.GL_QUADS;
@@ -198,14 +197,19 @@ implements MouseWheelListener{
 				double ratio = Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
 				//System.out.println(ratio);
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
-				if (button == 1) scrollToNewPos(newPos);
-				else clickHandler.handleClick(currentRect, button);
+				if (button == 1) {
+					scrollToNewPos(newPos);
+			        Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
+			        rectFader.setStartDelay(200);
+			        rectFader.setAcceleration(0.4f);
+			        rectFader.start();
+				} else {
+					clickHandler.handleClick(currentRect, button);
+					currentRect = null;
+					setAlpha(0);
+				}
 				//InfoText.showText("Zoom", newPos.getX(),newPos.getY(),newPos.getZ());
 		        // Cube fader
-		        Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
-		        rectFader.setStartDelay(200);
-		        rectFader.setAcceleration(0.4f);
-		        rectFader.start();
 				//currentRect = null;
 			}
 		} else {
@@ -304,7 +308,7 @@ implements MouseWheelListener{
 
 			float z = 20f;
 	        gl.glEnable(GL_BLEND);
-	        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	        gl.glBlendFunc(GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
 	        renderFace(gl, marker);
 			gl.glDisable(GL_BLEND);

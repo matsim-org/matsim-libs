@@ -23,6 +23,7 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDra
 
 import com.sun.opengl.util.BufferUtil;
 
-public class QueryAgentEvents implements OTFQuery {
+public class QueryAgentEvents extends QueryAgentPlan {
 
 	private static final long serialVersionUID = -7388598935268835323L;
 
@@ -76,7 +77,8 @@ public class QueryAgentEvents implements OTFQuery {
 	}
 
 	public String agentID;
-	private float[] vertex = null;
+	private final float[] vertex = null;
+	private final ByteBuffer colors = null;
 	private transient FloatBuffer vert;
 	private transient List<InfoText> texts = null;
 	private transient InfoText agentText = null;
@@ -96,7 +98,7 @@ public class QueryAgentEvents implements OTFQuery {
 
 		Plan plan = person.getSelectedPlan();
 
-		this.vertex = QueryAgentPlan.buildRoute(plan);
+		buildRoute(plan);
 	}
 
 	public void draw(OTFDrawer drawer) {

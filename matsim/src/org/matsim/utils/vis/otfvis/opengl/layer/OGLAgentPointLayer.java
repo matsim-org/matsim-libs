@@ -233,13 +233,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
-			@Override
 			protected void setAgentSize(){gl.glPointSize(10);};
-			@Override
 			protected void setTexture(){this.texture = null;};
 		};
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
-			@Override
 			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
 		};		
 		

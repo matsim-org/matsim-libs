@@ -23,12 +23,13 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
@@ -39,6 +40,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -72,10 +74,12 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public String agentID;
 	private float[] vertex = null;
+	private byte[] colors = null;
 	private transient FloatBuffer vert;
 	private Object [] acts;
 	private transient InfoText agentText = null;
 	private int lastActivity = -1;
+	private ByteBuffer cols; 
 
 	boolean calcOffset = true;
 
@@ -83,39 +87,85 @@ public class QueryAgentPlan implements OTFQuery {
 		this.agentID = id;
 	}
 
-	public static float[] buildRoute(Plan plan) {
-		float[] vertex = null;
-		List<Link> drivenLinks = new LinkedList<Link> ();
+	public static int countLines(Plan plan) {
+		int count = 0;
+		List actslegs = plan.getActsLegs();
+		Act prevAct = null;
+		
+		for (int i= 0; i< actslegs.size(); i++) {
+			if(i%2==0) {
+				// handle act
+				prevAct = (Act)plan.getActsLegs().get(i);
+				count++;
+			} else {
+				// handle leg 
+				Leg leg = (Leg)actslegs.get(i);
+				
+				if (leg.getMode().equals(Mode.car)) {
+					Link[] route = leg.getRoute().getLinkRoute();
+					for (Link driven : route) {
+						count++;
+					}
+					count++; //last position
+				} else {
+					
+				}
+			}
+		}
+		return count;
+	}
+	protected void setCol(int pos, Color col) {
+		this.colors[pos*4 +0 ] = (byte)col.getRed();
+		this.colors[pos*4 +1 ] = (byte)col.getGreen();
+		this.colors[pos*4 +2 ] = (byte)col.getBlue();
+		this.colors[pos*4 +3 ] = (byte)128;
+	}
+	
+	protected void setCoord(int pos, Coord coord, Color col) {
+		this.vertex[pos*2 +0 ] = (float)coord.getX();
+		this.vertex[pos*2 +1 ] = (float)coord.getY();
+		setCol(pos, col);
+	}
+	
+	public void buildRoute(Plan plan) {
+		int count = countLines(plan);
+		if(count == 0) return;
+
+		int pos = 0;
+		this.vertex = new float[count*2];
+		this.colors = new byte[count*4]; //BufferUtil.newByteBuffer(count*4);
+
+		Color carColor = Color.ORANGE;
+		Color actColor = Color.BLUE;
+		Color ptColor = Color.RED;
 		
 		List actslegs = plan.getActsLegs();
 		for (int i= 0; i< actslegs.size(); i++) {
 			if(i%2==0) {
 				// handle act
+				Color col = actColor;
 				Act act = (Act)plan.getActsLegs().get(i);
-				drivenLinks.add(act.getLink());
+				Coord coord = act.getCoord();
+				if (coord == null) coord = act.getLink().getCenter();
+				setCoord(pos++, coord, col);
 			} else {
-				// handle leg
+				// handle leg 
 				Leg leg = (Leg)actslegs.get(i);
 				
-				//if (!leg.getMode().equals("car")) continue;
-				Link[] route = leg.getRoute().getLinkRoute();
-				for (Link driven : route) {
-					drivenLinks.add(driven);
+				if (leg.getMode().equals(Mode.car)) {
+					Link[] route = leg.getRoute().getLinkRoute();
+					Node last = null;
+					for (Link driven : route) {
+						Node node = driven.getFromNode();
+						last = driven.getToNode();
+						setCoord(pos++, node.getCoord(), carColor);
+					}
+					if(last != null) setCoord(pos++, last.getCoord(), carColor);
+				} else {
+					setCol(pos-1, ptColor); // replace act Color with pt color... here we need walk etc too
 				}
 			}
 		}
-
-		if(drivenLinks.size() == 0) return null;
-
-		// convert this to drawable info
-		vertex = new float[drivenLinks.size()*2];
-		int pos = 0;
-		for(Link qlink : drivenLinks) {
-			Node node = qlink.getFromNode();
-			vertex[pos++] = (float)node.getCoord().getX();
-			vertex[pos++] = (float)node.getCoord().getY();
-		}
-		return vertex;
 	}
 	
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
@@ -128,12 +178,12 @@ public class QueryAgentPlan implements OTFQuery {
 
 		for (int i=0;i< this.acts.length; i++) {
 			Act act = (Act)plan.getActsLegs().get(i*2);
-			Link link = net.getQueueLink(act.getLinkId()).getLink();
-			Node node = link.getToNode();
-			this.acts[i] = new MyInfoText( (float)node.getCoord().getX(), (float)node.getCoord().getY(), act.getType());
+			Coord coord = act.getCoord();
+			if (coord == null) coord = act.getLink().getCenter();
+			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());
 		}
 		
-		this.vertex = buildRoute(plan);
+		buildRoute(plan);
 
 	}
 
@@ -173,6 +223,7 @@ public class QueryAgentPlan implements OTFQuery {
 				this.vertex[i+1] -= north;
 			}
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+			this.cols = BufferUtil.copyByteBuffer(ByteBuffer.wrap(this.colors));
 			for (int i=0;i< this.acts.length; i++) {
 				MyInfoText inf = (MyInfoText)this.acts[i];
 				this.acts[i] = InfoText.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
@@ -192,11 +243,16 @@ public class QueryAgentPlan implements OTFQuery {
 
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_LINE_SMOOTH);
+        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
         gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+        vert.position(0);
+        cols.position(0);
 		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
+        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, cols);
 		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
         gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
         gl.glDisable(GL.GL_LINE_SMOOTH);
 		if (pos != null) {
 			//System.out.println("POS: " + pos.x + ", " + pos.y);

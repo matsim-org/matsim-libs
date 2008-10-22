@@ -77,16 +77,18 @@ import com.sun.opengl.util.texture.TextureIO;
 
 class OTFGLOverlay extends OTFGLDrawableImpl {
 	private final String texture;
-	private final int relX;
-	private final int relY;
+	private final float relX;
+	private final float relY;
 	private final boolean opaque;
+	private final float size;
 	Texture t = null;
 	
-	OTFGLOverlay(String texture, int relX, int relY, boolean opaque) {
+	OTFGLOverlay(String texture, float relX, float relY, float size, boolean opaque) {
 		this.texture = texture;
 		this.relX =relX;
 		this.relY = relY;
 		this.opaque = opaque;
+		this.size = size;
 	}
 	
 	public void onDraw(GL gl) {
@@ -97,34 +99,48 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		int[] viewport = new int[4];
 		gl.glGetIntegerv( GL_VIEWPORT, viewport ,0 );
 
-		int startX = relX >= 0 ? (viewport[2] - viewport[0])*relX :viewport[2] - (viewport[0] - viewport[2])*relX; 
-		int startY = relY >= 0 ? (viewport[3] - viewport[1])*relX :viewport[3] - (viewport[1] - viewport[3])*relX; 
-		int width = t.getWidth();
-		int length = t.getHeight();
+		float height = this.size*t.getHeight()/viewport[3];
+		float length = this.size*t.getWidth()/viewport[2];
 		int z = 0;
+
+//		float startX = relX >= 0 ? (viewport[2] - viewport[0])*relX :viewport[2] - (viewport[0] - viewport[2])*relX; 
+//		float startY = relY >= 0 ? (viewport[3] - viewport[1])*relX :viewport[3] - (viewport[1] - viewport[3])*relX; 
+
+		float startX = relX >= 0 ? -1.f + relX : 1.f -length -relX; 
+		float startY = relY >= 0 ? -1.f + relY : 1.f -height -relY; 
+
+		gl.glColor4d(1,1,1,1);
+//		gl.glColor4d(0,0,0,0);
+
 		
 		//push 1:1 screen matrix
-		gl.glMatrixMode( GL.GL_PROJECTION);
 		gl.glPushMatrix();
+		gl.glMatrixMode( GL.GL_PROJECTION);
 		gl.glLoadIdentity();
 		//glu.gluOrtho2D( 0.0, width, 0.0, height);
 		gl.glMatrixMode( GL.GL_MODELVIEW);
-		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		//gl.glViewport( 0, 0, width, height);
+		//gl.glViewport( 0, 0, 1, 1);
 		//drawQuad
+		if(!this.opaque) {
+			this.gl.glEnable(GL.GL_BLEND);
+			this.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		}
+
+		t.enable();
+		t.bind();
 		gl.glBegin(GL.GL_QUADS);
-		gl.glTexCoord2f(1,1); gl.glVertex3f(startX - length, startY - width, z);
-		gl.glTexCoord2f(1,0); gl.glVertex3f(startX - length, startY + width, z);
-		gl.glTexCoord2f(0,0); gl.glVertex3f(startX + length, startY + width, z);
-		gl.glTexCoord2f(0,1); gl.glVertex3f(startX + length, startY - width, z);
+		gl.glTexCoord2f(0,1); gl.glVertex3f(startX, startY, z);
+		gl.glTexCoord2f(1,1); gl.glVertex3f(startX + length, startY, z);
+		gl.glTexCoord2f(1,0); gl.glVertex3f(startX + length, startY + height, z);
+		gl.glTexCoord2f(0,0); gl.glVertex3f(startX, startY + height, z);
 		gl.glEnd();
 		//restore old mode
-		gl.glMatrixMode( GL.GL_PROJECTION);
+		t.disable();
+		if(!this.opaque) {
+			this.gl.glDisable(GL.GL_BLEND);
+		}
 		gl.glPopMatrix();
-		gl.glMatrixMode( GL.GL_MODELVIEW);
-		gl.glPopMatrix();
-
 	}
 
 	@Override
@@ -364,7 +380,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
 
-		this.overlayItems.add(new OTFGLOverlay("../../tmp/matsim72dpi.png",0,0,true));
+		this.overlayItems.add(new OTFGLOverlay("res/logo.png",-0.0001f,0.0001f,2.0f, false));
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 		}
 
@@ -471,47 +487,20 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		if(queryHandler != null) queryHandler.drawQueries(this);
 
-//		if(background != null) {
-//			background.onDraw(gl);
-//		}
-//
-//
-//		if (isActiveNet) {
-//			gl.glEnable(GL.GL_TEXTURE_2D);
-//			gl.glBindTexture(GL.GL_TEXTURE_2D, QuadDrawer.linkcolors);
-//			gl.glCallList(netDisplList);
-//			gl.glDisable(GL.GL_TEXTURE_2D);
-//		} else gl.glCallList(netDisplList);
-//
-//		//AgentDrawer.carjpg.enable();
-//		//AgentDrawer.carjpg.bind();
-//		gl.glCallList(agentDisplList);
-//		//AgentDrawer.carjpg.disable();
-//
-//		int vehs = 0;
-//		for (OTFGLDrawable item : otherItems) {
-//			item.draw();
-//			if (item instanceof AgentArrayDrawer) {
-//				vehs += ((AgentArrayDrawer)item).count;
-//			}
-//		}
-//
 		if(((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).drawLinkIds()) displayLinkIds();
 
 		this.gl.glDisable(GL.GL_BLEND);
 
 
 		InfoText.drawInfoTexts(drawable);
+		//if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
 
 		this.mouseMan.drawElements(this.gl);
-		if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
+
 		for (OTFGLDrawable item : overlayItems) {
 			item.draw();
 		}
-		//statusDrawer.displayStatusText("Z " + mouseMan.getView().z);
 
-//		System.out.print("DRAWING : " );
-//		Gbl.printElapsedTime();
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {

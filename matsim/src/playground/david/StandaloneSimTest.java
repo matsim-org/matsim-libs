@@ -40,10 +40,11 @@ public class StandaloneSimTest {
 //		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
 //		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
 		String netFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
-		String popFileName = "../../tmp/studies/ivtch/plans100p.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans1p.xml";
 
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
+		Gbl.printElapsedTime();
 
 		String localDtdBase = "./dtd/";
 		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
@@ -69,6 +70,8 @@ public class StandaloneSimTest {
 		config.simulation().setStuckTime(100);
 		config.simulation().removeStuckVehicles(false);
 		config.simulation().removeStuckVehicles(true);
+		config.simulation().setFlowCapFactor(1.);
+		config.simulation().setStorageCapFactor(1.);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()

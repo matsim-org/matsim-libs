@@ -62,6 +62,7 @@ public class OTFVisConfig extends Module {
 	private float linkWidth = 30;
 	private boolean drawLinkIds = false;
 	private boolean drawTime = false;
+	private boolean drawOverlays = true;
 
 
 	@Override
@@ -260,6 +261,13 @@ public class OTFVisConfig extends Module {
 		this.drawLinkIds = drawLinkIds;
 	}
 
+	public void setDrawOverlays(boolean drawOverlays) {
+		this.drawOverlays = drawOverlays;
+	}
+	
+	public boolean drawOverlays() {
+		return drawOverlays;
+	}
 	public void setDrawTime(boolean draw) {
 		this.drawTime = draw;
 	}

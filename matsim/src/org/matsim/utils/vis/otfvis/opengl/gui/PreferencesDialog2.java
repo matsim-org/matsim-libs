@@ -27,6 +27,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
@@ -51,7 +52,7 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			JPanel panel = new JPanel(null);
 			getContentPane().add(panel);
 			panel.setBorder(BorderFactory.createTitledBorder("Switches"));
-			panel.setBounds(240, 130, 220, 80);
+			panel.setBounds(240, 130, 220, 140);
 
 			JCheckBox SynchBox = new JCheckBox("show parked vehicles");
 //			SynchBox.setMnemonic(KeyEvent.VK_M);
@@ -70,6 +71,24 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			SynchBox.setVisible(true);
 			//SynchBox.setMaximumSize(new Dimension(250,60));
 			panel.add(SynchBox);
+
+			SynchBox = new JCheckBox("show overlays");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawOverlays());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 60, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+
+//			SynchBox = new JCheckBox("show time GL");
+////			SynchBox.setMnemonic(KeyEvent.VK_M);
+//			SynchBox.setSelected(cfg.drawTime());
+//			SynchBox.addItemListener(this);
+//			SynchBox.setBounds(10, 80, 200, 31);
+//			//SynchBox.setVisible(true);
+//			//SynchBox.setMaximumSize(new Dimension(250,60));
+//			panel.add(SynchBox);
 		}
 	}
 
@@ -86,7 +105,25 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		} else if (source.getText().equals("show link Ids")) {
 			// toggle draw link Ids
 			cfg.setDrawLinkIds(!cfg.drawLinkIds());
+		} else if (source.getText().equals("show overlays")) {
+			// toggle draw Overlays
+			cfg.setDrawOverlays(!cfg.drawOverlays());
+		} else if (source.getText().equals("show time GL")) {
+			// toggle draw time in GL
+			//TODO does not work yet 
+			//cfg.setDrawTime(!cfg.drawTime());
 		}
 	}
+	public static void main(final String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JFrame frame = new JFrame();
+				PreferencesDialog2 inst = new PreferencesDialog2(frame, new OTFVisConfig(), null);
+				inst.setVisible(true);
+			}
+		});
+	}
+
+
 	
 }

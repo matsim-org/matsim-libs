@@ -21,17 +21,19 @@
 package playground.david;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
@@ -63,16 +65,38 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 
 	int modulo = 1;
 	int count = 0;
+	PopulationWriter plansWriter;
+	public Set<Link> usedlinkList = new HashSet<Link>();
+
 	
-	public FilterPersons2(int modulo) {
+	public FilterPersons2(int modulo, PopulationWriter plansWriter) {
 		super();
 		this.modulo = modulo;
+		this.plansWriter = plansWriter;
 	}
 
+	public void addLinks(Plan p) {
+		List<?> actl = p.getActsLegs();
+		for (int i= 0; i< actl.size() ; i++) {
+				if (i % 2 == 0) {
+					// activity
+					Act a = (Act)actl.get(i);
+					this.usedlinkList.add(a.getLink());
+				} else {
+					// Leg
+					Leg l = (Leg) actl.get(i);
+					List<Link> ll = new LinkedList<Link>();
+					for(Link link : l.getRoute().getLinkRoute()) {
+						usedlinkList.add(link);
+					}
+				}
+		}
+		
+	}
 	@Override
 	public void run(Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
-		person.removeWorstPlans(1);
+		person.removeUnselectedPlans();
 		Plan plan = person.getSelectedPlan();
 		Leg leg = plan.getNextLeg(plan.getFirstActivity());
 		if(!leg.getMode().equals(BasicLeg.Mode.car)) {
@@ -81,10 +105,15 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		}
 		if ((count++ % modulo) == 0) {
 			try {
-				ReducePopulationExe.relevantPopulation.addPerson(person);
+				plansWriter.writePerson(person);
+				//addLinks(plan);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		if(count % 10000 == 0) {
+			System.out.println("");
+			System.out.println("Count == " + count);
 		}
 	}
 }
@@ -98,12 +127,14 @@ public class ReducePopulationExe {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		final int b;
+		b=324;
+		
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
-		String netFileName = "../../tmp/studies/ivtch/ivtch-osm.xml";
-		String outnetFileName = "../../tmp/studies/ivtch/ivtch_red50.xml";
-
-		String popFileName = "../../tmp/studies/ivtch/plans50p.xml";
-		String outpopFileName = "../../tmp/studies/ivtch/plans50p_kill.xml";
+		//String netFileName = "../../tmp/studies/ivtch/ivtch-osm.xml";
+		String netFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans10p.xml";
+		String outpopFileName = "../../tmp/studies/ivtch/plans1p.xml";
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
@@ -114,29 +145,23 @@ public class ReducePopulationExe {
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
 
-		relevantPopulation = new Population(false);
-		Population population = new Population(true);
+		relevantPopulation = new Population(Population.USE_STREAMING);
+		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
+
+		Population population = new Population(Population.USE_STREAMING);
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
-		population.addAlgorithm(new FilterPersons2(1));
+		FilterPersons2 filter = new FilterPersons2(10, plansWriter);
+		population.addAlgorithm(filter);
 		plansReader.readFile(popFileName);
 
-		System.out.println("read # persons: " );
+		System.out.println("write # persons: " );
 		relevantPopulation.printPlansCount();
 		population.runAlgorithms();
 		
-		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
-		plansWriter.write();
+		plansWriter.writeEndPlans();
 		
-		Events events = new Events();
-		EventHH eventhh = new EventHH();
-		
-		events.addHandler(eventhh);
-		QueueSimulation queueSim = new QueueSimulation(network, relevantPopulation, events);
-
-		queueSim.run();
-	
-//		Set<Link> nolinkList = new HashSet<Link>();
-//		for(Link link : network.getLinks().values()) if(!eventhh.linkList.contains(link.getId().toString())) nolinkList.add(link);
+//		List<Link> nolinkList = new LinkedList<Link>();
+//		for(Link link : network.getLinks().values()) if(!filter.usedlinkList.contains(link)) nolinkList.add(link);
 //		
 //		for(Link link : nolinkList)network.removeLink(link);
 //		
