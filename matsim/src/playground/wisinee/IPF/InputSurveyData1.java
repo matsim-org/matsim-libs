@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class InputSurveyData1 {
 	
-	public void inputData(int nx, int[]ncx, int nRow, int nCol,String spt){
+	public void inputData(int nx,int[]ncx,int nRow,int nCol,String spt,int[] xCol,int yCol,double sValue){
 		GlobalVars.initialRij = new double[nRow][nCol];	
 		try{
 			String s1, value; 
@@ -19,7 +19,6 @@ public class InputSurveyData1 {
 			int[] x = new int[nx];
 			int y = 0;
 			int sumncx=1;
-			double ny=0;
 			File inFile = new File("./input/Survey.txt");			
 			BufferedReader in = new BufferedReader(new FileReader(inFile));
 						
@@ -38,13 +37,10 @@ public class InputSurveyData1 {
 						value = s1;
 					}
 					col = col+1;
-					switch (col){
-					case 1: x[2] = Integer.parseInt(value)-1; break;
-					case 2: x[1] = Integer.parseInt(value)-1; break;
-					case 3: x[0] = Integer.parseInt(value)-1; break;
-					case 4: y = Integer.parseInt(value)-1; break;
-					case 5: ny = Double.parseDouble(value); break;
-					}			
+					for(int c=0;c<nx;c++){
+						if (col==xCol[c]) x[c]=Integer.parseInt(value)-1;
+					}	
+					if(col==yCol) y=Integer.parseInt(value)-1;		
 				}
 				for (int i=0;i<nx;i++){
 					if(i==0){
@@ -58,7 +54,12 @@ public class InputSurveyData1 {
 						sumncx=1;
 					}									
 				}					
-				GlobalVars.initialRij[pos][y] =GlobalVars.initialRij[pos][y]+ny;					
+				GlobalVars.initialRij[pos][y] =GlobalVars.initialRij[pos][y]+1;					
+			}
+			for(int i=0;i<nRow;i++){
+				for(int j=0;j<nCol;j++){
+					if(GlobalVars.initialRij[i][j]==0) GlobalVars.initialRij[i][j]=sValue;
+				}
 			}
 			in.close();			
 		} catch(EOFException e){

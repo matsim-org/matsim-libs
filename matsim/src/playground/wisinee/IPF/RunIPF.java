@@ -29,7 +29,18 @@ import java.util.ArrayList;
 			ncx[1] = 5;							//independent variables respectively
 			ncx[2] = 3;							//
 //			----------------------------------------------------------------------
+			int[]xCol = new int[nx];			
+			xCol[0]= 5;						//identify which column in the household and survey data
+			xCol[1]= 4;						//for each independent variable
+			xCol[2]= 3;						
+//			----------------------------------------------------------------------
+			int zoneCol=2;						//identify which column in the household and survey data
+												//for indicating zone where the household is located
+//			----------------------------------------------------------------------
 			int nRow = 75; 						//total rows = 5*5*3 = 75
+//			----------------------------------------------------------------------
+//			identify which column in the survey data for the variable to be generated
+			int yCol=6;							
 //			----------------------------------------------------------------------
 			int[] bin = new int[nRow];	
 //			number of categories of the generated variable
@@ -40,12 +51,14 @@ import java.util.ArrayList;
 			String heading = "Income";
 //			number of zones
 			int nz = 3;
+//			small value of the zero cells of the initial matrix
+			double sValue=0.1;
 //--------------------------------------------------------------------------------	
 //================================================================================		
 			System.out.println("===============================================");
 			System.out.println("Collecting information from 'Survey data'");
 			InputSurveyData1 io1 = new InputSurveyData1();
-			io1.inputData(nx,ncx,nRow,nCol,spt);	
+			io1.inputData(nx,ncx,nRow,nCol,spt,xCol,yCol,sValue);	
 			System.out.println("Finish reading information from 'Survey data'");
 			System.out.println("===============================================");
 			System.out.println("Start reading information from 'Household data'");
@@ -84,13 +97,11 @@ import java.util.ArrayList;
 						value = s1;
 					}
 					col = col+1;
-//					identify which column in the household dataset for each independent variable
-					switch (col){
-					case 2: zone = value; break;
-					case 3: x[2] = Integer.parseInt(value)-1; break;
-					case 4:	x[1]= Integer.parseInt(value)-1; break;
-					case 5: x[0] = Integer.parseInt(value)-1; break;
-					}					
+					
+					if (col==zoneCol) zone=value;
+					for(int c=0;c<nx;c++){
+						if (col==xCol[c]) x[c]=Integer.parseInt(value)-1;
+					}				
 				}				
 				if (zone.compareTo(zoneOld)!= 0 && zoneOld.compareTo("")!= 0 || row == lastRowData){
 					if (row == lastRowData){
