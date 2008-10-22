@@ -1,6 +1,6 @@
 package playground.wisinee.IPF;
 
 public class OriginalData {	
-	public String data;			//for keeping the all the original data
-	public int[] dataCol = new int[20];	
+	public String data;			//to keep the all the information from original data
+	public int[] dataCol = new int[30];	
 }

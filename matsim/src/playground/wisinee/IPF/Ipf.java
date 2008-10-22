@@ -102,14 +102,14 @@ public class Ipf {
 					rij[i][j] = cij[i][j];
 				}			
 			}	
-			System.out.print("IPF Interation: " + k + '\t');
+			System.out.print("IPF Iteration: " + k + '\t');
 			System.out.println("Convergence: " + conv);
 			k++;
 		} while(k <= maxItn);
-		System.out.print("IPF Interation: " + k1 + '\t');
+		System.out.print("IPF Iteration: " + k1 + '\t');
 		System.out.println("Convergence: " + conv);
 		System.out.println("Reach convergence at....");
-		System.out.print("IPF Interation: " + k1 + '\t');
+		System.out.print("IPF Iteration: " + k1 + '\t');
 		System.out.println("Convergence: " + conv);
 		
 		return cij;	

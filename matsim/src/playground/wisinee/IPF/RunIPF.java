@@ -7,15 +7,15 @@ import java.util.ArrayList;
 
 		public static void main(String[] args){	
 			
-//==========SETTING=============================================================			
+//==========INITIAL SETTING=============================================================			
 //----------File name-----------------------------------------------------------
-//			initial Household data
+//			**INPUT** initial Household/Person data
 			File inFile1 = new File("./input/HHData.txt");	
-////			initial pattern data (initial matrix) 
-//			File inFile2 = new File("./input/SurveyData.csv");		
-////			given distribution (fixed column)
-//			File inFile3 = new File("./input/IncomeDistb.csv");	
-//			final output file 
+//			**INPUT** initial pattern data/survey data (initial matrix) 
+			File inFile2 = new File("./input/Survey.txt");		
+//			**INPUT** given distribution (fixed column)
+			File inFile3 = new File("./input/Pdf.txt");		
+//			**OUTPUT** final Household/Person list with the generated attribute 
 			File outFile = new File("./output/HHData_income.txt");	
 //-------------------------------------------------------------------------------			
 //----------Parameter------------------------------------------------------------	
@@ -30,14 +30,14 @@ import java.util.ArrayList;
 			ncx[2] = 3;							//
 //			----------------------------------------------------------------------
 			int[]xCol = new int[nx];			
-			xCol[0]= 5;						//identify which column in the household and survey data
-			xCol[1]= 4;						//for each independent variable
+			xCol[0]= 5;							//identify which column in the household and survey data
+			xCol[1]= 4;							//for each independent variable
 			xCol[2]= 3;						
 //			----------------------------------------------------------------------
 			int zoneCol=2;						//identify which column in the household and survey data
 												//for indicating zone where the household is located
 //			----------------------------------------------------------------------
-			int nRow = 75; 						//total rows = 5*5*3 = 75
+			int nRow = 75; 						//total rows; for example:5*5*3 = 75
 //			----------------------------------------------------------------------
 //			identify which column in the survey data for the variable to be generated
 			int yCol=6;							
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 			int[] bin = new int[nRow];	
 //			number of categories of the generated variable
 			int nCol = 10;
-//			identify how many rows in the Household list (not include heading)
+//			identify how many rows in the Household/Person list (not include heading)
 			int lastRowData = 1272;
 //			heading for the generated column
 			String heading = "Income";
@@ -55,15 +55,45 @@ import java.util.ArrayList;
 			double sValue=0.1;
 //--------------------------------------------------------------------------------	
 //================================================================================		
+			
 			System.out.println("===============================================");
-			System.out.println("Collecting information from 'Survey data'");
-			InputSurveyData1 io1 = new InputSurveyData1();
-			io1.inputData(nx,ncx,nRow,nCol,spt,xCol,yCol,sValue);	
-			System.out.println("Finish reading information from 'Survey data'");
+			System.out.println("+++++SETTING PARAMETERS+++++");
+			System.out.println("INPUT 'HOUSEHOLD/PERSON DATA' File from: \""+inFile1+"\"");
+			System.out.println("INPUT 'SURVEY DATA' File from: \""+inFile2+"\"");		
+			System.out.println("INPUT 'DISTRIBUTION DATA' File from: \""+inFile3+"\"");
+			System.out.println("OUTPUT File to: \""+outFile+"\"");
+			System.out.println();
+			System.out.println("Using seperater:\""+spt+"\"");
+			System.out.println();
+			checkDataHeading(inFile1,inFile2,inFile3);	
+			System.out.println("From 'HOUSEHOLD/PERSON DATA' and 'SURVEY DATA'");
+			System.out.println("Using Column:"+zoneCol+"Å@to identify zone");
+			System.out.println();
+			System.out.println("Number of independent variablesÅ@(x):"+nx);
+			for(int i=0;i<nx;i++){
+				System.out.println("x"+(i+1)+" from Column:"+xCol[i]);
+				System.out.println("Number of categories for x"+(i+1)+":"+xCol[i]);
+			}
+			System.out.println();
+			System.out.println("Generated variable (y) name:"+heading);
+			System.out.println("Using Column:"+yCol+" from 'SURVEY DATA' for y");	
+			System.out.println("Number of categories of y:"+nCol);
+			System.out.println();
+			System.out.println("Number of zones:"+nz);
+			System.out.println("Small value for zero cells:"+sValue);
+			
+				
 			System.out.println("===============================================");
-			System.out.println("Start reading information from 'Household data'");
-		try{
-	
+			
+			
+			System.out.println("Start reading information from 'SURVEY DATA'");
+			InputSurveyData io1 = new InputSurveyData();
+			io1.inputData(nx,ncx,nRow,nCol,spt,xCol,yCol,sValue,inFile2);	
+			System.out.println("Finish.");
+			System.out.println("===============================================");
+			System.out.println("Start reading information from 'HOUSEHOLD/PERSON DATA'");
+		try{	
+
 			BufferedReader in = new BufferedReader(new FileReader(inFile1));
 			FileOutputStream out = new FileOutputStream(outFile);	
 			
@@ -82,7 +112,8 @@ import java.util.ArrayList;
 			int pos = 0;
 			int sumncx=1;
 			
-			s1 = in.readLine();
+			s1 = in.readLine();			//readout the heading
+			
 			new PrintStream(out).println(s1+spt+heading);
 			while ((s1= in.readLine()) != null){
 				orgData = s1;
@@ -128,21 +159,19 @@ import java.util.ArrayList;
 									
 					int n = 0;		
 					for (int i=0;i<nRow;i++){
-						GlobalVars.fixedR[n]= bin[i];
-						System.out.println(GlobalVars.fixedR[n]);                          
+						GlobalVars.fixedR[n]= bin[i];                     
 						n++;
 					}
 				
 					z = z+1;
 					System.out
-							.println("Finish collecting data for zone : (" + z +") " + zoneOld);
-					System.out.println("===============================================");
+							.println("Finish. zone: (" + z +") " + zoneOld);
 					//get fixed value for column
-					System.out.println("Start reading 'Pdf data'");
-					InputPdf1 io3 = new InputPdf1();
-					io3.inputDistribution(z,nCol,spt);
-					System.out.println("Finish reading 'Pdf data'");
-					System.out.println("===============================================");
+					System.out.println("Start reading 'DISTRIBUTION DATA' zone: (" + z +") " + zoneOld);
+					
+					InputPdf io3 = new InputPdf();
+					io3.inputDistribution(z,nCol,spt,inFile3);
+					System.out.println("Finish.");
 					
 					//call ipf for each zone
 					System.out.println("Start IPF calculation....");			
@@ -151,27 +180,25 @@ import java.util.ArrayList;
 					i1.setFixColumn(GlobalVars.fixedC, nCol);
 					i1.setInitialMatrix(GlobalVars.initialRij, nRow, nCol);
 					GlobalVars.finalRij=i1.ipfcal(nRow, nCol);					
-					System.out.println("Finish IPF calculation!!");
-					System.out.println("===============================================");
+					System.out.println("Finish.");
 					
-					System.out.println("Start link IPF result to 'Household data'....");				
+					System.out.println("Start linking IPF result to 'HOUSEHOLD/PERSON DATA'");				
 					//link back to each HH
-					LinktoInsee1 link = new LinktoInsee1();
+					LinktoHHlist link = new LinktoHHlist();
 					link.link(GlobalVars.orgn.size(),nx,ncx,nRow,nCol,spt);
-					System.out.println("Finish link to Insee for zone : (" + z
-							+ ") " + zoneOld);
+					System.out.println("Finish.");
 					//print final data to file
-					System.out.println("Start writing final result to file....");					
+					System.out.println("Start writing 'FINAL RESULT' to 'OUTPUT FILE'");					
 					for (int i = 0; i<GlobalVars.orgn.size();i++){
 						new PrintStream(out).println(GlobalVars.finalData[i]);
 					}
-					System.out.println("Finish for zone : ("+z+")"+zoneOld);
-					System.out.println("===============================================");
+					System.out.println("Finish. zone: ("+z+")"+zoneOld);
 					System.out.println("===============================================");
 					//clear temporary data;
 					bin = new int[nRow];
 					GlobalVars.orgn.clear();
-					if (z==nz) System.out.println("Finish for all zones!!");
+					if (z==nz) {System.out.println("Finish all zones!!");break;} 
+					System.out.println("Continue reading information from 'HOUSEHOLD/PERSON DATA'");
 				}	
 				if (row < lastRowData){
 					for (int i=0;i<nx;i++){
@@ -207,5 +234,46 @@ import java.util.ArrayList;
 			System.out.println(e.getMessage());				
 		}
 	}
-
+	private static void checkDataHeading(File inFile1,File inFile2,File inFile3){
+		try{
+		BufferedReader in1 = new BufferedReader(new FileReader(inFile1));
+		String s1;
+		s1 = in1.readLine();	
+		System.out.println("INPUT 'HOUSEHOLD/PERSON DATA'");
+		System.out.println("Data Heading....");
+		System.out.println("********************************");
+		System.out.println(s1);
+		System.out.println("********************************");
+		System.out.println();
+		in1.close();
+		
+		
+		BufferedReader in2 = new BufferedReader(new FileReader(inFile2));
+		s1 = in2.readLine();	
+		System.out.println("INPUT 'SURVEY DATA'");
+		System.out.println("Data Heading....");
+		System.out.println("********************************");
+		System.out.println(s1);
+		System.out.println("********************************");
+		System.out.println();
+		in2.close();
+		
+		
+		BufferedReader in3 = new BufferedReader(new FileReader(inFile3));
+		s1 = in3.readLine();	
+		System.out.println("INPUT 'DISTRIBUTION DATA'");
+		System.out.println("Data Heading....");
+		System.out.println("********************************");
+		System.out.println(s1);
+		System.out.println("********************************");
+		System.out.println();
+		in3.close();
+		
+		} catch(EOFException e){
+			System.out.println("End of stream");
+		} catch (IOException e){
+			System.out.println(e.getMessage());				
+		}
+	}
+		
 }
