@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.LocationMutator;
@@ -77,7 +78,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
 			
-			//initially using 25.3 km/h + 20 %
+			//initially using 25.3 km/h + 20%
 			// micro census 2005
 			double speed = 30.36/3.6;
 			
@@ -137,24 +138,24 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
+		ArrayList<Activity> secondaryTypes = plan.getPerson().getKnowledge().getActivities(false);
+		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);	
 			
-			// found shopping or leisure activity
-			if (act.getType().startsWith("s") || act.getType().startsWith("l")) {
-				manager.slActivityFound(act, (Leg)actslegs.get(j+1));
-			}
-			
-			// found home, work or education activity
-			else if (act.getType().startsWith("h") || act.getType().startsWith("w") || 
-					act.getType().startsWith("e")) {
+			// found secondary activity
+			if (secondaryTypes.contains(act.getType())) {
+				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+			}		
+			// found primary activity
+			else {
 				
 				if (j == (actslegs.size()-1)) {
-					manager.hweActivityFound(act, null);
+					manager.primaryActivityFound(act, null);
 				}
 				else {
-					manager.hweActivityFound(act, (Leg)actslegs.get(j+1));
+					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
 				}
 			}
 		}

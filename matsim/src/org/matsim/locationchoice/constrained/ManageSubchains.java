@@ -35,26 +35,23 @@ public class ManageSubchains {
 	
 	private int subChainIndex = -1;
 	boolean chainStarted = false;
-	boolean sl_found = false;
+	boolean secondaryActFound = false;
 
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 	
-	public void slActivityFound(Act act, Leg leg) {
-		// no plan starts with s or l !
+	public void secondaryActivityFound(Act act, Leg leg) {
+		// no plan starts with secondary activity!
 		this.subChains.get(subChainIndex).addAct(act);
-		this.sl_found = true;	
+		this.secondaryActFound = true;	
 		this.ttBudget += leg.getTravTime();
-		this.totalTravelDistance += leg.getRoute().getDist();
-
-		//log.info("found s/l act");	
+		this.totalTravelDistance += leg.getRoute().getDist();	
 	}
 	
-	public void hweActivityFound(Act act, Leg leg) {
-		//log.info("found hwe act");	
+	public void primaryActivityFound(Act act, Leg leg) {
 		// close chain
 		if (chainStarted) {
-			if (sl_found) {
+			if (secondaryActFound) {
 				this.subChains.get(subChainIndex).setTotalTravelDistance(this.totalTravelDistance);
 				this.subChains.get(subChainIndex).setTtBudget(this.ttBudget);
 				this.subChains.get(subChainIndex).setEndCoord(act.getCoord());
@@ -63,7 +60,6 @@ public class ManageSubchains {
 			else {
 				this.subChains.remove(subChainIndex);
 				this.subChainIndex--;
-				//log.info("chain removed");
 			}
 		}
 		
@@ -75,10 +71,9 @@ public class ManageSubchains {
 			this.subChains.get(subChainIndex).setFirstPrimAct(act);
 			this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
 			this.chainStarted = true;
-			this.sl_found = false;
+			this.secondaryActFound = false;
 			this.ttBudget = leg.getTravTime();
 			this.totalTravelDistance = leg.getRoute().getDist();
-			//log.info("chain startet");
 		}			
 	}
 

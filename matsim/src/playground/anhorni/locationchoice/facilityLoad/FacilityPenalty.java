@@ -52,7 +52,7 @@ public class FacilityPenalty {
 	
 	FacilityPenalty(double minCapacity, int scaleNumberOfPersons) {
 		this.capacity = minCapacity;
-		this.facilityLoad = new FacilityLoad(this.numberOfTimeBins);
+		this.facilityLoad = new FacilityLoad(this.numberOfTimeBins, scaleNumberOfPersons);
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 		
 		this.restraintFcnFactor = Double.parseDouble(Gbl.getConfig().locationchoice().getRestraintFcnFactor());

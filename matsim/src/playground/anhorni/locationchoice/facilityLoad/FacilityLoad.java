@@ -38,12 +38,12 @@ public class FacilityLoad {
 	
 	// ----------------------------------------------------------------------
 		
-	FacilityLoad(int numberOfTimeBins) {
+	FacilityLoad(int numberOfTimeBins, int scaleNumberOfPersons) {
 		this.numberOfTimeBins = numberOfTimeBins;
 		this.arrivals = new int [numberOfTimeBins];
 		this.departures = new int [numberOfTimeBins];
 		this.load = new int [numberOfTimeBins];
-		
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
 
 		for (int i = 0; i < numberOfTimeBins; i++){
 			this.arrivals[i] = 0;

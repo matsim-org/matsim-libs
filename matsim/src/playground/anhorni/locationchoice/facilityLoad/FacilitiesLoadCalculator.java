@@ -55,15 +55,18 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	private EventsToFacilityLoad eventsToFacilityLoad;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
 	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
-
-	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		this.facilityPenalties = facilityPenalties;
-	}
 	
 	// scales the load of the facilities (for e.g. 10 % runs)
 	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
-	// TODO: this has to be taken from the config.
-	private int scaleNumberOfPersons = 10;
+	private int scaleNumberOfPersons = 1;
+	
+	//--------------------------------------------------------------------------------------------------
+
+	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
+		this.scaleNumberOfPersons = Integer.parseInt(Gbl.getConfig().locationchoice().getScalefactor());
+	}
+	
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();

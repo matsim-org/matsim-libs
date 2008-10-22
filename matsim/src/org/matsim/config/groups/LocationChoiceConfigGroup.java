@@ -32,10 +32,12 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String CONSTRAINED = "constrained";	
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
+	private static final String SCALEFACTOR = "scalefactor";
 
 	private String constrained = null;
 	private String restraintFcnFactor = null;
 	private String restraintFcnExp = null;
+	private String scalefactor = null;
 
 	public LocationChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -52,6 +54,9 @@ public class LocationChoiceConfigGroup extends Module {
 		if (RESTR_FCN_EXP.equals(key)) {
 			return getRestraintFcnExp();
 		}
+		if (SCALEFACTOR.equals(key)) {
+			return getScalefactor();
+		}
 		throw new IllegalArgumentException(key);
 	}
 
@@ -63,6 +68,8 @@ public class LocationChoiceConfigGroup extends Module {
 			setRestraintFcnFactor(value);
 		} else if (RESTR_FCN_EXP.equals(key)) {
 			setRestraintFcnExp(value);
+		} else if (SCALEFACTOR.equals(key)) {
+			setScalefactor(value);
 		} else		
 		{
 			throw new IllegalArgumentException(key);
@@ -75,6 +82,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, CONSTRAINED);
 		this.addParameterToMap(map, RESTR_FCN_FACTOR);
 		this.addParameterToMap(map, RESTR_FCN_EXP);
+		this.addParameterToMap(map, SCALEFACTOR);
 		return map;
 	}
 
@@ -96,5 +104,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setRestraintFcnExp(final String restraintFcnExp) {
 		this.restraintFcnExp = restraintFcnExp;
+	}
+	public String getScalefactor() {
+		return scalefactor;
+	}
+	public void setScalefactor(String scalefactor) {
+		this.scalefactor = scalefactor;
 	}
 }
