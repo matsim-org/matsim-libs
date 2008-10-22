@@ -503,6 +503,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	}
 
+	public void addOverlay(OTFGLOverlay overlay) {
+		overlayItems.add(overlay);
+	}
+	
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
 	}
 
