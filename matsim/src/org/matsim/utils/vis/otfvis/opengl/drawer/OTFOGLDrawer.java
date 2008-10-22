@@ -25,6 +25,7 @@ import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_LINEAR;
 import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
 import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
+import static javax.media.opengl.GL.GL_VIEWPORT;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -56,6 +57,7 @@ import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.renderers.ValueColorizer;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
@@ -73,6 +75,66 @@ import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
+class OTFGLOverlay extends OTFGLDrawableImpl {
+	private String texture;
+	private int relX;
+	private int relY;
+	private boolean opaque;
+	Texture t = null;
+	
+	OTFGLOverlay(String texture, int relX, int relY, boolean opaque) {
+		this.texture = texture;
+		this.relX =relX;
+		this.relY = relY;
+		this.opaque = opaque;
+	}
+	
+	@Override
+	public void onDraw(GL gl) {
+		if(t == null) {
+			t = OTFOGLDrawer.createTexture(texture);
+		}
+		
+		int[] viewport = new int[4];
+		gl.glGetIntegerv( GL_VIEWPORT, viewport ,0 );
+
+		int startX = relX >= 0 ? (viewport[2] - viewport[0])*relX :viewport[2] - (viewport[0] - viewport[2])*relX; 
+		int startY = relY >= 0 ? (viewport[3] - viewport[1])*relX :viewport[3] - (viewport[1] - viewport[3])*relX; 
+		int width = t.getWidth();
+		int length = t.getHeight();
+		int z = 0;
+		
+		//push 1:1 screen matrix
+		gl.glMatrixMode( GL.GL_PROJECTION);
+		gl.glPushMatrix();
+		gl.glLoadIdentity();
+		//glu.gluOrtho2D( 0.0, width, 0.0, height);
+		gl.glMatrixMode( GL.GL_MODELVIEW);
+		gl.glPushMatrix();
+		gl.glLoadIdentity();
+		//gl.glViewport( 0, 0, width, height);
+		//drawQuad
+		gl.glBegin(GL.GL_QUADS);
+		gl.glTexCoord2f(1,1); gl.glVertex3f(startX - length, startY - width, z);
+		gl.glTexCoord2f(1,0); gl.glVertex3f(startX - length, startY + width, z);
+		gl.glTexCoord2f(0,0); gl.glVertex3f(startX + length, startY + width, z);
+		gl.glTexCoord2f(0,1); gl.glVertex3f(startX + length, startY - width, z);
+		gl.glEnd();
+		//restore old mode
+		gl.glMatrixMode( GL.GL_PROJECTION);
+		gl.glPopMatrix();
+		gl.glMatrixMode( GL.GL_MODELVIEW);
+		gl.glPopMatrix();
+
+	}
+
+	@Override
+	public void invalidate(SceneGraph graph) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
 public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
@@ -86,6 +148,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private GLCanvas canvas = null;
 	private VisGUIMouseHandler mouseMan = null;
 	private final OTFClientQuad clientQ;
+	private String lastTime = "";
 
 	//Handle these separately, as the agents needs textures set, which should only be done once
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
@@ -334,7 +397,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	}
 
 
-	//private String lastTime = "";
 	public void displayLinkIds() {
 		// Check for linewidth of street
 		final double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
@@ -441,7 +503,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		InfoText.drawInfoTexts(drawable);
 
 		this.mouseMan.drawElements(this.gl);
-		//statusDrawer.displayStatusText( lastTime);
+		if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
 		//statusDrawer.displayStatusText("Z " + mouseMan.getView().z);
 
 //		System.out.print("DRAWING : " );
@@ -524,7 +586,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		//scaledAgentSize = agentSize * this.mouseMan.getScale();
 
 
-		//lastTime = Time.writeTime(time, ':');
+		lastTime = Time.writeTime(time, ':');
 
 		// do something like
 		// getTimeStep from somewhere

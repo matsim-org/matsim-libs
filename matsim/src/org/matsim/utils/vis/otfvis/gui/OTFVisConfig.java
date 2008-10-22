@@ -61,6 +61,8 @@ public class OTFVisConfig extends Module {
 	private Color networkColor = new Color(128, 128, 128, 200);
 	private float linkWidth = 30;
 	private boolean drawLinkIds = false;
+	private boolean drawTime = false;
+
 
 	@Override
 	public String getValue(final String key) {
@@ -256,6 +258,14 @@ public class OTFVisConfig extends Module {
 	 */
 	public void setDrawLinkIds(boolean drawLinkIds) {
 		this.drawLinkIds = drawLinkIds;
+	}
+
+	public void setDrawTime(boolean draw) {
+		this.drawTime = draw;
+	}
+	
+	public boolean drawTime() {
+		return drawTime;
 	}
 
 }

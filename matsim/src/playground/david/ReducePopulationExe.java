@@ -100,10 +100,10 @@ public class ReducePopulationExe {
 	public static void main(String[] args) {
 		//String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\DSkutter010car_bln.router_wip.plans.v4.xml";
 		String netFileName = "../../tmp/studies/ivtch/ivtch-osm.xml";
-		String outnetFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
+		String outnetFileName = "../../tmp/studies/ivtch/ivtch_red50.xml";
 
-		String popFileName = "../../tmp/studies/ivtch/plans100p.xml.gz";
-		String outpopFileName = "../../tmp/studies/ivtch/plans100p.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans50p.xml";
+		String outpopFileName = "../../tmp/studies/ivtch/plans50p_kill.xml";
 
 		Gbl.startMeasurement();
 		Gbl.createConfig(args);
