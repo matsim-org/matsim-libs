@@ -153,6 +153,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	//Handle these separately, as the agents needs textures set, which should only be done once
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFGLDrawable> agentItems = new ArrayList<OTFGLDrawable>();
+	private final List<OTFGLDrawable> overlayItems = new ArrayList<OTFGLDrawable>();
 	//private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
 
 	//private final SimpleBackgroundDrawer background = null;
@@ -364,6 +365,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
 
+		this.overlayItems.add(new OTFGLOverlay("../../tmp/matsim72dpi.png",0,0,true));
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 		}
 
@@ -504,6 +506,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		this.mouseMan.drawElements(this.gl);
 		if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
+		for (OTFGLDrawable item : overlayItems) {
+			item.draw();
+		}
 		//statusDrawer.displayStatusText("Z " + mouseMan.getView().z);
 
 //		System.out.print("DRAWING : " );
