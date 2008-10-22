@@ -76,10 +76,10 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
 class OTFGLOverlay extends OTFGLDrawableImpl {
-	private String texture;
-	private int relX;
-	private int relY;
-	private boolean opaque;
+	private final String texture;
+	private final int relX;
+	private final int relY;
+	private final boolean opaque;
 	Texture t = null;
 	
 	OTFGLOverlay(String texture, int relX, int relY, boolean opaque) {
@@ -89,7 +89,6 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		this.opaque = opaque;
 	}
 	
-	@Override
 	public void onDraw(GL gl) {
 		if(t == null) {
 			t = OTFOGLDrawer.createTexture(texture);
