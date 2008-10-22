@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
@@ -41,6 +42,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
+
+import playground.anhorni.locationchoice.facilityLoad.FacilityPenalty;
 
 /* Scoring function factoring in:
  * - opentimes
@@ -70,12 +73,8 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-
-	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
-	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
-	 * values each time from a string, this whole init() concept can be removed and with this
-	 * also this public member.  -marcel, 07aug07
-	 */
+	private TreeMap<Id, FacilityPenalty> facilityPenalties;
+	
 	public static boolean initialized = false;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
@@ -83,7 +82,8 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 
 	private static final Logger log = Logger.getLogger(LocationChoiceScoringFunction.class);
 
-	public LocationChoiceScoringFunction(final Plan plan) {
+	
+	public LocationChoiceScoringFunction(final Plan plan, TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		init();
 		this.reset();
 
@@ -91,7 +91,12 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
 		this.penalty = new Vector<Penalty>();
+		this.facilityPenalties = facilityPenalties;
 	}
+	
+
+	
+	
 
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
@@ -138,6 +143,8 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		Iterator<Penalty> pen_it = this.penalty.iterator();
 		while (pen_it.hasNext()){
 			Penalty penalty = pen_it.next();
+			
+			// TODO: check activity is secondary
 			this.score -=penalty.getPenalty();
 		}
 		this.penalty.clear();
@@ -258,6 +265,30 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		}
 		double duration = activityEnd - activityStart;
 
+	
+		// utility of performing an action, duration is >= 1, thus log is no problem ----------------
+		double typicalDuration = params.getTypicalDuration();
+
+		if (duration > 0) {
+			double utilPerf = marginalUtilityOfPerforming * typicalDuration
+					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+
+			double utilWait = marginalUtilityOfWaiting * duration;
+			score += Math.max(0, Math.max(utilPerf, utilWait));
+		} else {
+			score += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+		}
+		
+		// used arrival and departure time because of parking cap restr. before act actually starts
+		if (act.getType().startsWith("s") || act.getType().startsWith("l")){
+			this.penalty.add(new Penalty(arrivalTime, departureTime, 
+					this.facilityPenalties.get(act.getFacility().getId()), score));
+		}
+		
+		
+		// DISUTILITIES: -------------------------------------------------------------------------------
+		
+		
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
@@ -269,21 +300,6 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		double latestStartTime = params.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
 			score += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
-		}
-
-		// utility of performing an action, duration is >= 1, thus log is no problem
-		double typicalDuration = params.getTypicalDuration();
-
-		if (duration > 0) {
-			double utilPerf = marginalUtilityOfPerforming * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-
-			utilPerf *= act.getFacility().getAttrFactor();
-
-			double utilWait = marginalUtilityOfWaiting * duration;
-			score += Math.max(0, Math.max(utilPerf, utilWait));
-		} else {
-			score += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 
 		// disutility if stopping too early
@@ -303,11 +319,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
-		// used arrival and departure time because of parking cap restr. before act actually starts
-		if (act.getType().startsWith("s")){
-			this.penalty.add(new Penalty(arrivalTime, departureTime, act.getFacility(), score));
-		}
-
+		
 		return score;
 	}
 

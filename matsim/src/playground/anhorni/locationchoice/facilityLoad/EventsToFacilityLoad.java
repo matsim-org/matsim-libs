@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,57 +21,66 @@
 package playground.anhorni.locationchoice.facilityLoad;
 
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
 /**
  *
  * @author anhorni
+ * 
  */
 public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHandler {
 
-	private Facilities facilities = null;
-	private int scaleNumberOfPersons = 1;
-
+	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final Facilities facilities, int scaleNumberOfPersons) {
+	public EventsToFacilityLoad(final Facilities facilities, int scaleNumberOfPersons,
+			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super();
-		this.facilities = facilities;
-		this.scaleNumberOfPersons = scaleNumberOfPersons;
 		
-		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
-		while (iter.hasNext()){
-			Facility f = iter.next();
-			f.setScaleNumberOfPersons(this.scaleNumberOfPersons);
+		this.facilityPenalties = facilityPenalties;
+		
+		
+		Iterator<? extends Facility> iter_fac = facilities.getFacilities().values().iterator();
+		while (iter_fac.hasNext()){
+			Facility f = iter_fac.next();
+			
+			double capacity = Double.MAX_VALUE;
+			Iterator<? extends Activity> iter_act = f.getActivities().values().iterator();
+			while (iter_act.hasNext()){
+				Activity act = iter_act.next();
+				if (act.getCapacity() < capacity) {
+					capacity = act.getCapacity();
+				}
+			}			
+			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons));
 		}
 	}
-
+	
 	public void handleEvent(final ActStartEvent event) {
 		Facility facility = event.act.getFacility();		
-		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
-			facility.addArrival(event.time, this.scaleNumberOfPersons);
-		}
+		this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.time);
 	}
 
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
-		if (event.acttype.startsWith("s") || event.acttype.startsWith("l")) {
-			facility.addDeparture(event.time);
-		}
+		this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.time);
 	}
 
 	public void finish() {
-		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
-		while (iter.hasNext()){
-			Facility f = iter.next();
-			f.finish();
+		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
+		while (iter_fp.hasNext()){
+			FacilityPenalty fp = iter_fp.next();
+			fp.finish();
 		}
 		log.info("EventsToFacilityLoad finished");
 	}
@@ -82,11 +91,19 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	}
 	
 	public void resetAll(final int iteration) {
-		Iterator<? extends Facility> iter = this.facilities.getFacilities().values().iterator();
-		while (iter.hasNext()){
-			Facility f = iter.next();
-			f.reset();
+		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
+		while (iter_fp.hasNext()){
+			FacilityPenalty fp = iter_fp.next();
+			fp.reset();
 		}
 		log.info("EventsToFacilityLoad resetted");
+	}
+
+	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
+		return facilityPenalties;
+	}
+
+	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
 	}
 }

@@ -28,16 +28,14 @@ public class LocationChoiceConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "locationchoice";
 	
-	// zh, ch
-	// TODO: Provide center coord + radius to define an area for 
-	// locatio choice. For the moment zh and ch scenario.
-	private static final String AREA = "area";
-	
 	// true; false
-	private static final String CONSTRAINED = "constrained";
+	private static final String CONSTRAINED = "constrained";	
+	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
+	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 
-	private String area = null;
 	private String constrained = null;
+	private String restraintFcnFactor = null;
+	private String restraintFcnExp = null;
 
 	public LocationChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -45,21 +43,26 @@ public class LocationChoiceConfigGroup extends Module {
 
 	@Override
 	public String getValue(final String key) {
-		if (AREA.equals(key)) {
-			return getArea();
-		}
 		if (CONSTRAINED.equals(key)) {
 			return getMode();
+		}
+		if (RESTR_FCN_FACTOR.equals(key)) {
+			return getRestraintFcnFactor();
+		}
+		if (RESTR_FCN_EXP.equals(key)) {
+			return getRestraintFcnExp();
 		}
 		throw new IllegalArgumentException(key);
 	}
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if (AREA.equals(key)) {
-			setArea(value);
-		} else if (CONSTRAINED.equals(key)) {
+		if (CONSTRAINED.equals(key)) {
 			setMode(value);
+		} else if (RESTR_FCN_FACTOR.equals(key)) {
+			setRestraintFcnFactor(value);
+		} else if (RESTR_FCN_EXP.equals(key)) {
+			setRestraintFcnExp(value);
 		} else		
 		{
 			throw new IllegalArgumentException(key);
@@ -69,25 +72,29 @@ public class LocationChoiceConfigGroup extends Module {
 	@Override
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		this.addParameterToMap(map, AREA);
 		this.addParameterToMap(map, CONSTRAINED);
+		this.addParameterToMap(map, RESTR_FCN_FACTOR);
+		this.addParameterToMap(map, RESTR_FCN_EXP);
 		return map;
 	}
 
-	/* direct access */
 
-	public String getArea() {
-		return this.area;
-	}
-	public void setArea(final String area) {
-		this.area = area;
-	}
-	
 	public String getMode() {
 		return this.constrained;
 	}
 	public void setMode(final String constrained) {
 		this.constrained = constrained;
 	}
-	
+	public String getRestraintFcnFactor() {
+		return this.restraintFcnFactor;
+	}
+	public void setRestraintFcnFactor(final String restraintFcnFactor) {
+		this.restraintFcnFactor = restraintFcnFactor;
+	}
+	public String getRestraintFcnExp() {
+		return this.restraintFcnExp;
+	}
+	public void setRestraintFcnExp(final String restraintFcnExp) {
+		this.restraintFcnExp = restraintFcnExp;
+	}
 }

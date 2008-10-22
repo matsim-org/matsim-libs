@@ -23,8 +23,10 @@ package playground.anhorni.locationchoice.facilityLoad;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
@@ -36,7 +38,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
@@ -52,17 +53,22 @@ import org.matsim.world.algorithms.WorldValidation;
 public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
 	private EventsToFacilityLoad eventsToFacilityLoad;
-
+	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
 	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
 
+	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
+	}
+	
 	// scales the load of the facilities (for e.g. 10 % runs)
 	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 	// TODO: this has to be taken from the config.
-	private int scaleNumberOfPersons=10;
+	private int scaleNumberOfPersons = 10;
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
-		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons);
+		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons,
+				this.facilityPenalties);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 
 		// correctly initalize the world.
@@ -84,89 +90,61 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		Facilities facilities = controler.getFacilities();
 				
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration());
+			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration(), 
+					this.eventsToFacilityLoad.getFacilityPenalties());
 		}	
 		this.eventsToFacilityLoad.resetAll(event.getIteration());
 	}
 
-	private void printStatistics(Facilities facilities, String iterationPath, int iteration) {
+	private void printStatistics(Facilities facilities, String iterationPath, int iteration, 
+			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
-			final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tAttrFactor\tsumPenaltyFactor";
-			final BufferedWriter out_shop = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_shop.txt");
-			final BufferedWriter out_leisure = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_leisure.txt");
-			final BufferedWriter out_shop_summary = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
-
-			out_shop.write(header);
-			out_shop.newLine();
-			
-			out_leisure.write(header);
-			out_leisure.newLine();
-			
-			double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-			Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
-			while (iter.hasNext()){
-				Facility facility = iter.next();
-				
-				CoordImpl bellevue = new CoordImpl(683508.50, 246832.91);
-				if (facility.getCenter().calcDistance(bellevue) <= 30000) {
-												
+				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tsumPenaltyFactor";
+				final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
+				final BufferedWriter out_summary = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
+	
+				out.write(header);
+				out.newLine();
+							
+				double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	
+				Iterator<? extends Facility> iter = facilities.getFacilities().values().iterator();
+				while (iter.hasNext()){
+					Facility facility = iter.next();
+					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
+													
 					Iterator<Activity> act_it=facility.getActivities().values().iterator();
 					while (act_it.hasNext()){
 						Activity activity = act_it.next();
-						// check if this is a shopping facility
-						if (activity.getType().startsWith("s") && !activity.getType().equals("shop_other")) {
-							out_shop.write(facility.getId().toString()+"\t"+
+						out.write(facility.getId().toString()+"\t"+
 								String.valueOf(facility.getCenter().getX())+"\t"+
 								String.valueOf(facility.getCenter().getY())+"\t"+
-								String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-								String.valueOf(facility.getAllVisitors())+"\t"+
-								String.valueOf(facility.getDailyCapacity())+"\t"+
-								String.valueOf(facility.getAttrFactor()+"\t"+
-								String.valueOf(facility.getSumCapacityPenaltyFactor())));
-							out_shop.newLine();	
-							
-							for (int i = 0; i<24; i++) {
-								loadPerHourSum[i] += facility.getLoadPerHour(i);
-							}
-							
-							break;
+								String.valueOf(facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay())+"\t"+
+								String.valueOf(facilityPenalty.getFacilityLoad().getAllVisitors())+"\t"+
+								String.valueOf(facilityPenalty.getCapacity())+"\t"+
+								String.valueOf(facilityPenalty.getSumCapacityPenaltyFactor()));
+						out.newLine();
+						
+						for (int i = 0; i<24; i++) {
+							loadPerHourSum[i] += facilityPenalty.getFacilityLoad().getLoadPerHour(i);
 						}
-						//or a leisure facility
-						if (activity.getType().startsWith("l")) {
-							out_leisure.write(facility.getId().toString()+"\t"+
-								String.valueOf(facility.getCenter().getX())+"\t"+
-								String.valueOf(facility.getCenter().getY())+"\t"+
-								String.valueOf(facility.getNumberOfVisitorsPerDay())+"\t"+
-								String.valueOf(facility.getAllVisitors())+"\t"+
-								String.valueOf(facility.getDailyCapacity())+"\t"+
-								String.valueOf(1.0)+"\t"+
-								String.valueOf(0.0));						
-							out_leisure.newLine();							
-							break;
-						}
+						break;
 					}
 				}
+				out.flush();
+				out.close();
+				
+				out_summary.write("Hour\tLoad");
+				out_summary.newLine();
+				for (int i = 0; i<24; i++) {
+					out_summary.write(String.valueOf(i)+"\t"+String.valueOf(loadPerHourSum[i]));
+					out_summary.newLine();
+					out_summary.flush();
+				}
+				out_summary.close();		
+			} catch (final IOException e) {
+				Gbl.errorMsg(e);
 			}
-			out_shop.flush();
-			out_shop.close();
-			
-			out_leisure.flush();
-			out_leisure.close();
-			
-			out_shop_summary.write("Hour\tLoad");
-			out_shop_summary.newLine();
-			for (int i = 0; i<24; i++) {
-				out_shop_summary.write(String.valueOf(i)+"\t"+String.valueOf(loadPerHourSum[i]));
-				out_shop_summary.newLine();
-				out_shop_summary.flush();
-			}
-			out_shop_summary.close();
-			
-		}
-		catch (final IOException e) {
-			Gbl.errorMsg(e);
-		}
 	}
 }

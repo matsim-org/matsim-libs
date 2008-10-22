@@ -21,62 +21,42 @@
 package org.matsim.locationchoice;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 
 public class RandomLocationMutator extends LocationMutator {
 
-	private boolean ch = false;
-	private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
-
+	//private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
 	public RandomLocationMutator(final NetworkLayer network) {
 		super(network);
-		
-		if (Gbl.getConfig().locationchoice().getArea().equals("ch")) {
-			this.ch = true;
-			log.info("Doing location choice in whole of ch");
-		}
-		else {
-			log.info("Doing location choice in zh region");
-		}
 	}
-
 
 	// plan == selected plan
 	@Override
 	public void handlePlan(final Plan plan){
-
-		if (this.chShopFacilitiesTreeMap.size() > 0 && this.zhShopFacilities.size() > 0) {
-			
-			if (this.ch) {
-				exchangeFacilities("s",this.chShopFacilities, plan);
-			}
-			else {
-				exchangeFacilities("s",this.zhShopFacilities, plan);				
-			}
-			
-		}
-
-		if (this.chLeisureFacilitiesTreeMap.size() > 0 && this.zhLeisureFacilities.size() > 0) {
-			if (this.ch) {
-				exchangeFacilities("l",this.chLeisureFacilities, plan);
-			}
-			else {
-				exchangeFacilities("l",this.zhLeisureFacilities, plan);
-			}
+		
+		ArrayList<Activity> secondaryTypes = plan.getPerson().getKnowledge().getActivities(false);
+		
+		Iterator<Activity> iter_types = secondaryTypes.iterator();
+		while (iter_types.hasNext()){
+			Activity activity = iter_types.next();
+			String type = activity.getType();
+			exchangeFacilities(type ,(ArrayList<Facility>)this.quad_trees.get(type).values(), plan);
 		}
 	}
 
-
 	public void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities, final Plan plan) {
+		
+		if (exchange_facilities.size() == 0) return;
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {

@@ -31,7 +31,7 @@ public class SubChain {
 	private Act firstPrimAct = null;
 	private Act lastPrimAct = null;
 	
-	private List<Act> slActs = null;
+	private List<Act> secondaryActs = null;
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
 	
@@ -40,11 +40,11 @@ public class SubChain {
 
 	
 	public SubChain() {
-		slActs = new Vector<Act>();		
+		secondaryActs = new Vector<Act>();		
 	}
 	
 	public void addAct(Act act) {
-		this.slActs.add(act);
+		this.secondaryActs.add(act);
 	}
 
 
@@ -74,11 +74,11 @@ public class SubChain {
 	}
 
 	public List<Act> getSlActs() {
-		return slActs;
+		return secondaryActs;
 	}
 
 	public void setSlActs(List<Act> slActs) {
-		this.slActs = slActs;
+		this.secondaryActs = slActs;
 	}
 
 	public Act getFirstPrimAct() {

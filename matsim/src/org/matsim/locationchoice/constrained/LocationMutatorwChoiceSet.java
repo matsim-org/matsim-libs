@@ -78,7 +78,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			SubChain sc = sc_it.next();
 			
 			//initially using 25.3 km/h + 20 %
-			// mikro census 2005
+			// micro census 2005
 			double speed = 30.36/3.6;
 			
 			if (sc.getTtBudget() < 1.0) {
@@ -166,11 +166,6 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		if (type.startsWith("s")) {
-			return (ArrayList<Facility>) this.zhShopFacQuadTree.get(midPointX, midPointY, radius);
-		}
-		else {
-			return (ArrayList<Facility>) this.zhLeisureFacQuadTree.get(midPointX, midPointY, radius);
-		}
+		return (ArrayList<Facility>) this.quad_trees.get(type).get(midPointX, midPointY, radius);
 	}
 }

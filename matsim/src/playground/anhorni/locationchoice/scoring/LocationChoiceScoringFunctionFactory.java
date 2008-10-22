@@ -20,9 +20,14 @@
 
 package playground.anhorni.locationchoice.scoring;
 
+import java.util.TreeMap;
+
+import org.matsim.basic.v01.Id;
 import org.matsim.population.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
+
+import playground.anhorni.locationchoice.facilityLoad.FacilityPenalty;
 
 /**
  * A factory to create {@link LocationChoiceScoringFunction}s.
@@ -31,11 +36,14 @@ import org.matsim.scoring.ScoringFunctionFactory;
  */
 public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFactory {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.demandmodeling.plans.Plan)
-	 */
+	TreeMap<Id, FacilityPenalty> facilityPenalties = null;
+	
+	public LocationChoiceScoringFunctionFactory(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
+	}
+	
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
-		return new LocationChoiceScoringFunction(plan);
+		return new LocationChoiceScoringFunction(plan, facilityPenalties);
 	}
 
 }
