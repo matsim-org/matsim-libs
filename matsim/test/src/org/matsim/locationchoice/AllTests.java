@@ -29,7 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.locationchoice");
 		//$JUnit-BEGIN$
 
-//		suite.addTestSuite(CountsParserWriterTest.class);
+//		suite.addTestSuite(LocationChoiceTest.class);
 
 		//$JUnit-END$
 		return suite;

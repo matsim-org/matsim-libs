@@ -280,11 +280,9 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		}
 		
 		// used arrival and departure time because of parking cap restr. before act actually starts
-		if (act.getType().startsWith("s") || act.getType().startsWith("l")){
-			this.penalty.add(new Penalty(arrivalTime, departureTime, 
+		this.penalty.add(new Penalty(arrivalTime, departureTime, 
 					this.facilityPenalties.get(act.getFacility().getId()), score));
-		}
-		
+	
 		
 		// DISUTILITIES: -------------------------------------------------------------------------------
 		
