@@ -165,6 +165,13 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	public final boolean isStreaming() {
 		return this.isStreaming;
 	}
+	
+	/**
+	 * @return the size of the population, i.e. the number of persons in this population.
+	 */
+	public int size() {
+		return this.persons.size();
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods
