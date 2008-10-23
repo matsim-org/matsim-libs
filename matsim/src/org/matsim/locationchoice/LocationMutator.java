@@ -22,6 +22,8 @@ package org.matsim.locationchoice;
 
 import java.util.Iterator;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
@@ -42,11 +44,12 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected Controler controler = null;	
 	protected TreeMap<String, QuadTree<Facility>> quad_trees;
 		
-//	private static final Logger log = Logger.getLogger(LocationMutator.class);
+	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
-		this.initialize(network, controler);
+		this.quad_trees = new TreeMap<String, QuadTree<Facility>>();
+		this.initialize(network, controler);		
 	}
 		
 	private void initTrees(Facilities facilities) {
@@ -77,18 +80,16 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		while (tree_it.hasNext()) {
 			TreeMap<Id, Facility> tree_of_type = tree_it.next();
 			String type = type_it.next();						
-			this.quad_trees.put(type, this.builFacQuadTree(tree_of_type));		
+			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));		
 		}	
 	}
 
 	private void initialize(final NetworkLayer network, Controler controler) {
 			
 		//create a quadtree for every activity type
-		this.initTrees(controler.getFacilities());
-					
+		this.initTrees(controler.getFacilities());				
 		this.network = network;
 		this.controler = controler;
-	
 	}
 
 	public void handlePlan(final Plan plan){
@@ -109,9 +110,9 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		handlePlan(plan);
 	}
 	
-	private QuadTree<Facility> builFacQuadTree(TreeMap<Id,Facility> facilities_of_type) {
+	private QuadTree<Facility> builFacQuadTree(String type, TreeMap<Id,Facility> facilities_of_type) {
 		Gbl.startMeasurement();
-		System.out.println("      building facility quad tree...");
+		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -132,7 +133,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		for (final Facility f : facilities_of_type.values()) {
 			quadtree.put(f.getCenter().getX(),f.getCenter().getY(),f);
 		}
-		System.out.println("      done.");
+		log.info("    done");
 		Gbl.printRoundTime();
 		return quadtree;
 	}

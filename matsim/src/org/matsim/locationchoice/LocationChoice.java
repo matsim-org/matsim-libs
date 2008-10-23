@@ -102,4 +102,17 @@ public class LocationChoice extends MultithreadedModuleA {
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
+
+	// for test cases:
+	public NetworkLayer getNetwork() {
+		return network;
+	}
+
+	public Controler getControler() {
+		return controler;
+	}
+
+	public List<PlanAlgorithm> getPlanAlgoInstances() {
+		return planAlgoInstances;
+	}
 }
