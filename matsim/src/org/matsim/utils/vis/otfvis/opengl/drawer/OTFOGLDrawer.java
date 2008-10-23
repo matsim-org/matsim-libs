@@ -35,6 +35,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -76,7 +77,7 @@ import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
 
 class OTFGLOverlay extends OTFGLDrawableImpl {
-	private final String texture;
+	private final InputStream texture;
 	private final float relX;
 	private final float relY;
 	private final boolean opaque;
@@ -84,11 +85,23 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 	Texture t = null;
 	
 	OTFGLOverlay(String texture, float relX, float relY, float size, boolean opaque) {
+		try {
+			this.texture = new FileInputStream(texture);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		this.relX =relX;
+		this.relY = relY;
+		this.size = size;
+		this.opaque = opaque;
+	}
+	
+	OTFGLOverlay(final InputStream texture, float relX, float relY, float size, boolean opaque) {
 		this.texture = texture;
 		this.relX =relX;
 		this.relY = relY;
-		this.opaque = opaque;
 		this.size = size;
+		this.opaque = opaque;
 	}
 	
 	public void onDraw(GL gl) {
@@ -106,8 +119,8 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 //		float startX = relX >= 0 ? (viewport[2] - viewport[0])*relX :viewport[2] - (viewport[0] - viewport[2])*relX; 
 //		float startY = relY >= 0 ? (viewport[3] - viewport[1])*relX :viewport[3] - (viewport[1] - viewport[3])*relX; 
 
-		float startX = relX >= 0 ? -1.f + relX : 1.f -length -relX; 
-		float startY = relY >= 0 ? -1.f + relY : 1.f -height -relY; 
+		float startX = relX >= 0 ? -1.f + relX : 1.f -length +relX; 
+		float startY = relY >= 0 ? -1.f + relY : 1.f -height +relY; 
 
 		gl.glColor4d(1,1,1,1);
 //		gl.glColor4d(0,0,0,0);
@@ -327,24 +340,24 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 
 		public void onDraw(GL gl) {
-			final int z = 0;
-			final float laneWidth = agentSize;
-			final float width = laneWidth*1.5f;
-			final float length = laneWidth*1.5f;
+//			final int z = 0;
+//			final float laneWidth = agentSize;
+//			final float width = laneWidth*1.5f;
+//			final float length = laneWidth*1.5f;
 
 			setColor(gl);
 
-			if (true) {
+//			if (true) {
 				displayPS(gl);
-				return;
-			}
-
-			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(1,1); gl.glVertex3f(this.startX - length, this.startY - width, z);
-			gl.glTexCoord2f(1,0); gl.glVertex3f(this.startX - length, this.startY + width, z);
-			gl.glTexCoord2f(0,0); gl.glVertex3f(this.startX + length, this.startY + width, z);
-			gl.glTexCoord2f(0,1); gl.glVertex3f(this.startX + length, this.startY - width, z);
-			gl.glEnd();
+//				return;
+//			}
+//
+//			gl.glBegin(GL.GL_QUADS);
+//			gl.glTexCoord2f(1,1); gl.glVertex3f(this.startX - length, this.startY - width, z);
+//			gl.glTexCoord2f(1,0); gl.glVertex3f(this.startX - length, this.startY + width, z);
+//			gl.glTexCoord2f(0,0); gl.glVertex3f(this.startX + length, this.startY + width, z);
+//			gl.glTexCoord2f(0,1); gl.glVertex3f(this.startX + length, this.startY - width, z);
+//			gl.glEnd();
 		}
 	}
 
@@ -380,7 +393,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
 
-		this.overlayItems.add(new OTFGLOverlay("res/logo.png",-0.0001f,0.0001f,2.0f, false));
+		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 		}
 
