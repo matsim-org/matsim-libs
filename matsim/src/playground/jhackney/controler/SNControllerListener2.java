@@ -243,7 +243,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		if( event.getIteration()%replan_interval==0){
 
-			if(CALCSTATS && event.getIteration()%1==0){
+			if(CALCSTATS && event.getIteration()%10==0){
 				Gbl.printMemoryUsage();
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
@@ -260,7 +260,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 				this.log.info(" ... done");
 			}
 
-			if(event.getIteration()%1==0){
+			if(event.getIteration()%10==0){
 				this.log.info(" Writing out social network for iteration " + snIter + " ...");
 				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
