@@ -448,6 +448,10 @@ public class QueueLink {
 	public Queue<Vehicle> getVehiclesInBuffer() {
 		return this.buffer;
 	}
+	
+	public PriorityQueue<Vehicle> getVehiclesOnParkingList() {
+		return this.parkingList;
+	}
 
 	protected boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
