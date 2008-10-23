@@ -37,7 +37,7 @@ import org.matsim.population.Population;
  */
 public class StrategyManager {
 
-	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
+	protected final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
@@ -156,7 +156,7 @@ public class StrategyManager {
 	 *
 	 * @return the chosen strategy
 	 */
-	private PlanStrategy chooseStrategy() {
+	protected PlanStrategy chooseStrategy() {
 		double rnd = MatsimRandom.random.nextDouble() * this.totalWeights;
 
 		double sum = 0.0;
@@ -179,6 +179,10 @@ public class StrategyManager {
 	 */
 	public void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		this.maxPlansPerAgent = maxPlansPerAgent;
+	}
+	
+	public int getMaxPlansPerAgent() {
+		return this.maxPlansPerAgent;
 	}
 
 	/**
