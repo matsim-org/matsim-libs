@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNControlerListenerRePlanSecLoc.java
+ * SNControlerListener2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -49,7 +49,6 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialInteractorActs;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
@@ -57,13 +56,12 @@ import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
-import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.scoring.TrackEventsOverlapII;
+
 
 
 
@@ -99,7 +97,7 @@ import playground.jhackney.scoring.TrackEventsOverlapII;
  * @author jhackney
  *
  */
-public class SNControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
+public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
 
@@ -114,15 +112,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	ActivityActReader aar = null;
 	PajekWriter pjw;
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
-	//InteractorTest
-//	SpatialInteractorActs plansInteractorS;//spatial (face to face)
+
 	SpatialInteractorEvents plansInteractorS;
 	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-//	private TrackEventsOverlap teo=null;
 	private EventsPostProcess epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
@@ -142,22 +138,6 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
 
-		// Make a new zone layer (Raster)
-//		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
-//		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
-//		if(Gbl.getWorld().getLayers().size()>2){
-//		System.out.println("World already contains a zone layer");
-//		new WorldCreateRasterLayer(gridSpacing).run(Gbl.getWorld());
-//		}else{
-//		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
-////		new WorldCreateRasterLayer(3000).run(Gbl.getWorld());
-//		}
-//		// Stitch together the world
-//		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-//		}
-//		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
-//		new WorldCreateRasterLayer2(gridSpacing).run(Gbl.getWorld());
-
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 
@@ -168,21 +148,18 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 
-		//teo = new TrackEventsOverlap();
 		epp=new EventsPostProcess(this.controler.getPopulation());
 
-//		this.controler.getEvents().addHandler(this.teo);
 		this.controler.getEvents().addHandler(this.epp);
-		
-		//TODO superfluous in 0th iteration and not necessary anymore except that scoring runction needs it (can null be passed?)
+
+		//TODO superfluous in 0th iteration and not necessary anymore except that scoring function needs it (can null be passed?)
 		teo=new MakeTimeWindowsFromEvents(epp);
 		twm=teo.getTimeWindowMap();
-		
+
 		this.log.info(" ... Instantiation of events overlap tracking done");
-//		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
-		
+
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
@@ -197,24 +174,65 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-		
-		//TODO: put in the spatial interactions here. The TimeWindowMap was updated in MobSim and is current, here.
-		// Do not call the teo.clear method. Instead, let
-		// the controler clear the teo in the notifyIterationStarts method
-		
-		Gbl.printMemoryUsage();
-		
-		//SSTEST this.spatialScorer.scoreActs(this.controler.getPopulation(), snIter);
-		log.info("SSTEST Clearing and recalculating actStats "+snIter);
-		this.actStats.clear();
-		
-		Gbl.printMemoryUsage();
-		teo=new MakeTimeWindowsFromEvents(epp);
-		twm= teo.getTimeWindowMap();
+		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+//			got new epp from mobsim
+//			make new timewindows and map (uses old plans and new events)
+			Gbl.printMemoryUsage();
+			teo=new MakeTimeWindowsFromEvents(epp);
+			twm= teo.getTimeWindowMap();
+//			execute spatial interactions (uses timewindows)
+			if (total_spatial_fraction(this.fractionS) > 0) {
+				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
+			} else {
+				this.log.info("     (none)");
+			}
+			this.log.info(" ... Spatial interactions done\n");
+			Gbl.printMemoryUsage();
+//			execute nonspatial interactions (uses new social network)
+			this.log.info(" Non-Spatial interactions ...");
+			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
+				String facTypeNS = this.infoToExchange[ii];
+				if (!facTypeNS.equals("none")) {
+					this.log.info("  Geographic Knowledge about all types of places is being exchanged ...");
+					this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
+				}
+			}
 
-		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
-		log.info("SSTEST Finish Scoring with actStats "+snIter);
-		scoring.finish();
+//			Exchange of knowledge about people
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
+			if (fract_intro > 0) {
+				this.log.info("  Knowledge about other people is being exchanged ...");
+				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
+			}
+			this.log.info("  ... done");
+//			forget knowledge
+			//TODO  Should be an algorithm
+			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
+			Iterator<Person> iperson = personList.iterator();
+			while (iperson.hasNext()) {
+				Person p = iperson.next();
+//				Remember a number of activities equal to at least the number of
+//				acts per plan times the number of plans in memory
+				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
+				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
+			}
+			this.log.info(" ... done");
+			Gbl.printMemoryUsage();
+			//dissolve social ties
+
+//			make new actstats (uses new twm AND new socialnet)
+			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+//			Removing the social links here
+			this.log.info(" Removing social links ...");
+			this.snet.removeLinks(snIter);
+			this.log.info(" ... done");
+			Gbl.printMemoryUsage();
+
+			log.info("SSTEST Finish Scoring with actStats "+snIter);
+			scoring.finish();
+
+			snIter++;
+		}
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -222,18 +240,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("finishIteration ... "+event.getIteration());
 
 		Gbl.printMemoryUsage();
-		
-		if( event.getIteration()%replan_interval==0){
-			
-			// Removing the social links here rather than before the
-			//replanning and assignment lets you use the actual encounters in a social score
-			this.log.info(" Removing social links ...");
-			this.snet.removeLinks(snIter);
-			this.log.info(" ... done");
-			
-			Gbl.printMemoryUsage();
 
-//			You could forget activities here, after the replanning and assignment
+		if( event.getIteration()%replan_interval==0){
 
 			if(CALCSTATS && event.getIteration()%1==0){
 				Gbl.printMemoryUsage();
@@ -242,7 +250,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				this.log.info(" ... done");
 
 				Gbl.printMemoryUsage();
-				
+
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
 				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
@@ -281,72 +289,10 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		Controler controler = event.getControler();
 
-		/* code previously in setupIteration() */
-
-		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
-
-			// only generate the map if spatial meeting is important in this experiment
-			if (total_spatial_fraction(this.fractionS) > 0) {
-
-				// Agents' planned interactions
-				this.log.info("  Agents planned social interactions, respectively their meetings based on last MobSim iteration ...");
-				this.log.info("  Agents' relationships are updated to reflect these interactions! ...");
-				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
-				
-				// Agents' actual interactions
-				// TrackEventsOverlap must be passed to initialization of the interactor
-				// timeWindowMap is updated in the scoringListener after the MobSim
-				// this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter);
-				// 
-			} else {
-				this.log.info("     (none)");
-			}
-			this.epp.reset(snIter);
-			this.teo.clearTimeWindowMap();
-			this.log.info(" ... Spatial interactions done\n");
-
-			Gbl.printMemoryUsage();
-			
-			this.log.info(" Non-Spatial interactions ...");
-			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
-				String facTypeNS = this.infoToExchange[ii];
-
-				//	Geographic Knowledge about all types of places is exchanged
-				if (!facTypeNS.equals("none")) {
-					this.log.info("  Geographic Knowledge about all types of places is being exchanged ...");
-					this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
-				}
-			}
-
-			// Exchange of knowledge about people
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
-			if (fract_intro > 0) {
-				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
-			}
-
-			this.log.info("  ... done");
-
-			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
-			this.log.info("  Should be an algorithm");
-			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<Person> iperson = personList.iterator();
-			while (iperson.hasNext()) {
-				Person p = iperson.next();
-//				Remember a number of activities equal to at least the number of
-//				acts per plan times the number of plans in memory
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-//				this.log.info("NOTE that manageMemory is turned off");
-				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
-			}
-			this.log.info(" ... done");
-
-			Gbl.printMemoryUsage();
-			
-			snIter++;
-		}
+		this.epp.reset(snIter);// I think this doesn't need to be called
+		this.teo.clearTimeWindowMap();// needs to be called because it's not an eventhandler
+		this.actStats.clear();// needs to be called because it's not an eventhandler
 	}
 
 	/* ===================================================================
@@ -454,7 +400,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
 		this.log.info("... done");
 
-		this.snIter = this.controler.getFirstIteration();
+		this.snIter = this.controler.getFirstIteration()+1;
 	}
 
 	/**

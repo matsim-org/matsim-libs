@@ -9,7 +9,7 @@ public class SNController extends Controler {
 	}
 	public static void main(final String[] args) {
 		final Controler controler = new SNController(args);
-		controler.addControlerListener(new SNControllerListener());
+		controler.addControlerListener(new SNControllerListener2());
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
