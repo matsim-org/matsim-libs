@@ -69,10 +69,10 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final void addPerson(final Person p)throws Exception {
+	public final void addPerson(final Person p) {
 		// validation
 		if (this.persons.containsKey(p.getId())) {
-			throw new Exception("Person with id = " + p.getId() + " already exists.");
+			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
 		}
 
 		// show counter

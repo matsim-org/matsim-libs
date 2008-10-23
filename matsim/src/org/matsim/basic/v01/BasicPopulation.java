@@ -31,7 +31,7 @@ public interface BasicPopulation<T extends BasicPerson> {
 	
 	public void setName(String name);
 	
-	public void addPerson(T person) throws Exception;
+	public void addPerson(T person);
 
 	public T getPerson(Id personId);
 

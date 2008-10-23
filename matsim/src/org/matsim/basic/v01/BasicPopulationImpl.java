@@ -42,10 +42,10 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 	/* (non-Javadoc)
 	 * @see org.matsim.basic.v01.BasicPopulation#addPerson(T)
 	 */
-	public void addPerson(T person) throws Exception {
+	public void addPerson(T person) {
 		// validation
 		if (this.persons.containsKey(person.getId())) {
-			throw new Exception("Person with id = " + person.getId() + " already exists.");
+			throw new IllegalArgumentException("Person with id = " + person.getId() + " already exists.");
 		}
 		persons.put(person.getId(), person);
 	}
