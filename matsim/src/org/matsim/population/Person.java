@@ -157,6 +157,21 @@ public class Person extends BasicPersonImpl<Plan>{
 				"[nof_plans=" + this.plans.size() + "]";
 	}
 
+	/**
+	 * Removes the specified plan from the agent. If the removed plan was the selected one,
+	 * a new random plan will be selected.
+	 * 
+	 * @param plan
+	 * @return <code>true</code> if the plan was removed from the person
+	 */
+	public boolean removePlan(final Plan plan) {
+		boolean result = this.plans.remove(plan);
+		if (this.selectedPlan == plan && result) {
+			this.setSelectedPlan(this.getRandomPlan());
+		}
+		return result;
+	}
+	
 	/** Removes the plans with the worst score until only <code>maxSize</code> plans are left.
 	 * Plans with undefined scores are treated as plans with very bad scores and thus removed
 	 * first. If there are several plans with the same bad score, it can not be predicted which
