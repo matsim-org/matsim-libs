@@ -23,6 +23,7 @@ package org.matsim.locationchoice;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
@@ -36,8 +37,8 @@ import org.matsim.population.Plan;
 public class RandomLocationMutator extends LocationMutator {
 
 	//private static final Logger log = Logger.getLogger(RandomLocationMutator.class);
-	public RandomLocationMutator(final NetworkLayer network) {
-		super(network);
+	public RandomLocationMutator(final NetworkLayer network, Controler controler) {
+		super(network, controler);
 	}
 
 	// plan == selected plan

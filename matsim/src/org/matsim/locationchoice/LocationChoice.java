@@ -95,7 +95,7 @@ public class LocationChoice extends MultithreadedModuleA {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		if (!this.constrained) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network));
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler));
 		}
 		else {
 			this.planAlgoInstances.add(new LocationMutatorwChoiceSetSimultan(this.network, this.controler));

@@ -64,12 +64,12 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 
 	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		this.facilityPenalties = facilityPenalties;
-		this.scaleNumberOfPersons = Integer.parseInt(Gbl.getConfig().locationchoice().getScalefactor());
 	}
 	
 
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
+		this.scaleNumberOfPersons = Integer.parseInt(Gbl.getConfig().locationchoice().getScalefactor());
 		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), this.scaleNumberOfPersons,
 				this.facilityPenalties);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);

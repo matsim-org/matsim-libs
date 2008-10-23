@@ -106,9 +106,9 @@ public class LocationChoiceConfigGroup extends Module {
 		this.restraintFcnExp = restraintFcnExp;
 	}
 	public String getScalefactor() {
-		return scalefactor;
+		return this.scalefactor;
 	}
-	public void setScalefactor(String scalefactor) {
+	public void setScalefactor(final String scalefactor) {
 		this.scalefactor = scalefactor;
 	}
 }

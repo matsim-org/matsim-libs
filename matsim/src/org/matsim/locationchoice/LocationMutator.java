@@ -48,11 +48,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
 		this.initialize(network, controler);
 	}
-	
-	public LocationMutator(final NetworkLayer network) {
-		this.initialize(network, null);
-	}
-	
+		
 	private void initTrees(Facilities facilities) {
 		
 		TreeMap<String, TreeMap<Id, Facility>> trees = new TreeMap<String, TreeMap<Id, Facility>>();
