@@ -34,6 +34,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -51,6 +52,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLException;
 import javax.swing.JFrame;
 
 import org.matsim.gbl.Gbl;
@@ -72,6 +74,7 @@ import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 
+import com.sun.opengl.util.Screenshot;
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
@@ -177,6 +180,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	private VisGUIMouseHandler mouseMan = null;
 	private final OTFClientQuad clientQ;
 	private String lastTime = "";
+	private int lastShot = -1;
+
 
 	//Handle these separately, as the agents needs textures set, which should only be done once
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
@@ -506,14 +511,31 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 
 		InfoText.drawInfoTexts(drawable);
-		//if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
+		if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
 
 		this.mouseMan.drawElements(this.gl);
 
-		for (OTFGLDrawable item : overlayItems) {
-			item.draw();
+		if(this.config.drawOverlays()) {
+			for (OTFGLDrawable item : overlayItems) {
+				item.draw();
+			}
 		}
 
+		if(this.config.renderImages() && lastShot < now){
+			lastShot = now;
+			String nr = String.format("%07d", now);
+			try {
+				Screenshot.writeToFile(new File("movie"+ this +" Frame" + nr + ".jpg"), drawable.getWidth(), drawable.getHeight());
+			} catch (GLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// could happen for folded displays on split screen... ignore
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void addOverlay(OTFGLOverlay overlay) {
@@ -584,6 +606,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private final Object blockRefresh = new Object();
 	private SceneGraph actGraph = null;
+	private int now;
 
 	/***
 	 * invalidate, gets the actual correct data from the host, to display the given rect
@@ -595,8 +618,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		agentSize = Float.parseFloat(Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.AGENT_SIZE));
 		//scaledAgentSize = agentSize * this.mouseMan.getScale();
 
-
-		lastTime = Time.writeTime(time, ':');
+		if(time != -1) {
+			this.now = time;
+			lastTime = Time.writeTime(time, ':');
+		}
 
 		// do something like
 		// getTimeStep from somewhere

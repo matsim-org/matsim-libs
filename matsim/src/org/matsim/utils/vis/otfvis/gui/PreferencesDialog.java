@@ -46,9 +46,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
+
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener  {
 
-	public static Class preDialogClass = PreferencesDialog.class;
+	public static Class preDialogClass = PreferencesDialog2.class;
 	
 	protected transient final OTFVisConfig cfg;
 	private JComboBox rightMFunc;
@@ -287,7 +289,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
     public static void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog) {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu( "File" );
-        fileMenu.add("Open...");
         menuBar.add( fileMenu );
         Action exitAction = new AbstractAction() {
             { putValue( Action.NAME, "Preferences..." );
@@ -297,6 +298,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
             }
           };
           fileMenu.add( exitAction );
+          fileMenu.add("Open...");
 
         frame.setJMenuBar( menuBar );
  	}

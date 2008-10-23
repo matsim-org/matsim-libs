@@ -27,6 +27,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
@@ -105,6 +106,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 		try {
 
+			//Make sure menus appear above JOGL Layer
+			JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
 			
 			if (Gbl.getConfig() == null) Gbl.createConfig(null);
 			
@@ -144,7 +147,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 
 			if (this.splitLayout) {
 				OTFDrawer drawer = getLeftDrawerComponent(frame);
-				drawer.invalidate(0);
+				drawer.invalidate((int)hostControl.getTime());
 				this.hostControl.addHandler("test", drawer);
 				pane.setLeftComponent(drawer.getComponent());
 			}
@@ -152,7 +155,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 			OTFDrawer drawer2 = getRightDrawerComponent(frame);
 			pane.setRightComponent(drawer2.getComponent());
 			this.hostControl.addHandler("test2", drawer2);
-			drawer2.invalidate(0);
+			drawer2.invalidate((int)hostControl.getTime());
 
 			System.out.println("Finished init");
 			pane.setDividerLocation(0.5);

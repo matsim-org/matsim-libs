@@ -40,7 +40,7 @@ public class StandaloneSimTest {
 //		String netFileName = "/TU Berlin/workspace/berlin-wip/network/wip_net.xml";
 //		String popFileName = "/TU Berlin/workspace/berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml";
 		String netFileName = "../../tmp/studies/ivtch/ivtch_red100.xml";
-		String popFileName = "../../tmp/studies/ivtch/plans1p.xml";
+		String popFileName = "../../tmp/studies/ivtch/plans10p.xml";
 
 		Gbl.startMeasurement();
 		final Config config = Gbl.createConfig(args);
@@ -64,19 +64,21 @@ public class StandaloneSimTest {
 //		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 
 //		config.simulation().setStartTime(Time.parseTime("05:55:00"));
-		config.simulation().setEndTime(Time.parseTime("24:00:00"));
+//		config.simulation().setEndTime(Time.parseTime("24:00:00"));
 //		config.simulation().setStartTime(Time.parseTime("05:55:00"));
 
 		config.simulation().setStuckTime(100);
 		config.simulation().removeStuckVehicles(false);
 		config.simulation().removeStuckVehicles(true);
-		config.simulation().setFlowCapFactor(1.);
-		config.simulation().setStorageCapFactor(1.);
+		config.simulation().setFlowCapFactor(0.2);
+		config.simulation().setStorageCapFactor(.2);
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		//sim.openNetStateWriter("testWrite", netFileName, 10);
+		config.simulation().setSnapshotFormat("otfvis");
+		config.simulation().setSnapshotPeriod(300);
 
 		sim.run();
 

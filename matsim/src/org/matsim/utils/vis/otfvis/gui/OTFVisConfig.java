@@ -63,6 +63,7 @@ public class OTFVisConfig extends Module {
 	private boolean drawLinkIds = false;
 	private boolean drawTime = false;
 	private boolean drawOverlays = true;
+	private boolean renderImages = false;
 
 
 	@Override
@@ -274,6 +275,16 @@ public class OTFVisConfig extends Module {
 	
 	public boolean drawTime() {
 		return drawTime;
+	}
+
+	public boolean setRenderImages(boolean val) {
+		// TODO Auto-generated method stub
+		return renderImages = val;
+	}
+	
+	public boolean renderImages() {
+		// TODO Auto-generated method stub
+		return renderImages;
 	}
 
 }

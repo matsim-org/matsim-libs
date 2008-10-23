@@ -26,6 +26,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
@@ -109,6 +111,9 @@ public class OnTheFlyClientQuad extends Thread {
 		frame.add(pane);
 
 		try {
+			//Make sure menus appear above JOGL Layer
+			JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
+			
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
@@ -125,6 +130,8 @@ public class OnTheFlyClientQuad extends Thread {
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 
 			pane.setLeftComponent(drawer.getComponent());
+//			pane.getContentPane().add(drawer.getComponent());
+			pane.validate();
 			if(hostControl.isLiveHost()) {
 				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
@@ -135,7 +142,7 @@ public class OnTheFlyClientQuad extends Thread {
 				// only set custom frame size if not in fullscreen mode
 				frame.setSize(1024, 600);
 			}
-			drawer.invalidate(0);
+			drawer.invalidate((int)hostControl.getTime());
 			frame.setVisible(true);
 			hostControl.addHandler(id1, drawer);
 

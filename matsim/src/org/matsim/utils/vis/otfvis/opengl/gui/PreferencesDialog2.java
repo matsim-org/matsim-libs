@@ -81,14 +81,23 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 			//SynchBox.setMaximumSize(new Dimension(250,60));
 			panel.add(SynchBox);
 
-//			SynchBox = new JCheckBox("show time GL");
-////			SynchBox.setMnemonic(KeyEvent.VK_M);
-//			SynchBox.setSelected(cfg.drawTime());
-//			SynchBox.addItemListener(this);
-//			SynchBox.setBounds(10, 80, 200, 31);
-//			//SynchBox.setVisible(true);
-//			//SynchBox.setMaximumSize(new Dimension(250,60));
-//			panel.add(SynchBox);
+			SynchBox = new JCheckBox("show time GL");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawTime());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 80, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+
+			SynchBox = new JCheckBox("save jpg frames");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.renderImages());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 100, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
 		}
 	}
 
@@ -108,10 +117,12 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 		} else if (source.getText().equals("show overlays")) {
 			// toggle draw Overlays
 			cfg.setDrawOverlays(!cfg.drawOverlays());
+		} else if (source.getText().equals("save jpg frames")) {
+			// toggle save jpgs
+			cfg.setRenderImages(!cfg.renderImages());
 		} else if (source.getText().equals("show time GL")) {
 			// toggle draw time in GL
-			//TODO does not work yet 
-			//cfg.setDrawTime(!cfg.drawTime());
+			cfg.setDrawTime(!cfg.drawTime());
 		}
 	}
 	public static void main(final String[] args) {

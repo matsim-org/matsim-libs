@@ -96,8 +96,8 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 
 		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
-//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
-		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
+		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
 		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
 
@@ -133,9 +133,9 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		config.simulation().setEndTime(Time.parseTime("12:02:00"));
 		config.network().setInputFile(netFileName);
 
-		config.simulation().setSnapshotFormat("none");
+		config.simulation().setSnapshotFormat("otfvis");
 		config.simulation().setSnapshotPeriod(10);
-		config.simulation().setSnapshotFile("./output/remove_thisB");
+		config.simulation().setSnapshotFile("./output/otfvis1p");
 
 
 		OnTheFlyQueueSim2FILE sim = new OnTheFlyQueueSim2FILE(net, population, events);
@@ -144,10 +144,6 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		sim.run();
 
 		Gbl.printElapsedTime();
-
-		String[] visargs = {"./output/remove_thisB"};
-		NetVis.main(visargs);
-
 	}
 
 	public void setOtfwriter(OTFQuadFileHandler.Writer  otfwriter) {

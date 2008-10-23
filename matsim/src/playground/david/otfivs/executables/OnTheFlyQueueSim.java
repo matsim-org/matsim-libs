@@ -32,6 +32,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.executables.OnTheFlyClientQuadSwing;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.world.MatsimWorldReader;
@@ -52,7 +53,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		OnTheFlyClientQuadSwing.main(new String []{"rmi:127.0.0.1:4019"});
+		OnTheFlyClientQuad.main(new String []{"rmi:127.0.0.1:4019"});
 	}
 
 	@Override
