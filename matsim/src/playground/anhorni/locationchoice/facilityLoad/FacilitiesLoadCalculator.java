@@ -116,23 +116,18 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				while (iter.hasNext()){
 					Facility facility = iter.next();
 					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());
-													
-					Iterator<Activity> act_it=facility.getActivities().values().iterator();
-					while (act_it.hasNext()){
-						Activity activity = act_it.next();
-						out.write(facility.getId().toString()+"\t"+
-								String.valueOf(facility.getCenter().getX())+"\t"+
-								String.valueOf(facility.getCenter().getY())+"\t"+
-								String.valueOf(facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay())+"\t"+
-								String.valueOf(facilityPenalty.getFacilityLoad().getAllVisitors())+"\t"+
-								String.valueOf(facilityPenalty.getCapacity())+"\t"+
-								String.valueOf(facilityPenalty.getSumCapacityPenaltyFactor()));
-						out.newLine();
-						
-						for (int i = 0; i<24; i++) {
-							loadPerHourSum[i] += facilityPenalty.getFacilityLoad().getLoadPerHour(i);
-						}
-						break;
+												
+					out.write(facility.getId().toString()+"\t"+
+							String.valueOf(facility.getCenter().getX())+"\t"+
+							String.valueOf(facility.getCenter().getY())+"\t"+
+							String.valueOf(facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay())+"\t"+
+							String.valueOf(facilityPenalty.getFacilityLoad().getAllVisitors())+"\t"+
+							String.valueOf(facilityPenalty.getCapacity())+"\t"+
+							String.valueOf(facilityPenalty.getSumCapacityPenaltyFactor()));
+					out.newLine();
+					
+					for (int i = 0; i < 24; i++) {
+						loadPerHourSum[i] += facilityPenalty.getFacilityLoad().getLoadPerHour(i);
 					}
 				}
 				out.flush();

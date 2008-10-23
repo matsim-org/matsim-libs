@@ -54,27 +54,25 @@ public class FacilityLoad {
 	
 	private void calculateFacilityLoad24() {
 		int numberOfVisitors = 0;
-		for (int i=0; i<this.numberOfTimeBins; i++) {
+		for (int i = 0; i < this.numberOfTimeBins; i++) {
 			numberOfVisitors += this.arrivals[i];
-			this.load[i] = numberOfVisitors*this.scaleNumberOfPersons;
+			this.load[i] = numberOfVisitors * this.scaleNumberOfPersons;
 			numberOfVisitors -= this.departures[i];
 		}
 	}
 	
 	
 	// time in seconds from midnight
-	public void addArrival(double time) {
-		
-		
+	public void addArrival(double time) {		
+		this.addToAllVisitors(this.scaleNumberOfPersons);
 		// we do not handle times > 24h
 		// we do not care about #arrivals==#departures after the last time bin
-		if (time > 24.0*3600.0) {
+		if (time > 24.0*3600.0) {		
 			return;
 		}
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(3600/(this.numberOfTimeBins/24))));		
-		this.arrivals[timeBinIndex]+=1;
+		this.arrivals[timeBinIndex] += 1;
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
-		this.addToAllVisitors(this.scaleNumberOfPersons);
 	}
 	
 	public void addDeparture(double time) {
@@ -122,7 +120,7 @@ public class FacilityLoad {
 	}
 
 	public int getAllVisitors() {
-		return allVisitors;
+		return this.allVisitors;
 	}
 
 	public void setAllVisitors(int allVisitors) {
@@ -138,8 +136,8 @@ public class FacilityLoad {
 			this.arrivals[i] = 0;
 			this.departures[i] = 0;
 			this.load[i] = 0;
-			this.numberOfVisitorsPerDay = 0;
-			this.allVisitors = 0;
 		}
+		this.numberOfVisitorsPerDay = 0;
+		this.allVisitors = 0;
 	}
 }
