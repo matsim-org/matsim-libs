@@ -36,6 +36,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	
 	protected Person person;
 	protected QueueNetwork queueNetwork;
+	protected double time;
 	
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
 	
@@ -49,6 +50,9 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		super(router, routerFreeflow);
 	}
 	
+	/*
+	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
+	 */
 	public void setPerson(Person person)
 	{
 		this.person = person;
@@ -90,6 +94,29 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	public QueueNetwork QueueNetwork()
 	{
 		return this.queueNetwork;
+	}
+
+	/*
+	 * We have to hand over the time to the Cost- and TimeCalculators of the Router.
+	 */
+	public void setTime(Double time)
+	{
+		this.time = time;
+		
+		if(routeAlgo instanceof PersonLeastCostPathCalculator)
+		{
+			((PersonLeastCostPathCalculator)routeAlgo).setTime(time);
+		}
+		
+		if(routeAlgoFreeflow instanceof PersonLeastCostPathCalculator)
+		{
+			((PersonLeastCostPathCalculator)routeAlgoFreeflow).setTime(time);
+		}
+	}
+	
+	public double getTime()
+	{
+		return this.time;
 	}
 	
 	public KnowledgePlansCalcRoute clone()

@@ -43,8 +43,15 @@ public class DeadEndRemover {
 	
 	public static void removeDeadEnds(Person person)
 	{
-		// try getting Nodes from the Persons Knowledge
-		Map<Id, Node> knownNodesMap = KnowledgeTools.getKnownNodes(person);
+		Map<Id, Node> knownNodesMap;
+		
+		/*
+		 * Try getting Nodes from the Persons Knowledge.
+		 * If there is no Knowledge there can't be a Map of known Nodes
+		 * so set the knownNodesMap to null.
+		 */ 
+		if(person.getKnowledge() != null) knownNodesMap = KnowledgeTools.getKnownNodes(person);
+		else knownNodesMap = null;
 		
 		// if the Person has an Activity Room in his/her Knowledge
 		if(knownNodesMap != null)

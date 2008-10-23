@@ -29,6 +29,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
+import playground.christoph.router.util.DeadEndRemover;
+
 
 /**
  * A class for running {@link CreateKnownNodesMap} in parallel using threads.
@@ -38,7 +40,9 @@ import org.matsim.population.Population;
 public class ParallelCreateKnownNodesMap {
 
 	private final static Logger log = Logger.getLogger(ParallelCreateKnownNodesMap.class);
-		
+	
+	protected static boolean removeDeadEnds = true;
+	
 	/**
 	 * Creates a Map of known Nodes of each person of the given <code>population</code> using up to 
 	 * <code>numberOfThreads</code> threads to speed things up. The given <code>nodeSelectors</code> will be
@@ -115,6 +119,15 @@ public class ParallelCreateKnownNodesMap {
 		}
 	}
 	
+	public static void setRemoveDeadEnds(boolean value)
+	{
+		removeDeadEnds = value;
+	}
+	
+	public static boolean getRemoveDeadEnds()
+	{
+		return removeDeadEnds;
+	}
 	
 	
 	/**
@@ -166,6 +179,9 @@ public class ParallelCreateKnownNodesMap {
 					
 				}	// for all NodeSelectors
 	
+				// if Flag is set, remove Dead Ends from the Person's Activity Room
+				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+				
 				numRuns++;
 				if (numRuns % 500 == 0) log.info("created Acivityrooms for " + numRuns + " persons in thread " + threadId);
 			

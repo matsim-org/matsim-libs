@@ -24,16 +24,12 @@ package playground.christoph.events;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
+
 import org.matsim.controler.Controler;
-import org.matsim.network.Node;
-import org.matsim.population.Act;
+
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRouteLandmarks;
@@ -41,9 +37,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 
-import playground.christoph.events.algorithms.ActEndReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
-import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -57,7 +51,6 @@ import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
-import playground.christoph.router.util.DeadEndRemover;
 
 
 /**
@@ -99,7 +92,7 @@ public class EventControler extends Controler{
 		 * can NOT be used). Due to this fact replanning when leaving a links is
 		 * implemented in the MyQueueNode Class.
 		 */
-		events.addHandler(new ActEndReplanner());
+//		events.addHandler(new ActEndReplanner());
 	}
 	
 	/*
@@ -239,12 +232,12 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 			
 			counter++;
-			if(counter < 50)
+			if(counter < 50000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
 				customAttributes.put("initialReplanning", new Boolean(false));
-				customAttributes.put("leaveLinkReplanning", new Boolean(true));
-				customAttributes.put("endActivityReplanning", new Boolean(false));
+				customAttributes.put("leaveLinkReplanning", new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(true));
 			}
 			else
 			{
@@ -298,7 +291,7 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-			if (counter++ < 50) personNodeSelectors.add(nodeSelectors.get(1));
+			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
 		}

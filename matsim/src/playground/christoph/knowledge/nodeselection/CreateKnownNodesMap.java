@@ -64,7 +64,6 @@ public class CreateKnownNodesMap {
 		{
 			collectSelectedNodes(person, nodeSelector);
 		}
-		
 		// if Flag is set, remove Dead Ends from the Person's Activity Room
 		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
 	}
@@ -107,7 +106,6 @@ public class CreateKnownNodesMap {
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
 
-				//nodeSelector.getNodes(nodes);
 				nodeSelector.addNodesToMap(nodesMap);
 			}
 		}	//if instanceof SelectNodesDijkstra

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParallelLeaveLinkReplanner.java
+ * ParallelActEndReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,28 +25,20 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.population.Act;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * A class for running {@link LeaveLinkReplanner} in parallel using threads.
+ * A class for running {@link ActEndReplanner} in parallel using threads.
  *
  * @author Christoph Dobler
  */
-public class ParallelLeaveLinkReplanner extends ParallelReplanner {
+public class ParallelActEndReplanner extends ParallelReplanner {
 	
-	private final static Logger log = Logger.getLogger(ParallelLeaveLinkReplanner.class);
+	private final static Logger log = Logger.getLogger(ParallelActEndReplanner.class);
 	
-	/** 
-	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
-	 * Objects now ArrayLists are handed over.
-	 * 
-	 * @param currentNodes
-	 * @param vehicles
-	 * @param time
-	 */
-	public static void run(ArrayList<QueueNode> currentNodes, ArrayList<Vehicle> vehicles, double time)
+	public static void run(ArrayList<Act> fromActs, ArrayList<Vehicle> vehicles, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -67,9 +59,9 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		for(int j = 0; j < vehicles.size(); j++)
 		{
 			Vehicle vehicle = vehicles.get(i);
-			QueueNode queueNode = currentNodes.get(i);
+			Act fromAct = fromActs.get(i);
 			
-			replannerThreads[i % numOfThreads].handleVehicle(vehicle, queueNode);
+			replannerThreads[i % numOfThreads].handleVehicle(vehicle, fromAct);
 			i++;
 		}
 		
@@ -104,7 +96,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
 		private final List<Vehicle> vehicles = new LinkedList<Vehicle>();
-		private final List<QueueNode> currentNodes = new LinkedList<QueueNode>();
+		private final List<Act> fromActs = new LinkedList<Act>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
 		{
@@ -114,10 +106,10 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
-		public void handleVehicle(final Vehicle vehicle, final QueueNode currentNode)
+		public void handleVehicle(final Vehicle vehicle, final Act fromAct)
 		{
 			this.vehicles.add(vehicle);
-			this.currentNodes.add(currentNode);
+			this.fromActs.add(fromAct);
 		}
 
 		public void run()
@@ -128,37 +120,26 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
 				Vehicle vehicle = vehicles.get(i);
-				QueueNode queueNode = currentNodes.get(i);
+				Act fromAct = fromActs.get(i);
+						
+				// replanner of the person
+				PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
+					
+				// get the index of the Replanner in the replanners Array
+				int index = replanners.indexOf(replanner);
+					
+				// get the replanner or a clone if it, if it's not the first running thread
+				replanner = this.replannerArray[index][threadId];
 				
-				// If replanning flag is set in the Person
-//				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
-//				if(replanning)
-				/*
-				 *  Replanning Flag is already checked in the MyQueueNetwork class.
-				 *  If among the link leaving Agents no one has set the replanning flag,
-				 *  there is no need to start the Replanner...
-				 */			
-//				{
-					// replanner of the person
-					PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
-					
-					// get the index of the Replanner in the replanners Array
-					int index = replanners.indexOf(replanner);
-					
-					// get the replanner or a clone if it, if it's not the first running thread
-					replanner = this.replannerArray[index][threadId];
-					
-					new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
-//					log.info("Did Leave Link Replanning...");
-//				}
-
-	
+				new ActEndReplanner(fromAct, vehicle, time, replanner);
+//				log.info("Did Act End Replanning...");
+				
 				numRuns++;
-				//if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
+				if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
 			
 			}
 		
-//			log.info("Thread " + threadId + " done.");
+			log.info("Thread " + threadId + " done.");
 			
 		}	// run
 		

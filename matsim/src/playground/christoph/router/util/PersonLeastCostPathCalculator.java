@@ -30,6 +30,7 @@ public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalc
 	
 	protected Person person;
 	protected QueueNetwork queueNetwork;
+	protected double time;
 	
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person)
 	{
@@ -56,6 +57,16 @@ public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalc
 	public QueueNetwork getQueueNetwork()
 	{
 		return this.queueNetwork;
+	}
+	
+	public void setTime(double time)
+	{
+		this.time = time;
+	}
+	
+	public double getTime()
+	{
+		return this.time;
 	}
 	
 	@Override

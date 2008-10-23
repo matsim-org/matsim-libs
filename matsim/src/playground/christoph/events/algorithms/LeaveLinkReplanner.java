@@ -239,7 +239,7 @@ public class LeaveLinkReplanner {
 		if (replanner instanceof KnowledgePlansCalcRoute)
 		{
 			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
-//			((KnowledgePlansCalcRoute)replanner).setQueueNetwork(this.queueNode.queueNetwork);
+			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
 		}
 			
 		replanner.run(newPlan);			
