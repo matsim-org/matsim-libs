@@ -64,6 +64,13 @@ public class PlanStrategy {
 			this.modules.add(module);
 		}
 	}
+	
+	/**
+	 * @return the number of strategy modules added to this strategy
+	 */
+	public int getNumberOfStrategyModules() {
+		return this.modules.size();
+	}
 
 	/**
 	 * Adds a person to this strategy to be handled. It is not required that
