@@ -39,6 +39,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,8 +78,80 @@ import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 
 import com.sun.opengl.util.Screenshot;
 import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.j2d.TextureRenderer;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
+
+/**
+ * Call TextRenderHack to fix the TextRender problem on the Mac This class should only be used until
+ * Apple puts out their fix.
+ * 
+ * @author Jeff Addison - Southgate Software Ltd. www.southgatesoftware.com
+ */
+class TextRenderHack
+{
+	/**
+	 * Call this function in your drawing code to fix the TextRender rendering problem on the Mac
+	 * 
+	 * @param tr Text Renderer to fix
+	 */
+	public static void fixIt(TextRenderer tr)
+	{
+		// Get the OS Name
+		String osName = System.getProperty("os.name");
+
+		// Only fix it if it's broke :)
+		if (osName != null && osName.toLowerCase().contains("mac"))
+		{
+			// Call the TextRenderer's private function getBackingStore to get the backingStore
+			TextureRenderer backingStore = (TextureRenderer) invokePrivateMethod(tr, "getBackingStore",
+					null);
+
+			// If we have a valid backing store, mark the entire thing dirty.
+			if (backingStore != null)
+			{
+				backingStore.markDirty(0, 0, backingStore.getWidth(), backingStore.getHeight());
+			}
+		}
+	}
+
+	/**
+	 * Invokes a private method on and Object.
+	 * 
+	 * @param o Object to call private method on
+	 * @param methodName Name of the method to call
+	 * @param params Array of parameters to be passed to the function
+	 * @return Object that the method called normally returns (Cast to proper type) NOTE: This function
+	 *         was found on the Internet. Lost the link so we are unable to give the author the proper
+	 *         credit.
+	 */
+	public static Object invokePrivateMethod(Object o, String methodName, Object[] params)
+	{
+		// Go and find the private method...
+		final Method methods[] = o.getClass().getDeclaredMethods();
+		for (int i = 0; i < methods.length; ++i)
+		{
+			if (methodName.equals(methods[i].getName()))
+			{
+				try
+				{
+					methods[i].setAccessible(true);
+					return methods[i].invoke(o, params);
+				}
+				catch (IllegalAccessException ex)
+				{
+					System.out.println("IllegalAccessException accessing " + methodName);
+				}
+				catch (InvocationTargetException ite)
+				{
+					System.out.println("InvocationTargetException accessing " + methodName);
+				}
+			}
+		}
+		return null;
+	}
+
+}
 
 class OTFGLOverlay extends OTFGLDrawableImpl {
 	private final InputStream texture;
@@ -119,14 +193,10 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		float length = this.size*t.getWidth()/viewport[2];
 		int z = 0;
 
-//		float startX = relX >= 0 ? (viewport[2] - viewport[0])*relX :viewport[2] - (viewport[0] - viewport[2])*relX; 
-//		float startY = relY >= 0 ? (viewport[3] - viewport[1])*relX :viewport[3] - (viewport[1] - viewport[3])*relX; 
-
 		float startX = relX >= 0 ? -1.f + relX : 1.f -length +relX; 
 		float startY = relY >= 0 ? -1.f + relY : 1.f -height +relY; 
 
 		gl.glColor4d(1,1,1,1);
-//		gl.glColor4d(0,0,0,0);
 
 		
 		//push 1:1 screen matrix
@@ -227,11 +297,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			// Calculate text location and color
 			int x = this.drawable.getWidth() - this.statusWidth - 5;
 			int y = this.drawable.getHeight() - 30;
-			float c = 0.55f;
+			float c = 0.75f;
 
 			// Render the text
-			this.textRenderer.beginRendering(this.drawable.getWidth(), this.drawable.getHeight());
 			this.textRenderer.setColor(c, c, c, c);
+			this.textRenderer.beginRendering(this.drawable.getWidth(), this.drawable.getHeight());
 			this.textRenderer.draw(this.status, x, y);
 			this.textRenderer.endRendering();
 		}
@@ -485,6 +555,8 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	synchronized public void display(GLAutoDrawable drawable) {
 //		Gbl.startMeasurement();
+		
+		
 		this.gl = drawable.getGL();
 
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
@@ -509,6 +581,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		this.gl.glDisable(GL.GL_BLEND);
 
+
+		// Mac OS X impl of TextRenderer is broken as of 2008/10/24
+		// remove this if there is --ever-- a fix
+		TextRenderHack.fixIt( this.statusDrawer.textRenderer );
 
 		InfoText.drawInfoTexts(drawable);
 		if(this.config.drawTime()) statusDrawer.displayStatusText(lastTime);
