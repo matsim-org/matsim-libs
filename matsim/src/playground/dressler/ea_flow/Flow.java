@@ -107,7 +107,7 @@ public class Flow {
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			int l = (int)link.getLength()/(int)link.getFreespeed(1.);
+			int l = (int)link.getLength()/(int)link.getFreespeed(1.); // TODO
 			this._flow.put(link, new EdgeIntervalls(l));
 			//TODO achtung cast von double auf int
 		}
@@ -197,7 +197,7 @@ public class Flow {
 			int flow = this._flow.get(link).getFlowAt(time);
 			int i = cap-flow;
 			if (i<0){
-				throw new IllegalArgumentException("to much flow on " + edge);
+				throw new IllegalArgumentException("too much flow on " + edge);
 			}
 			if(i<result ){
 				result= i;
@@ -271,6 +271,7 @@ public class Flow {
 			}
 			temp[time]+=flow;
 		}
+		
 		int[] result = new int[maxtime+1];
 		for(int i=0; i<=maxtime;i++){
 			result[i]=temp[i];

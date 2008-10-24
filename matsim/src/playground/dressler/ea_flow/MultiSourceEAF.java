@@ -70,7 +70,7 @@ public class MultiSourceEAF {
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
 			//System.out.println(link.getId().toString());
-			int l = (int)link.getLength()/(int)link.getFreespeed(1.);
+			int l = (int)link.getLength()/(int)link.getFreespeed(1.);//TOTO traveltime
 			flow.put(link, new EdgeIntervalls(l));
 			//TODO achtung cast von double auf int
 		}
