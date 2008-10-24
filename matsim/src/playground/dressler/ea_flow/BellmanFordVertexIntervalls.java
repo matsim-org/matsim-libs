@@ -190,6 +190,10 @@ public class BellmanFordVertexIntervalls {
 		if(Integer.MAX_VALUE==totime){
 			throw new BFException("sink can not be reached!");
 		}
+		if(totime>_timehorizon){
+			throw new BFException("sink can not be reached within timehorizon!");
+		}
+			
 		//start constructing the path
 		Path path = new Path();
 		path.setArrival(totime);

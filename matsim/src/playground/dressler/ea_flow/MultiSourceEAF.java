@@ -55,7 +55,7 @@ public class MultiSourceEAF {
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
 		 
 		 HashMap<Link, EdgeIntervalls> flow;
-		 int timeHorizon = 6;
+		 int timeHorizon = 9;
 		 
 		 //TODO choose the one you need
 		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/equil/network.xml");
@@ -86,7 +86,7 @@ public class MultiSourceEAF {
 				maxId = node.getId();
 			}
 		}*/
-		demands.put(source, 100);
+		demands.put(source, 11);
 		Node sink = network.getNode("5_zweite_sink");
 		Path result;
 		if (source == null || sink == null) {
@@ -98,13 +98,19 @@ public class MultiSourceEAF {
 			Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(travelcost, traveltime,fluss);
 			BellmanFordVertexIntervalls.debug(false);
-			for (int i=0; i<10; i++){
+			for (int i=0; i<20; i++){
 				result = routingAlgo.doCalculations();
+				if (result==null){
+					break;
+				}
 				System.out.println("path: " +  result);
 				fluss.augment(result);
 				System.out.println(fluss);
 			}
+			System.out.println(fluss.arrivalsToString());
+			System.out.println(fluss.arrivalPatternToString());
 		}
+		
 		System.out.println("demand:" + demands.get(source));
    	    System.out.println("... immer noch!\n");
 	}

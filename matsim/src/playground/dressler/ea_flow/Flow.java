@@ -137,9 +137,28 @@ public class Flow {
 		this._demands = demands;
 		this._sink = sink;
 		_timeHorizon = horizon;
+		this._nonactives = this.nonActives();
 	}
 
-//--------------------F;low handeling Methods-------------------------------------//	
+	/**
+	 * for all Nodes it is specified if the node is an unactive source
+	 */
+	private HashMap<Node,Boolean> nonActives(){
+		HashMap<Node,Boolean> nonactives = new HashMap<Node,Boolean>();
+		for(Node node : this._network.getNodes().values()){
+			if(!this._sources.contains(node)){
+				nonactives.put(node, false);
+			}else{
+				if(this._demands.get(node)!=0){
+					nonactives.put(node, false);
+				}else{
+					nonactives.put(node, true);
+				}
+			}
+		}
+		return nonactives;
+	}
+//--------------------Flow handeling Methods-------------------------------------//	
 	
 	/**
 	 * Method to determen wheather a Node is a Source with positive demand
@@ -238,6 +257,60 @@ public class Flow {
 		return this._nonactives.get(node);
 	}
 	
+	
+//-----------evaluation methods---------------------------------------------------//
+	
+	public int[] arrivals(){
+		int maxtime = 0;
+		int[] temp = new int[this._timeHorizon+1];
+		for (Path path : _paths){
+			int flow = path.getFlow();
+			int time = path.getArrival();
+			if (maxtime < time){
+				maxtime = time; 
+			}
+			temp[time]+=flow;
+		}
+		int[] result = new int[maxtime+1];
+		for(int i=0; i<=maxtime;i++){
+			result[i]=temp[i];
+		}
+		return result;
+		
+	}
+	
+	public int[] arrivalPattern(){
+		int[] result = this.arrivals();
+		int sum = 0;
+		for (int i=0;i<result.length; i++){
+			sum+=result[i];
+			result[i]=sum;
+		}
+		return result;
+	}
+	
+	public String arrivalsToString(){
+		//StringBuilder strb1 = new StringBuilder();
+		StringBuilder strb2 = new StringBuilder("       arrivals:");
+		int[] a =this.arrivals();
+		for (int i=1; i<a.length;i++){
+			String temp = String.valueOf(a[i]);
+			strb2.append(" "+i+":"+temp);
+		}
+		return strb2.toString();
+	}
+	
+	public String arrivalPatternToString(){
+		//StringBuilder strb1 = new StringBuilder();
+		StringBuilder strb2 = new StringBuilder("arrival pattern:");
+		int[] a =this.arrivalPattern();
+		for (int i=1; i<a.length;i++){
+			String temp = String.valueOf(a[i]);
+			strb2.append(" "+i+":"+temp);
+		}
+		return strb2.toString();
+	}
+	
 //-------------------Getters Setters toString---------------------------------------//	
 
 	/**
@@ -252,24 +325,9 @@ public class Flow {
 		return strb.toString();
 	}
 	
-	/**
-	 * for all Nodes it is specified if the node is an unactive source
-	 */
-	private HashMap<Node,Boolean> nonActives(){
-		HashMap<Node,Boolean> nonactives = new HashMap<Node,Boolean>();
-		for(Node node : this._network.getNodes().values()){
-			if(!this._sources.contains(node)){
-				nonactives.put(node, false);
-			}else{
-				if(this._demands.get(node)!=0){
-					nonactives.put(node, false);
-				}else{
-					nonactives.put(node, true);
-				}
-			}
-		}
-		return nonactives;
-	}
+	
+	
+
 	
 	/**
 	 * @return the _demands
