@@ -20,6 +20,7 @@
 
 package playground.anhorni.locationchoice.facilityLoad;
 
+import org.jfree.util.Log;
 import org.matsim.gbl.Gbl;
 
 /*
@@ -121,12 +122,11 @@ public class FacilityPenalty {
 		this.sumCapacityPenaltyFactor = sumCapacityPenaltyFactor;
 	}
 
-
-	public void finish(){
+	public void finish() {
 		this.facilityLoad.finish();	
 	}
 	
-	public void reset(){
+	public void reset() {
 		this.facilityLoad.reset();
 	}
 

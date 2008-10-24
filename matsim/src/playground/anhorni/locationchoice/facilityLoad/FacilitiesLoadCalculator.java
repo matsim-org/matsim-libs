@@ -84,6 +84,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
+		//log.info("notifyAfterMobsim");
 		this.eventsToFacilityLoad.finish();		
 	}
 	

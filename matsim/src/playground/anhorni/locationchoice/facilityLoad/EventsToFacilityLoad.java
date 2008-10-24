@@ -49,7 +49,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 		
 		this.facilityPenalties = facilityPenalties;
 		
-		
+		log.info(facilities.getFacilities().values().size() +"facilities size");
 		Iterator<? extends Facility> iter_fac = facilities.getFacilities().values().iterator();
 		while (iter_fac.hasNext()){
 			Facility f = iter_fac.next();
@@ -67,16 +67,21 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	}
 	
 	public void handleEvent(final ActStartEvent event) {
-		Facility facility = event.act.getFacility();		
-		this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.time);
+		Facility facility = event.act.getFacility();
+		if (!event.act.getType().equalsIgnoreCase("home")) {
+			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.time);
+		}
 	}
 
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
-		this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.time);
+		if (!event.act.getType().equalsIgnoreCase("home")) {
+			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.time);
+		}
 	}
 
 	public void finish() {
+		//log.info(this.facilityPenalties.values().size()+ " facilitiespenalties");
 		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
 		while (iter_fp.hasNext()){
 			FacilityPenalty fp = iter_fp.next();

@@ -20,7 +20,11 @@
 
 package playground.anhorni.locationchoice.facilityLoad;
 
+import org.apache.log4j.Logger;
+
 public class FacilityLoad {
+	
+	private final static Logger log = Logger.getLogger(FacilityLoad.class);
 	
 	private int [] arrivals = null;
 	private int [] departures = null;
@@ -53,11 +57,13 @@ public class FacilityLoad {
 	}
 	
 	private void calculateFacilityLoad24() {
+		//log.info("calculateFacilityLoad24");
 		int numberOfVisitors = 0;
 		for (int i = 0; i < this.numberOfTimeBins; i++) {
 			numberOfVisitors += this.arrivals[i];
+			//log.info("timebin: " + i + "load: "+  this.load[i]);
 			this.load[i] = numberOfVisitors * this.scaleNumberOfPersons;
-			numberOfVisitors -= this.departures[i];
+			numberOfVisitors -= this.departures[i];			
 		}
 	}
 	
@@ -72,6 +78,7 @@ public class FacilityLoad {
 		}
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(3600/(this.numberOfTimeBins/24))));		
 		this.arrivals[timeBinIndex] += 1;
+		log.info("arrival at: " + time + "bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
 	
@@ -83,6 +90,7 @@ public class FacilityLoad {
 		}
 		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(3600/(this.numberOfTimeBins/24))));
 		this.departures[timeBinIndex]+=1;
+		log.info("departure at: " + time + "bin: " + timeBinIndex);
 	}
 	
 	public void addToAllVisitors(int scaleNumberOfPersons) {
@@ -104,7 +112,7 @@ public class FacilityLoad {
 	public double getLoadPerHour(int hour) {
 		double hourlyLoad = 0.0;
 
-		for (int i = 0; i<4 ; i++) {
+		for (int i = 0; i < 4 ; i++) {
 			int index = hour*4 + i;
 			hourlyLoad += this.load[index];
 		}
@@ -128,6 +136,7 @@ public class FacilityLoad {
 	}
 
 	public void finish() {
+		log.info("FacilityLoad finished");
 		this.calculateFacilityLoad24();
 	}
 	
