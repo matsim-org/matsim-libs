@@ -141,8 +141,8 @@ LIBS := $(LIBS):libs/geotools/xsdlib-20050614.jar
 
 # libs required for OTFVis:
 LIBS := $(LIBS):libs/TimingFramework-0.53.jar
-LIBS := $(LIBS):libs/jogl-1.1.0/gluegen-rt.jar
-LIBS := $(LIBS):libs/jogl-1.1.0/jogl.jar
+LIBS := $(LIBS):libs/jogl-1.1.1/gluegen-rt.jar
+LIBS := $(LIBS):libs/jogl-1.1.1/jogl.jar
 
 CLASSPATH = classes
 SOURCEPATH = src
