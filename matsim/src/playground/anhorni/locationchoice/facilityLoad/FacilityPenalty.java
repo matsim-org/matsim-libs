@@ -127,6 +127,7 @@ public class FacilityPenalty {
 	}
 	
 	public void reset() {
+		this.sumCapacityPenaltyFactor = 0.0;
 		this.facilityLoad.reset();
 	}
 
