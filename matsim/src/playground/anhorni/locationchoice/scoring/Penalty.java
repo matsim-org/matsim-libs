@@ -29,7 +29,7 @@ public class Penalty {
 	}
 		
 	public double getPenalty() {
-		this.facilityPenalty.finish();
+		this.facilityPenalty.finish(); // is this still needed? we have a call in EventsToFacilityLoad
 		return this.score * this.facilityPenalty.getCapacityPenaltyFactor(startTime, endTime);
 	}
 }
