@@ -22,15 +22,17 @@ package playground.yu.utils;
 
 import java.io.IOException;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
@@ -52,23 +54,28 @@ public class KMLNetWriterTest {
 				NetworkLayer.LAYER_TYPE, null);
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Document d = new Document(kmzFilename);
-		KML k = new KML();
-		k.setFeature(d);
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		
+		DocumentType d = kmlObjectFactory.createDocumentType();
+		d.setId(kmzFilename);
+		KmlType k = kmlObjectFactory.createKmlType();
 
-		Folder f = new Folder("testFolder");
+		k.setAbstractFeatureGroup(kmlObjectFactory.createDocument(d));
+
+		FolderType f = kmlObjectFactory.createFolderType();
+		f.setId("testFolder");
 		f.setName("testFolderName");
-		d.addFeature(f);
+		d.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(f));
 
-		KMZWriter kw = new KMZWriter(kmzFilename, KMLWriter.DEFAULT_XMLNS);
+		KMZWriter kw = new KMZWriter(kmzFilename);
 
-		MatsimKMLLogo mkl = null;
+		ScreenOverlayType mkl = null;
 		try {
-			mkl = new MatsimKMLLogo(kw);
+			mkl = MatsimKMLLogo.writeMatsimKMLLogo(kw);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		f.addFeature(mkl);
+		f.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(mkl));
 
 		KmlNetworkWriter nw = new KmlNetworkWriter(network,
 //				new AtlantisToWGS84()
@@ -76,7 +83,7 @@ public class KMLNetWriterTest {
 		, kw, d);
 
 		try {
-			f.addFeature(nw.getNetworkFolder());
+			f.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nw.getNetworkFolder()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

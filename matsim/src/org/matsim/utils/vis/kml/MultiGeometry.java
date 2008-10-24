@@ -29,11 +29,16 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 /**
  * For documentation, refer to
  * <a href="http://earth.google.com/kml/kml_tags_21.html#multigeometry">
- * http://earth.google.com/kml/kml_tags_21.html#multigeometry</a>
- * 
+ * http://earth.google.com/kml/kml_tags_21.html#multigeometry</a><br>
+ * <br>
  * A multigeometry is a container for one or more geometry primitives 
  * associated with the same feature. It allows the grouping of features, so
  * the user doesn't see all the single parts that build this complex feature.
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
  */
 public class MultiGeometry extends Geometry {
 	

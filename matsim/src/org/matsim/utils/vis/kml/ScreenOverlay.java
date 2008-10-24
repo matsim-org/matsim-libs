@@ -27,10 +27,14 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 import org.matsim.utils.vis.kml.fields.Vec2Type;
 
 /**
- * @author dgrether
- * @see <a
- * href="http://code.google.com/apis/kml/documentation/kml_tags_21.html#screenoverlay">
- * KML-ScreenOverlay [code.google.com]</a>
+ * For documentation, refer to
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#screenoverlay">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#screenoverlay</a>
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
  */
 public class ScreenOverlay extends Overlay {
 

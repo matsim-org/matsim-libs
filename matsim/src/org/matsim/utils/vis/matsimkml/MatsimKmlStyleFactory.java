@@ -22,15 +22,15 @@ package org.matsim.utils.vis.matsimkml;
 
 import java.io.IOException;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.LineStyleType;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.StyleType;
+
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.vis.kml.ColorStyle;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Icon;
-import org.matsim.utils.vis.kml.IconStyle;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.LineStyle;
-import org.matsim.utils.vis.kml.Style;
-import org.matsim.utils.vis.kml.fields.Color;
 
 
 /**
@@ -52,61 +52,75 @@ public class MatsimKmlStyleFactory {
 	/**
 	 * some colors frequently used in matsim: bgr: 15,15,190
 	 */
-	public static final Color MATSIMRED = new Color("ff","0f","0f","be");
+	public static final byte[] MATSIMRED = new byte[]{(byte) 0xFF, (byte) 0x0F, (byte) 0x0F, (byte) 0xBE};
 	/**
 	 * some colors frequently used in matsim
 	 */
-	public static final Color MATSIMBLUE = new Color(190, 10, 80, 190);
+//	public static final Color MATSIMBLUE = new Color(190, 10, 80, 190);
 	/**
 	 * some colors frequently used in matsim
 	 */
-	public static final Color MATSIMGREY = new Color(210, 50, 50, 70);
+	public static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 50, (byte) 50, (byte) 70};
 	/**
 	 * some colors frequently used in matsim
 	 */
-	public static final Color MATSIMWHITE = new Color(230, 230, 230, 230);
+	public static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
 	/**
 	 * the kmz writer
 	 */
 	private KMZWriter writer = null;
 
-	private Document document;
+	private ObjectFactory kmlObjectFactory = null;
+	
+	private DocumentType document;
 
-	private Style defaultnetworknodestyle;
+	private StyleType defaultnetworknodestyle;
 
-	private Style defaultnetworklinkstyle;
+	private StyleType defaultnetworklinkstyle;
 
-	public MatsimKmlStyleFactory(KMZWriter writer, Document document) {
+	public MatsimKmlStyleFactory(KMZWriter writer, DocumentType document) {
 		this.writer = writer;
 		this.document = document;
 	}
 
-	public Style createDefaultNetworkNodeStyle() throws IOException {
+	public StyleType createDefaultNetworkNodeStyle() throws IOException {
 		if (this.defaultnetworknodestyle == null) {
-			this.defaultnetworknodestyle = new Style("defaultnetworknodestyle");
-			Icon icon = new Icon(DEFAULTNODEICON);
+			this.defaultnetworknodestyle = kmlObjectFactory.createStyleType();
+			this.defaultnetworknodestyle.setId("defaultnetworknodestyle");
 
+			LinkType iconLink = kmlObjectFactory.createLinkType();
+			iconLink.setHref(DEFAULTNODEICON);
 			this.writer.addNonKMLFile(MatsimResource.getAsInputStream(DEFAULTNODEICONRESOURCE), DEFAULTNODEICON);
-			IconStyle iStyle = new IconStyle(icon, MATSIMRED, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
+			IconStyleType iStyle = kmlObjectFactory.createIconStyleType();
+			iStyle.setIcon(iconLink);
+			iStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
+			iStyle.setScale(MatsimKmlStyleFactory.ICONSCALE);
 			this.defaultnetworknodestyle.setIconStyle(iStyle);
-			this.document.addStyle(this.defaultnetworknodestyle);
+			this.document.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.defaultnetworknodestyle));
 //			LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
 //			style.setLineStyle(lineStyle);
 		}
 		return this.defaultnetworknodestyle;
 	}
 
-	public Style createDefaultNetworkLinkStyle() throws IOException {
+	public StyleType createDefaultNetworkLinkStyle() throws IOException {
 		if (this.defaultnetworklinkstyle == null) {
-			this.defaultnetworklinkstyle = new Style("defaultnetworklinkstyle");
-			Icon icon = new Icon(DEFAULTLINKICON);
+			this.defaultnetworklinkstyle = kmlObjectFactory.createStyleType();
+			this.defaultnetworklinkstyle.setId("defaultnetworklinkstyle");
 
+			LinkType iconLink = kmlObjectFactory.createLinkType();
+			iconLink.setHref(DEFAULTLINKICON);
 			this.writer.addNonKMLFile(MatsimResource.getAsInputStream(DEFAULTNODEICONRESOURCE), DEFAULTLINKICON);
-			IconStyle iStyle = new IconStyle(icon, MATSIMWHITE, IconStyle.DEFAULT_COLOR_MODE, ICONSCALE);
+			IconStyleType iStyle = kmlObjectFactory.createIconStyleType();
+			iStyle.setIcon(iconLink);
+			iStyle.setColor(MatsimKmlStyleFactory.MATSIMWHITE);
+			iStyle.setScale(MatsimKmlStyleFactory.ICONSCALE);
 			this.defaultnetworklinkstyle.setIconStyle(iStyle);
-			LineStyle lineStyle = new LineStyle(MATSIMGREY, ColorStyle.DEFAULT_COLOR_MODE, 12);
+			LineStyleType lineStyle = kmlObjectFactory.createLineStyleType();
+			lineStyle.setColor(MatsimKmlStyleFactory.MATSIMGREY);
+			lineStyle.setWidth(12.0);
 			this.defaultnetworklinkstyle.setLineStyle(lineStyle);
-			this.document.addStyle(this.defaultnetworklinkstyle);
+			this.document.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.defaultnetworklinkstyle));
 		}
 		return this.defaultnetworklinkstyle;
 	}

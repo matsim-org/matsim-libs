@@ -23,16 +23,18 @@ package playground.dgrether.visualization;
 import java.io.IOException;
 import java.util.Date;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
+
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
@@ -46,11 +48,13 @@ public class KmlNetworkVisualizer {
 
 	private NetworkLayer networkLayer;
 
-	private KML mainKml;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	
+	private KmlType mainKml;
 
-	private Document mainDoc;
+	private DocumentType mainDoc;
 
-	private Folder mainFolder;
+	private FolderType mainFolder;
 
 	private KMZWriter writer;
 	public KmlNetworkVisualizer(final String networkFile, final String outputPath) {
@@ -66,23 +70,23 @@ public class KmlNetworkVisualizer {
 
 	private void write(final String filename) {
 		// init kml
-		this.mainKml = new KML();
-		this.mainDoc = new Document(filename);
-		this.mainKml.setFeature(this.mainDoc);
+		this.mainKml = this.kmlObjectFactory.createKmlType();
+		this.mainDoc = this.kmlObjectFactory.createDocumentType();
+		this.mainKml.setAbstractFeatureGroup(this.kmlObjectFactory.createDocument(mainDoc));
 		// create a folder
-		this.mainFolder = new Folder("2dnetworklinksfolder");
+		this.mainFolder = this.kmlObjectFactory.createFolderType();
 		this.mainFolder.setName("Matsim Data");
-		this.mainDoc.addFeature(this.mainFolder);
+		this.mainDoc.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(this.mainFolder));
 		// the writer
-		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
+		this.writer = new KMZWriter(filename);
 		try {
 			// add the matsim logo to the kml
-			MatsimKMLLogo logo = new MatsimKMLLogo(this.writer);
-			this.mainFolder.addFeature(logo);
+			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
 			KmlNetworkWriter netWriter = new KmlNetworkWriter(this.networkLayer,
 					new GK4toWGS84(), this.writer, this.mainDoc);
-			Folder networkFolder = netWriter.getNetworkFolder();
-			this.mainFolder.addFeature(networkFolder);
+			FolderType networkFolder = netWriter.getNetworkFolder();
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
 			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
 			e.printStackTrace();

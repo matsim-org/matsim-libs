@@ -20,11 +20,17 @@
 
 package org.matsim.utils.vis.kml.fields;
 
-
 /**
+ * For documentation, refer to
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#color">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#color</a><br>
+ * <br>
  * This class is used for the kml <color> tags. It provides several constructors with which
- * color objects can be created conveniently.
- * @author dgrether
+ * color objects can be created conveniently.<br>
+ *
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
  *
  */
 public class Color {

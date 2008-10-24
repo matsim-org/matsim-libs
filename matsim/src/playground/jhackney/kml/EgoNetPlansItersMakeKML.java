@@ -22,11 +22,29 @@ package playground.jhackney.kml;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.ListIterator;
 import java.util.TreeMap;
+
+import javax.xml.bind.JAXBElement;
+
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.AbstractStyleSelectorType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LineStringType;
+import net.opengis.kml._2.LineStyleType;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.LookAtType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -48,28 +66,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.ColorStyle;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Feature;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.Geometry;
-import org.matsim.utils.vis.kml.Icon;
-import org.matsim.utils.vis.kml.IconStyle;
-import org.matsim.utils.vis.kml.KML;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.LabelStyle;
-import org.matsim.utils.vis.kml.LineString;
-import org.matsim.utils.vis.kml.LineStyle;
-import org.matsim.utils.vis.kml.LinearRing;
-import org.matsim.utils.vis.kml.LookAt;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.PolyStyle;
-import org.matsim.utils.vis.kml.Polygon;
-import org.matsim.utils.vis.kml.Style;
-import org.matsim.utils.vis.kml.TimeSpan;
-import org.matsim.utils.vis.kml.TimeStamp;
-import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
 import playground.jhackney.algorithms.PersonCalcEgoSpace;
@@ -89,25 +86,28 @@ public class EgoNetPlansItersMakeKML {
 //	private static String coloredLinkKMLFilename;
 //	private static boolean useCompression = false;
 
-	private static KML myKML;
+	private static ObjectFactory kmlObjectFactory = null;
+	
+	private static KmlType myKML;
 //	, coloredLinkKML;
-	private static Document myKMLDocument;
+	private static DocumentType myKMLDocument;
 //	, coloredLinkKMLDocument;
 
-	private static Folder networkFolder=null;
+	private static FolderType networkFolder=null;
 
-	private static Style workStyle, leisureStyle,
+	private static StyleType workStyle, leisureStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
-	private static HashMap<String,Style> facStyle= new HashMap<String,Style>();
+	private static HashMap<String,StyleType> facStyle= new HashMap<String,StyleType>();
 	private static CoordinateTransformation trafo;
 	private static Config config = null;
 	private static final Logger log = Logger.getLogger(EgoNetPlansItersMakeKML.class);
 
-	private static TreeMap<String,Folder> agentMap = new TreeMap<String,Folder>();
+	private static TreeMap<String,FolderType> agentMap = new TreeMap<String,FolderType>();
 	private static Person ego;
-	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
-	private static TimeStamp timeStamp;
-	private static TimeSpan timeSpan;
+//	private static TreeMap<Id,Color> colors = new TreeMap<Id,Color>();
+	private static TreeMap<Id,Byte[]> colors = new TreeMap<Id,Byte[]>();
+	private static TimeStampType timeStamp;
+	private static TimeSpanType timeSpan;
 	private static int nColors=13;//36
 	private static Person ai;
 
@@ -141,9 +141,11 @@ public class EgoNetPlansItersMakeKML {
 //		": \"" + config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION) + "\"");
 //		}
 
-		myKML = new KML();
-		myKMLDocument = new Document("the root document");
-		myKML.setFeature(myKMLDocument);
+		EgoNetPlansItersMakeKML.kmlObjectFactory = new ObjectFactory();
+		
+		myKML = kmlObjectFactory.createKmlType();
+		myKMLDocument = kmlObjectFactory.createDocumentType();
+		myKML.setAbstractFeatureGroup(kmlObjectFactory.createDocument(myKMLDocument));
 
 //		coloredLinkKML = new KML();
 //		coloredLinkKMLDocument = new Document("network main feature");
@@ -154,29 +156,31 @@ public class EgoNetPlansItersMakeKML {
 		///////////////////////////
 		// display road network
 		///////////////////////////
-		Style linkStyle = new Style("defaultLinkStyle");
-		myKMLDocument.addStyle(linkStyle);
-		linkStyle.setLineStyle(new LineStyle(new Color("ff", "00", "00", "00"), ColorStyle.DEFAULT_COLOR_MODE, 1));
+		StyleType linkStyle = kmlObjectFactory.createStyleType();
+		linkStyle.setId("defaultLinkStyle");
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		byte[] color = new byte[]{(byte) 0xff, (byte) 0x00, (byte) 0x00, (byte) 0x00};
+		lst.setColor(color);
+		lst.setWidth(1.0);
+		linkStyle.setLineStyle(lst);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(linkStyle));
 
-		networkFolder = new Folder(
-				"network used",
-				"network used",
-				network.getName(),
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				false,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-		myKMLDocument.addFeature(networkFolder);
+		networkFolder = kmlObjectFactory.createFolderType();
+		networkFolder.setName("network used");
+		networkFolder.setDescription(network.getName());
+		networkFolder.setVisibility(false);
+		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 
 		for (Link link : network.getLinks().values()) {
-			networkFolder.addFeature(generateLinkPlacemark(link, linkStyle, trafo));
+			networkFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(generateLinkPlacemark(link, linkStyle, trafo)));
 		}
 
 	}
 
 	public static void generateStyles() {
+
+		LinkType link = null;
+		IconStyleType icon = null;
 
 		if(config.getModule(KML21_MODULE)==null) return;
 
@@ -186,49 +190,57 @@ public class EgoNetPlansItersMakeKML {
 //		myKMLDocument.addStyle(agentLinkStyle);
 //		agentLinkStyle.setLineStyle(new LineStyle(new Color("ff", "00", "ff", "ff"), ColorStyle.DEFAULT_COLOR_MODE, 14));
 
-		workStyle = new Style("workStyle");
-		myKMLDocument.addStyle(workStyle);
-		leisureStyle = new Style("leisureFacilityStyle");
-		myKMLDocument.addStyle(leisureStyle);
-		educStyle = new Style("educStyle");
-		myKMLDocument.addStyle(educStyle);
-		shopStyle=new Style("shopStyle");
-		myKMLDocument.addStyle(shopStyle);
-		homeStyle=new Style("homeStyle");
-		myKMLDocument.addStyle(homeStyle);
-
 		double labelScale = 1.0;
-		workStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/W.png")));
-		workStyle.setLabelStyle(
-				new LabelStyle(
-						Color.DEFAULT_COLOR,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		leisureStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/L.png")));
-		leisureStyle.setLabelStyle(
-				new LabelStyle(
-						Color.DEFAULT_COLOR,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		educStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/E.png")));
-		educStyle.setLabelStyle(
-				new LabelStyle(
-						Color.DEFAULT_COLOR,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		shopStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/S.png")));
-		shopStyle.setLabelStyle(
-				new LabelStyle(
-						Color.DEFAULT_COLOR,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		homeStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/H.png")));
-		homeStyle.setLabelStyle(
-				new LabelStyle(
-						Color.DEFAULT_COLOR,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
 
+		workStyle = kmlObjectFactory.createStyleType();
+		workStyle.setId("workStyle");
+		link = kmlObjectFactory.createLinkType();
+		link.setHref("http://maps.google.com/mapfiles/kml/paddle/W.png");
+		icon = kmlObjectFactory.createIconStyleType();
+		icon.setIcon(link);
+		icon.setScale(labelScale);
+		workStyle.setIconStyle(icon);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(workStyle));
+
+		leisureStyle = kmlObjectFactory.createStyleType();
+		leisureStyle.setId("leisureFacilityStyle");
+		link = kmlObjectFactory.createLinkType();
+		link.setHref("http://maps.google.com/mapfiles/kml/paddle/L.png");
+		icon = kmlObjectFactory.createIconStyleType();
+		icon.setIcon(link);
+		icon.setScale(labelScale);
+		leisureStyle.setIconStyle(icon);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(leisureStyle));
+
+		educStyle = kmlObjectFactory.createStyleType();
+		educStyle.setId("educStyle");
+		link = kmlObjectFactory.createLinkType();
+		link.setHref("http://maps.google.com/mapfiles/kml/paddle/E.png");
+		icon = kmlObjectFactory.createIconStyleType();
+		icon.setIcon(link);
+		icon.setScale(labelScale);
+		educStyle.setIconStyle(icon);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(educStyle));
+
+		shopStyle = kmlObjectFactory.createStyleType();
+		shopStyle.setId("shopStyle");
+		link = kmlObjectFactory.createLinkType();
+		link.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
+		icon = kmlObjectFactory.createIconStyleType();
+		icon.setIcon(link);
+		icon.setScale(labelScale);
+		shopStyle.setIconStyle(icon);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(shopStyle));
+
+		homeStyle = kmlObjectFactory.createStyleType();
+		homeStyle.setId("homeStyle");
+		link = kmlObjectFactory.createLinkType();
+		link.setHref("http://maps.google.com/mapfiles/kml/paddle/H.png");
+		icon = kmlObjectFactory.createIconStyleType();
+		icon.setIcon(link);
+		icon.setScale(labelScale);
+		homeStyle.setIconStyle(icon);
+		myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(homeStyle));
 
 		facStyle.put("home",homeStyle);
 		facStyle.put("shop",shopStyle);
@@ -285,7 +297,8 @@ public class EgoNetPlansItersMakeKML {
 		Plan myPlan = alter.getSelectedPlan();
 
 //		Color color = setColor(i, nColors+1);
-		Color color = new Color("0","0","0","0");
+		Byte[] color = new Byte[]{(byte) 0, (byte) 0, (byte) 0, (byte) 0};
+//		Color color = new Color("0","0","0","0");
 		if(colors.keySet().contains(alter.getId())){
 			color=colors.get(alter.getId());
 		}else{
@@ -293,54 +306,61 @@ public class EgoNetPlansItersMakeKML {
 			colors.put(alter.getId(), color);
 		}
 
-		timeStamp = new TimeStamp(new GregorianCalendar(1970, 0, 1, iter, 0, 0));
-		timeSpan = new TimeSpan(new GregorianCalendar(1970, 0, 1, iter, 0, 0),
-					new GregorianCalendar(1970, 0, 1, iter, 59, 59));
+		timeStamp = kmlObjectFactory.createTimeStampType();
+		timeStamp.setWhen("1970-01-01T" + Time.writeTime(iter * 3600));
+		timeSpan = kmlObjectFactory.createTimeSpanType();
+		timeSpan.setBegin("1970-01-01T" + Time.writeTime(iter * 3600));
+		timeSpan.setEnd("1970-01-01T" + Time.writeTime(iter * 3600 + 59 * 60 + 59));
 
-		Style agentLinkStyle =null;
-		if(!myKMLDocument.containsStyle("agentLinkStyle"+alter.getId().toString())){
-			agentLinkStyle = new Style("agentLinkStyle"+alter.getId().toString());
-			agentLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 10));
-			myKMLDocument.addStyle(agentLinkStyle);
-		}else// Set a constant color for each agent for all iterations
-			agentLinkStyle=myKMLDocument.getStyle("agentLinkStyle"+alter.getId().toString());
+		StyleType agentLinkStyle = null;
+		boolean styleExists = false;
+		ListIterator<JAXBElement<? extends AbstractStyleSelectorType>> stylesIterator = myKMLDocument.getAbstractStyleSelectorGroup().listIterator();
+		while(stylesIterator.hasNext() && !styleExists) {
+			
+			JAXBElement<? extends AbstractStyleSelectorType> style = stylesIterator.next();
+			if (style.getValue().getId().equals("agentLinkStyle"+alter.getId().toString())) {
+				styleExists = true;
+				agentLinkStyle = (StyleType) style.getValue();
+			}
+			
+		}
+		if (!styleExists) {
+			agentLinkStyle = kmlObjectFactory.createStyleType();
+			agentLinkStyle.setId("agentLinkStyle"+alter.getId().toString());
+			myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(agentLinkStyle));
+		}
+		
 
-
-		Folder agentFolder;
-		if(!myKMLDocument.containsFeature("agent "+myPlan.getPerson().getId().toString())){
-			agentFolder = new Folder(
-					"agent "+myPlan.getPerson().getId().toString(),
-					"agent "+myPlan.getPerson().getId().toString(),
-					"Contains one agent",
-					Feature.DEFAULT_ADDRESS,
-					Feature.DEFAULT_LOOK_AT,
-					Feature.DEFAULT_STYLE_URL,
-					true,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
+		FolderType agentFolder = null;
+		boolean featureExists = false;
+		ListIterator<JAXBElement<? extends AbstractFeatureType>> featureIterator = myKMLDocument.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !featureExists) {
+			JAXBElement<? extends AbstractFeatureType> abstractFeature = featureIterator.next();
+			if (abstractFeature.getValue().getId().equals("agent "+myPlan.getPerson().getId().toString())) {
+				featureExists = true;
+				agentFolder = (FolderType) abstractFeature.getValue();
+			}
+		}
+		if (!featureExists) {
+			agentFolder = kmlObjectFactory.createFolderType();
+			agentFolder.setId("agent "+myPlan.getPerson().getId().toString());
+			agentFolder.setName("agent "+myPlan.getPerson().getId().toString());
+			agentFolder.setDescription("Contains one agent");
+			
 //			new TimeStamp(new GregorianCalendar(1970, 0, 1, 0, 0, iter)));
-
-
 			log.info("MAKING NEW KML AGENT FOLDER FOR "+ agentFolder.getId());
-			myKMLDocument.addFeature(agentFolder);
+			myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(agentFolder));
 			agentMap.put(agentFolder.getId(),agentFolder);
-		}else{
-			agentFolder =agentMap.get("agent "+myPlan.getPerson().getId().toString());
 		}
 
 		// route folder for each agent and iteration (this is the plan)
-		Folder planFolder = new Folder(
-				"plan "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"plan "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"Contains one agent's route and its activities in one iteration",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				true,
-				Feature.DEFAULT_REGION,
-				timeSpan);
+		FolderType planFolder = kmlObjectFactory.createFolderType();
+		planFolder.setId("plan "+myPlan.getPerson().getId().toString()+"-"+iter);
+		planFolder.setName("plan "+myPlan.getPerson().getId().toString()+"-"+iter);
+		planFolder.setDescription("Contains one agent's route and its activities in one iteration");
+		planFolder.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 		log.info("MAKING NEW KML PLAN FOLDER "+planFolder.getId()+" FOR AGENT "+agentFolder.getId());
-		agentFolder.addFeature(planFolder);
+		agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(agentFolder));
 
 		// put the activity space polygon into the planFolder
 //		makeActivitySpaceKML_Poly(myPerson, iter, planFolder, color);
@@ -361,19 +381,23 @@ public class EgoNetPlansItersMakeKML {
 		}
 
 		// put facilities in a folder, one facilities folder for each Plan
-		Folder facilitiesFolder = new Folder(
-				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"facilities "+myPlan.getPerson().getId().toString()+"-"+iter,
-				"Contains all the facilities of one agent's plan in one iteration.",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				false,
-				Feature.DEFAULT_REGION,
-				timeSpan);
+		FolderType facilitiesFolder = kmlObjectFactory.createFolderType();
+		facilitiesFolder.setId("facilities "+myPlan.getPerson().getId().toString()+"-"+iter);
+		facilitiesFolder.setName("facilities "+myPlan.getPerson().getId().toString()+"-"+iter);
+		facilitiesFolder.setDescription("Contains all the facilities of one agent's plan in one iteration.");
+		facilitiesFolder.setVisibility(false);
+		facilitiesFolder.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
-		if(!planFolder.containsFeature(facilitiesFolder.getId())){
-			planFolder.addFeature(facilitiesFolder);
+		featureExists = false;
+		featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !featureExists) {
+			AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+			if (abstractFeature.getId().equals(facilitiesFolder.getId())) {
+				featureExists = true;
+			}
+		}
+		if (!featureExists) {
+			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(facilitiesFolder));
 		}
 
 		ActLegIterator actLegIter = myPlan.getIterator();
@@ -386,9 +410,18 @@ public class EgoNetPlansItersMakeKML {
 
 			Link[] routeLinks = (leg).getRoute().getLinkRoute();
 			for (Link routeLink : routeLinks) {
-				Placemark agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
-				if(!planFolder.containsFeature(agentLinkL.getId())){
-					planFolder.addFeature(agentLinkL);
+				PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
+				
+				featureExists = false;
+				featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+				while (featureIterator.hasNext() && !featureExists) {
+					AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+					if (abstractFeature.getId().equals(agentLinkL.getId())) {
+						featureExists = true;
+					}
+				}
+				if (!featureExists) {
+					planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLinkL));
 				}
 			}
 			Act act = (Act) actLegIter.nextAct();
@@ -408,58 +441,71 @@ public class EgoNetPlansItersMakeKML {
 			//Above lines call code that results in a null pointer. Test
 			// michi's new change. Note the Act.setFacility() might not
 			// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008
-			Style myStyle=facStyle.get(myAct.getType());
-			Placemark aFacility = new Placemark(
-					myAct.getType().substring(0, 1),
-					null,
-					myActivity,
-					"address",
-					Feature.DEFAULT_LOOK_AT,
-					myStyle.getStyleUrl(),
-					true,
-					Feature.DEFAULT_REGION,
-					timeSpan);
-			if(!facilitiesFolder.containsFeature(aFacility.getId())){
-				facilitiesFolder.addFeature(aFacility);
-			}
-
+			StyleType myStyle=facStyle.get(myAct.getType());
+			PlacemarkType aFacility = kmlObjectFactory.createPlacemarkType();
+			aFacility.setId(myAct.getType().substring(0, 1));
+			aFacility.setDescription(myActivity);
+			aFacility.setAddress("address");
+			aFacility.setStyleUrl(myStyle.getId());
+			aFacility.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 			// Get the coordinates of the facility associated with the Act and transform
 			// to WGS84 for GoogleEarth
-
 			Coord geometryCoord = trafo.transform(myAct.getCoord());
-			Point myPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
-			aFacility.setGeometry(myPoint);
-			aFacility.setLookAt(new LookAt(geometryCoord.getX(),geometryCoord.getY()));
+			PointType myPoint = kmlObjectFactory.createPointType();
+			myPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
+			aFacility.setAbstractGeometryGroup(kmlObjectFactory.createPoint(myPoint));
+			LookAtType lookAt = kmlObjectFactory.createLookAtType();
+			lookAt.setLongitude(geometryCoord.getX());
+			lookAt.setLatitude(geometryCoord.getY());
+			aFacility.setAbstractViewGroup(kmlObjectFactory.createLookAt(lookAt));
+
+			featureExists = false;
+			featureIterator = facilitiesFolder.getAbstractFeatureGroup().listIterator();
+			while (featureIterator.hasNext() && !featureExists) {
+				AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+				if (abstractFeature.getId().equals(aFacility.getId())) {
+					featureExists = true;
+				}
+			}
+			if (!featureExists) {
+				facilitiesFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aFacility));
+			}
 		}
 
 		log.info("    done.");
 
 	}
 
-	private static void makeEgoSpaceKML_Line(int iter, Folder planFolder, Color color) {
+	private static void makeEgoSpaceKML_Line(int iter, FolderType planFolder, Byte[] color) {
 
 		String id = ego.getId().toString();
 
-		Style egoSpaceStyle=new Style("ego space "+id+"-"+iter);
+		StyleType egoSpaceStyle = kmlObjectFactory.createStyleType();
+		egoSpaceStyle.setId("ego space "+id+"-"+iter);
 
-		egoSpaceStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 2));
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(new byte[]{color[0], color[1], color[2], color[3]});
+		lst.setWidth(2.0);
 		System.out.println(" # # # # makeEgoSpaceKML_Line "+color.toString());
 
-		Folder es = new Folder(
-				"ego space "+id+"-"+iter,
-				"ego space "+id+"-"+iter,
-				"Contains one agent's ego space in one iteration",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				egoSpaceStyle.getId(),
-				true,
-				Feature.DEFAULT_REGION,
-				timeSpan);
+		FolderType es = kmlObjectFactory.createFolderType();
+		es.setId("ego space "+id+"-"+iter);
+		es.setName("ego space "+id+"-"+iter);
+		es.setDescription("Contains one agent's ego space in one iteration");
+		es.setStyleUrl(egoSpaceStyle.getId());
+		es.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
-		if(!planFolder.containsFeature(es.getId())){
-			planFolder.addFeature(es);
+		boolean folderExists = false;
+		ListIterator<JAXBElement<? extends AbstractFeatureType>> featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !folderExists) {
+			AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+			if (abstractFeature.getId().equals(es.getId())) {
+				folderExists = true;
+			}
 		}
-
+		if (!folderExists) {
+			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(es));
+		}
 
 		// make the activity spaces
 		new PersonCalcEgoSpace().run(ego);
@@ -476,7 +522,7 @@ public class EgoNetPlansItersMakeKML {
 				double theta = space.getParam("theta").doubleValue();
 				double x = space.getParam("x").doubleValue();
 				double y = space.getParam("y").doubleValue();
-				Point oldPoint=null;
+				Coord oldCoord=null;
 				for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
 					// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
 					double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
@@ -485,113 +531,128 @@ public class EgoNetPlansItersMakeKML {
 					double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
 //					double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
 					Coord coordOut = trafo.transform(new CoordImpl(p_xOut, p_yOut));
-					Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
 //					CoordI coordIn = trafo.transform(new Coord(p_xIn, p_yIn));
 //					Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
 
 					if(t>0.0){
 
-						Placemark linkPlacemark = new Placemark(
-								Double.toString(t),
-								Feature.DEFAULT_NAME,
-								Feature.DEFAULT_DESCRIPTION,
-								Feature.DEFAULT_ADDRESS,
-								Feature.DEFAULT_LOOK_AT,
-								egoSpaceStyle.getId(),
-								Feature.DEFAULT_VISIBILITY,
-								Feature.DEFAULT_REGION,
-								timeSpan);
+						PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
+						linkPlacemark.setId(Double.toString(t));
+						linkPlacemark.setStyleUrl(egoSpaceStyle.getId());
+						linkPlacemark.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
-						linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
-						es.addFeature(linkPlacemark);
+						LineStringType lineString = kmlObjectFactory.createLineStringType();
+						lineString.getCoordinates().add(Double.toString(oldCoord.getX()) + "," + Double.toString(oldCoord.getY()) + ",0.0");
+						lineString.getCoordinates().add(Double.toString(coordOut.getX()) + "," + Double.toString(coordOut.getY()) + ",0.0");
+						linkPlacemark.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
+						
+						es.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(linkPlacemark));
+						
 					}
-					oldPoint=pointOut;
+					oldCoord=coordOut;
 				}
 			}
 		}
 	}
 
-	private static void makeTangentialSocialLinkKML(Person myPerson, int i,
-			Folder folder){
+	private static void makeTangentialSocialLinkKML(Person myPerson, int i,	FolderType folder){
 
+		StyleType tangentialLinkStyle = kmlObjectFactory.createStyleType();
+		tangentialLinkStyle.setId("tangentialLinkStyle"+myPerson.getId().toString());
+		
+		byte[] color = new byte[]{(byte) 255, (byte) 128, (byte) 128, (byte) 128};
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(color);
+		lst.setWidth(5.0);
+		tangentialLinkStyle.setLineStyle(lst);
 
-		Style tangentialLinkStyle=new Style("tangentialLinkStyle"+myPerson.getId().toString());
-		Color color = new Color(255,128,128,128);
-		tangentialLinkStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 5));
 		// Add a line from the alter's home to another alter's home in the color grey
 		String id = myPerson.getId().toString();
-		Placemark socialLink =  new Placemark(
-				id+ai.getId().toString()+"_"+i,
-				"Tangential social link_"+i,
-				Feature.DEFAULT_DESCRIPTION,
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				tangentialLinkStyle.getId(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				timeSpan);
+		
+		PlacemarkType socialLink = kmlObjectFactory.createPlacemarkType();
+		socialLink.setId(id+ai.getId().toString()+"_"+i);
+		socialLink.setName("Tangential social link_"+i);
+		socialLink.setStyleUrl(tangentialLinkStyle.getId());
+		socialLink.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
+		LineStringType lineString = kmlObjectFactory.createLineStringType();
+				
 		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
-		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
+		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," + Double.toString(coordFrom.getY()) + ",0.0");
 		Coord coordTo = trafo.transform(((Act)ai.getSelectedPlan().getActsLegs().get(0)).getCoord());
-		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
-		socialLink.setGeometry(new LineString(pointFrom, pointTo));
-		folder.addFeature(socialLink);
+		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," + Double.toString(coordTo.getY()) + ",0.0");
+		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
+		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
 		log.info("Feature added: grey social link from alter "+ai.getId()+" to alter "+myPerson.getId());
 	}
 
 	private static void makeCoreSocialLinkKML(Person myPerson, int i,
-			Folder folder, Style agentLinkStyle){
+			FolderType folder, StyleType agentLinkStyle){
 		// Add a line from the alter's home to the ego's home in the color of the alter
 		String id = myPerson.getId().toString();
-		Color color = agentLinkStyle.getLineStyle().getColor();
-		Style socialLinkStyle=new Style(id+ego.getId().toString());
-		socialLinkStyle.setLineStyle(new LineStyle(color, LineStyle.DEFAULT_COLOR_MODE,5));
+		byte[] color = agentLinkStyle.getLineStyle().getColor();
+		StyleType socialLinkStyle = kmlObjectFactory.createStyleType();
+		socialLinkStyle.setId(id+ego.getId().toString());
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(color);
+		lst.setWidth(5.0);
+		socialLinkStyle.setLineStyle(lst);
 
-		Placemark socialLink =  new Placemark(
-				id+ego.getId().toString()+"_"+i,
-				"Core social link_"+i,
-				Feature.DEFAULT_DESCRIPTION,
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				socialLinkStyle.getId(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				timeSpan);
-
+		PlacemarkType socialLink = kmlObjectFactory.createPlacemarkType();
+		socialLink.setId(id+ego.getId().toString()+"_"+i);
+		socialLink.setName("Core social link_"+i);
+		socialLink.setStyleUrl(socialLinkStyle.getId());
+		socialLink.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
+		
+		LineStringType lineString = kmlObjectFactory.createLineStringType();
 		Coord coordFrom = trafo.transform(((Act)myPerson.getSelectedPlan().getActsLegs().get(0)).getCoord());
-		Point pointFrom= new Point(coordFrom.getX(),coordFrom.getY(), 0.0);
+		lineString.getCoordinates().add(Double.toString(coordFrom.getX()) + "," +Double.toString(coordFrom.getY()) + ",0.0");
 		Coord coordTo = trafo.transform(((Act)ego.getSelectedPlan().getActsLegs().get(0)).getCoord());
-		Point pointTo= new Point(coordTo.getX(),coordTo.getY(), 0.0);
-		socialLink.setGeometry(new LineString(pointFrom, pointTo));
-		folder.addFeature(socialLink);
+		lineString.getCoordinates().add(Double.toString(coordTo.getX()) + "," +Double.toString(coordTo.getY()) + ",0.0");
+		socialLink.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
+		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(socialLink));
 	}
 
 	private static void makeActivitySpaceKML_Line(Person myPerson, int i,
-			Folder planFolder, Style agentLinkStyle) {
+			FolderType planFolder, StyleType agentLinkStyle) {
 
 		String id = myPerson.getId().toString();
 
 //		String spaceName="P"+id+" activity space Iter= "+i;
-		Style activitySpaceStyle=null;
-		activitySpaceStyle=myKMLDocument.getStyle("agentLinkStyle"+myPerson.getId().toString());
-		Color color = agentLinkStyle.getLineStyle().getColor();
-		activitySpaceStyle.setLineStyle(new LineStyle(color, ColorStyle.DEFAULT_COLOR_MODE, 4));
+		StyleType activitySpaceStyle=null;
+		
+		boolean styleExists = false;
+		ListIterator<JAXBElement<? extends AbstractStyleSelectorType>> styleIterator = myKMLDocument.getAbstractStyleSelectorGroup().listIterator();
+		while (styleIterator.hasNext() && !styleExists) {
+			AbstractStyleSelectorType abstractStyle = styleIterator.next().getValue();
+			if (abstractStyle.getId().equals("agentLinkStyle"+myPerson.getId().toString())) {
+				activitySpaceStyle = (StyleType) abstractStyle;
+			}
+		}
 
+		byte[] color = agentLinkStyle.getLineStyle().getColor();
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(color);
+		lst.setWidth(4.0);
+		activitySpaceStyle.setLineStyle(lst);
 
-		Folder as = new Folder(
-				"activity space "+id+"-"+i,
-				"activity space "+id+"-"+i,
-				"Contains one agent's activity space in one iteration",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				activitySpaceStyle.getId(),
-				true,
-				Feature.DEFAULT_REGION,
-				timeSpan);
+		FolderType as = kmlObjectFactory.createFolderType();
+		as.setId("activity space "+id+"-"+i);
+		as.setName("activity space "+id+"-"+i);
+		as.setDescription("Contains one agent's activity space in one iteration");
+		as.setStyleUrl(activitySpaceStyle.getId());
+		as.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
-		if(!planFolder.containsFeature(as.getId())){
-			planFolder.addFeature(as);
+		boolean featureExists = false;
+		ListIterator<JAXBElement<? extends AbstractFeatureType>> featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !featureExists) {
+			AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+			if (abstractFeature.getId().equals(as.getId())) {
+				featureExists = true;
+			}
+		}
+		if (!featureExists) {
+			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(as));
 		}
 
 
@@ -620,7 +681,7 @@ public class EgoNetPlansItersMakeKML {
 			double theta = space.getParam("theta").doubleValue();
 			double x = space.getParam("x").doubleValue();
 			double y = space.getParam("y").doubleValue();
-			Point oldPoint=null;
+			Coord oldCoord=null;
 			for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
 				// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
 				double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
@@ -629,103 +690,98 @@ public class EgoNetPlansItersMakeKML {
 				double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
 //				double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
 				Coord coordOut = trafo.transform(new CoordImpl(p_xOut, p_yOut));
-				Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
 //				CoordI coordIn = trafo.transform(new Coord(p_xIn, p_yIn));
 //				Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
 
 				if(t>0.0){
 
-					Placemark linkPlacemark = new Placemark(
-							Double.toString(t),
-							Feature.DEFAULT_NAME,
-							Feature.DEFAULT_DESCRIPTION,
-							Feature.DEFAULT_ADDRESS,
-							Feature.DEFAULT_LOOK_AT,
-							activitySpaceStyle.getId(),
-							Feature.DEFAULT_VISIBILITY,
-							Feature.DEFAULT_REGION,
-							timeSpan);
+					PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
+					linkPlacemark.setId(Double.toString(t));
+					linkPlacemark.setStyleUrl(activitySpaceStyle.getId());
+					linkPlacemark.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
-					linkPlacemark.setGeometry(new LineString(oldPoint, pointOut));
-					as.addFeature(linkPlacemark);
+					LineStringType lstrt = kmlObjectFactory.createLineStringType();
+					lstrt.getCoordinates().add(Double.toString(oldCoord.getX()) + "," + Double.toString(oldCoord.getY()) + ",0.0");
+					lstrt.getCoordinates().add(Double.toString(coordOut.getX()) + "," + Double.toString(coordOut.getY()) + ",0.0");
+					linkPlacemark.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lstrt));
+					as.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(linkPlacemark));
 				}
-				oldPoint=pointOut;
+				oldCoord=coordOut;
 			}
 		}
 	}
 
-	private static void makeActivitySpaceKML_Poly(Person myPerson, int i,
-			Folder planFolder, Color color) {
-		// TODO
-		// define polygon style
-		String id = myPerson.getId().toString();
-		LineStyle spaceLineStyle = new LineStyle(color, LineStyle.DEFAULT_COLOR_MODE, LineStyle.DEFAULT_WIDTH);
-		PolyStyle spacePolyStyle = new PolyStyle(color,PolyStyle.DEFAULT_COLOR_MODE, false, true);
-		Style spaceStyle = new Style(id);
-		spaceStyle.setLineStyle(spaceLineStyle);
-		spaceStyle.setPolyStyle(spacePolyStyle);
-		String spaceName="activity space";
+//	private static void makeActivitySpaceKML_Poly(Person myPerson, int i,
+//			Folder planFolder, Color color) {
+//		// TODO
+//		// define polygon style
+//		String id = myPerson.getId().toString();
+//		LineStyle spaceLineStyle = new LineStyle(color, LineStyle.DEFAULT_COLOR_MODE, LineStyle.DEFAULT_WIDTH);
+//		PolyStyle spacePolyStyle = new PolyStyle(color,PolyStyle.DEFAULT_COLOR_MODE, false, true);
+//		Style spaceStyle = new Style(id);
+//		spaceStyle.setLineStyle(spaceLineStyle);
+//		spaceStyle.setPolyStyle(spacePolyStyle);
+//		String spaceName="activity space";
+//
+//		// make the activity spaces
+//		new PersonCalcActivitySpace("all").run(myPerson);
+////		new PersonDrawActivitySpace().run(myPerson);
+//		// add the points of the activity space to the polygon
+//		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
+//
+//		List<Point> boundaryOut = new ArrayList<Point>();
+//		List<Point> boundaryIn = new ArrayList<Point>();
+//		if (space instanceof ActivitySpaceEllipse) {
+//			spaceName = myPerson.getId()+"-ellipse-"+i;
+//
+////			calculate the circumference points (boundary)
+//			double a = space.getParam("a").doubleValue();
+//			double b = space.getParam("b").doubleValue();
+//			double theta = space.getParam("theta").doubleValue();
+//			double x = space.getParam("x").doubleValue();
+//			double y = space.getParam("y").doubleValue();
+//			for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
+//				// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
+//				double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
+//				double p_xIn = 0.9*(a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta)) + x;
+//				// "a*((cos(t)))*sin(phi) + b*((sin(t)))*cos(phi) + y0"
+//				double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
+//				double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
+//				Coord coordOut = trafo.transform(new CoordImpl(p_xOut, p_yOut));
+//				Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
+//				Coord coordIn = trafo.transform(new CoordImpl(p_xIn, p_yIn));
+//				Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
+//				boundaryOut.add(pointOut);
+////				boundaryIn.add(pointIn);
+//			}
+//		}
+//
+//		// define the polygon feature
+//
+//		Placemark pl = new Placemark(
+//				spaceName,
+//				spaceName,
+//				spaceName+": test activity space",
+//				Feature.DEFAULT_ADDRESS,
+//				Feature.DEFAULT_LOOK_AT,
+//				spaceStyle.getId(),
+//				Feature.DEFAULT_VISIBILITY,
+//				Feature.DEFAULT_REGION,
+//				timeSpan);
+//
+//		// make the polygon feature
+//		Polygon polygon = new Polygon(true,true,Geometry.DEFAULT_ALTITUDE_MODE);
+//		polygon.setBoundary(new LinearRing(boundaryOut));
+//		polygon.addInnerBoundary(new LinearRing(boundaryIn));
+//		// add the polygon feature
+//		pl.setGeometry(polygon);
+//		if(!planFolder.containsFeature(pl.getId())){
+//			planFolder.addFeature(pl);
+//		}
+//
+//	}
 
-		// make the activity spaces
-		new PersonCalcActivitySpace("all").run(myPerson);
-//		new PersonDrawActivitySpace().run(myPerson);
-		// add the points of the activity space to the polygon
-		ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
-
-		List<Point> boundaryOut = new ArrayList<Point>();
-		List<Point> boundaryIn = new ArrayList<Point>();
-		if (space instanceof ActivitySpaceEllipse) {
-			spaceName = myPerson.getId()+"-ellipse-"+i;
-
-//			calculate the circumference points (boundary)
-			double a = space.getParam("a").doubleValue();
-			double b = space.getParam("b").doubleValue();
-			double theta = space.getParam("theta").doubleValue();
-			double x = space.getParam("x").doubleValue();
-			double y = space.getParam("y").doubleValue();
-			for (double t=0.0; t<2.0*Math.PI; t=t+2.0*Math.PI/360.0) {
-				// "a*((cos(t)))*cos(phi) - b*((sin(t)))*sin(phi) + x0"
-				double p_xOut = a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta) + x;
-				double p_xIn = 0.9*(a*Math.cos(t)*Math.cos(theta) - b*Math.sin(t)*Math.sin(theta)) + x;
-				// "a*((cos(t)))*sin(phi) + b*((sin(t)))*cos(phi) + y0"
-				double p_yOut = a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta) + y;
-				double p_yIn = 0.9*(a*Math.cos(t)*Math.sin(theta) + b*Math.sin(t)*Math.cos(theta)) + y;
-				Coord coordOut = trafo.transform(new CoordImpl(p_xOut, p_yOut));
-				Point pointOut= new Point(coordOut.getX(),coordOut.getY(), 0.0);
-				Coord coordIn = trafo.transform(new CoordImpl(p_xIn, p_yIn));
-				Point pointIn= new Point(coordIn.getX(),coordIn.getY(), 0.0);
-				boundaryOut.add(pointOut);
-//				boundaryIn.add(pointIn);
-			}
-		}
-
-		// define the polygon feature
-
-		Placemark pl = new Placemark(
-				spaceName,
-				spaceName,
-				spaceName+": test activity space",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				spaceStyle.getId(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				timeSpan);
-
-		// make the polygon feature
-		Polygon polygon = new Polygon(true,true,Geometry.DEFAULT_ALTITUDE_MODE);
-		polygon.setBoundary(new LinearRing(boundaryOut));
-		polygon.addInnerBoundary(new LinearRing(boundaryIn));
-		// add the polygon feature
-		pl.setGeometry(polygon);
-		if(!planFolder.containsFeature(pl.getId())){
-			planFolder.addFeature(pl);
-		}
-
-	}
-
-	private static void makeActKML(Person myPerson, Act act, int actNo, Folder planFolder, Style agentLinkStyle, int iter) {
-		// TODO Auto-generated method stub
+	private static void makeActKML(Person myPerson, Act act, int actNo, FolderType planFolder, StyleType agentLinkStyle, int iter) {
 
 		String styleUrl = null;
 		String fullActName = null;
@@ -733,7 +789,7 @@ public class EgoNetPlansItersMakeKML {
 		double actEndTime;
 		switch(actType) {
 		case 'h':
-			styleUrl = homeStyle.getStyleUrl();
+			styleUrl = homeStyle.getId();
 			if (act.getStartTime() == 0.0) {
 				fullActName = "morning home "+myPerson.getId();
 			} else {
@@ -742,19 +798,19 @@ public class EgoNetPlansItersMakeKML {
 			}
 			break;
 		case 's':
-			styleUrl = shopStyle.getStyleUrl();
+			styleUrl = shopStyle.getId();
 			fullActName = "shop"+myPerson.getId()+"-"+actNo;
 			break;
 		case 'l':
-			styleUrl = leisureStyle.getStyleUrl();
+			styleUrl = leisureStyle.getId();
 			fullActName = "leisure"+myPerson.getId();
 			break;
 		case 'w':
-			styleUrl = workStyle.getStyleUrl();
+			styleUrl = workStyle.getId();
 			fullActName = "work"+myPerson.getId()+"-"+actNo;
 			break;
 		case 'e':
-			styleUrl = educStyle.getStyleUrl();
+			styleUrl = educStyle.getId();
 			fullActName = "education"+myPerson.getId()+"-"+actNo;
 			break;
 		}
@@ -764,102 +820,98 @@ public class EgoNetPlansItersMakeKML {
 			actEndTime = 24.0 * 60 * 60;
 		}
 
-
-		Placemark pl = new Placemark(
-				fullActName,
-				null,
-				fullActName+": "+Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime),
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				styleUrl,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				timeSpan);
-		if(!planFolder.containsFeature(pl.getId())){
-			planFolder.addFeature(pl);
-		}
+		PlacemarkType pl = kmlObjectFactory.createPlacemarkType();
+		pl.setId(fullActName);
+		pl.setDescription(fullActName+": "+Time.writeTime(act.getStartTime()) + " - " + Time.writeTime(actEndTime));
+		pl.setStyleUrl(styleUrl);
+		pl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
 
 		Coord geometryCoord = trafo.transform(new CoordImpl(act.getCoord().getX(), act.getCoord().getY()));
-		Point actPoint = new Point(geometryCoord.getX(), geometryCoord.getY(), 0.0);
-		pl.setGeometry(actPoint);
+		PointType actPoint = kmlObjectFactory.createPointType();
+		actPoint.getCoordinates().add(Double.toString(geometryCoord.getX()) + "," + Double.toString(geometryCoord.getY()) + ",0.0");
+		pl.setAbstractGeometryGroup(kmlObjectFactory.createPoint(actPoint));
+
+		boolean featureExists = false;
+		ListIterator<JAXBElement<? extends AbstractFeatureType>> featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !featureExists) {
+			AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+			if (abstractFeature.getId().equals(pl.getId())) {
+				featureExists = true;
+			}
+		}
+		if (!featureExists) {
+			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(pl));
+		}
 
 //		if (!fullActName.equals("evening home")) {
 		Link actLink = act.getLink();
-		Placemark agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
-		if(!planFolder.containsFeature(agentLink.getId())){
-			planFolder.addFeature(agentLink);
+		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
+		
+		featureExists = false;
+		featureIterator = planFolder.getAbstractFeatureGroup().listIterator();
+		while (featureIterator.hasNext() && !featureExists) {
+			AbstractFeatureType abstractFeature = featureIterator.next().getValue();
+			if (abstractFeature.getId().equals(agentLink.getId())) {
+				featureExists = true;
+			}
+		}
+		if (!featureExists) {
+			planFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(agentLink));
 		}
 //		}
 
 	}
 
-	private static void setFacStyles(Color color) {
+//	private static void setFacStyles(Color color) {
+//
+//		// Generates facility styles specific to agent
+//
+//		double labelScale = 1.0;
+//		workStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/W.png")));
+//		workStyle.setLabelStyle(
+//				new LabelStyle(
+//						color,
+//						ColorStyle.DEFAULT_COLOR_MODE,
+//						labelScale));
+//		leisureStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/L.png")));
+//		leisureStyle.setLabelStyle(
+//				new LabelStyle(
+//						color,
+//						ColorStyle.DEFAULT_COLOR_MODE,
+//						labelScale));
+//		educStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/E.png")));
+//		educStyle.setLabelStyle(
+//				new LabelStyle(
+//						color,
+//						ColorStyle.DEFAULT_COLOR_MODE,
+//						labelScale));
+//		shopStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/S.png")));
+//		shopStyle.setLabelStyle(
+//				new LabelStyle(
+//						color,
+//						ColorStyle.DEFAULT_COLOR_MODE,
+//						labelScale));
+//		homeStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/H.png")));
+//		homeStyle.setLabelStyle(
+//				new LabelStyle(
+//						color,
+//						ColorStyle.DEFAULT_COLOR_MODE,
+//						labelScale));
+//	}
 
-		// Generates facility styles specific to agent
-
-		double labelScale = 1.0;
-		workStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/W.png")));
-		workStyle.setLabelStyle(
-				new LabelStyle(
-						color,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		leisureStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/L.png")));
-		leisureStyle.setLabelStyle(
-				new LabelStyle(
-						color,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		educStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/E.png")));
-		educStyle.setLabelStyle(
-				new LabelStyle(
-						color,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		shopStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/S.png")));
-		shopStyle.setLabelStyle(
-				new LabelStyle(
-						color,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-		homeStyle.setIconStyle(new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/H.png")));
-		homeStyle.setLabelStyle(
-				new LabelStyle(
-						color,
-						ColorStyle.DEFAULT_COLOR_MODE,
-						labelScale));
-	}
-
-	private static Color setColor(int i, int intervals) {
+	private static Byte[] setColor(int i, int intervals) {
 
 		// returns a color as a function of integer i
-		int alpha = 255;
+		byte alpha = (byte) 255;
 
-		int r = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) + 1));
+		byte r = (byte)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) + 1));
 //		log.info(r);
-		int g = (int)(127.0 * (Math.cos((i * 2 * Math.PI) / intervals) + 1));
+		byte g = (byte)(127.0 * (Math.cos((i * 2 * Math.PI) / intervals) + 1));
 //		log.info(g);
-		int b = (int)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) * (-1) + 1));
+		byte b = (byte)(127.0 * (Math.sin((i * 2 * Math.PI) / intervals) * (-1) + 1));
 //		log.info(b);
 
-		String aStr = Integer.toHexString(alpha);
-		if (aStr.length() == 1) {
-			aStr = "0".concat(aStr);
-		}
-		String rStr = Integer.toHexString(r);
-		if (rStr.length() == 1) {
-			rStr = "0".concat(rStr);
-		}
-		String gStr = Integer.toHexString(g);
-		if (gStr.length() == 1) {
-			gStr = "0".concat(gStr);
-		}
-		String bStr = Integer.toHexString(b);
-		if (bStr.length() == 1) {
-			bStr = "0".concat(bStr);
-		}
-
-		Color color = new Color(aStr, bStr, gStr, rStr);
+		Byte[] color = new Byte[]{alpha, b, g, r};
 		return color;
 	}
 
@@ -875,7 +927,7 @@ public class EgoNetPlansItersMakeKML {
 
 		try {
 			//add the matsim logo to the kml
-			myKMLDocument.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
+			myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(MatsimKMLLogo.writeMatsimKMLLogo(myKMZDocumentWriter)));
 //			networkFolder.addFeature(new MatsimKMLLogo(myKMZDocumentWriter));
 		} catch (IOException e) {
 			log.error("Cannot add logo to the KMZ file.", e);
@@ -891,61 +943,48 @@ public class EgoNetPlansItersMakeKML {
 
 	}
 
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo) {
+	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo) {
 
-		Placemark linkPlacemark = null;
+		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
+		linkPlacemark.setName("link" + link.getId());
+
+		LineStringType lst = kmlObjectFactory.createLineStringType();
 
 		Node fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
-		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
+		lst.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
 
 		Node toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
-		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
+		lst.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");
 
-		linkPlacemark = new Placemark(
-				"link" + link.getId(),
-				Feature.DEFAULT_NAME,
-				Feature.DEFAULT_DESCRIPTION,
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				style.getStyleUrl(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		linkPlacemark.setGeometry(new LineString(fromPoint, toPoint));
+		linkPlacemark.setStyleUrl(style.getId());
+		linkPlacemark.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lst));
 
 		return linkPlacemark;
 	}
-	private static Placemark generateLinkPlacemark(Link link, Style style, CoordinateTransformation trafo, int iter) {
+	
+	private static PlacemarkType generateLinkPlacemark(Link link, StyleType style, CoordinateTransformation trafo, int iter) {
 
-		Placemark linkPlacemark = null;
-
+		PlacemarkType linkPlacemark = kmlObjectFactory.createPlacemarkType();
+		linkPlacemark.setId("link" + link.getId());
+		linkPlacemark.setStyleUrl(style.getId());
+		linkPlacemark.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
+		
+		LineStringType lineString = kmlObjectFactory.createLineStringType();
+		
 		Node fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
-		Point fromPoint = new Point(fromNodeGeometryCoord.getX(), fromNodeGeometryCoord.getY(), 0.0);
-
 		Node toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
-		Point toPoint = new Point(toNodeGeometryCoord.getX(), toNodeGeometryCoord.getY(), 0.0);
 
-		linkPlacemark = new Placemark(
-				"link" + link.getId(),
-				Feature.DEFAULT_NAME,
-				Feature.DEFAULT_DESCRIPTION,
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				style.getStyleUrl(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				timeSpan);
-
-		linkPlacemark.setGeometry(new LineString(fromPoint, toPoint));
+		lineString.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
+		lineString.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");
+		linkPlacemark.setAbstractGeometryGroup(kmlObjectFactory.createLineString(lineString));
 
 		return linkPlacemark;
 	}

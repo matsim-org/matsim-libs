@@ -2,6 +2,15 @@ package playground.gregor.gis.deprecated;
 
 import java.util.Iterator;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LineStringType;
+import net.opengis.kml._2.LineStyleType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.StyleType;
+
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -10,17 +19,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.vis.kml.ColorStyle;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
-import org.matsim.utils.vis.kml.LineString;
-import org.matsim.utils.vis.kml.LineStyle;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.Style;
-import org.matsim.utils.vis.kml.fields.Color;
+import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.world.World;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -29,13 +28,13 @@ public class Network2Kml {
 
 	private NetworkLayer network;
 
-
-    private static KML kml;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	private static KmlType kml;
 	private static String KMLFilename = "./test.kmz";
 	private static boolean useCompression = true;
-	private static Document kmlDocument;
+	private static DocumentType kmlDocument;
 
-	private Style normal;
+	private StyleType normal;
 
 
 	public Network2Kml(NetworkLayer network){
@@ -65,69 +64,68 @@ public class Network2Kml {
 		String key = "link";
 
 
-		Folder folder = new Folder(
-				key,
-				key,
-				("Contains all "+ key),
-				key, org.matsim.utils.vis.kml.Feature.DEFAULT_LOOK_AT,
-				org.matsim.utils.vis.kml.Feature.DEFAULT_STYLE_URL,
-				true,
-				org.matsim.utils.vis.kml.Feature.DEFAULT_REGION,
-				org.matsim.utils.vis.kml.Feature.DEFAULT_TIME_PRIMITIVE);
+		FolderType folder = this.kmlObjectFactory.createFolderType();
+		folder.setName(key);
+		folder.setDescription("Contains all " + key);
 
-			kmlDocument.addFeature(folder);
+		kmlDocument.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(folder));
+		
+		Iterator it = this.network.getLinks().values().iterator();
+		while (it.hasNext()){
+			Link link = (Link) it.next();
+			Coord from = transform.transform(link.getFromNode().getCoord());
+			Coord to = transform.transform(link.getToNode().getCoord());
 
-			Iterator it = this.network.getLinks().values().iterator();
-			while (it.hasNext()){
-				Link link = (Link) it.next();
-				Coord from = transform.transform(link.getFromNode().getCoord());
-				Coord to = transform.transform(link.getToNode().getCoord());
+			LineStringType ls = this.kmlObjectFactory.createLineStringType();
+			ls.getCoordinates().add(Double.toString(from.getX()) + "," + Double.toString(from.getY()) + "," + Double.toString(Double.NaN));
+			ls.getCoordinates().add(Double.toString(to.getX()) + "," + Double.toString(to.getY()) + "," + Double.toString(Double.NaN));
 
+			String styleUrl = this.normal.getId();
 
-				LineString ls = new LineString(new Point(from.getX(),from.getY(),Double.NaN), new Point(to.getX(),to.getY(),Double.NaN));
+			PlacemarkType placemark = this.kmlObjectFactory.createPlacemarkType();
+			placemark.setName("link" + link.getId().toString());
+			placemark.setDescription("link" + link.getId().toString());
+			placemark.setAddress(styleUrl);
+			placemark.setStyleUrl(styleUrl);
 
-				String styleUrl = this.normal.getStyleUrl();
+			//			if (!(key.contains("connection") || key.contains("node")) )
+//			placemark.setVisibility(false);
+			placemark.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(ls));
+			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(placemark));
 
-				Placemark placemark = new Placemark(
-						link.getId().toString(),
-						"link" + link.getId().toString(),
-						"link" + link.getId().toString(),
-						styleUrl, org.matsim.utils.vis.kml.Feature.DEFAULT_LOOK_AT,
-						styleUrl,
-						true,
-						org.matsim.utils.vis.kml.Feature.DEFAULT_REGION,
-						org.matsim.utils.vis.kml.Feature.DEFAULT_TIME_PRIMITIVE);
-//				if (!(key.contains("connection") || key.contains("node")) )
-//					placemark.setVisibility(false);
-				folder.addFeature(placemark);
-				placemark.setGeometry(ls);
-
-			}
+		}
 
 
 	}
 
 	private void writeKml() {
-		KMLWriter myKMLDocumentWriter;
-		myKMLDocumentWriter = new KMLWriter(kml, KMLFilename, KMLWriter.DEFAULT_XMLNS, useCompression);
-		myKMLDocumentWriter.write();
+		
+		KMZWriter myKMLDocumentWriter = new KMZWriter(KMLFilename);
+		myKMLDocumentWriter.writeMainKml(kml);
+		myKMLDocumentWriter.close();
 
 	}
 
 	private void generateStyles(){
-		this.normal = new Style("normalRoadStyle");
-		kmlDocument.addStyle(this.normal);
-		this.normal.setLineStyle(new LineStyle(new Color("7f","ff","ae","21"), ColorStyle.DEFAULT_COLOR_MODE, 5));
+		
+		this.normal = this.kmlObjectFactory.createStyleType();
+		this.normal.setId("normalRoadStyle");
+		
+		LineStyleType lst = this.kmlObjectFactory.createLineStyleType();
+		byte[] color = new byte[]{(byte) 0x7f, (byte) 0xff, (byte) 0xae, (byte) 0x21};
+		lst.setColor(color);
+		lst.setWidth(5.0);
+		this.normal.setLineStyle(lst);
+		
+		kmlDocument.getAbstractStyleSelectorGroup().add(this.kmlObjectFactory.createStyle(this.normal));
 
 	}
 
 	private void createKml(String kmlFileName) {
 
-		kml = new KML();
-		kmlDocument = new Document("padang");
-		kml.setFeature(kmlDocument);
-
-
+		kml = this.kmlObjectFactory.createKmlType();
+		kmlDocument = this.kmlObjectFactory.createDocumentType();
+		kml.setAbstractFeatureGroup(this.kmlObjectFactory.createDocument(kmlDocument));
 
 	}
 

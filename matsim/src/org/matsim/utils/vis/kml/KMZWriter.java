@@ -31,8 +31,17 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.NetworkLinkType;
+import net.opengis.kml._2.ObjectFactory;
+
 import org.apache.log4j.Logger;
-import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
 /**
  * A writer for complex keyhole markup files used by Google Earth. It supports
@@ -45,8 +54,6 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 public class KMZWriter {
 
 	private static final Logger log = Logger.getLogger(KMZWriter.class);
-
-	private KMLWriter.XMLNS xmlNS = null;
 
 	private BufferedWriter out = null;
 
@@ -61,26 +68,10 @@ public class KMZWriter {
 	 *          the location of the file to be written.
 	 */
 	public KMZWriter(final String outFilename) {
-		this(outFilename, KMLWriter.DEFAULT_XMLNS);
-	}
-
-	/**
-	 * Creates a new kmz-file with the specified namespace/version and opens the
-	 * file for writing.
-	 *
-	 * @param outFilename
-	 *          the location of the file to be written.
-	 * @param xmlNS
-	 *          the version in which to write the entries.
-	 *
-	 * @see KMLWriter.XMLNS
-	 */
-	public KMZWriter(final String outFilename, final XMLNS xmlNS) {
 		String filename = outFilename;
 		if (filename.endsWith(".kml") || filename.endsWith(".kmz")) {
 			filename = filename.substring(0, filename.length() - 4);
 		}
-		this.xmlNS = xmlNS;
 
 		try {
 			this.zipOut = new ZipOutputStream(new FileOutputStream(filename + ".kmz"));
@@ -93,13 +84,17 @@ public class KMZWriter {
 		// added) main-KML.
 		// this is required as GoogleEarth will only display the first-added KML in
 		// a kmz.
-		KML docKml = new KML();
-		Document docDoc = new Document("link to main document");
-		docKml.setFeature(docDoc);
-		NetworkLink nl = new NetworkLink("mainlink", new Link("main.kml"));
-		docKml.setFeature(nl);
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		KmlType docKML = kmlObjectFactory.createKmlType();
+		NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
+		nl.setName("mainLink");
 
-		writeKml("doc.kml", docKml);
+		LinkType link = kmlObjectFactory.createLinkType();
+		link.setHref("main.kml");
+		nl.setLink(link);
+		docKML.setAbstractFeatureGroup(kmlObjectFactory.createNetworkLink(nl));
+
+		writeKml("doc.kml", docKML);
 	}
 
 	/**
@@ -112,7 +107,7 @@ public class KMZWriter {
 	 * @param kml
 	 *          The KML-object to store in the file.
 	 */
-	public void writeLinkedKml(final String filename, final KML kml) {
+	public void writeLinkedKml(final String filename, final KmlType kml) {
 		if (filename.equals("doc.kml")) {
 			throw new IllegalArgumentException(
 					"The filename 'doc.kml' is reserved for the primary kml.");
@@ -133,7 +128,7 @@ public class KMZWriter {
 	 *          the KML-object that will be read by Google Earth when opening the
 	 *          file.
 	 */
-	public void writeMainKml(final KML kml) {
+	public void writeMainKml(final KmlType kml) {
 		writeKml("main.kml", kml);
 	}
 
@@ -211,7 +206,7 @@ public class KMZWriter {
 	 * @param filename
 	 * @param kml
 	 */
-	private void writeKml(final String filename, final KML kml) {
+	private void writeKml(final String filename, final KmlType kml) {
 
 		try {
 
@@ -219,23 +214,23 @@ public class KMZWriter {
 			ze.setMethod(ZipEntry.DEFLATED);
 			this.zipOut.putNextEntry(ze);
 
-			this.writeXMLDeclaration();
-
-			int offset = 0;
-			String offsetString = "  ";
-
-			kml.writeKML(this.out, this.xmlNS, offset, offsetString, this.xmlNS);
+			try {
+				JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
+				ObjectFactory factory = new ObjectFactory();
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				marshaller.marshal(factory.createKml(kml), out);
+			} catch (PropertyException e) {
+				e.printStackTrace();
+			} catch (JAXBException e) {
+				e.printStackTrace();
+			}
+			
 			this.out.flush();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
-	private void writeXMLDeclaration() throws IOException {
-		this.out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		this.out.newLine();
-	}
-
 
 }

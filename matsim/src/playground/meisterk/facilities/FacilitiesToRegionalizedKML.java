@@ -136,7 +136,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		shopStyle.setIconStyle(shopIconStyle);
 		BasicLinkType shopIconLink = this.kmlJAXBFactory.createBasicLinkType();
 		shopIconStyle.setIcon(shopIconLink);
-		shopIconStyle.setLiteralScale(this.iconScale);
+		shopIconStyle.setScale(this.iconScale);
 		shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 		log.info("Initializing KML...done.");
 

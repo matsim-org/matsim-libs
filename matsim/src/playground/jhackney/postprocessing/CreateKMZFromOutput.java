@@ -19,19 +19,11 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 

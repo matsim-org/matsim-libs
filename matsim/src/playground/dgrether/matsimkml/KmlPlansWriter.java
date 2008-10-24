@@ -22,15 +22,20 @@ package playground.dgrether.matsimkml;
 import java.io.IOException;
 import java.util.Set;
 
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.StyleType;
+
+import org.apache.log4j.Logger;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
 
@@ -41,7 +46,7 @@ import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
  */
 public class KmlPlansWriter {
 
-
+	private static final Logger log = Logger.getLogger(KmlPlansWriter.class);
 
 	private NetworkLayer network;
 
@@ -49,42 +54,59 @@ public class KmlPlansWriter {
 
 	private NetworkFeatureFactory featureFactory;
 
-	private Style networkLinkStyle;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	
+	private StyleType networkLinkStyle;
 
-	private Style networkNodeStyle;
+	private StyleType networkNodeStyle;
 
-	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer,  Document doc) {
+	public KmlPlansWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.featureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
-	public Folder getPlansFolder(Set<Plan> planSet) throws IOException {
-		Folder folder = new Folder("plans");
+	public FolderType getPlansFolder(Set<Plan> planSet) throws IOException {
+		
+		FolderType folder = this.kmlObjectFactory.createFolderType();
+		
 		folder.setName("MATSIM Plans, quantity: " + planSet.size());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 //		folder.addStyle(this.networkLinkStyle);
 //		folder.addStyle(this.networkNodeStyle);
 		Act act;
-		Folder planFolder;
+		FolderType planFolder;
 		Leg leg;
+		AbstractFeatureType abstractFeature;
 		for (Plan plan : planSet) {
-			planFolder = new Folder("plan" + plan.getPerson().getId());
+			planFolder = kmlObjectFactory.createFolderType();
 			planFolder.setName("Selected Plan of Person: " + plan.getPerson().getId());
 			act = plan.getFirstActivity();
 			do {
-				planFolder.addFeature(this.featureFactory.createActFeature(act, this.networkNodeStyle));
+				abstractFeature = this.featureFactory.createActFeature(act, this.networkNodeStyle);
+				if (abstractFeature.getClass().equals(PlacemarkType.class)) {
+					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature)); 
+				} else {
+					log.warn("Not yet implemented: Adding act KML features of type " + abstractFeature.getClass());
+				}
+				
 				leg = plan.getNextLeg(act);
-				planFolder.addFeature(this.featureFactory.createLegFeature(leg, this.networkLinkStyle));
+				abstractFeature = this.featureFactory.createLegFeature(leg, this.networkLinkStyle);
+				if (abstractFeature.getClass().equals(FolderType.class)) {
+					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+				} else {
+					log.warn("Not yet implemented: Adding leg KML features of type " + abstractFeature.getClass());
+				}
+
 				act = plan.getNextActivity(leg);
 			}
 			while (plan.getNextLeg(act) != null);
-			folder.addFeature(planFolder);
+			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(planFolder));
 		}
-
+		
 		return folder;
+		
 	}
-
 
 }

@@ -27,6 +27,14 @@ import java.io.OutputStreamWriter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * A writer for KML files.
+ * 
+ * @author meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
+ */
 public class KMLWriter {
 
 	private boolean useCompression;
@@ -35,6 +43,14 @@ public class KMLWriter {
 	private BufferedWriter out;
 	private KML kml;
 
+	/**
+	 * An enumeration type to handle different versions of Google Earth KML.
+	 * 
+	 * @author dgrether, meisterk, mrieser
+	 * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+	 * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+	 *
+	 */
 	public enum XMLNS {
 
 		// add objects for more versions here

@@ -27,11 +27,14 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
 /**
  * For documentation, refer to
- * <a href="http://earth.google.com/kml/kml_tags_21.html#placemark">
- * http://earth.google.com/kml/kml_tags_21.html#placemark</a>
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#placemark">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#placemark</a>
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
  *
- */
-public class Placemark extends Feature {
+ */public class Placemark extends Feature {
 
 	private Geometry geometry;
 

@@ -28,8 +28,13 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
 /**
  * For documentation, refer to
- * <a href="http://earth.google.com/kml/kml_tags_21.html#linestring">
- * http://earth.google.com/kml/kml_tags_21.html#linestring</a>
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#linestring">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#linestring</a>
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
  */
 public class LineString extends Geometry {
 

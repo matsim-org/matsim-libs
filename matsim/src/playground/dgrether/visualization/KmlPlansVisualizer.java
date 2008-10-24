@@ -25,6 +25,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
@@ -34,10 +40,6 @@ import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
@@ -53,11 +55,13 @@ public class KmlPlansVisualizer {
 
 	private static final Logger log = Logger.getLogger(KmlPlansVisualizer.class);
 
-	private KML mainKml;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	
+	private KmlType mainKml;
 
-	private Document mainDoc;
+	private DocumentType mainDoc;
 
-	private Folder mainFolder;
+	private FolderType mainFolder;
 
 	private KMZWriter writer;
 
@@ -72,15 +76,15 @@ public class KmlPlansVisualizer {
 
 	private void write(final String filename) {
 		// init kml
-		this.mainKml = new KML();
-		this.mainDoc = new Document(filename);
-		this.mainKml.setFeature(this.mainDoc);
+		this.mainKml = this.kmlObjectFactory.createKmlType();
+		this.mainDoc = this.kmlObjectFactory.createDocumentType();
+		this.mainKml.setAbstractFeatureGroup(this.kmlObjectFactory.createDocument(mainDoc));
 		// create a folder
-		this.mainFolder = new Folder("matsimdatafolder");
+		this.mainFolder = this.kmlObjectFactory.createFolderType();
 		this.mainFolder.setName("Matsim Data");
-		this.mainDoc.addFeature(this.mainFolder);
+		this.mainDoc.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(this.mainFolder));
 		// the writer
-		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
+		this.writer = new KMZWriter(filename);
 		Set<Plan> planSetBig = filterPlans();
 		log.info("Found " + planSetBig.size() + " relevant plans");
 		int i = 0;
@@ -95,12 +99,12 @@ public class KmlPlansVisualizer {
 		this.scenario.setPlans(null);
 		try {
 			// add the matsim logo to the kml
-			MatsimKMLLogo logo = new MatsimKMLLogo(this.writer);
-			this.mainFolder.addFeature(logo);
+			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(logo));
 			KmlPlansWriter plansWriter = new KmlPlansWriter(this.scenario.getNetwork(),
 					TransformationFactory.getCoordinateTransformation(Gbl.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84), this.writer, this.mainDoc);
-			Folder plansFolder = plansWriter.getPlansFolder(planSet);
-			this.mainFolder.addFeature(plansFolder);
+			FolderType plansFolder = plansWriter.getPlansFolder(planSet);
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(plansFolder));
 		} catch (IOException e) {
 			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
 			e.printStackTrace();

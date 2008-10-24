@@ -20,6 +20,14 @@
 
 package org.matsim.utils.vis.matsimkml;
 
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.LineStringType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -28,12 +36,6 @@ import org.matsim.population.Leg;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.Feature;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.LineString;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.Style;
 
 /**
  * @author dgrether
@@ -93,75 +95,107 @@ public class NetworkFeatureFactory {
 	 */
 	public static final String ENDLI = "</li>";
 
+	private ObjectFactory kmlObjectFactory = null;
+	
 	public NetworkFeatureFactory(CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
+		this.kmlObjectFactory = new ObjectFactory();
 	}
 
-
-
-	public Feature createLinkFeature(final Link l, Style networkStyle) {
-		String description = createLinkDescription(l);
-		Folder folder = new Folder(l.getId().toString());
+	public AbstractFeatureType createLinkFeature(final Link l, StyleType networkStyle) {
+		
+		FolderType folder = this.kmlObjectFactory.createFolderType();
+		String description = this.createLinkDescription(l);
 		folder.setName(l.getId().toString());
-		Placemark p = new Placemark("link" + l.getId().toString());
+
+		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(l.getId().toString());
+
 		Coord fromCoord = this.coordTransform.transform(l.getFromNode().getCoord());
 		Coord toCoord = this.coordTransform.transform(l.getToNode().getCoord());
-		LineString line = new LineString(new Point(fromCoord.getX(), fromCoord.getY(), 0.0), new Point(toCoord.getX(), toCoord.getY(), 0.0));
-		p.setGeometry(line);
-		p.setStyleUrl(networkStyle.getStyleUrl());
+		LineStringType line = this.kmlObjectFactory.createLineStringType();
+		line.getCoordinates().add(Double.toString(fromCoord.getX()) + "," + Double.toString(fromCoord.getY()) + ",0.0");
+		line.getCoordinates().add(Double.toString(toCoord.getX()) + "," + Double.toString(toCoord.getY()) + ",0.0");
+		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
+		p.setStyleUrl(networkStyle.getId());
 		p.setDescription(description);
-
-		Placemark pointPlacemark = new Placemark("linkCenter" + l.getId());
+		
+		PlacemarkType pointPlacemark = this.kmlObjectFactory.createPlacemarkType();
 		Coord centerCoord = this.coordTransform.transform(l.getCenter());
-		Point point = new Point(centerCoord.getX(), centerCoord.getY(), 0.0);
-		pointPlacemark.setGeometry(point);
-		pointPlacemark.setStyleUrl(networkStyle.getStyleUrl());
+		PointType point = this.kmlObjectFactory.createPointType();
+		point.getCoordinates().add(Double.toString(centerCoord.getX()) + "," + Double.toString(centerCoord.getY()) + ",0.0");
+		pointPlacemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+		pointPlacemark.setStyleUrl(networkStyle.getId());
 		pointPlacemark.setDescription(description);
 //		return pointPlacemark;
-		folder.addFeature(pointPlacemark);
-		folder.addFeature(p);
+		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
+		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
+		
 		return folder;
+		
 	}
 
-
-	public Feature createNodeFeature(final Node n, Style networkStyle) {
-		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
+	public AbstractFeatureType createNodeFeature(final Node n, StyleType networkStyle) {
+		
+		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(n.getId().toString());
-		Coord coord = this.coordTransform.transform(n.getCoord());
-		Point point = new Point(coord.getX(), coord.getY(), 0.0);
-		p.setGeometry(point);
-		p.setStyleUrl(networkStyle.getStyleUrl());
-		p.setDescription(createNodeDescription(n));
-		return p;
-	}
 
-	public Feature createActFeature(Act act, Style style) {
-		Placemark p = new Placemark(MatsimKmlIdPool.getInstance().getKmlId());
+		Coord coord = this.coordTransform.transform(n.getCoord());
+		PointType point = this.kmlObjectFactory.createPointType();
+		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+		p.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+		
+		p.setStyleUrl(networkStyle.getId());
+		p.setDescription(this.createNodeDescription(n));
+		
+		return p;
+		
+	}
+	
+	public AbstractFeatureType createActFeature(Act act, StyleType style) {
+
+		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName("Activity on link: " + act.getLinkId().toString());
+
 		Coord coord = this.coordTransform.transform(act.getCoord());
-		Point point = new Point(coord.getX(), coord.getY(), 0.0);
-		p.setGeometry(point);
-		p.setStyleUrl(style.getStyleUrl());
+		PointType point = this.kmlObjectFactory.createPointType();
+		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+		p.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+
+		p.setStyleUrl(style.getId());
 //		p.setDescription(createNodeDescription(n));
 		return p;
+		
 	}
 
-
-
-	public Feature createLegFeature(Leg leg, Style style) {
-		Folder folder = new Folder(MatsimKmlIdPool.getInstance().getKmlId());
+	public AbstractFeatureType createLegFeature(Leg leg, StyleType style) {
+	
+		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(String.valueOf(leg.getNum()));
 //		String description = createLegDescription(leg);
+
 		for (Link l : leg.getRoute().getLinkRoute()) {
-			folder.addFeature(createLinkFeature(l, style));
+			
+			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
+			if (abstractFeature.getClass().equals(FolderType.class)) {
+				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+			} else {
+				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
+			}
 		}
 		for (Node n : leg.getRoute().getRoute()) {
-			folder.addFeature(createNodeFeature(n, style));
+			
+			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
+			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
+				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+			} else {
+				log.warn("Not yet implemented: Adding node KML features of type" + abstractFeature.getClass());
+			}
 		}
+		
 		return folder;
 	}
-
+	
 
 	private String createLinkDescription(Link l) {
 		StringBuffer buffer = new StringBuffer();

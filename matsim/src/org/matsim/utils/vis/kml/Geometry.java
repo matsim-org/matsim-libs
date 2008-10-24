@@ -27,8 +27,13 @@ import org.matsim.utils.vis.kml.KMLWriter.XMLNS;
 
 /**
  * For documentation, refer to
- * <a href="http://earth.google.com/kml/kml_tags_21.html#geometry">
- * http://earth.google.com/kml/kml_tags_21.html#geometry</a>
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#geometry">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#geometry</a>
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
  */
 public abstract class Geometry extends Object {
 

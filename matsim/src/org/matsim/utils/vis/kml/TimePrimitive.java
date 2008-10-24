@@ -25,8 +25,13 @@ import java.util.GregorianCalendar;
 
 /**
  * For documentation, refer to
- * <a href="http://earth.google.com/kml/kml_tags_21.html#timeprimitive">
- * http://earth.google.com/kml/kml_tags_21.html#timeprimitive</a>
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#timeprimitive">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#timeprimitive</a>
+ * 
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
+ *
  */
 public abstract class TimePrimitive extends Object {
 

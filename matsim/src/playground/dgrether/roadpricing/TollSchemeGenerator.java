@@ -25,6 +25,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.opengis.kml._2.BoundaryType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinearRingType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.PolygonType;
+import net.opengis.kml._2.ScreenOverlayType;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
@@ -42,14 +53,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Geometry.AltitudeMode;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.gis.ShapeFileNetworkWriter;
@@ -299,23 +303,27 @@ public class TollSchemeGenerator {
 	
 
 	private void writeKml(NetworkLayer net, String filename) {
-		KML mainKml;
-		Document mainDoc;
-		Folder mainFolder;
+		
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		KmlType mainKml;
+		DocumentType mainDoc;
+		FolderType mainFolder;
+		
 		KMZWriter writer;
-		mainKml = new KML();
-		mainDoc = new Document(filename);
-		mainKml.setFeature(mainDoc);
+
+		mainKml = kmlObjectFactory.createKmlType();
+		mainDoc = kmlObjectFactory.createDocumentType();
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 		// create a folder
-		mainFolder = new Folder("2dnetworklinksfolder");
+		mainFolder = kmlObjectFactory.createFolderType();
 		mainFolder.setName("Matsim Data");
-		mainDoc.addFeature(mainFolder);
+		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(mainFolder));
 		// the writer
-		writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
+		writer = new KMZWriter(filename);
 		try {
 			// add the matsim logo to the kml
-			MatsimKMLLogo logo = new MatsimKMLLogo(writer);
-			mainFolder.addFeature(logo);
+			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
+			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(logo));
 			//create coordinate transformation for wgs84
 			CoordinateTransformation transform = TransformationFactory
 					.getCoordinateTransformation(this.config.global()
@@ -323,27 +331,31 @@ public class TollSchemeGenerator {
 			//write the network
 			KmlNetworkWriter netWriter = new KmlNetworkWriter(net, transform, writer,
 					mainDoc);
-			Folder networkFolder = netWriter.getNetworkFolder();
-			mainFolder.addFeature(networkFolder);
+			FolderType networkFolder = netWriter.getNetworkFolder();
+			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 
 			// write moute polygon
-			Folder polygonFolder = new Folder("moutpolygon");
+			FolderType polygonFolder = kmlObjectFactory.createFolderType();
 			polygonFolder.setName("Mout area");
-			org.matsim.utils.vis.kml.Polygon p = new org.matsim.utils.vis.kml.Polygon(
-					false, true, AltitudeMode.CLAMP_TO_GROUND);
-			org.matsim.utils.vis.kml.LinearRing ring = new org.matsim.utils.vis.kml.LinearRing();
+			
+			PolygonType p = kmlObjectFactory.createPolygonType();
+			p.setTessellate(true);
+			
+			LinearRingType ring = kmlObjectFactory.createLinearRingType();
 			Coord transC;
 			for (Coord c : this.usedCoords) {
 				transC = transform.transform(c);
-				ring.addCoordinate(new org.matsim.utils.vis.kml.Point(transC.getX(),
-						transC.getY(), 0));
+				PointType point = kmlObjectFactory.createPointType();
+				point.getCoordinates().add(Double.toString(transC.getX()) + "," + Double.toString(transC.getY()) + ",0.0");
 			}
-			p.setBoundary(ring);
-			Placemark polyPlace = new Placemark("poly93");
+			BoundaryType boundary = kmlObjectFactory.createBoundaryType();
+			boundary.setLinearRing(ring);
+			p.setOuterBoundaryIs(boundary);
+			PlacemarkType polyPlace = kmlObjectFactory.createPlacemarkType();
 			polyPlace.setName("Mout area polygon");
-			polyPlace.setGeometry(p);
-			polygonFolder.addFeature(polyPlace);
-			mainFolder.addFeature(polygonFolder);
+			polyPlace.setAbstractGeometryGroup(kmlObjectFactory.createPolygon(p));
+			polygonFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(polyPlace));
+			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(polygonFolder));
 			// polygonFolder.addFeature(feature)
 
 		} catch (IOException e) {

@@ -22,11 +22,16 @@ package org.matsim.network;
 
 import java.io.IOException;
 
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.StyleType;
+
+import org.apache.log4j.Logger;
 import org.matsim.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.Style;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
 
@@ -35,50 +40,64 @@ import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
  */
 public class KmlNetworkWriter {
 
+	private static final Logger log = Logger.getLogger(KmlNetworkWriter.class);
+
 	private NetworkLayer network;
 
 	private MatsimKmlStyleFactory styleFactory;
 
-	private Style networkLinkStyle;
+	private ObjectFactory kmlObjectFactory;
+	
+	private StyleType networkLinkStyle;
 
 	private NetworkFeatureFactory networkFeatureFactory;
 
-	private Style networkNodeStyle;
+	private StyleType networkNodeStyle;
 
-	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, Document doc) {
+	public KmlNetworkWriter(final NetworkLayer network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
-
-	public Folder getNetworkFolder() throws IOException {
-		Folder folder = new Folder(this.network.getName());
+	public FolderType getNetworkFolder() throws IOException {
+		
+		FolderType folder = this.kmlObjectFactory.createFolderType();
+		
 		folder.setName("MATSIM Network: " + this.network.getName());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
-		Folder nodeFolder = new Folder(this.network.getName() + "nodes");
+		
+		FolderType nodeFolder = kmlObjectFactory.createFolderType();
 		nodeFolder.setName("Nodes");
-//		nodeFolder.addStyle(this.networkNodeStyle);
-		folder.addFeature(nodeFolder);
-		Folder linkFolder = new Folder(this.network.getName() + "links");
+//		linkFolder.addStyle(this.networkNodeStyle);
+		for (Node n : this.network.getNodes().values()) {
+			
+			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle);
+			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
+				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+			} else {
+				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
+			}
+
+		}
+		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodeFolder));
+
+		FolderType linkFolder = kmlObjectFactory.createFolderType();
 		linkFolder.setName("Links");
 //		linkFolder.addStyle(this.networkLinkStyle);
-		folder.addFeature(linkFolder);
-
-		for (Node n : this.network.getNodes().values()) {
-			nodeFolder.addFeature(this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle));
-		}
 		for (Link l : this.network.getLinks().values()) {
-			linkFolder.addFeature(this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle));
+			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle);
+			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
+				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+			} else {
+				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
+			}
 		}
-
+		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(linkFolder));
+		
 		return folder;
+		
 	}
-
-
-
-
-
 
 }

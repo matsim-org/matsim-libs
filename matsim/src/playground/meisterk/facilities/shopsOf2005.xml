@@ -11,14 +11,14 @@
 
 <!-- for ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities() -->
 
-<!--
+
 <config>
 	<module name="facilities">
 		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/shopsOf2005_geocoded.kml" />
 		<param name="outputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
 	</module>
 </config>
--->
+
 
 <!-- for --> 
 <!-- ShopsOf2005ToFacilities.shopsToTXT() -->
@@ -45,10 +45,10 @@
 <!-- for --> 
 <!-- ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus() -->
 
-<config>
-	<module name="facilities">
-		<param name="inputFacilitiesFile" value="/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/facilities_KTIYear2.xml.gz" />
-		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities_KTIYear2.xml.gz" />
-	</module>
-</config>
+<!--<config>-->
+<!--	<module name="facilities">-->
+<!--		<param name="inputFacilitiesFile" value="/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/facilities_KTIYear2.xml.gz" />-->
+<!--		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities_KTIYear2.xml.gz" />-->
+<!--	</module>-->
+<!--</config>-->
 

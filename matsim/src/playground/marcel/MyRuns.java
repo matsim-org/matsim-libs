@@ -29,7 +29,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +38,19 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LineStringType;
+import net.opengis.kml._2.LineStyleType;
+import net.opengis.kml._2.MultiGeometryType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PolyStyleType;
+import net.opengis.kml._2.ScreenOverlayType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
 
 import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
@@ -122,23 +134,7 @@ import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.ColorStyle;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Feature;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.Geometry;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.LineString;
-import org.matsim.utils.vis.kml.LineStyle;
-import org.matsim.utils.vis.kml.MultiGeometry;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.PolyStyle;
-import org.matsim.utils.vis.kml.Style;
-import org.matsim.utils.vis.kml.TimeSpan;
-import org.matsim.utils.vis.kml.fields.Color;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
@@ -1966,22 +1962,25 @@ public class MyRuns {
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
 
-	private static Geometry getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
 		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static Geometry getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
-		final MultiGeometry networkGeom = new MultiGeometry();
+	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
+		
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		
+		final MultiGeometryType networkGeom = kmlObjectFactory.createMultiGeometryType();
 
 		for (Link link : network.getLinks().values()) {
 			Integer volume = linkVolumes.get(link.getId());
 			if (volume == null) volume = 0;
 			final Coord fromCoord = coordTransform.transform(link.getFromNode().getCoord());
 			final Coord toCoord = coordTransform.transform(link.getToNode().getCoord());
-			final Point fromPoint = new Point(fromCoord.getX(), fromCoord.getY(), volume);
-			final Point toPoint = new Point(toCoord.getX(), toCoord.getY(), volume);
-			final LineString lineString = new LineString(fromPoint, toPoint, true, true, Geometry.AltitudeMode.RELATIVE_TO_GROUND);
-			networkGeom.addGeometry(lineString);
+			final LineStringType lst = kmlObjectFactory.createLineStringType();
+			lst.getCoordinates().add(Double.toString(fromCoord.getX()) + "," + Double.toString(fromCoord.getY()) + "," + volume);
+			lst.getCoordinates().add(Double.toString(toCoord.getX()) + "," + Double.toString(toCoord.getY()) + "," + volume);
+			networkGeom.getAbstractGeometryGroup().add(kmlObjectFactory.createLineString(lst));
 		}
 
 		return networkGeom;
@@ -2061,57 +2060,68 @@ public class MyRuns {
 
 		System.out.println("  writing the network...");
 
-		final KML kml = new KML();
+		final ObjectFactory kmlObjectFactory = new ObjectFactory();
+		
+		final KmlType kml = kmlObjectFactory.createKmlType();
 
-		final Document kmlDoc = new Document("the root document");
-		kml.setFeature(kmlDoc);
+		final DocumentType kmlDoc = kmlObjectFactory.createDocumentType();
+		kmlDoc.setId("the root document");
+		kml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(kmlDoc));
 
-		final Style style = new Style("redWallStyle");
-		kmlDoc.addStyle(style);
-		style.setLineStyle(new LineStyle(new Color("af", "00", "00", "ff"), ColorStyle.DEFAULT_COLOR_MODE, 3));
-		style.setPolyStyle(new PolyStyle(new Color("7f", "00", "00", "ff"), ColorStyle.DEFAULT_COLOR_MODE, true, true));
+		final StyleType style = kmlObjectFactory.createStyleType();
+		style.setId("redWallStyle");
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(new byte[]{(byte) 0xaf, (byte) 0x00, (byte) 0x00, (byte) 0xff});
+		lst.setWidth(3.0);
+		style.setLineStyle(lst);
+		PolyStyleType pst = kmlObjectFactory.createPolyStyleType();
+		pst.setColor(new byte[]{(byte) 0x7f, (byte) 0x00, (byte) 0x00, (byte) 0xff});
+		style.setPolyStyle(pst);
+		kmlDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(style));
 
-		final Folder networksFolder = new Folder("networks");
-		kmlDoc.addFeature(networksFolder);
-
+		final FolderType networksFolder = kmlObjectFactory.createFolderType();
+		networksFolder.setId("networks");
+		kmlDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networksFolder));
+		
 		if (useVolumes) {
 			for (int hour = 4; hour < 23; hour++) {
 				System.out.println("adding network hour = " + hour);
-				final Placemark placemark = new Placemark(
-						"network " + hour, // id
-						"Network at " + hour, // name
-						"the road network at " + hour,	// description
-						Placemark.DEFAULT_ADDRESS,
-						Feature.DEFAULT_LOOK_AT,
-						style.getStyleUrl(),
-						Feature.DEFAULT_VISIBILITY,
-						Feature.DEFAULT_REGION,
-						new TimeSpan(new GregorianCalendar(1970, 0, 1, hour, 0, 0),
-								new GregorianCalendar(1970, 0, 1, hour, 59, 59)));
-				networksFolder.addFeature(placemark);
+				
+				final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
+				placemark.setId("network " + hour);
+				placemark.setName("Network at " + hour);
+				placemark.setDescription("the road network at " + hour);
+				placemark.setStyleUrl(style.getId());
+				
+				TimeSpanType timeSpan = kmlObjectFactory.createTimeSpanType();
+				timeSpan.setBegin("1970-01-01T" + Time.writeTime(hour * 3600));
+				timeSpan.setEnd("1970-01-01T" + Time.writeTime(hour * 3600 + 59 * 60 + 59));
+				placemark.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
+
 				TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 				if (hourValues == null) {
 					hourValues = new TreeMap<Id, Integer>();
 				}
-				placemark.setGeometry(getNetworkAsKml(network, hourValues, new CH1903LV03toWGS84()));
+				placemark.setAbstractGeometryGroup(
+						kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, hourValues, new CH1903LV03toWGS84())));
+				
+				networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 			}
 		} else {
-			final Placemark placemark = new Placemark(
-					"network", // id
-					"Network", // name
-					"the road network",	// description
-					Placemark.DEFAULT_ADDRESS,
-					Feature.DEFAULT_LOOK_AT,
-					style.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-			networksFolder.addFeature(placemark);
-			placemark.setGeometry(getNetworkAsKml(network, new CH1903LV03toWGS84()));
+			
+			final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
+			placemark.setId("network");
+			placemark.setName("Network");
+			placemark.setDescription("the road network");
+			placemark.setStyleUrl(style.getId());
+			placemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, new CH1903LV03toWGS84())));
+			
+			networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 		}
 
-		final KMLWriter kmlWriter = new KMLWriter(kml, "test.kml", KMLWriter.DEFAULT_XMLNS, true);
-		kmlWriter.write();
+		final KMZWriter kmzWriter = new KMZWriter("test.kml");
+		kmzWriter.writeMainKml(kml);
+		kmzWriter.close();
 
 		System.out.println("  done.");
 
@@ -2135,34 +2145,41 @@ public class MyRuns {
 
 		System.out.println("  writing the network...");
 
-		final KML kml = new KML();
+		final ObjectFactory kmlObjectFactory = new ObjectFactory();
+		
+		final KmlType kml = kmlObjectFactory.createKmlType();
 
-		final Document kmlDoc = new Document("the root document");
-		kml.setFeature(kmlDoc);
+		final DocumentType kmlDoc = kmlObjectFactory.createDocumentType();
+		kmlDoc.setId("the root document");
+		kml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(kmlDoc));
 
-		final Style style = new Style("redWallStyle");
-		kmlDoc.addStyle(style);
-		style.setLineStyle(new LineStyle(new Color("af", "00", "00", "ff"), ColorStyle.DEFAULT_COLOR_MODE, 3));
-		style.setPolyStyle(new PolyStyle(new Color("7f", "00", "00", "ff"), ColorStyle.DEFAULT_COLOR_MODE, true, true));
+		final StyleType style = kmlObjectFactory.createStyleType();
+		style.setId("redWallStyle");
+		LineStyleType lst = kmlObjectFactory.createLineStyleType();
+		lst.setColor(new byte[]{(byte) 0xaf, (byte) 0x00, (byte) 0x00, (byte) 0xff});
+		lst.setWidth(3.0);
+		style.setLineStyle(lst);
+		PolyStyleType pst = kmlObjectFactory.createPolyStyleType();
+		pst.setColor(new byte[]{(byte) 0x7f, (byte) 0x00, (byte) 0x00, (byte) 0xff});
+		style.setPolyStyle(pst);
+		kmlDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(style));
 
-		final Folder networksFolder = new Folder("networks");
-		kmlDoc.addFeature(networksFolder);
+		final FolderType networksFolder = kmlObjectFactory.createFolderType();
+		networksFolder.setId("networks");
+		kmlDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networksFolder));
 
-		final Placemark placemark = new Placemark(
-				"network", // id
-				"Network", // name
-				"the road network",	// description
-				Placemark.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				style.getStyleUrl(),
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-		networksFolder.addFeature(placemark);
-		placemark.setGeometry(getNetworkAsKml(network, new GK4toWGS84()));
+		final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
+		placemark.setId("network");
+		placemark.setName("Network");
+		placemark.setDescription("the road network");
+		placemark.setStyleUrl(style.getId());
+		placemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, new GK4toWGS84())));
+		
+		networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 
-		final KMLWriter kmlWriter = new KMLWriter(kml, "test.kml", KMLWriter.DEFAULT_XMLNS, true);
-		kmlWriter.write();
+		final KMZWriter kmzWriter = new KMZWriter("test.kml");
+		kmzWriter.writeMainKml(kml);
+		kmzWriter.close();
 
 		System.out.println("  done.");
 
@@ -2375,16 +2392,18 @@ public class MyRuns {
 	}
 
 	public static void writeKml() {
-		KML mainKml = new KML();
-		Document mainDoc = new Document("test.kmz");
-		mainKml.setFeature(mainDoc);
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		KmlType mainKml = kmlObjectFactory.createKmlType();
+		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
+		mainDoc.setId("test.kmz");
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 
-		KMZWriter writer = new KMZWriter("test.kmz", KMLWriter.DEFAULT_XMLNS);
+		KMZWriter writer = new KMZWriter("test.kmz");
 
-		MatsimKMLLogo logo;
+		ScreenOverlayType logo;
 		try {
-			logo = new MatsimKMLLogo(writer);
-			mainDoc.addFeature(logo);
+			logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
+			mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(logo));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

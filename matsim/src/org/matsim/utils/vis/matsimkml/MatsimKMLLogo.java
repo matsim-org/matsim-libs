@@ -22,11 +22,14 @@ package org.matsim.utils.vis.matsimkml;
 
 import java.io.IOException;
 
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
+import net.opengis.kml._2.UnitsEnumType;
+import net.opengis.kml._2.Vec2Type;
+
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.vis.kml.Icon;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.ScreenOverlay;
-import org.matsim.utils.vis.kml.fields.Vec2Type;
 
 
 /**
@@ -34,26 +37,45 @@ import org.matsim.utils.vis.kml.fields.Vec2Type;
  * @author dgrether
  *
  */
-public class MatsimKMLLogo extends ScreenOverlay {
+public class MatsimKMLLogo {
 	/**
 	 * Writes the logo file to the kmz and creates the ScreenOverlay with the logo
 	 * @param writer
 	 * @throws IOException if the file with the logo could not be read and written
 	 */
-	public MatsimKMLLogo(final KMZWriter writer) throws IOException {
-		super("matsimlogo");
+	public static ScreenOverlayType writeMatsimKMLLogo(final KMZWriter writer) throws IOException {
+		
 		writer.addNonKMLFile(MatsimResource.getAsInputStream("matsim_logo_transparent.png"), "matsimLogo.png");
-		Icon icon = new Icon("./matsimLogo.png");
-    this.setIcon(icon);
-    this.setName("Matsim Logo");
-    // place the image bottom left
-    Vec2Type overlayXY = new Vec2Type(1.0, -0.7, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
-    Vec2Type screenXY = new Vec2Type(0.85, 25, Vec2Type.Units.fraction, Vec2Type.Units.pixels);
-    Vec2Type sizeXY = new Vec2Type(0.14, 0.00, Vec2Type.Units.fraction, Vec2Type.Units.fraction);
-    this.setOverlayXY(overlayXY);
-    this.setScreenXY(screenXY);
-    this.setSize(sizeXY);
-    this.setDrawOrder(Integer.MAX_VALUE);
+		
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+
+		ScreenOverlayType matsimLogo = kmlObjectFactory.createScreenOverlayType();
+		
+		LinkType icon = kmlObjectFactory.createLinkType();
+		icon.setHref("./matsimLogo.png");
+		matsimLogo.setIcon(icon);
+		matsimLogo.setName("Matsim Logo");
+		Vec2Type overlayXY = kmlObjectFactory.createVec2Type();
+		overlayXY.setX(1.0);
+		overlayXY.setY(-0.7);
+		overlayXY.setXunits(UnitsEnumType.FRACTION);
+		overlayXY.setYunits(UnitsEnumType.FRACTION);
+		matsimLogo.setOverlayXY(overlayXY);
+		Vec2Type screenXY = kmlObjectFactory.createVec2Type();
+		screenXY.setX(0.85);
+		screenXY.setY(25.0);
+		screenXY.setXunits(UnitsEnumType.FRACTION);
+		screenXY.setYunits(UnitsEnumType.PIXELS);
+		matsimLogo.setScreenXY(screenXY);
+		Vec2Type sizeXY = kmlObjectFactory.createVec2Type();
+		sizeXY.setX(0.14);
+		sizeXY.setY(0.0);
+		sizeXY.setXunits(UnitsEnumType.FRACTION);
+		sizeXY.setYunits(UnitsEnumType.FRACTION);
+		matsimLogo.setSize(sizeXY);
+		matsimLogo.setDrawOrder(Integer.MAX_VALUE);
+		
+		return matsimLogo;
 	}
 
 }

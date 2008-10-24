@@ -21,8 +21,21 @@
 package org.matsim.utils.vis.snapshots.writers;
 
 import java.io.IOException;
-import java.util.GregorianCalendar;
 import java.util.TreeMap;
+
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.MultiGeometryType;
+import net.opengis.kml._2.NetworkLinkType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimResource;
@@ -30,43 +43,30 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.ColorStyle;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.Icon;
-import org.matsim.utils.vis.kml.IconStyle;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.kml.Link;
-import org.matsim.utils.vis.kml.MultiGeometry;
-import org.matsim.utils.vis.kml.NetworkLink;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Point;
-import org.matsim.utils.vis.kml.Style;
-import org.matsim.utils.vis.kml.TimeSpan;
-import org.matsim.utils.vis.kml.TimeStamp;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 
-	private KML mainKml = null;
-	private Document mainDoc = null;
-	private Folder mainFolder = null;
-
-	private Style carStyle = null;
-
-	private KML timeKml = null;
-	private Document timeDoc = null;
-	private Placemark timePlacemark = null;
-	private MultiGeometry timeGeometry = null;
-
+	private ObjectFactory kmlObjectFactory = null;
+	
+	private KmlType mainKml = null;
+	private DocumentType mainDoc = null;
+	private FolderType mainFolder = null;
+	
+	private StyleType carStyle = null;
+	
+	private KmlType timeKml = null;
+	private DocumentType timeDoc = null;
+	private PlacemarkType timePlacemark = null;
+	private MultiGeometryType timeGeometry = null;
+	
 	private KMZWriter writer = null;
 
 	private CoordinateTransformation coordTransform = null;
 
-	private final TreeMap<Double, NetworkLink> timeLinks = new TreeMap<Double, NetworkLink>();
+	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<Double, NetworkLinkType>();
 
 	private double time = Time.UNDEFINED_TIME;
 	
@@ -75,33 +75,38 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	public KmlSnapshotWriter(final String filename, final CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
 		//the kmz writer
-		this.writer = new KMZWriter(filename, KMLWriter.DEFAULT_XMLNS);
+		this.writer = new KMZWriter(filename);
 		//the main kml document
-		this.mainKml = new KML();
-		this.mainDoc = new Document(filename);
-		this.mainKml.setFeature(this.mainDoc);
+		
+		this.mainKml = kmlObjectFactory.createKmlType();
+		this.mainDoc = kmlObjectFactory.createDocumentType();
+		this.mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(this.mainDoc));
 
 		//set car style
-		Icon icon;
+		LinkType iconLink = kmlObjectFactory.createLinkType();
 		try {
 			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("car.png"), "data/car.png");
-			icon = new Icon("./car.png");
+			iconLink.setHref("./car.png");
 		} catch (IOException e1) {
 			log.warn("Cannot write car icon to kmz, trying to use icon from http://maps.google.com/mapfiles/kml/pal4/icon15.png");
-			icon = new Icon("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
+			iconLink.setHref("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
-		this.carStyle = new Style("redCarStyle");
-		this.carStyle.setIconStyle(new IconStyle(icon, MatsimKmlStyleFactory.MATSIMRED, ColorStyle.DEFAULT_COLOR_MODE, 0.5));
-		this.mainDoc.addStyle(this.carStyle);
+		this.carStyle = kmlObjectFactory.createStyleType();
+		this.carStyle.setId("redCarStyle");
+		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+		carIconStyle.setIcon(iconLink);
+		carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
+		carIconStyle.setScale(0.5);
+		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
 
-		this.mainFolder = new Folder("networklinksfolder");
-		this.mainDoc.addFeature(this.mainFolder);
+		this.mainFolder = kmlObjectFactory.createFolderType();
+		this.mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(this.mainFolder));
+		
 		//set logo
 		try {
-			MatsimKMLLogo logo;
-			logo = new MatsimKMLLogo(this.writer);
-			this.mainFolder.addFeature(logo);
+//			ScreenOverlayType logo;
+			MatsimKMLLogo.writeMatsimKMLLogo(this.writer);
 		} catch (IOException e) {
 			log.warn("Cannot read matsim logo file! The logo will not be added to the kmz");
 			e.printStackTrace();
@@ -112,25 +117,43 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	public void beginSnapshot(final double time) {
 		this.time = time;
 		String timeStr = Time.writeTime(time, Time.TIMEFORMAT_HHMMSS, ':');
-		this.timeKml = new KML();
-		this.timeDoc = new Document(timeStr);
-		this.timeKml.setFeature(this.timeDoc);
-		this.timeDoc.addStyle(this.carStyle);
-		this.timePlacemark = new Placemark(timeStr);
-		this.timeDoc.addFeature(this.timePlacemark);
-		this.timeGeometry = new MultiGeometry();
-		this.timePlacemark.setGeometry(this.timeGeometry);
-		this.timePlacemark.setStyleUrl(this.carStyle.getStyleUrl());
+		
+		this.timeKml = kmlObjectFactory.createKmlType();
+
+		this.timeGeometry = kmlObjectFactory.createMultiGeometryType();
+		
+		this.timePlacemark = kmlObjectFactory.createPlacemarkType();
+		this.timePlacemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometry));
+		this.timePlacemark.setStyleUrl(this.carStyle.getId());
+		
+		this.timeDoc = kmlObjectFactory.createDocumentType();
+		this.timeDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
+		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemark));
+		
+		this.timeKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(this.timeDoc));
 	}
 
 	public void endSnapshot() {
 		String filename = "data/time_" + this.time + ".kml";
 		this.writer.writeLinkedKml(filename, this.timeKml);
 
-		NetworkLink nl = new NetworkLink("link for time" + this.time, new Link(filename));
-		nl.setTimePrimitive(new TimeStamp(
-				new GregorianCalendar(1970, 0, 1, (int) (this.time / 3600), (int) ((this.time / 60) % 60), (int) (this.time % 60))));
-		this.mainFolder.addFeature(nl);
+		NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
+		
+		LinkType link = kmlObjectFactory.createLinkType();
+		link.setHref(filename);
+		
+		nl.setLink(link);
+	
+		TimeStampType timeStamp = kmlObjectFactory.createTimeStampType();
+		// TODO is that time correct?
+		timeStamp.setWhen("1970-01-01T" + Time.writeTime(this.time));
+		
+		nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeStamp(timeStamp));
+		
+//		NetworkLink nl = new NetworkLink("link for time" + this.time, new Link(filename));
+//		nl.setTimePrimitive(new TimeStamp(
+//				new GregorianCalendar(1970, 0, 1, (int) (this.time / 3600), (int) ((this.time / 60) % 60), (int) (this.time % 60))));
+		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createNetworkLink(nl));
 		this.timeLinks.put(Double.valueOf(this.time), nl);
 
 		this.timeKml = null;
@@ -145,8 +168,9 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		}
 
 		Coord coord = this.coordTransform.transform(new CoordImpl(position.getEasting(), position.getNorthing()));
-		Point point = new Point(coord.getX(), coord.getY(), 0.0);
-		this.timeGeometry.addGeometry(point);
+		PointType point = kmlObjectFactory.createPointType();
+		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+		this.timeGeometry.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
 	}
 
 	public void finish() {
@@ -156,10 +180,14 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		for (Double t : this.timeLinks.keySet()) {
 			double time = t.doubleValue();
 			if (lt != null) {
-				NetworkLink nl = this.timeLinks.get(lt);
-				nl.setTimePrimitive(new TimeSpan(
-						new GregorianCalendar(1970, 0, 1, (int) (lasttime / 3600), (int) ((lasttime / 60) % 60), (int) (lasttime % 60)),
-						new GregorianCalendar(1970, 0, 1, (int) (time / 3600), (int) ((time / 60) % 60), (int) (time % 60))));
+				NetworkLinkType nl = this.timeLinks.get(lt);
+				TimeSpanType timeSpan = kmlObjectFactory.createTimeSpanType();
+				timeSpan.setBegin("1970-01-01T" + Time.writeTime(lasttime));
+				timeSpan.setEnd("1970-01-01T" + Time.writeTime(time));
+				nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
+//				nl.setTimePrimitive(new TimeSpan(
+//						new GregorianCalendar(1970, 0, 1, (int) (lasttime / 3600), (int) ((lasttime / 60) % 60), (int) (lasttime % 60)),
+//						new GregorianCalendar(1970, 0, 1, (int) (time / 3600), (int) ((time / 60) % 60), (int) (time % 60))));
 			}
 			lt = t;
 			lasttime = time;

@@ -19,11 +19,18 @@
  * *********************************************************************** */
 
 package org.matsim.utils.vis.kml.fields;
+
 /**
+ * For documentation, refer to
+ * <a href="http://code.google.com/apis/kml/documentation/kmlreference.html#kmlfields">
+ * http://code.google.com/apis/kml/documentation/kmlreference.html#kmlfields</a><br>
  * 
- * @author dgrether
+ * @author dgrether, meisterk, mrieser
+ * @deprecated For working with KML files, please use the library kml-2.2-jaxb-2.1.7.jar. 
+ * See ch.ethz.ivt.KMLDemo in that library for examples of usage.
  *
  */
+
 public class Vec2Type {
 	/**
 	 * Constants needed for efficient toString()

@@ -24,6 +24,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.ScreenOverlayType;
+
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.KmlNetworkWriter;
@@ -46,10 +52,6 @@ import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
 import org.matsim.utils.vis.kml.KMZWriter;
 import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
 
@@ -67,22 +69,26 @@ public class NetworkDistance {
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 
-		KML mainKml = new KML();
-		Document mainDoc = new Document("berlin_wipnet");
-		mainKml.setFeature(mainDoc);
+		ObjectFactory kmlObjectFactory = new ObjectFactory();
+		
+		KmlType mainKml = kmlObjectFactory.createKmlType();
+		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
+		mainDoc.setId("berlin_wipnet");
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
 		// create a folder
-		Folder mainFolder = new Folder("2dnetworklinksfolder");
+		FolderType mainFolder = kmlObjectFactory.createFolderType();
+		mainFolder.setId("2dnetworklinksfolder");
 		mainFolder.setName("Matsim Data");
-		mainDoc.addFeature(mainFolder);
+		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(mainFolder));
 		// the writer
-		KMZWriter writer = new KMZWriter(networkKmzFilename, KMLWriter.DEFAULT_XMLNS);
+		KMZWriter writer = new KMZWriter(networkKmzFilename);
 		try {
 			// add the matsim logo to the kml
-			MatsimKMLLogo logo = new MatsimKMLLogo(writer);
-			mainFolder.addFeature(logo);
+			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
+			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(logo));
 			KmlNetworkWriter netWriter = new KmlNetworkWriter(network, ct, writer, mainDoc);
-			Folder networkFolder = netWriter.getNetworkFolder();
-			mainFolder.addFeature(networkFolder);
+			FolderType networkFolder = netWriter.getNetworkFolder();
+			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
 			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
 			e.printStackTrace();

@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -37,6 +38,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 import net.opengis.kml._2.AbstractFeatureType;
@@ -63,33 +65,13 @@ import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.misc.Time;
-import org.matsim.utils.vis.kml.Document;
-import org.matsim.utils.vis.kml.Feature;
-import org.matsim.utils.vis.kml.Folder;
-import org.matsim.utils.vis.kml.Icon;
-import org.matsim.utils.vis.kml.IconStyle;
-import org.matsim.utils.vis.kml.KML;
-import org.matsim.utils.vis.kml.KMLWriter;
-import org.matsim.utils.vis.kml.Placemark;
-import org.matsim.utils.vis.kml.Style;
-
-//import com.google.earth.kml._2.AbstractFeatureType;
-//import com.google.earth.kml._2.AbstractGeometryType;
-//import com.google.earth.kml._2.BasicLinkType;
-//import com.google.earth.kml._2.DocumentType;
-//import com.google.earth.kml._2.FolderType;
-//import com.google.earth.kml._2.IconStyleType;
-//import com.google.earth.kml._2.KmlType;
-//import com.google.earth.kml._2.ObjectFactory;
-//import com.google.earth.kml._2.PlacemarkType;
-//import com.google.earth.kml._2.PointType;
-//import com.google.earth.kml._2.StyleType;
-//import com.google.earth.kml._2.TimeSpanType;
+import org.matsim.utils.vis.kml.KMZWriter;
 
 /**
  * In April 2005, I collected information on shop facilities of the major
@@ -188,17 +170,22 @@ public class ShopsOf2005ToFacilities {
 	private static final String PALETTE = "PALETTE";
 	private static final String CONTAINS_PALETTE = ".*" + PALETTE + ".*";
 
-	private static KML myKML = null;
-	private static Document myKMLDocument = null;
-	private static Folder mainKMLFolder = null;
+	private static JAXBContext jaxbContext = null;
+	private static ObjectFactory kmlObjectFactory = null;
+	private static KmlType myKML = null;
+	private static DocumentType myKMLDocument = null;
+	private static FolderType mainKMLFolder = null;
 
 	private static String kmlFilename = "output" + FILE_SEPARATOR + "shopsOf2005.kml";
 
-	private static Style coopStyle = null;
-	private static Style pickpayStyle = null;
-	private static Style migrosStyle = null;
-	private static Style dennerStyle = null;
+	private static HashMap<String, StyleType> styles = new HashMap<String, StyleType>();
+	private static StyleType coopStyle = null;
+	private static StyleType pickpayStyle = null;
+	private static StyleType migrosStyle = null;
+	private static StyleType dennerStyle = null;
 
+	private static HashMap<String, String> icons = null;
+	
 	private static ShopId shopId = null;
 
 
@@ -208,11 +195,11 @@ public class ShopsOf2005ToFacilities {
 	public static void main(final String[] args) {
 		Gbl.createConfig(args);
 
-//		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
+		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
 //		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
 //		ShopsOf2005ToFacilities.shopsToTXT();
 //		ShopsOf2005ToFacilities.shopsToOpentimesKML();
-		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
+//		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
 
 	}
 
@@ -238,14 +225,12 @@ public class ShopsOf2005ToFacilities {
 
 		try {
 
-			JAXBContext jaxbContext = JAXBContext.newInstance("com.google.earth.kml._2");
+			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
 			Unmarshaller unMarshaller = jaxbContext.createUnmarshaller();
 			kmlElement = (JAXBElement<KmlType>) unMarshaller.unmarshal(new FileInputStream(Gbl.getConfig().facilities().getInputFile()));
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -280,48 +265,53 @@ public class ShopsOf2005ToFacilities {
 
 	private static void setUp() {
 
-		myKML = new KML();
-		myKMLDocument = new Document("the root document");
-		myKML.setFeature(myKMLDocument);
-		mainKMLFolder = new Folder(
-				"main shops KML folder",
-				"Shops of 2005",
-				"All revealed shops of 2005.",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-		myKMLDocument.addFeature(mainKMLFolder);
+		try {
+			jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+
+		kmlObjectFactory = new ObjectFactory();
+
+		myKML = kmlObjectFactory.createKmlType();
+		myKMLDocument = kmlObjectFactory.createDocumentType();
+		myKMLDocument.setName("the root document");
+		myKML.setAbstractFeatureGroup(kmlObjectFactory.createDocument(myKMLDocument));
+
+		mainKMLFolder = kmlObjectFactory.createFolderType();
+		mainKMLFolder.setName("Shops of 2005");
+		mainKMLFolder.setDescription("All revealed shops of 2005.");
+		myKMLDocument.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(mainKMLFolder));
 
 	}
 
 	private static void setupStyles() {
 
-		System.out.print("Setting up KML styles...");
+		System.out.println("Setting up KML styles...");
 
-		coopStyle = new Style("coopStyle");
-		myKMLDocument.addStyle(coopStyle);
-		coopStyle.setIconStyle(
-				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/C.png")));
-
-		pickpayStyle = new Style("pickpayStyle");
-		myKMLDocument.addStyle(pickpayStyle);
-		pickpayStyle.setIconStyle(
-				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/P.png")));
-
-		migrosStyle = new Style("migrosStyle");
-		myKMLDocument.addStyle(migrosStyle);
-		migrosStyle.setIconStyle(
-				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/M.png")));
-
-		dennerStyle = new Style("dennerStyle");
-		myKMLDocument.addStyle(dennerStyle);
-		dennerStyle.setIconStyle(
-				new IconStyle(new Icon("http://maps.google.com/mapfiles/kml/paddle/D.png")));
-
-		System.out.println("done.");
+		icons = new HashMap<String, String>();
+		icons.put("coop", "icons/shopsOf2005/C.png");
+		icons.put("pickpay", "icons/shopsOf2005/P.png");
+		icons.put("migros", "icons/shopsOf2005/M.png");
+		icons.put("denner", "icons/shopsOf2005/D.png");
+		
+		for (String retailer : icons.keySet()) {
+			
+			StyleType style = kmlObjectFactory.createStyleType();
+			style.setId(retailer + "Style");
+			myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(coopStyle));
+			BasicLinkType basicLink = kmlObjectFactory.createBasicLinkType();
+			basicLink.setHref(icons.get(retailer));
+			IconStyleType icon = kmlObjectFactory.createIconStyleType();
+			icon.setIcon(basicLink);
+			style.setIconStyle(icon);
+			
+			styles.put(retailer, style);
+			myKMLDocument.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(style));
+			
+		}
+		
+		System.out.println("Setting up KML styles...done.");
 
 	}
 
@@ -329,37 +319,20 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Denner shops...");
 
-		Folder aFolder = null;
-		Placemark aShop = null;
-
-		aFolder = new Folder(
-				"dennerFolder",
-				"Denner TG ZH",
-				"Alle Denner TG ZH Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(aFolder);
-
+		FolderType aFolder = kmlObjectFactory.createFolderType();
+		aFolder.setName("Denner TG ZH");
+		aFolder.setDescription("Alle Denner TG ZH Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(aFolder));
+		
 		List<String> lines = null;
 		String[] tokens = null;
 
 		try {
-
 			lines = FileUtils.readLines(new File(dennerTGZHFilename), "UTF-8");
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		// Java regex has to match ENTIRE string rather than "quick match" in most libraries
-		// for a discussion see
-		// http://www.regular-expressions.info/java.html
-//		String beginsWith3Digits = "^[0-9]{3}.*$";
 		boolean nextLineIsTheAddressLine = false;
 		String city = null;
 		String street = null;
@@ -376,18 +349,12 @@ public class ShopsOf2005ToFacilities {
 				street = tokens[9];
 				shopId = new ShopId(DENNER, "", "", "", postcode, city, street);
 
-				aShop = new Placemark(
-						shopId.getShopId(),
-						shopId.getShopId(),
-						shopId.getShopId(),
-						shopId.getAddressForGeocoding(),
-						Feature.DEFAULT_LOOK_AT,
-						dennerStyle.getStyleUrl(),
-						Feature.DEFAULT_VISIBILITY,
-						Feature.DEFAULT_REGION,
-						Feature.DEFAULT_TIME_PRIMITIVE);
-
-				aFolder.addFeature(aShop);
+				PlacemarkType aShop = kmlObjectFactory.createPlacemarkType();
+				aShop.setName(shopId.getShopId());
+				aShop.setDescription(shopId.getShopId());
+				aShop.setAddress(shopId.getAddressForGeocoding());
+				aShop.setStyleUrl(styles.get("denner").getId());
+				aFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aShop));
 
 			}
 
@@ -412,21 +379,10 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Coop Züri shops...");
 
-		Folder coopFolder = null;
-		Placemark aCoop = null;
-
-		coopFolder = new Folder(
-				"coopZHFolder",
-				"Coop ZH",
-				"Alle Coop ZH Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(coopFolder);
+		FolderType coopFolder = kmlObjectFactory.createFolderType();
+		coopFolder.setName("Coop ZH");
+		coopFolder.setDescription("Alle Coop ZH Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(coopFolder));
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -459,18 +415,12 @@ public class ShopsOf2005ToFacilities {
 
 				shopId = new ShopId(COOP, VSTTyp, tokens[8], COOP_ZH, tokens[43], tokens[44], tokens[42]);
 
-				aCoop = new Placemark(
-						shopId.getShopId(),
-						shopId.getShopId(),
-						shopId.getShopId(),
-						shopId.getAddressForGeocoding(),
-						Feature.DEFAULT_LOOK_AT,
-						coopStyle.getStyleUrl(),
-						Feature.DEFAULT_VISIBILITY,
-						Feature.DEFAULT_REGION,
-						Feature.DEFAULT_TIME_PRIMITIVE);
-
-				coopFolder.addFeature(aCoop);
+				PlacemarkType aCoop = kmlObjectFactory.createPlacemarkType();
+				aCoop.setName(shopId.getShopId());
+				aCoop.setDescription(shopId.getShopId());
+				aCoop.setAddress(shopId.getAddressForGeocoding());
+				aCoop.setStyleUrl(styles.get("coop").getId());
+				coopFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aCoop));
 
 			}
 
@@ -484,21 +434,10 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Coop Thurgau shops...");
 
-		Folder coopFolder = null;
-		Placemark aCoop = null;
-
-		coopFolder = new Folder(
-				"coopTGFolder",
-				"Coop TG",
-				"Alle Coop TG Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(coopFolder);
+		FolderType coopFolder = kmlObjectFactory.createFolderType();
+		coopFolder.setName("Coop TG");
+		coopFolder.setDescription("Alle Coop TG Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(coopFolder));
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -530,18 +469,12 @@ public class ShopsOf2005ToFacilities {
 					tokens[2].split(" ")[1],
 					tokens[1]);
 
-			aCoop = new Placemark(
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getAddressForGeocoding(),
-					Feature.DEFAULT_LOOK_AT,
-					coopStyle.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-
-			coopFolder.addFeature(aCoop);
+			PlacemarkType aCoop = kmlObjectFactory.createPlacemarkType();
+			aCoop.setName(shopId.getShopId());
+			aCoop.setDescription(shopId.getShopId());
+			aCoop.setAddress(shopId.getAddressForGeocoding());
+			aCoop.setStyleUrl(styles.get("coop").getId());
+			coopFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aCoop));
 
 		}
 
@@ -554,21 +487,10 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Pick Pay shops...");
 
-		Folder pickpayFolder = null;
-		Placemark aPickpay = null;
-
-		pickpayFolder = new Folder(
-				"pickpayFolder",
-				"Pickpay",
-				"Alle Pickpay Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(pickpayFolder);
+		FolderType pickpayFolder = kmlObjectFactory.createFolderType();
+		pickpayFolder.setName("Pickpay");
+		pickpayFolder.setDescription("Alle Pickpay Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(pickpayFolder));
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -593,18 +515,12 @@ public class ShopsOf2005ToFacilities {
 
 			shopId = new ShopId(PICKPAY, "", tokens[1], "", tokens[4], tokens[5], tokens[2]);
 
-			aPickpay = new Placemark(
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getAddressForGeocoding(),
-					Feature.DEFAULT_LOOK_AT,
-					pickpayStyle.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-
-			pickpayFolder.addFeature(aPickpay);
+			PlacemarkType aPickpay = kmlObjectFactory.createPlacemarkType();
+			aPickpay.setName(shopId.getShopId());
+			aPickpay.setDescription(shopId.getShopId());
+			aPickpay.setAddress(shopId.getAddressForGeocoding());
+			aPickpay.setStyleUrl(styles.get("pickpay").getId());
+			pickpayFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aPickpay));
 
 		}
 
@@ -616,21 +532,10 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Migros ZH shops...");
 
-		Folder migrosZHFolder = null;
-		Placemark aMigrosZH = null;
-
-		migrosZHFolder = new Folder(
-				"migrosZHFolder",
-				"Migros ZH",
-				"Alle Migros ZH Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(migrosZHFolder);
+		FolderType migrosFolder = kmlObjectFactory.createFolderType();
+		migrosFolder.setName("Migros ZH");
+		migrosFolder.setDescription("Alle Migros ZH Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(migrosFolder));
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -655,18 +560,12 @@ public class ShopsOf2005ToFacilities {
 
 			shopId = new ShopId(MIGROS, "", tokens[1], MIGROS_ZH, tokens[3].split(" ")[0], tokens[3].split(" ")[1], tokens[2]);
 
-			aMigrosZH = new Placemark(
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getAddressForGeocoding(),
-					Feature.DEFAULT_LOOK_AT,
-					migrosStyle.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-
-			migrosZHFolder.addFeature(aMigrosZH);
+			PlacemarkType aMigros = kmlObjectFactory.createPlacemarkType();
+			aMigros.setName(shopId.getShopId());
+			aMigros.setDescription(shopId.getShopId());
+			aMigros.setAddress(shopId.getAddressForGeocoding());
+			aMigros.setStyleUrl(styles.get("migros").getId());
+			migrosFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aMigros));
 
 		}
 
@@ -678,21 +577,10 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Setting up Migros Ostschweiz shops...");
 
-		Folder migrosOstschweizFolder = null;
-		Placemark aMigrosOstschweiz = null;
-
-		migrosOstschweizFolder = new Folder(
-				"migrosOstschweizFolder",
-				"Migros Ostschweiz",
-				"Alle Migros Ostschweiz Läden",
-				Feature.DEFAULT_ADDRESS,
-				Feature.DEFAULT_LOOK_AT,
-				Feature.DEFAULT_STYLE_URL,
-				Feature.DEFAULT_VISIBILITY,
-				Feature.DEFAULT_REGION,
-				Feature.DEFAULT_TIME_PRIMITIVE);
-
-		mainKMLFolder.addFeature(migrosOstschweizFolder);
+		FolderType migrosFolder = kmlObjectFactory.createFolderType();
+		migrosFolder.setName("Migros Ostschweiz");
+		migrosFolder.setDescription("Alle Migros Ostschweiz Läden");
+		mainKMLFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(migrosFolder));
 
 		List<String> lines = null;
 		String[] tokens = null;
@@ -725,18 +613,12 @@ public class ShopsOf2005ToFacilities {
 					tokens[7].trim()
 			);
 
-			aMigrosOstschweiz = new Placemark(
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getShopId(),
-					shopId.getAddressForGeocoding(),
-					Feature.DEFAULT_LOOK_AT,
-					migrosStyle.getStyleUrl(),
-					Feature.DEFAULT_VISIBILITY,
-					Feature.DEFAULT_REGION,
-					Feature.DEFAULT_TIME_PRIMITIVE);
-
-			migrosOstschweizFolder.addFeature(aMigrosOstschweiz);
+			PlacemarkType aMigros = kmlObjectFactory.createPlacemarkType();
+			aMigros.setName(shopId.getShopId());
+			aMigros.setDescription(shopId.getShopId());
+			aMigros.setAddress(shopId.getAddressForGeocoding());
+			aMigros.setStyleUrl(styles.get("migros").getId());
+			migrosFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(aMigros));
 
 		}
 
@@ -746,15 +628,33 @@ public class ShopsOf2005ToFacilities {
 
 	private static void write() {
 
-		System.out.print("Writing KML files out...");
+		System.out.println("Writing KML files out...");
 
-		KMLWriter myKMLDocumentWriter;
-		myKMLDocumentWriter = new KMLWriter(myKML, kmlFilename, KMLWriter.DEFAULT_XMLNS, false);
-		myKMLDocumentWriter.write();
-//		KMZWriter writer;
-//		writer = new KMZWriter(kmlFilename);
-//		writer.writeMainKml(myKML);
-//		writer.close();
+		try {
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			marshaller.marshal(kmlObjectFactory.createKml(myKML), new FileOutputStream(kmlFilename));
+		} catch (PropertyException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+
+		KMZWriter writer;
+		writer = new KMZWriter(kmlFilename);
+		
+		for (String icon : icons.values()) {
+			try {
+				writer.addNonKMLFile(MatsimResource.getAsInputStream(icon), icon);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		writer.writeMainKml(myKML);
+		writer.close();
 
 		System.out.println("done.");
 
@@ -1737,7 +1637,7 @@ public class ShopsOf2005ToFacilities {
 			shopStyle.setIconStyle(shopIconStyle);
 			BasicLinkType shopIconLink = factory.createBasicLinkType();
 			shopIconStyle.setIcon(shopIconLink);
-			shopIconStyle.setLiteralScale(shopIconScales.get(new Integer(dataSetIndex)));
+			shopIconStyle.setScale(shopIconScales.get(new Integer(dataSetIndex)));
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
