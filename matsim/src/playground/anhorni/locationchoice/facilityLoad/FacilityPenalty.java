@@ -20,7 +20,6 @@
 
 package playground.anhorni.locationchoice.facilityLoad;
 
-import org.jfree.util.Log;
 import org.matsim.gbl.Gbl;
 
 /*
