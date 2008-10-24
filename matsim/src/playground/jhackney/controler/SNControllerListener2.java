@@ -218,14 +218,15 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			}
 			this.log.info(" ... done");
 			Gbl.printMemoryUsage();
+			
 			//dissolve social ties
-
-//			make new actstats (uses new twm AND new socialnet)
-			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
-//			Removing the social links here
 			this.log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... done");
+			
+//			make new actstats (uses new twm AND new socialnet)
+			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+
 			Gbl.printMemoryUsage();
 
 			log.info("SSTEST Finish Scoring with actStats "+snIter);
@@ -243,7 +244,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		if( event.getIteration()%replan_interval==0){
 
-			if(CALCSTATS && event.getIteration()%10==0){
+			if(CALCSTATS && event.getIteration()%1==0){
 				Gbl.printMemoryUsage();
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
@@ -267,11 +268,11 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 				this.log.info(" ... done");
 
 //				Write out the KML for the EgoNet of a chosen agent
-				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-//				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
-				this.log.info(" ... done");
+//				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
+//				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+////				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+//				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
+//				this.log.info(" ... done");
 			}
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
