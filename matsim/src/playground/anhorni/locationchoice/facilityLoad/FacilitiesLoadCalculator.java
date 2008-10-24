@@ -34,7 +34,6 @@ import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.StartupListener;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;

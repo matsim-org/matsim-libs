@@ -41,7 +41,11 @@ public class RandomLocationMutator extends LocationMutator {
 		super(network, controler);
 	}
 
-	// plan == selected plan
+	/*
+	 * For all secondary activities of the plan chose randomly a new facility which provides 
+	 * the possibility to perform the same activity. 
+	 * plan == selected plan
+	 */
 	@Override
 	public void handlePlan(final Plan plan){
 		
