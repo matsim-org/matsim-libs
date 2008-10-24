@@ -58,9 +58,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  creating single person with desires... ");
 		Population pop = new Population(false);
 		Person p = new Person(new IdImpl(0));
-		try {
-			pop.addPerson(p);
-		} catch (Exception e) { throw new RuntimeException(e); }
+		pop.addPerson(p);
 		Desires d = p.createDesires("created by 'DesiresTest.testReadWriteDesires'");
 		if (!d.putActivityDuration("home","16:00:00")) throw new RuntimeException("'home' actDur not added to the desires.");
 		if (!d.putActivityDuration("work",8*3600)) throw new RuntimeException("'work' actDur not added to the desires.");

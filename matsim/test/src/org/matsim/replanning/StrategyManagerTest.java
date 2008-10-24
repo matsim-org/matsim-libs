@@ -36,9 +36,8 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 * are called according to their weights.
 	 *
 	 * @author mrieser
-	 * @throws Exception 
 	 */
-	public void testChangeRequests() throws Exception {
+	public void testChangeRequests() {
 
 		Population population = new Population(Population.NO_STREAMING);
 		for (int i = 0; i < 1000; i++) {
@@ -116,9 +115,8 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 * Also checks that the removal of strategies not known to the StrategyManager doesn't have any side-effects.
 	 *
 	 * @author mrieser
-	 * @throws Exception 
 	 */
-	public void testRemoveStrategy() throws Exception {
+	public void testRemoveStrategy() {
 
 		Population population = new Population(Population.NO_STREAMING);
 		for (int i = 0; i < 100; i++) {
@@ -173,9 +171,8 @@ public class StrategyManagerTest extends MatsimTestCase {
 	 * with undefined score are chosen before any other plan with defined score.
 	 *
 	 * @author mrieser
-	 * @throws Exception 
 	 */
-	public void testOptimisticBehavior() throws Exception {
+	public void testOptimisticBehavior() {
 
 		Population population = new Population(Population.NO_STREAMING);
 		Person person = null;

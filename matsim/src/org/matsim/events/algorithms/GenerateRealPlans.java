@@ -269,19 +269,14 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	private Plan getPlanForPerson(final Person person) {
 		Person realperson = this.realplans.getPerson(person.getId());
 		if (realperson == null) {
-			try {
-				realperson = new Person(person.getId());
-				realperson.setSex(person.getSex());
-				realperson.setAge(person.getAge());
-				realperson.setLicence(person.getLicense());
-				realperson.setCarAvail(person.getCarAvail());
-				realperson.setEmployed(person.getEmployed());
-				realperson.createPlan(true);
-				this.realplans.addPerson(realperson);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			realperson = new Person(person.getId());
+			realperson.setSex(person.getSex());
+			realperson.setAge(person.getAge());
+			realperson.setLicence(person.getLicense());
+			realperson.setCarAvail(person.getCarAvail());
+			realperson.setEmployed(person.getEmployed());
+			realperson.createPlan(true);
+			this.realplans.addPerson(realperson);
 		}
 		return realperson.getPlans().get(0);
 	}
@@ -289,14 +284,9 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	private Plan getPlanForPerson(final String personId) {
 		Person realperson = this.realplans.getPerson(personId);
 		if (realperson == null) {
-			try {
-				realperson = new Person(new IdImpl(personId));
-				realperson.createPlan(true);
-				this.realplans.addPerson(realperson);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			realperson = new Person(new IdImpl(personId));
+			realperson.createPlan(true);
+			this.realplans.addPerson(realperson);
 		}
 		return realperson.getPlans().get(0);
 	}

@@ -96,11 +96,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	public void endTag(final String name, final String content,
 			final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			try {
-				this.plans.addPerson(this.currperson);
-			} catch (Exception e) {
-				Gbl.errorMsg(e);
-			}
+			this.plans.addPerson(this.currperson);
 			this.currperson = null;
 		}
 		else if (PLAN.equals(name)) {
@@ -172,28 +168,19 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		try {
-			this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
+		this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
 					atts.getValue("y100"), atts.getValue("link"), atts
 							.getValue("start_time"), atts.getValue("end_time"), atts
 							.getValue("dur"), null);
-		} catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
 	}
 
 	private void startLeg(final Attributes atts) {
-		try {
-			this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"), atts.getValue("trav_time"),
+		this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"), atts.getValue("trav_time"),
 					atts.getValue("arr_time"));
-		} catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts
-				.getValue("trav_time"));
+		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts.getValue("trav_time"));
 	}
 
 }

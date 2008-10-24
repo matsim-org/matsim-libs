@@ -81,15 +81,8 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 		Act actA = new Act("h", position.getEasting(), position.getNorthing(),
 				position.getLink(), 0.0, this.currenttime, this.currenttime, true);
 		plan.addAct(actA);
-
 		pers.addPlan(plan);
-
-		try {
-			this.plans.addPerson(pers);
-		} catch (Exception e) { 
-			e.printStackTrace();
-		}
-
+		this.plans.addPerson(pers);
 	}
 
 	public void finish() {

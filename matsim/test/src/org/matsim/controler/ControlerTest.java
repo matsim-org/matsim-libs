@@ -76,29 +76,26 @@ public class ControlerTest extends MatsimTestCase {
 		 * same time at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);
 		Person person1 = null;
-		try {
-			person1 = new Person(new IdImpl(1));
-			Plan plan1 = person1.createPlan(true);
-			Act a1 = plan1.createAct("h", link1);
-			a1.setEndTime(7.0*3600);
-			Leg leg1 = plan1.createLeg(Mode.car);
-			Route route1 = leg1.createRoute(null, null);
-			route1.setRoute("2 3");
-			plan1.createAct("h", link3);
-			population.addPerson(person1);
 
-			Person person2 = new Person(new IdImpl(2));
-			Plan plan2 = person2.createPlan(true);
-			Act a2 = plan2.createAct("h", link1);
-			a2.setEndTime(7.0*3600);
-			Leg leg2 = plan2.createLeg(Mode.car);
-			Route route2 = leg2.createRoute(null, null);
-			route2.setRoute("2 3");
-			plan2.createAct("h", link3);
-			population.addPerson(person2);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		person1 = new Person(new IdImpl(1));
+		Plan plan1 = person1.createPlan(true);
+		Act a1 = plan1.createAct("h", link1);
+		a1.setEndTime(7.0*3600);
+		Leg leg1 = plan1.createLeg(Mode.car);
+		Route route1 = leg1.createRoute(null, null);
+		route1.setRoute("2 3");
+		plan1.createAct("h", link3);
+		population.addPerson(person1);
+
+		Person person2 = new Person(new IdImpl(2));
+		Plan plan2 = person2.createPlan(true);
+		Act a2 = plan2.createAct("h", link1);
+		a2.setEndTime(7.0*3600);
+		Leg leg2 = plan2.createLeg(Mode.car);
+		Route route2 = leg2.createRoute(null, null);
+		route2.setRoute("2 3");
+		plan2.createAct("h", link3);
+		population.addPerson(person2);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -198,27 +195,24 @@ public class ControlerTest extends MatsimTestCase {
 		Person person1 = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
-		try {
-			person1 = new Person(new IdImpl(1));
-			// --- plan 1 ---
-			Plan plan1 = person1.createPlan(true);
-			Act a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			a1.setEndTime(7.0*3600);
-			leg1 = plan1.createLeg(Mode.car);
-			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			plan1.createAct("h", link3);
-			// --- plan 2 ---
-			Plan plan2 = person1.createPlan(true);
-			Act a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
-			a2.setEndTime(7.0*3600);
-			
-			leg2 = plan2.createLeg(Mode.car);
-			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			plan2.createAct("h", link3);
-			population.addPerson(person1);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+
+		person1 = new Person(new IdImpl(1));
+		// --- plan 1 ---
+		Plan plan1 = person1.createPlan(true);
+		Act a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		a1.setEndTime(7.0*3600);
+		leg1 = plan1.createLeg(Mode.car);
+		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+		plan1.createAct("h", link3);
+		// --- plan 2 ---
+		Plan plan2 = person1.createPlan(true);
+		Act a2 = plan2.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		a2.setEndTime(7.0*3600);
+
+		leg2 = plan2.createLeg(Mode.car);
+		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+		plan2.createAct("h", link3);
+		population.addPerson(person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -280,26 +274,23 @@ public class ControlerTest extends MatsimTestCase {
 		Act act2b = null;
 		Leg leg1 = null;
 		Leg leg2 = null;
-		try {
-			person1 = new Person(new IdImpl(1));
-			// --- plan 1 ---
-			Plan plan1 = person1.createPlan(true);
-			act1a = plan1.createAct("h", new CoordImpl(-50.0, 10.0));
-			act1a.setEndTime(7.0*3600);
-			leg1 = plan1.createLeg(Mode.car);
-			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			act1b = plan1.createAct("h", new CoordImpl(1075.0, -10.0)); 
-			// --- plan 2 ---
-			Plan plan2 = person1.createPlan(true);
-			act2a = plan2.createAct("h", new CoordImpl(-50.0, -10.0));
-			act2a.setEndTime(7.9*3600);
-			leg2 = plan2.createLeg(Mode.car);
-			// DO NOT CREATE A ROUTE FOR THE LEG!!!
-			act2b = plan2.createAct("h", new CoordImpl(1111.1, 10.0));
-			population.addPerson(person1);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+
+		person1 = new Person(new IdImpl(1));
+		// --- plan 1 ---
+		Plan plan1 = person1.createPlan(true);
+		act1a = plan1.createAct("h", new CoordImpl(-50.0, 10.0));
+		act1a.setEndTime(7.0*3600);
+		leg1 = plan1.createLeg(Mode.car);
+		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+		act1b = plan1.createAct("h", new CoordImpl(1075.0, -10.0));
+		// --- plan 2 ---
+		Plan plan2 = person1.createPlan(true);
+		act2a = plan2.createAct("h", new CoordImpl(-50.0, -10.0));
+		act2a.setEndTime(7.9*3600);
+		leg2 = plan2.createLeg(Mode.car);
+		// DO NOT CREATE A ROUTE FOR THE LEG!!!
+		act2b = plan2.createAct("h", new CoordImpl(1111.1, 10.0));
+		population.addPerson(person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters

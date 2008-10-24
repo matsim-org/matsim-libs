@@ -207,40 +207,36 @@ public class PopulationReaderKutter implements PopulationReader {
 			int arrTime = this.currTime;
 			int travTime = 0;
 
-			try {
-				Zone zone = (Zone)this.tvzLayer.getLocation(cellid);
-				Coord coord = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
-				String activity = "";
-				int duration = 0;
-				boolean skipActivity = false;
+			Zone zone = (Zone)this.tvzLayer.getLocation(cellid);
+			Coord coord = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
+			String activity = "";
+			int duration = 0;
+			boolean skipActivity = false;
 
-				if (acttype < 18) {
-					activity = this.activities[acttype];
-					duration = this.durations[acttype];
-				} else if (acttype == 99) {
-					activity = "home";
-					coord = this.currHome;
-					duration = 24*3600 - this.currTime;	// the rest of the day
-					if (duration < 0) {
-						duration = 0;
-					}
-				} else {
-					skipActivity = true;
+			if (acttype < 18) {
+				activity = this.activities[acttype];
+				duration = this.durations[acttype];
+			} else if (acttype == 99) {
+				activity = "home";
+				coord = this.currHome;
+				duration = 24*3600 - this.currTime;	// the rest of the day
+				if (duration < 0) {
+					duration = 0;
 				}
+			} else {
+				skipActivity = true;
+			}
 
-				if (!skipActivity) {
-					Leg l = this.currPlan.createLeg(mode);
-					l.setDepTime(this.currTime);
-					l.setTravTime(travTime);
-					l.setArrTime(arrTime);
-					this.currTime = this.currTime + duration;
-					Act a = this.currPlan.createAct(activity, coord);
-					a.setStartTime(arrTime);
-					a.setEndTime(this.currTime);
-					a.setDur(duration);
-				}
-			} catch (Exception e) {
-				Gbl.errorMsg(e);
+			if (!skipActivity) {
+				Leg l = this.currPlan.createLeg(mode);
+				l.setDepTime(this.currTime);
+				l.setTravTime(travTime);
+				l.setArrTime(arrTime);
+				this.currTime = this.currTime + duration;
+				Act a = this.currPlan.createAct(activity, coord);
+				a.setStartTime(arrTime);
+				a.setEndTime(this.currTime);
+				a.setDur(duration);
 			}
 		}
 
@@ -348,12 +344,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			while (this.currentSum >= ANTEIL) {
 				this.currPerson = parsePerson();
 				parsePlan(row);
-				try {
-					PopulationReaderKutter.this.population.addPerson(this.currPerson);
-				}
-				catch (Exception e) {
-					Gbl.errorMsg(e);
-				}
+				PopulationReaderKutter.this.population.addPerson(this.currPerson);
 				this.currPerson = null;
 				this.currPlan = null;
 				this.currHome = null;

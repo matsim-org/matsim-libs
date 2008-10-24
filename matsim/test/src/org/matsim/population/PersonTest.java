@@ -192,29 +192,24 @@ public class PersonTest extends MatsimTestCase {
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		try {
-			person = new Person(new IdImpl(1));
-			plans[0] = person.createPlan(false);
-			plans[1] = person.createPlan(false);
-			plans[1].setScore(0.0);
-			plans[2] = person.createPlan(false);
-			plans[3] = person.createPlan(false);
-			plans[3].setScore(-50.0);
-			plans[4] = person.createPlan(false);
-			plans[4].setScore(50.0);
-			plans[5] = person.createPlan(false);
-			plans[5].setScore(50.0);
-			plans[6] = person.createPlan(false);
-			plans[6].setScore(60.0);
-			plans[7] = person.createPlan(false);
-			plans[8] = person.createPlan(false);
-			plans[8].setScore(-10.0);
-			plans[9] = person.createPlan(false);
-			population.addPerson(person);
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		person = new Person(new IdImpl(1));
+		plans[0] = person.createPlan(false);
+		plans[1] = person.createPlan(false);
+		plans[1].setScore(0.0);
+		plans[2] = person.createPlan(false);
+		plans[3] = person.createPlan(false);
+		plans[3].setScore(-50.0);
+		plans[4] = person.createPlan(false);
+		plans[4].setScore(50.0);
+		plans[5] = person.createPlan(false);
+		plans[5].setScore(50.0);
+		plans[6] = person.createPlan(false);
+		plans[6].setScore(60.0);
+		plans[7] = person.createPlan(false);
+		plans[8] = person.createPlan(false);
+		plans[8].setScore(-10.0);
+		plans[9] = person.createPlan(false);
+		population.addPerson(person);
 
 		// now test if we all for plans without score are returned
 		Plan plan = person.getRandomUnscoredPlan();

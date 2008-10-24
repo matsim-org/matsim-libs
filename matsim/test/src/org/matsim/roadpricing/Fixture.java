@@ -132,9 +132,8 @@ public class Fixture {
 	/**
 	 * @param network the network returned by {@link #createNetwork1()}
 	 * @return a population for network1
-	 * @throws Exception 
 	 **/
-	public static Population createPopulation1(final NetworkLayer network) throws Exception {
+	public static Population createPopulation1(final NetworkLayer network) {
 		Population population = new Population(Population.NO_STREAMING);
 
 		Link link0 = network.getLink(new IdImpl(0));
@@ -159,9 +158,8 @@ public class Fixture {
 	/**
 	 * @param network the network returned by {@link #createNetwork2()} 
 	 * @return a population for network2
-	 * @throws Exception 
 	 **/
-	public static Population createPopulation2(final NetworkLayer network) throws Exception {
+	public static Population createPopulation2(final NetworkLayer network) {
 		Population population = new Population(Population.NO_STREAMING);
 
 		population.addPerson(Fixture.createPerson2(1, "07:00", network.getLink("1"), network.getLink("7"), network.getLink("13")));
@@ -169,7 +167,7 @@ public class Fixture {
 		return population;
 	}
 
-	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) throws Exception {
+	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) {
 		Person person = new Person(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
@@ -182,7 +180,7 @@ public class Fixture {
 		return person;
 	}
 
-	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) throws Exception {
+	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
 		Person person = new Person(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
@@ -196,21 +194,17 @@ public class Fixture {
 
 	public static Population createReferencePopulation1(final World world) {
 		// run mobsim once without toll and get score for network1/population1
-		try {
-			NetworkLayer network = createNetwork1();
-			world.setNetworkLayer(network);
-			Population referencePopulation = Fixture.createPopulation1(network);
-			Events events = new Events();
-			EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());
-			events.addHandler(scoring);
-			QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);
-			sim.run();
-			scoring.finish();
+		NetworkLayer network = createNetwork1();
+		world.setNetworkLayer(network);
+		Population referencePopulation = Fixture.createPopulation1(network);
+		Events events = new Events();
+		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());
+		events.addHandler(scoring);
+		QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);
+		sim.run();
+		scoring.finish();
 
-			return referencePopulation;
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+		return referencePopulation;
 	}
 
 	public static void compareRoutes(final String expectedRoute, final Route realRoute) {

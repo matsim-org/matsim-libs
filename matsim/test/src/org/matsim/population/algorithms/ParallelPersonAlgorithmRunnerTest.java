@@ -26,8 +26,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -63,13 +61,9 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 	public void testNofPersons() {
 		loadConfig(null);
 		Population population = new Population(Population.NO_STREAMING);
-		try {
-			for (int i = 0; i < 100; i++) {
-				Person person = new Person(new IdImpl(i));
-				population.addPerson(person);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		for (int i = 0; i < 100; i++) {
+			Person person = new Person(new IdImpl(i));
+			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);

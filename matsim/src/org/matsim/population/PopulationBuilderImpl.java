@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population;
 
 import java.util.ArrayList;
@@ -36,10 +37,8 @@ import org.matsim.interfaces.basic.v01.PopulationBuilder;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
-
 /**
  * @author dgrether
- *
  */
 public class PopulationBuilderImpl implements PopulationBuilder {
 
@@ -67,11 +66,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 				}
 				else if (currentlocation.isLinkId()) {
 					Link link = this.network.getLink(currentlocation.getLocationId());
-					try {
-						act = ((Plan)basicPlan).createAct(currentActType, link);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					act = ((Plan)basicPlan).createAct(currentActType, link);
 				}
 			}
 		}
@@ -79,16 +74,10 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public BasicLeg createLeg(BasicPlan basicPlan, Mode legMode) {
-		Leg leg = null;
-		try {
-			leg = (Leg) ((Plan)basicPlan).createLeg(legMode);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return leg;
+		return ((Plan)basicPlan).createLeg(legMode);
 	}
 
-	public BasicPerson createPerson(Id id) throws Exception {
+	public BasicPerson createPerson(Id id) {
 		Person p = new Person(id);
 		this.population.addPerson(p);
 		return p;
@@ -112,7 +101,5 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		route.setLinkRoute(links);
 		return route;
 	}
-
-
 
 }

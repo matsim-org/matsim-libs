@@ -68,43 +68,39 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Plan plan;
 		Leg leg;
 		Route route;
-		try {
-			person = new Person(new IdImpl("1"));
-			plan = person.createPlan(true);
-			Act a = plan.createAct("h", link1);
-			a.setEndTime(7.0 * 3600);
-			leg = plan.createLeg(Mode.car);
-			route = new Route();
-			route.setRoute("2 7 12");
-			leg.setRoute(route);
-			plan.createAct("w", link20);
-			population.addPerson(person);
 
-			person = new Person(new IdImpl("2"));
-			plan = person.createPlan(true);
-			Act a2 = plan.createAct("h", link1);
-			a2.setEndTime(7.0 * 3600 + 5.0 * 60);
-			leg = plan.createLeg(Mode.car);
-			route = new Route();
-			route.setRoute("2 7 12");
-			leg.setRoute(route);
-			plan.createAct("w", link20);
-			population.addPerson(person);
+		person = new Person(new IdImpl("1"));
+		plan = person.createPlan(true);
+		Act a = plan.createAct("h", link1);
+		a.setEndTime(7.0 * 3600);
+		leg = plan.createLeg(Mode.car);
+		route = new Route();
+		route.setRoute("2 7 12");
+		leg.setRoute(route);
+		plan.createAct("w", link20);
+		population.addPerson(person);
 
-			person = new Person(new IdImpl("3"));
-			plan = person.createPlan(true);
-			Act a3 = plan.createAct("h", link1);
-			a3.setEndTime(7.0 * 3600 + 10.0 * 60);
-			leg = plan.createLeg(Mode.car);
-			route = new Route();
-			route.setRoute("2 6 12");
-			leg.setRoute(route);
-			plan.createAct("w", link20);
-			population.addPerson(person);
+		person = new Person(new IdImpl("2"));
+		plan = person.createPlan(true);
+		Act a2 = plan.createAct("h", link1);
+		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
+		leg = plan.createLeg(Mode.car);
+		route = new Route();
+		route.setRoute("2 7 12");
+		leg.setRoute(route);
+		plan.createAct("w", link20);
+		population.addPerson(person);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		person = new Person(new IdImpl("3"));
+		plan = person.createPlan(true);
+		Act a3 = plan.createAct("h", link1);
+		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
+		leg = plan.createLeg(Mode.car);
+		route = new Route();
+		route.setRoute("2 6 12");
+		leg.setRoute(route);
+		plan.createAct("w", link20);
+		population.addPerson(person);
 
 		return population;
 	}

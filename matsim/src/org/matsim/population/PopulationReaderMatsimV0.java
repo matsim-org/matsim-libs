@@ -91,12 +91,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			try {
-				this.plans.addPerson(this.currperson);
-			}
-			catch (Exception e) {
-				Gbl.errorMsg(e);
-			}
+			this.plans.addPerson(this.currperson);
 			this.currperson = null;
 		} else if (PLAN.equals(name)) {
 			this.currplan = null;
@@ -156,24 +151,14 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		if (atts.getValue("zone") != null) {
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
-		try {
-			 this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
-					 atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
-		}
-		catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
+		this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
+				atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
 	}
 
 	private void startLeg(final Attributes atts) {
-		try {
-			this.currleg =
+		this.currleg =
 				 this.currplan.createLeg(atts.getValue("mode"),atts.getValue("dep_time"),atts.getValue("trav_time"),
 																 atts.getValue("arr_time"));
-		}
-		catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
 	}
 
 	private void startRoute(final Attributes atts) {

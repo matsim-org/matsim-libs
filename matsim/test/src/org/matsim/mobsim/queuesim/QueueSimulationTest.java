@@ -20,7 +20,6 @@
 
 package org.matsim.mobsim.queuesim;
 
-
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -73,44 +72,40 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
-		try {
-			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new IdImpl(0));
-			Plan plan = person.createPlan(true);
-			Act a1 = plan.createAct("h", link1);
-			a1.setEndTime(6*3600 - 500);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = new Route();
+		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
+		Person person = new Person(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Act a1 = plan.createAct("h", link1);
+		a1.setEndTime(6*3600 - 500);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Route route = new Route();
+		route.setRoute("2 3");
+		leg.setRoute(route);
+		plan.createAct("w", link3);
+		plans.addPerson(person);
+
+		// add a lot of other persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 10000; i++) {
+			person = new Person(new IdImpl(i));
+			plan = person.createPlan(true);
+			/* exact dep. time: 6:28:18. The agents needs:
+			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
+			 * the buffer of link 1.
+			 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
+			 * - the agent takes 100 sec. to travel along link 2, after which it gets placed in the buffer of link 2
+			 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
+			 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
+			 * to start 1 + 100 + 1 = 102 secs earlier.
+			 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
+			 */
+			Act a = plan.createAct("h", link1);
+			a.setEndTime(7*3600 - 1902);
+			leg = plan.createLeg(BasicLeg.Mode.car);
+			route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
-
-			// add a lot of other persons with legs from link1 to link3, starting at 6:30
-			for (int i = 1; i <= 10000; i++) {
-				person = new Person(new IdImpl(i));
-				plan = person.createPlan(true);
-				/* exact dep. time: 6:28:18. The agents needs:
-				 * - at the specified time, the agent goes into the waiting list, and if space is available, into
-				 * the buffer of link 1.
-				 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
-				 * - the agent takes 100 sec. to travel along link 2, after which it gets placed in the buffer of link 2
-				 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
-				 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
-				 * to start 1 + 100 + 1 = 102 secs earlier.
-				 * So, the start time is 7*3600 - 1800 - 102 = 7*3600 - 1902
-				 */
-				Act a = plan.createAct("h", link1);
-				a.setEndTime(7*3600 - 1902);
-				leg = plan.createLeg(BasicLeg.Mode.car);
-				route = new Route();
-				route.setRoute("2 3");
-				leg.setRoute(route);
-				plan.createAct("w", link3);
-				plans.addPerson(person);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
 		/* build events */
@@ -162,34 +157,30 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
-		try {
-			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new IdImpl(0));
-			Plan plan = person.createPlan(true);
-			Act a1 = plan.createAct("h", link1);
-			a1.setEndTime(6*3600 - 500);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = new Route();
-			route.setRoute("2 3");
+		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
+		Person person = new Person(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Act a1 = plan.createAct("h", link1);
+		a1.setEndTime(6*3600 - 500);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Route route = new Route();
+		route.setRoute("2 3");
+		leg.setRoute(route);
+		plan.createAct("w", link3);
+		plans.addPerson(person);
+
+		// add a lot of persons with legs from link2 to link3
+		for (int i = 1; i <= 10000; i++) {
+			person = new Person(new IdImpl(i));
+			plan = person.createPlan(true);
+			Act a2 = plan.createAct("h", link2);
+			a2.setEndTime(7*3600 - 1801);
+			leg = plan.createLeg(BasicLeg.Mode.car);
+			route = new Route();
+			route.setRoute("3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
-
-			// add a lot of persons with legs from link2 to link3
-			for (int i = 1; i <= 10000; i++) {
-				person = new Person(new IdImpl(i));
-				plan = person.createPlan(true);
-				Act a2 = plan.createAct("h", link2);
-				a2.setEndTime(7*3600 - 1801);
-				leg = plan.createLeg(BasicLeg.Mode.car);
-				route = new Route();
-				route.setRoute("3");
-				leg.setRoute(route);
-				plan.createAct("w", link3);
-				plans.addPerson(person);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
 		/* build events */
@@ -240,47 +231,43 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
-		try {
-			// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-			Person person = new Person(new IdImpl(0));
-			Plan plan = person.createPlan(true);
-			Act a1 = plan.createAct("h", link1);
-			a1.setEndTime(6*3600 - 500);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = new Route();
+		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
+		Person person = new Person(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Act a1 = plan.createAct("h", link1);
+		a1.setEndTime(6*3600 - 500);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Route route = new Route();
+		route.setRoute("2 3");
+		leg.setRoute(route);
+		plan.createAct("w", link3);
+		plans.addPerson(person);
+
+		// add a lot of persons with legs from link2 to link3
+		for (int i = 1; i <= 5000; i++) {
+			person = new Person(new IdImpl(i));
+			plan = person.createPlan(true);
+			Act a2 = plan.createAct("h", link2);
+			a2.setEndTime(7*3600 - 1801);
+			leg = plan.createLeg(BasicLeg.Mode.car);
+			route = new Route();
+			route.setRoute("3");
+			leg.setRoute(route);
+			plan.createAct("w", link3);
+			plans.addPerson(person);
+		}
+		// add a lot of persons with legs from link1 to link3
+		for (int i = 5001; i <= 10000; i++) {
+			person = new Person(new IdImpl(i));
+			plan = person.createPlan(true);
+			Act a2 = plan.createAct("h", link1);
+			a2.setEndTime(7*3600 - 1902);
+			leg = plan.createLeg(BasicLeg.Mode.car);
+			route = new Route();
 			route.setRoute("2 3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
-
-			// add a lot of persons with legs from link2 to link3
-			for (int i = 1; i <= 5000; i++) {
-				person = new Person(new IdImpl(i));
-				plan = person.createPlan(true);
-				Act a2 = plan.createAct("h", link2);
-				a2.setEndTime(7*3600 - 1801);
-				leg = plan.createLeg(BasicLeg.Mode.car);
-				route = new Route();
-				route.setRoute("3");
-				leg.setRoute(route);
-				plan.createAct("w", link3);
-				plans.addPerson(person);
-			}
-			// add a lot of persons with legs from link1 to link3
-			for (int i = 5001; i <= 10000; i++) {
-				person = new Person(new IdImpl(i));
-				plan = person.createPlan(true);
-				Act a2 = plan.createAct("h", link1);
-				a2.setEndTime(7*3600 - 1902);
-				leg = plan.createLeg(BasicLeg.Mode.car);
-				route = new Route();
-				route.setRoute("2 3");
-				leg.setRoute(route);
-				plan.createAct("w", link3);
-				plans.addPerson(person);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
 		/* build events */
@@ -393,27 +380,23 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
-		try {
-			// create a person with a car-leg from link1 to link5, but an incomplete route
-			Person person = new Person(new IdImpl(0));
-			Plan plan = person.createPlan(true);
-			Act a1 = plan.createAct("h", link1);
-			a1.setEndTime(8*3600);
-			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = new Route();
-			route.setRoute(nodes);
-			leg.setRoute(route);
-			Act a2 = plan.createAct("w", link5);
-			a2.setEndTime(9*3600);
-			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = new Route();
-			route.setRoute("6");
-			leg.setRoute(route);
-			plan.createAct("h", link6);
-			plans.addPerson(person);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// create a person with a car-leg from link1 to link5, but an incomplete route
+		Person person = new Person(new IdImpl(0));
+		Plan plan = person.createPlan(true);
+		Act a1 = plan.createAct("h", link1);
+		a1.setEndTime(8*3600);
+		Leg leg = plan.createLeg(BasicLeg.Mode.car);
+		Route route = new Route();
+		route.setRoute(nodes);
+		leg.setRoute(route);
+		Act a2 = plan.createAct("w", link5);
+		a2.setEndTime(9*3600);
+		leg = plan.createLeg(BasicLeg.Mode.car);
+		route = new Route();
+		route.setRoute("6");
+		leg.setRoute(route);
+		plan.createAct("h", link6);
+		plans.addPerson(person);
 
 		/* build sim */
 		return new QueueSimulation(network, plans, events);

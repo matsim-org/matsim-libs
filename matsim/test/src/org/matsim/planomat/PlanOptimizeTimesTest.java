@@ -158,11 +158,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 			// write out the test person and the modified plan into a file
 			Population outputPopulation = new Population();
-			try {
-				outputPopulation.addPerson(testPerson);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			outputPopulation.addPerson(testPerson);
 
 			System.out.println("Writing plans file...");
 			PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans_" + planomatTestRun.getTestIdentifier() + ".xml.gz", "v4");
@@ -271,11 +267,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		// write out the test person and the modified plan into a file
 		Population outputPopulation = new Population();
-		try {
-			outputPopulation.addPerson(testPerson);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");

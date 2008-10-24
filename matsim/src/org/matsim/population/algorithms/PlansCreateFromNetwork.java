@@ -69,65 +69,59 @@ public class PlansCreateFromNetwork {
 		System.out.println("      p2c_proportion   = " + this.p2c_prop);
 		System.out.println("      creating " + nof_persons + " persons");
 		for (int i=1; i<=nof_persons; i++) {
-			try {
-				String sex = "m"; if (MatsimRandom.random.nextDouble() < 0.5) { sex = "f"; }
-				double rd = MatsimRandom.random.nextDouble();
-				String license = "no";
-				String car_avail = "never";
-				String employed = "no";
-				int age = -1;
-				if (rd < 0.05) {
-					age = MatsimRandom.random.nextInt(7);
-				}
-				else if (rd < 0.2) {
-					age = 7 + MatsimRandom.random.nextInt(11);
-				}
-				else if (rd < 0.4) {
-					age = 18 + MatsimRandom.random.nextInt(10);
-					if (MatsimRandom.random.nextDouble() < 0.7) { employed = "yes"; }
-					if (MatsimRandom.random.nextDouble() < 0.5) {
-						license = "yes";
-						double rd2 = MatsimRandom.random.nextDouble();
-						if (rd2 < 0.4) { car_avail = "sometimes"; }
-						else if (rd2 < 0.5) { car_avail = "always"; }
-					}
-				}
-				else if (rd < 0.9) {
-					age = 28 + MatsimRandom.random.nextInt(37);
-					if (MatsimRandom.random.nextDouble() < 0.6) { employed = "yes"; }
-					if (MatsimRandom.random.nextDouble() < 0.7) {
-						license = "yes";
-						double rd2 = MatsimRandom.random.nextDouble();
-						if (rd2 < 0.2) { car_avail = "sometimes"; }
-						else if (rd2 < 0.7) { car_avail = "always"; }
-					}
-				}
-				else {
-					age = 65 + MatsimRandom.random.nextInt(35);
-					if (MatsimRandom.random.nextDouble() < 0.4) {
-						license = "yes";
-						double rd2 = MatsimRandom.random.nextDouble();
-						if (rd2 < 0.2) { car_avail = "sometimes"; }
-						else if (rd2 < 0.4) { car_avail = "always"; }
-					}
-				}
-				Person p = new Person(new IdImpl(i));
-				p.setSex(sex);
-				p.setAge(age);
-				p.setLicence(license);
-				p.setCarAvail(car_avail);
-				p.setEmployed(employed);
-				plans.addPerson(p);
+			String sex = "m";
+			if (MatsimRandom.random.nextDouble() < 0.5) { 
+				sex = "f";
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
+			double rd = MatsimRandom.random.nextDouble();
+			String license = "no";
+			String car_avail = "never";
+			String employed = "no";
+			int age = -1;
+			if (rd < 0.05) {
+				age = MatsimRandom.random.nextInt(7);
+			} else if (rd < 0.2) {
+				age = 7 + MatsimRandom.random.nextInt(11);
+			} else if (rd < 0.4) {
+				age = 18 + MatsimRandom.random.nextInt(10);
+				if (MatsimRandom.random.nextDouble() < 0.7) { 
+					employed = "yes";
+				}
+				if (MatsimRandom.random.nextDouble() < 0.5) {
+					license = "yes";
+					double rd2 = MatsimRandom.random.nextDouble();
+					if (rd2 < 0.4) { car_avail = "sometimes"; }
+					else if (rd2 < 0.5) { car_avail = "always"; }
+				}
+			} else if (rd < 0.9) {
+				age = 28 + MatsimRandom.random.nextInt(37);
+				if (MatsimRandom.random.nextDouble() < 0.6) { 
+					employed = "yes";
+				}
+				if (MatsimRandom.random.nextDouble() < 0.7) {
+					license = "yes";
+					double rd2 = MatsimRandom.random.nextDouble();
+					if (rd2 < 0.2) { car_avail = "sometimes"; }
+					else if (rd2 < 0.7) { car_avail = "always"; }
+				}
+			} else {
+				age = 65 + MatsimRandom.random.nextInt(35);
+				if (MatsimRandom.random.nextDouble() < 0.4) {
+					license = "yes";
+					double rd2 = MatsimRandom.random.nextDouble();
+					if (rd2 < 0.2) { car_avail = "sometimes"; }
+					else if (rd2 < 0.4) { car_avail = "always"; }
+				}
 			}
+			Person p = new Person(new IdImpl(i));
+			p.setSex(sex);
+			p.setAge(age);
+			p.setLicence(license);
+			p.setCarAvail(car_avail);
+			p.setEmployed(employed);
+			plans.addPerson(p);
 		}
 		System.out.println("    done.");
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 }

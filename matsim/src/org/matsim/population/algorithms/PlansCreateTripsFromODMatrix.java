@@ -67,40 +67,36 @@ public class PlansCreateTripsFromODMatrix {
 
 		ZoneLayer layer = (ZoneLayer)this.matrix.getLayer();
 
-		try {
-			int counter = 0;
-			double sum = 0.0;
-			for (ArrayList<Entry> entries : this.matrix.getFromLocations().values()) {
-				for (Entry entry : entries) {
-					sum += entry.getValue();
-					while (sum >= 1.0) {
-						counter++;
-						sum--;
-						Person person = new Person(new IdImpl(counter));
-						person.setCarAvail("yes");
-						person.setEmployed("yes");
-						Plan plan = person.createPlan(true);
-						Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
-						int endTime = -1;
+		int counter = 0;
+		double sum = 0.0;
+		for (ArrayList<Entry> entries : this.matrix.getFromLocations().values()) {
+			for (Entry entry : entries) {
+				sum += entry.getValue();
+				while (sum >= 1.0) {
+					counter++;
+					sum--;
+					Person person = new Person(new IdImpl(counter));
+					person.setCarAvail("yes");
+					person.setEmployed("yes");
+					Plan plan = person.createPlan(true);
+					Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
+					int endTime = -1;
 
-						double rnd = MatsimRandom.random.nextDouble();
-						for (int i = 0, max = this.timeDistribution.size(); i < max && endTime == -1; i++) {
-							if (rnd <= this.timeDistribution.get(i)) {
-								endTime = i*this.timeBinSize + MatsimRandom.random.nextInt(this.timeBinSize);
-							}
+					double rnd = MatsimRandom.random.nextDouble();
+					for (int i = 0, max = this.timeDistribution.size(); i < max && endTime == -1; i++) {
+						if (rnd <= this.timeDistribution.get(i)) {
+							endTime = i*this.timeBinSize + MatsimRandom.random.nextInt(this.timeBinSize);
 						}
-
-						Act a = plan.createAct("work", coord);
-						a.setEndTime(endTime);
-						plan.createLeg(BasicLeg.Mode.car);
-						a = plan.createAct("work", coord);
-
-						plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.
 					}
+
+					Act a = plan.createAct("work", coord);
+					a.setEndTime(endTime);
+					plan.createLeg(BasicLeg.Mode.car);
+					a = plan.createAct("work", coord);
+
+					plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.
 				}
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 
 		System.out.println("    done.");

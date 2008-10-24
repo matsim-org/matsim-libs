@@ -37,10 +37,8 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	/**
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
-	 *
-	 * @throws Exception
 	 */
-	public void testAddUtility() throws Exception {
+	public void testAddUtility() {
 		Population population = new Population(Population.NO_STREAMING);
 		Person person = new Person(new IdImpl(1));
 		population.addPerson(person);

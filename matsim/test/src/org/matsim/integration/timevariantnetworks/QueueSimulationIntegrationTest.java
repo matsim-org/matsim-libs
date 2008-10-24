@@ -56,7 +56,7 @@ import org.matsim.world.World;
  */
 public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
-	public void testFreespeed() throws Exception {
+	public void testFreespeed() {
 		loadConfig(null);
 		World world = Gbl.createWorld();
 
@@ -94,10 +94,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * Test the queue simulation for correct behavior if capacity of links is
 	 * reduced during the run.
 	 *
-	 * @throws Exception
 	 * @author illenberger
 	 */
-	public void testCapacity() throws Exception {
+	public void testCapacity() {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
@@ -190,11 +189,10 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @param destLink the destination link.
 	 * @param count the number of persons to create
 	 * @return a list of persons where the ordering corresponds to the departure times.
-	 * @throws Exception
 	 * @author illenberger
 	 */
 	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink,
-			final int count) throws Exception {
+			final int count) {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
 			Person person = new Person(new IdImpl(i + (int)depTime));

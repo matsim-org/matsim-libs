@@ -54,11 +54,7 @@ public class PlansFilterActInArea extends AbstractPersonAlgorithm {
 			String type = act.getType();
 			if (type.contains(this.actType)) {
 				if(this.network.getLink(act.getLink().getId().toString()) != null) {
-					try {
-						this.plans.addPerson(person);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					this.plans.addPerson(person);
 				}
 				return;
 			}
