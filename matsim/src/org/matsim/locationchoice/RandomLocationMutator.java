@@ -51,21 +51,21 @@ public class RandomLocationMutator extends LocationMutator {
 		while (iter_types.hasNext()){
 			Activity activity = iter_types.next();
 			String type = activity.getType();
-			exchangeFacilities(type ,(ArrayList<Facility>)this.quad_trees.get(type).values(), plan);
+			exchangeFacilities(type ,this.quad_trees.get(type).values().toArray(), plan);
 		}
 	}
 
-	public void exchangeFacilities(final String type, ArrayList<Facility>  exchange_facilities, final Plan plan) {
+	public void exchangeFacilities(final String type, Object [] exchange_facilities, final Plan plan) {
 		
-		if (exchange_facilities.size() == 0) return;
+		if (exchange_facilities.length == 0) return;
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			if (act.getType().startsWith(type)) {
 				
-				final Facility facility=(Facility)exchange_facilities.toArray()[
-				           MatsimRandom.random.nextInt(exchange_facilities.size()-1)];
+				final Facility facility=(Facility)exchange_facilities[
+				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
 				
 				act.setFacility(facility);
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
