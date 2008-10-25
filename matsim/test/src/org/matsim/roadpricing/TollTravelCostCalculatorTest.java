@@ -46,112 +46,102 @@ import org.matsim.testcases.MatsimTestCase;
 public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 	public void testDistanceTollRouter() {
-		try {
-			loadConfig(null);
+		loadConfig(null);
 
-			NetworkLayer network = Fixture.createNetwork2();
-			Gbl.getWorld().setNetworkLayer(network);
-			// a basic toll where only the morning hours are tolled
-			RoadPricingScheme toll = new RoadPricingScheme(network);
-			toll.setType("distance");
-			toll.addLink("5");
-			toll.addLink("11");
-			Population population = Fixture.createPopulation2(network);
-			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-			TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		NetworkLayer network = Fixture.createNetwork2();
+		Gbl.getWorld().setNetworkLayer(network);
+		// a basic toll where only the morning hours are tolled
+		RoadPricingScheme toll = new RoadPricingScheme(network);
+		toll.setType("distance");
+		toll.addLink("5");
+		toll.addLink("11");
+		Population population = Fixture.createPopulation2(network);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
-			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-			commonRouterData.run(network);
+		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
+		commonRouterData.run(network);
 
-			Leg leg = ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1)));
+		Leg leg = ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1)));
 
-			// 1st case: without toll, agent chooses shortest path
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1))).getRoute());
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			assertNull(leg.getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		// 1st case: without toll, agent chooses shortest path
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1))).getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		assertNull(leg.getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
 
-			Cost morningCost = toll.addCost(6*3600, 10*3600, 0.0003); // 0.0003 * link_length(100m) = 0.03, which is slightly below the threshold of 0.0333
-			// 2nd case: with a low toll, agent still chooses shortest path
-			clearRoutes(population);
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.0003); // 0.0003 * link_length(100m) = 0.03, which is slightly below the threshold of 0.0333
+		// 2nd case: with a low toll, agent still chooses shortest path
+		clearRoutes(population);
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
 
-			// 3rd case: with a higher toll, agent decides to drive around tolled link
-			toll.removeCost(morningCost);
-			toll.addCost(6*3600, 10*3600, 0.00035); // new morning toll, this should be slightly over the threshold
-			clearRoutes(population);
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		// 3rd case: with a higher toll, agent decides to drive around tolled link
+		toll.removeCost(morningCost);
+		toll.addCost(6*3600, 10*3600, 0.00035); // new morning toll, this should be slightly over the threshold
+		clearRoutes(population);
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
 	}
 
 	public void testCordonTollRouter() {
-		try {
-			loadConfig(null);
+		loadConfig(null);
 
-			NetworkLayer network = Fixture.createNetwork2();
-			Gbl.getWorld().setNetworkLayer(network);
-			// a basic toll where only the morning hours are tolled
-			RoadPricingScheme toll = new RoadPricingScheme(network);
-			toll.setType("cordon");
-			toll.addLink("5");
-			toll.addLink("11");
-			Population population = Fixture.createPopulation2(network);
-			FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-			TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+		NetworkLayer network = Fixture.createNetwork2();
+		Gbl.getWorld().setNetworkLayer(network);
+		// a basic toll where only the morning hours are tolled
+		RoadPricingScheme toll = new RoadPricingScheme(network);
+		toll.setType("cordon");
+		toll.addLink("5");
+		toll.addLink("11");
+		Population population = Fixture.createPopulation2(network);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+		TravelCost costCalc = new TollTravelCostCalculator(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
 
-			PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
-			commonRouterData.run(network);
+		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
+		commonRouterData.run(network);
 
-			Leg leg = ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1)));
+		Leg leg = ((Leg) (population.getPerson("1").getPlans().get(0).getActsLegs().get(1)));
 
-			// 1st case: without toll, agent chooses shortest path
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		// 1st case: without toll, agent chooses shortest path
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
 
-			// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
-			Cost morningCost = toll.addCost(6*3600, 10*3600, 0.03);
-			clearRoutes(population);
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
-			toll.removeCost(morningCost);
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.03);
+		clearRoutes(population);
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
+		toll.removeCost(morningCost);
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 4 5", leg.getRoute());
 
-			// 3rd case: with a higher toll, agent decides to drive around tolled link
-			toll.addCost(6*3600, 10*3600, 0.035);
-			clearRoutes(population);
-			new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
-			// also test it with A*-Landmarks
-			clearRoutes(population);
-			new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
-			Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		// 3rd case: with a higher toll, agent decides to drive around tolled link
+		toll.addCost(6*3600, 10*3600, 0.035);
+		clearRoutes(population);
+		new PlansCalcRouteDijkstra(network, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRouteLandmarks(network, commonRouterData, costCalc, timeCostCalc).run(population);
+		Fixture.compareRoutes("1 2 3 4 5", leg.getRoute());
 	}
 
 	/**

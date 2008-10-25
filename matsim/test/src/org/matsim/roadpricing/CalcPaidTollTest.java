@@ -20,6 +20,10 @@
 
 package org.matsim.roadpricing;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -31,6 +35,7 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
+import org.xml.sax.SAXException;
 
 /**
  * Tests that {@link CalcPaidToll} calculates the correct tolls
@@ -166,37 +171,37 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		NetworkLayer network = Fixture.createNetwork1();
 		world.setNetworkLayer(network);
 
+		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
 		try {
-			RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(network);
 			reader.parse(tollFile);
-			RoadPricingScheme scheme = reader.getScheme();
-			assertEquals(tollType, scheme.getType());
-
-			Population population = Fixture.createPopulation1(network);
-			runTollSimulation(network, population, scheme);
-			return population;
-		} catch (Exception e) {
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		RoadPricingScheme scheme = reader.getScheme();
+		assertEquals(tollType, scheme.getType());
+
+		Population population = Fixture.createPopulation1(network);
+		runTollSimulation(network, population, scheme);
+		return population;
 	}
 
 	private void runTollSimulation(final NetworkLayer network, final Population population, final RoadPricingScheme toll) {
-		try {
-			Events events = new Events();
-			CalcPaidToll paidToll = new CalcPaidToll(network, toll);
-			events.addHandler(paidToll);
-			EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
-			events.addHandler(scoring);
+		Events events = new Events();
+		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
+		events.addHandler(paidToll);
+		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory());
+		events.addHandler(scoring);
 
-			QueueSimulation sim = new QueueSimulation(network, population, events);
-			sim.run();
+		QueueSimulation sim = new QueueSimulation(network, population, events);
+		sim.run();
 
-			paidToll.sendUtilityEvents(Time.MIDNIGHT, events);
+		paidToll.sendUtilityEvents(Time.MIDNIGHT, events);
 
-			scoring.finish();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		scoring.finish();
 	}
 
 }
