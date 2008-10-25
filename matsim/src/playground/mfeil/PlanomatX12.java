@@ -75,7 +75,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		this.scorer 				= new PlanomatXPlanScorer (factory);
 		
 		if (constrained) locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
-		else locationChoiceAlgorithm = new RandomLocationMutator(network);
+		else locationChoiceAlgorithm = new RandomLocationMutator(network, controler);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
