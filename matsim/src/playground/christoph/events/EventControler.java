@@ -37,7 +37,9 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 
+import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
+import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -142,10 +144,18 @@ public class EventControler extends Controler{
 	 */
 	protected void initParallelReplanningModules()
 	{
+		ParallelReplanner.init(replanners);
+		ParallelReplanner.setNumberOfThreads(2);
+
+	/*
 		ParallelLeaveLinkReplanner.init(replanners);
 		ParallelLeaveLinkReplanner.setNumberOfThreads(2);
+		ParallelActEndReplanner.init(replanners);
+		ParallelActEndReplanner.setNumberOfThreads(2);
 		
 		// more Modules to come...
+	 */
+	
 	}
 	
 	/*
@@ -291,7 +301,7 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
+//			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
 		}
@@ -303,7 +313,7 @@ public class EventControler extends Controler{
 	protected void createKnownNodes()
 	{
 		// use only one of these two - they should produce the same results... 
-		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 1);
+		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
 
 		// non multi-core calculation
 		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);

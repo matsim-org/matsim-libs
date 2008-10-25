@@ -41,7 +41,7 @@ public abstract class ParallelReplanner {
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 	
 	protected static ArrayList<PlanAlgorithm> replanners;
-	protected static int numOfThreads = 1;	// use by default only one thread
+	protected static int numOfThreads = 2;	// use by default only one thread
 	protected static PlanAlgorithm[][] replannerArray;
 	
 	// Set the Replanners ArrayList here - this can be done once from the Controler
@@ -84,6 +84,7 @@ public abstract class ParallelReplanner {
 				}
 				else
 				{
+					log.error("replanner class " + replanner.getClass());
 					log.error("Could not clone the Replanner - use reference to the existing Replanner and hope the best...");
 					replannerArray[i][j] = replanner;
 				}

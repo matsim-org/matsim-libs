@@ -20,7 +20,6 @@
 
 package playground.christoph.knowledge;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,7 +37,6 @@ import playground.christoph.knowledge.utils.GetAllNodes;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	//ArrayList<Node> selectedNodes;
 	Map<Id, Node> selectedNodesMap;
 	
 	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
@@ -46,7 +44,6 @@ public class TestNodeSelection {
 	
 	protected void init()
 	{
-		//selectedNodes = new ArrayList<Node>();
 		selectedNodesMap = new TreeMap<Id, Node>();
 	}
 	

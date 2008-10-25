@@ -65,6 +65,26 @@ public class MyQueueNetwork extends QueueNetwork{
 		createLookupTable();
 	}
 
+	public static void doLeaveLinkReplanning(boolean value)
+	{
+		leaveLinkReplanning = value;
+	}
+	
+	public static boolean isLeaveLinkReplanning()
+	{
+		return leaveLinkReplanning;
+	}
+	
+	public static void doActEndReplanning(boolean value)
+	{
+		actEndReplanning = value;
+	}
+	
+	public static boolean isActEndReplanning()
+	{
+		return actEndReplanning;
+	}
+	
 	/*
 	 * Creates a lookuptable that connects 
 	 */
@@ -94,6 +114,16 @@ public class MyQueueNetwork extends QueueNetwork{
 	@Override
 	protected void simStep(final double time) {
 		
+		// Do Replanning if active...
+		if (leaveLinkReplanning) leaveLinkReplanning(time);
+		if (actEndReplanning) actEndReplanning(time);
+		
+		// ... and finally execute the Simulation Step.
+		super.simStep(time);	
+	}
+	
+	protected void leaveLinkReplanning(double time)
+	{
 		// Leave Link Replanning Objects
 		ArrayList<Vehicle> vehiclesToReplanLeaveLink = new ArrayList<Vehicle>();
 		ArrayList<QueueNode> currentNodesLeaveLink = new ArrayList<QueueNode>();
@@ -130,10 +160,14 @@ public class MyQueueNetwork extends QueueNetwork{
 		{
 //			log.info("Found " + vehiclesToReplan.size() + " vehicles that are going to leave their links and need probably a replanning!");
 			ParallelLeaveLinkReplanner.run(currentNodesLeaveLink, vehiclesToReplanLeaveLink, time);
-//			log.info("Done parallel replanning in this step!");
+//			log.info("Done parallel Leave Link Replanning in this step!");
 		}
-		
-		
+	
+	}	// leaveLinkReplanning
+	
+	
+	protected void actEndReplanning(double time)
+	{
 		// Act End Replanning Objects
 		ArrayList<Vehicle> vehiclesToReplanActEnd = new ArrayList<Vehicle>();
 		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
@@ -158,9 +192,7 @@ public class MyQueueNetwork extends QueueNetwork{
 				 * so Act End Replanning is needed.
 				 */
 				PriorityQueue<Vehicle> onParkingListVehiclesQueue = queueLinks[i].getVehiclesOnParkingList();
-				
-				boolean test = true;
-				
+								
 				for (Vehicle vehicle : onParkingListVehiclesQueue)
 				{	
 					// check if Act End Replanning flag is set
@@ -169,17 +201,13 @@ public class MyQueueNetwork extends QueueNetwork{
 					{						
 						// if the current Activity has ended
 						if (vehicle.getDepartureTime_s() <= time) 
-						{
-							if (test == false)
-							{
-								log.error("\"Test\" is false but should be true ?!");
-							}
-							
+						{				
 							vehiclesToReplanActEnd.add(vehicle);
 							
 							PersonAgent personAgent = vehicle.getDriver();
 							Act fromAct = (Act)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
 							fromActActEnd.add(fromAct);
+							if (fromAct == null) log.error("Found fromAct that is null!");
 						}
 						
 						/*
@@ -188,8 +216,8 @@ public class MyQueueNetwork extends QueueNetwork{
 						 * check the following vehicles.
 						 */
 						else
-						{	test = false;
-//							break;
+						{	
+							break;
 						}
 					}
 				}
@@ -201,14 +229,13 @@ public class MyQueueNetwork extends QueueNetwork{
 	
 		if (vehiclesToReplanActEnd.size() > 0)
 		{	
-			log.info(vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
+//			log.info(vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
 			ParallelActEndReplanner.run(fromActActEnd, vehiclesToReplanActEnd, time);
+//			log.info("Done parallel Act End Replanning in this step!");
 		}
-		
-		
-		// ... and finally execute the Simulation Step.
-		super.simStep(time);	
-	}
+	
+	}	// actEndReplanning
+	
 	
 	public void setControler(Controler controler) 
 	{

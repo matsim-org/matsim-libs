@@ -73,6 +73,11 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
+/*		log.info(this);
+		log.info(fromNode);
+		log.info(toNode);
+		log.info(time);
+*/
 		return dijkstra.calcLeastCostPath(fromNode, toNode, startTime);
 	}
 	
@@ -147,12 +152,13 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 			timeFunctionClone = timeFunction;
 		}
 		
-		
-		// how to handle an A*- Algorithm???
 		Dijkstra dijkstraClone = new Dijkstra(networkClone, costFunctionClone, timeFunctionClone);
 		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone);
-		clone.queueNetwork = this.queueNetwork;
-	
+		clone.setQueueNetwork(this.queueNetwork);
+		//clone.queueNetwork = this.queueNetwork;
+		
+		// TODO: how to handle an A*-Algorithm???
+		
 		return clone; 
 	}
 	

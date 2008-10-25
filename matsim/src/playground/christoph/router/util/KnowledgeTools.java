@@ -75,9 +75,9 @@ public class KnowledgeTools {
 	 * If no Nodes are known, all links are returned.
 	 */
 	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
-	{
-		// If the current Person has knowledge about known Nodes
-		if(knownNodesMap != null)
+	{	
+		// If the current Person has knowledge about known Nodes (Map exists and has Elements)
+		if(knownNodesMap != null && knownNodesMap.size() != 0)
 		{
 			ArrayList<Link> knownLinks = new ArrayList<Link>();
 			
@@ -107,7 +107,10 @@ public class KnowledgeTools {
 	//public static boolean knowsLink(Link link, ArrayList<Node> knownNodes)
 	public static boolean knowsLink(Link link, Map<Id, Node> knownNodesMap)
 	{
+		// if no Map found or the Map is empty -> Person knows the entire network, return true
 		if ( knownNodesMap == null ) return true;
+		if ( knownNodesMap.size() == 0) return true;
+		
 		if ( knownNodesMap.containsKey(link.getFromNode().getId()) && knownNodesMap.containsKey(link.getToNode().getId()) ) return true;
 		else return false;
 	}

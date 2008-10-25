@@ -55,7 +55,6 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		//for (Vehicle vehicle : vehicles)
 		for(int j = 0; j < vehicles.size(); j++)
 		{
 			Vehicle vehicle = vehicles.get(i);
@@ -70,7 +69,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		{
 			thread.start();
 		}
-		
+	
 		// wait for the threads to finish
 		try {
 			for (Thread thread : threads) 
@@ -116,12 +115,11 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		{
 			int numRuns = 0;
 			
-			//for (Vehicle vehicle : this.vehicles)
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
 				Vehicle vehicle = vehicles.get(i);
 				Act fromAct = fromActs.get(i);
-						
+				
 				// replanner of the person
 				PlanAlgorithm replanner = (PlanAlgorithm)vehicle.getDriver().getPerson().getCustomAttributes().get("Replanner");
 					
@@ -130,7 +128,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 					
 				// get the replanner or a clone if it, if it's not the first running thread
 				replanner = this.replannerArray[index][threadId];
-				
+								
 				new ActEndReplanner(fromAct, vehicle, time, replanner);
 //				log.info("Did Act End Replanning...");
 				
@@ -139,7 +137,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			
 			}
 		
-			log.info("Thread " + threadId + " done.");
+//			log.info("Thread " + threadId + " done.");
 			
 		}	// run
 		

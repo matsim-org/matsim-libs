@@ -23,9 +23,13 @@ package playground.christoph.knowledge.nodeselection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -157,7 +161,24 @@ public class ParallelCreateKnownNodesMap {
 			int numRuns = 0;
 			
 			for (Person person : this.persons)
-			{			
+			{	
+				/* 
+				 * If person has no Knowledge create at least the knowledge structure to
+				 * avoid error during the simulation.
+				 * No known nodes is handled as if the person would know the entire network.
+				 * This should be faster than using a Map that contains all Nodes of the network.
+				 */
+				if(person.getKnowledge() == null) 
+				{
+					person.createKnowledge("activityroom");
+					
+					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
+
+					// add the new created Nodes to the knowledge of the person
+					Map<String,Object> customKnowledgeAttributes = person.getKnowledge().getCustomAttributes();
+					customKnowledgeAttributes.put("Nodes", nodesMap);
+				}
+				
 				// all NodeSelectors of the Person
 				ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
 
@@ -178,7 +199,7 @@ public class ParallelCreateKnownNodesMap {
 					}
 					
 				}	// for all NodeSelectors
-	
+				
 				// if Flag is set, remove Dead Ends from the Person's Activity Room
 				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
 				

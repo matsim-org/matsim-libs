@@ -24,11 +24,14 @@ import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
+import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
+import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
+import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
@@ -144,9 +147,30 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 			routeAlgoFreeflowClone = routeAlgoFreeflow;
 		}
 		
-		KnowledgePlansCalcRoute clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoFreeflowClone); 
-		clone.queueNetwork = this.queueNetwork;
+		/* 
+		 * routeAlgo and routeAlgoFreeflow may be the references to the same object.
+		 * In this case -> use only one clone.
+		 */
+		KnowledgePlansCalcRoute clone;
+		if(routeAlgo == routeAlgoFreeflow)
+		{
+			clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoClone);
+		}
+		else
+		{
+			clone = new KnowledgePlansCalcRoute(routeAlgoClone, routeAlgoFreeflowClone);
+		}
 		
+		clone.setQueueNetwork(this.queueNetwork);
+		//clone.queueNetwork = this.queueNetwork;
+/*		
+		log.info(routeAlgo.getClass());
+		log.info("org   " + this);
+		log.info("clone " + clone);
+		
+		log.info("org wrapper   " + this.routeAlgo);
+		log.info("clone wrapper " + clone.routeAlgo);
+*/		
 		return clone;
 	}
 }

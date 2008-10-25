@@ -61,7 +61,7 @@ public class ActEndReplanner implements ActEndEventHandler {
 		this.person = vehicle.getDriver().getPerson();
 		this.time = time;
 		this.replanner = replanner;
-		
+
 		Plan plan = person.getSelectedPlan();
 		this.betweenLeg = plan.getNextLeg(fromAct);
 	
@@ -74,9 +74,6 @@ public class ActEndReplanner implements ActEndEventHandler {
 			toAct = null;
 			log.error("An agents next activity is null - this should not happen!");
 		}
-
-		this.replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
-		if (replanner == null) log.error("No Replanner found in Person!");
 		
 		// calculate new Route
 		if(toAct != null && replanner != null)
@@ -163,6 +160,7 @@ public class ActEndReplanner implements ActEndEventHandler {
 		// This Plan contains only the just ended and the next Activity.
 		// -> That's the only Part of the Route that we want to replan.
 		Plan newPlan = new Plan(person);
+		person.addPlan(newPlan);
 		person.setSelectedPlan(newPlan);
 		
 		// Here we are at the moment.
@@ -190,6 +188,9 @@ public class ActEndReplanner implements ActEndEventHandler {
 		
 		// reactivate previously selected, replanned plan
 		person.setSelectedPlan(currentPlan);
+		
+		// remove previously added new Plan
+		person.removePlan(newPlan);
 	}
 	
 }
