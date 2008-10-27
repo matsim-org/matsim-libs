@@ -22,6 +22,7 @@ package org.matsim.utils.vis.snapshots.writers;
 
 import java.io.IOException;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -49,22 +50,22 @@ import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 
-	private ObjectFactory kmlObjectFactory = new ObjectFactory();
+	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
-	private KmlType mainKml = null;
-	private DocumentType mainDoc = null;
+	private final KmlType mainKml;
+	private final DocumentType mainDoc;
 	private FolderType mainFolder = null;
 	
-	private StyleType carStyle = null;
+	private final StyleType carStyle;
 	
 	private KmlType timeKml = null;
 	private DocumentType timeDoc = null;
 	private PlacemarkType timePlacemark = null;
 	private MultiGeometryType timeGeometry = null;
 	
-	private KMZWriter writer = null;
+	private final KMZWriter writer;
 
-	private CoordinateTransformation coordTransform = null;
+	private final CoordinateTransformation coordTransform;
 
 	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<Double, NetworkLinkType>();
 
@@ -116,7 +117,6 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	public void beginSnapshot(final double time) {
 		this.time = time;
-		String timeStr = Time.writeTime(time, Time.TIMEFORMAT_HHMMSS, ':');
 		
 		this.timeKml = kmlObjectFactory.createKmlType();
 
@@ -145,14 +145,10 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		nl.setLink(link);
 	
 		TimeStampType timeStamp = kmlObjectFactory.createTimeStampType();
-		// TODO is that time correct?
 		timeStamp.setWhen("1970-01-01T" + Time.writeTime(this.time));
 		
 		nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeStamp(timeStamp));
 		
-//		NetworkLink nl = new NetworkLink("link for time" + this.time, new Link(filename));
-//		nl.setTimePrimitive(new TimeStamp(
-//				new GregorianCalendar(1970, 0, 1, (int) (this.time / 3600), (int) ((this.time / 60) % 60), (int) (this.time % 60))));
 		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createNetworkLink(nl));
 		this.timeLinks.put(Double.valueOf(this.time), nl);
 
@@ -175,22 +171,18 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	public void finish() {
 		// change timestamps to timespans
-		Double lt = null;
-		double lasttime = Double.NEGATIVE_INFINITY;
-		for (Double t : this.timeLinks.keySet()) {
-			double time = t.doubleValue();
-			if (lt != null) {
-				NetworkLinkType nl = this.timeLinks.get(lt);
+		String lastTimeS = null;
+		String timeS;
+		for (Entry<Double, NetworkLinkType> e : this.timeLinks.entrySet()) {
+			timeS = Time.writeTime(e.getKey().doubleValue());
+			if (lastTimeS != null) {
+				NetworkLinkType nl = e.getValue();
 				TimeSpanType timeSpan = kmlObjectFactory.createTimeSpanType();
-				timeSpan.setBegin("1970-01-01T" + Time.writeTime(lasttime));
-				timeSpan.setEnd("1970-01-01T" + Time.writeTime(time));
+				timeSpan.setBegin("1970-01-01T" + lastTimeS);
+				timeSpan.setEnd("1970-01-01T" + timeS);
 				nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timeSpan));
-//				nl.setTimePrimitive(new TimeSpan(
-//						new GregorianCalendar(1970, 0, 1, (int) (lasttime / 3600), (int) ((lasttime / 60) % 60), (int) (lasttime % 60)),
-//						new GregorianCalendar(1970, 0, 1, (int) (time / 3600), (int) ((time / 60) % 60), (int) (time % 60))));
 			}
-			lt = t;
-			lasttime = time;
+			lastTimeS = timeS;
 		}
 		// write main kml
 		this.writer.writeMainKml(this.mainKml);
