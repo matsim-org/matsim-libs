@@ -33,8 +33,8 @@ public class IdImpl implements Id, Serializable {
 		this.id = id;
 	}
 
-	public IdImpl(final int id) {
-		this.id = Integer.toString(id);
+	public IdImpl(final long id) {
+		this.id = Long.toString(id);
 	}
 
 	@Override
