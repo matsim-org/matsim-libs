@@ -52,7 +52,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
-	private final PlanAlgorithm 			planomatAlgorithm;
+	//private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlanAlgorithm				timer;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
@@ -65,10 +65,10 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 	public PlanomatX15 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory) {
 
-		this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
+		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanomatXPlanScorer (factory);
-		this.timer					= new TimeOptimizer2(factory, legTravelTimeEstimator);
+		this.timer					= new TimeOptimizer4(factory, legTravelTimeEstimator);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -108,7 +108,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
 		double [] xs;
-		double [] ys = new double [MAX_ITERATIONS];
+		double [] ys = new double [MAX_ITERATIONS+1];
 		
 		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
@@ -143,6 +143,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		// Write the given plan into the tabuList
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
 		stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
+		ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
 		// Do Tabu Search iterations
 		int currentIteration;
@@ -215,7 +216,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 			// Statistics
 			stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
 			//streamOverview.println(bestIterSolution.getScore());
-			ys[currentIteration-1]=bestIterSolution.getScore();
+			ys[currentIteration]=bestIterSolution.getScore();
 			
 
 			if (this.MAX_ITERATIONS==currentIteration){
