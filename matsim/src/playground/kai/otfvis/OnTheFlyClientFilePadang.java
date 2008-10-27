@@ -134,8 +134,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.100/100.movie.mvi";
-		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
+		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.100/100.movie.mvi";
+//		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
 //		final String filename =  "./output/ITERS/it.100/100.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
