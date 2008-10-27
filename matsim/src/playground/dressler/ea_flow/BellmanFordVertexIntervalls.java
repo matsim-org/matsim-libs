@@ -175,6 +175,9 @@ public class BellmanFordVertexIntervalls {
 	 * @return
 	 */
 	private boolean isActiveSource(Node node) {
+		if(_debug){
+			System.out.println(node.getId() + " active:" + this._flow.isActiveSource(node));
+		}
 		return this._flow.isActiveSource(node);
 	}
 	
@@ -252,12 +255,12 @@ public class BellmanFordVertexIntervalls {
 			t=i.getHighBound();
 			if(i.getDist()){
 				if(_debug){
-					System.out.println("wir kommen los");
+					System.out.println("wir kommen los:"+ from.getId());
 				}	//TODO cas auf int!!!
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
 					if(_debug){
-						System.out.println("wir kommen weiter");
+						System.out.println("wir kommen weiter: "+ to.getId());
 						for(Intervall inter: arrive){
 							System.out.println(forward);
 							System.out.println(inter);
@@ -267,6 +270,8 @@ public class BellmanFordVertexIntervalls {
 					if(temp){
 						changed = true;
 					}
+				}else{
+					System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
 				}
 			}
 		}while(!labelfrom.isLast(i));

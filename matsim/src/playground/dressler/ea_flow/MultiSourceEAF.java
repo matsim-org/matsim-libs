@@ -25,6 +25,11 @@
 package playground.dressler.ea_flow;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -45,17 +50,31 @@ public class MultiSourceEAF {
 	
 	
 	private boolean _debug = false;
+	
+	//TODO comment
+	private static HashMap<Node,Integer> readDemands(NetworkLayer network, String filename) throws IOException{
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
+			String inline = null;
+			while ((inline = in.readLine()) != null) {
+				String[] line = inline.split(";");
+				Node node = network.getNode(line[0].trim()); 
+				int d = Integer.valueOf(line[1].trim());
+				demands.put(node, d);
+			}
+		return demands;
+	}
 	/**
 	 * @param args blub
+	 * 
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		 System.out.println("Ich lebe");
 		 NetworkLayer network = new NetworkLayer();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
 		 
 		 HashMap<Link, EdgeIntervalls> flow;
-		 int timeHorizon = 9;
+		 int timeHorizon = 90;
 		 
 		 //TODO choose the one you need
 		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/equil/network.xml");
@@ -64,32 +83,29 @@ public class MultiSourceEAF {
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/equil/network.xml");
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/two-routes/network.xml");
 		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/roundabout/network.xml");
-		 networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");		 
-		 
-		// CODE
+		 //networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
+		 networkReader.readFile("/Users/manuel/Documents/meine_EA/manu2.xml");
+		 HashMap<Node, Integer> demands;
+		try {
+			demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu2.dem");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
-			//System.out.println(link.getId().toString());
 			int l = (int)link.getLength()/(int)link.getFreespeed(1.);//TOTO traveltime
 			flow.put(link, new EdgeIntervalls(l));
 			//TODO achtung cast von double auf int
 		}
 		
 		// find source and sink
-		Node source = network.getNode("0_erste_source");
 		LinkedList<Node> sources = new LinkedList<Node>();
-		sources.add(source);
-		HashMap<Node,Integer> demands =new HashMap<Node,Integer>();
-		/*Id maxId = source.getId();
-		for(Node node : network.getNodes().values()){
-			if(Integer.parseInt(node.getId().toString()) > Integer.parseInt(maxId.toString())){
-				maxId = node.getId();
-			}
-		}*/
-		demands.put(source, 11);
-		Node sink = network.getNode("5_zweite_sink");
+		sources.addAll(demands.keySet());
+		
+		Node sink = network.getNode("5");
 		Path result;
-		if (source == null || sink == null) {
+		if (sources.isEmpty() || sink == null) {
 			System.out.println("nicht da");
 		} else {
 			TravelCost travelcost = new FakeTravelTimeCost();
@@ -97,7 +113,7 @@ public class MultiSourceEAF {
 
 			Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(travelcost, traveltime,fluss);
-			BellmanFordVertexIntervalls.debug(false);
+			BellmanFordVertexIntervalls.debug(true);
 			for (int i=0; i<20; i++){
 				result = routingAlgo.doCalculations();
 				if (result==null){
@@ -110,8 +126,10 @@ public class MultiSourceEAF {
 			System.out.println(fluss.arrivalsToString());
 			System.out.println(fluss.arrivalPatternToString());
 		}
-		
-		System.out.println("demand:" + demands.get(source));
+		System.out.println("demands:");
+		for (Node node : demands.keySet()){
+			System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+		}
    	    System.out.println("... immer noch!\n");
 	}
 
