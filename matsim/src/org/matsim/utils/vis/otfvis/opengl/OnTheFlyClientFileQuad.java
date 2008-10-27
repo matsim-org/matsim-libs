@@ -210,7 +210,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		//splitLayout = false;
+		splitLayout = false;
 	}
 
 	public OnTheFlyClientFileQuad( String filename2,  OTFConnectionManager connect) {
