@@ -117,7 +117,20 @@ public class MyQueueNetwork extends QueueNetwork{
 		// Do Replanning if active...
 		if (leaveLinkReplanning) leaveLinkReplanning(time);
 		if (actEndReplanning) actEndReplanning(time);
-		
+/*
+		if (actEndReplanning) 
+		{
+			long now = System.currentTimeMillis();
+			actEndReplanning(time);
+			long duration = System.currentTimeMillis() - now;
+			log.info("actEndReplanning V1: " + duration);
+			
+			now = System.currentTimeMillis();
+			actEndReplanningV2(time);
+			duration = System.currentTimeMillis() - now;
+			log.info("actEndReplanning V2: " + duration);
+		}
+*/		
 		// ... and finally execute the Simulation Step.
 		super.simStep(time);	
 	}
@@ -171,7 +184,72 @@ public class MyQueueNetwork extends QueueNetwork{
 		// Act End Replanning Objects
 		ArrayList<Vehicle> vehiclesToReplanActEnd = new ArrayList<Vehicle>();
 		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
+		/*
+		 * Checking only Links that leed to active Nodes is not allowed here!
+		 * If a Person enters an inative Link, this Link is reactivated - but
+		 * this is done when simulation the SimStep, what is to late for us.
+		 * Checking if the current QueueNode is active is not allowed here!
+		 * So we check every Link within the QueueNetwork.
+		 */
+		for (QueueLink queueLink : this.getLinks().values())
+		{	
+			/*
+			 * For every Vehicle in the Parking List of the QueueLink is checked,
+			 * if the current time is after the planned departure time. If true,
+			 * the vehicle is going to end it's current activity in this SimStep,
+			 * so Act End Replanning is needed.
+			 */
+			PriorityQueue<Vehicle> onParkingListVehiclesQueue = queueLink.getVehiclesOnParkingList();
+							
+			for (Vehicle vehicle : onParkingListVehiclesQueue)
+			{	
+				// check if Act End Replanning flag is set
+				boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
+				if(actEndReplanning) 
+				{
+					// if the current Activity has ended
+					if (vehicle.getDepartureTime_s() <= time) 
+					{				
+						vehiclesToReplanActEnd.add(vehicle);
+						
+						PersonAgent personAgent = vehicle.getDriver();
+						Act fromAct = (Act)personAgent.getActsLegs().get(personAgent.getNextActivity() - 2);
+						fromActActEnd.add(fromAct);
+						if (fromAct == null) log.error("Found fromAct that is null!");
+					}
+					
+					/*
+					 * onParkingListVehiclesQueue is a PriorityQueue which is sorted by the departure time
+					 * of its Vehicles. So if a vehicle has not reached its departure time the is no need to
+					 * check the following vehicles.
+					 */
+					else
+					{	
+						break;
+					}
+				}
+					
+			}	// for all QueueLink in the Lookup Table
 		
+		}	// for all QueueNodes in the Network
+		
+	
+		if (vehiclesToReplanActEnd.size() > 0)
+		{	
+//			log.info(vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
+			ParallelActEndReplanner.run(fromActActEnd, vehiclesToReplanActEnd, time);
+//			log.info("Done parallel Act End Replanning in this step!");
+		}
+	
+	}	// actEndReplanning
+	
+	
+	// Another implementation of the actEndReplanning - seems to be slower!
+	protected void actEndReplanningV2(double time)
+	{
+		// Act End Replanning Objects
+		ArrayList<Vehicle> vehiclesToReplanActEnd = new ArrayList<Vehicle>();
+		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
 		/*
 		 * Checking if the current QueueNode is active is not allowed here!
 		 * A Node may be inactive when an Agent ends his Activity at one of the
@@ -235,7 +313,7 @@ public class MyQueueNetwork extends QueueNetwork{
 		}
 	
 	}	// actEndReplanning
-	
+
 	
 	public void setControler(Controler controler) 
 	{

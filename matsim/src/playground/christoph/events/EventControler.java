@@ -37,13 +37,13 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 
-import playground.christoph.events.algorithms.ParallelActEndReplanner;
-import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
+import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
+import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
@@ -245,9 +245,13 @@ public class EventControler extends Controler{
 			if(counter < 50000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
-				customAttributes.put("initialReplanning", new Boolean(false));
+				customAttributes.put("initialReplanning", new Boolean(true));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
+				
+				// (de)activate replanning
+				MyQueueNetwork.doLeaveLinkReplanning(false);
+				MyQueueNetwork.doActEndReplanning(false);
 			}
 			else
 			{
@@ -255,6 +259,10 @@ public class EventControler extends Controler{
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
 				customAttributes.put("endActivityReplanning", new Boolean(false));
+				 
+				// deactivate replanning
+				MyQueueNetwork.doLeaveLinkReplanning(false);
+				MyQueueNetwork.doActEndReplanning(false);
 			}
 		}
 	}
@@ -395,22 +403,34 @@ public class EventControler extends Controler{
 	
 	protected void doInitialReplanning()
 	{
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
-	
-		while (PersonIterator.hasNext())
+		ArrayList<Person> personsToReplan = new ArrayList<Person>();
+		
+		for (Person person : this.getPopulation().getPersons().values())
 		{
-			Person p = PersonIterator.next();
+			boolean replanning = (Boolean)person.getCustomAttributes().get("initialReplanning");
 			
-			boolean replanning = (Boolean)p.getCustomAttributes().get("initialReplanning");
+			if (replanning)
+			{
+				personsToReplan.add(person);
+			}
+		}
+		
+		double time = 0.0;
+		ParallelInitialReplanner.run(personsToReplan, time);
+
+/*
+		for (Person person : this.getPopulation().getPersons().values())
+		{			
+			boolean replanning = (Boolean)person.getCustomAttributes().get("initialReplanning");
 			
 			if (replanning)
 			{
 				KnowledgePlansCalcRoute replanner = (KnowledgePlansCalcRoute)replanners.get(1);
-				replanner.setPerson(p);
-				replanner.run(p.getSelectedPlan());
+				replanner.setPerson(person);
+				replanner.run(person.getSelectedPlan());
 			}
 		}
-	
+*/	
 	} //doInitialReplanning
 	
 	/* ===================================================================
