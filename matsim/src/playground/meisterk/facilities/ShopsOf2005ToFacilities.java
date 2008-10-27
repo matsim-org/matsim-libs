@@ -171,7 +171,7 @@ public class ShopsOf2005ToFacilities {
 	private static final String CONTAINS_PALETTE = ".*" + PALETTE + ".*";
 
 	private static JAXBContext jaxbContext = null;
-	private static ObjectFactory kmlObjectFactory = null;
+	private static ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private static KmlType myKML = null;
 	private static DocumentType myKMLDocument = null;
 	private static FolderType mainKMLFolder = null;
@@ -270,8 +270,6 @@ public class ShopsOf2005ToFacilities {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-
-		kmlObjectFactory = new ObjectFactory();
 
 		myKML = kmlObjectFactory.createKmlType();
 		myKMLDocument = kmlObjectFactory.createDocumentType();

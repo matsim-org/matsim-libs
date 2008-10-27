@@ -46,7 +46,7 @@ public class KmlNetworkWriter {
 
 	private MatsimKmlStyleFactory styleFactory;
 
-	private ObjectFactory kmlObjectFactory;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
 	private StyleType networkLinkStyle;
 

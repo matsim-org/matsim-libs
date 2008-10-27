@@ -70,7 +70,7 @@ public class MatsimKmlStyleFactory {
 	 */
 	private KMZWriter writer = null;
 
-	private ObjectFactory kmlObjectFactory = null;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
 	private DocumentType document;
 

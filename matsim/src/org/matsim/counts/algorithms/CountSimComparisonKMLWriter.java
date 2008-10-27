@@ -149,7 +149,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * The object factory for KML types.
 	 */
-	private ObjectFactory kmlObjectFactory = null;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	/**
 	 * main kml, doc and folder
 	 */
@@ -216,7 +216,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		super(countSimCompList);
 		this.network = network;
 		this.coordTransform = coordTransform;
-		this.kmlObjectFactory = new ObjectFactory();
 	}
 
 	/**

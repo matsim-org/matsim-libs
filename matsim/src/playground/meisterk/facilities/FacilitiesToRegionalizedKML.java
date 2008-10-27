@@ -93,7 +93,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 	private String outputFilename = null;
 
 	private JAXBContext jaxbContext = null;
-	private ObjectFactory kmlJAXBFactory = null;
+	private ObjectFactory kmlJAXBFactory = new ObjectFactory();
 	private KmlType kml = null;
 	private DocumentType document = null;
 
@@ -120,8 +120,6 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		this.kmlJAXBFactory = new ObjectFactory();
 
 		this.kml = this.kmlJAXBFactory.createKmlType();
 		this.document = this.kmlJAXBFactory.createDocumentType();

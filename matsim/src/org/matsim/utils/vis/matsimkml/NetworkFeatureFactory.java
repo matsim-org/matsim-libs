@@ -95,11 +95,10 @@ public class NetworkFeatureFactory {
 	 */
 	public static final String ENDLI = "</li>";
 
-	private ObjectFactory kmlObjectFactory = null;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
 	public NetworkFeatureFactory(CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
-		this.kmlObjectFactory = new ObjectFactory();
 	}
 
 	public AbstractFeatureType createLinkFeature(final Link l, StyleType networkStyle) {

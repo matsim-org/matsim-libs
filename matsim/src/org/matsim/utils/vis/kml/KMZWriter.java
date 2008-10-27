@@ -216,10 +216,10 @@ public class KMZWriter {
 
 			try {
 				JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
-				ObjectFactory factory = new ObjectFactory();
+				ObjectFactory kmlObjectFactory = new ObjectFactory();
 				Marshaller marshaller = jaxbContext.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-				marshaller.marshal(factory.createKml(kml), out);
+				marshaller.marshal(kmlObjectFactory.createKml(kml), out);
 			} catch (PropertyException e) {
 				e.printStackTrace();
 			} catch (JAXBException e) {

@@ -80,7 +80,7 @@ public class EgoNetPlansMakeKML {
 //	private static String coloredLinkKMLFilename;
 	private static boolean useCompression = false;
 
-	private static ObjectFactory kmlObjectFactory = null;
+	private static ObjectFactory kmlObjectFactory = new ObjectFactory();
 
 	private static KmlType myKML;
 //	, coloredLinkKML;
@@ -124,7 +124,6 @@ public class EgoNetPlansMakeKML {
 					": \"" + config.getParam(KML21_MODULE, CONFIG_USE_COMPRESSION) + "\"");
 		}
 
-		EgoNetPlansMakeKML.kmlObjectFactory = new ObjectFactory();
 		myKML = kmlObjectFactory.createKmlType();
 		myKMLDocument = kmlObjectFactory.createDocumentType();
 		myKML.setAbstractFeatureGroup(kmlObjectFactory.createDocument(myKMLDocument));

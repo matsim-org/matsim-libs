@@ -49,7 +49,7 @@ import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 
-	private ObjectFactory kmlObjectFactory = null;
+	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
 	private KmlType mainKml = null;
 	private DocumentType mainDoc = null;

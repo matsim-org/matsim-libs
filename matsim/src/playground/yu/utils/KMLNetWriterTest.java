@@ -59,7 +59,6 @@ public class KMLNetWriterTest {
 		DocumentType d = kmlObjectFactory.createDocumentType();
 		d.setId(kmzFilename);
 		KmlType k = kmlObjectFactory.createKmlType();
-
 		k.setAbstractFeatureGroup(kmlObjectFactory.createDocument(d));
 
 		FolderType f = kmlObjectFactory.createFolderType();
