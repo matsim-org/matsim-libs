@@ -33,9 +33,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 
 
-
-
-
 /**
  * @author Matthias Feil
  * TS algorithm to optimize time. Similar to Planomat.
@@ -70,6 +67,30 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 		
 		long runStartTime = System.currentTimeMillis();
 		
+		// Initial clean-up of plan for the case actslegs is not sound.
+		double now =((Act)(plan.getActsLegs().get(0))).getEndTime();
+		
+		double travelTime;
+		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
+			((Leg)(plan.getActsLegs().get(i))).setDepTime(now);
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
+			((Leg)(plan.getActsLegs().get(i))).setArrTime(now+travelTime);
+			((Leg)(plan.getActsLegs().get(i))).setTravTime(travelTime);
+			now+=travelTime;
+			
+			if (i!=plan.getActsLegs().size()-2){
+				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
+				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDur()-travelTime, 0.0);
+				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
+				now+=travelTime;
+			}
+			else {
+				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
+				((Act)(plan.getActsLegs().get(i+1))).setDur(((Act)(plan.getActsLegs().get(i+1))).getEndTime()-now);
+			}
+		}
+		
+		
 		int neighbourhood_size = 0;
 		for (int i = plan.getActsLegs().size()-1;i>0;i=i-2){
 			neighbourhood_size += i;
@@ -78,6 +99,7 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 		int [] notNewInNeighbourhood 					= new int [neighbourhood_size];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood 	= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> tabuList			 	= new ArrayList<PlanomatXPlan>();
+		
 		
 		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
 		Counter.timeOptCounter++;
@@ -94,7 +116,7 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 			stream.print(act.getType()+"\t");
 		}
 		stream.println();
-		stream.print("\t\t\t\t");
+		stream.print("\t\t\t");
 		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
 			stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
 		}
@@ -111,9 +133,16 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 		tabuList.add(new PlanomatXPlan (((PlanomatXPlan)plan).getPerson()));
 		tabuList.get(0).copyPlan((PlanomatXPlan)plan);
 		
+		// Write the given plan into the bestSolution arrayList
+		PlanomatXPlan bestSolution = new PlanomatXPlan(plan.getPerson());
+		bestSolution.copyPlan((PlanomatXPlan)plan);
+		
 		
 		// Do Tabu Search iterations
 		int currentIteration;
+		ArrayList<PlanomatXPlan> bestIterSolution = new ArrayList<PlanomatXPlan> ();
+		bestIterSolution.add(new PlanomatXPlan (((PlanomatXPlan)plan).getPerson()));
+		bestIterSolution.get(0).copyPlan(plan);
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
 			stream.println("Iteration "+currentIteration);
@@ -122,29 +151,31 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood);	
 			
 			// Check whether plans are tabu
-			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood, stream);
+
+			bestIterSolution.get(0).setScore(-10000);
+			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood, stream, bestIterSolution);
 			if (warningTabu) {
 				log.info("No non-tabu solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break;
 			}
-			
-			
 		
 			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
-			java.util.Collections.sort(nonTabuNeighbourhood);
-			PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
-			bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
-			tabuList.add(bestIterSolution);
-			stream.println("Best score \t"+bestIterSolution.getScore());
+			tabuList.add(bestIterSolution.get(0));
+			stream.println("Best score \t"+bestIterSolution.get(0).getScore());
+			
+			if(bestIterSolution.get(0).getScore()>bestSolution.getScore()){
+				bestSolution = new PlanomatXPlan(bestIterSolution.get(0).getPerson());
+				bestSolution.copyPlan(bestIterSolution.get(0));
+			}
 			
 			if (this.MAX_ITERATIONS==currentIteration){
-				log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
+				//log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
 			}
 			else {
 				// Write this iteration's solution into all neighbourhood fields for the next iteration
 				for (int initialisationOfNextIteration = 0;initialisationOfNextIteration<neighbourhood_size; initialisationOfNextIteration++){
-					neighbourhood[initialisationOfNextIteration] = new PlanomatXPlan (bestIterSolution.getPerson());
-					neighbourhood[initialisationOfNextIteration].copyPlan(bestIterSolution);
+					neighbourhood[initialisationOfNextIteration] = new PlanomatXPlan (bestIterSolution.get(0).getPerson());
+					neighbourhood[initialisationOfNextIteration].copyPlan(bestIterSolution.get(0));
 				}
 				// Reset the nonTabuNeighbourhood list
 				nonTabuNeighbourhood.clear();
@@ -152,8 +183,7 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 		}
 		
 		// Update the plan with the final solution 		
-		java.util.Collections.sort(tabuList);
-		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+		stream.println("Selected solution\t"+bestSolution.getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		
 		//log.info("Finale actslegs für Person "+tabuList.get(tabuList.size()-1).getPerson().getId()+": "+tabuList.get(tabuList.size()-1).getActsLegs());
@@ -161,7 +191,7 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 
 		for (int i = 0; i<al.size();i++){
 			al.remove(i);
-			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+			al.add(i, bestSolution.getActsLegs().get(i));	
 		}
 		log.info("Person "+plan.getPerson().getId()+" runtime: "+(System.currentTimeMillis()-runStartTime));
 		
@@ -192,7 +222,8 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 	public int increaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
 		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=OFFSET){
-			
+			//log.info("ActsLegs bevor Start: "+basePlan.getActsLegs());
+			//log.info("Bevor Start: ActEndtime = "+(((Act)(basePlan.getActsLegs().get(inner))).getEndTime()));
 			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
 			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET;
 			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
@@ -212,7 +243,8 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 				}
 				else {
 					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
-					((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getDur()-((Act)(basePlan.getActsLegs().get(i+1))).getStartTime());
+					((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
+					//log.info("Letzte Dur: ActEndtime = "+(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime())+", now = "+now);
 				}
 			}
 			
@@ -253,7 +285,8 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 	
 	
 	public boolean checkForTabuSolutions (PlanomatXPlan [] neighbourhood, int [] notNewInNeighbourhood, 
-			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood, PrintStream stream){
+			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood, PrintStream stream,
+			ArrayList<PlanomatXPlan> bestIterSolution){
 		
 		boolean warningOuter = true;
 		boolean warningInner = true;
@@ -270,7 +303,13 @@ public class TimeOptimizer2 implements org.matsim.population.algorithms.PlanAlgo
 				if (!warningInner) {
 					stream.print("0\t");
 					warningOuter = false;
-					nonTabuNeighbourhood.add(neighbourhood[i]);
+					//nonTabuNeighbourhood.add(neighbourhood[i]);
+					if (neighbourhood[i].getScore()>bestIterSolution.get(0).getScore()){
+						
+						bestIterSolution.clear();
+						bestIterSolution.add(neighbourhood[i]);
+						
+					}
 				}
 			}
 			else stream.print("1\t");
