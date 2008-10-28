@@ -56,7 +56,7 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 3;
+		this.STOP_CRITERION			= 5;
 		this.minimumTime			= 3600;
 		//TODO @MF: constants to be configured externally
 	}
@@ -74,7 +74,7 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), (PlanomatXPlan)plan);
 		
 		while (move!=0.0){
-			log.info("Move = "+move);
+			//log.info("Move = "+move);
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), (PlanomatXPlan)plan);
 		}
 		plan.setScore(this.scorer.getScore(plan));
@@ -89,26 +89,26 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 		ArrayList<PlanomatXPlan> tabuList			 	= new ArrayList<PlanomatXPlan>();
 		
 		
-		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-		Counter.timeOptCounter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.print(plan.getScore()+"\t\t\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			Act act = (Act)plan.getActsLegs().get(z);
-			stream.print(act.getType()+"\t");
-		}
-		stream.println();
-		stream.print("\t\t\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
-		}
-		stream.println();
+		//String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
+		//Counter.timeOptCounter++;
+		//PrintStream stream;
+		//try {
+			//stream = new PrintStream (new File(outputfile));
+		//} catch (FileNotFoundException e) {
+			//e.printStackTrace();
+			//return;
+		//}
+		//stream.print(plan.getScore()+"\t\t\t");
+		//for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+			//Act act = (Act)plan.getActsLegs().get(z);
+			//stream.print(act.getType()+"\t");
+		//}
+		//stream.println();
+		//stream.print("\t\t\t");
+		//for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+			//stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
+		//}
+		//stream.println();
 		
 		
 		// Copy the plan into all fields of the array neighbourhood
@@ -131,13 +131,13 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 		int lastImprovement = 0;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-			stream.println("Iteration "+currentIteration);
+			//stream.println("Iteration "+currentIteration);
 			
 			// Define the neighbourhood
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood);	
 			
 			// Check whether plans are tabu
-			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood, stream);
+			boolean warningTabu = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, nonTabuNeighbourhood);
 			if (warningTabu) {
 				log.info("No non-tabu solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break;
@@ -146,7 +146,7 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
 			java.util.Collections.sort(nonTabuNeighbourhood);
 			tabuList.add(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
-			stream.println("Best score \t"+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore());
+			//stream.println("Best score \t"+nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore());
 			
 			if (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getScore()>bestSolution.getScore()){
 				bestSolution = nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1);
@@ -173,7 +173,7 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 	
 		// Update the plan with the final solution 		
 		//java.util.Collections.sort(tabuList);
-		stream.println("Selected solution\t"+bestSolution.getScore());
+		//stream.println("Selected solution\t"+bestSolution.getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		
 		//log.info("Finale actslegs für Person "+tabuList.get(tabuList.size()-1).getPerson().getId()+": "+tabuList.get(tabuList.size()-1).getActsLegs());
@@ -322,31 +322,31 @@ public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgo
 	
 	
 	public boolean checkForTabuSolutions (PlanomatXPlan [] neighbourhood, int [] notNewInNeighbourhood, 
-			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood, PrintStream stream){
+			ArrayList<PlanomatXPlan> tabuList, ArrayList<PlanomatXPlan> nonTabuNeighbourhood){
 		
 		boolean warningOuter = true;
 		boolean warningInner = true;
 		for (int i=0;i<neighbourhood.length;i++){
-			stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
+			//stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
 			if (notNewInNeighbourhood[i]==0){
 				for (int j=0;j<tabuList.size();j++){
 					warningInner = checkForEquality (neighbourhood[i].getActsLegs(), tabuList.get(tabuList.size()-1-j).getActsLegs());
 					if (warningInner) {
-						stream.print("1\t");
+				//		stream.print("1\t");
 						break;
 					}
 				}
 				if (!warningInner) {
-					stream.print("0\t");
+					//stream.print("0\t");
 					warningOuter = false;
 					nonTabuNeighbourhood.add(neighbourhood[i]);
 				}
 			}
-			else stream.print("1\t");
+			//else stream.print("1\t");
 			for (int z= 0;z<neighbourhood[i].getActsLegs().size();z=z+2){
-				stream.print(((Act)(neighbourhood[i].getActsLegs().get(z))).getDur()+"\t");
+				//stream.print(((Act)(neighbourhood[i].getActsLegs().get(z))).getDur()+"\t");
 			}
-			stream.println();
+			//stream.println();
 		}
 		return warningOuter;
 	}

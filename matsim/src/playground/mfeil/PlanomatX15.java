@@ -26,7 +26,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.planomat.*;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
@@ -68,13 +67,13 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanomatXPlanScorer (factory);
-		this.timer					= new TimeOptimizer6(factory, legTravelTimeEstimator);
+		this.timer					= new TimeOptimizer5(factory, legTravelTimeEstimator);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		this.MAX_ITERATIONS 		= 10;
+		this.MAX_ITERATIONS 		= 20;
 	}
 	
 		
