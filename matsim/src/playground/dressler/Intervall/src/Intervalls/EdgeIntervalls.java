@@ -244,8 +244,13 @@ public class EdgeIntervalls {
 			throw new IllegalArgumentException("capacity shold be positive");
 		}
 		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
-			System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow());
+			if(_debug){
+				System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow()+" on: "+((EdgeIntervall)_tree._curr.obj));
+			}
 			if(((EdgeIntervall)_tree._curr.obj).getFlow()<u){
+				if(_debug){
+					System.out.println("capacity left: " + (u-((EdgeIntervall)_tree._curr.obj).getFlow()));
+				}
 				return (EdgeIntervall)_tree._curr.obj;
 			}
 		}
@@ -289,22 +294,33 @@ public class EdgeIntervalls {
 				
 				Intervall j =minPossible(t,u);
 				if(j==null){
+					if(_debug){
+						System.out.println("no possible interval after:" + t+ "with cap: " +u);
+					}
 					break;
 				}
 				t=j.getHighBound();
-				/*
-				System.out.println("kapazitaet frei");
-				System.out.println("old i: " +i);
-				System.out.println("old j: " +j);
-				*/
+				if(_debug){
+					System.out.println("kapazitaet frei");
+					System.out.println("old i: " +i);
+					System.out.println("old j: " +j);
+				}
 				if( i.intersects(j)){
-					j=i.Intersection(j).shiftPositive(_traveltime);
+					//TODO test intensively
+					if(!_debug){
+						j=i.Intersection(j).shiftPositive(_traveltime);
+					}else{
+						j=i.Intersection(j);
+						System.out.println("i intersection j:" + j);
+						j=j.shiftPositive(_traveltime);
+						System.out.println("shifted by: " + _traveltime+ " -> " +  j);
+					}
 					if(j!=null){
-						/*
-						System.out.println("i: " +i);
-						System.out.println("j: " +j);
-						System.out.println("tau:" +traveltime);
-						*/
+						if(_debug){
+							System.out.println("new i: " +i);
+							System.out.println("new j: " +j);
+							System.out.println("tau:" +this._traveltime);
+						}
 						result.add(j);
 					}	
 				}	
