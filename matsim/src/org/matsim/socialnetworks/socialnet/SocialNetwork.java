@@ -555,7 +555,7 @@ public class SocialNetwork {
 			while (it_link.hasNext()) {
 				SocialNetEdge myLink = it_link.next();
 				double randremove=MatsimRandom.random.nextDouble();
-				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p ) {
+				if ((iteration - myLink.getTimeLastUsed()) >= remove_age && randremove<remove_p ) {
 					linksToRemove.add(myLink);
 				}
 			}
@@ -576,7 +576,7 @@ public class SocialNetwork {
 				if(degree > maxDeg){
 					Gbl.errorMsg(this.getClass()+" degree of person "+myLink.getPersonFrom().getId()+" = "+degree+" > maxDegree="+maxDeg);
 				}
-				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*((double)degree/(double)maxDeg)) {
+				if ((iteration - myLink.getTimeLastUsed()) >= remove_age && randremove<remove_p*((double)degree/(double)maxDeg)) {
 					linksToRemove.add(myLink);
 				}
 			}
@@ -594,7 +594,7 @@ public class SocialNetwork {
 				if(age > iteration){
 					Gbl.errorMsg(this.getClass()+" age of edge from "+myLink.getPersonFrom().getId()+" to "+ myLink.getPersonTo().getId()+" = "+age+" > iteration ="+iteration);
 				}
-				if ((iteration - myLink.getTimeLastUsed()) > remove_age && randremove<remove_p*((double)age/(double)iteration) ) {
+				if ((iteration - myLink.getTimeLastUsed()) >= remove_age && randremove<remove_p*((double)age/(double)iteration) ) {
 					linksToRemove.add(myLink);
 				}
 			}
@@ -618,7 +618,7 @@ public class SocialNetwork {
 
 //					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
 //					this.removeLink(myOpposingLink);
-					if ((iteration - edge.getTimeLastUsed()) >= remove_age ) {
+					if ((iteration - edge.getTimeLastUsed()) >= remove_age ) {//JH changed here
 						SocialNetEdge opposite_edge=edge.getPersonTo().getKnowledge().getEgoNet().getEgoLink(edge.getPersonFrom());
 						if(!(linksToRemove.contains(opposite_edge) || linksToRemove.contains(edge))){
 							linksToRemove.add(edge);
