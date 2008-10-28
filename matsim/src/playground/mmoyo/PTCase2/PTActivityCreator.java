@@ -136,11 +136,12 @@ public class PTActivityCreator {
 		}//for Person person
 		
 		//Write outplan XML
+		System.out.println("writing output plan file...");
 		Gbl.getConfig().plans().setOutputFile(outputFile); 
 		Gbl.getConfig().plans().setOutputVersion("v4");
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
 		plansWriter.write();
-		
-	}//constructor
+		System.out.println("Done");
+	}//createPTActs
 }
