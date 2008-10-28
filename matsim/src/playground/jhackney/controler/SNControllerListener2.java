@@ -174,7 +174,8 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+//		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
+		if( event.getIteration()%replan_interval==0){
 //			got new epp from mobsim
 //			make new timewindows and map (uses old plans and new events)
 			Gbl.printMemoryUsage();
@@ -232,7 +233,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			log.info("SSTEST Finish Scoring with actStats "+snIter);
 			scoring.finish();
 
-			snIter++;
+//			snIter++;
 		}
 	}
 
@@ -274,6 +275,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 //				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 //				this.log.info(" ... done");
 			}
+			snIter++;
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
 			if(CALCSTATS){
@@ -401,7 +403,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
 		this.log.info("... done");
 
-		this.snIter = this.controler.getFirstIteration()+1;
+		this.snIter = this.controler.getFirstIteration();
 	}
 
 	/**
