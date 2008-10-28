@@ -618,7 +618,7 @@ public class SocialNetwork {
 
 //					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
 //					this.removeLink(myOpposingLink);
-					if ((iteration - edge.getTimeLastUsed()) > remove_age ) {
+					if ((iteration - edge.getTimeLastUsed()) >= remove_age ) {
 						SocialNetEdge opposite_edge=edge.getPersonTo().getKnowledge().getEgoNet().getEgoLink(edge.getPersonFrom());
 						if(!(linksToRemove.contains(opposite_edge) || linksToRemove.contains(edge))){
 							linksToRemove.add(edge);
