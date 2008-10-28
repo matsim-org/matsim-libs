@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeOptimizer4.java
+ * TimeOptimizer5.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -35,28 +35,29 @@ import org.matsim.population.Leg;
 
 /**
  * @author Matthias Feil
- * Like TimeOptimizer3 but including travel time estimation also for decrease method. Moreover, a stop 
- * criterion implemented.
+ * Like TimeOptimizer4 but with minimum time functionality.
  */
 
-public class TimeOptimizer4 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class TimeOptimizer5 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, OFFSET, STOP_CRITERION;
+	private final double					minimumTime;
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
-	private static final Logger 			log = Logger.getLogger(TimeOptimizer4.class);
+	private static final Logger 			log = Logger.getLogger(TimeOptimizer5.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer4 (ScoringFunctionFactory factory, LegTravelTimeEstimator estimator){
+	public TimeOptimizer5 (ScoringFunctionFactory factory, LegTravelTimeEstimator estimator){
 		
 		this.scorer 				= new PlanomatXPlanScorer (factory);
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 5;
+		this.STOP_CRITERION			= 3;
+		this.minimumTime			= 3600;
 		//TODO @MF: constants to be configured externally
 	}
 	
@@ -70,28 +71,13 @@ public class TimeOptimizer4 implements org.matsim.population.algorithms.PlanAlgo
 		long runStartTime = System.currentTimeMillis();
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
-		double now =((Act)(plan.getActsLegs().get(0))).getEndTime();		
-		double travelTime;
-		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
-			((Leg)(plan.getActsLegs().get(i))).setDepTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
-			((Leg)(plan.getActsLegs().get(i))).setArrTime(now+travelTime);
-			((Leg)(plan.getActsLegs().get(i))).setTravTime(travelTime);
-			now+=travelTime;
-			
-			if (i!=plan.getActsLegs().size()-2){
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDur()-travelTime, 0.0);
-				((Act)(plan.getActsLegs().get(i+1))).setDur(travelTime);	
-				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
-				now+=travelTime;
-			}
-			else {
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				((Act)(plan.getActsLegs().get(i+1))).setDur(86400-now);
-			}
-		}
+		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), (PlanomatXPlan)plan);
 		
+		while (move!=0.0){
+			log.info("Move = "+move);
+			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), (PlanomatXPlan)plan);
+		}
+		plan.setScore(this.scorer.getScore(plan));
 		
 		int neighbourhood_size = 0;
 		for (int i = plan.getActsLegs().size()-1;i>0;i=i-2){
@@ -225,7 +211,8 @@ public class TimeOptimizer4 implements org.matsim.population.algorithms.PlanAlgo
 	
 	public int increaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
-		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=OFFSET){
+		//double localOffset = this.OFFSET-(MatsimRandom.random.nextDouble()*OFFSET/2);
+		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=(OFFSET+this.minimumTime)){
 			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
 			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET;
 			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
@@ -278,7 +265,8 @@ public class TimeOptimizer4 implements org.matsim.population.algorithms.PlanAlgo
 	
 	public int decreaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
-		if (((Act)(basePlan.getActsLegs().get(outer))).getDur()>=OFFSET){
+		//double localOffset = this.OFFSET-(MatsimRandom.random.nextDouble()*OFFSET/2);
+		if (((Act)(basePlan.getActsLegs().get(outer))).getDur()>=OFFSET+this.minimumTime){
 			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()-OFFSET);
 			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()-OFFSET;
 			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
@@ -378,6 +366,42 @@ public class TimeOptimizer4 implements org.matsim.population.algorithms.PlanAlgo
 			return true;
 		}
 	}	
+	
+	
+	public double cleanSchedule (double now, PlanomatXPlan plan){
+		
+		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
+		((Act)(plan.getActsLegs().get(0))).setDur(now);
+			
+		double travelTime;
+		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
+			((Leg)(plan.getActsLegs().get(i))).setDepTime(now);
+			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
+			((Leg)(plan.getActsLegs().get(i))).setArrTime(now+travelTime);
+			((Leg)(plan.getActsLegs().get(i))).setTravTime(travelTime);
+			now+=travelTime;
+			
+			if (i!=plan.getActsLegs().size()-2){
+				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
+				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDur()-travelTime, this.minimumTime);
+				((Act)(plan.getActsLegs().get(i+1))).setDur(travelTime);	
+				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
+				now+=travelTime;
+			}
+			else {
+				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
+				
+				if (86400>now){
+					((Act)(plan.getActsLegs().get(i+1))).setDur(86400-now);
+				}
+				else {
+					return now-86400;
+				}
+			}
+		}
+		return 0;
+	}
+		
 
 	
 }
