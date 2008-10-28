@@ -27,10 +27,10 @@
 	<!--Number of independent variables and number of categories for each of the independent variables-->
 	<entry key="nx">3</entry>
 	<!--Number of categories for each of independent variables respectively-->
-	<!--please use comma to separate each variable-->	
+	<!--please use comma to separate each value-->	
 	<entry key="ncx">3,5,5</entry>
 	<!--Identify which column in the household and survey data for each independent variable-->
-	<!--please use comma to separate each variable-->
+	<!--please use comma to separate each value-->
 	<entry key="xCol">3,4,5</entry>
 </properties>
 
