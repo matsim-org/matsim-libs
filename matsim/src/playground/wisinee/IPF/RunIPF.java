@@ -2,64 +2,106 @@ package playground.wisinee.IPF;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 	public class RunIPF {
+//		private final static String testPropertyFile = "./test/scenarios/ipf/TestParameter.xml";	
+		
+		
+		public  String householdFile=null;
+		public  String surveyFile=null;
+		public  String distributionFile=null;
+		public  String outputFile=null;
+		public  File inFile1=null;
+		public  File inFile2=null;
+		public  File inFile3=null;
+		public  File outFile=null;
+		public  String spt=null;
+		public  double sValue=0.1;
+		public  int nx=1;
+		public  int nz=1;
+		public  String heading=null;
+		public  int lastRowData=1;
+		public  int nCol=1;
+		public  int zoneCol=1;
+		public  int yCol=1;	
+		public  String ncxString=null;
+		public  String xColString=null;		
 
-		public static void main(String[] args){	
+	
+//			public static void main(String[] args){					
+//				runIpfCal(testPropertyFile);
+//			}
 			
-//==========INITIAL SETTING=============================================================			
-//----------File name-----------------------------------------------------------
-//			**INPUT** initial Household/Person data
-			File inFile1 = new File("./input/HHData.txt");	
-//			**INPUT** initial pattern data/survey data (initial matrix) 
-			File inFile2 = new File("./input/Survey.txt");		
-//			**INPUT** given distribution (fixed column)
-			File inFile3 = new File("./input/Pdf.txt");		
-//			**OUTPUT** final Household/Person list with the generated attribute 
-			File outFile = new File("./output/HHData_income.txt");	
-//-------------------------------------------------------------------------------			
-//----------Parameter------------------------------------------------------------	
-//			Setting column separator
-			String spt = ",";
-//			number of independent variables and number of categories for each of the independent variables
-			int nx = 3;    						//number of independent variables
-//			----------------------------------------------------------------------
-			int[]ncx = new int[nx];	
-			ncx[0] = 5;							//number of categories for each of 
-			ncx[1] = 5;							//independent variables respectively
-			ncx[2] = 3;							//
-//			----------------------------------------------------------------------
-			int[]xCol = new int[nx];			
-			xCol[0]= 5;							//identify which column in the household and survey data
-			xCol[1]= 4;							//for each independent variable
-			xCol[2]= 3;						
-//			----------------------------------------------------------------------
-			int zoneCol=2;						//identify which column in the household and survey data
-												//for indicating zone where the household is located
-//			----------------------------------------------------------------------
-//			identify which column in the survey data for the variable to be generated
-			int yCol=6;							
-//			----------------------------------------------------------------------
-//			number of categories of the generated variable
-			int nCol = 10;
-//			identify how many rows in the Household/Person list (not include heading)
-			int lastRowData = 1272;
-//			heading for the generated column
-			String heading = "Income";
-//			number of zones
-			int nz = 3;
-//			small value of the zero cells of the initial matrix
-			double sValue=0.1;
-//--------------------------------------------------------------------------------	
-//================================================================================		
+			public void runIpfCal(String PropFile){	
+	
+				Properties props = new Properties();
+				try{
+					props.loadFromXML( new FileInputStream(PropFile) );
+					householdFile = props.getProperty("household File");
+					surveyFile = props.getProperty("survey File");
+					distributionFile = props.getProperty("distribution File");
+					outputFile = props.getProperty("output File");
+					spt = props.getProperty("spt");
+					heading = props.getProperty("heading");
+					sValue = Double.parseDouble(props.getProperty("sValue"));
+					nz = Integer.parseInt(props.getProperty("nz"));
+					nx = Integer.parseInt(props.getProperty("nx"));
+					lastRowData = Integer.parseInt(props.getProperty("lastRowData"));
+					nCol = Integer.parseInt(props.getProperty("nCol"));
+					zoneCol = Integer.parseInt(props.getProperty("zoneCol"));
+					yCol = Integer.parseInt(props.getProperty("yCol"));
+					ncxString = props.getProperty("ncx");
+					xColString = props.getProperty("xCol");
+				}
+				catch( Exception xc ){
+					xc.printStackTrace();
+					System.exit(-1);
+				}
+				inFile1= new File(householdFile);
+				inFile2= new File(surveyFile);
+				inFile3= new File(distributionFile);
+				outFile= new File(outputFile);	
+				
+				int[]ncx = new int[nx];
+				int k=0;
+				int found1 = -2;
+				while (found1 != -1){
+					found1 = ncxString.indexOf(",");
+					if (found1 != -1) {
+						ncx[k] = Integer.parseInt(ncxString.substring(0,found1));
+						ncxString = ncxString.substring(found1+1);						
+					}
+					else{
+						ncx[k] = Integer.parseInt(ncxString);
+					}
+				k++;
+				}
+				k=0;
+				found1 = -2;
+				int[]xCol = new int[nx];
+				
+				while (found1 != -1){
+					found1 = xColString.indexOf(",");
+					if (found1 != -1) {
+						xCol[k] = Integer.parseInt(xColString.substring(0,found1));
+						xColString = xColString.substring(found1+1);						
+					}
+					else{
+						xCol[k]  = Integer.parseInt(xColString);
+					}
+				k++;
+				}			
+
 			int nRow=1; 						
 			for (int i=0;i<nx;i++){
 				nRow = nRow*ncx[i];
 			}
 			int[] bin = new int[nRow];			
 			
-			System.out.println("===============================================");
-			System.out.println("+++++SETTING PARAMETERS+++++");
+			System.out.println("================================================");
+			System.out.println("          +++++SETTING PARAMETERS+++++         ");
+			System.out.println("================================================");			
 			System.out.println("INPUT 'HOUSEHOLD/PERSON DATA' File from: \""+inFile1+"\"");
 			System.out.println("INPUT 'SURVEY DATA' File from: \""+inFile2+"\"");		
 			System.out.println("INPUT 'DISTRIBUTION DATA' File from: \""+inFile3+"\"");
@@ -74,7 +116,7 @@ import java.util.ArrayList;
 			System.out.println("Number of independent variables@(x):"+nx);
 			for(int i=0;i<nx;i++){
 				System.out.println("x"+(i+1)+" from Column:"+xCol[i]);
-				System.out.println("Number of categories for x"+(i+1)+":"+xCol[i]);
+				System.out.println("Number of categories for x"+(i+1)+":"+ncx[i]);
 			}
 			System.out.println();
 			System.out.println("Generated variable (y) name:"+heading);
@@ -83,16 +125,16 @@ import java.util.ArrayList;
 			System.out.println();
 			System.out.println("Number of zones:"+nz);
 			System.out.println("Small value for zero cells:"+sValue);
-			
-				
-			System.out.println("===============================================");
+			System.out.println("================================================");
+			System.out.println("       +++++END SETTING PARAMETERS+++++      ");	
+			System.out.println("================================================");
 			
 			
 			System.out.println("Start reading information from 'SURVEY DATA'");
 			InputSurveyData io1 = new InputSurveyData();
 			io1.inputData(nx,ncx,nRow,nCol,spt,xCol,yCol,sValue,inFile2);	
 			System.out.println("Finish.");
-			System.out.println("===============================================");
+			System.out.println("------------------------------------------------");
 			System.out.println("Start reading information from 'HOUSEHOLD/PERSON DATA'");
 		try{	
 
@@ -195,7 +237,7 @@ import java.util.ArrayList;
 						new PrintStream(out).println(GlobalVars.finalData[i]);
 					}
 					System.out.println("Finish. zone: ("+z+")"+zoneOld);
-					System.out.println("===============================================");
+					System.out.println("------------------------------------------------");
 					//clear temporary data;
 					bin = new int[nRow];
 					GlobalVars.orgn.clear();
@@ -236,16 +278,16 @@ import java.util.ArrayList;
 			System.out.println(e.getMessage());				
 		}
 	}
-	private static void checkDataHeading(File inFile1,File inFile2,File inFile3){
+	private void checkDataHeading(File inFile1,File inFile2,File inFile3){
 		try{
 		BufferedReader in1 = new BufferedReader(new FileReader(inFile1));
 		String s1;
 		s1 = in1.readLine();	
 		System.out.println("INPUT 'HOUSEHOLD/PERSON DATA'");
 		System.out.println("Data Heading....");
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println(s1);
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println();
 		in1.close();
 		
@@ -254,9 +296,9 @@ import java.util.ArrayList;
 		s1 = in2.readLine();	
 		System.out.println("INPUT 'SURVEY DATA'");
 		System.out.println("Data Heading....");
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println(s1);
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println();
 		in2.close();
 		
@@ -265,9 +307,9 @@ import java.util.ArrayList;
 		s1 = in3.readLine();	
 		System.out.println("INPUT 'DISTRIBUTION DATA'");
 		System.out.println("Data Heading....");
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println(s1);
-		System.out.println("********************************");
+		System.out.println(":::::::::::::::::::::::::::::::::");
 		System.out.println();
 		in3.close();
 		
