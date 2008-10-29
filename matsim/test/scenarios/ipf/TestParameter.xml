@@ -32,5 +32,8 @@
 	<!--Identify which column in the household and survey data for each independent variable-->
 	<!--please use comma to separate each value-->
 	<entry key="xCol">3,4,5</entry>
+	<!--IPF calculation parameters-->
+	<entry key="maxIteration">100</entry>
+	<entry key="convergence">0.5</entry>	
 </properties>
 
