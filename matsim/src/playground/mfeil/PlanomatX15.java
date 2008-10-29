@@ -67,7 +67,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanomatXPlanScorer (factory);
-		this.timer					= new TimeOptimizer8(factory, legTravelTimeEstimator);
+		this.timer					= new TimeOptimizer9(factory, legTravelTimeEstimator);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -179,7 +179,10 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 					planomatRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
 					// Scoring
-					neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
+					//log.info("Score davor = "+neighbourhood[x].getScore());
+					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
+					//log.info("Score danach = "+neighbourhood[x].getScore());
+					
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
 					// Write the solution into a list so that it can be retrieved for later iterations

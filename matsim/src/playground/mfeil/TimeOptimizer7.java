@@ -38,6 +38,7 @@ import org.matsim.population.Leg;
  * Like TimeOptimizer6 but different neighbourhood search.
  */
 
+@Deprecated
 public class TimeOptimizer7 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, OFFSET, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
