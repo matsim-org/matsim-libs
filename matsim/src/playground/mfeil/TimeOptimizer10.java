@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeOptimizer8.java
+ * TimeOptimizer10.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -35,22 +35,25 @@ import org.matsim.population.Leg;
 
 /**
  * @author Matthias Feil
- * Like TimeOptimizer6 but different neighbourhood search.
+ * Like TimeOptimizer8 but trying to take advantage of specifics of PlanScorer (only legs required to score a plan).
+ * This speeds the TimeOptimizer further up by about 20%.
+ * Can be ONLY used if PlanScorer is applicable. However, does not work when PlanomatXPlanScorer has to be used 
+ * (in this case, TimeOptimizer8 is your choice).
  */
 
-public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						MAX_ITERATIONS, OFFSET, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
 	private final double					minimumTime;
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
-	private static final Logger 			log = Logger.getLogger(TimeOptimizer8.class);
+	private static final Logger 			log = Logger.getLogger(TimeOptimizer10.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer8 (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizer10 (LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
@@ -91,7 +94,7 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 		int [] notNewInNeighbourhood 					= new int [neighbourhood_size];
 		ArrayList<PlanomatXPlan> tabuList			 	= new ArrayList<PlanomatXPlan>();
 		Object [] solutions 							= new Object [3];
-		int currentIteration;
+		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 		
 		
@@ -134,6 +137,20 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 		// Iteration 1
 		//stream.println("Iteration "+1);
 		this.createInitialNeighbourhood(InitialNeighbourhood, notNewInNeighbourhood, moves);
+		
+		// Check whether there are new solutions (is only necessary if there is no swap = versions 8 and 10)
+		boolean warningNotNew=true;
+		for (int i = 0; i<neighbourhood.length;i++){
+			if (notNewInNeighbourhood[i]==0) {
+				warningNotNew = false;
+				break;
+			}
+		}
+		if (warningNotNew==true) {
+			log.info("No new solution at TimeOptimizer iteration "+currentIteration);
+			return;
+		}
+		
 		solutions = this.checkForTabuSolutions (InitialNeighbourhood, notNewInNeighbourhood, tabuList, moves, position);
 		
 		tabuList.add((PlanomatXPlan)solutions[0]);
@@ -160,6 +177,19 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 			
 			// Define the neighbourhood			
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, moves, position);
+			
+			// Check whether there are new solutions (is only necessary if there is no swap = versions 8 and 10)
+			warningNotNew=true;
+			for (int i = 0; i<neighbourhood.length;i++){
+				if (notNewInNeighbourhood[i]==0) {
+					warningNotNew = false;
+					break;
+				}
+			}
+			if (warningNotNew==true) {
+				log.info("No new solution at TimeOptimizer iteration "+currentIteration);
+				break;
+			}
 						
 			// Check whether plans are tabu	
 			solutions = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, moves, position);
@@ -325,9 +355,9 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 	public int increaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
 		if (((Act)(basePlan.getActsLegs().get(inner))).getDur()>=(OFFSET+this.minimumTime)){
-			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
+			//((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()+OFFSET);
 			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()+OFFSET;
-			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
+			//((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
 			
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i=i+2){
@@ -338,27 +368,27 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 				now+=travelTime;
 				
 				if (i!=inner-1){
-					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					//((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
 					now+=((Act)(basePlan.getActsLegs().get(i+1))).getDur();
-					((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
+					//((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
 				}
 				else {
-					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					//((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
 					
 					if (((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()>now){
-						((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
+					//	((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
 					}
 					else {
-						((Act)(basePlan.getActsLegs().get(i+1))).setDur(0);
-						((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);
+					//	((Act)(basePlan.getActsLegs().get(i+1))).setDur(0);
+						//((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);
 						if (basePlan.getActsLegs().size()>i+3){
 							travelTime = this.estimator.getLegTravelTimeEstimation(basePlan.getPerson().getId(), now, (Act)(basePlan.getActsLegs().get(i+1)), (Act)(basePlan.getActsLegs().get(i+3)), (Leg)(basePlan.getActsLegs().get(i+2)));
 							((Leg)(basePlan.getActsLegs().get(i+2))).setArrTime(now+travelTime);
 							((Leg)(basePlan.getActsLegs().get(i+2))).setTravTime(travelTime);
 							now+=travelTime;
-							((Act)(basePlan.getActsLegs().get(i+3))).setStartTime(now);
+						//	((Act)(basePlan.getActsLegs().get(i+3))).setStartTime(now);
 							if (((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()>now){
-								((Act)(basePlan.getActsLegs().get(i+3))).setDur(((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()-now);
+						//		((Act)(basePlan.getActsLegs().get(i+3))).setDur(((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()-now);
 							}
 							else return 1;
 						}
@@ -366,8 +396,9 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 					}
 				}
 			}
-			
+			//log.info("Actslegs davor = "+basePlan.getActsLegs());
 			basePlan.setScore(scorer.getScore(basePlan));
+			//log.info("Score = "+scorer.getScore(basePlan));
 			return 0;
 		}
 		else return 1;
@@ -378,9 +409,9 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 	public int decreaseTime(PlanomatXPlan basePlan, int outer, int inner){
 		
 		if (((Act)(basePlan.getActsLegs().get(outer))).getDur()>=OFFSET+this.minimumTime){
-			((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()-OFFSET);
+			//((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(outer))).getDur()-OFFSET);
 			double now =((Act)(basePlan.getActsLegs().get(outer))).getEndTime()-OFFSET;
-			((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
+			//((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
 			
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i=i+2){
@@ -391,27 +422,27 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 				now+=travelTime;
 				
 				if (i!=inner-1){
-					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					//((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
 					now+=((Act)(basePlan.getActsLegs().get(i+1))).getDur();
-					((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
+					//((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
 				}
 				else {
-					((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+					//((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
 					
 					if (((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()>now){
-						((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
+						//((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
 					}
 					else {
-						((Act)(basePlan.getActsLegs().get(i+1))).setDur(0);
-						((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);
+						//((Act)(basePlan.getActsLegs().get(i+1))).setDur(0);
+						//((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);
 						if (basePlan.getActsLegs().size()>i+3){
 							travelTime = this.estimator.getLegTravelTimeEstimation(basePlan.getPerson().getId(), now, (Act)(basePlan.getActsLegs().get(i+1)), (Act)(basePlan.getActsLegs().get(i+3)), (Leg)(basePlan.getActsLegs().get(i+2)));
 							((Leg)(basePlan.getActsLegs().get(i+2))).setArrTime(now+travelTime);
 							((Leg)(basePlan.getActsLegs().get(i+2))).setTravTime(travelTime);
 							now+=travelTime;
-							((Act)(basePlan.getActsLegs().get(i+3))).setStartTime(now);
+							//((Act)(basePlan.getActsLegs().get(i+3))).setStartTime(now);
 							if (((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()>now){
-								((Act)(basePlan.getActsLegs().get(i+3))).setDur(((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()-now);
+								//((Act)(basePlan.getActsLegs().get(i+3))).setDur(((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()-now);
 							}
 							else return 1;
 						}
@@ -419,8 +450,9 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 					}
 				}
 			}
-			
+			//log.info("Actslegs davor = "+basePlan.getActsLegs());
 			basePlan.setScore(scorer.getScore(basePlan));
+			//log.info("Score = "+scorer.getScore(basePlan));
 			return 0;
 		}
 		else return 1;
@@ -439,7 +471,7 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 		boolean warningInner = true;
 		Object [] out = new Object [2];
 		PlanomatXPlan plan = new PlanomatXPlan (neighbourhood[0].getPerson());
-		plan.setScore(-1000);
+		plan.setScore(-100000);
 		for (int i=0;i<neighbourhood.length;i++){
 		//	stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
 			if (notNewInNeighbourhood[i]==0){
@@ -461,12 +493,19 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 					}
 				}
 			}
-			//else stream.print("1\t");
-			//for (int z= 0;z<neighbourhood[i].getActsLegs().size();z=z+2){
-			//	stream.print(((Act)(neighbourhood[i].getActsLegs().get(z))).getDur()+"\t");
-			//}
-			//stream.println();
+		//	else stream.print("1\t");
+		//	stream.print(((Leg)(neighbourhood[i].getActsLegs().get(1))).getDepTime()+"\t");
+		//	for (int z= 2;z<neighbourhood[i].getActsLegs().size()-1;z=z+2){
+		//		stream.print((((Leg)(neighbourhood[i].getActsLegs().get(z+1))).getDepTime()-((Leg)(neighbourhood[i].getActsLegs().get(z-1))).getArrTime())+"\t");
+		//	}
+		//	stream.print(86400-((Leg)(neighbourhood[i].getActsLegs().get(neighbourhood[i].getActsLegs().size()-2))).getArrTime()+"\t");
+		//	stream.println();
 		}
+		
+		// clean-up of plan (=bestIterSolution)
+		this.cleanActs(plan);
+		//log.info("Clean actslegs: "+plan.getActsLegs());
+		
 		out[0]=plan;
 		out[1]=warningOuter;
 		return out;
@@ -479,8 +518,9 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 			return false;
 		}
 		else{
-			for (int i=0;i<list1.size()-2;i=i+2){
-				if (((Act)(list1.get(i))).getDur()!=((Act)(list2.get(i))).getDur()){
+			for (int i=1;i<list1.size()-1;i=i+2){
+				//if (((Act)(list1.get(i))).getDur()!=((Act)(list2.get(i))).getDur()){
+				if (((Leg)(list1.get(i))).getDepTime()!=((Leg)(list2.get(i))).getDepTime()	||	((Leg)(list1.get(i))).getArrTime()!=((Leg)(list2.get(i))).getArrTime()){
 					return false;
 				}
 			}
@@ -524,6 +564,27 @@ public class TimeOptimizer8 implements org.matsim.population.algorithms.PlanAlgo
 	}
 		
 
+	public void cleanActs (PlanomatXPlan plan){
+		
+		((Act)(plan.getActsLegs().get(0))).setEndTime(((Leg)(plan.getActsLegs().get(1))).getDepTime());
+		((Act)(plan.getActsLegs().get(0))).setDur(((Leg)(plan.getActsLegs().get(1))).getDepTime());
+		
+		for (int i=2;i<=plan.getActsLegs().size()-1;i=i+2){
+			
+			if (i!=plan.getActsLegs().size()-1){
+				((Act)(plan.getActsLegs().get(i))).setStartTime(((Leg)(plan.getActsLegs().get(i-1))).getArrTime());
+				((Act)(plan.getActsLegs().get(i))).setEndTime(((Leg)(plan.getActsLegs().get(i+1))).getDepTime());
+				((Act)(plan.getActsLegs().get(i))).setDur(((Leg)(plan.getActsLegs().get(i+1))).getDepTime()-((Leg)(plan.getActsLegs().get(i-1))).getArrTime());
+				
+			}
+			else {
+				((Act)(plan.getActsLegs().get(i))).setStartTime(((Leg)(plan.getActsLegs().get(i-1))).getArrTime());
+				((Act)(plan.getActsLegs().get(i))).setDur(86400-((Leg)(plan.getActsLegs().get(i-1))).getArrTime());
+	
+			}
+		}
+	}
+	
 	
 }
 	

@@ -66,14 +66,15 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 
 		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
-		this.scorer 				= new PlanomatXPlanScorer (factory);
-		this.timer					= new TimeOptimizer9(factory, legTravelTimeEstimator);
+		//this.scorer 				= new PlanomatXPlanScorer (factory);
+		this.scorer 				= new PlanScorer (factory);
+		this.timer					= new TimeOptimizer10(legTravelTimeEstimator, this.scorer);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		this.MAX_ITERATIONS 		= 20;
+		this.MAX_ITERATIONS 		= 50;
 	}
 	
 		
