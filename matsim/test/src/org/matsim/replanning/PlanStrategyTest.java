@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PlanStrategyTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,25 +20,45 @@
 
 package org.matsim.replanning;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.population.Plan;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.testcases.MatsimTestCase;
 
-import org.matsim.testcases.TestDepth;
+public class PlanStrategyTest extends MatsimTestCase {
 
-public class AllTests {
+	/**
+	 * @author mrieser
+	 */
+	public void testGetNumberOfStrategyModules() {
+		final PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
+		assertEquals(0, strategy.getNumberOfStrategyModules());
+		strategy.addStrategyModule(new DummyStrategyModule());
+		assertEquals(1, strategy.getNumberOfStrategyModules());
+		strategy.addStrategyModule(new DummyStrategyModule());
+		assertEquals(2, strategy.getNumberOfStrategyModules());
+	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.replanning");
-		suite.addTestSuite(PlanStrategyTest.class);
-		//$JUnit-BEGIN$
-		if (TestDepth.getDepth() == TestDepth.extended) {
-			suite.addTestSuite(ReRoutingTest.class);
+	/**
+	 * A dummy strategy module for use in tests, without any functionality
+	 *
+	 * @author mrieser
+	 */
+	private static class DummyStrategyModule implements StrategyModule {
+
+		/*package*/ DummyStrategyModule() {
+			// empty constructor with default visibility for a private inner class
 		}
-		suite.addTestSuite(StrategyManagerTest.class);
-		suite.addTest(org.matsim.replanning.modules.AllTests.suite());
-		suite.addTest(org.matsim.replanning.selectors.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+
+		public void finish() {
+		}
+
+		public void handlePlan(final Plan plan) {
+		}
+
+		public void init() {
+		}
+
 	}
 
 }

@@ -69,7 +69,10 @@ public class PlanStrategy {
 	 * @return the number of strategy modules added to this strategy
 	 */
 	public int getNumberOfStrategyModules() {
-		return this.modules.size();
+		if (this.firstModule == null) {
+			return 0;
+		}
+		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
 
 	/**
