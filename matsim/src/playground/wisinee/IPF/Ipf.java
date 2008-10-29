@@ -44,11 +44,9 @@ public class Ipf {
 		initialRij = new double[nr][nc];
 		initialRij = rij; 
 	}
-	public double[][] ipfcal(int nr, int nc){
+	public double[][] ipfcal(int nr, int nc, double convSet, int maxItn){
 		int k = 1, k1 = 0;
-		int maxItn = 100;
 		double conv = 0;
-		double convSet = 0.5 ;
 		double diff = 0;
 				
 		double[] totalR = new double[nr];

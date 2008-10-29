@@ -46,7 +46,8 @@ import java.util.Properties;
 		public  int yCol=1;	
 		public  String ncxString=null;
 		public  String xColString=null;		
-
+		public  int maxItn =100;
+		public  double convSet =0.5;
 	
 //			public static void main(String[] args){					
 //				runIpfCal(testPropertyFile);
@@ -72,6 +73,8 @@ import java.util.Properties;
 					yCol = Integer.parseInt(props.getProperty("yCol"));
 					ncxString = props.getProperty("ncx");
 					xColString = props.getProperty("xCol");
+					maxItn = Integer.parseInt(props.getProperty("maxIteration"));
+					convSet = Double.parseDouble(props.getProperty("convergence"));
 				}
 				catch( Exception xc ){
 					xc.printStackTrace();
@@ -242,7 +245,7 @@ import java.util.Properties;
 					i1.setFixRow(GlobalVars.fixedR, nRow);
 					i1.setFixColumn(GlobalVars.fixedC, nCol);
 					i1.setInitialMatrix(GlobalVars.initialRij, nRow, nCol);
-					GlobalVars.finalRij=i1.ipfcal(nRow, nCol);					
+					GlobalVars.finalRij=i1.ipfcal(nRow, nCol,convSet,maxItn);					
 					System.out.println("Finish.");
 					
 					System.out.println("Start linking IPF result to 'HOUSEHOLD/PERSON DATA'");				
