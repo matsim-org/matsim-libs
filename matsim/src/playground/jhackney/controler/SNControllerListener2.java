@@ -262,11 +262,11 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 				this.log.info(" ... done");
 			}
 
-			if(event.getIteration()%10==0){
-				this.log.info(" Writing out social network for iteration " + snIter + " ...");
-				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-				this.log.info(" ... done");
+//			if(event.getIteration()%10==0){
+//				this.log.info(" Writing out social network for iteration " + snIter + " ...");
+//				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+//				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+//				this.log.info(" ... done");
 
 //				Write out the KML for the EgoNet of a chosen agent
 //				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
@@ -274,7 +274,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 ////				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 //				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
 //				this.log.info(" ... done");
-			}
+//			}
 			snIter++;
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
