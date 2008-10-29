@@ -1,18 +1,21 @@
 package playground.mmoyo.PTCase2;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.network.Node;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.population.Leg;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import playground.mmoyo.PTRouter.*;
-import org.matsim.network.Link;
-import org.matsim.population.Act;
+
+import playground.mmoyo.PTRouter.PTNProximity;
+import playground.mmoyo.PTRouter.PTNode;
 /** 
  * Second version of Router using Matsims Class Dijkstra  
  * We avoid the relationship with the city network and use coordinate search instead
@@ -123,15 +126,14 @@ public class PTRouter2 {
 					//insert transfer activity  TODO: what about walking and other posibble "pt modal choices"
 
 					double startTime=depTime + routeTravelTime;
-					Act act= new Act("Wait PT Vehicle", link);
-					act.setCoord(link.getToNode().getCoord());
+					Act act= new Act("Wait PT Vehicle", link.getToNode().getCoord());
 					act.setStartTime(startTime);
-					//act.setDur(linkTravelTime*60);  
+					//act.setDur(linkTravelTime*60);
 					act.calculateDuration();
 					act.setEndTime(startTime + (linkTravelTime*60));
-					act.setLinkId(link.getId());
+//					act.setLinkId(link.getId());
 					//act.setCoord(coord)
-					actLegList.add(act);    
+					actLegList.add(act);
 				
 				}//if link = standard
 				//set arrTime for the next loop:
