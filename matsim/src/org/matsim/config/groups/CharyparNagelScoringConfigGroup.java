@@ -42,6 +42,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String PERFORMING = "performing";
 	private static final String TRAVELING = "traveling";
 	private static final String TRAVELING_PT = "travelingPt";
+	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
 	private static final String DISTANCE_COST = "distanceCost";
 
@@ -69,6 +70,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double performing = +6.0;
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
+	private double travelingWalk = -6.0;
 	private double distanceCost = 0.0;
 	private double waiting = -0.0;
 
@@ -95,6 +97,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return Double.toString(getTraveling());
 		} else if (TRAVELING_PT.equals(key)) {
 			return Double.toString(getTravelingPt());
+		} else if (TRAVELING_WALK.equals(key)) {
+			return Double.toString(getTravelingWalk());
 		} else if (DISTANCE_COST.equals(key)) {
 			return Double.toString(getDistanceCost());
 		} else if (WAITING.equals(key)) {
@@ -146,6 +150,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setTraveling(Double.parseDouble(value));
 		} else if (TRAVELING_PT.equals(key)) {
 			setTravelingPt(Double.parseDouble(value));
+		} else if (TRAVELING_WALK.equals(key)) {
+			setTravelingWalk(Double.parseDouble(value));
 		} else if (DISTANCE_COST.equals(key)) {
 			setDistanceCost(Double.parseDouble(value));
 		} else if (WAITING.equals(key)) {
@@ -195,6 +201,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(PERFORMING, getValue(PERFORMING));
 		map.put(TRAVELING, getValue(TRAVELING));
 		map.put(TRAVELING_PT, getValue(TRAVELING_PT));
+		map.put(TRAVELING_WALK, getValue(TRAVELING_WALK));
 		map.put(WAITING, getValue(WAITING));
 		map.put(DISTANCE_COST, getValue(DISTANCE_COST));
 
@@ -308,6 +315,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		this.travelingPt = travelingPt;
 	}
 
+	public double getTravelingWalk() {
+		return this.travelingWalk;
+	}
+	public void setTravelingWalk(final double travelingWalk) {
+		this.travelingWalk = travelingWalk;
+	}
+	
 	public double getDistanceCost() {
 		return this.distanceCost;
 	}

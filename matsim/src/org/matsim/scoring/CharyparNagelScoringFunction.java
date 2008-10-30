@@ -181,6 +181,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
 	protected static double marginalUtilityOfTraveling = Double.NaN;
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
+	private static double marginalUtilityOfTravelingWalk = Double.NaN;
 	private static double marginalUtilityOfPerforming = Double.NaN;
 	private static double distanceCost = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
@@ -195,6 +196,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		marginalUtilityOfEarlyDeparture = params.getEarlyDeparture() / 3600.0;
 		marginalUtilityOfTraveling = params.getTraveling() / 3600.0;
 		marginalUtilityOfTravelingPT = params.getTravelingPt() / 3600.0;
+		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
 		distanceCost = params.getDistanceCost() / 1000.0;
@@ -357,6 +359,8 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
+		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
+			tmpScore += travelTime * marginalUtilityOfTravelingWalk - distanceCost * dist;
 		} else {
 			// use the same values as for "car"
 			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
