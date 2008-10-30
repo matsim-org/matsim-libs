@@ -233,7 +233,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			this.log.info(" ... removing social links done");
 			
 //			make new actstats (uses new twm AND new socialnet)
-			this.log.info(" Remaking actStats from events")
+			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 
 			Gbl.printMemoryUsage();
