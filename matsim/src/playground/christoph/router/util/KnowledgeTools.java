@@ -66,7 +66,6 @@ public class KnowledgeTools {
 			log.error("person = null!");
 		}
 		
-		//return knownNodes;
 		return knownNodesMap;
 	}
 	
@@ -99,7 +98,7 @@ public class KnowledgeTools {
 		}
 		return links;
 	}
-
+	
 	/*
 	 * Returns true, if the Start- and Endnode of the Link are included in the Map.
 	 * Returns true, if no known nodes are stored in the current Person.

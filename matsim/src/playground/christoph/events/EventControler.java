@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.controler.Controler;
-
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.Dijkstra;
@@ -43,6 +42,8 @@ import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
+import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
+import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.router.CompassRoute;
@@ -62,6 +63,16 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
  *
  * @author Christoph Dobler
  */
+
+/* Example for the new entries in a config.xml file to read / write selected nodes from / to files.
+<module name="selection">
+	<param name="readSelection" value="true"/>
+	<param name="inputSelectionFile" value="mysimulations/berlin/selection.xml.gz" />
+	<param name="writeSelection" value="true"/>
+	<param name="outputSelectionFile" value="./output/berlin/selection.xml.gz" />
+	<param name="dtdFile" value="./src/playground/christoph/knowledge/nodeselection/Selection.dtd" />
+</module>
+*/
 public class EventControler extends Controler{
 
 	protected ReplanningQueueSimulation sim;
@@ -72,8 +83,6 @@ public class EventControler extends Controler{
 	
 	private static final Logger log = Logger.getLogger(EventControler.class);
 	
-	
-//	private static final String FILENAME_EVENTS = "events.txt.gz";
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
@@ -172,17 +181,19 @@ public class EventControler extends Controler{
 		selectNodesDijkstra.setCostFactor(1.1);
 		nodeSelectors.add(selectNodesDijkstra);
 	}
-	
-	
+
 	@Override
 	protected void runMobSim() 
-	{
+	{			
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 		
 		sim.setControler(this);
 		
 		// CostCalculator entsprechend setzen!
 //		setCostCalculator();
+
+//		log.info("Read known Nodes Maps from a File");
+//		readKnownNodesMap();
 		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
@@ -205,6 +216,9 @@ public class EventControler extends Controler{
 		log.info("Create known Nodes Maps");
 		createKnownNodes();
 
+		log.info("Write known Nodes Maps to a File");
+		writeKownNodesMap();
+		
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
 		 * depending on the intention of the simulation.
@@ -309,9 +323,44 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-//			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
+			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
+		}
+	}
+	
+	/*
+	 * Read Maps of Nodes that each Agents "knows" from a file that is specified in config.xml.
+	 */
+	protected void readKnownNodesMap()
+	{
+		// reading Selection from file
+		boolean readSelection = Boolean.valueOf(this.config.getModule("selection").getValue("readSelection"));
+		if (readSelection)
+		{
+			String path = this.config.getModule("selection").getValue("inputSelectionFile");
+			log.info("Path: " + path);
+			new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			log.info("Read input selection file!");
+		}
+	}
+	
+	/*
+	 * Write Maps of Nodes that each Agents "knows" to a file that is specified in config.xml.
+	 */
+	protected void writeKownNodesMap()
+	{
+		// writing Selection to file
+		boolean writeSelection = Boolean.valueOf(this.config.getModule("selection").getValue("writeSelection"));
+		if (writeSelection)
+		{
+			String outPutFile = this.config.getModule("selection").getValue("outputSelectionFile");
+			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
+			
+			new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write();
+			//new SelectionWriter(this.population, getOutputFilename("selection.xml.gz"), "1.0", "dummy").write();	
+						
+			log.info("Path: " + outPutFile);
 		}
 	}
 	
@@ -325,79 +374,7 @@ public class EventControler extends Controler{
 
 		// non multi-core calculation
 		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);
-		
-		
-/*		// remove this part, if the methods from above work as expected
 
-		Iterator<Person> PersonIterator = this.getPopulation().iterator();
-		
-		int counter = 1;
-		
-		while (PersonIterator.hasNext())
-		{
-			if (counter == 5000) break;
-			
-			if (counter % 500 == 0) log.info("created Acivityrooms for " + counter + " persons.");
-			counter++;
-			
-			Person p = PersonIterator.next();
-		
-			if(p.getKnowledge() == null) p.createKnowledge("activityroom");
-			
-			Plan plan = p.getSelectedPlan();
-					
-			//ArrayList<Node> nodes = new ArrayList<Node>();
-			Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
-			
-			ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)p.getCustomAttributes().get("NodeSelectors");
-			
-			for(int i = 0; i < personNodeSelectors.size(); i++)
-			{
-				SelectNodes nodeSelector = personNodeSelectors.get(i);
-				
-				if(nodeSelector instanceof SelectNodesDijkstra)
-				{
-					ActIterator actIterator = plan.getIteratorAct();
-					
-					// get all acts of the selected plan
-					ArrayList<Act> acts = new ArrayList<Act>();					
-					while(actIterator.hasNext()) acts.add((Act)actIterator.next());
-					
-					for(int j = 1; j < acts.size(); j++)
-					{						
-						Node startNode = acts.get(j-1).getLink().getToNode();
-						Node endNode = acts.get(j).getLink().getFromNode();
-						
-						((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
-						((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
-						
-						//nodeSelector.getNodes(nodes);
-						nodeSelector.addNodesToMap(nodesMap);
-					}
-				}	//if instanceof SelectNodesDijkstra
-				
-				else if(nodeSelector instanceof SelectNodesCircular)
-				{
-					// do something here...
-				}
-				
-				else
-				{
-					log.error("Unkown NodeSelector!");
-				}
-			}
-
-			// add the selected Nodes to the knowledge of the person
-			Map<String,Object> customKnowledgeAttributes = p.getKnowledge().getCustomAttributes();
-			customKnowledgeAttributes.put("Nodes", nodesMap);
-
-			// remove Dead Ends from the Person's Activity Room
-			DeadEndRemover.removeDeadEnds(p);
-			
-//			log.info("created Activityroom for person..." + p.getId());
-		}
-		//ArrayList<Id> includedLinkIds = (ArrayList<Id>)person.getKnowledge().getCustomAttributes().get("IncludedLinkIDs");
-*/
 	}	// setNodes()
 
 	
