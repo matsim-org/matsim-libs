@@ -18,6 +18,23 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 public class TimeWindowCalcTimeCorrelations {
 
+	/**
+	 * Writes out a flat file with one line per agent and time window 
+	 * indicating various statistics about the time window object, including:
+	 * the number of agents in their ego net who
+	 * are at the time window (time/place/friendship overlap);
+	 * the number of agents total in the time window (time/place overlap);
+	 * the average start and end times of the agents in question at the time window
+	 * the average distances from home locations to the facility in the time window for the agents in question
+	 * 
+	 * NOTE: if the size of the ego net is zero (no friends) the distance entered for the average
+	 * distance of the ego network to the facility is equal to the distance of the ego to the facility.
+	 * 
+	 * @param timeWindowMap
+	 * @param out2name
+	 * @param out1name
+	 * @author jhackney
+	 */
 	public TimeWindowCalcTimeCorrelations(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
