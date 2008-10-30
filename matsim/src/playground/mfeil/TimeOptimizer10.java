@@ -76,10 +76,11 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), (PlanomatXPlan)plan);
-		
+		int loops=1;
 		while (move!=0.0){
-			//log.info("Move = "+move);
+			loops++;
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), (PlanomatXPlan)plan);
+			if (loops>5)break;
 		}
 		plan.setScore(this.scorer.getScore(plan));
 		

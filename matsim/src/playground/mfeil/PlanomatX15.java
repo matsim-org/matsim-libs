@@ -43,7 +43,7 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * Like PlanomatX11 but also calling TimeOptimizer.
+ * Like PlanomatX11 but calling TimeOptimizer rather than Planomat.
  */
 
 public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorithm { 
@@ -68,7 +68,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		//this.scorer 				= new PlanomatXPlanScorer (factory);
 		this.scorer 				= new PlanScorer (factory);
-		this.timer					= new TimeOptimizer10(legTravelTimeEstimator, this.scorer);
+		this.timer					= new TimeOptimizer8(legTravelTimeEstimator, this.scorer);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -110,18 +110,18 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		double [] xs;
 		double [] ys = new double [MAX_ITERATIONS+1];
 		
-		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
+		//String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		
-		Counter.counter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
+		//Counter.counter++;
+		//PrintStream stream;
+		//try {
+		//	stream = new PrintStream (new File(outputfile));
+		//} catch (FileNotFoundException e) {
+		//	e.printStackTrace();
+		//	return;
+		//}
+		//stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		
 		FileOutputStream fileOverview;
 		PrintStream overview;
@@ -142,13 +142,13 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		// Write the given plan into the tabuList
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
-		stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
+		//stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 		ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
 		// Do Tabu Search iterations
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
-			stream.println("Iteration "+currentIteration);
+		//	stream.println("Iteration "+currentIteration);
 			//streamOverview.print("Iteration "+currentIteration+"\t");
 			
 			// Define the neighbourhood
@@ -198,15 +198,15 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 					else if (solution.getActsLegs().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-				stream.print(neighbourhood[x].getScore()+"\t");
-				stream.print(notNewInNeighbourhood[x]+"\t");
-				stream.print(tabuInNeighbourhood[x]+"\t");
-				stream.print(scoredInNeighbourhood[x]+"\t");
-				for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
-					Act act = (Act)neighbourhood[x].getActsLegs().get(i);
-					stream.print(act.getType()+"\t");
-				}
-				stream.println();
+			//	stream.print(neighbourhood[x].getScore()+"\t");
+			//	stream.print(notNewInNeighbourhood[x]+"\t");
+			//	stream.print(tabuInNeighbourhood[x]+"\t");
+			//	stream.print(scoredInNeighbourhood[x]+"\t");
+			//	for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
+			//		Act act = (Act)neighbourhood[x].getActsLegs().get(i);
+			//		stream.print(act.getType()+"\t");
+			//	}
+			//	stream.println();
 			}
 			
 			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
@@ -216,7 +216,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 			tabuList.add(bestIterSolution);
 			
 			// Statistics
-			stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
+		//	stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
 			//streamOverview.println(bestIterSolution.getScore());
 			ys[currentIteration]=bestIterSolution.getScore();
 			
@@ -237,7 +237,7 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		// Update the plan with the final solution 		
 		java.util.Collections.sort(tabuList);
-		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		
 		log.info("Finale actslegs für Person "+tabuList.get(tabuList.size()-1).getPerson().getId()+": "+tabuList.get(tabuList.size()-1).getActsLegs());
@@ -276,10 +276,10 @@ public class PlanomatX15 implements org.matsim.population.algorithms.PlanAlgorit
 		chart.addMatsimLogo();
 		chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		
-		stream.println("\nDauer der Planomat-Aufrufe: "+planomatRunTime);
-		stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
-		stream.println("Anzahl der Planomat-Aufrufe: "+numberPlanomatCalls);				
-		stream.close();
+	//	stream.println("\nDauer der Planomat-Aufrufe: "+planomatRunTime);
+	//	stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
+	//	stream.println("Anzahl der Planomat-Aufrufe: "+numberPlanomatCalls);				
+	//	stream.close();
 		
 		
 		overview.println(Counter.counter+"_"+plan.getPerson().getId()+"\t"+planomatRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberPlanomatCalls);

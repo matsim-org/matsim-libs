@@ -23,22 +23,22 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.scoring.PlanScorer;
 
 
 /**
  * @author Matthias Feil
- * Initialiser for time opt module.
+ * Initialiser for TimeOptimizer module.
  */
 
 public class TimeOptInitialiser extends MultithreadedModuleA{
 	
-	private final ScoringFunctionFactory 	factory;
+	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
 
 	
-	public TimeOptInitialiser (LegTravelTimeEstimator estimator) {
-		this.factory = new CharyparNagelScoringFunctionFactory();
+	public TimeOptInitialiser (LegTravelTimeEstimator estimator, CharyparNagelScoringFunctionFactory factory) {
+		this.scorer = new PlanScorer(factory);
 		this.estimator = estimator;
 	}
 
@@ -47,7 +47,7 @@ public class TimeOptInitialiser extends MultithreadedModuleA{
 	public PlanAlgorithm getPlanAlgoInstance() {
 		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer (this.factory, this.estimator);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer10 (this.estimator, this.scorer);
 
 		return timeOptAlgorithm;
 	}
