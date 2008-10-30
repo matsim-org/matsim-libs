@@ -243,7 +243,8 @@ public class EdgeIntervalls {
 		if (u<=0){
 			throw new IllegalArgumentException("capacity shold be positive");
 		}
-		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
+		//TODO check wether this was the problem of negation in for
+		for(_tree.goToNodeAt(t);!_tree.isAtEnd() ;_tree.increment()){
 			if(_debug){
 				System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow()+" on: "+((EdgeIntervall)_tree._curr.obj));
 			}
@@ -292,7 +293,7 @@ public class EdgeIntervalls {
 		if(forward){
 			while(t<max){
 				
-				Intervall j =minPossible(t,u);
+				Intervall j =this.minPossible(t,u);
 				if(j==null){
 					if(_debug){
 						System.out.println("no possible interval after:" + t+ "with cap: " +u);
@@ -431,7 +432,20 @@ public class EdgeIntervalls {
 	}
 	
 //------------------------MAIN METHOD--------------------------------//
-	
+	public static void main(String[] args){
+		EdgeIntervalls.debug(true);
+		EdgeIntervalls test = new EdgeIntervalls(1);
+		test.augment(1, 1, 1);
+		test.augment(3, 1, 1);
+		Intervall i = new Intervall(1,Integer.MAX_VALUE);
+		ArrayList<Intervall> result = test.propagate(i, 1, true);
+		System.out.println("empty:  " +result.isEmpty());
+		if(!result.isEmpty()){
+			for (Intervall j :result){
+				System.out.println(j);
+			}
+		}
+	}
 	
 
 }
