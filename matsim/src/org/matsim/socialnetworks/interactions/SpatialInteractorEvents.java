@@ -47,7 +47,7 @@ public class SpatialInteractorEvents {
 	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration,
 			Hashtable<Facility,ArrayList<TimeWindow>> twm) {
 
-		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
+		this.log.info(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
 //		this.timeWindowMap=teo.getTimeWindowMap();
 		this.timeWindowMap=twm;
@@ -72,7 +72,7 @@ public class SpatialInteractorEvents {
 			Gbl.errorMsg(" Spatial interaction type is \"" + interaction_type
 					+ "\". Only \"random\", \"meetall\", \"timewindowrandom\", and \"timewindowall\" are supported at this time.");
 		}
-		System.out.println("...finished");
+		this.log.info("...finished");
 	}
 
 	/**
