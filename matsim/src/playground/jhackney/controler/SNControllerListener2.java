@@ -179,20 +179,25 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 //			got new epp from mobsim
 //			make new timewindows and map (uses old plans and new events)
 			Gbl.printMemoryUsage();
+			controler.stopwatch.beginOperation("spatialencounters");
 			this.log.info(" Making time Windows and Map from Events");
 			teo=new MakeTimeWindowsFromEvents(epp);
 			this.log.info(" ... done making time windows and map");
 			twm= teo.getTimeWindowMap();
 //			execute spatial interactions (uses timewindows)
+			
 			if (total_spatial_fraction(this.fractionS) > 0) {
 				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
 			} else {
 				this.log.info("     (none)");
 			}
 			this.log.info(" ... Spatial interactions done\n");
+			controler.stopwatch.endOperation("spatialencounters");
+			
 			Gbl.printMemoryUsage();
 //			execute nonspatial interactions (uses new social network)
 			this.log.info(" Non-Spatial interactions ...");
+			controler.stopwatch.beginOperation("infoexchange");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
 				String facTypeNS = this.infoToExchange[ii];
 				if (!facTypeNS.equals("none")) {
@@ -200,6 +205,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 					this.plansInteractorNS.exchangeGeographicKnowledge(facTypeNS, snIter);
 				}
 			}
+			controler.stopwatch.endOperation("infoexchange");
 
 //			Exchange of knowledge about people
 			this.log.info("Introducing people");
@@ -229,8 +235,10 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			
 			//dissolve social ties
 			this.log.info(" Removing social links ...");
+			controler.stopwatch.beginOperation("dissolvelinks");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... removing social links done");
+			controler.stopwatch.endOperation("dissolvelinks");
 			
 //			make new actstats (uses new twm AND new socialnet)
 			this.log.info(" Remaking actStats from events");
@@ -256,9 +264,11 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 			if(CALCSTATS && event.getIteration()%10==0){
 				Gbl.printMemoryUsage();
+				controler.stopwatch.beginOperation("netstats");
 				this.log.info(" Calculating and reporting network statistics ...");
 				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
 				this.log.info(" ... done");
+				controler.stopwatch.endOperation("netstats");
 
 				Gbl.printMemoryUsage();
 
