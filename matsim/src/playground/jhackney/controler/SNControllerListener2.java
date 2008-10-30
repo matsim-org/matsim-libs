@@ -262,7 +262,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		if( event.getIteration()%replan_interval==0){
 
-			if(CALCSTATS && event.getIteration()%10==0){
+			if(CALCSTATS && event.getIteration()%50==0){
 				Gbl.printMemoryUsage();
 				controler.stopwatch.beginOperation("netstats");
 				this.log.info(" Calculating and reporting network statistics ...");
