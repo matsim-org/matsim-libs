@@ -179,7 +179,9 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 //			got new epp from mobsim
 //			make new timewindows and map (uses old plans and new events)
 			Gbl.printMemoryUsage();
+			this.log.info(" Making time Windows and Map from Events");
 			teo=new MakeTimeWindowsFromEvents(epp);
+			this.log.info(" ... done making time windows and map");
 			twm= teo.getTimeWindowMap();
 //			execute spatial interactions (uses timewindows)
 			if (total_spatial_fraction(this.fractionS) > 0) {
@@ -200,14 +202,19 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			}
 
 //			Exchange of knowledge about people
+			this.log.info("Introducing people");
 			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 			}
-			this.log.info("  ... done");
+			else{
+				this.log.info("  No introductions");
+			}
+			this.log.info("  ... introducing people done");
 //			forget knowledge
 			//TODO  Should be an algorithm
+			this.log.info("Forgetting knowledge");
 			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
 			Iterator<Person> iperson = personList.iterator();
 			while (iperson.hasNext()) {
@@ -217,21 +224,23 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
 				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
 			}
-			this.log.info(" ... done");
+			this.log.info(" ... forgetting knowledge done");
 			Gbl.printMemoryUsage();
 			
 			//dissolve social ties
 			this.log.info(" Removing social links ...");
 			this.snet.removeLinks(snIter);
-			this.log.info(" ... done");
+			this.log.info(" ... removing social links done");
 			
 //			make new actstats (uses new twm AND new socialnet)
+			this.log.info(" Remaking actStats from events")
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 
 			Gbl.printMemoryUsage();
 
-			log.info("SSTEST Finish Scoring with actStats "+snIter);
+			this.log.info("SSTEST Finish Scoring with actStats "+snIter);
 			scoring.finish();
+			this.log.info(" ... scoring with actStats finished");
 
 //			snIter++;
 		}
