@@ -12,6 +12,7 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
+import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
 import playground.wrashid.PHEV.parking.data.Facility;
@@ -33,9 +34,15 @@ public class Main {
 		MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader .readFile("C:\\data\\SandboxCVS\\ivt\\studies\\switzerland\\world\\world.xml");
 		Layer layer = world.getLayer("municipality");
+		Location loc = layer.getLocation("6712");
+
+		ZoneLayer zl = (ZoneLayer) layer;
+		Zone zone = (Zone) zl.getLocation("6712");
+		System.out.println(zone.getName());
+		// TODO: continue here also
 		*/
 		
-		
+		/*
 		// read network layer
 		NetworkLayer network = new NetworkLayer();
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(network);
@@ -43,13 +50,13 @@ public class Main {
 		//for (Link link:network.getLinks().values()){
 		//	System.out.println(link.getId() +  " - " + link.getCapacity(network.getCapacityPeriod()));
 		//}
-		
+		*/
 		
 		// read street parking data of zurich
 		LinkedList<Coord> streetData = StreetParkingReader.readData("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhäuser\\facilities\\input\\streetParking2007_1.txt");
 		
 		
-		
+		/*
 		// calculate the number of parkings per link for the city of Zurich
 		// key=linkId, value=NumberOfParkings
 		HashMap<String, Integer> numberOfStreetParkingsPerLink=new HashMap<String, Integer>();
@@ -63,9 +70,10 @@ public class Main {
 			numberOfParkings++;
 			numberOfStreetParkingsPerLink.put(linkId,numberOfParkings);
 		}
-		
+		*/
 		// ??? print some statistics about the existing parkings?
 		// ??? do some anylysis
+		// look for some good tool for producing charts
 		// TODO: continue here...
 		
 	}
