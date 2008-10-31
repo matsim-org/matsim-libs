@@ -76,6 +76,8 @@ public class KmlNetworkWriter {
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+			} else if (abstractFeature.getClass().equals(FolderType.class)) {
+				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 			} else {
 				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
 			}
@@ -90,6 +92,8 @@ public class KmlNetworkWriter {
 			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+			} else if (abstractFeature.getClass().equals(FolderType.class)) {
+				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 			} else {
 				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
 			}
