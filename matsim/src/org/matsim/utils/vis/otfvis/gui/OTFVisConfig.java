@@ -43,7 +43,7 @@ public class OTFVisConfig extends Module {
 	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
 	public static final String BIG_TIME_STEP = "bigTimeStep";
-	public static final String TIME_STEP = "timeStep";
+//	public static final String TIME_STEP = "timeStep";
 
 	private  float agentSize = 300.f;
 	private  String middleMouseFunc = "Pan";
@@ -53,7 +53,7 @@ public class OTFVisConfig extends Module {
 	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
 
 	private int bigTimeStep = 600;
-	private final int timeStep = 1;
+//	private final int timeStep = 1;
 	private String queryType = "agentPlan";
 	private boolean multipleSelect = true;
 	private boolean showParking = false;
@@ -64,7 +64,6 @@ public class OTFVisConfig extends Module {
 	private boolean drawTime = false;
 	private boolean drawOverlays = true;
 	private boolean renderImages = false;
-
 
 	@Override
 	public String getValue(final String key) {
@@ -277,13 +276,11 @@ public class OTFVisConfig extends Module {
 		return drawTime;
 	}
 
-	public boolean setRenderImages(boolean val) {
-		// TODO Auto-generated method stub
-		return renderImages = val;
+	public boolean setRenderImages(boolean render) {
+		return renderImages = render;
 	}
 	
 	public boolean renderImages() {
-		// TODO Auto-generated method stub
 		return renderImages;
 	}
 
