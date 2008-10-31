@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -39,61 +39,26 @@ import org.matsim.utils.misc.Time;
 
 /**
  * @author dgrether
- *
  */
 public class NetworkFeatureFactory {
 
 	private static final Logger log = Logger.getLogger(NetworkFeatureFactory.class);
 
 	private CoordinateTransformation coordTransform;
-	/**
-	 * constant for the link description
-	 */
+
 	public static final String ENDP = "</p>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String STARTP = "<p>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String ENDH3 = "</h3>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String STARTH3 = "<h3>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String ENDH2 = "</h2>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String ENDCDATA = "]]>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String STARTH2 = "<h2>";
-	/**
-	 * constant for the link description
-	 */
 	public static final String STARTCDATA = "<![CDATA[";
-	/**
-	 * constant for the link description
-	 */
-	public static final String STARTUL = "<ul>";
-	/**
-	 * constant for the link description
-	 */
-	public static final String ENDUL = "</ul>";
-	/**
-	 * constant for the link description
-	 */
-	public static final String STARTLI = "<li>";
-	/**
-	 * constant for the link description
-	 */
-	public static final String ENDLI = "</li>";
+
+	private static final String STARTUL = "<ul>";
+	private static final String ENDUL = "</ul>";
+	private static final String STARTLI = "<li>";
+	private static final String ENDLI = "</li>";
 
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	
@@ -102,7 +67,6 @@ public class NetworkFeatureFactory {
 	}
 
 	public AbstractFeatureType createLinkFeature(final Link l, StyleType networkStyle) {
-		
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		String description = this.createLinkDescription(l);
 		folder.setName(l.getId().toString());
@@ -126,16 +90,14 @@ public class NetworkFeatureFactory {
 		pointPlacemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
 		pointPlacemark.setStyleUrl(networkStyle.getId());
 		pointPlacemark.setDescription(description);
-//		return pointPlacemark;
+
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(pointPlacemark));
 		folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(p));
 		
 		return folder;
-		
 	}
 
 	public AbstractFeatureType createNodeFeature(final Node n, StyleType networkStyle) {
-		
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		p.setName(n.getId().toString());
 
@@ -148,7 +110,6 @@ public class NetworkFeatureFactory {
 		p.setDescription(this.createNodeDescription(n));
 		
 		return p;
-		
 	}
 	
 	public AbstractFeatureType createActFeature(Act act, StyleType style) {
@@ -162,19 +123,15 @@ public class NetworkFeatureFactory {
 		p.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
 
 		p.setStyleUrl(style.getId());
-//		p.setDescription(createNodeDescription(n));
 		return p;
-		
 	}
 
 	public AbstractFeatureType createLegFeature(Leg leg, StyleType style) {
-	
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(String.valueOf(leg.getNum()));
-//		String description = createLegDescription(leg);
 
 		for (Link l : leg.getRoute().getLinkRoute()) {
-			
+
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
 			if (abstractFeature.getClass().equals(FolderType.class)) {
 				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
@@ -194,22 +151,23 @@ public class NetworkFeatureFactory {
 		
 		return folder;
 	}
-	
 
 	private String createLinkDescription(Link l) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(NetworkFeatureFactory.STARTCDATA);
+		StringBuilder buffer = new StringBuilder(100);
+//		buffer.append(NetworkFeatureFactory.STARTCDATA);
 		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append("Link: " );
 		buffer.append(l.getId());
 		buffer.append(NetworkFeatureFactory.ENDH2);
 		buffer.append(NetworkFeatureFactory.STARTH3);
-		buffer.append("From Node: "+ l.getFromNode().getId());
+		buffer.append("From Node: ");
+		buffer.append(l.getFromNode().getId());
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTH3);
-		buffer.append("To Node: " + l.getToNode().getId());
+		buffer.append("To Node: ");
+		buffer.append(l.getToNode().getId());
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(NetworkFeatureFactory.ENDP);
@@ -238,16 +196,14 @@ public class NetworkFeatureFactory {
 		buffer.append(ENDUL);
 		buffer.append(NetworkFeatureFactory.ENDP);
 
-		buffer.append(NetworkFeatureFactory.ENDCDATA);
+//		buffer.append(NetworkFeatureFactory.ENDCDATA);
 
 		return buffer.toString();
-
 	}
 
-
 	private String createNodeDescription(Node n) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(NetworkFeatureFactory.STARTCDATA);
+		StringBuilder buffer = new StringBuilder(100);
+//		buffer.append(NetworkFeatureFactory.STARTCDATA);
 		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append("Node: " );
 		buffer.append(n.getId());
@@ -282,11 +238,8 @@ public class NetworkFeatureFactory {
 		}
 		buffer.append(ENDUL);
 		buffer.append(NetworkFeatureFactory.ENDP);
-		buffer.append(NetworkFeatureFactory.ENDCDATA);
+//		buffer.append(NetworkFeatureFactory.ENDCDATA);
 		return buffer.toString();
-
 	}
-
-
 
 }
