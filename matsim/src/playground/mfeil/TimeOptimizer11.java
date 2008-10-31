@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeOptimizer10.java
+ * TimeOptimizer11.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -33,25 +33,24 @@ import org.matsim.population.Leg;
 
 /**
  * @author Matthias Feil
- * Like TimeOptimizer8 but trying to take advantage of specifics of PlanScorer (only legs required to score a plan).
- * This speeds the TimeOptimizer further up by about 20%.
- * Can be ONLY used if PlanScorer is applicable. However, does not work when PlanomatXPlanScorer has to be used 
- * (in this case, TimeOptimizer8 is your choice).
+ * Like TimeOptimizer10 (so including log-only consideration) but also with
+ * swapping of activity durations from TimeOptimizer9.
  */
 
-public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
-	private final int						MAX_ITERATIONS, OFFSET, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
+	private final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
+	private int								OFFSET;
 	private final double					minimumTime;
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
-	private static final Logger 			log = Logger.getLogger(TimeOptimizer10.class);
+	private static final Logger 			log = Logger.getLogger(TimeOptimizer11.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer10 (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizer11 (LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
@@ -74,6 +73,7 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), (PlanomatXPlan)plan);
+		
 		int loops=1;
 		while (move!=0.0){
 			loops++;
@@ -83,6 +83,7 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 				return;
 			}
 		}
+		
 		plan.setScore(this.scorer.getScore(plan));
 		
 		int neighbourhood_size = 0;
@@ -213,6 +214,12 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 			else {
 				lastImprovement++;
 				if (lastImprovement > STOP_CRITERION) break;
+				// NEW NEW NEW NEW NEW
+				//if (changeInOffset)	break;
+				//else {
+				//	this.OFFSET /=2;
+				//	changeInOffset = true;
+				//}
 			}
 			
 			if (this.MAX_ITERATIONS!=currentIteration){
@@ -403,7 +410,9 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 			//log.info("Score = "+scorer.getScore(basePlan));
 			return 0;
 		}
-		else return 1;
+		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+		else return this.swapDurations (basePlan, outer, inner);	
+		// else return 1;
 	}
 	
 	
@@ -457,9 +466,61 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 			//log.info("Score = "+scorer.getScore(basePlan));
 			return 0;
 		}
-		else return 1;
+		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+		else return this.swapDurations(basePlan, outer, inner);
+		// else return 1;
 	}
 	
+	
+	// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+	public int swapDurations (PlanomatXPlan basePlan, int outer, int inner){
+		
+		((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur());
+		double now =((Act)(basePlan.getActsLegs().get(outer))).getStartTime()+((Act)(basePlan.getActsLegs().get(outer))).getDur();
+		((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
+		
+		double travelTime;
+		for (int i=outer+1;i<=inner-1;i=i+2){
+			((Leg)(basePlan.getActsLegs().get(i))).setDepTime(now);
+			travelTime = this.estimator.getLegTravelTimeEstimation(basePlan.getPerson().getId(), now, (Act)(basePlan.getActsLegs().get(i-1)), (Act)(basePlan.getActsLegs().get(i+1)), (Leg)(basePlan.getActsLegs().get(i)));
+			((Leg)(basePlan.getActsLegs().get(i))).setArrTime(now+travelTime);
+			((Leg)(basePlan.getActsLegs().get(i))).setTravTime(travelTime);
+			now+=travelTime;
+			
+			if (i!=inner-1){
+				((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+				now+=((Act)(basePlan.getActsLegs().get(i+1))).getDur();
+				((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);					
+			}
+			else {
+				((Act)(basePlan.getActsLegs().get(i+1))).setStartTime(now);
+				
+				if (((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()>now){
+					((Act)(basePlan.getActsLegs().get(i+1))).setDur(((Act)(basePlan.getActsLegs().get(i+1))).getEndTime()-now);
+				}
+				else {
+					((Act)(basePlan.getActsLegs().get(i+1))).setDur(0);
+					((Act)(basePlan.getActsLegs().get(i+1))).setEndTime(now);
+					if (basePlan.getActsLegs().size()>i+3){
+						travelTime = this.estimator.getLegTravelTimeEstimation(basePlan.getPerson().getId(), now, (Act)(basePlan.getActsLegs().get(i+1)), (Act)(basePlan.getActsLegs().get(i+3)), (Leg)(basePlan.getActsLegs().get(i+2)));
+						((Leg)(basePlan.getActsLegs().get(i+2))).setArrTime(now+travelTime);
+						((Leg)(basePlan.getActsLegs().get(i+2))).setTravTime(travelTime);
+						now+=travelTime;
+						((Act)(basePlan.getActsLegs().get(i+3))).setStartTime(now);
+						if (((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()>now){
+							((Act)(basePlan.getActsLegs().get(i+3))).setDur(((Act)(basePlan.getActsLegs().get(i+3))).getEndTime()-now);
+						}
+						else return 1;
+					}
+					else return 1;
+				}
+			}
+		}
+		
+		basePlan.setScore(scorer.getScore(basePlan));
+		return 0;
+		
+	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// Help methods 

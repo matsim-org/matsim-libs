@@ -21,7 +21,6 @@ package playground.mfeil;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
 import org.matsim.locationchoice.LocationChoice;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.network.NetworkLayer;
@@ -33,7 +32,6 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.scoring.*;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -70,14 +68,6 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		//factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
 		this.factory = new CharyparNagelScoringFunctionFactory();
 		
-	//	int gblCounter = 0;
-		
-	//	actTypes = new ArrayList<String>();
-	//	while (Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter)!=null){
-	//		actTypes.add(Gbl.getConfig().findParam("planCalcScore", "activityType_"+gblCounter));
-	//		gblCounter++;
-	//	}
-		
 		this.planAlgoInstances = new Vector<PlanAlgorithm>();
 		this.controler = controlerTest;
 		this.init(network, controler);
@@ -105,7 +95,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX12 (this.estimator, this.network, this.travelCostCalc, 
+		planomatXAlgorithm =  new PlanomatX16 (this.estimator, this.network, this.travelCostCalc, 
 				this.travelTimeCalc, this.preProcessRoutingData, this.factory, this.constrained, this.controler);
 
 		return planomatXAlgorithm;

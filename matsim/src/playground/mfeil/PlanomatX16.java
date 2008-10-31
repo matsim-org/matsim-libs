@@ -29,7 +29,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.planomat.*;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
@@ -47,36 +46,36 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * This is the current standard version but preparing to include the location choice.
- * Some stuff in the locationChoiceAlgorithms is not working when executing so needs 
- * clarification with Andreas Horni.
- * 
- * Moreover, this version implements actTypes search based on each agent's knowledge.
- * General actTypes retrieval from gbl has been dropped.
+ * New standard version. Features
+ * calling of TimeOptimizer rather than Planomat
+ * differentiation into primary and secondary activities
+ * locationChoice
  */
 
-public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
-	private final PlanAlgorithm 			planomatAlgorithm;
+	//private final PlanAlgorithm 			planomatAlgorithm;
+	private final PlanAlgorithm				timer;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX12.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX16.class);
 	private final PlanAlgorithm				locationChoiceAlgorithm;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX12 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX16 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, 
 			boolean constrained, Controler controler) {
 
-		this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
+		//this.planomatAlgorithm 	= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
-		this.scorer 				= new PlanomatXPlanScorer (factory);
+		this.scorer 				= new PlanScorer (factory);
+		this.timer					= new TimeOptimizer8(legTravelTimeEstimator, this.scorer);
 		
 		if (constrained) locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
 		else locationChoiceAlgorithm = new RandomLocationMutator(network, controler);
@@ -86,7 +85,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
-		this.MAX_ITERATIONS 		= 10;
+		this.MAX_ITERATIONS 		= 50;
 		
 	}
 	
@@ -121,7 +120,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
 		double [] xs;
-		double [] ys 									= new double [MAX_ITERATIONS];
+		double [] ys 									= new double [MAX_ITERATIONS+1];
 		// NEW NEW NEW NEW NEW NEW 
 		ArrayList<Activity> primActs					= plan.getPerson().getKnowledge().getActivities(true);
 		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();	
@@ -159,6 +158,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		// Write the given plan into the tabuList
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
 		stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
+		ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
 		// Do Tabu Search iterations
 		int currentIteration;
@@ -193,7 +193,8 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 					//Optimizing the start times
 					numberPlanomatCalls++;
 					long planomatStartTime = System.currentTimeMillis();
-					this.planomatAlgorithm.run (neighbourhood[x]); //Calling standard Planomat to optimise start times and mode choice
+					//this.planomatAlgorithm.run (neighbourhood[x]); //Calling standard Planomat to optimise start times and mode choice
+					this.timer.run(neighbourhood[x]);
 					planomatRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
 					// Scoring
@@ -232,7 +233,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 			// Statistics
 			stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
 			//streamOverview.println(bestIterSolution.getScore());
-			ys[currentIteration-1]=bestIterSolution.getScore();
+			ys[currentIteration]=bestIterSolution.getScore();
 			
 
 			if (this.MAX_ITERATIONS==currentIteration){

@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.population.Plan;
 import org.matsim.scoring.PlanScorer;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 
@@ -41,7 +40,8 @@ import org.matsim.population.Leg;
 
 public class TimeOptimizer9 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
-	private final int						MAX_ITERATIONS, OFFSET, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
+	private final int						MAX_ITERATIONS, STOP_CRITERION, NEIGHBOURHOOD_SIZE;
+	private int								OFFSET;
 	private final double					minimumTime;
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
@@ -51,9 +51,9 @@ public class TimeOptimizer9 implements org.matsim.population.algorithms.PlanAlgo
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer9 (ScoringFunctionFactory factory, LegTravelTimeEstimator estimator){
+	public TimeOptimizer9 (LegTravelTimeEstimator estimator, PlanScorer scorer){
 		
-		this.scorer 				= new PlanomatXPlanScorer (factory);
+		this.scorer 				= scorer;
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
@@ -94,6 +94,7 @@ public class TimeOptimizer9 implements org.matsim.population.algorithms.PlanAlgo
 		Object [] solutions 							= new Object [3];
 		int currentIteration;
 		int lastImprovement 							= 0;
+		boolean changeInOffset							= false;
 		
 		
 		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
@@ -184,6 +185,12 @@ public class TimeOptimizer9 implements org.matsim.population.algorithms.PlanAlgo
 			else {
 				lastImprovement++;
 				if (lastImprovement > STOP_CRITERION) break;
+					// NEW NEW NEW NEW NEW
+					//if (changeInOffset)	break;
+					//else {
+					//	this.OFFSET /=2;
+					//	changeInOffset = true;
+					//}
 			}
 			
 			if (this.MAX_ITERATIONS!=currentIteration){
