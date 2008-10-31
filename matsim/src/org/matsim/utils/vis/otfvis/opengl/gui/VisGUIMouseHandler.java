@@ -405,7 +405,7 @@ implements MouseWheelListener{
 	private float maxZoom;
 	public void setBounds(float minEasting, float minNorthing, float maxEasting, float maxNorthing, float minZoom) {
 		this.minZoom = minZoom;
-		this.maxZoom = Math.max(maxNorthing- minNorthing, (maxEasting-minEasting));
+		this.maxZoom = 1.5f * Math.max(maxNorthing- minNorthing, (maxEasting-minEasting));
 		bounds = new Rectangle2D.Float(minEasting, minNorthing, maxEasting - minEasting, maxNorthing- minNorthing);
 		
     	cameraStart = new Point3f((maxEasting-minEasting)/2, (maxNorthing-minNorthing)/2, (maxNorthing-minNorthing)*0.8f);
