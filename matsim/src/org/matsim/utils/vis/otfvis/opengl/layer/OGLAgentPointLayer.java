@@ -53,16 +53,15 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 					Color.RED, Color.YELLOW, Color.GREEN});
 	
 	// for Padang time-based agents
-	private final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
+	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
+	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
-	private final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
+	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
 			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
 	
 	public static class AgentArrayDrawer extends OTFGLDrawableImpl {
-		public final static RandomColorizer colorizer2 = new RandomColorizer(257);
 
-
-		public int count = 0;
+		private int count = 0;
 		private static int alpha =120;
 		
 		private ByteBuffer colorsIN = null;
@@ -70,16 +69,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		private final  List<FloatBuffer> posBuffers= new LinkedList<FloatBuffer>();
 		private final  List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
-		
 				
 		public static void setAlpha(int alp) { alpha = alp;}
 		
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 		protected Texture texture;
-		
-		public AgentArrayDrawer() {
-			
-		}
 		
 		protected void setTexture() {
 			this.texture = AgentDrawer.carjpg;
@@ -92,68 +86,68 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		protected void setAgentSize() {
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
 
-		    if (gl.isFunctionAvailable("glPointParameterf")) {
+			if (gl.isFunctionAvailable("glPointParameterf")) {
 				// Query for the max point size supported by the hardware
-			    float [] maxSize = {0.0f};
-			    gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
-			    float quadratic[] =  { 0.0f, 0.0001f, 0.000000f };
-			    gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
+				float [] maxSize = {0.0f};
+				gl.glGetFloatv( GL.GL_POINT_SIZE_MAX_ARB, FloatBuffer.wrap(maxSize) );
+				float quadratic[] =  { 0.0f, 0.0001f, 0.000000f };
+				gl.glPointParameterfvARB( GL.GL_POINT_DISTANCE_ATTENUATION_ARB, FloatBuffer.wrap(quadratic ));
 
-			    gl.glPointSize(agentSize/10.f);
-		        gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
-		        gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
-		    	
-		    } else {
-		    	gl.glPointSize(agentSize/10);
-		    }
-			
+				gl.glPointSize(agentSize/10.f);
+				gl.glPointParameterf(GL.GL_POINT_SIZE_MIN_ARB, 1.f);
+				gl.glPointParameterf(GL.GL_POINT_SIZE_MAX_ARB, agentSize*30.f);
+
+			} else {
+				gl.glPointSize(agentSize/10);
+			}
 		}
 		
 		public void onDraw(GL gl) {
-			if (posBuffers.size() == 0) return ;
+			if (posBuffers.size() == 0) {
+				return;
+			}
 			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
-		
+
 			setAgentSize();
-			
-	        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-	        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
-	        
-	        setTexture();
-	        if (texture != null) {
+
+			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
+
+			setTexture();
+			if (texture != null) {
 				texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
 				gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
 				texture.bind();	        	
-	        }
+			}
 
 			ByteBuffer colors =  null;
 			FloatBuffer vertex =  null;
-			
+
 			for(int i = 0; i < posBuffers.size(); i++) {
 				colors = colBuffers.get(i);
 				vertex = posBuffers.get(i);
 				int remain = i == posBuffers.size()-1 ? count %BUFFERSIZE : BUFFERSIZE; //Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 				colors.position(0);
 				vertex.position(0);
-		        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-		        gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
-		        gl.glDrawArrays (GL.GL_POINTS, 0, remain);
+				gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
+				gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);      
+				gl.glDrawArrays (GL.GL_POINTS, 0, remain);
 			}
 
 			// for possibly adding data
 			vertex.position((count % BUFFERSIZE) * 2);
 			colors.position((count % BUFFERSIZE) * 4);
-			
-	        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-	        gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
-	        if (texture != null ) {
-	        	texture.disable();	
-	        }
-	        
-	        
-	        gl.glDisable(GL.GL_POINT_SPRITE_ARB);
-		
+
+			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
+			gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
+			if (texture != null ) {
+				texture.disable();	
+			}
+
+			gl.glDisable(GL.GL_POINT_SPRITE_ARB);
 		}
+		
 		public int getNearestAgent(Point2D.Double point) {
 			FloatBuffer vertex =  null;
 			
@@ -227,8 +221,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	
 	public class AgentPadangDrawer  extends AgentPointDrawer {
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
-			protected void setAgentSize(){gl.glPointSize(10);};
-			protected void setTexture(){this.texture = null;};
+			protected void setAgentSize(){gl.glPointSize(10);}
+			protected void setTexture(){this.texture = null;}
 		};
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
 			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
@@ -246,12 +240,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user !=-1) drawerEvacuees.addAgent(id, startX, startY, AgentArrayDrawer.colorizer2.getColor(user), false);
+			if (user !=-1) drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
 			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
-		
-		
-	
 	}
 
 	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
@@ -261,8 +252,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			if (user != -1) drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
 			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
-		
-
 	}
 
 	private final AgentArrayDrawer drawer = new AgentArrayDrawer();
@@ -303,11 +292,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	public int getAgentIndex(Point2D.Double point) {
 		return drawer.getNearestAgent(point);
 	}
-	
-	
-	
+
 	public Point2D.Double getAgentCoords(char [] id) {
-		Point2D.Double point = null;
 		int idNr = Arrays.hashCode(id);
 		Integer i = drawer.id2coord.get(idNr);
 		if (i != null) {
@@ -316,7 +302,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			float x = vertex.get(innerIdx*2);
 			float y = vertex.get(innerIdx*2+1);
 			return new Point2D.Double(x,y);
-		} else return null;
+		}
+		return null;
 		
 	}
 }
