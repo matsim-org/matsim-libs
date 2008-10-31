@@ -43,9 +43,8 @@ public class PTControler2 {
     			Coord coord2= new CoordImpl(683064,262261);
 	    		Route route = ptRouter2.findRoute(coord1, coord2,50700);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
-	    		ptRouter2.PrintRoute(route);
 	    		//System.out.println(route.getRoute().toString());
-	    		
+	    		ptRouter2.PrintRoute(route);
 	    		break;
 	    	case 2:
 	    		PTActivityCreator ptActivityCreator= new PTActivityCreator(ptNetworkLayer, CONFIG, ZURICHPTPLANS, ptRouter2);
