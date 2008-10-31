@@ -22,16 +22,16 @@ package org.matsim.socialnetworks.socialnet;
 
 import org.matsim.population.Person;
 
-public class SocialNetEdge {
+public class SocialNetEdge implements Comparable<SocialNetEdge>{
 
-    public Person person1, person2;
-    public int timeMade;
-    public int timeLastUsed;
-    public int timesMet=1;
+    private Person person1, person2;
+    private int timeMade;
+    private int timeLastUsed;
+    private int timesMet=1;
     double strength=1.0;
-    public String type;
+    private String type;
 
-    public SocialNetEdge(Person a1, Person a2){
+    public SocialNetEdge(Person a1, Person a2) {
 
 	person1 = a1;
 	person2 = a2;
@@ -75,4 +75,20 @@ public class SocialNetEdge {
     public int getTimesMet(){
 	return timesMet;
     }
+	public int compareTo(SocialNetEdge e) {
+		// TODO Auto-generated method stub
+		double eFrom=new Double(e.getPersonFrom().getId().toString()).doubleValue();
+		double eTo=new Double(e.getPersonTo().getId().toString()).doubleValue();
+		double thisFrom=new Double(this.getPersonFrom().getId().toString()).doubleValue();
+		double thisTo=new Double(this.getPersonTo().getId().toString()).doubleValue();
+		double mult=10000000.;
+		if((eFrom*mult+eTo) > (thisFrom*mult+thisTo)){
+			return 1;
+		}else if((eFrom*mult+eTo) < (thisFrom*mult+thisTo)){
+			return -1;
+		}else{
+		return 0;
+		}
+	}
+    
 }

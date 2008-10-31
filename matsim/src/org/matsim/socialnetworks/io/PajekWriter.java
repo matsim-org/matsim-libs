@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -79,7 +81,7 @@ public class PajekWriter {
 
 	}
 
-	public void write(ArrayList<SocialNetEdge> links, Population plans, int iter) {
+	public void write(TreeSet<SocialNetEdge> links, Population plans, int iter) {
 		BufferedWriter pjnet = null;
 
 		// from config
@@ -128,8 +130,8 @@ public class PajekWriter {
 			while (itLink.hasNext()) {
 				SocialNetEdge printLink = itLink.next();
 				int age = iter-printLink.getTimeLastUsed();
-				Person printPerson1 = printLink.person1;
-				Person printPerson2 = printLink.person2;
+				Person printPerson1 = printLink.getPersonFrom();
+				Person printPerson2 = printLink.getPersonTo();
 
 				Coord xy1 = ((Act) printPerson1.getSelectedPlan().getActsLegs().get(0)).getCoord();
 				Coord xy2 = ((Act) printPerson2.getSelectedPlan().getActsLegs().get(0)).getCoord();

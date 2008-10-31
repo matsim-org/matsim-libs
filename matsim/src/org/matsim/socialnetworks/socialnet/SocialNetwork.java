@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.groups.SocNetConfigGroup;
@@ -48,8 +50,10 @@ public class SocialNetwork {
 	private Collection<Person> persons;
 
 	// a Collection of all the Links in the network
-	public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
-
+	//public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
+	public TreeSet<SocialNetEdge> linksList = new TreeSet<SocialNetEdge>();
+	
+	
 //	public int setupIter=0;
 	// public ArrayList<SocialNetNode> nodes;
 
@@ -544,6 +548,8 @@ public class SocialNetwork {
 		// Establish the link removal policy from config parameters and call
 		// method
 		ArrayList<SocialNetEdge> linksToRemove = new ArrayList<SocialNetEdge>();
+		Object [] linkarray = this.getLinks().toArray();
+		
 		log.info("  removeLinks() algorithm \"" + linkRemovalCondition + "\"");
 
 		if(linkRemovalCondition.equals("none")) return;
@@ -605,19 +611,18 @@ public class SocialNetwork {
 			log.info("  Removing links keeping the average degree roughly constant");
 			log.info("  Number of links before removal: "+this.getLinks().size());
 			int kbar=Integer.parseInt(socnetConfig.getSocNetKbar());
-//			int numRemoved=0;
+
 			if (UNDIRECTED) {
 				int nRemove=this.getLinks().size()-(int) ((double) kbar/2.*this.persons.size());
 				log.info("  Number of links to remove: "+nRemove);
 				int i=0;
 				while(i<nRemove){
-//					for(int i=0;i<nRemove;i++){
-					int index = MatsimRandom.random.nextInt(this.getLinks().size());
-					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
-//					removeLink(edge);
 
-//					SocialNetEdge myOpposingLink=edge.getPersonTo().getKnowledge().egoNet.getEgoLink(edge.getPersonFrom());
-//					this.removeLink(myOpposingLink);
+					int index = MatsimRandom.random.nextInt(this.getLinks().size());
+//					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
+					SocialNetEdge edge = (SocialNetEdge) linkarray[index];
+//					SocialNetEdge edge = (SocialNetEdge) this.getLinks().get(index);
+
 					if ((iteration - edge.getTimeLastUsed()) >= remove_age ) {//JH changed here
 						SocialNetEdge opposite_edge=edge.getPersonTo().getKnowledge().getEgoNet().getEgoLink(edge.getPersonFrom());
 						if(!(linksToRemove.contains(opposite_edge) || linksToRemove.contains(edge))){
@@ -625,7 +630,6 @@ public class SocialNetwork {
 							i++;
 						}
 					}
-//					numRemoved++;
 				}
 			}else if(!UNDIRECTED){
 				Gbl.errorMsg(this.getClass()+" does not support DIRECTED networks yet.");
@@ -675,7 +679,8 @@ public class SocialNetwork {
 
 	}
 
-	public ArrayList<SocialNetEdge> getLinks() {
+//	public ArrayList<SocialNetEdge> getLinks() {
+		public TreeSet<SocialNetEdge> getLinks() {
 		return linksList;
 	}
 
@@ -691,7 +696,7 @@ public class SocialNetwork {
 		// Just a test
 		int ii = 0;
 		for (SocialNetEdge link : linksList) {
-			log.info(ii + " " + link.person1.getId() + " " + link.person2.getId());
+			log.info(ii + " " + link.getPersonFrom().getId() + " " + link.getPersonTo().getId());
 			ii++;
 		}
 	}

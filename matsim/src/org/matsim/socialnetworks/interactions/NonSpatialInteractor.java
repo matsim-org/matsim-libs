@@ -20,6 +20,9 @@
 
 package org.matsim.socialnetworks.interactions;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
@@ -57,14 +60,19 @@ public class NonSpatialInteractor{
 		System.out.println("  |Exchanging knowledge about "+facType+" activity");
 
 
-		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
+//		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
 		links = net.getLinks().toArray();
+		final List<Object> list = (List<Object>) Arrays.asList( links );
+		java.util.Collections.shuffle(list, MatsimRandom.random);
+		links=list.toArray();
+		
 		int numPicks = (int) (proportionOfLinksToActivate * links.length);
 
 //		Pick a random link
 		for(int i=0;i<numPicks;i++){
-			int linkno = MatsimRandom.random.nextInt(this.links.length);
-			SocialNetEdge mySocialLink = (SocialNetEdge) links[linkno];
+//			int linkno = MatsimRandom.random.nextInt(this.links.length);
+//			SocialNetEdge mySocialLink = (SocialNetEdge) links[linkno];
+			SocialNetEdge mySocialLink = (SocialNetEdge) links[i];
 
 //			Interact numInteractions times if chosen link is to be activated
 			for (int k = 0; k < numInteractionsPerLink; k++) {
@@ -95,16 +103,22 @@ public class NonSpatialInteractor{
 	 */
 	public void exchangeSocialNetKnowledge(int iteration) {
 
-		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
+//		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
 		links = net.getLinks().toArray();
+		final List<Object> list = (List<Object>) Arrays.asList( links );
+		java.util.Collections.shuffle(list, MatsimRandom.random);
+		links=list.toArray();
+		
+		
 		int numPicks = (int) (fract_intro * links.length);
 
 		for(int i=0;i<numPicks;i++){
 
 //			Get a random social link
-			int rndInt1 = MatsimRandom.random.nextInt(Integer.MAX_VALUE);
-			int linkno = rndInt1 % links.length;
-			SocialNetEdge myLink = (SocialNetEdge) links[linkno];
+//			int rndInt1 = MatsimRandom.random.nextInt(Integer.MAX_VALUE);
+//			int linkno = rndInt1 % links.length;
+//			SocialNetEdge myLink = (SocialNetEdge) links[linkno];
+			SocialNetEdge myLink = (SocialNetEdge) links[i];
 
 			for (int j = 0; j < numInteractionsPerLink; j++) {
 
