@@ -92,14 +92,14 @@
       <artifactId>jogl</artifactId>
       <version>1.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.0/jogl.jar</systemPath>
+      <systemPath>${basedir}/libs/jogl-1.1.1/jogl.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>gluegen</groupId>
       <artifactId>jogl-gluegen</artifactId>
       <version>1.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.0/gluegen-rt.jar</systemPath>
+      <systemPath>${basedir}/libs/jogl-1.1.1/gluegen-rt.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>kml</groupId>
