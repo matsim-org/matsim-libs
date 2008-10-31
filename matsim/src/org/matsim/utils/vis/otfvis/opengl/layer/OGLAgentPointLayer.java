@@ -72,7 +72,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		private final  List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
 		
 				
-		public static void setAlpha(int alp) { alpha = alp;};
+		public static void setAlpha(int alp) { alpha = alp;}
 		
 		private final Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
 		protected Texture texture;
@@ -203,12 +203,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			count++;
 			
 		}
-		
-		public void addAgent(char[] id, float startX, float startY, int state, float color) {
-//			Color mycolor = colorizer.getColor(0.1 + 0.9*color);
-			Color mycolor = colorizer2.getColor(state);
-			addAgent(id, startX, startY, mycolor, true);
-		}
 
 	}
 	
@@ -218,7 +212,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			if (user != 2) {
 				drawer.addAgent(id, startX, startY, colorizer.getColor(0.1 + 0.9*color), true);
 			} else {
-				drawer.addAgent(id, startX, startY, Color.BLUE, true);
+				drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}
 		}
 	
