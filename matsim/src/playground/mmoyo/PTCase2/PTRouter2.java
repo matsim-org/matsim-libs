@@ -139,94 +139,12 @@ public class PTRouter2 {
 				//set arrTime for the next loop:
 				legArrTime =  accumulatedTime;
 				routeTravelTime=0;
-					/*codigo original
-					if (x>0){
-						legRoute.getRoute().add(route.getLinkRoute()[x-1].getToNode()); //if Transfer or end of route we add the toNode of last Link to complete the route;
-					}
-						//Add the standard leg 
-						arrTime=depTime+travTime;
-						Leg leg = createLeg(num, legRoute, depTime, travTime, arrTime);
-						legList.add(leg);
-						
-						depTime= leg.getArrTime();
-						num++;
-		
-						//Add the transfer leg
-						if (link.getType().equals("Transfer")){
-							legRoute = new Route();
-							legRoute.getRoute().add(link.getFromNode());
-							legRoute.getRoute().add(link.getToNode());
-						
-							///////////////////////////////////////////////////////
-							//System.out.println(subRoute.getRoute().toString());
-							//System.out.println(legRoute.toString());
-							//System.out.println("\nCambio" );
-							//leg.setNum(num);
-							//System.out.println(leg.setRoute(legRoute);
-							//leg.setDepTime(depTime);
-							//leg.setTravTime(travTime);
-							//leg.setArrTime(depTime+travTime);
-							//legList.add(leg);
-							///////////////////////////////////////////////////////
-							
-							arrTime= depTime;
-							travTime= ptTravelTime.getLinkTravelTime(link, travTime);
-							depTime= depTime +  travTime;
-							
-							num++;
-						}
-						//clean variables
-						legRoute = new Route();
-						leg=null;
-						travTime=0;
-					*/
+					
 				
 			}// for x=0
 		}//if route!null
 		return actLegList;
-			/*
-			for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){
-				PTNode ptNode= (PTNode)iter.next();
-				if(ptNode.getIdPTLine()==idPTLine && iter.hasNext()){
-					//legList.get(x);
-					//System.out.print(ptNode.getId().toString() + " ");
-					legRoute.getRoute().add(ptNode);
-					if (check){
-						Link link= findLink(fromNode, ptNode);
-						if (link== null){
-							System.out.println (fromNode.getId() + " "+  ptNode.getId());	
-						}
-						travTime = travTime+ ptTravelTime.getLinkTravelTime(link, travTime); //TODO: corregir este travTime
-						//System.out.println("link:" + link.getId() + " traveltime:" + this.ptTravelTime.getLinkTravelTime(link, 8000));
-						//System.out.println(ptNode.getId() + " " + ptNode.getIdPTLine() + " " + legRoute.getRoute().size());
-					}
-				}else{
-					//System.out.println("\n" + ptNode.getIdPTLine().toString());
-					//System.out.println(subRoute.getRoute().toString());
-					//System.out.println(legRoute.toString());
-					//System.out.println("\nCambio" );
-					
-					Leg leg = new Leg(Leg.Mode.pt);
-					leg.setNum(num);
-					leg.setRoute(legRoute);
-					leg.setDepTime(depTime);
-					leg.setTravTime(travTime);
-					leg.setArrTime(depTime+travTime);
-					legList.add(leg);
-					
-					//clean variables
-					depTime= leg.getArrTime();
-					legRoute = new Route();
-					fromNode= ptNode;
-					travTime=0;
-					check=true;
-					num++;
-					//x++;
-				}
-				idPTLine= ptNode.getIdPTLine();	
-			}
-			 */
-			//System.out.println(legList.toString());
+		
 	}
 	
 		
@@ -271,3 +189,93 @@ public class PTRouter2 {
 		System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravTime());
 	}
 }
+
+
+
+
+/*
+for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){
+	PTNode ptNode= (PTNode)iter.next();
+	if(ptNode.getIdPTLine()==idPTLine && iter.hasNext()){
+		//legList.get(x);
+		//System.out.print(ptNode.getId().toString() + " ");
+		legRoute.getRoute().add(ptNode);
+		if (check){
+			Link link= findLink(fromNode, ptNode);
+			if (link== null){
+				System.out.println (fromNode.getId() + " "+  ptNode.getId());	
+			}
+			travTime = travTime+ ptTravelTime.getLinkTravelTime(link, travTime); //TODO: corregir este travTime
+			//System.out.println("link:" + link.getId() + " traveltime:" + this.ptTravelTime.getLinkTravelTime(link, 8000));
+			//System.out.println(ptNode.getId() + " " + ptNode.getIdPTLine() + " " + legRoute.getRoute().size());
+		}
+	}else{
+		//System.out.println("\n" + ptNode.getIdPTLine().toString());
+		//System.out.println(subRoute.getRoute().toString());
+		//System.out.println(legRoute.toString());
+		//System.out.println("\nCambio" );
+		
+		Leg leg = new Leg(Leg.Mode.pt);
+		leg.setNum(num);
+		leg.setRoute(legRoute);
+		leg.setDepTime(depTime);
+		leg.setTravTime(travTime);
+		leg.setArrTime(depTime+travTime);
+		legList.add(leg);
+		
+		//clean variables
+		depTime= leg.getArrTime();
+		legRoute = new Route();
+		fromNode= ptNode;
+		travTime=0;
+		check=true;
+		num++;
+		//x++;
+	}
+	idPTLine= ptNode.getIdPTLine();	
+}
+ */
+//System.out.println(legList.toString());
+
+
+/*codigo original
+if (x>0){
+	legRoute.getRoute().add(route.getLinkRoute()[x-1].getToNode()); //if Transfer or end of route we add the toNode of last Link to complete the route;
+}
+	//Add the standard leg 
+	arrTime=depTime+travTime;
+	Leg leg = createLeg(num, legRoute, depTime, travTime, arrTime);
+	legList.add(leg);
+	
+	depTime= leg.getArrTime();
+	num++;
+
+	//Add the transfer leg
+	if (link.getType().equals("Transfer")){
+		legRoute = new Route();
+		legRoute.getRoute().add(link.getFromNode());
+		legRoute.getRoute().add(link.getToNode());
+	
+		///////////////////////////////////////////////////////
+		//System.out.println(subRoute.getRoute().toString());
+		//System.out.println(legRoute.toString());
+		//System.out.println("\nCambio" );
+		//leg.setNum(num);
+		//System.out.println(leg.setRoute(legRoute);
+		//leg.setDepTime(depTime);
+		//leg.setTravTime(travTime);
+		//leg.setArrTime(depTime+travTime);
+		//legList.add(leg);
+		///////////////////////////////////////////////////////
+		
+		arrTime= depTime;
+		travTime= ptTravelTime.getLinkTravelTime(link, travTime);
+		depTime= depTime +  travTime;
+		
+		num++;
+	}
+	//clean variables
+	legRoute = new Route();
+	leg=null;
+	travTime=0;
+*/
