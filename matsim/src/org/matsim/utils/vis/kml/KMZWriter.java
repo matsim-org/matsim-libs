@@ -87,7 +87,6 @@ public class KMZWriter {
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KmlType docKML = kmlObjectFactory.createKmlType();
 		NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
-		nl.setName("mainLink");
 
 		LinkType link = kmlObjectFactory.createLinkType();
 		link.setHref("main.kml");
