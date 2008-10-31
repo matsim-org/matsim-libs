@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
@@ -34,7 +33,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Plan;
 import org.matsim.utils.collections.QuadTree.Rect;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.otfvis.data.OTFDefaultNetWriterFactoryImpl;
@@ -48,14 +46,18 @@ import org.matsim.world.World;
 public class OTFTVehServer implements OTFServerRemote {
 	private  String vehFileName = "";
 	private static final int BUFFERSIZE = 100000000;
-	BufferedReader reader = null;
+	private BufferedReader reader = null;
 	private double nextTime = -1;
 	private List<Double> times = null;
-	TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
+	private TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	public OTFServerQuad quad;
+	private OTFServerQuad quad;
 
+	private ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
+	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
+	private double time;
+	
 	public OTFTVehServer(String netFileName, String vehFileName) {
 		this.vehFileName = vehFileName;
 
@@ -74,58 +76,49 @@ public class OTFTVehServer implements OTFServerRemote {
 		this.quad.addAdditionalElement(this.writer);
 
 //		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
-		this.times =null;
+//		this.times =null;
 
 		open();
 		readOneStep();
 	}
 
-	private List<Double>  buildTimesList() {
-		Gbl.startMeasurement();
-		System.out.println("Scanning timesteps:");
-
-		// Get time Structure
-		List<Double> times = new ArrayList<Double>();
-		open();
-		String line = null;
-		boolean lineFound = false;
-		String lasttime = "-1";
-
-		try {
-			line = this.reader.readLine();
-			while ( !lineFound && (line != null)) {
-				line = line.substring(line.indexOf('\t')+1);
-				String tt = line.substring(0, line.indexOf('\t'));
-				if(!tt.equals(lasttime)) {
-					times.add(Double.valueOf(tt));
-					lasttime = tt;
-					System.out.print(tt);
-					System.out.print(", ");
-				}
-				line = this.reader.readLine();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println();
-		System.out.println("Nr of timesteps: " + times.size());
-		try {
-			reader.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Gbl.printElapsedTime();
-		return times;
-	}
-
-	ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-	//private final int cntPositions=0;
-	//private final double lastTime=-1;
-	//private final int cntTimesteps=0;
-	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
-	private double time;
+//	private List<Double>  buildTimesList() {
+//		Gbl.startMeasurement();
+//		System.out.println("Scanning timesteps:");
+//
+//		// Get time Structure
+//		List<Double> times = new ArrayList<Double>();
+//		open();
+//		String line = null;
+//		boolean lineFound = false;
+//		String lasttime = "-1";
+//
+//		try {
+//			line = this.reader.readLine();
+//			while ( !lineFound && (line != null)) {
+//				line = line.substring(line.indexOf('\t')+1);
+//				String tt = line.substring(0, line.indexOf('\t'));
+//				if(!tt.equals(lasttime)) {
+//					times.add(Double.valueOf(tt));
+//					lasttime = tt;
+//					System.out.print(tt);
+//					System.out.print(", ");
+//				}
+//				line = this.reader.readLine();
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println();
+//		System.out.println("Nr of timesteps: " + times.size());
+//		try {
+//			reader.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		Gbl.printElapsedTime();
+//		return times;
+//	}
 
 	public boolean readOneLine(){
 		String line = null;
@@ -134,7 +127,6 @@ public class OTFTVehServer implements OTFServerRemote {
 		try {
 			line = this.reader.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -160,7 +152,6 @@ public class OTFTVehServer implements OTFServerRemote {
 			try {
 				line = this.reader.readLine();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -175,7 +166,7 @@ public class OTFTVehServer implements OTFServerRemote {
 		while ((this.time <= this.newTime) && !this.finishedReading)readOneStep();
 	}
 
-	synchronized public void readOneStep() {
+	synchronized private void readOneStep() {
 		if ( this.finishedReading) return;
 
 		double actTime = this.time;
@@ -204,17 +195,16 @@ public class OTFTVehServer implements OTFServerRemote {
 			System.arraycopy(this.buf.array(), 0, buffer, 0, buffer.length);
 			this.nextTime = actTime;
 			this.timesteps.put((int)this.nextTime, buffer);
-			//this.actBuffer = buffer;
 			//System.out.println("Read timestep: " + actTime);
 		}
 
 	}
 
-	public void step() throws RemoteException {
-		requestNewTime((int)(this.nextTime+1), TimePreference.LATER);
-	}
+//	private void step() throws RemoteException {
+//		requestNewTime((int)(this.nextTime+1), TimePreference.LATER);
+//	}
 
-	public void open() {
+	private void open() {
 		Gbl.startMeasurement();
 		try {
 			this.reader = IOUtils.getBufferedReader(this.vehFileName);
@@ -225,15 +215,15 @@ public class OTFTVehServer implements OTFServerRemote {
 		}
 	}
 
-	private void finish() {
-	try {
-		this.reader.close();
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-	Gbl.printElapsedTime();
-	}
-
+//	private void finish() {
+//	try {
+//		this.reader.close();
+//	} catch (IOException e) {
+//		e.printStackTrace();
+//	}
+//	Gbl.printElapsedTime();
+//	}
+//
 
 	public int getLocalTime() throws RemoteException {
 		return (int)this.nextTime;
@@ -272,27 +262,26 @@ public class OTFTVehServer implements OTFServerRemote {
 		return false;
 	}
 
-	public static void main(String[] args) {
-
-		String netFileName = "../studies/schweiz/2network/ch.xml";
-		String vehFileName = "../runs/run168/run168.it210.T.veh";
-//		String netFileName = "../../tmp/studies/ivtch/network.xml";
-//		String vehFileName = "../../tmp/studies/ivtch/T.veh";
-
-		OTFTVehServer test  = new OTFTVehServer(netFileName, vehFileName);
-		try {
-			double time = test.getLocalTime();
-			test.step();
-			while (time != test.getLocalTime()) {
-				time = test.getLocalTime();
-				test.step();
-			}
-			test.finish();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//
+//		String netFileName = "../studies/schweiz/2network/ch.xml";
+//		String vehFileName = "../runs/run168/run168.it210.T.veh";
+////		String netFileName = "../../tmp/studies/ivtch/network.xml";
+////		String vehFileName = "../../tmp/studies/ivtch/T.veh";
+//
+//		OTFTVehServer test  = new OTFTVehServer(netFileName, vehFileName);
+//		try {
+//			double time = test.getLocalTime();
+//			test.step();
+//			while (time != test.getLocalTime()) {
+//				time = test.getLocalTime();
+//				test.step();
+//			}
+//			test.finish();
+//		} catch (RemoteException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException {
 		int lastTime = -1;
@@ -325,7 +314,6 @@ public class OTFTVehServer implements OTFServerRemote {
 		if (foundTime == -1) return false;
 
 		this.nextTime = foundTime;
-		//this.actBuffer = null;
 		return true;
 	}
 
@@ -334,5 +322,3 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 }
-
-
