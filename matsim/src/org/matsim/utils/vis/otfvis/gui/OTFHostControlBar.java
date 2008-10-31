@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.otfvis.gui;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -70,7 +69,7 @@ import org.matsim.utils.vis.otfvis.server.OTFTVehServer;
 
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener {
 
-	private static final String CONNECT = "connect";
+//	private static final String CONNECT = "connect";
 	private static final String TO_START = "to_start";
 	private static final String PAUSE = "pause";
 	private static final String PLAY = "play";
@@ -79,7 +78,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private static final String STOP = "stop";
 	private static final String SET_TIME = "set_time";
 	private static final String TOGGLE_SYNCH = "Synch";
-	private static final String TOGGLE_LINK_LABELS = "Link Labels";
 	private static final String STEP_BB = "step_bb";
 	private static final String STEP_B = "step_b";
 	private static final String FULLSCREEN = "fullscreen";
@@ -225,12 +223,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return clientQ;
 	}
 
-	public class PreloadHelper extends Thread {
-//		private final Map<String, OTFDrawer> drawers;
-
-		public PreloadHelper(Map<String, OTFDrawer> handlers) {
-//			this.drawers = handlers;
-		}
+	/*package*/ class PreloadHelper extends Thread {
 
 		public void preloadCache() {
 			boolean hasNext = true;
@@ -255,7 +248,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				}
 				if (timeLine != null) timeLine.setCachedTime(-1);
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -397,7 +389,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
  	 	  movieTimer.start();
  			movieTimer.setActive(true);
  			playButton.setIcon(pauseIcon);
-// 			playButton.setSelected(true);
  	  } else {
  	   	pressed_PAUSE();
  	  }
@@ -473,7 +464,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			simTime = host.getLocalTime();
 			updateTimeLabel();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -496,11 +486,12 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		public void run() {gotoTime();}}.start();
 	}
 
-	@Override
-	public void paint(Graphics g) {
-		//    updateTimeLabel();
-		super.paint(g);
-	}
+// deactivated the method below as it just calls the super-method. Marcel, 31oct2008
+//	@Override
+//	public void paint(Graphics g) {
+//		updateTimeLabel();
+//		super.paint(g);
+//	}
 
 	protected boolean onAction(String command) {
 		return false; // return id command was handeled
@@ -515,11 +506,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				else if (PAUSE.equals(command))
 					pressed_PAUSE();
 				else if (PLAY.equals(command))
-					pressed_PLAY();
+						pressed_PLAY();
 				else if (STEP_F.equals(command))
 					pressed_STEP_F();
 				else if (STEP_FF.equals(command))
-					pressed_STEP_FF();
+						pressed_STEP_FF();
 				else if (STEP_B.equals(command))
 					pressed_STEP_B();
 				else if (STEP_BB.equals(command))
@@ -528,13 +519,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					pressed_STOP();
 				else if (FULLSCREEN.equals(command)) {
 					pressed_FULLSCREEN();
-				}
-				else if (command.equals(SET_TIME))
+				} else if (command.equals(SET_TIME))
 					changed_SET_TIME(event);
 			} catch (IOException e) {
 				System.err.println("ControlToolbar encountered problem: " + e);
 			}
-
 		}
 		updateTimeLabel();
 
@@ -562,26 +551,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			add(SynchBox);
 		}
 
-//		JCheckBox linkLabelBox = new JCheckBox(TOGGLE_LINK_LABELS);
-//		linkLabelBox.setMnemonic(KeyEvent.VK_L);
-//		linkLabelBox.setSelected(true);
-//		linkLabelBox.addItemListener(this);
-//		add(linkLabelBox);
 	}
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {
 			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED;
 			if (movieTimer != null) movieTimer.updateSyncPlay();
-//		} else if (source.getText().equals(TOGGLE_LINK_LABELS)) {
-//			if (e.getStateChange() == ItemEvent.DESELECTED) {
-//				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "false");
-//			} else {
-//				//visConfig.set(VisConfig.SHOW_LINK_LABELS, "true");
-//			}
 		}
 		repaint();
-		//networkScrollPane.repaint();
 	}
 
 	public void stateChanged(ChangeEvent e) {
@@ -594,10 +571,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 	public Collection<Double> getTimeSteps() {
 		try {
-			Collection<Double> ret = this.host.getTimeSteps();
-			return ret;
+			return this.host.getTimeSteps();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -607,7 +582,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		try {
 			return host.getLocalTime();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return -1;
@@ -670,8 +644,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				try {
 					sleep(DELAYSIM);
 					synchronized(blockReading) {
-						if (isActive && synchronizedPlay) {
-							if(simTime >= loopEnd || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))
+						if (isActive && synchronizedPlay &&
+							(simTime >= loopEnd || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
 								host.requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
 						}
 
@@ -687,7 +661,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				} catch (RemoteException e) {
 					stopMovie();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -701,8 +674,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		return liveHost;
 	}
 
-	// consolidate this with the OTFQuadClient Query method , there shoul only be ONE way to send queies,
-	// apparently quereies are not dependen on a certain view right now, so it should be hot.doQuery
+	// consolidate this with the OTFQuadClient Query method , there should only be ONE way to send queries,
+	// apparently queries are not dependent on a certain view right now, so it should be host.doQuery
 
 	public OTFQuery doQuery(OTFQuery query) {
 		OTFQuery result = null;
@@ -711,7 +684,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				result = ((OTFLiveServerRemote)host).answerQuery(query);
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;
@@ -719,7 +691,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	public void finishedInitialisition() {
 		if(!isLiveHost()) {
-			new PreloadHelper (handlers).start();
+			new PreloadHelper().start();
 		}
 	}
 
