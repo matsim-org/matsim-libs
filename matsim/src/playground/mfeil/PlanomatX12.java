@@ -122,8 +122,9 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		boolean warningTabu;
 		double [] xs;
 		double [] ys 									= new double [MAX_ITERATIONS];
-		
-		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();		
+		// NEW NEW NEW NEW NEW NEW 
+		ArrayList<Activity> primActs					= plan.getPerson().getKnowledge().getActivities(true);
+		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();	
 		
 		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
@@ -166,7 +167,7 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 			//streamOverview.print("Iteration "+currentIteration+"\t");
 			
 			// Define the neighbourhood
-			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, actTypes);	
+			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, actTypes, primActs);	
 			
 			// Check whether differing plans are tabu
 			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, notNewInNeighbourhood, tabuInNeighbourhood);
@@ -313,7 +314,8 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 	// Neighbourhood definition 
 	//////////////////////////////////////////////////////////////////////
 	
-	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[] notNewInNeighbourhood, ArrayList<Activity> actTypes) {
+	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[] notNewInNeighbourhood, 
+			ArrayList<Activity> actTypes, ArrayList<Activity> primActs) {
 		int neighbourPos;
 		int [] changePositions = {2,4};
 		for (neighbourPos = 0; neighbourPos<(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos++){
@@ -322,16 +324,16 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
 		int[] actsToBeAdded = new int [(int)(neighbourhood[0].getActsLegs().size()/2)+1];
 		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes);
+			notNewInNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes, primActs);
 		}
-		int [] typePosition = {0,1};
-		typePosition[0]=(int)(MatsimRandom.random.nextDouble()*((int)(neighbourhood[0].getActsLegs().size()/2)-1))+1;
+		int [] typePosition = {(int)(MatsimRandom.random.nextDouble()*((int)(neighbourhood[0].getActsLegs().size()/2)-1))+1,1};
+		
 		int [] actsToBeChanged = new int [actsToBeAdded.length];
 		for (int i = 0; i<actsToBeChanged.length;i++){
 			actsToBeChanged[i] = (int)(MatsimRandom.random.nextDouble()* actTypes.size());
 		}
 		for (neighbourPos = (int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes);
+			notNewInNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes, primActs);
 		}
 	}
 			
@@ -369,38 +371,54 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}
 	
-	public int changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, ArrayList<Activity> actTypes){
+	public int changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
+			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
 				
 		if(MatsimRandom.random.nextDouble()>=weight){
 			
+			// NEW NEW NEW NEW NEW NEW NEW NEW NE
 			// removing an activity, "cycling"
-			
-			if (positions[3]<(int)(basePlan.getActsLegs().size()/2)){
-						
-				if (basePlan.getActsLegs().size()==5){
+			if (basePlan.getActsLegs().size()==5){
+				if (this.checkPrimary((Act)basePlan.getActsLegs().get(2), primActs)) return 1;
+				else {
 					this.removeAct(1, basePlan);
 					positions[3]++;
 					return 0;
 				}
-				else if (basePlan.getActsLegs().size()>5){
-					if(positions[1]==0){
-						positions[1] = (int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getActsLegs().size()/2)-1))+1;
-						this.removeAct(positions[1], basePlan);
-						
-					}
-					else if(positions[1]<=(int)(basePlan.getActsLegs().size()/2)-1){
-						this.removeAct(positions[1], basePlan);
-						
+			}
+			if(positions[1]==0){
+				positions[1] = (int)(MatsimRandom.random.nextDouble()*((int)(basePlan.getActsLegs().size()/2)-1))+1;
+			}
+			
+			if (basePlan.getActsLegs().size()>5){
+			
+				OuterLoop:
+				while (positions[3]<(int)(basePlan.getActsLegs().size()/2)){
+					
+					if (positions[1]<=(int)(basePlan.getActsLegs().size()/2)-1){
+						if (this.checkPrimary((Act)basePlan.getActsLegs().get(positions[1]*2), primActs)	&&
+								!(this.checkForSamePrimary(basePlan, positions[1]))) {
+							positions[1]++;
+							positions[3]++;
+							continue OuterLoop;
+						}
+						else this.removeAct(positions[1], basePlan);
 					}
 					else {
 						positions[1] = 1;
-						this.removeAct(positions[1], basePlan);
+						if (this.checkPrimary((Act)basePlan.getActsLegs().get(positions[1]*2), primActs)	&&
+								!(this.checkForSamePrimary(basePlan, positions[1]))) {
+							positions[1]++;
+							positions[3]++;
+							continue OuterLoop;
+						}
+						else this.removeAct(positions[1], basePlan);
 					}
 					positions[1]++;
 					positions[3]++;
 					return 0;
 				}
-				else return 1;
+				return 1;
 			}
 			else return 1;
 		}
@@ -435,12 +453,20 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}
 	
-	public int changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, ArrayList<Activity> actTypes){
+	public int changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
+			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
 		
-		if (position[1]<=(actTypes.size()-1)*(((int)(basePlan.getActsLegs().size()/2))-1)){
+		// NEW NEW NEW NEW NEW NEW NEW NEW NE
+		OuterLoop:
+		while (position[1]<=(actTypes.size()-1)*(((int)(basePlan.getActsLegs().size()/2))-1)){
 			if (position[0]>basePlan.getActsLegs().size()/2-1)position[0] = 1;		
 			
 			Act act = (Act) basePlan.getActsLegs().get(position[0]*2);
+			if (this.checkPrimary(act, primActs)	&&	!(this.checkForSamePrimary(basePlan, position[0]))){
+				position[0]++;
+				position[1]++;
+				continue OuterLoop;
+			}
 			String type;
 					
 			do {
@@ -690,5 +716,37 @@ public class PlanomatX12 implements org.matsim.population.algorithms.PlanAlgorit
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
 	}
+	
+	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
+	// Checks whether an act is primary
+	public boolean checkPrimary (Act act, ArrayList<Activity> primActs){
+		
+		for (int i = 0; i<primActs.size();i++){
+			if (act.getFacilityId().equals(primActs.get(i).getFacility().getId())	&&	act.getType().equals((primActs.get(i)).getType())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// Checks whether a primary act is several times in the plan so that it can be dropped as requested
+	public boolean checkForSamePrimary (PlanomatXPlan plan, int position){
+		
+		for (int i = 0; i<position*2;i+=2){
+			if (((Act)(plan.getActsLegs().get(position*2))).getFacilityId().equals(((Act)(plan.getActsLegs().get(i))).getFacilityId())	&&
+					((Act)(plan.getActsLegs().get(position*2))).getType().equals(((Act)(plan.getActsLegs().get(i))).getType())){
+				return true;
+			}
+		}
+		for (int i = position*2+2; i<plan.getActsLegs().size()-2;i+=2){
+			if (((Act)(plan.getActsLegs().get(position*2))).getFacilityId().equals(((Act)(plan.getActsLegs().get(i))).getFacilityId())	&&
+					((Act)(plan.getActsLegs().get(position*2))).getType().equals(((Act)(plan.getActsLegs().get(i))).getType())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 }
 	
