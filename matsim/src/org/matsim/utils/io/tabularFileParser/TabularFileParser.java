@@ -28,23 +28,10 @@ import java.io.IOException;
  * Parser for plain text files that are structured in columns.
  *
  * @author gunnar
- *
  */
 public class TabularFileParser {
 
-    // -------------------- INSTANCE VARIABLES --------------------
-
-    private TabularFileParserConfig config;
-
-    // -------------------- CONSTRUCTION --------------------
-
-    /**
-     * Empty default constructor.
-     */
-    public TabularFileParser() {
-    }
-
-    // -------------------- PARSING --------------------
+    private TabularFileParserConfig config = null;
 
     private boolean isStart(String line) {
         final String regex = this.config.getStartRegex();
@@ -104,18 +91,24 @@ public class TabularFileParser {
 
         boolean started = (config.getStartRegex() == null);
         boolean ended = false;
-
-        BufferedReader reader = new BufferedReader(new FileReader(config
-                .getFile()));
-        String line;
-        while ((line = reader.readLine()) != null && !ended)
-            if (started) {
-                ended = isEnd(line);
-                if (!ended && !isComment(line))
-                    handler.startRow(split(line));
-            } else
-                started = isStart(line);
-        reader.close();
+        
+        BufferedReader reader = new BufferedReader(new FileReader(config.getFile()));
+        try {
+        	String line;
+	        while ((line = reader.readLine()) != null && !ended) {
+	            if (started) {
+	                ended = isEnd(line);
+	                if (!ended && !isComment(line)) {
+	                    handler.startRow(split(line));
+	                }
+	            } else {
+	                started = isStart(line);
+	            }
+	        }
+	      // no catch-block, the exception is passed upwards, but still try to close the reader
+        } finally {
+        	reader.close();
+        }
     }
 
 }
