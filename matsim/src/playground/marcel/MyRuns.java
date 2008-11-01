@@ -135,7 +135,7 @@ import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 import org.matsim.visum.VisumAnbindungstabelleWriter;
 import org.matsim.visum.VisumMatrixReader;
 import org.matsim.visum.VisumMatrixWriter;

@@ -53,7 +53,7 @@ import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Counter;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 
 public class NetworkDistance {
 

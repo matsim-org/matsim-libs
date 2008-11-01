@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.matsimkml;
+package org.matsim.utils.vis.kml;
 
 import java.io.IOException;
 
@@ -30,7 +30,6 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.vis.kml.KMZWriter;
 
 /**
  * @author dgrether

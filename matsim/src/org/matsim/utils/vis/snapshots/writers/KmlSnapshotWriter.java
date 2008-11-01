@@ -45,8 +45,8 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
-import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 

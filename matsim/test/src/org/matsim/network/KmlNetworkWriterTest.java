@@ -35,7 +35,7 @@ import org.matsim.gbl.MatsimResource;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
+import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
 
 /**
  * @author mrieser

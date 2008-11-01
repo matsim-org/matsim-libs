@@ -36,8 +36,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
-import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
+import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.utils.vis.kml.NetworkFeatureFactory;
 
 
 /**

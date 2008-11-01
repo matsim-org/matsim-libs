@@ -36,7 +36,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 
 /**
  * @author dgrether

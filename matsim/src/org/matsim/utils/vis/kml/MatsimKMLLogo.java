@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.matsimkml;
+package org.matsim.utils.vis.kml;
 
 import java.io.IOException;
 
@@ -29,18 +29,17 @@ import net.opengis.kml._2.UnitsEnumType;
 import net.opengis.kml._2.Vec2Type;
 
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.vis.kml.KMZWriter;
-
 
 /**
  * A ScreenOverlay representing the MATSim logo
+ * 
  * @author dgrether
- *
  */
 public class MatsimKMLLogo {
 	/**
 	 * Writes the logo file to the kmz and creates the ScreenOverlay with the logo
 	 * @param writer
+	 * @return ScreenOverlay containing the MATSim logo to be added to the KMZ file
 	 * @throws IOException if the file with the logo could not be read and written
 	 */
 	public static ScreenOverlayType writeMatsimKMLLogo(final KMZWriter writer) throws IOException {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.vis.matsimkml;
+package org.matsim.utils.vis.kml;
 
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.FolderType;

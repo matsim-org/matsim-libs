@@ -41,7 +41,7 @@ import org.matsim.population.filters.SelectedPlanFilter;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.ScenarioLoader;
 import playground.dgrether.matsimkml.KmlPlansWriter;

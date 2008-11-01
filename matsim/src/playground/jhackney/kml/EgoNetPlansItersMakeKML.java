@@ -67,7 +67,7 @@ import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 
 import playground.jhackney.algorithms.PersonCalcEgoSpace;
 

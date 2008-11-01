@@ -32,8 +32,8 @@ import net.opengis.kml._2.StyleType;
 import org.apache.log4j.Logger;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKmlStyleFactory;
-import org.matsim.utils.vis.matsimkml.NetworkFeatureFactory;
+import org.matsim.utils.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.utils.vis.kml.NetworkFeatureFactory;
 
 /**
  * @author dgrether

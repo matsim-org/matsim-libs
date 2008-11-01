@@ -54,7 +54,7 @@ import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.vis.kml.KMZWriter;
-import org.matsim.utils.vis.matsimkml.MatsimKMLLogo;
+import org.matsim.utils.vis.kml.MatsimKMLLogo;
 
 import playground.dgrether.analysis.gis.ShapeFileNetworkWriter;
 import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
