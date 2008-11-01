@@ -219,14 +219,12 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		/**
 		 * Compares two NodePairs
 		 * @param other
-		 * @return true if the Nodes in other are the same as in this and appear in the same order
+		 * @return <code>true</code> if the Nodes in other are the same as in this and appear in the same order
 		 */
 		public boolean equals(Object other) {
 			if (other instanceof NodePair) {
-				if (getFirst().equals(((NodePair)other).getFirst())
-						&& getSecond().equals(((NodePair)other).getSecond())) {
-					return true;
-				}
+				NodePair o = (NodePair) other;
+				return (getFirst().equals(o.getFirst())) && (getSecond().equals(o.getSecond()));
 			}
 			return false;
 		}
@@ -256,7 +254,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			if (s == null) {
 				s = 1;
 			} else {
-				s++;
+				s = s + 1;
 			}
 
 			this.startTimeOccurrenceCnt.put(time, s);
@@ -280,28 +278,29 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	public Rectangle2D.Double getTravelZone() {
 		return this.travelZone;
 	}
-}
+	
+	/**
+	 * @author lnicolas
+	 * Compares two NodePairs.
+	 */
+	static class NodePairComparator implements Comparator<NodePair>, Serializable {
 
-/**
- * @author lnicolas
- * Compares two NodePairs.
- */
-class NodePairComparator implements Comparator<FromToSummary.NodePair>, Serializable {
+		private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
+		public int compare(NodePair n1, NodePair n2) {
+			Node n1First = n1.getFirst();
+			Node n1Second = n1.getSecond();
+			Node n2First = n2.getFirst();
+			Node n2Second = n2.getSecond();
 
-	public int compare(FromToSummary.NodePair n1, FromToSummary.NodePair n2) {
-		Node n1First = n1.getFirst();
-		Node n1Second = n1.getSecond();
-		Node n2First = n2.getFirst();
-		Node n2Second = n2.getSecond();
-
-		if (n1First.equals(n2First) && n1Second.equals(n2Second)) {
-			return 0;
-		} else if (n1First.equals(n2First)) {
-			return n1Second.compareTo(n2Second);
-		} else {
-			return n1First.compareTo(n2First);
+			if (n1First.equals(n2First) && n1Second.equals(n2Second)) {
+				return 0;
+			} else if (n1First.equals(n2First)) {
+				return n1Second.compareTo(n2Second);
+			} else {
+				return n1First.compareTo(n2First);
+			}
 		}
 	}
+
 }
