@@ -291,7 +291,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private class TestControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
+	private static class TestControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 		private final LinkAnalyzer la = new LinkAnalyzer("15");
 		private BottleneckTravelTimeAnalyzer ttAnalyzer = null;
