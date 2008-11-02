@@ -36,7 +36,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.utils.geometry.CoordImpl;
 
-
 /**
  * Tests for {@link PathSizeLogitSelector}.
  *
@@ -45,16 +44,13 @@ import org.matsim.utils.geometry.CoordImpl;
 public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
-	private Config config = null;
-	private NetworkLayer network;
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
-		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
-		this.config.charyparNagelScoring().setPathSizeLogitBeta(2.0);
-		this.network = createNetwork();
+		Config config = loadConfig(null); // required for planCalcScore.beta to be defined
+		config.charyparNagelScoring().setBrainExpBeta(2.0);
+		config.charyparNagelScoring().setPathSizeLogitBeta(2.0);
 	}
 
 	@Override
@@ -62,33 +58,30 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		return new PathSizeLogitSelector();
 	}
 
-	
-	
-	
 	@Override
 	public void testNegativeScore() {
+		NetworkLayer network = createNetwork();
 		PlanSelector selector = getPlanSelector();
-		
-		Link l6 = this.network.getLink("6");
-		Link l7 = this.network.getLink("7");
-		
-		Node n1 = this.network.getNode("1");
-		Node n2 = this.network.getNode("2");
-		Node n3 = this.network.getNode("3");
-		Node n4 = this.network.getNode("4");
-		
-		
+
+		Link l6 = network.getLink("6");
+		Link l7 = network.getLink("7");
+
+		Node n1 = network.getNode("1");
+		Node n2 = network.getNode("2");
+		Node n3 = network.getNode("3");
+		Node n4 = network.getNode("4");
+
 		// test with only one plan...
 		Person person = new Person(new IdImpl(1));
 		Plan p1 = new Plan(person);
-		Act a = new Act("h",0,10,l6,0,0,0,false);
-		Act b = new Act("w",0,0,l7,0,0,0,false);
+		Act a = new Act("h", l6);
+		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
 		leg.setTravTime(10.0);
 		leg.setArrTime(10.0);
-		
+
 		Route r = new Route();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
@@ -100,12 +93,12 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.addAct(b);
 		p1.setScore(-10);
 		person.addPlan(p1);
-		
+
 		assertNotNull(selector.selectPlan(person));
-		
+
 		// ... test with multiple plans that all have negative score
-		a = new Act("h",0,10,l6,0,0,0,false);
-		b = new Act("w",0,0,l7,0,0,0,false);
+		a = new Act("h", l6);
+		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -124,9 +117,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.addAct(b);
 		p2.setScore(-10);
 		person.addPlan(p2);
-		
-		a = new Act("h",0,10,l6,0,0,0,false);
-		b = new Act("w",0,0,l7,0,0,0,false);
+
+		a = new Act("h", l6);
+		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -155,8 +148,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		// test with only one plan, but with NEGATIVE_INFINITY...
 		person = new Person(new IdImpl(1));
 		p1 = new Plan(person);
-		a = new Act("h",0,10,l6,0,0,0,false);
-		b = new Act("w",0,0,l7,0,0,0,false);
+		a = new Act("h", l6);
+		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -179,19 +172,18 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	public void testZeroScore() {
+		NetworkLayer network = createNetwork();
 		PlanSelector selector = getPlanSelector();
-		Link l6 = this.network.getLink("6");
-		Link l7 = this.network.getLink("7");
+		Link l6 = network.getLink("6");
+		Link l7 = network.getLink("7");
 		
-		Node n1 = this.network.getNode("1");
-		Node n3 = this.network.getNode("3");
-
-		
+		Node n1 = network.getNode("1");
+		Node n3 = network.getNode("3");
 		
 		Person person = new Person(new IdImpl(1));
 		Plan p1 = new Plan(person);
-		Act a = new Act("h",0,10,l6,0,0,0,false);
-		Act b = new Act("w",0,0,l7,0,0,0,false);
+		Act a = new Act("h", l6);
+		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -214,20 +206,20 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	public void testPathSizeLogitSelector() {
+		NetworkLayer network = createNetwork();
+
+		Link l6 = network.getLink("6");
+		Link l7 = network.getLink("7");
 		
-		Link l6 = this.network.getLink("6");
-		Link l7 = this.network.getLink("7");
-		
-		Node n1 = this.network.getNode("1");
-		Node n2 = this.network.getNode("2");
-		Node n3 = this.network.getNode("3");
-		Node n4 = this.network.getNode("4");
-		
-		
+		Node n1 = network.getNode("1");
+		Node n2 = network.getNode("2");
+		Node n3 = network.getNode("3");
+		Node n4 = network.getNode("4");
+
 		Person person = new Person(new IdImpl(1));
 		Plan p1 = new Plan(person);
-		Act a = new Act("h",0,10,l6,0,0,0,false);
-		Act b = new Act("w",0,0,l7,0,0,0,false);
+		Act a = new Act("h", l6);
+		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -244,9 +236,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p1.addAct(b);
 		p1.setScore(-10);
 		person.addPlan(p1);
-		
-		a = new Act("h",0,10,l6,0,0,0,false);
-		b = new Act("w",0,0,l7,0,0,0,false);
+	
+		a = new Act("h", l6);
+		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -266,8 +258,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p2.setScore(-10);
 		person.addPlan(p2);
 		
-		a = new Act("h",0,10,l6,0,0,0,false);
-		b = new Act("w",0,0,l7,0,0,0,false);
+		a = new Act("h", l6);
+		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
 		leg.setDepTime(0.0);
@@ -287,9 +279,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.addAct(b);
 		p3.setScore(-10);
 		person.addPlan(p3);
-		
-		
-		
+
 		PathSizeLogitSelector selector = new PathSizeLogitSelector();
 		int cnt1 = 0;
 		int cnt2 = 0;
@@ -305,15 +295,12 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		log.info("Plan 1 was returned " + cnt1 + " times.");
 		log.info("Plan 2 was returned " + cnt2 + " times.");
 		log.info("Plan 3 was returned " + cnt3 + " times.");
-		
+
 		assertEquals(5732, cnt1);
 		assertEquals(2136, cnt2);
 		assertEquals(2132, cnt3);
-			
 	}
 
-
-	
 	private NetworkLayer createNetwork() {
 		//we use a simple "red bus / blue bus paradox" network
 		// Sketch of the network
@@ -356,6 +343,5 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 		return network;
 	}
-
 
 }
