@@ -20,9 +20,6 @@
 
 package org.matsim.replanning.selectors;
 
-import org.apache.log4j.Logger;
-import org.matsim.config.Config;
-
 /**
  * Tests for {@link ExpBetaPlanSelector}.
  *
@@ -30,13 +27,10 @@ import org.matsim.config.Config;
  */
 public class ExpBetaPlanChangerTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
-	private Config config = null;
-
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.config = loadConfig(null); // required for planCalcScore.beta to be defined
+		loadConfig(null); // required for planCalcScore.beta to be defined
 	}
 
 	@Override
