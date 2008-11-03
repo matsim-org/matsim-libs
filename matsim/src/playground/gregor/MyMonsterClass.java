@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -66,7 +65,6 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.Location;
 import org.matsim.world.World;
 import org.matsim.writer.MatsimWriter;
 
@@ -319,7 +317,10 @@ public class MyMonsterClass {
 			}
 
 
-			BasicAct nact = new Act("w",((Location)act.getLink()).getCenter().getX(),((Location)act.getLink()).getCenter().getY(),(Link)(act.getLink()),0,39600,39600,true);
+			Act nact = new Act("w", act.getLink().getCenter(), act.getLink());
+			nact.setStartTime(0);
+			nact.setEndTime(39600);
+			nact.setDur(39600);
 			Plan plan = new Plan(nperson);
 			plan.addAct(nact);
 			nperson.addPlan(plan);

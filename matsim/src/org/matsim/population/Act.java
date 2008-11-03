@@ -61,18 +61,6 @@ public class Act extends BasicActImpl {
 		this.setCoord(coord);
 	}
 
-	@Deprecated
-	public Act(final String type, final double x, final double y, final Link link,
-			final double startTime, final double endTime, final double dur, final boolean isPrimary) {
-  	super(type);
-  	this.setCoord(new CoordImpl(x, y));
-		this.link = link;
-		this.setLinkId(link.getId());
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.dur = dur;
-	}
-
 	public Act(final Act act) {
 		super(act.getType());
 		// Act coord could be null according to first c'tor!

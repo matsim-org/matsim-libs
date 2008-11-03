@@ -166,7 +166,8 @@ public class PrimaryLocationDrawing {
 			for (int i = 0; i < li ; i++) {
 				final Person pers = new Person(new IdImpl(this.id++));
 				final Plan plan = new Plan(pers);
-				final Act act = new Act("h",link.getCenter().getX(),link.getCenter().getY(),link,Time.MIDNIGHT,6*3600,Time.UNDEFINED_TIME,false);
+				final Act act = new Act("h",link.getCenter(),link);
+				act.setEndTime(6*3600);
 				plan.addAct(act);
 				pers.addPlan(plan);
 				try {
@@ -237,7 +238,7 @@ public class PrimaryLocationDrawing {
 				leg.setArrTime(Time.UNDEFINED_TIME);
 				leg.setDepTime(Time.UNDEFINED_TIME);
 				leg.setTravTime(Time.UNDEFINED_TIME);
-				Act act = new Act("w",link.getCenter().getX(),link.getCenter().getY(),link,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,true);
+				Act act = new Act("w",link.getCenter(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);
 				try {

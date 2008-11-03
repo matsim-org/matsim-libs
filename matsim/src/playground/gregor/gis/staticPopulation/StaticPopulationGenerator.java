@@ -102,7 +102,10 @@ public class StaticPopulationGenerator {
 				for (int i = 0; i < li ; i++) {
 					final Person pers = new Person(new IdImpl(id++));
 					final Plan plan = new Plan(pers);
-					final Act act = new Act("h",link.getCenter().getX(),link.getCenter().getY(),link,3 * 3600.0,3 *3600.0,0,true);
+					final Act act = new Act("h",link.getCenter(),link);
+					act.setStartTime(3 * 3600.0);
+					act.setEndTime(3 *3600.0);
+					act.setDur(0);
 					plan.addAct(act);
 					pers.addPlan(plan);
 					try {

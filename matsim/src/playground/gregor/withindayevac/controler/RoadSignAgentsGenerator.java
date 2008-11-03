@@ -35,7 +35,6 @@ import org.matsim.population.Route;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.misc.Time;
 
 public class RoadSignAgentsGenerator {
 
@@ -58,13 +57,14 @@ public class RoadSignAgentsGenerator {
 			
 			for (Link dest : node.getOutLinks().values()){
 				Plan plan  = new Plan(p);
-				Act actA = new Act("h", link.getCenter().getX(), link.getCenter().getY(), link, Time.UNDEFINED_TIME, 3600 * 3 - 2, 0.0, true);
+				Act actA = new Act("h", link.getCenter(), link);
+				actA.setEndTime(3600 * 3 - 2);
 				Leg leg = new Leg(BasicLeg.Mode.car);
 				leg.setNum(0);
 				leg.setDepTime(0.0);
 				leg.setTravTime(0.0);
 				leg.setArrTime(0.0);
-				Act actB = new Act("h",dest.getCenter().getX(), dest.getCenter().getY(), dest, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, 0.0, true);
+				Act actB = new Act("h",dest.getCenter(), dest);
 				plan.addAct(actA);
 				plan.addLeg(leg);
 				plan.addAct(actB);

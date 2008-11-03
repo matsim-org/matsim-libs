@@ -39,7 +39,7 @@ import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends EvacuationPlansGeneratorAndNetworkTrimmer {
 
@@ -101,7 +101,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 			leg.setArrTime(0.0);
 			plan.addLeg(leg);
 
-			Act actB = new Act("h", 12000.0, -12000.0, network.getLink(saveLinkId), Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, 0.0, true);
+			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actB);
 
 			router.run(plan);

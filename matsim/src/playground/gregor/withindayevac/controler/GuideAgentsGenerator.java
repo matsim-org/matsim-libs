@@ -33,7 +33,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * 
@@ -56,13 +56,14 @@ public class GuideAgentsGenerator {
 			Id id = new IdImpl("guide" + count++);
 			Person p = new Person(id);
 			Plan plan  = new Plan(p);
-			Act actA = new Act("h", 12000.0, -12000.0, l, Time.UNDEFINED_TIME, 3600 * 3, 0.0, true);
+			Act actA = new Act("h", new CoordImpl(12000.0, -12000.0), l);
+			actA.setEndTime(3600 * 3);
 			Leg leg = new Leg(BasicLeg.Mode.car);
 			leg.setNum(0);
 			leg.setDepTime(0.0);
 			leg.setTravTime(0.0);
 			leg.setArrTime(0.0);
-			Act actB = new Act("h", 12000.0, -12000.0, network.getLink(saveLinkId), Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, 0.0, true);
+			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));
 			plan.addAct(actA);
 			plan.addLeg(leg);
 			plan.addAct(actB);
