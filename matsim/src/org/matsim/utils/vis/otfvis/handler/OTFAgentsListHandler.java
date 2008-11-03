@@ -36,10 +36,12 @@ import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
-
 public class OTFAgentsListHandler extends OTFDataReader {
-	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.1", ReaderV1_2.class);
-	static boolean prevV1_2 = OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.2", ReaderV1_2.class);
+
+	static {
+		OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.1", ReaderV1_2.class);
+		OTFDataReader.setPreviousVersion(OTFAgentsListHandler.class.getCanonicalName() + "V1.2", ReaderV1_2.class);
+	}
 
 	protected Class agentReceiverClass = null;
 
@@ -88,22 +90,19 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			// Write additional agent data
-	        /*
-	         * (4) write agents
-	         */
 			out.putInt(positions.size());
 
 			for (ExtendedPositionInfo pos : positions) {
 				writeAgent(pos, out);
 			}
-	        positions.clear();
+			positions.clear();
 		}
 
 	}
 
-	static char[] idBuffer = new char[100];
+	protected char[] idBuffer = new char[100];
 
-	public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
+	public void readAgent(ByteBuffer in, SceneGraph graph) {
 		int length = in.getInt();
 		idBuffer = new char[length];
 		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
@@ -139,13 +138,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		for(int i= 0; i< count; i++) readAgent(in, graph);
 	}
 
-
-
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 	}
-
-
 
 
 	@Override
@@ -173,7 +168,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	public static final class ReaderV1_2 extends OTFAgentsListHandler {
 
 		@Override
-		public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
+		public void readAgent(ByteBuffer in, SceneGraph graph) {
 			int length = in.getInt();
 			idBuffer = new char[length];
 			for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
@@ -198,7 +193,5 @@ public class OTFAgentsListHandler extends OTFDataReader {
 				// at this version, only userdata was defined... aka state
 
 	 	}
-
-
 	}
 }

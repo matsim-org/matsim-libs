@@ -37,16 +37,16 @@ import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
-import org.matsim.utils.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
-
 public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
-	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFLinkAgentsHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	static {
+		OTFDataReader.setPreviousVersion(OTFLinkAgentsHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	}
 	
 	private final Logger log = Logger.getLogger(OTFLinkAgentsHandler.class);
 
@@ -56,21 +56,13 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	protected List<OTFDataSimpleAgent.Receiver> agents = new LinkedList<OTFDataSimpleAgent.Receiver>();
 	
-	static public class Writer extends  OTFDefaultLinkHandler.Writer implements  OTFWriterFactory<QueueLink>{
+	static public class Writer extends  OTFDefaultLinkHandler.Writer {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -7916541567386865404L;
+
 		protected static final transient Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 
-		@Override
-		public void writeConstData(ByteBuffer out) throws IOException {
-			super.writeConstData(out);
-		}
-
-
-		public void writeAgent(PositionInfo pos, ByteBuffer out) throws IOException {
+		public void writeAgent(PositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
 			out.putInt(id.length());
 			for (int i=0; i<id.length(); i++) out.putChar(id.charAt(i));
@@ -98,21 +90,19 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			out.putFloat((float)pos.getSpeed());
 		}
 		
-		protected void writeAllAgents(ByteBuffer out) throws IOException {
+		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
-	        /*
-	         * (4) write agents
-	         */
-	        positions.clear();
+
+			positions.clear();
 			src.getVehiclePositions(positions);
 
-			if(showParked) {
+			if (showParked) {
 				out.putInt(positions.size());
 
 				for (PositionInfo pos : positions) {
 					writeAgent(pos, out);
 				}
-			}else {
+			} else {
 				int valid = 0;
 				for (PositionInfo pos : positions) {
 					if (pos.getVehicleState() != VehicleState.Parking) valid++;
@@ -125,7 +115,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			}
 
 		}
-		
+
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			super.writeDynData(out);
@@ -140,12 +130,14 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	}
 	
-	static char[] idBuffer = new char[100];
+	private char[] idBuffer = new char[100];
 	
-	public void readAgent(ByteBuffer in, SceneGraph graph) throws IOException {
-		try{
+	public void readAgent(ByteBuffer in, SceneGraph graph) {
 		int length = in.getInt();
-		if(length > 100)throw new Exception();
+		if(length > 100) {
+			log.warn("Agent could not be read fully from stream");
+			return;
+		}
 		idBuffer = new char[length];
 		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
 		float x = in.getFloat();
@@ -156,22 +148,18 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		// No agent receiver given, then we are finished
 		if (agentReceiverClass == null) return;
 
-			OTFDataSimpleAgent.Receiver drawer = null;
-			try {
-				drawer = (org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
-				drawer.setAgent(idBuffer, x, y, 0, state, color);
-				agents.add(drawer);
-			} catch (InstantiationException e) {
-				log.warn("Agent drawer could not be instanciated");
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} //factoryAgent.getOne();
+		OTFDataSimpleAgent.Receiver drawer = null;
+		try {
+			drawer = (org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent.Receiver) graph.newInstance(agentReceiverClass);
+			drawer.setAgent(idBuffer, x, y, 0, state, color);
+			agents.add(drawer);
+		} catch (InstantiationException e) {
+			log.warn("Agent drawer could not be instanciated");
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} //factoryAgent.getOne();
 
-		}catch (Exception e){
-			log.warn("Agent could not be read fully from stream");
-		}
- 	}
+	}
 	
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
@@ -182,14 +170,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		int count = in.getInt();
 		for(int i= 0; i< count; i++) readAgent(in, graph);
 	}
-
-
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		super.readConstData(in);
-	}
-
-
 
 	@Override
 	public void connect(Receiver receiver) {
@@ -211,10 +191,9 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 	
 	/***
 	 * PREVIOUS VERSION of the reader
+	 * 
 	 * @author dstrippgen
-	 *
 	 */
-
 	public static final class ReaderV1_1 extends OTFLinkAgentsHandler {
 		@Override
 		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {

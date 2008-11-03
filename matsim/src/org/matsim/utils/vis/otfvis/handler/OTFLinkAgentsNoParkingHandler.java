@@ -20,7 +20,6 @@
 
 package org.matsim.utils.vis.otfvis.handler;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.mobsim.queuesim.QueueLink;
@@ -32,18 +31,12 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 public class OTFLinkAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	
 	static public class Writer extends  OTFLinkAgentsHandler.Writer {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 6541770536927233851L;
 
 		@Override
-		protected void writeAllAgents(ByteBuffer out) throws IOException {
+		protected void writeAllAgents(ByteBuffer out) {
 			// Write additional agent data
-	        /*
-	         * (4) write agents
-	         */
-	        positions.clear();
+			positions.clear();
 			src.getVehiclePositions(positions);
 			int valid = 0;
 			for (PositionInfo pos : positions) {
