@@ -28,6 +28,7 @@ import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 
 
 /**
@@ -77,6 +78,11 @@ public class ControlerTest extends org.matsim.planomat.PlanomatControler {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
 				strategy.addStrategyModule(planomatStrategyModule);
+			}
+			else if (classname.equals("TimeOptimizer")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, new CharyparNagelScoringFunctionFactory());
+				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 		
 			manager.addStrategy(strategy, rate);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX16.java
+ * PlanomatX17.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,13 +46,11 @@ import java.io.*;
 
 /**
  * @author Matthias Feil
- * New standard version. Features
- * calling of TimeOptimizer rather than Planomat
- * differentiation into primary and secondary activities
- * locationChoice
+ * Like PlanomatX17 but with Collections.max rather than Collections.sort (probably slight runtime
+ * improvement. Should go into improved overall version of PlanomatX).
  */
 
-public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -61,14 +59,14 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	private final PlanAlgorithm				timer;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX16.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX17.class);
 	private final PlanAlgorithm				locationChoiceAlgorithm;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX16 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
+	public PlanomatX17 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, 
 			boolean constrained, Controler controler) {
 
@@ -198,7 +196,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					planomatRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
 					// Scoring
-					neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
+					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
 					// Write the solution into a list so that it can be retrieved for later iterations
@@ -225,9 +223,10 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			}
 			
 			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
-			java.util.Collections.sort(nonTabuNeighbourhood);
-			PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
-			bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
+			//java.util.Collections.sort(nonTabuNeighbourhood);
+			PlanomatXPlan bestIterSolution = java.util.Collections.max(nonTabuNeighbourhood);
+			//PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
+			//bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
 			tabuList.add(bestIterSolution);
 			
 			// Statistics
@@ -251,37 +250,38 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		
 		// Update the plan with the final solution 		
-		java.util.Collections.sort(tabuList);
-		stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
+		//java.util.Collections.sort(tabuList);
+		PlanomatXPlan bestSolution = java.util.Collections.max(tabuList);
+		stream.println("Selected solution\t"+bestSolution.getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		
 		xs = new double [currentIteration];
 		for (int i = 0;i<xs.length;i++)xs[i]=i+1;
 		
-		if(al.size()>tabuList.get(tabuList.size()-1).getActsLegs().size()){ 
+		if(al.size()>bestSolution.getActsLegs().size()){ 
 			int i;
-			for (i = 0; i<tabuList.get(tabuList.size()-1).getActsLegs().size();i++){
+			for (i = 0; i<bestSolution.getActsLegs().size();i++){
 				al.remove(i);
-				al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+				al.add(i, bestSolution.getActsLegs().get(i));	
 			}
 			for (int j = i; j<al.size();j=j+0){
 				al.remove(j);
 			}
 		}
-		else if(al.size()<tabuList.get(tabuList.size()-1).getActsLegs().size()){
+		else if(al.size()<bestSolution.getActsLegs().size()){
 			int i;
 			for (i = 0; i<al.size();i++){
 				al.remove(i);
-				al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+				al.add(i, bestSolution.getActsLegs().get(i));	
 			}
-			for (int j = i; j<tabuList.get(tabuList.size()-1).getActsLegs().size();j++){			
-				al.add(j, tabuList.get(tabuList.size()-1).getActsLegs().get(j));
+			for (int j = i; j<bestSolution.getActsLegs().size();j++){			
+				al.add(j, bestSolution.getActsLegs().get(j));
 			}
 		}
 		else {
 			for (int i = 0; i<al.size();i++){
 			al.remove(i);
-			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
+			al.add(i, bestSolution.getActsLegs().get(i));	
 			}
 		}
 		XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");

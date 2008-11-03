@@ -33,7 +33,7 @@ import org.matsim.population.Leg;
 
 /**
  * @author Matthias Feil
- * Like TimeOptimizer10 (so including log-only consideration) but also with
+ * Like TimeOptimizer10 (so including leg-only consideration) but also with
  * swapping of activity durations from TimeOptimizer9.
  */
 
@@ -56,7 +56,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 3;
+		this.STOP_CRITERION			= 10;
 		this.minimumTime			= 3600;
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		//TODO @MF: constants to be configured externally
@@ -72,15 +72,22 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		long runStartTime = System.currentTimeMillis();
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
-		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), (PlanomatXPlan)plan);
-		
+		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
 			loops++;
-			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), (PlanomatXPlan)plan);
-			if (loops>5) {
-				log.warn("No valid initial solution found for "+plan.getPerson().getId()+"!");
-				return;
+			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
+			log.info("Move = "+move);
+			if (loops>3) {
+				for (int i=2;i<plan.getActsLegs().size()-4;i+=2){
+					((Act)plan.getActsLegs().get(i)).setDur(this.minimumTime);
+				}
+				move = this.cleanSchedule(this.minimumTime, plan);
+				if (move!=0.0){
+					log.warn("No valid initial solution found for "+plan.getPerson().getId()+"!");
+					plan.setScore(-1000);
+					return;
+				}
 			}
 		}
 		
@@ -592,7 +599,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 	}	
 	
 	
-	public double cleanSchedule (double now, PlanomatXPlan plan){
+	public double cleanSchedule (double now, Plan plan){
 		
 		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
 		((Act)(plan.getActsLegs().get(0))).setDur(now);
@@ -627,7 +634,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 	}
 		
 
-	public void cleanActs (PlanomatXPlan plan){
+	public void cleanActs (Plan plan){
 		
 		((Act)(plan.getActsLegs().get(0))).setEndTime(((Leg)(plan.getActsLegs().get(1))).getDepTime());
 		((Act)(plan.getActsLegs().get(0))).setDur(((Leg)(plan.getActsLegs().get(1))).getDepTime());
