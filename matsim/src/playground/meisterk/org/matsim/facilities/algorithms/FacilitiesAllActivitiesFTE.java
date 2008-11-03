@@ -33,9 +33,9 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 
-import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus;
-import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensusParser;
-import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus.ProductionSector;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
 

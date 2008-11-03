@@ -28,8 +28,8 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 
-import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus;
-import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensusParser;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
 
 public class FacilitiesWork9To18 {
 
