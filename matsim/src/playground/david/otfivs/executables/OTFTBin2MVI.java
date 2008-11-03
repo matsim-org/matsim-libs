@@ -23,6 +23,7 @@ package playground.david.otfivs.executables;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -78,7 +79,6 @@ public class OTFTBin2MVI extends OTFQuadFileHandler.Writer {
 		byte[] target = new byte[count*2];
 		int j = reader.read(target);
 		ByteBuffer buf = ByteBuffer.wrap(target);
-		buf.order(ByteOrder.LITTLE_ENDIAN);
 		String test = buf.asCharBuffer().toString();
 		return test;
 	}
@@ -112,13 +112,13 @@ public class OTFTBin2MVI extends OTFQuadFileHandler.Writer {
 			String times,counts;
 			times = getString(4);
 			while(times.equals("TIME")) {
-				int now = getInt();
+				int now = reader.readInt();
 				counts = getString(5);
-				int count = getInt();
+				int count = reader.readInt();
 				for(int i = 0;i<count;i++) {
-					float x = getFloat();
-					float y = getFloat();
-					int coloer = getInt();
+					float x = (float)reader.readDouble();
+					float y = (float)reader.readDouble();
+					int coloer = reader.readInt();
 					// write to mvi
 					ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl("0"), x, y,
 							0, 0, 50, PositionInfo.VehicleState.Driving, 0, 0);
@@ -128,7 +128,7 @@ public class OTFTBin2MVI extends OTFQuadFileHandler.Writer {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			System.out.println("Expceted unexpected end of file.. dumping rest of vehicles");
 		}
 
 		finish();
