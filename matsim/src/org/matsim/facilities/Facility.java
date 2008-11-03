@@ -21,6 +21,7 @@
 package org.matsim.facilities;
 
 import java.util.TreeMap;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -38,11 +39,6 @@ public class Facility extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-
-	protected Facility(final Facilities layer, final Id id, final Coord center, final String desc) {
-		this(layer,id,center);
-		this.desc = desc.intern();
-	}
 
 	protected Facility(final Facilities layer, final Id id, final Coord center) {
 		super(layer,id,center);
@@ -100,14 +96,6 @@ public class Facility extends AbstractLocation {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
 		return (Link)this.getDownMapping().get(this.down_mapping.firstKey());
-	}
-
-
-	// ----------------------------------------------------
-	public void reset() {
-	}
-
-	public void finish() {
 	}
 
 	//////////////////////////////////////////////////////////////////////
