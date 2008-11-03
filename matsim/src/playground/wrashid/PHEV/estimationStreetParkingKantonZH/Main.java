@@ -104,8 +104,9 @@ public class Main {
 		//	System.out.println(linkId + "-" + numberOfStreetParkingsPerLink.get(linkId));
 		//}
 		
-
-		
+		//TODO: Find best match CityZone for each community
+		// Do the statistics written above in CityZone class, so that they can be used afterwards.
+		// write out the facilities to the file
 		
 
 		
@@ -234,11 +235,11 @@ public class Main {
 			}
 		}
 		
-		Iterator iter=layer.getLocations().values().iterator();
-		while (iter.hasNext()){
-			Zone zone = (Zone)iter.next();
-			System.out.println(zone.getId());
-		}
+		//Iterator iter=layer.getLocations().values().iterator();
+		//while (iter.hasNext()){
+		//	Zone zone = (Zone)iter.next();
+			//System.out.println(zone.getId());
+		//}
 		
 		
 
