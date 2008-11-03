@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.facilities;
+package playground.meisterk.org.matsim.run.facilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,6 +72,10 @@ import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.kml.KMZWriter;
+
+import playground.meisterk.org.matsim.facilities.ShopId;
+import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesKTIYear2;
+
 
 /**
  * In April 2005, I collected information on shop facilities of the major

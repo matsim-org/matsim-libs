@@ -18,17 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities.algorithms;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.enterprisecensus.EnterpriseCensus;
-import org.matsim.enterprisecensus.EnterpriseCensusParser;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
+
+import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus;
+import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensusParser;
 
 public class FacilitiesWork9To18 {
 

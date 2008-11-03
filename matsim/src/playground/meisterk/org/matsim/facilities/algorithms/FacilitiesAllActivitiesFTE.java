@@ -18,26 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities.algorithms;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.enterprisecensus.EnterpriseCensus;
-import org.matsim.enterprisecensus.EnterpriseCensusParser;
-import org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.FacilitiesProductionKTI.KTIYear;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+
+import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus;
+import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensusParser;
+import playground.meisterk.org.matsim.enteroprisecensus.EnterpriseCensus.ProductionSector;
+import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
+import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
 
 public class FacilitiesAllActivitiesFTE {
 
@@ -85,7 +85,7 @@ public class FacilitiesAllActivitiesFTE {
 		Random random = new Random(Gbl.getConfig().global().getRandomSeed());
 
 		// see http://www.matsim.org/node/36 for the next step
-		int dontUseTheFirstDraw = random.nextInt();
+		random.nextInt();
 
 
 		TreeMap<String, Integer> tempFacilities = new TreeMap<String, Integer>();

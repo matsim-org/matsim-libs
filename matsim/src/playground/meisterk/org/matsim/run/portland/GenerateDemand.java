@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.portland;
+package playground.meisterk.org.matsim.run.portland;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -29,7 +29,6 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 

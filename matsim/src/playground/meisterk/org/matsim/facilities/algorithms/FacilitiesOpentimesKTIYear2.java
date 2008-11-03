@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.facilities;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -28,13 +28,14 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesProductionKTI;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.Opentime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.misc.Day;
 import org.matsim.world.Location;
+
+import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.

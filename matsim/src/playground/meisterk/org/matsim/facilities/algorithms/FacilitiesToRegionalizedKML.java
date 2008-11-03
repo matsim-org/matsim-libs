@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.facilities;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,7 +48,7 @@ import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.misc.Time;
 
-import playground.meisterk.facilities.ShopsOf2005ToFacilities.Day;
+import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities.Day;
 
 //import com.google.earth.kml._2.BasicLinkType;
 //import com.google.earth.kml._2.DocumentType;

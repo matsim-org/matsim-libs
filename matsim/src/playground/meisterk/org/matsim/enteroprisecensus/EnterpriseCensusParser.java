@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.enterprisecensus;
+package playground.meisterk.org.matsim.enteroprisecensus;
 
 import java.io.File;
 import java.io.IOException;

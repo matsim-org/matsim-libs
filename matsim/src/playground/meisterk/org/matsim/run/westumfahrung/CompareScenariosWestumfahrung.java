@@ -1,4 +1,4 @@
-package playground.meisterk.westumfahrung;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.utils.misc.Time;
 
-import playground.meisterk.facilities.ShopsOf2005ToFacilities;
+import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
+
 
 /**
  * Compare two scenarios (network, plans, events) with each other.

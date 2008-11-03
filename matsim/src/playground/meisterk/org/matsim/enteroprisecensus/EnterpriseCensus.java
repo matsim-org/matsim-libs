@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.enterprisecensus;
+package playground.meisterk.org.matsim.enteroprisecensus;
 
 import java.util.ArrayList;
 import java.util.HashSet;

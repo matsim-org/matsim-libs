@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities.algorithms;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 import java.util.TreeMap;

@@ -1,4 +1,4 @@
-package playground.meisterk.facilities;
+package playground.meisterk.org.matsim.facilities;
 
 public class ShopId {
 	
