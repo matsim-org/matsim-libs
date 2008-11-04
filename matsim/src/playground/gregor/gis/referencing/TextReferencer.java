@@ -292,10 +292,10 @@ public class TextReferencer {
 				Geometry geo = ft.getDefaultGeometry();
 				double x = geo.getCentroid().getX();
 				double y = geo.getCentroid().getY();
-				rdw.writeLine(new String[] {uid, x+"", y+""});
+				rdw.writeLine(new String[] {uid,"1" , x+"", y+""});
 				
 			} else {
-				rdw.writeLine(new String[] {uid, "", ""});
+				rdw.writeLine(new String[] {uid,"0", "", ""});
 				rfw.writeLine(line);
 			}
 			line = tfr.readLine();
@@ -562,7 +562,7 @@ public class TextReferencer {
 		final String zonesKel =  "../inputs/padang/referencing/zonesKel.shp";
 		final String homes = "../inputs/padang/referencing/homes.shp";
 
-		final String unclassified = "../inputs/padang/referencing/input_working-day.csv";
+		final String unclassified = "../inputs/padang/referencing/survey_final.csv";
 
 
 		final ArrayList<FeatureSource> fts = new ArrayList<FeatureSource>();
