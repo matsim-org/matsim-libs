@@ -167,7 +167,11 @@ public class Plan extends BasicPlanImpl {
 			Logger.getLogger(BasicLegImpl.class).warn("Unknown Leg mode: " + modestring);
 			mode = BasicLeg.Mode.undefined;
 		}
-		return createLeg(mode, Time.parseTime(depTime), Time.parseTime(travTime), Time.parseTime(arrTime));
+		Leg leg = createLeg(mode);
+		leg.setDepTime(Time.parseTime(depTime));
+		leg.setTravTime(Time.parseTime(travTime));
+		leg.setArrTime(Time.parseTime(arrTime));
+		return leg;
 	}
 
 	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException {
@@ -177,19 +181,6 @@ public class Plan extends BasicPlanImpl {
 		int legnum = (this.actsLegs.size()-1) /2;
 		leg.setNum(legnum);
 		this.actsLegs.add(leg);
-		return leg;
-	}
-
-	/**
-	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
-	 */
-  @Deprecated
-	public final Leg createLeg(final BasicLeg.Mode mode, final double depTime, final double travTime,
-			 final double arrTime) throws IllegalStateException {
-		Leg leg = createLeg(mode);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(arrTime);
 		return leg;
 	}
 
@@ -378,7 +369,10 @@ public class Plan extends BasicPlanImpl {
 				} else {
 					// Leg
 					Leg l = (Leg) actl.get(i);
-					Leg l2 = createLeg(l.getMode(), l.getDepTime(), l.getTravTime(), l.getArrTime());
+					Leg l2 = createLeg(l.getMode());
+					l2.setDepTime(l.getDepTime());
+					l2.setTravTime(l.getTravTime());
+					l2.setArrTime(l.getArrTime());
 					if (l.getRoute() != null) {
 						Route r = new Route(l.getRoute());
 						l2.setRoute(r);
