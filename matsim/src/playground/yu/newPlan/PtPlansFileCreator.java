@@ -9,9 +9,11 @@ import java.util.List;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -131,22 +133,23 @@ public class PtPlansFileCreator {
 		createPtPerson("1981", endTime, "7621", getSrcRoute(northNodes));
 	}
 
-	protected void createPtPerson(String startLinkId, String endTime,
+	private void createPtPerson(String startLinkId, String endTime,
 			String endLinkId, List<Node> srcRoute) {
 
 		Person p = new Person(new IdImpl("245-" + personCount));
 		try {
 			Plan pl = new Plan(p);
 			p.addPlan(pl);
-			pl.createAct("h", (String) null, null, startLinkId, null, endTime,
-					null, null);
-			Leg leg = pl.createLeg(Mode.car, Time.parseTime(endTime),
-					Time.UNDEFINED_TIME, Time.UNDEFINED_TIME);
+			Link link = this.network.getLink(new IdImpl(startLinkId));
+			Act a = pl.createAct("h", link);
+			a.setEndTime(Time.parseTime(endTime));
+			Leg leg = pl.createLeg(Mode.car);
+			leg.setDepTime(Time.parseTime(endTime));
 			Route route = new Route();
 			leg.setRoute(route);
 			route.setRoute(srcRoute);
-			pl.createAct("w", (String) null, null, endLinkId, null, null, null,
-					null);
+			link = this.network.getLink(new IdImpl(endLinkId));
+			pl.createAct("w", link);
 			pop.addPerson(p);
 			personCount++;
 			System.out.println("i have " + pop.getPersons().size()

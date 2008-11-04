@@ -10,6 +10,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -78,15 +79,28 @@ public class CreatePlans {
 			double depTime=3600*8;
 			double duration=3600*8;
 
-			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,depTime,duration,false);
-			plan.createLeg(BasicLeg.Mode.car,depTime,0.0,depTime);
-			plan.createAct("work",work_facility.getCenter().getX(),work_facility.getCenter().getY(),work_facility.getLink(),depTime,depTime+duration,duration,false);
-			plan.createLeg(BasicLeg.Mode.car,depTime+duration,0.0,depTime+duration);
-			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),depTime+duration,3600*24,duration,false);
+			Act a = plan.createAct("home",home_facility.getCenter());
+			a.setLink(home_facility.getLink());
+			a.setEndTime(depTime);
+			Leg l = plan.createLeg(BasicLeg.Mode.car);
+			l.setArrTime(depTime);
+			l.setTravTime(0.0);
+			l.setDepTime(depTime);
+			a = plan.createAct("work",work_facility.getCenter());
+			a.setLink(work_facility.getLink());
+			a.setStartTime(depTime);
+			a.setEndTime(depTime+duration);
+			a.setDur(duration);
+			l = plan.createLeg(BasicLeg.Mode.car);
+			l.setArrTime(depTime+duration);
+			l.setTravTime(0.0);
+			l.setDepTime(depTime+duration);
+			a = plan.createAct("home",home_facility.getCenter());
+			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 
 
-			Leg l=null;
+//			Leg l=null;
 
 		}
 

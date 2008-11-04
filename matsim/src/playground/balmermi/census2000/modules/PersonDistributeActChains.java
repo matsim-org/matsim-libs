@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000.data.ActChains;
 
@@ -215,7 +217,8 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					plan.createAct(type,0.0,0.0,null,start_time,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,primary);
+					Act a = plan.createAct(type, new CoordImpl(0.0,0.0));
+					a.setStartTime(start_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
 			}
@@ -225,8 +228,14 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					plan.createAct(type,0.0,0.0,null,start_time,end_time,dur,primary);
-					plan.createLeg(BasicLeg.Mode.undefined,end_time,0,end_time);
+					Act a = plan.createAct(type, new CoordImpl(0.0,0.0));
+					a.setStartTime(start_time);
+					a.setEndTime(end_time);
+					a.setDur(dur);
+					Leg l = plan.createLeg(BasicLeg.Mode.undefined);
+					l.setArrTime(end_time);
+					l.setTravTime(0);
+					l.setDepTime(end_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
 			}

@@ -21,10 +21,13 @@
 package playground.dgrether;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -32,6 +35,8 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.Route;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 
 
 /**
@@ -61,26 +66,35 @@ public class Plansgenerator {
 		init();
 		this.plans = new Population(false);
 		int homeEndtime = 6 * 3600;
+		final Link link1 = ((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE)).getLink(new IdImpl("1"));
+		final Link link20 = ((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE)).getLink(new IdImpl("20"));
+		final Coord homeCoord = new CoordImpl(-25000, 0);
+		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
 			Person p = new Person(new IdImpl(i));
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;
-			plan.createAct("h", "-25000", "0", "1", null, Integer.toString(homeEndtime), null, null);
+			Act a = plan.createAct("h", homeCoord);
+			a.setLink(link1);
+			a.setEndTime(homeEndtime);
 			//leg to work
-			Leg leg = plan.createLeg("car", null, null, null);
+			Leg leg = plan.createLeg(Mode.car);
 			Route route = new Route();
 			route.setRoute("2 4 5");
 			leg.setRoute(route);
 			//work
-			plan.createAct("w", "10000", "0", "20", null, null, "2:30", "true");
+			a = plan.createAct("w", workCoord);
+			a.setLink(link20);
+			a.setDur(2.5 * 3600);
 			//leg to work
-			leg = plan.createLeg("car", null, null, null);
+			leg = plan.createLeg(Mode.car);
 			route = new Route();
 			route.setRoute("13 14 15 1");
 			leg.setRoute(route);
-			plan.createAct("h", "-25000", "0", "1", null, null, null, null);
+			a = plan.createAct("h", homeCoord);
+			a.setLink(link1);
 
 
 

@@ -10,6 +10,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -92,17 +93,37 @@ public class CreatePlans1 {
 			// shop: 16-17.30
 			// home: 17.30-0:00
 			
-			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),0.0,depTimeHome,depTimeHome,false);
-			plan.createLeg(BasicLeg.Mode.car,depTimeHome,0.0,depTimeHome);
-			plan.createAct("work",work_facility.getCenter().getX(),work_facility.getCenter().getY(),work_facility.getLink(),depTimeHome,depTimeWork,depTimeWork-depTimeHome,false);
-			plan.createLeg(BasicLeg.Mode.car,depTimeWork,0.0,depTimeWork);
-			plan.createAct("shop",shop_facility.getCenter().getX(),shop_facility.getCenter().getY(),shop_facility.getLink(),depTimeWork,depTimeShop,depTimeShop-depTimeWork,false);
-			plan.createLeg(BasicLeg.Mode.car,depTimeShop,0.0,depTimeShop);
-			plan.createAct("home",home_facility.getCenter().getX(),home_facility.getCenter().getY(),home_facility.getLink(),depTimeShop,mitterNacht,mitterNacht-depTimeShop,false);
+			Act a = plan.createAct("home",home_facility.getCenter());
+			a.setLink(home_facility.getLink());
+			a.setEndTime(depTimeHome);
+			Leg l = plan.createLeg(BasicLeg.Mode.car);
+			l.setArrTime(depTimeHome);
+			l.setTravTime(0.0);
+			l.setDepTime(depTimeHome);
+			a = plan.createAct("work",work_facility.getCenter());
+			a.setLink(work_facility.getLink());
+			a.setStartTime(depTimeHome);
+			a.setEndTime(depTimeWork);
+			a.setDur(depTimeWork-depTimeHome);
+			l = plan.createLeg(BasicLeg.Mode.car);
+			l.setArrTime(depTimeWork);
+			l.setTravTime(0.0);
+			l.setDepTime(depTimeWork);
+			a = plan.createAct("shop",shop_facility.getCenter());
+			a.setLink(shop_facility.getLink());
+			a.setStartTime(depTimeWork);
+			a.setEndTime(depTimeShop);
+			a.setDur(depTimeShop-depTimeWork);
+			l = plan.createLeg(BasicLeg.Mode.car);
+			l.setArrTime(depTimeShop);
+			l.setTravTime(0.0);
+			l.setDepTime(depTimeShop);
+			a = plan.createAct("home",home_facility.getCenter());
+			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 
 
-			Leg l=null;
+//			Leg l=null;
 
 		}
 

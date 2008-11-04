@@ -40,7 +40,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.misc.Time;
 
 public class PlansCreateFromMZ {
 
@@ -217,9 +216,13 @@ public class PlansCreateFromMZ {
 					Act from_act = (Act)plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setDur(from_act.getEndTime()-from_act.getStartTime());
-					Leg leg = plan.createLeg(mode,departure,(arrival-departure),arrival);
+					Leg leg = plan.createLeg(mode);
+					leg.setDepTime(departure);
+					leg.setTravTime(arrival-departure);
+					leg.setArrTime(arrival);
 					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravTime()));
-					plan.createAct(acttype,to.getX(),to.getY(),null,arrival,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,false);
+					Act act = plan.createAct(acttype,to);
+					act.setStartTime(arrival);
 					
 					// coordinate consistency check
 					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
@@ -228,10 +231,15 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					plan.createAct(HOME,from.getX(),from.getY(),null,0,departure,departure,false);
-					Leg leg = plan.createLeg(mode,departure,(arrival-departure),arrival);
+					Act homeAct = plan.createAct(HOME,from);
+					homeAct.setEndTime(departure);
+					Leg leg = plan.createLeg(mode);
+					leg.setDepTime(departure);
+					leg.setTravTime(arrival-departure);
+					leg.setArrTime(arrival);
 					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravTime()));
-					plan.createAct(acttype,to.getX(),to.getY(),null,arrival,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,false);
+					Act act = plan.createAct(acttype,to);
+					act.setStartTime(arrival);
 				}
 			}
 			// replacing the person string with the new data
