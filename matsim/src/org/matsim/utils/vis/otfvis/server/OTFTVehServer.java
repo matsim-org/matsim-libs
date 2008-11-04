@@ -211,6 +211,7 @@ public class OTFTVehServer implements OTFServerRemote {
 			this.reader.readLine(); // Read the commentary line
 		} catch (IOException e) {
 			e.printStackTrace();
+			 this.finishedReading = true;
 			return;
 		}
 	}

@@ -23,7 +23,7 @@ package org.matsim.utils.vis.otfvis.data;
 import java.io.Serializable;
 
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 
 
 public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWriterFactory {
@@ -35,7 +35,7 @@ public class OTFDefaultNetWriterFactoryImpl implements Serializable, OTFNetWrite
 	
 	private  OTFWriterFactory agentWriterFac = null;
 	private  OTFWriterFactory nodeWriterFac = new OTFDefaultNodeHandler.Writer();
-	private  OTFWriterFactory linkWriterFac = new OTFLinkAgentsNoParkingHandler.Writer();
+	private  OTFWriterFactory linkWriterFac = new OTFLinkLanesAgentsNoParkingHandler.Writer();
 	
 	public OTFDataWriter getAgentWriter() {
 		if(agentWriterFac != null) return agentWriterFac.getWriter();

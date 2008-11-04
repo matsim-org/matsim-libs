@@ -69,9 +69,13 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		}
 
 		public void setQuad(float startX, float startY, float endX, float endY) {
+			setQuad(startX, startY,endX, endY, 1);
+		}
+
+		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
 			this.quad[0] = new Point2D.Float(startX, startY);
 			this.quad[1] = new Point2D.Float(endX, endY);
-			final Point2D.Float ortho = calcOrtho(startX, startY,endX, endY, SimpleStaticNetLayer.cellWidth_m);
+			final Point2D.Float ortho = calcOrtho(startX, startY,endX, endY, nrLanes*SimpleStaticNetLayer.cellWidth_m);
 			this.quad[2] = new Point2D.Float(startX + ortho.x, startY + ortho.y);
 			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
 		}

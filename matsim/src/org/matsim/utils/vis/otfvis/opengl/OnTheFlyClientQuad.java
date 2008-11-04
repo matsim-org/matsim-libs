@@ -27,7 +27,6 @@ import java.rmi.RemoteException;
 
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
-import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
@@ -45,6 +44,7 @@ import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
@@ -52,7 +52,7 @@ import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public class OnTheFlyClientQuad extends Thread {
-	private String url;
+	private final String url;
 	private OTFConnectionManager connect = new OTFConnectionManager();
 	private final boolean isMac;
 	
@@ -66,11 +66,13 @@ public class OnTheFlyClientQuad extends Thread {
 
 		connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(QueueLink.class, OTFLinkAgentsHandler.Writer.class);
+		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(OTFLinkAgentsHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
 		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
@@ -120,7 +122,7 @@ public class OnTheFlyClientQuad extends Thread {
 			PreferencesDialog.buildMenu(frame, visconf, hostControl);
 
 			OTFDefaultNetWriterFactoryImpl factory = new OTFDefaultNetWriterFactoryImpl();
-			if (connect.getEntries(QueueLink.class).isEmpty())	factory.setLinkWriterFac(new OTFLinkAgentsNoParkingHandler.Writer());
+			if (connect.getEntries(QueueLink.class).isEmpty())	factory.setLinkWriterFac(new OTFLinkLanesAgentsNoParkingHandler.Writer());
 			else {
 				Class linkhandler = connect.getEntries(QueueLink.class).iterator().next();
 				factory.setLinkWriterFac((OTFWriterFactory<QueueLink>)linkhandler.newInstance());

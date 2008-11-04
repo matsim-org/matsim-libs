@@ -356,11 +356,11 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		protected float coloridx = 0;
 		
 
-		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end){
+		Point2D.Float calcOrtho(Point2D.Float start, Point2D.Float end, int nrLanes){
 			double dx = end.y - start.y;
 			double dy = end.x -start.x;
 			double sqr1 = Math.sqrt(dx*dx +dy*dy);
-			final double cellWidth_m = linkWidth;
+			final double cellWidth_m = nrLanes*linkWidth;
 
 			dx = dx*cellWidth_m/sqr1;
 			dy = -dy*cellWidth_m/sqr1;
@@ -369,9 +369,13 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		}
 
 		public void setQuad(float startX, float startY, float endX, float endY) {
+			setQuad(startX, startY,endX, endY, 1);
+		}
+
+		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
 			this.quad[0] = new Point2D.Float(startX, startY);
 			this.quad[1] = new Point2D.Float(endX, endY);
-			final Point2D.Float ortho = calcOrtho(this.quad[0], this.quad[1]);
+			final Point2D.Float ortho = calcOrtho(this.quad[0], this.quad[1], nrLanes);
 			this.quad[2] = new Point2D.Float(startX + ortho.x, startY + ortho.y);
 			this.quad[3] = new Point2D.Float(endX + ortho.x, endY + ortho.y);
 		}
