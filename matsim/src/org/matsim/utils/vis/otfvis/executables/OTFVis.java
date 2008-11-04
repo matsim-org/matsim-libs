@@ -29,9 +29,12 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 
+/* was set to deprecated a while ago. If you still have a reason to use this class
+ * instead of org.matsim.run.OTFVis, then please tell me so. Otherwise I might
+ * delete this class completely after some while... / marcel,20081104
+ */
 /**
- * @deprecated 
- * use org.matsim.run.OTFVis instead
+ * @deprecated use org.matsim.run.OTFVis instead
  */
 @Deprecated
 public class OTFVis   extends Thread {

@@ -38,9 +38,14 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
 
+/* set to deprecated on 20081104. If you still have a reason to use this class
+ * instead of org.matsim.run.OTFVis, then please tell me so. Otherwise I might
+ * delete this class completely after some while... / marcel,20081104
+ */
 /**
  * @author DS
  *
+ * @deprecated please use org.matsim.run.OTFVis to start the visualizer
  */
 public class OnTheFlyQueueSimWriter extends QueueSimulation{
 	protected LegHistogram hist = null;
