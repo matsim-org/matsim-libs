@@ -37,7 +37,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
 	final String NODES_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_nodes.shp";
-	final private static float [] buildingsColor = new float [] {.5f,.1f,.1f,.7f};
+	final private static float [] buildingsColor = new float [] {.1f,.1f,.1f,.99f};
 	final private static float [] linksColor = new float [] {.1f,.1f,.1f,7.f};
 	final private static float [] nodesColor = new float [] {.0f,.0f,.0f,7.f};
 	
@@ -112,8 +112,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	public OTFDrawer getRightDrawerComponent(final JFrame frame) throws RemoteException {
 		final OTFClientQuad clientQ2 = this.hostControl.createNewView(null, null, connect1);
 
-		final OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-//		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
+		final OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
+		//drawer2.addOverlay(overlay)
+		//		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
 		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
 			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
@@ -134,9 +135,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.200/200.movie.mvi";
-//		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../outputs/output/ITERS/it.200/200.movie.mvi";
+//		final String filename =  CVSROOT + "/runs/run310/output/ITERS/it.0/0.movie.mvi";
+		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
+//		final String filename =  "../outputs/output/ITERS/it.70/70.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
@@ -171,7 +172,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(150.f);
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
 		
 		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
 		
