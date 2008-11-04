@@ -20,7 +20,6 @@
 
 package org.matsim.utils.vis.otfvis.gui;
 
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,7 +43,6 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
@@ -56,24 +54,23 @@ import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinne;
 import org.matsim.utils.vis.otfvis.opengl.queries.QuerySpinneNOW;
 
-
 public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
 
-	public static class QueryEntry {
+	private static class QueryEntry {
 		public QueryEntry(String string, String string2, Class class1) {
 			this.shortName = string;
 			this.toolTip = string2;
 			this.clazz = class1;
 		}
 		@Override
-		public String toString() { return shortName;};
+		public String toString() { return shortName;}
 		
 		public String shortName;
 		public String toolTip;
 		public Class clazz;
 	}
 
-	public static QueryEntry[] queries = {
+	private QueryEntry[] queries = {
 		new QueryEntry("agentPlan", "show the actual plan of an agent", QueryAgentPlan.class),
 		new QueryEntry("agentEvents", "show the actual events of an agent", QueryAgentEvents.class),
 		new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
@@ -82,16 +79,16 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	};
 	
 	private final OTFHostControlBar handler;
-	private final  String queryType = "Agent";
+//	private final  String queryType = "Agent";
 	private JTextField text;
 	private transient final OTFVisConfig cfg;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
 	
-	public OTFQueryControlBar(String name, OTFHostControlBar handler) {
+	public OTFQueryControlBar(String name, OTFHostControlBar handler, final OTFVisConfig config) {
 		super(name);
 		this.handler = handler;
-		this.cfg = (OTFVisConfig)Gbl.getConfig().getModule("otfvis");
+		this.cfg = config;
 		{
 			JLabel jLabel3 = new JLabel();
 			add(jLabel3);
@@ -101,7 +98,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		{
 			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
 			leftMFuncModel.setSelectedItem(queries[0]);
-	        ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setQueryType(queries[0].clazz.getCanonicalName());
+			this.cfg.setQueryType(queries[0].clazz.getCanonicalName());
 			JComboBox queryType = new JComboBox();
 			add(queryType);
 			queryType.setActionCommand("type_changed");
@@ -153,8 +150,8 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		} else if ("type_changed".equals(command)) {
 			JComboBox cb = (JComboBox)e.getSource();
 	        QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
-	        cfg.setQueryType(queryType.clazz.getCanonicalName());
-	        ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setQueryType(queryType.clazz.getCanonicalName());
+	        this.cfg.setQueryType(queryType.clazz.getCanonicalName());
+	        this.cfg.setQueryType(queryType.clazz.getCanonicalName());
 	        removeQueries();
 	        cb.setToolTipText(queryType.toolTip);
 		} else if ("clear".equals(command)) {
@@ -171,9 +168,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void stateChanged(ChangeEvent e) {
-
 	}
-	
 	
 	public void handleIdQuery(String id, String queryName) {
 		OTFQuery marked = null;
@@ -187,19 +182,21 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	
 	public void handleIdQuery(Collection<String> list, String queryName) {
 
-		boolean clearSelected = !((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).isMultipleSelect();
-		if (clearSelected) removeQueries();
-		
-		String all = text.getText();
-		
-		for(String id : list) {
-			if ( all.length() != 0) all += ", ";
-			all += id;
-			handleIdQuery(id, queryName);
-				
+		if (!this.cfg.isMultipleSelect()) {
+			removeQueries();
 		}
 		
-		text.setText(all);
+		StringBuilder infoText = new StringBuilder(text.getText());
+		
+		for(String id : list) {
+			if (infoText.length() != 0) {
+				infoText.append(", ");
+			}
+			infoText.append(id);
+			handleIdQuery(id, queryName);	
+		}
+
+		text.setText(infoText.toString());
 		handler.redrawHandlers();
 	}
 	
@@ -215,25 +212,25 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 
 	private OTFQuery createQuery(String className) {
 		OTFQuery query = null;
-	      try {
-	          Class classDefinition = Class.forName(className);
-	          query = (OTFQuery)classDefinition.newInstance();
-	      } catch (InstantiationException e) {
-	          System.out.println(e);
-	      } catch (IllegalAccessException e) {
-	          System.out.println(e);
-	      } catch (ClassNotFoundException e) {
-	          System.out.println(e);
-	      }
-	      return query;
+		try {
+			Class classDefinition = Class.forName(className);
+			query = (OTFQuery)classDefinition.newInstance();
+		} catch (InstantiationException e) {
+			System.out.println(e);
+		} catch (IllegalAccessException e) {
+			System.out.println(e);
+		} catch (ClassNotFoundException e) {
+			System.out.println(e);
+		}
+		return query;
 	}
-	
+
 	public void handleClick(Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
 			handler.redrawHandlers();
 		} else {
-			String queryName = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getQueryType();
+			String queryName = this.cfg.getQueryType();
 			OTFQuery query = createQuery(queryName);
 			
 			if (query.getType() == OTFQuery.Type.AGENT) {
@@ -278,6 +275,5 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public void updateQueries() {
 		for(OTFQuery query : queryItems) if (query.isAlive()) handleQuery(query);
 	}
-
 
 }

@@ -135,7 +135,7 @@ public class OnTheFlyClientQuad extends Thread {
 //			pane.getContentPane().add(drawer.getComponent());
 			pane.validate();
 			if(hostControl.isLiveHost()) {
-				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl);
+				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl, visconf);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
 				((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
 			}
