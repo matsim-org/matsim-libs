@@ -123,7 +123,7 @@ public class SocScoringFunctionEvent implements ScoringFunction{
 		betaFriendFoe*this.friendFoeRatio+
 		betaNFriends * this.nFriends +
 		betaLogNFriends * Math.log(this.nFriends+1) +
-		betaTimeWithFriends * timeWithFriends;
+		betaTimeWithFriends * Math.log(this.timeWithFriends/3600.+1);
 	}
 
 	public void reset() {
