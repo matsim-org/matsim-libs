@@ -29,6 +29,8 @@ import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
 
 public class SystemOptEvacControler extends EvacuationQSimControler{
 
+
+
 	public SystemOptEvacControler(final String[] args) {
 		super(args);
 	}
@@ -48,9 +50,9 @@ public class SystemOptEvacControler extends EvacuationQSimControler{
 		this.events.removeHandler(this.travelTimeCalculator);
 		this.events.addHandler(t);
 		this.strategyManager = loadStrategyManager();
+		this.addControlerListener(t);
 	}
 
-	
 	public static void main(final String[] args) {
 		final Controler controler = new SystemOptEvacControler(args);
 		controler.run();

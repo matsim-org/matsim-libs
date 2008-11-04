@@ -43,8 +43,9 @@ public class MarginalTravelCostCalculator implements TravelCost {
 
 	public double getLinkTravelCost(final Link link, final double time) {
 		double t = this.timeCostCalculator.getLinkTravelTime(link, time);
-		double s = this.timeCostCalculator.getSocialCost(link, time);
-		return t + s;
+//		double s = this.timeCostCalculator.getSocialCost(link, time);
+		return t; // + s;
 	}
+	
 
 }
