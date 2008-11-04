@@ -32,17 +32,15 @@ import org.matsim.utils.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFData.Receiver;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDataReader;
 
-
 public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.Provider {
-	static boolean prevV1_1 = OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	static {
+		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
+	}
 
 	protected OTFDataQuad.Receiver quadReceiver = null;
 
 	static public class Writer extends  OTFDataWriter<QueueLink> implements OTFWriterFactory<QueueLink> {
 
-		/**
-		 *
-		 */
 		private static final long serialVersionUID = 2827811927720044709L;
 
 		@Override
@@ -56,7 +54,6 @@ public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			out.putFloat((float)this.src.getDisplayableTimeCapValue());
-
 		}
 
 		public OTFDataWriter<QueueLink> getWriter() {
@@ -67,24 +64,18 @@ public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		this.quadReceiver.setColor(in.getFloat());
-
 	}
-
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat());
 	}
 
-
-
-
 	@Override
 	public void connect(Receiver receiver) {
 		if (receiver  instanceof OTFDataQuad.Receiver) {
 			this.quadReceiver = (OTFDataQuad.Receiver)receiver;
 		}
-
 	}
 
 	@Override
@@ -93,15 +84,12 @@ public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.
 	}
 
 
-	// Prevoius version of the reader
-
+	// Previous version of the reader
 
 	public static final class ReaderV1_1 extends OTFDefaultLinkHandler {
 		@Override
 		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		}
-
-
 	}
 }
 
