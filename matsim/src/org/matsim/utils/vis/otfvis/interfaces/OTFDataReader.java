@@ -36,9 +36,8 @@ public abstract class  OTFDataReader {
 		return previousVersions.get(identifier);
 	}
 	
-	public static boolean setPreviousVersion(String identifier, Class clazz) {
+	public static void setPreviousVersion(String identifier, Class clazz) {
 		previousVersions.put(identifier, clazz);
-		return true;
 	}
 	public static String getVersionString(int major, int minor) {
 		return "V" + major + "." + minor;
