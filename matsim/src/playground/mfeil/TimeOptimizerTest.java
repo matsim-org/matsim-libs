@@ -8,7 +8,6 @@ import org.matsim.scoring.PlanScorer;
 import org.matsim.population.Plan;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
