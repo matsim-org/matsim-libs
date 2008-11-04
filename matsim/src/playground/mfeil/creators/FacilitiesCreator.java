@@ -28,7 +28,7 @@ import org.matsim.gbl.Gbl;
 public class FacilitiesCreator {
 
 	/**
-	 * Creates facilities for the Manhatten-like network.
+	 * Creates facilities for the Manhattan-like network.
 	 */
 	public static void main(String[] args) {
 		
@@ -54,7 +54,7 @@ public class FacilitiesCreator {
 				 out.write("\t<facility id=\""+facilityID+"\" x=\"0.0\" y=\""+(i*distance-distance/2)+"\">\n");
 				 out.write("\t\t<activity type=\"home\"/>\n");
 				 out.write("\t\t<activity type=\"work\"/>\n");
-				 out.write("\t\t<facility/>\n\n");
+				 out.write("\t</facility>\n\n");
 				 facilityID++;
 				 out.write("<!-- ====================================================================== -->\n\n");
 			 }
@@ -62,7 +62,7 @@ public class FacilitiesCreator {
 				 out.write("\t<facility id=\""+facilityID+"\" x=\""+(networkSize-1)*distance+"\" y=\""+(i*distance-distance/2)+"\">\n");
 				 out.write("\t\t<activity type=\"home\"/>\n");
 				 out.write("\t\t<activity type=\"work\"/>\n");
-				 out.write("\t\t<facility/>\n\n");
+				 out.write("\t</facility>\n\n");
 				 facilityID++;
 				 out.write("<!-- ====================================================================== -->\n\n");
 			 }
@@ -70,7 +70,7 @@ public class FacilitiesCreator {
 				 out.write("\t<facility id=\""+facilityID+"\" x=\""+(i*distance-distance/2)+"\" y=\"0.0\">\n");
 				 out.write("\t\t<activity type=\"home\"/>\n");
 				 out.write("\t\t<activity type=\"work\"/>\n");
-				 out.write("\t\t<facility/>\n\n");
+				 out.write("\t</facility>\n\n");
 				 facilityID++;
 				 out.write("<!-- ====================================================================== -->\n\n");
 			 }
@@ -78,7 +78,21 @@ public class FacilitiesCreator {
 				 out.write("\t<facility id=\""+facilityID+"\" x=\""+(i*distance-distance/2)+"\" y=\""+distance*(networkSize-1)+"\">\n");
 				 out.write("\t\t<activity type=\"home\"/>\n");
 				 out.write("\t\t<activity type=\"work\"/>\n");
-				 out.write("\t\t<facility/>\n\n");
+				 out.write("\t</facility>\n\n");
+				 facilityID++;
+				 out.write("<!-- ====================================================================== -->\n\n");
+			 }
+			 for (int i=0;i<networkSize;i+=2){
+				 out.write("\t<facility id=\""+facilityID+"\" x=\""+(networkSize/2*distance-distance/2)+"\" y=\""+(i*distance)+"\">\n");
+				 out.write("\t\t<activity type=\"shopping\"/>\n");
+				 out.write("\t</facility>\n\n");
+				 facilityID++;
+				 out.write("<!-- ====================================================================== -->\n\n");
+			 }
+			 for (int i=1;i<networkSize;i+=2){
+				 out.write("\t<facility id=\""+facilityID+"\" x=\""+(networkSize/2*distance-distance/2)+"\" y=\""+(i*distance)+"\">\n");
+				 out.write("\t\t<activity type=\"leisure\"/>\n");
+				 out.write("\t</facility>\n\n");
 				 facilityID++;
 				 out.write("<!-- ====================================================================== -->\n\n");
 			 }

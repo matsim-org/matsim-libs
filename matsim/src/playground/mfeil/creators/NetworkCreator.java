@@ -28,7 +28,7 @@ import org.matsim.gbl.Gbl;
 public class NetworkCreator {
 
 	/**
-	 * Creates a Manhatten-like network.
+	 * Creates a Manhattan-like network.
 	 */
 	public static void main(String[] args) {
 		
@@ -77,13 +77,13 @@ public class NetworkCreator {
 			 }
 			 for (int i=1;i<networkSize*networkSize+1;i+=2*networkSize){
 				 for (int j=i;j<i+networkSize-1;j++){
-					 out.write("\t\t<link id=\""+linkID+"\" from=\""+j+"\" to=\""+(j+1)+"\" length=\""+distance+"\" freespeed=\"7.5\" capacity=\""+capacity+"\" permlanes=\"1.0\" oneway=\"1\" origid=\""+linkID+"\" type=\"1\" />\n");
+					 out.write("\t\t<link id=\""+linkID+"\" from=\""+(j+1)+"\" to=\""+(j)+"\" length=\""+distance+"\" freespeed=\"7.5\" capacity=\""+capacity+"\" permlanes=\"1.0\" oneway=\"1\" origid=\""+linkID+"\" type=\"1\" />\n");
 					 linkID++;
 				 }
 			 }
 			 for (int i=networkSize+1;i<networkSize*networkSize;i+=2*networkSize){
 				 for (int j=i;j<i+networkSize-1;j++){
-					 out.write("\t\t<link id=\""+linkID+"\" from=\""+(j+1)+"\" to=\""+j+"\" length=\""+distance+"\" freespeed=\"7.5\" capacity=\""+capacity+"\" permlanes=\"1.0\" oneway=\"1\" origid=\""+linkID+"\" type=\"1\" />\n");
+					 out.write("\t\t<link id=\""+linkID+"\" from=\""+(j)+"\" to=\""+(j+1)+"\" length=\""+distance+"\" freespeed=\"7.5\" capacity=\""+capacity+"\" permlanes=\"1.0\" oneway=\"1\" origid=\""+linkID+"\" type=\"1\" />\n");
 					 linkID++;
 				 }
 			 }
