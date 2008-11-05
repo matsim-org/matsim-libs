@@ -44,7 +44,7 @@ public class FacilitiesCreator {
 			 BufferedWriter out = new BufferedWriter(fw);
 			 
 			 out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-			 out.write("<!DOCTYPE network SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n\n");
+			 out.write("<!DOCTYPE facilities SYSTEM \"http://www.matsim.org/files/dtd/facilities_v1.dtd\">\n\n");
 			 
 			 out.write("<facilities name=\"Facilities_Test1\">\n\n");
 			 
