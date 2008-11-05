@@ -185,7 +185,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			this.log.info(" ... done making time windows and map");
 			twm= teo.getTimeWindowMap();
 //			execute spatial interactions (uses timewindows)
-			
+
 			if (total_spatial_fraction(this.fractionS) > 0) {
 				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
 			} else {
@@ -193,7 +193,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			}
 			this.log.info(" ... Spatial interactions done\n");
 			controler.stopwatch.endOperation("spatialencounters");
-			
+
 			Gbl.printMemoryUsage();
 //			execute nonspatial interactions (uses new social network)
 			this.log.info(" Non-Spatial interactions ...");
@@ -232,14 +232,14 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			}
 			this.log.info(" ... forgetting knowledge done");
 			Gbl.printMemoryUsage();
-			
+
 			//dissolve social ties
 			this.log.info(" Removing social links ...");
 			controler.stopwatch.beginOperation("dissolvelinks");
 			this.snet.removeLinks(snIter);
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
-			
+
 //			make new actstats (uses new twm AND new socialnet)
 			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
@@ -262,15 +262,16 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		if( event.getIteration()%replan_interval==0){
 
-			if(CALCSTATS && event.getIteration()%50==0){
-				Gbl.printMemoryUsage();
-				controler.stopwatch.beginOperation("netstats");
-				this.log.info(" Calculating and reporting network statistics ...");
-				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
-				this.log.info(" ... done");
-				controler.stopwatch.endOperation("netstats");
+			Gbl.printMemoryUsage();
+			controler.stopwatch.beginOperation("netstats");
+			this.log.info(" Calculating and reporting network statistics ...");
+			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+			this.log.info(" ... done");
+			controler.stopwatch.endOperation("netstats");
 
-				Gbl.printMemoryUsage();
+			Gbl.printMemoryUsage();
+
+			if(CALCSTATS && event.getIteration()%50==0){
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
@@ -282,17 +283,17 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			}
 
 //			if(event.getIteration()%10==0){
-//				this.log.info(" Writing out social network for iteration " + snIter + " ...");
-//				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-//				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-//				this.log.info(" ... done");
+//			this.log.info(" Writing out social network for iteration " + snIter + " ...");
+//			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+//			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+//			this.log.info(" ... done");
 
-//				Write out the KML for the EgoNet of a chosen agent
-//				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-//				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-////				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-//				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
-//				this.log.info(" ... done");
+//			Write out the KML for the EgoNet of a chosen agent
+//			this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
+//			Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+////			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+//			EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
+//			this.log.info(" ... done");
 //			}
 			snIter++;
 		}

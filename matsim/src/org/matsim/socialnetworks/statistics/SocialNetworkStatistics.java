@@ -78,6 +78,7 @@ import edu.uci.ics.jung.utils.UserData;
  */
 public class SocialNetworkStatistics {
 
+	private final int writeInterval=50;
 	private final Logger log = Logger.getLogger(SocialNetworkStatistics.class);
 	private String statsoutdir;
 
@@ -169,7 +170,7 @@ public class SocialNetworkStatistics {
 		log.info("Filling graph object for JUNG, g is instantiated but not filled");
 		Gbl.printMemoryUsage();
 		fillGraph(this.g, snet, plans);
-		
+
 		log.info("   MatSim social network converted into a JUNG graph for analysis");
 		log.info("     >> See Palla et al for k-clustering calculations or check JUNG");
 		Gbl.printMemoryUsage();
@@ -186,9 +187,11 @@ public class SocialNetworkStatistics {
 		// Graph statistics
 		// Calcualted and output in Person and Edge statistics
 		// Persons statistics
+
 		runPersonStatistics(iteration, plans, snet);
 		// Edge statistics
 		runEdgeStatistics(iteration, plans);
+
 	}
 
 	private void runEdgeStatistics(int iter, Population plans) {
@@ -215,15 +218,17 @@ public class SocialNetworkStatistics {
 			double x2 = (Integer.parseInt(myEdge.getUserDatum("visitNum").toString()));
 			smDur.accumulate(x1);
 			smNum.accumulate(x2);
-			try {
-				eout.write(iter + " " + myEdge.getUserDatum("timeLastUsed") + " "
-						+ myEdge.getUserDatum("timeMet") + " " + dyadDist + " "
-						+ pFrom.getId() + " " + pTo.getId() + " "
-						+ myEdge.getUserDatum("type") + " "
-						+ myEdge.getUserDatum("visitNum"));
-				eout.newLine();
-				eout.flush();
-			} catch (IOException ex) {
+			if(iter%writeInterval==0){
+				try {
+					eout.write(iter + " " + myEdge.getUserDatum("timeLastUsed") + " "
+							+ myEdge.getUserDatum("timeMet") + " " + dyadDist + " "
+							+ pFrom.getId() + " " + pTo.getId() + " "
+							+ myEdge.getUserDatum("type") + " "
+							+ myEdge.getUserDatum("visitNum"));
+					eout.newLine();
+					eout.flush();
+				} catch (IOException ex) {
+				}
 			}
 		}
 		try {
@@ -322,11 +327,11 @@ public class SocialNetworkStatistics {
 //			new PersonCalcEgoSpace().run(myPerson);
 //			ActivitySpace space = myPerson.getKnowledge().getActivitySpaces().get(0);
 //			if(space instanceof ActivitySpaceEllipse){
-//				esa=space.getParams().get("a");
-//				esb=space.getParams().get("b");
-//				esx=space.getParams().get("x");
-//				esy=space.getParams().get("y");
-//				est=space.getParams().get("theta");
+//			esa=space.getParams().get("a");
+//			esb=space.getParams().get("b");
+//			esx=space.getParams().get("x");
+//			esy=space.getParams().get("y");
+//			est=space.getParams().get("theta");
 //			}
 //			myPerson.getKnowledge().clearActivitySpaces();
 
@@ -346,12 +351,6 @@ public class SocialNetworkStatistics {
 					Act nextAct = (Act) a_it.next();
 					planTypeString.append(nextAct.getType().charAt(0));
 				}
-				// 10.03.08 JH If Plan.getType() is to be called in social nets in the future, for example
-//				to compare some statistics across plan types, remove this comment. However this
-//				could lead to setting the type to undefined values because the type string that is
-//				constructed above is not checked vs the DTD and might result in nonsense plan types
-//				for other users
-//				thisPlan.setType(planType);
 			}
 			else {
 				planTypeString = new StringBuilder(planType.toString());
@@ -371,21 +370,22 @@ public class SocialNetworkStatistics {
 			// CoolPlace place = (CoolPlace) viter.next();
 			// log.info(iter+"\t"+id+"\t"+place.activity.getType()+"\t"+place.facility.getId());
 			// }
-			try {
-//				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
-//						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-//						+ " " + myPerson.getKnowledge().getActivities().size() + " "+
-//						esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
-				aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
-						+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
-						+ " " + myPerson.getKnowledge().getActivities().size() + " "+pop);
-				aout.newLine();
-				aout.flush();
-			} catch (IOException e) {
+			if(iter%writeInterval==0){
+				try {
+//					aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
+//					+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
+//					+ " " + myPerson.getKnowledge().getActivities().size() + " "+
+//					esa+" "+esb+" "+esx+" "+esy+" "+est+" "+pop);
+					aout.write(iter + " " + id + " " + homeId + " " + deg + " " + aSd1
+							+ " " + aSd2 + " " + aSd3 + " " + clusterCoef + " " + planTypeString.toString()
+							+ " " + myPerson.getKnowledge().getActivities().size() + " "+pop);
+					aout.newLine();
+					aout.flush();
+				} catch (IOException e) {
 
-				e.printStackTrace();
+					e.printStackTrace();
+				}
 			}
-
 			// Node-based Graph statistics (temporary solution)
 			smAD.accumulate(deg);
 			smCC.accumulate(clusterCoef);
