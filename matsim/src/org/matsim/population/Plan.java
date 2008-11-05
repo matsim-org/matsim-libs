@@ -120,26 +120,6 @@ public class Plan extends BasicPlanImpl {
 		return a;
 	}
 
-	/**
-	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
-	 */
-  @Deprecated
-	public final Act createAct(final String type, final double x, final double y, final Link link, final double startTime,
-			final double endTime, final double dur, final boolean isPrimary) throws IllegalStateException {
-		if (endTime == Time.UNDEFINED_TIME) {
-			verifyCreateAct(null);
-		} else {
-			verifyCreateAct(Double.toString(endTime));
-		}
-		Act a = new Act(type, link);
-		a.setCoord(new CoordImpl(x, y));
-		a.setStartTime(startTime);
-		a.setEndTime(endTime);
-		a.setDur(dur);
-		this.actsLegs.add(a);
-		return a;
-	}
-
   /**
    * @deprecated use method with less arguments and make use of the appropriate setters afterwards
    */

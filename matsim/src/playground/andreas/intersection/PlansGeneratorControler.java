@@ -23,16 +23,17 @@ package playground.andreas.intersection;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.misc.Time;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class PlansGeneratorControler extends Controler {
 
@@ -161,10 +162,15 @@ public class PlansGeneratorControler extends Controler {
 		Person p = new Person(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. , Time.UNDEFINED_TIME, true);
+			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
+			act1.setLink(fromLink);
+			act1.setStartTime(0.);
+			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
-			plan.createLeg("car", null, null, null);
-			plan.createAct("h", 200., 200., toLink, 8 * 60 * 60, 0., 0., true);
+			plan.createLeg(BasicLeg.Mode.car);
+			Act act2 = plan.createAct("h", new CoordImpl(200., 200.));
+			act2.setLink(toLink);
+			act2.setStartTime(8 * 60 * 60);
 
 			p.addPlan(plan);
 			population.addPerson(p);

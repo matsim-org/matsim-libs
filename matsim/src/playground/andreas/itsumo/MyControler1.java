@@ -23,6 +23,7 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
@@ -30,12 +31,14 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
 import org.matsim.run.Events2Snapshot;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.netvis.NetVis;
 
 
@@ -112,21 +115,29 @@ public class MyControler1 extends Controler {
 
 			try {
 				Plan plan1 = new Plan(p);
-				plan1.createAct("h", 100., 100., this.network.getLink("9"), 0., 0*60*60., 0., true);
-				Leg leg = plan1.createLeg("car", null, null, null);
+				Act act1a = plan1.createAct("h", new CoordImpl(100., 100.));
+				act1a.setLink(this.network.getLink("9"));
+				act1a.setEndTime(0*60*60.);
+				Leg leg = plan1.createLeg(BasicLeg.Mode.car);
 				Route route = new Route();
 				route.setRoute("3 4");
 				leg.setRoute(route);
-				plan1.createAct("h", 200., 200., this.network.getLink("15"), 8*60*60, 0., 0., true);
+				Act act1b = plan1.createAct("h", new CoordImpl(200., 200.));
+				act1b.setLink(this.network.getLink("15"));
+				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
 				Plan plan2 = new Plan(p);
-				plan2.createAct("h", 100., 100., this.network.getLink("9"), 0., 0*60*60., 0., true);
-				Leg leg2 = plan2.createLeg("car", null, null, null);
+				Act act2a = plan1.createAct("h", new CoordImpl(100., 100.));
+				act2a.setLink(this.network.getLink("9"));
+				act2a.setEndTime(0*60*60.);
+				Leg leg2 = plan2.createLeg(BasicLeg.Mode.car);
 				Route route2 = new Route();
 				route2.setRoute("3 6 4");
 				leg2.setRoute(route2);
-				plan2.createAct("h", 200., 200., this.network.getLink("15"), 8*60*60, 0., 0., true);
+				Act act2b = plan1.createAct("h", new CoordImpl(200., 200.));
+				act2b.setLink(this.network.getLink("15"));
+				act2b.setStartTime(8*60*60);
 				p.addPlan(plan2);
 
 				population.addPerson(p);
@@ -309,9 +320,15 @@ public class MyControler1 extends Controler {
 		Person p = new Person(new IdImpl(ii));
 		Plan plan = new Plan(p);
 		try {
-			plan.createAct("h", 100., 100., sourceLink, 0., 0*60*60., 0., true);
-			plan.createLeg("car", null, null, null);
-			plan.createAct("h", 200., 200., destLink, 8*60*60, 0., 0., true);
+			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));
+			act1.setLink(sourceLink);
+			act1.setStartTime(0.);
+			act1.setEndTime(0 * 60 * 60.);
+
+			plan.createLeg(BasicLeg.Mode.car);
+			Act act2 = plan.createAct("h", new CoordImpl(200., 200.));
+			act2.setLink(destLink);
+			act2.setStartTime(8 * 60 * 60);
 
 			p.addPlan(plan);
 			population.addPerson(p);

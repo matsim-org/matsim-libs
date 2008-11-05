@@ -21,6 +21,7 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
@@ -28,12 +29,12 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
-import org.matsim.utils.misc.Time;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -179,10 +180,11 @@ public class CMCFScenarioGeneratorNoReroute {
 			p.addPlan(plan);
 			// home % 2
 			homeEndTime = homeEndTime + firstHomeEndTime + ((i - 1) % 2);
-			plan.createAct("h", l1.getCenter().getX(), l1.getCenter().getY(), l1,
-					Time.UNDEFINED_TIME, homeEndTime, Time.UNDEFINED_TIME, false);
+			Act act1 = plan.createAct("h", l1.getCenter());
+			act1.setLink(l1);
+			act1.setEndTime(homeEndTime);
 			// leg to home
-			Leg leg = plan.createLeg("car", null, null, null);
+			Leg leg = plan.createLeg(BasicLeg.Mode.car);
 			Route route = new Route();
 			if (!isAlternativeRouteEnabled) {
 				route.setRoute("2 3 5 6");
@@ -191,8 +193,8 @@ public class CMCFScenarioGeneratorNoReroute {
 				route.setRoute("2 3 4 5 6");
 			}
 			leg.setRoute(route);
-			plan.createAct("h", l6.getCenter().getX(), l6.getCenter().getY(), l6,
-					Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+			Act act2 = plan.createAct("h", l6.getCenter());
+			act2.setLink(l6);
 			this.plans.addPerson(p);
 		}
 	}
