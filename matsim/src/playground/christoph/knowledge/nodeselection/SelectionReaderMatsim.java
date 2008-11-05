@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.christoph.knowledge.nodeselection;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Stack;
@@ -68,13 +69,15 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	protected Id nodeId;
 	protected Id linkId;
 	
+	protected FileNameCreator fileNameCreator;
 			
 	public SelectionReaderMatsim(NetworkLayer network, Population population)
 	{
 		this.network = network;
 		this.population = population;
+		this.fileNameCreator = new FileNameCreator();
 	}
-  
+
 	public void setOverwriteExistingSelection(boolean value)
 	{
 		overwriteExistingSelection = value;
@@ -247,11 +250,11 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 		return id;
 	}
 	
-	public void readFile(String filename)
+	public void readFile(String fileName)
 	{
 		try 
 		{
-			super.parse(filename);
+			super.parse(fileName);
 		} 
 		catch (SAXException e)
 		{
@@ -265,4 +268,32 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 			e.printStackTrace();
 		}
 	}
+	
+	public void readMultiFile(String baseFileName)
+	{		
+		fileNameCreator.setBaseFileName(baseFileName);
+		
+		String nextFileName = fileNameCreator.getNextFileName();
+
+		while (new File(nextFileName).exists())
+		{
+			log.info(nextFileName);
+			readFile(nextFileName);
+			nextFileName = fileNameCreator.getNextFileName();
+		}
+		
+	}
+	
+	public void setNumDigits(int numDigits)
+	{
+		//this.numDigits = numDigits;
+		this.fileNameCreator.setNumDigits(numDigits);
+	}
+	
+	public int getNumDigits()
+	{
+		//return this.numDigits;
+		return this.fileNameCreator.getNumDigits();
+	}
+
 }

@@ -28,6 +28,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
@@ -40,7 +41,8 @@ public class TestNodeSelection {
 	Map<Id, Node> selectedNodesMap;
 	
 	final String networkFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
-	final String kmzFile = "D:/Master_Thesis_HLI/Workspace/TestNetz/kmzFile.kmz";
+	final String kmzFile = "kmzFile.kmz";
+	final String outputDirectory = "D:/Master_Thesis_HLI/Workspace/TestNetz"; 
 	
 	protected void init()
 	{
@@ -56,7 +58,7 @@ public class TestNodeSelection {
 	protected void testDijkstraSelector()
 	{
 		// FreespeedTravelTimeCost als Massstab
-		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 17.0);
+		SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 1.1);
 		
 		// Fahrzeit als Massstab
 		//SelectNodesDijkstra snd = new SelectNodesDijkstra(network, network.getNode("545"), network.getNode("4058"), 10000);
@@ -82,20 +84,18 @@ public class TestNodeSelection {
 	// nicht selektierte Nodes aus dem Netzwerk entfernen
 	protected void removeOtherNodes()
 	{
-		//ArrayList<Node> allNodes = new GetAllNodes().getAllNodes(network);
-		Map<Id, Node> allNodesMap = new GetAllNodes().getAllNodes(network);
+		Map<Id, Node> nodesToRemove = new TreeMap<Id, Node>();
 		
-/*		for(int i = 0; i < allNodes.size(); i++)
-		{
-			if(!selectedNodes.contains(allNodes.get(i))) network.removeNode(allNodes.get(i));
-		}
-*/
 		// iterate over Array or Iteratable 
-		for (Node node : allNodesMap.values())
+		for (Node node : network.getNodes().values())
 		{
-			if(!selectedNodesMap.containsKey(node.getId())) network.removeNode(node);
+			if(!selectedNodesMap.containsKey(node.getId())) nodesToRemove.put(node.getId(), node);
 		}
 
+		for (Node node : nodesToRemove.values()) 
+		{
+			network.removeNode(node);
+		}
 	}
 	
 	protected void getIncludedLinks()
@@ -106,10 +106,18 @@ public class TestNodeSelection {
 	
 	protected void createKMLFile()
 	{
-		MyKMLNetWriterTest kmlWriter = new MyKMLNetWriterTest();
+		KMLPersonWriter kmlWriter = new KMLPersonWriter();
 		kmlWriter.setKmzFileName(kmzFile);
+		kmlWriter.setOutputDirectory(outputDirectory);
 		kmlWriter.setNetwork(network);
-		kmlWriter.createKmzFile();
+		
+		kmlWriter.writeKnownNodes(false);
+		kmlWriter.writeRouteNodes(false);
+		kmlWriter.writeActivityLinks(false);
+		kmlWriter.writeNetwork(true);
+		
+		kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+		kmlWriter.writeFile();
 	}
 	
 	public static void main(String[] args)

@@ -21,6 +21,7 @@
 package playground.christoph.knowledge.nodeselection;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ public class SelectionWriter extends Writer {
 	private boolean fileOpened = false;
 	private String description = "";
 	private String dtdFile;
+	//private int numDigits = 3;
+	private FileNameCreator fileNameCreator;
 	
 	private SelectionWriterHandler handler = null;
 	private final Population population;
@@ -63,12 +66,12 @@ public class SelectionWriter extends Writer {
 		this.outfile = filename;
 		this.dtdFile = dtdFile;
 		this.description = description;
+		this.fileNameCreator = new FileNameCreator(this.outfile);
 		createHandler(this.dtdFile);
 	}
 
-	/**
+	/*
 	 * Just a helper method to instantiate the correct handler
-	 * @param version
 	 */
 	private void createHandler(String dtd)
 	{
@@ -174,12 +177,95 @@ public class SelectionWriter extends Writer {
 		}
 	}
 
+	/*
+	 * Write a single file containing all data.
+	 */
 	@Override
 	public void write() 
 	{
 		this.writeStartSelection(description);
 		this.writePersons();
 		this.writeEndSelection();
+	}
+
+	/*
+	 * Splits up the population in some files with n person in each of them (except the last one...).
+	 */
+	public void write(int n)
+	{
+		// don't allow zero persons per file
+		if(n == 0) n = this.population.size();
+
+		// counter variable
+		int i = 0;
+/*		
+		// save default fileName
+		String defaultFileName = new String(this.outfile);
+
+		// create header and ending of the creates filesnames
+		String header;
+		String ending;
+		
+		if(this.outfile.toLowerCase().endsWith(".xml.gz"))
+		{
+			header = this.outfile.toLowerCase().substring(0, this.outfile.length() - 7);
+			ending = ".xml.gz";
+		}
+		else if (this.outfile.toLowerCase().endsWith(".xml"))
+		{
+			header = this.outfile.toLowerCase().substring(0, this.outfile.length() - 4);
+			ending = ".xml";
+		}
+		else
+		{
+			log.error("Didn't recognize the ending of the output file!");
+			header = new String(this.outfile + ".");
+			ending = new String();
+		}
+			
+		// NumberFormat to format the counter in the filenames
+		NumberFormat nf = NumberFormat.getInstance();
+
+		// set how many places you want to the left of the decimal.
+		nf.setMinimumIntegerDigits(this.numDigits);
+*/				
+		Iterator<Person> p_it = this.population.getPersons().values().iterator();
+		
+		while (p_it.hasNext()) 
+		{
+			if (i % n == 0)
+			{
+				//this.outfile = new String(header + "_" + nf.format(i / n) + ending);
+				this.outfile = this.fileNameCreator.getNextFileName();
+				log.info(this.outfile);
+				this.writeStartSelection(description);
+			}
+			Person p = p_it.next();
+			writePerson(p);
+			
+			if ( (i + 1) % n == 0 || !p_it.hasNext())
+			{	
+				this.writeEndSelection();
+				//this.outfile = new String(defaultFileName);
+			}
+			i++;
+		}
+		
+		this.outfile = this.fileNameCreator.getBaseFileName();
+		
+		log.info("Splitted the created knowledge selection into " + this.fileNameCreator.getFileCounter() + " files.");
+	}
+	
+	public void setNumDigits(int numDigits)
+	{
+		//this.numDigits = numDigits;
+		this.fileNameCreator.setNumDigits(numDigits);
+	}
+	
+	public int getNumDigits()
+	{
+		//return this.numDigits;
+		return this.fileNameCreator.getNumDigits();
 	}
 
 	public SelectionWriterHandler getHandler() {

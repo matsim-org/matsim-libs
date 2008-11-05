@@ -35,9 +35,14 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.utils.geometry.transformations.GK4toWGS84;
+import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
+import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -323,7 +328,7 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-			if (counter++ < 50000) personNodeSelectors.add(nodeSelectors.get(1));
+			if (counter++ < 50) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
 		}
@@ -340,7 +345,8 @@ public class EventControler extends Controler{
 		{
 			String path = this.config.getModule("selection").getValue("inputSelectionFile");
 			log.info("Path: " + path);
-			new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			//new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
 			log.info("Read input selection file!");
 		}
 	}
@@ -357,7 +363,8 @@ public class EventControler extends Controler{
 			String outPutFile = this.config.getModule("selection").getValue("outputSelectionFile");
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 			
-			new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write();
+			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
+			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(5000);
 			//new SelectionWriter(this.population, getOutputFilename("selection.xml.gz"), "1.0", "dummy").write();	
 						
 			log.info("Path: " + outPutFile);
@@ -370,8 +377,10 @@ public class EventControler extends Controler{
 	protected void createKnownNodes()
 	{
 		// use only one of these two - they should produce the same results... 
-		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
-
+		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 1);
+		
+		writePersonKML(this.population.getPerson("100139"));
+		
 		// non multi-core calculation
 		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);
 
@@ -409,6 +418,26 @@ public class EventControler extends Controler{
 		}
 */	
 	} //doInitialReplanning
+	
+	
+	protected void writePersonKML(Person person)
+	{
+		KMLPersonWriter test = new KMLPersonWriter(network, person);
+		
+		// set CoordinateTransformation
+		String coordSys = this.config.global().getCoordinateSystem();
+		if(coordSys.equalsIgnoreCase("GK4")) test.setCoordinateTransformation(new GK4toWGS84());
+		if(coordSys.equalsIgnoreCase("Atlantis")) test.setCoordinateTransformation(new AtlantisToWGS84());
+		if(coordSys.equalsIgnoreCase("CH1903_LV03")) test.setCoordinateTransformation(new CH1903LV03toWGS84());
+		
+		// waiting for an implementation...
+		//new WGS84toCH1903LV03();
+		
+		String outputDirectory = this.config.controler().getOutputDirectory();
+		test.setOutputDirectory(outputDirectory);
+		
+		test.writeFile();
+	}
 	
 	/* ===================================================================
 	 * main
