@@ -19,6 +19,7 @@
  * *********************************************************************** */
 
 package org.matsim.utils.vis.otfvis.opengl.queries;
+
 import java.awt.Color;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -50,17 +51,14 @@ import org.matsim.utils.vis.otfvis.opengl.gl.InfoText;
 
 import com.sun.opengl.util.BufferUtil;
 
-
 public class QuerySpinne implements OTFQuery {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -749787121253826794L;
 	protected Id linkId;
 	private transient Map<Link,Integer> drivenLinks = null;
 	private float[] vertex = null;
 	private int[] count = null;
-	boolean calcOffset = true;
+	private boolean calcOffset = true;
 	private transient FloatBuffer vert;
 //	private transient FloatBuffer cnt;
 	private transient ByteBuffer colors =  null;
@@ -179,14 +177,14 @@ public class QuerySpinne implements OTFQuery {
 
 			for (int i = 0; i< this.count.length; i++) {
 				Color mycolor = colorizer3.getColor(this.count[i]);
-				this.colors.put( (byte)mycolor.getRed());
-				this.colors.put( (byte)mycolor.getGreen());
+				this.colors.put((byte)mycolor.getRed());
+				this.colors.put((byte)mycolor.getGreen());
 				this.colors.put((byte)mycolor.getBlue());
-				this.colors.put( (byte)120);
-				this.colors.put( (byte)mycolor.getRed());
-				this.colors.put( (byte)mycolor.getGreen());
+				this.colors.put((byte)120);
+				this.colors.put((byte)mycolor.getRed());
+				this.colors.put((byte)mycolor.getGreen());
 				this.colors.put((byte)mycolor.getBlue());
-				this.colors.put( (byte)120);
+				this.colors.put((byte)120);
 			}
 
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
@@ -201,14 +199,14 @@ public class QuerySpinne implements OTFQuery {
 		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_LINE_SMOOTH);
-        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glLineWidth(2.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
 		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, this.colors);
-        gl.glDrawArrays (GL.GL_LINES, 0, this.vertex.length/2);
+		gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, this.colors);
+		gl.glDrawArrays (GL.GL_LINES, 0, this.vertex.length/2);
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
+		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 		gl.glDisable(GL.GL_LINE_SMOOTH);
 		gl.glDisable(GL.GL_BLEND);
 

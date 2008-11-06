@@ -23,7 +23,6 @@ package org.matsim.utils.vis.otfvis.opengl.queries;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +57,14 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 		private static final long serialVersionUID = 1L;
 		public final static List<PersonEvent> events = new ArrayList<PersonEvent>();
-		private final String agentID;
+		private final String agentId;
 		
-		public MyEventsHandler(String agentID) {
-			this.agentID = agentID;
+		public MyEventsHandler(String agentId) {
+			this.agentId = agentId;
 		}
 
 		public void handleEvent(PersonEvent event) {
-			if(event.agentId.equals(this.agentID)){
+			if(event.agentId.equals(this.agentId)){
 				events.add(event);
 			}
 			
@@ -76,24 +75,22 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		
 	}
 
-	public String agentID;
 	private final float[] vertex = null;
-	private final ByteBuffer colors = null;
 	private transient FloatBuffer vert;
 	private transient List<InfoText> texts = null;
 	private transient InfoText agentText = null;
 
-	boolean calcOffset = true;
+	private boolean calcOffset = true;
 	private MyEventsHandler handler = null;
 
 	
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
 		if(handler == null) {
-			handler = new MyEventsHandler(agentID);
+			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);
 		}
 		
-		Person person = plans.getPerson(this.agentID);
+		Person person = plans.getPerson(this.agentId);
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();
@@ -109,23 +106,23 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	public static void drawCircle(GL gl, float x, float y, float size) {
 		float w = 40;
-		
+
 		gl.glLineWidth(2);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glBegin(GL.GL_LINE_STRIP);
 		for (float f = 0; f < w;) {
 			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
-		    f += (2*Math.PI/w);
+			f += (2*Math.PI/w);
 		}
 		gl.glEnd();
-        gl.glDisable(GL.GL_LINE_SMOOTH);
+		gl.glDisable(GL.GL_LINE_SMOOTH);
 	}
-	
+
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
 		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-		Point2D.Double pos = layer.getAgentCoords(this.agentID.toCharArray());
+		Point2D.Double pos = layer.getAgentCoords(this.agentId.toCharArray());
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
@@ -139,7 +136,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 
 			if (pos != null) {
-				this.agentText = InfoText.showTextPermanent(this.agentID, (float)pos.x, (float)pos.y, -0.0005f );
+				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
 				this.agentText.setAlpha(0.7f);
 			}
 			this.texts = new ArrayList<InfoText>();
@@ -200,11 +197,5 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	public Type getType() {
 		return OTFQuery.Type.AGENT;
 	}
-
-	public void setId(String id) {
-		this.agentID = id;
-	}
-
-
 
 }

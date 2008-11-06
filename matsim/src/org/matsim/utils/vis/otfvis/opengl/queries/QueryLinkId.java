@@ -42,16 +42,13 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
- 
 public class QueryLinkId implements OTFQuery {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -1389950511283282110L;
-	double sx;
-	double sy;
-	double width = 0;
-	double height = 0;
+	private double sx;
+	private double sy;
+	private double width = 0;
+	private double height = 0;
 	
 	public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
 
@@ -79,9 +76,9 @@ public class QueryLinkId implements OTFQuery {
 
 	class AddIdStringExecutor extends Executor<OTFDataWriter> {
 		private final boolean nearestOnly;
-		private double minDist = Double.POSITIVE_INFINITY, dist = 0;
-		final double epsilon = 0.0001;
-		final double cellWidth;
+		private double minDist = Double.POSITIVE_INFINITY;
+		private static final double epsilon = 0.0001;
+		private final double cellWidth;
 		
 		public AddIdStringExecutor(boolean nearestOnly) {
 			this.nearestOnly = nearestOnly;
@@ -98,21 +95,21 @@ public class QueryLinkId implements OTFQuery {
 				double fromY = link.getFromNode().getCoord().getY();
 				double middleX = alpha*fromX + (1.0-alpha)*link.getToNode().getCoord().getX();
 				double middleY = alpha*fromY + (1.0-alpha)*link.getToNode().getCoord().getY();
-				if(nearestOnly) {
+				if (nearestOnly) {
 					
 					double xDist = middleX - sx;
 					double yDist = middleY - sy;
-						// search for NEAREST agent to given POINT
-						dist = Math.sqrt(xDist*xDist + yDist*yDist);
-						if(dist <= minDist){
-							// is  this just about the same distance, then put both into account
-							if (minDist - dist > epsilon) linkIds.clear();
-							
-							minDist = dist;
-							Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
-							linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
-						}
-					
+					// search for NEAREST agent to given POINT
+					double dist = Math.sqrt(xDist*xDist + yDist*yDist);
+					if(dist <= minDist){
+						// is this just about the same distance, then put both into account
+						if (minDist - dist > epsilon) linkIds.clear();
+
+						minDist = dist;
+						Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
+						linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
+					}
+
 				} else {
 					Point2D.Float anchor = SimpleStaticNetLayer.SimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);			
 					linkIds.put(new CoordImpl(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
@@ -122,7 +119,6 @@ public class QueryLinkId implements OTFQuery {
 	}
 	
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		double minDist = Double.POSITIVE_INFINITY, dist = 0, epsilon = 0.0001;
 		
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
@@ -140,8 +136,6 @@ public class QueryLinkId implements OTFQuery {
 	}
 
 	public void remove() {
-		// TODO Auto-generated method stub
-
 	}
 	
 	public boolean isAlive() {
@@ -154,7 +148,6 @@ public class QueryLinkId implements OTFQuery {
 
 	public void setId(String id) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

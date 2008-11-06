@@ -34,18 +34,13 @@ import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 
+public class QueryAgentActivityStatus implements OTFQuery {
 
-public class QueryAgentActivityStatus implements OTFQuery{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8532403277319196797L;
 
-	public String agentID;
+	private String agentID;
 
-	boolean calcOffset = true;
-
-	double now;
+	private double now;
 	//out
 	int activityNr = -1;
 	double finished = 0;
@@ -56,7 +51,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 
 		Plan plan = person.getSelectedPlan();
 
-		// find the acual activity by searchin all activity links
+		// find the actual activity by searching all activity links
 		// for a vehicle with this agent id
 
 		for (int i=0;i< plan.getActsLegs().size(); i+=2) {
@@ -65,7 +60,7 @@ public class QueryAgentActivityStatus implements OTFQuery{
 			Collection<Vehicle> vehs = link.getAllVehicles();
 			for (Vehicle info : vehs) {
 				if (info.getDriver().getPerson().getId().toString().compareTo(this.agentID) == 0) {
-					// we found the little nutty, now lets reason about the lngth of ist activity
+					// we found the little nutty, now lets reason about the length of 1st activity
 					double departure = info.getDepartureTime_s();
 					double diff =  departure - info.getLastMovedTime();
 					this.finished = (this.now - info.getLastMovedTime()) / diff;
@@ -77,13 +72,9 @@ public class QueryAgentActivityStatus implements OTFQuery{
 	}
 
 	public void remove() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void draw(OTFDrawer drawer) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public boolean isAlive() {

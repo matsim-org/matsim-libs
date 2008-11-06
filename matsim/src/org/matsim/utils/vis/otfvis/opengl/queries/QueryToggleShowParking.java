@@ -28,18 +28,14 @@ import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 
-
+/**
+ * This is not a real query, it just toggles the rendering of vehicles while activities
+ */
 public class QueryToggleShowParking implements OTFQuery {
-
-	// This is not a real query it just toggles the rendering of vehicles while activities
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3558773539361553004L;
 
 	public void draw(OTFDrawer drawer) {
-		
 	}
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
@@ -47,7 +43,6 @@ public class QueryToggleShowParking implements OTFQuery {
 	}
 
 	public void remove() {
-		
 	}
 	
 	public boolean isAlive() {
@@ -58,10 +53,6 @@ public class QueryToggleShowParking implements OTFQuery {
 	}
 
 	public void setId(String id) {
-		// TODO Auto-generated method stub
-		
 	}
-
-
 
 }

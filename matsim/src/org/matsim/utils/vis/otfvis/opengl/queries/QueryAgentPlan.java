@@ -53,15 +53,11 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDra
 import com.sun.opengl.util.BufferUtil;
 
 public class QueryAgentPlan implements OTFQuery {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -8415337571576184768L;
 
 	private static class MyInfoText implements Serializable{
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1L;
 		float east, north;
 		String name;
@@ -72,7 +68,7 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 	}
 
-	public String agentID;
+	protected String agentId;
 	private float[] vertex = null;
 	private byte[] colors = null;
 	private transient FloatBuffer vert;
@@ -81,52 +77,47 @@ public class QueryAgentPlan implements OTFQuery {
 	private int lastActivity = -1;
 	private ByteBuffer cols; 
 
-	boolean calcOffset = true;
+	private boolean calcOffset = true;
 
 	public void setId(String id) {
-		this.agentID = id;
+		this.agentId = id;
 	}
 
-	public static int countLines(Plan plan) {
+	private static int countLines(Plan plan) {
 		int count = 0;
 		List actslegs = plan.getActsLegs();
-		Act prevAct = null;
-		
+
 		for (int i= 0; i< actslegs.size(); i++) {
 			if(i%2==0) {
 				// handle act
-				prevAct = (Act)plan.getActsLegs().get(i);
 				count++;
 			} else {
 				// handle leg 
 				Leg leg = (Leg)actslegs.get(i);
-				
+
 				if (leg.getMode().equals(Mode.car)) {
 					Link[] route = leg.getRoute().getLinkRoute();
-					for (Link driven : route) {
-						count++;
-					}
+					count += route.length;
 					count++; //last position
-				} else {
-					
 				}
 			}
 		}
 		return count;
 	}
+
 	protected void setCol(int pos, Color col) {
 		this.colors[pos*4 +0 ] = (byte)col.getRed();
 		this.colors[pos*4 +1 ] = (byte)col.getGreen();
 		this.colors[pos*4 +2 ] = (byte)col.getBlue();
 		this.colors[pos*4 +3 ] = (byte)128;
 	}
-	
+
 	protected void setCoord(int pos, Coord coord, Color col) {
 		this.vertex[pos*2 +0 ] = (float)coord.getX();
 		this.vertex[pos*2 +1 ] = (float)coord.getY();
 		setCol(pos, col);
 	}
-	
+
 	public void buildRoute(Plan plan) {
 		int count = countLines(plan);
 		if(count == 0) return;
@@ -138,7 +129,7 @@ public class QueryAgentPlan implements OTFQuery {
 		Color carColor = Color.ORANGE;
 		Color actColor = Color.BLUE;
 		Color ptColor = Color.RED;
-		
+
 		List actslegs = plan.getActsLegs();
 		for (int i= 0; i< actslegs.size(); i++) {
 			if(i%2==0) {
@@ -151,7 +142,7 @@ public class QueryAgentPlan implements OTFQuery {
 			} else {
 				// handle leg 
 				Leg leg = (Leg)actslegs.get(i);
-				
+
 				if (leg.getMode().equals(Mode.car)) {
 					Link[] route = leg.getRoute().getLinkRoute();
 					Node last = null;
@@ -167,9 +158,9 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 		}
 	}
-	
+
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		Person person = plans.getPerson(this.agentID);
+		Person person = plans.getPerson(this.agentId);
 		if (person == null) return;
 
 		Plan plan = person.getSelectedPlan();
@@ -182,7 +173,7 @@ public class QueryAgentPlan implements OTFQuery {
 			if (coord == null) coord = act.getLink().getCenter();
 			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());
 		}
-		
+
 		buildRoute(plan);
 
 	}
@@ -195,23 +186,23 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public static void drawCircle(GL gl, float x, float y, float size) {
 		float w = 40;
-		
+
 		gl.glLineWidth(2);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
 		gl.glBegin(GL.GL_LINE_STRIP);
 		for (float f = 0; f < w;) {
 			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
-		    f += (2*Math.PI/w);
+			f += (2*Math.PI/w);
 		}
 		gl.glEnd();
-        gl.glDisable(GL.GL_LINE_SMOOTH);
+		gl.glDisable(GL.GL_LINE_SMOOTH);
 	}
-	
+
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
 		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-		Point2D.Double pos = layer.getAgentCoords(this.agentID.toCharArray());
+		Point2D.Double pos = layer.getAgentCoords(this.agentId.toCharArray());
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
@@ -231,7 +222,7 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 
 			if (pos != null) {
-				this.agentText = InfoText.showTextPermanent(this.agentID, (float)pos.x, (float)pos.y, -0.0005f );
+				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
 				this.agentText.setAlpha(0.7f);
 			}
 			//InfoText.showText("Agent selected...");
@@ -241,19 +232,19 @@ public class QueryAgentPlan implements OTFQuery {
 		Color color = Color.ORANGE;
 		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
 
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_LINE_SMOOTH);
-        gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-        gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-        vert.position(0);
-        cols.position(0);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+		vert.position(0);
+		cols.position(0);
 		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
-        gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, cols);
+		gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, cols);
 		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
 		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
-        gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-        gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-        gl.glDisable(GL.GL_LINE_SMOOTH);
+		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
+		gl.glDisable(GL.GL_LINE_SMOOTH);
 		if (pos != null) {
 			//System.out.println("POS: " + pos.x + ", " + pos.y);
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
@@ -271,7 +262,7 @@ public class QueryAgentPlan implements OTFQuery {
 			if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).fill = 0.0f;
 		} else {
 			QueryAgentActivityStatus query = new QueryAgentActivityStatus();
-			query.setId(this.agentID);
+			query.setId(this.agentId);
 			query.setNow(drawer.getActGraph().getTime());
 			query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
 			if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
@@ -283,7 +274,7 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 		}
 
-        gl.glDisable(GL.GL_BLEND);
+		gl.glDisable(GL.GL_BLEND);
 
 	}
 
@@ -298,7 +289,7 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
 	}
-	
+
 	public boolean isAlive() {
 		return false;
 	}

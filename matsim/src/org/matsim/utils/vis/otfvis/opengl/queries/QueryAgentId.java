@@ -36,16 +36,13 @@ import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo.VehicleState;
 
-
 public class QueryAgentId implements OTFQuery {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -4466967514266968254L;
-	double x;
-	double y;
-	double width = 0;
-	double height = 0;
+	private double x;
+	private double y;
+	private double width = 0;
+	private double height = 0;
 	public List<String> agentIds = new ArrayList<String>();
 
 	public QueryAgentId(double x,double y) {
@@ -64,7 +61,8 @@ public class QueryAgentId implements OTFQuery {
 	}
 
 	public void query(QueueNetwork net, Population plans, Events events, OTFServerQuad quad) {
-		double minDist = Double.POSITIVE_INFINITY, dist = 0;;
+		double minDist = Double.POSITIVE_INFINITY;
+		double dist = 0;
 		for( QueueLink qlink : net.getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
 			qlink.getVehiclePositions(positions);
