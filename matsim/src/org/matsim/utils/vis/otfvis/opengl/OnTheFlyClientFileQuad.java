@@ -31,6 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.gui.OTFHostControlBar;
@@ -41,6 +42,7 @@ import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfvis.opengl.gui.OTFTimeLine;
@@ -210,6 +212,9 @@ public class OnTheFlyClientFileQuad extends Thread {
 		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		splitLayout = false;
 	}
 
