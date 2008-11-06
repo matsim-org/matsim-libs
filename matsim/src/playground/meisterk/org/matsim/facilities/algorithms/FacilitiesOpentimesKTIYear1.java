@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 
 public class FacilitiesOpentimesKTIYear1 {
 
-	private TreeMap<String, Opentime> openingTimes = new TreeMap<String, Opentime>();
+	private TreeMap<String, OpeningTime> openingTimes = new TreeMap<String, OpeningTime>();
 	
 	private final static Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear1.class);
 
@@ -49,7 +49,7 @@ public class FacilitiesOpentimesKTIYear1 {
 				String actType = a.getType();
 
 				// delete all existing open times info
-				TreeMap<String, TreeSet<Opentime>> o = a.getOpentimes();
+				TreeMap<String, TreeSet<OpeningTime>> o = a.getOpentimes();
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {
@@ -63,9 +63,9 @@ public class FacilitiesOpentimesKTIYear1 {
 	}
 
 	private void loadOpeningTimes() {
-		openingTimes.put("work", new Opentime("wkday", "7:00", "18:00"));
-		openingTimes.put("shop", new Opentime("wkday", "8:00", "20:00"));
-		openingTimes.put("education", new Opentime("wkday", "7:00", "18:00"));
-		openingTimes.put("leisure", new Opentime("wkday", "6:00", "24:00"));
+		openingTimes.put("work", new OpeningTime("wkday", "7:00", "18:00"));
+		openingTimes.put("shop", new OpeningTime("wkday", "8:00", "20:00"));
+		openingTimes.put("education", new OpeningTime("wkday", "7:00", "18:00"));
+		openingTimes.put("leisure", new OpeningTime("wkday", "6:00", "24:00"));
 	}
 }

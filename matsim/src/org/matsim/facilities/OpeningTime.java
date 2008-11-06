@@ -23,7 +23,7 @@ package org.matsim.facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
-public class Opentime implements Comparable<Opentime> {
+public class OpeningTime implements Comparable<OpeningTime> {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -37,11 +37,11 @@ public class Opentime implements Comparable<Opentime> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	@Deprecated
-	public Opentime(final String day, final String start_time, final String end_time) {
+	public OpeningTime(final String day, final String start_time, final String end_time) {
 		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
 	}
 
-	public Opentime(final String day, final double startTime, final double endTime) {
+	public OpeningTime(final String day, final double startTime, final double endTime) {
 		this.day = day;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -54,7 +54,7 @@ public class Opentime implements Comparable<Opentime> {
 	//
 	//////////////////////////////////////////////////////////////////////
 
-	public int compareTo(Opentime other) {
+	public int compareTo(OpeningTime other) {
 		// two functionalities in one:
 		// 1. the earlier start_time comes before the other. If they're the same,
 		//    the end times decides which comes first
@@ -110,8 +110,8 @@ public class Opentime implements Comparable<Opentime> {
 
 	@Override
 	public final boolean equals(final Object o) {
-		if (o instanceof Opentime) {
-			Opentime other = (Opentime)o;
+		if (o instanceof OpeningTime) {
+			OpeningTime other = (OpeningTime)o;
 			if (other.day.equals(this.day) && (other.startTime == this.startTime) && (other.endTime == this.endTime)) {
 				return true;
 			}

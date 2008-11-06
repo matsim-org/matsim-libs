@@ -32,7 +32,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
@@ -431,7 +431,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-		TreeSet<Opentime> opentimes = null;
+		TreeSet<OpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
@@ -453,7 +453,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
 
-					for (Opentime opentime : opentimes) {
+					for (OpeningTime opentime : opentimes) {
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
 					}

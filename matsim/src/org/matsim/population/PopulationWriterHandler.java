@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.writer.WriterHandler;
 
 public interface PopulationWriterHandler extends WriterHandler {
@@ -129,7 +129,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final Opentime opentime, final BufferedWriter out) throws IOException;
+	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException;
 
 	public void endOpentime(final BufferedWriter out) throws IOException;
 

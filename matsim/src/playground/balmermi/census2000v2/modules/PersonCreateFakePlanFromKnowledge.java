@@ -67,15 +67,15 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 		Activity home = null;
 		ArrayList<Activity> home_acts = k.getActivities(CAtts.ACT_HOME);
-		if (home_acts.size()==0) { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDesc()+": no home activity defined"); }
+		if (home_acts.size()==0) { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": no home activity defined"); }
 		else if (home_acts.size()==1) { home = home_acts.get(0); }
 		else if (home_acts.size()==2) {
 			Household hh = (Household)person.getCustomAttributes().get(CAtts.HH_W);
 			if (home_acts.get(0).getFacility().equals(hh.getFacility())) { home = home_acts.get(0); }
 			else if (home_acts.get(1).getFacility().equals(hh.getFacility())) { home = home_acts.get(1); }
-			else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDesc()+", hhid_w="+hh.getId()+": given facilities do not match the household!"); }
+			else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+", hhid_w="+hh.getId()+": given facilities do not match the household!"); }
 		}
-		else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDesc()+": more than 2 home activities defined"); }
+		else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": more than 2 home activities defined"); }
 
 		Activity work = null;
 		for (int i=0; i<this.w_acts.length;i++) {  // that only works if we know that there is at most one work activity

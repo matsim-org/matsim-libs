@@ -41,7 +41,7 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -162,9 +162,9 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		int dayCounter = 0;
 		for (Day day : days) {
 			if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-				TreeSet<Opentime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+				TreeSet<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
 				if (dailyOpentimes != null) {
-					for (Opentime opentime : dailyOpentimes) {
+					for (OpeningTime opentime : dailyOpentimes) {
 
 						// build up placemark structure
 						aShopOpeningPeriod = this.kmlJAXBFactory.createPlacemarkType();

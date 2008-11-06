@@ -107,12 +107,12 @@ public class FacilitiesWriter extends Writer {
 				this.handler.startActivity(a, this.out);
 				this.handler.startCapacity(a, this.out);
 				this.handler.endCapacity(this.out);
-				Iterator<TreeSet<Opentime>> o_set_it = a.getOpentimes().values().iterator();
+				Iterator<TreeSet<OpeningTime>> o_set_it = a.getOpentimes().values().iterator();
 				while (o_set_it.hasNext()) {
-					TreeSet<Opentime> o_set = o_set_it.next();
-					Iterator<Opentime> o_it = o_set.iterator();
+					TreeSet<OpeningTime> o_set = o_set_it.next();
+					Iterator<OpeningTime> o_it = o_set.iterator();
 					while (o_it.hasNext()) {
-						Opentime o = o_it.next();
+						OpeningTime o = o_it.next();
 						this.handler.startOpentime(o, this.out);
 						this.handler.endOpentime(this.out);
 					}

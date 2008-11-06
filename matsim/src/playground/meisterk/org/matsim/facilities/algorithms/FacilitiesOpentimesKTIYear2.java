@@ -30,7 +30,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.utils.misc.Day;
 import org.matsim.world.Location;
@@ -71,7 +71,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		TreeMap<String, TreeSet<Opentime>> closestShopOpentimes = new TreeMap<String, TreeSet<Opentime>>();
+		TreeMap<String, TreeSet<OpeningTime>> closestShopOpentimes = new TreeMap<String, TreeSet<OpeningTime>>();
 
 		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
@@ -84,7 +84,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (Activity a : activities.values()) {
-			a.setOpentimes(new TreeMap<String, TreeSet<Opentime>>());
+			a.setOpentimes(new TreeMap<String, TreeSet<OpeningTime>>());
 		}
 		
 		// if only presence code and work are present
@@ -109,20 +109,20 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 			} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 				// eliminate lunch break
 				for (Day day : days) {
-					TreeSet<Opentime> dailyOpentime = closestShopOpentimes.get(day.getAbbrevEnglish());
+					TreeSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day.getAbbrevEnglish());
 					if (dailyOpentime != null) {
 						switch(dailyOpentime.size()) {
 						case 2:
 							startTime = Math.min(
-									((Opentime) dailyOpentime.toArray()[0]).getStartTime(),
-									((Opentime) dailyOpentime.toArray()[1]).getStartTime());
+									((OpeningTime) dailyOpentime.toArray()[0]).getStartTime(),
+									((OpeningTime) dailyOpentime.toArray()[1]).getStartTime());
 							endTime = Math.max(
-									((Opentime) dailyOpentime.toArray()[0]).getEndTime(),
-									((Opentime) dailyOpentime.toArray()[1]).getEndTime());
+									((OpeningTime) dailyOpentime.toArray()[0]).getEndTime(),
+									((OpeningTime) dailyOpentime.toArray()[1]).getEndTime());
 							break;
 						case 1:
-							startTime = ((Opentime) dailyOpentime.toArray()[0]).getStartTime();
-							endTime = ((Opentime) dailyOpentime.toArray()[0]).getEndTime();
+							startTime = ((OpeningTime) dailyOpentime.toArray()[0]).getStartTime();
+							endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
 							break;
 						}
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(

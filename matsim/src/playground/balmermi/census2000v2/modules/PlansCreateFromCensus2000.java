@@ -245,7 +245,7 @@ public class PlansCreateFromCensus2000 {
 			Activity act = this.chooseEducActBasedOnSchoolType(p,act_type);
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
 			p.getKnowledge().addActivity(act, false);
-			p.getKnowledge().setDesc(p.getKnowledge().getDesc()+"("+CAtts.P_SGDE+":"+sgde+")");
+			p.getKnowledge().setDescription(p.getKnowledge().getDescription()+"("+CAtts.P_SGDE+":"+sgde+")");
 		}
 	}
 
@@ -298,7 +298,7 @@ public class PlansCreateFromCensus2000 {
 				Facility home_f = p.getKnowledge().getActivities(CAtts.ACT_HOME).get(0).getFacility();
 				zone = (Zone)home_f.getUpMapping().values().iterator().next();
 				log.info("        => work muni = home muni (zid="+agde+") assigned.");
-				p.getKnowledge().setDesc(p.getKnowledge().getDesc()+"("+CAtts.P_AGDE+":"+agde+")");
+				p.getKnowledge().setDescription(p.getKnowledge().getDescription()+"("+CAtts.P_AGDE+":"+agde+")");
 			}
 			else { Gbl.errorMsg("pid="+p.getId()+", jobnr="+job+": Zone id="+agde+" not found!"); }
 		}
@@ -424,7 +424,7 @@ public class PlansCreateFromCensus2000 {
 			k.addActivity(hh_z.getFacility().getActivity(CAtts.ACT_HOME), false);
 		}
 		else { Gbl.errorMsg("that should not happen!"); }
-		k.setDesc(k.getDesc()+desc);
+		k.setDescription(k.getDescription()+desc);
 
 		p.setAge(Integer.parseInt(entries[CAtts.I_ALTJ]));
 		if (entries[CAtts.I_GESL].equals("1")) { p.setSex("m"); } else { p.setSex("f"); }

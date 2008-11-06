@@ -37,7 +37,7 @@ public class Activity {
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
-	private TreeMap<String,TreeSet<Opentime>> opentimes = new TreeMap<String,TreeSet<Opentime>>();
+	private TreeMap<String,TreeSet<OpeningTime>> opentimes = new TreeMap<String,TreeSet<OpeningTime>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -54,7 +54,7 @@ public class Activity {
 	//////////////////////////////////////////////////////////////////////
 	@Deprecated
 	public final void createOpentime(final String day, final double startTime, final double endTime) {
-		Opentime o = new Opentime(day, startTime, endTime);
+		OpeningTime o = new OpeningTime(day, startTime, endTime);
 		this.addOpentime(o);
 	}
 	
@@ -62,21 +62,21 @@ public class Activity {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void addOpentime(final Opentime opentime) {
+	public final void addOpentime(final OpeningTime opentime) {
 		String day = opentime.getDay();
 		if (!this.opentimes.containsKey(day)) {
-			this.opentimes.put(day,new TreeSet<Opentime>());
+			this.opentimes.put(day,new TreeSet<OpeningTime>());
 		}
-		TreeSet<Opentime> o_set = this.opentimes.remove(day);
+		TreeSet<OpeningTime> o_set = this.opentimes.remove(day);
 		if (o_set.isEmpty()) {
 			o_set.add(opentime);
 			this.opentimes.put(day,o_set);
 		}
 		else {
-			TreeSet<Opentime> new_o_set = new TreeSet<Opentime>();
-			Iterator<Opentime> o_it = o_set.iterator();
+			TreeSet<OpeningTime> new_o_set = new TreeSet<OpeningTime>();
+			Iterator<OpeningTime> o_it = o_set.iterator();
 			while (o_it.hasNext()) {
-				Opentime o = o_it.next();
+				OpeningTime o = o_it.next();
 				int merge_type = o.compareTo(opentime); // see Opentime for the meaning
 				if ((merge_type == -6) || (merge_type == 6)) {
 					// complete disjoint
@@ -115,8 +115,8 @@ public class Activity {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final boolean containsOpentime(final Opentime o) {
-		TreeSet<Opentime> o_set = this.getOpentimes(o.getDay());
+	public final boolean containsOpentime(final OpeningTime o) {
+		TreeSet<OpeningTime> o_set = this.getOpentimes(o.getDay());
 		if (o_set == null) {
 			return false;
 		}
@@ -139,7 +139,7 @@ public class Activity {
 		this.capacity = capacity;
 	}
 
-	public void setOpentimes(TreeMap<String, TreeSet<Opentime>> opentimes) {
+	public void setOpentimes(TreeMap<String, TreeSet<OpeningTime>> opentimes) {
 		this.opentimes = opentimes;
 	}
 
@@ -159,11 +159,11 @@ public class Activity {
 		return this.capacity;
 	}
 
-	public final TreeMap<String,TreeSet<Opentime>> getOpentimes() {
+	public final TreeMap<String,TreeSet<OpeningTime>> getOpentimes() {
 		return this.opentimes;
 	}
 
-	public final TreeSet<Opentime> getOpentimes(final String day) {
+	public final TreeSet<OpeningTime> getOpentimes(final String day) {
 		return this.opentimes.get(day);
 	}
 

@@ -28,7 +28,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.world.Location;
 
 public class FacilitiesCombine {
@@ -61,12 +61,12 @@ public class FacilitiesCombine {
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
-			Iterator<TreeSet<Opentime>> ts_it = a.getOpentimes().values().iterator();
+			Iterator<TreeSet<OpeningTime>> ts_it = a.getOpentimes().values().iterator();
 			while (ts_it.hasNext()) {
-				TreeSet<Opentime> ts = ts_it.next();
-				Iterator<Opentime> o_it = ts.iterator();
+				TreeSet<OpeningTime> ts = ts_it.next();
+				Iterator<OpeningTime> o_it = ts.iterator();
 				while (o_it.hasNext()) {
-					Opentime o = o_it.next();
+					OpeningTime o = o_it.next();
 					f2.getActivity(a.getType()).addOpentime(o);
 				}
 			}

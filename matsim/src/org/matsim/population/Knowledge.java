@@ -340,7 +340,7 @@ public class Knowledge extends CustomizableImpl {
 		return types;
 	}
 
-	public final String getDesc() {
+	public final String getDescription() {
 		return this.desc;
 	}
 
@@ -393,7 +393,7 @@ public class Knowledge extends CustomizableImpl {
 		return true;
 	}
 	
-	public void setDesc(String desc) {
+	public void setDescription(String desc) {
 		this.desc = desc;
 	}
 

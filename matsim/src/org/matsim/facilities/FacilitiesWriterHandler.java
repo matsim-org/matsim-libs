@@ -63,7 +63,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final Opentime opentime, final BufferedWriter out) throws IOException;
+	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException;
 
 	public void endOpentime(final BufferedWriter out) throws IOException;
 }

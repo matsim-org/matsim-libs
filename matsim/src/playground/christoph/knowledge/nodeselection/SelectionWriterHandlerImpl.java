@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
-import org.matsim.facilities.Opentime;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
@@ -90,8 +90,8 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException 
 	{
 		out.write("\t\t<knowledge");
-		if (knowledge.getDesc() != null)
-			out.write(" desc=\"" + knowledge.getDesc() + "\"");
+		if (knowledge.getDescription() != null)
+			out.write(" desc=\"" + knowledge.getDescription() + "\"");
 		out.write(">\n");
 	}
 
