@@ -50,6 +50,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
+/**
+ * NetworkGenerator kann aus einem speziell aufbereiteten *.shp-File von 
+ * LineStrings ein MATSim Netzwerk generieren. Insbesondere müssen die 
+ * LineStrings in ihren Attributen fromNode und toNode ID haben. 
+ * 
+ * @author laemmel
+ *
+ */
 public class NetworkGenerator {
 	private static final Logger log = Logger.getLogger(NetworkGenerator.class);
 	private final NetworkLayer network;
