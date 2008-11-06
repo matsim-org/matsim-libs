@@ -32,6 +32,7 @@ import playground.wrashid.deqsim.PDESStarter2;
 public class TestHandlerDetailedEventChecker extends TestHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
+	public LinkedList<PersonEvent> allEvents=new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 	private boolean printEvent = true;
 	private Population population;
@@ -207,6 +208,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void reset(int iteration) {
@@ -221,6 +223,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
@@ -231,6 +234,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
@@ -241,6 +245,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
@@ -251,6 +256,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -261,6 +267,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(ActStartEvent event) {
@@ -271,6 +278,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	public void handleEvent(AgentStuckEvent event) {
@@ -281,6 +289,7 @@ public class TestHandlerDetailedEventChecker extends TestHandler {
 		if (printEvent) {
 			System.out.println(event.toString());
 		}
+		allEvents.add(event);
 	}
 
 	// if populationModifier == null, then the DummyPopulationModifier is used
