@@ -23,7 +23,7 @@ package org.matsim.facilities;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
@@ -107,9 +107,9 @@ public class FacilitiesWriter extends Writer {
 				this.handler.startActivity(a, this.out);
 				this.handler.startCapacity(a, this.out);
 				this.handler.endCapacity(this.out);
-				Iterator<TreeSet<OpeningTime>> o_set_it = a.getOpentimes().values().iterator();
+				Iterator<SortedSet<OpeningTime>> o_set_it = a.getOpentimes().values().iterator();
 				while (o_set_it.hasNext()) {
-					TreeSet<OpeningTime> o_set = o_set_it.next();
+					SortedSet<OpeningTime> o_set = o_set_it.next();
 					Iterator<OpeningTime> o_it = o_set.iterator();
 					while (o_it.hasNext()) {
 						OpeningTime o = o_it.next();

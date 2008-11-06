@@ -21,8 +21,8 @@
 package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
@@ -61,9 +61,9 @@ public class FacilitiesCombine {
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
-			Iterator<TreeSet<OpeningTime>> ts_it = a.getOpentimes().values().iterator();
+			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpentimes().values().iterator();
 			while (ts_it.hasNext()) {
-				TreeSet<OpeningTime> ts = ts_it.next();
+				SortedSet<OpeningTime> ts = ts_it.next();
 				Iterator<OpeningTime> o_it = ts.iterator();
 				while (o_it.hasNext()) {
 					OpeningTime o = o_it.next();

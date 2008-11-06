@@ -22,8 +22,8 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
@@ -51,7 +51,7 @@ public class FacilitiesOpentimesKTIYear1 {
 				String actType = a.getType();
 
 				// delete all existing open times info
-				Map<DayType, TreeSet<OpeningTime>> o = a.getOpentimes();
+				Map<DayType, SortedSet<OpeningTime>> o = a.getOpentimes();
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {

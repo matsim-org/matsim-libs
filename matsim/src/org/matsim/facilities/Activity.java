@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -40,7 +41,7 @@ public class Activity {
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
-	private Map<DayType,TreeSet<OpeningTime>> opentimes = new TreeMap<DayType,TreeSet<OpeningTime>>();
+	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -70,7 +71,7 @@ public class Activity {
 		if (!this.opentimes.containsKey(day)) {
 			this.opentimes.put(day,new TreeSet<OpeningTime>());
 		}
-		TreeSet<OpeningTime> o_set = this.opentimes.remove(day);
+		SortedSet<OpeningTime> o_set = this.opentimes.remove(day);
 		if (o_set.isEmpty()) {
 			o_set.add(opentime);
 			this.opentimes.put(day,o_set);
@@ -137,7 +138,7 @@ public class Activity {
 		this.capacity = capacity;
 	}
 
-	public void setOpentimes(Map<DayType, TreeSet<OpeningTime>> opentimes) {
+	public void setOpentimes(Map<DayType, SortedSet<OpeningTime>> opentimes) {
 		this.opentimes = opentimes;
 	}
 
@@ -157,11 +158,11 @@ public class Activity {
 		return this.capacity;
 	}
 
-	public final Map<DayType,TreeSet<OpeningTime>> getOpentimes() {
+	public final Map<DayType,SortedSet<OpeningTime>> getOpentimes() {
 		return this.opentimes;
 	}
 
-	public final Set<OpeningTime> getOpentimes(final DayType day) {
+	public final SortedSet<OpeningTime> getOpentimes(final DayType day) {
 		return this.opentimes.get(day);
 	}
 
