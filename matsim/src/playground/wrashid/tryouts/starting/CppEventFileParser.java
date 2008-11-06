@@ -11,6 +11,12 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.LinkEnterEvent;
+import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.PersonEvent;
+
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
 
@@ -38,7 +44,7 @@ public class CppEventFileParser {
 		}
 	}
 
-	public ArrayList<EventLog> parseFile(String filePath) {
+	public static ArrayList<EventLog> parseFile(String filePath) {
 		int counter=0;
 		ArrayList<EventLog> rows = new ArrayList<EventLog>();
 		try {
@@ -105,6 +111,59 @@ public class CppEventFileParser {
 		}
 
 		return rows;
+	}
+	
+	public static boolean equals(PersonEvent personEvent,EventLog deqSimEvent){
+		if (Integer.parseInt(personEvent.agentId)!=deqSimEvent.getVehicleId()){
+			return false;
+		}
+		if (personEvent.time!=deqSimEvent.getTime()){
+			return false;
+		}
+		
+		if (personEvent instanceof AgentDepartureEvent){
+			if (Integer.parseInt(((AgentDepartureEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				return false;
+			}
+			
+			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.START_LEG)){
+				return false;
+			}
+		}
+		
+		if (personEvent instanceof LinkEnterEvent){
+			if (Integer.parseInt(((LinkEnterEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				return false;
+			}
+			
+			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
+				return false;
+			}
+		}
+		
+		if (personEvent instanceof LinkLeaveEvent){
+			if (Integer.parseInt(((LinkLeaveEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				return false;
+			}
+			
+			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
+				return false;
+			}
+		}
+		
+		if (personEvent instanceof AgentArrivalEvent){
+			if (Integer.parseInt(((AgentArrivalEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				return false;
+			}
+			
+			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.END_LEG)){
+				return false;
+			}
+		}
+		
+		
+		
+		return true;
 	}
 
 }
