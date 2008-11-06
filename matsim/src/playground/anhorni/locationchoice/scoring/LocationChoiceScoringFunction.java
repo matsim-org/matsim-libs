@@ -22,8 +22,8 @@ package playground.anhorni.locationchoice.scoring;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -432,7 +432,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-		TreeSet<OpeningTime> opentimes = null;
+		Set<OpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 

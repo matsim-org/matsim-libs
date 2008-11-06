@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
+import java.util.Set;
+
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 
@@ -35,8 +37,8 @@ public interface BasicActivity {
 	
 	public void setCapacity(int cap);
 
-	public void setOpeningTime(DayType day, BasicOpeningTime openingTime);
+	public void addOpeningTime(DayType day, BasicOpeningTime openingTime);
 
-	public BasicOpeningTime getOpeningTime(DayType day);
+	public Set<BasicOpeningTime> getOpeningTime(DayType day);
 	
 }

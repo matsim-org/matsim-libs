@@ -22,7 +22,7 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -162,7 +162,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		int dayCounter = 0;
 		for (Day day : days) {
 			if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-				TreeSet<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+				Set<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
 				if (dailyOpentimes != null) {
 					for (OpeningTime opentime : dailyOpentimes) {
 

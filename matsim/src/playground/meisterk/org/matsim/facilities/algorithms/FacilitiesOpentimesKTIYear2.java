@@ -21,6 +21,7 @@
 package playground.meisterk.org.matsim.facilities.algorithms;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -72,7 +73,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		TreeMap<DayType, TreeSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, TreeSet<OpeningTime>>();
+		Map<DayType, TreeSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, TreeSet<OpeningTime>>();
 
 		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);

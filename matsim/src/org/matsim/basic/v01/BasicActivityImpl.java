@@ -20,6 +20,8 @@
 package org.matsim.basic.v01;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.interfaces.basic.v01.BasicLocation;
@@ -33,7 +35,7 @@ public class BasicActivityImpl implements BasicActivity {
 	
 	private int capacity;
 	private BasicLocation location;
-	private Map<DayType,BasicOpeningTime> openingTime;
+	private Map<DayType,Set<BasicOpeningTime>> openingTimes;
 	
 	public int getCapacity() {
 		return this.capacity;
@@ -47,12 +49,20 @@ public class BasicActivityImpl implements BasicActivity {
 		this.capacity = cap;
 	}
 
-	public BasicOpeningTime getOpeningTime(DayType day) {
-		return this.openingTime.get(day);
+	public Set<BasicOpeningTime> getOpeningTime(DayType day) {
+		return this.openingTimes.get(day);
 	}
 
-	public void setOpeningTime(DayType day, BasicOpeningTime openingTime) {
-		this.openingTime.put(day, openingTime);
+	public void addOpeningTime(DayType day, BasicOpeningTime openingTime) {
+		Set<BasicOpeningTime> ot;
+		if (!this.openingTimes.containsKey(day)) {
+			ot = new TreeSet<BasicOpeningTime>();
+			this.openingTimes.put(day, ot);
+		}
+		else {
+			ot = this.openingTimes.get(day);
+		}
+		ot.add(openingTime);
 	}
 
 

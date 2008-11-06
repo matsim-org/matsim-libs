@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -1519,18 +1520,18 @@ public class ShopsOf2005ToFacilities {
 				// open times (variable length)
 				for (Day day : days) {
 
-					TreeSet<OpeningTime> dailyOpentime = shopping.getOpentimes(day.getAbbrevEnglish());
+					Set<OpeningTime> dailyOpentime = shopping.getOpentimes(day.getAbbrevEnglish());
 
 					if (dailyOpentime != null) {
 
 						// what crappy code is that...but I had to get finished :-)
-						opentime = dailyOpentime.last();
+						opentime = (OpeningTime) ((TreeSet)dailyOpentime).last();
 						aShopLine += ShopsOf2005ToFacilities.FIELD_DELIM;
 						aShopLine += Time.writeTime(opentime.getStartTime());
 						aShopLine += ShopsOf2005ToFacilities.FIELD_DELIM;
 						aShopLine += Time.writeTime(opentime.getEndTime());
 						if (dailyOpentime.size() == 2) {
-							opentime = dailyOpentime.first();
+							opentime = (OpeningTime) ((TreeSet)dailyOpentime).first();
 							aShopLine += ShopsOf2005ToFacilities.FIELD_DELIM;
 							aShopLine += Time.writeTime(opentime.getStartTime());
 							aShopLine += ShopsOf2005ToFacilities.FIELD_DELIM;
@@ -1665,7 +1666,7 @@ public class ShopsOf2005ToFacilities {
 				int dayCounter = 0;
 				for (Day day : days) {
 					if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-						TreeSet<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+						Set<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
 						if (dailyOpentimes != null) {
 							for (OpeningTime opentime : dailyOpentimes) {
 

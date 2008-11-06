@@ -21,7 +21,7 @@
 package org.matsim.scoring;
 
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.Set;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Facility;
@@ -58,7 +58,7 @@ public class CharyparNagelOpenTimesScoringFunction extends
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-		TreeSet<OpeningTime> opentimes = null;
+		Set<OpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
