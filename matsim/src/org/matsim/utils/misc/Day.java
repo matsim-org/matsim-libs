@@ -35,20 +35,20 @@ public enum Day {
 
 	private final DayType abbrevEnglish;
 	private final String abbrevGerman;
-
+	@Deprecated
 	Day(DayType abbrevEnglish, String abbrevGerman) {
 		this.abbrevEnglish = abbrevEnglish;
 		this.abbrevGerman = abbrevGerman;
 	}
-
+	@Deprecated
 	public String getAbbrevGerman() {
 		return abbrevGerman;
 	}
-
+	@Deprecated
 	public DayType getAbbrevEnglish() {
 		return abbrevEnglish;
 	}
-
+	@Deprecated
 	public static Day getDayByGermanAbbrev(String germanAbbrev) {
 
 		Day theDay = null;
