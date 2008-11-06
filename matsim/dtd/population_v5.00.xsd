@@ -58,17 +58,24 @@ xml:lang="en">
      <xs:attribute name="sex" type="sexType" use="optional" />
      <xs:attribute name="age" type="xs:nonNegativeInteger" use="optional" />
      <xs:attribute name="license" type="xs:boolean" use="optional" />
-     <xs:attribute name="carAvailable" type="carAvailType" use="optional" />
-     <xs:attribute name="isEmployed" type="xs:boolean" use="optional" />
+     <xs:attribute name="carAvailable" type="carAvailType" use="optional"/>
+     <xs:attribute name="isEmployed" type="xs:boolean" use="optional"/>
    </xs:extension>
   </xs:complexContent>
 </xs:complexType>
 
+<xs:complexType name="travelcardType">
+  <xs:sequence>
+    <xs:element name="swissTravelCard" type="swissTravelCardType"></xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+
 <xs:complexType name="knowledgeType">
   <xs:sequence>
-    <xs:element name="activity" type="activityType" minOccurs="0" maxOccurs="unbounded" />
+    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+    <xs:element name="activity" type="activityType" minOccurs="1" maxOccurs="unbounded" />
   </xs:sequence>
-  <xs:attribute name="desc" type="xs:string" use="optional" />
 </xs:complexType>
 
 <xs:complexType name="planType" >
@@ -91,8 +98,25 @@ xml:lang="en">
 
 <xs:complexType name="activityType">
   <xs:sequence>
-    <xs:element name="activityLocationInformation" type="activityLocationInformationType" minOccurs="1" maxOccurs="unbounded" />
+    <xs:element ref="location" minOccurs="1" maxOccurs="1" />
+    <xs:element name="capacity" minOccurs="0" maxOccurs="1">
+      <xs:complexType>
+        <xs:attribute name="persons" type="xs:nonNegativeInteger" />
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="openingTime" minOccurs="0" maxOccurs="unbounded" >
+      <xs:complexType>
+        <xs:attribute name="day" type="dayType" default="wk" />
+        <xs:attribute name="startTime" type="xs:time" use="required" />
+        <xs:attribute name="endTime" type="xs:time" use="required" />
+      </xs:complexType>
+    </xs:element>
   </xs:sequence>
+  <xs:attribute name="frequency" type="xs:nonNegativeInteger" use="optional">
+    <xs:annotation>
+      <xs:documentation>defines how often the person was at that place (in one year)</xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
 </xs:complexType>
 
 <xs:complexType name="actType">
@@ -118,26 +142,6 @@ xml:lang="en">
 
 
 <xs:complexType name="activityLocationInformationType">
-  <xs:sequence>
-    <xs:element ref="location" minOccurs="1" maxOccurs="1" />
-    <xs:element name="capacity" minOccurs="0" maxOccurs="1">
-      <xs:complexType>
-        <xs:attribute name="persons" type="xs:nonNegativeInteger" />
-      </xs:complexType>
-    </xs:element>
-    <xs:element name="openingTime" minOccurs="0" maxOccurs="unbounded" >
-      <xs:complexType>
-        <xs:attribute name="day" type="dayType" default="wk" />
-        <xs:attribute name="startTime" type="xs:time" use="required" />
-        <xs:attribute name="endTime" type="xs:time" use="required" />
-      </xs:complexType>
-    </xs:element>
-  </xs:sequence>
-  <xs:attribute name="frequency" type="xs:nonNegativeInteger">
-    <xs:annotation>
-      <xs:documentation>defines how often the person was at that place (in one year)</xs:documentation>
-    </xs:annotation>
-  </xs:attribute>
 </xs:complexType>
 
 <xs:complexType name="routeType">

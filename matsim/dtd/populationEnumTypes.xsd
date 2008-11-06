@@ -15,9 +15,7 @@ xml:lang="en">
   </xs:documentation>
 </xs:annotation>
 
-<xs:complexType name="travelcardType">
-  <xs:attribute name="type">
-    <xs:simpleType>
+<xs:simpleType name="swissTravelCardType">
       <xs:restriction base="xs:string">
         <xs:enumeration value="ch-GA" />
         <xs:enumeration value="ch-HT" />
@@ -26,9 +24,7 @@ xml:lang="en">
         <xs:enumeration value="ch-HT-mobility" />
         <xs:enumeration value="unknown" />
       </xs:restriction>
-    </xs:simpleType>
-  </xs:attribute>
-</xs:complexType>
+</xs:simpleType>
 
 
 <xs:simpleType name="carAvailType">

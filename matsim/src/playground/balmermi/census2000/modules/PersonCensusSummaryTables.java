@@ -98,7 +98,7 @@ public class PersonCensusSummaryTables extends AbstractPersonAlgorithm implement
 			out.write(person.getAge() + "\t");
 			out.write(person.getSex() + "\t");
 			out.write(p.isSwiss() + "\t");
-			out.write(person.isEmpoyed() + "\t");
+			out.write(person.isEmployed() + "\t");
 			out.write(person.getCarAvail() + "\t");
 			out.write(person.getLicense() + "\t");
 			out.write(hh.getCategory() + "\t");

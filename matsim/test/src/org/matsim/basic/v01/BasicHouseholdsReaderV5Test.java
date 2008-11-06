@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author dgrether
  */
-public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
+public class BasicHouseholdsReaderV5Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testHouseholds.xml";
 
@@ -65,6 +65,11 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 		assertEquals(48.28d, hh.getBasicLocation().getCoord().getX(), EPSILON);
 		assertEquals(7.56d, hh.getBasicLocation().getCoord().getY(), EPSILON);
 	
+		assertNotNull(hh.getVehicleDefinitionIds());
+		assertEquals(2, hh.getVehicleDefinitionIds().size());
+		assertEquals(id23, hh.getVehicleDefinitionIds().get(0));
+		assertEquals(id42, hh.getVehicleDefinitionIds().get(1));
+		
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.month, hh.getIncome().getIncomePeriod());
@@ -87,7 +92,11 @@ public class BasicHouseholdsReaderV100Test extends MatsimTestCase {
 		assertNotNull(hh.getBasicLocation().getLocationId()); 
 		assertTrue(hh.getBasicLocation().isFacilityId());
 		assertEquals(id666, hh.getBasicLocation().getLocationId());
-		
+
+		assertNotNull(hh.getVehicleDefinitionIds());
+		assertEquals(1, hh.getVehicleDefinitionIds().size());
+		assertEquals(id23, hh.getVehicleDefinitionIds().get(0));
+
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());
 		assertEquals(IncomePeriod.day, hh.getIncome().getIncomePeriod());

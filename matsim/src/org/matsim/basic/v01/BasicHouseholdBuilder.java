@@ -41,10 +41,12 @@ public class BasicHouseholdBuilder implements HouseholdBuilder {
 		return this.households;
 	}
 
+
 	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds) {
+			List<Id> membersPersonIds, List<Id> vehicleIds) {
 		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
 		hh.setMemberIds(membersPersonIds);
+		hh.setVehicleIds(vehicleIds);
 		this.households.add(hh);
 		return hh;
 	}

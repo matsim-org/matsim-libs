@@ -58,7 +58,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(population);
-		BasicHouseholdsReaderV100Test hhTest = new BasicHouseholdsReaderV100Test();
+		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
 		hhTest.checkContent(households);
 	}
 	
@@ -72,7 +72,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, fac);
 		parser.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(pop);
-		BasicHouseholdsReaderV100Test hhTest = new BasicHouseholdsReaderV100Test();
+		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
 		hhTest.checkContent(households);
 	}
 	
@@ -88,6 +88,17 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertNotNull(population);
 		BasicPerson pp = population.getPerson(id23);
 		assertNotNull(pp);
+		assertEquals(id23, pp.getId());
+		assertEquals("m", pp.getSex());
+		assertEquals(23, pp.getAge());
+		assertTrue(pp.hasLicense());
+		assertEquals("sometimes", pp.getCarAvail());
+		assertTrue(pp.isEmployed());
+		assertEquals("ch-HT-2y", pp.getTravelcards().first());
+		assertEquals(id23, pp.getFiscalHouseholdId());
+		
+		
+		//now check the contents of plans
 		assertEquals(1, pp.getPlans().size());
 		BasicPlan p = (BasicPlan) pp.getPlans().get(0);
 		assertNotNull(p);

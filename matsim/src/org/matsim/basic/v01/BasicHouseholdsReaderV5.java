@@ -64,9 +64,8 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 
 	private String currentLanguage;
 
-	public BasicHouseholdsReaderV5(HouseholdBuilder builder) {
-		this.builder = builder;
-	}
+	private List<Id> currentVehicleIds;
+
 
 	public BasicHouseholdsReaderV5(List<BasicHousehold> households) {
 		if (households == null) {
@@ -95,7 +94,7 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if (HouseholdsSchemaV5Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			this.currentHousehold = this.builder.createHousehold(this.currentHhId, this.currentmembers);
+			this.currentHousehold = this.builder.createHousehold(this.currentHhId, this.currentmembers, this.currentVehicleIds);
 			this.currentHhId = null;
 //			this.households.add(this.currentHousehold);
 			this.currentHousehold.setLanguage(this.currentLanguage);
@@ -104,6 +103,7 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 			this.currentincome = null;
 			this.currentHousehold.setLocation(this.currentlocation);
 			this.currentlocation = null;
+			this.currentVehicleIds = null;
 		}
 		else if (HouseholdsSchemaV5Names.INCOME.equalsIgnoreCase(name)) {
 			this.currentincome.setIncome(Double.parseDouble(content.trim()));
@@ -154,6 +154,12 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 			IncomePeriod p = getIncomePeriod(atts.getValue(HouseholdsSchemaV5Names.PERIOD));
 			this.currentincome = new BasicIncomeImpl(p);
 			this.currentincome.setCurrency(atts.getValue(HouseholdsSchemaV5Names.CURRENCY));
+		}
+		else if (HouseholdsSchemaV5Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.REFID));
+			if (this.currentVehicleIds == null) 
+				this.currentVehicleIds = new ArrayList<Id>();
+			this.currentVehicleIds.add(id);
 		}
 	}
 

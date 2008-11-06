@@ -17,37 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
+package org.matsim.basic.v01;
 
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+import org.matsim.basic.v01.BasicVehicleCapacity.BasicFreightCapacity;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicFreightCapacityImpl implements BasicFreightCapacity {
 
-	private List<Household> households;
-
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
+	private double volume;
+	
+	public void setVolume(double cubicMeters) {
+		this.volume = cubicMeters;
 	}
-
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
+	
+	public double getVolume() {
+		return this.volume;
 	}
-
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }

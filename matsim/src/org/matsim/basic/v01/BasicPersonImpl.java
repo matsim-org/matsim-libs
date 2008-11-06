@@ -47,10 +47,20 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	private Knowledge knowledge = null;
 	private Desires desires = null;
 
+	private Id householdId;
+
 	public BasicPersonImpl(final Id id) {
 		this.id = id;
 	}
 
+	public void setHouseholdId(Id householdId) {
+		this.householdId = householdId;
+	}
+	
+	public Id getFiscalHouseholdId(){
+		return this.householdId;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.matsim.basic.v01.BasicPerson#addPlan(T)
 	 */
@@ -117,7 +127,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	}
 
 	public final boolean hasLicense() {
-		return ("yes".equals(this.hasLicense));
+		return ("yes".equals(this.hasLicense)) || ("true".equals(this.hasLicense));
 	}
 
 	public final String getCarAvail() {
@@ -128,8 +138,8 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 		return this.isEmployed;
 	}
 
-	public final boolean isEmpoyed() {
-		return ("yes".equals(this.isEmployed));
+	public final boolean isEmployed() {
+		return ("yes".equals(this.isEmployed)) || ("true".equals(this.isEmployed));
 	}
 
 	public void setAge(final int age) {

@@ -49,4 +49,21 @@ public interface PopulationSchemaV5Names {
 	public static String LINKID = "linkId";
 	public static String SELECTED = "selected";
 	public static String POPULATION = "population";
+	public static String SEX = "sex";
+	public static String AGE = "age";
+	public static String LICENSE = "license";
+	public static String CARAVAILABLE = "carAvailable";
+	public static String ISEMPLOYED = "isEmployed";
+	public static String KNOWLEDGE = "knowledge";
+	public static String DESCRIPTION = "description";
+	public static String ACTIVITY = "activity";
+	public static String CAPACITY = "capacity";
+	public static String PERSONS = "persons";
+	public static String OPENINGTIME = "openingtime";
+	public static String DAY = "day";
+	public static String FREQUENCY = "frequency";
+	public static String TRAVELCARD = "travelcard";
+	public static String FISCALHOUSEHOLDID = "fiscalHouseholdId";
+	public static String SWISSTRAVELCARD = "swissTravelCard";
+	
 }

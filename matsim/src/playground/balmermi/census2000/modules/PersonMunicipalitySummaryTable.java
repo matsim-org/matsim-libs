@@ -129,7 +129,7 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 
 		if (p.isMale()) { v[5]++; }
 		if (p.isSwiss()) { v[6]++; }
-		if (person.isEmpoyed()) { v[7]++; }
+		if (person.isEmployed()) { v[7]++; }
 		if (YES.equals(person.getLicense())) { v[8]++; }
 	}
 

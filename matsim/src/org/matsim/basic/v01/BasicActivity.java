@@ -17,37 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
+package org.matsim.basic.v01;
 
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public interface BasicActivity {
+	
+	public BasicLocation getLocation();
+	
+	public int getCapacity();
+	
+	public void setCapacity(int cap);
 
-	private List<Household> households;
+	public void setOpeningTime(DayType day, BasicOpeningTime openingTime);
 
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
-	}
-
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
-	}
-
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public BasicOpeningTime getOpeningTime(DayType day);
+	
 }

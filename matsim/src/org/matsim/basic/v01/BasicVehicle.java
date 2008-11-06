@@ -17,37 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
-
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+package org.matsim.basic.v01;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public interface BasicVehicle {
 
-	private List<Household> households;
+	public String getType();
+	
+	public Id getId();
 
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
-	}
-
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
-	}
-
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }

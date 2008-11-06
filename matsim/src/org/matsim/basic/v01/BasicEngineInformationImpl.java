@@ -17,37 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
+package org.matsim.basic.v01;
 
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicEngineInformationImpl implements BasicEngineInformation {
 
-	private List<Household> households;
-
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
+	private FuelType fuelType;
+	private double gasConsumption;
+	
+	public BasicEngineInformationImpl(FuelType fueltype, double literPerMeter) {
+		this.setFuelType(fueltype);
+		this.setGasConsumption(literPerMeter);
 	}
 
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
+	public FuelType getFuelType() {
+		return this.fuelType;
 	}
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
+	public double getGasConsumption() {
+		return this.gasConsumption;
+	}
+
+	public void setFuelType(FuelType fueltype) {
+		this.fuelType = fueltype;
+	}
+
+	public void setGasConsumption(double literPerMeter) {
+		this.gasConsumption = literPerMeter ;
 	}
 
 }

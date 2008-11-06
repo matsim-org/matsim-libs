@@ -17,37 +17,62 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
+package org.matsim.basic.v01;
 
 import java.util.List;
+import java.util.Map;
 
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+import org.matsim.basic.v01.BasicEngineInformation.FuelType;
+import org.matsim.basic.v01.BasicVehicleCapacity.BasicFreightCapacity;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicVehicleBuilder {
 
-	private List<Household> households;
+	private Map<String, BasicVehicleType> vehicleTypes;
+	private List<BasicVehicle> vehicles;
 
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
+
+	public BasicVehicleBuilder(Map<String, BasicVehicleType> vehicleTypes,
+			List<BasicVehicle> vehicles) {
+		this.vehicleTypes = vehicleTypes;
+		this.vehicles = vehicles;
 	}
 
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
+
+	public BasicVehicleType createVehicleType(String type) {
+		if (!this.vehicleTypes.containsKey(type)) {
+			BasicVehicleType veh = new BasicVehicleTypeImpl(type);
+			this.vehicleTypes.put(type, veh);
+			return veh;
+		}
+		throw new IllegalArgumentException("Vehicle type with id: " + type + " already exists!");
 	}
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public BasicVehicleCapacity createVehicleCapacity() {
+		return new BasicVehicleCapacityImpl();
+	}
+
+
+	public BasicFreightCapacity createFreigthCapacity() {
+		return new BasicFreightCapacityImpl();
+	}
+
+
+	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new BasicEngineInformationImpl(fuelType, gasConsumption);
+	}
+
+
+	public BasicVehicle createVehicle(Id id, String type) {
+		BasicVehicle veh = new BasicVehicleImpl(id, type);
+		this.vehicles.add(veh);
+		return veh;
 	}
 
 }

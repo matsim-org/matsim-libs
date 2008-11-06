@@ -4,7 +4,34 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.00.xsd">
 
-<person id="23">
+<person id="23" sex="m" age="23" license="true" carAvailable="sometimes" isEmployed="true">
+  <travelcard>
+    <swissTravelCard>ch-HT-2y</swissTravelCard>
+  </travelcard>
+  <!--todo-->
+  <knowledge>
+    <description>some additional information</description>
+    <activity frequency="4">
+        <location>
+          <actLocation>
+            <facilityId refId="666" />
+          </actLocation>
+        </location>
+        <capacity persons="40" />
+        <openingTime day="wk" startTime="08:00:00" endTime="17:00:00"/>
+    </activity>
+    <activity>
+        <location>
+          <coordinate>
+            <xCoord>2.3</xCoord>
+            <yCoord>4.2</yCoord>
+          </coordinate>
+        </location>
+    </activity>
+    
+  </knowledge>
+ <!--end todo-->
+  
 	<plan selected="true">
 		<act type="h" endTime="06:00:00">
       <location>
@@ -51,20 +78,22 @@
       </location>
     </act>
 	</plan>
+  <fiscalHouseholdId refId="23"/>
 </person>
 
-<household id="23">
+  <household id="23">
     <members>
       <personId refId="42" />
       <personId refId="43" />
     </members>
-    
     <location>
       <coordinate>
         <xCoord>48.28</xCoord>
         <yCoord>7.56</yCoord>
       </coordinate>
     </location>
+    <vehicleDefinitionId refId="23" />
+    <vehicleDefinitionId refId="42" />
     <income currency="eur" period="month">
       50000
     </income>
@@ -81,6 +110,7 @@
         <facilityId refId="666" />
       </actLocation>
     </location>
+    <vehicleDefinitionId refId="23" />
     <income currency="eur" period="day">
       1000
     </income>    

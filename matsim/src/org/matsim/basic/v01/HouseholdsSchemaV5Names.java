@@ -44,5 +44,6 @@ public interface HouseholdsSchemaV5Names {
 	public static String FACILITYID = "facilityId";
 	public static String LINKID = "linkId";
 	public static String PERIOD = "period";
+	public static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
 	
 }

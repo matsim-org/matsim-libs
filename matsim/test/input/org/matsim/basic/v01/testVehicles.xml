@@ -4,18 +4,32 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.00.xsd">
  
-<vehicleType typeName="normalCar">
+<vehicleType typeId="normalCar">
   <description> </description>
   <!-- capacity including driver -->
   <capacity>
     <seats persons="5"/>
     <standingRoom persons="20" />
+    <freightCapacity>
+      <volume cubicMeters="23.23"></volume>
+    </freightCapacity>
   </capacity>
-  <length meter="7.5" />
+  <length meter="9.5" />
   <width meter="3" />
   <maximumVelocity meterPerSecond="42" />
+  <engineInformation>
+    <fuelType>diesel</fuelType>
+    <gasConsumption literPerMeter="0.23"/>
+  </engineInformation>
 </vehicleType>
 
-<vehicle id="25" type="normalCar" />
+<vehicleType typeId="defaultValueCar">
+</vehicleType>
+
+
+
+<vehicle id="23" type="normalCar" />
+<vehicle id="24" type="defaultValueCar" />
+
 
 </vehicleDefinitions>

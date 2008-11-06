@@ -35,5 +35,5 @@ public interface HouseholdBuilder {
 	public List<BasicHousehold> getHouseholds();
 
 	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds);
+			List<Id> membersPersonIds, List<Id> vehicleIds);
 }

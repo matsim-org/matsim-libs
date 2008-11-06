@@ -65,7 +65,7 @@ public interface BasicPerson<T extends BasicPlan> {
 
 	public String getEmployed();
 
-	public boolean isEmpoyed(); 
+	public boolean isEmployed(); 
 
 	public void setAge(final int age); 
 
@@ -88,4 +88,7 @@ public interface BasicPerson<T extends BasicPlan> {
 	public Knowledge getKnowledge();
 	
 	public Desires getDesires();
+	
+	public Id getFiscalHouseholdId();
+
 }

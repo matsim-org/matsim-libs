@@ -433,13 +433,13 @@ public class PlansCreateFromCensus2000 {
 		this.chooseWorkFacility(p,entries[CAtts.I_AGDE],entries[CAtts.I_PBER]);
 		
 		// some consistency checks
-		if (p.isEmpoyed()) {
+		if (p.isEmployed()) {
 			if (!p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W2) &&
 			    !p.getKnowledge().getActivityTypes().contains(CAtts.ACT_W3)) {
-				log.warn("pid="+p.getId()+",employed="+p.isEmpoyed()+": person does not have work activity!");
+				log.warn("pid="+p.getId()+",employed="+p.isEmployed()+": person does not have work activity!");
 			}
 			if (p.getAge()<15) {
-				log.warn("pid="+p.getId()+",employed="+p.isEmpoyed()+",age="+p.getAge()+": person is too young for beeing employed!");
+				log.warn("pid="+p.getId()+",employed="+p.isEmployed()+",age="+p.getAge()+": person is too young for beeing employed!");
 			}
 		}
 		if (p.getAge()<15) {

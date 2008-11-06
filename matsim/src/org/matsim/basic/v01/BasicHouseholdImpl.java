@@ -33,7 +33,7 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
  *
  */
 public class BasicHouseholdImpl implements BasicHousehold {
-	
+		
 
 	private Id id;
 	private List<Id> memberIds = null;
@@ -84,6 +84,10 @@ public class BasicHouseholdImpl implements BasicHousehold {
 
 	public void setIncome(BasicIncome income) {
 		this.income = income;
+	}
+
+	public void setVehicleIds(List<Id> vehicleIds) {
+		this.vehicleDefinitionIds = vehicleIds;
 	}
 
 }

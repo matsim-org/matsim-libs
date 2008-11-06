@@ -254,7 +254,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 	@Override
 	public void run(Person person) {
 		int age = person.getAge();
-		boolean employed = person.isEmpoyed();
+		boolean employed = person.isEmployed();
 		int row = -1;
 		if (age < 6) { row = 0; }
 		else if (age < 8) { row = 2; }

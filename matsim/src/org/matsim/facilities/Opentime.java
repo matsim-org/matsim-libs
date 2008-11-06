@@ -36,7 +36,7 @@ public class Opentime implements Comparable<Opentime> {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-
+	@Deprecated
 	public Opentime(final String day, final String start_time, final String end_time) {
 		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
 	}

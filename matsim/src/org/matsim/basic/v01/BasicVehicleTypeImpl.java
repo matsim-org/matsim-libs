@@ -17,37 +17,85 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
-
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+package org.matsim.basic.v01;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicVehicleTypeImpl implements BasicVehicleType {
 
-	private List<Household> households;
+	private double width = 1.0;
+	private double maxVelocity = 1.0;
+	private double length = 7.5;
+	private BasicEngineInformation engineInformation;
+	private String description;
+	private BasicVehicleCapacity capacity;
+	
+	private String typeId;
 
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
+	public BasicVehicleTypeImpl(String typeId) {
+		this.typeId = typeId;
 	}
 
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
+	public void setCapacity(BasicVehicleCapacity capacity) {
+		this.capacity = capacity;
 	}
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setDescription(String desc) {
+		this.description = desc;
 	}
 
+	public void setEngineInformation(BasicEngineInformation engineInformation) {
+		this.engineInformation = engineInformation;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	public void setMaximumVelocity(double meterPerSecond) {
+		this.maxVelocity = meterPerSecond;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+	
+	public double getWidth() {
+		return width;
+	}
+
+	
+	public double getMaximumVelocity() {
+		return maxVelocity;
+	}
+
+	
+	public double getLength() {
+		return length;
+	}
+
+	
+	public BasicEngineInformation getEngineInformation() {
+		return engineInformation;
+	}
+
+	
+	public String getDescription() {
+		return description;
+	}
+
+	
+	public BasicVehicleCapacity getCapacity() {
+		return capacity;
+	}
+
+	
+	public String getTypeId() {
+		return typeId;
+	}
+
+	
 }

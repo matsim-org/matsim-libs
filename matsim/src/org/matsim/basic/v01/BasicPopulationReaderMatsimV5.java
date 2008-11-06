@@ -147,6 +147,9 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			this.currentLeg.setRoute(this.currentRoute);
 			this.currentRoute = null;
 		}
+		else if (PopulationSchemaV5Names.SWISSTRAVELCARD.equalsIgnoreCase(name)) {
+			this.currentPerson.addTravelcard(content.trim());
+		}
 		else {
 			log.warn("Ignoring endTag (beta implementation!): " + name);
 		}
@@ -164,6 +167,23 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 		else if (PopulationSchemaV5Names.PERSON.equalsIgnoreCase(name)) {
 			try {
 				this.currentPerson = populationBuilder.createPerson(getId(atts));
+				for (int i = 0; i < atts.getLength(); i++) {
+					if (atts.getLocalName(i).equalsIgnoreCase(PopulationSchemaV5Names.SEX)){
+						this.currentPerson.setSex(atts.getValue(i));
+					}
+					else if (atts.getLocalName(i).equalsIgnoreCase(PopulationSchemaV5Names.AGE)){
+						this.currentPerson.setAge(Integer.parseInt(atts.getValue(i)));
+					}
+					else if (atts.getLocalName(i).equalsIgnoreCase(PopulationSchemaV5Names.LICENSE)){
+						this.currentPerson.setLicence(atts.getValue(i));
+					}
+					else if (atts.getLocalName(i).equalsIgnoreCase(PopulationSchemaV5Names.CARAVAILABLE)){
+						this.currentPerson.setCarAvail(atts.getValue(i));
+					}
+					else if (atts.getLocalName(i).equalsIgnoreCase(PopulationSchemaV5Names.ISEMPLOYED)){
+						this.currentPerson.setEmployed(atts.getValue(i));
+					}
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new IllegalArgumentException("person exists twice!", e);
@@ -228,6 +248,9 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 		else if (PopulationSchemaV5Names.LINKID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
 			this.currentlocation.setLocationId(id, false);
+		}
+		else if (PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
+			((BasicPersonImpl)this.currentPerson).setHouseholdId(new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID)));
 		}
 		else {
 			log.warn("Ignoring startTag (beta implementation!): " + name);

@@ -119,7 +119,7 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		else if (age < 8) { i = 2; }
 		else if (age < 66) { i = 4; }
 		else { i = 6; }
-		if (person.isEmpoyed()) { i++; }
+		if (person.isEmployed()) { i++; }
 
 		// calc j index
 		Plan plan = person.getPlans().get(0);

@@ -29,7 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for org.matsim.basic.v01");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(BasicPlanTest.class);
-		suite.addTestSuite(BasicHouseholdsReaderV100Test.class);
+		suite.addTestSuite(BasicHouseholdsReaderV5Test.class);
 		suite.addTestSuite(BasicPopulationReaderV5Test.class);
 		//$JUnit-END$
 		return suite;

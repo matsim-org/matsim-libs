@@ -17,37 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population;
-
-import java.util.List;
-
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.HouseholdBuilder;
-import org.matsim.interfaces.population.Household;
+package org.matsim.basic.v01;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public interface BasicVehicleType {
 
-	private List<Household> households;
+	public void setDescription(String desc);
 
-	public HouseholdBuilderImpl(List<Household> households) {
-		this.households = households;
-	}
+	public void setLength(double length);
 
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
-	}
+	public void setWidth(double width);
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public void setMaximumVelocity(double meterPerSecond);
 
+	public void setEngineInformation(BasicEngineInformation currentEngineInfo);
+
+	public void setCapacity(BasicVehicleCapacity capacity);
+
+	public double getWidth();
+
+	public double getMaximumVelocity();
+	
+	public double getLength();
+	
+	public BasicEngineInformation getEngineInformation();
+	
+	public String getDescription();
+	
+	public BasicVehicleCapacity getCapacity();
+	
+	public String getTypeId();
 }
