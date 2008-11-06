@@ -128,11 +128,6 @@ public class Activity {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final void setCapacity(final String capacity) {
-		int cap = Integer.parseInt(capacity);
-		this.setCapacity(cap);
-	}
-
 	public final void setCapacity(final int capacity) {
 		if (capacity < 0) {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");

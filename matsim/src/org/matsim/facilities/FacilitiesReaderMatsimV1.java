@@ -97,7 +97,8 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startCapacity(final Attributes atts) {
-		this.curractivity.setCapacity(atts.getValue("value"));
+		int cap = Integer.parseInt(atts.getValue("value"));
+		this.curractivity.setCapacity(cap);
 	}
 	
 	private void startOpentime(final Attributes atts) {
