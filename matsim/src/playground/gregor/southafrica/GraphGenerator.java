@@ -57,6 +57,13 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
+ * GraphGenerator kann aus einem beliebigen *.shp-File von LineStrings die 
+ * Netzwerkstruktur extrahieren (z.B. als Input für den NetworkGenerator). Das 
+ * ist natürlich etwas komplizierter, da erohne from-to Information auskommt. 
+ * Ausserdem werden redundante Knoten (Knoten an denen sich genau zwei 
+ * LineStrings treffen) entfernt und noch einige weitere Optimierungen 
+ * vorgenommen.
+ * 
  * @author laemmel
  * 
  */
