@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.gbl.Gbl;
 
 public class Activity {
@@ -37,7 +38,7 @@ public class Activity {
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
-	private TreeMap<String,TreeSet<OpeningTime>> opentimes = new TreeMap<String,TreeSet<OpeningTime>>();
+	private TreeMap<DayType,TreeSet<OpeningTime>> opentimes = new TreeMap<DayType,TreeSet<OpeningTime>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -53,7 +54,7 @@ public class Activity {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 	@Deprecated
-	public final void createOpentime(final String day, final double startTime, final double endTime) {
+	public final void createOpentime(final DayType day, final double startTime, final double endTime) {
 		OpeningTime o = new OpeningTime(day, startTime, endTime);
 		this.addOpentime(o);
 	}
@@ -63,7 +64,7 @@ public class Activity {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void addOpentime(final OpeningTime opentime) {
-		String day = opentime.getDay();
+		DayType day = opentime.getDay();
 		if (!this.opentimes.containsKey(day)) {
 			this.opentimes.put(day,new TreeSet<OpeningTime>());
 		}
@@ -139,7 +140,7 @@ public class Activity {
 		this.capacity = capacity;
 	}
 
-	public void setOpentimes(TreeMap<String, TreeSet<OpeningTime>> opentimes) {
+	public void setOpentimes(TreeMap<DayType, TreeSet<OpeningTime>> opentimes) {
 		this.opentimes = opentimes;
 	}
 
@@ -159,11 +160,11 @@ public class Activity {
 		return this.capacity;
 	}
 
-	public final TreeMap<String,TreeSet<OpeningTime>> getOpentimes() {
+	public final TreeMap<DayType,TreeSet<OpeningTime>> getOpentimes() {
 		return this.opentimes;
 	}
 
-	public final TreeSet<OpeningTime> getOpentimes(final String day) {
+	public final TreeSet<OpeningTime> getOpentimes(final DayType day) {
 		return this.opentimes.get(day);
 	}
 

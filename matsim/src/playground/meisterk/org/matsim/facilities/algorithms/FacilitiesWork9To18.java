@@ -23,6 +23,7 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -86,7 +87,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpentime(new OpeningTime("wk", "9:00", "18:00"));
+				a.addOpentime(new OpeningTime(DayType.wk, "9:00", "18:00"));
 			}
 
 			for (int i=0; i<B01S3; i++) {
@@ -100,7 +101,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpentime(new OpeningTime("wk", "9:00", "18:00"));
+				a.addOpentime(new OpeningTime(DayType.wk, "9:00", "18:00"));
 			}
 
 			hectareCnt++;

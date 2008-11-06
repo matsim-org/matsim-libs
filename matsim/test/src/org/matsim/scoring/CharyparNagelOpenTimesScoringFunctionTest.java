@@ -1,6 +1,7 @@
 package org.matsim.scoring;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -34,16 +35,16 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 
 		Activity noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
-		noWedAndWkDay.createOpentime("fri", 8.0 * 3600, 16.0 * 3600);
+		noWedAndWkDay.createOpentime(DayType.fri, 8.0 * 3600, 16.0 * 3600);
 
 		Activity wkdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
-		wkdayActivity.createOpentime("wkday", 7.5 * 3600, 18.0 * 3600);
+		wkdayActivity.createOpentime(DayType.wkday, 7.5 * 3600, 18.0 * 3600);
 
 		Activity wednesdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
-		wednesdayActivity.createOpentime("wed", 6.0 * 3600, 11.0 * 3600);
-		wednesdayActivity.createOpentime("wed", 13.0 * 3600, 19.0 * 3600);
+		wednesdayActivity.createOpentime(DayType.wed, 6.0 * 3600, 11.0 * 3600);
+		wednesdayActivity.createOpentime(DayType.wed, 13.0 * 3600, 19.0 * 3600);
 		// this one should be ignored
-		wednesdayActivity.createOpentime("wkday", 4.0 * 3600, 20.0 * 3600);
+		wednesdayActivity.createOpentime(DayType.wkday, 4.0 * 3600, 20.0 * 3600);
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object

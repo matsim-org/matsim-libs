@@ -20,20 +20,23 @@
 
 package org.matsim.utils.misc;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
+@Deprecated
+//refactor and use DayType instead
 public enum Day {
 
-	MONDAY ("mon", "Mo"),
-	TUESDAY ("tue", "Di"),
-	WEDNESDAY ("wed", "Mi"),
-	THURSDAY ("thu", "Do"),
-	FRIDAY ("fri", "Fr"),
-	SATURDAY ("sat", "Sa"),
-	SUNDAY ("sun", "So");
+	MONDAY (DayType.mon, "Mo"),
+	TUESDAY (DayType.tue, "Di"),
+	WEDNESDAY (DayType.wed, "Mi"),
+	THURSDAY (DayType.thu, "Do"),
+	FRIDAY (DayType.fri, "Fr"),
+	SATURDAY (DayType.sat, "Sa"),
+	SUNDAY (DayType.sun, "So");
 
-	private final String abbrevEnglish;
+	private final DayType abbrevEnglish;
 	private final String abbrevGerman;
 
-	Day(String abbrevEnglish, String abbrevGerman) {
+	Day(DayType abbrevEnglish, String abbrevGerman) {
 		this.abbrevEnglish = abbrevEnglish;
 		this.abbrevGerman = abbrevGerman;
 	}
@@ -42,7 +45,7 @@ public enum Day {
 		return abbrevGerman;
 	}
 
-	public String getAbbrevEnglish() {
+	public DayType getAbbrevEnglish() {
 		return abbrevEnglish;
 	}
 

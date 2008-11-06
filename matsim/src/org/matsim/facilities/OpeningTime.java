@@ -20,6 +20,7 @@
 
 package org.matsim.facilities;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
@@ -29,7 +30,7 @@ public class OpeningTime implements Comparable<OpeningTime> {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final String day;
+	private final DayType day;
 	private double startTime;
 	private double endTime;
 
@@ -37,11 +38,11 @@ public class OpeningTime implements Comparable<OpeningTime> {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	@Deprecated
-	public OpeningTime(final String day, final String start_time, final String end_time) {
+	public OpeningTime(final DayType day, final String start_time, final String end_time) {
 		this(day, Time.parseTime(start_time), Time.parseTime(end_time));
 	}
 
-	public OpeningTime(final String day, final double startTime, final double endTime) {
+	public OpeningTime(final DayType day, final double startTime, final double endTime) {
 		this.day = day;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -150,7 +151,7 @@ public class OpeningTime implements Comparable<OpeningTime> {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final String getDay() {
+	public final DayType getDay() {
 		return this.day;
 	}
 

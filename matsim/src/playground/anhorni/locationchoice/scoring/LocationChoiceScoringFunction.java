@@ -29,6 +29,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
@@ -442,9 +443,9 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
+				opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivity(facilityActType).getOpentimes("wkday");
+					opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

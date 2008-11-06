@@ -23,6 +23,7 @@ package org.matsim.scoring;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
@@ -68,9 +69,9 @@ public class CharyparNagelOpenTimesScoringFunction extends
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivity(facilityActType).getOpentimes("wed");
+				opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivity(facilityActType).getOpentimes("wkday");
+					opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

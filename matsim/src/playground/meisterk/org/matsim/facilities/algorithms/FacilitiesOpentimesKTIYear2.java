@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -71,7 +72,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		TreeMap<String, TreeSet<OpeningTime>> closestShopOpentimes = new TreeMap<String, TreeSet<OpeningTime>>();
+		TreeMap<DayType, TreeSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, TreeSet<OpeningTime>>();
 
 		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
@@ -84,7 +85,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (Activity a : activities.values()) {
-			a.setOpentimes(new TreeMap<String, TreeSet<OpeningTime>>());
+			a.setOpentimes(new TreeMap<DayType, TreeSet<OpeningTime>>());
 		}
 		
 		// if only presence code and work are present

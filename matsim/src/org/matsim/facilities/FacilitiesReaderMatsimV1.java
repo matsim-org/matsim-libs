@@ -27,6 +27,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -100,10 +101,19 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startOpentime(final Attributes atts) {
-		this.curractivity.createOpentime(atts.getValue("day"), Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time")));
+		DayType day = getDayType(atts.getValue("day"));
+		this.curractivity.createOpentime(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time")));
 	}
 
 	
+	private DayType getDayType(String dt){
+		for (DayType d : DayType.values()) {
+			if (d.toString().equalsIgnoreCase(dt))
+				return d;
+		}
+		throw new IllegalArgumentException("Cannot detect daytype for String: " + dt);
+	}
+
 	/**
 	 * Parses the specified facilities file. This method calls {@link #parse(String)}, but handles all
 	 * possible exceptions on its own.

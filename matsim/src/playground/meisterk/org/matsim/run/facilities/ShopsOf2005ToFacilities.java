@@ -56,6 +56,7 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -92,18 +93,18 @@ import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesK
 public class ShopsOf2005ToFacilities {
 
 	public enum Day {
-		MONDAY ("mon", "Mo"),
-		TUESDAY ("tue", "Di"),
-		WEDNESDAY ("wed", "Mi"),
-		THURSDAY ("thu", "Do"),
-		FRIDAY ("fri", "Fr"),
-		SATURDAY ("sat", "Sa"),
-		SUNDAY ("sun", "So");
+		MONDAY (DayType.mon, "Mo"),
+		TUESDAY (DayType.tue, "Di"),
+		WEDNESDAY (DayType.wed, "Mi"),
+		THURSDAY (DayType.thu, "Do"),
+		FRIDAY (DayType.fri, "Fr"),
+		SATURDAY (DayType.sat, "Sa"),
+		SUNDAY (DayType.sun, "So");
 
-		private final String abbrevEnglish;
+		private final DayType abbrevEnglish;
 		private final String abbrevGerman;
 
-		Day(final String abbrevEnglish, final String abbrevGerman) {
+		Day(final DayType abbrevEnglish, final String abbrevGerman) {
 			this.abbrevEnglish = abbrevEnglish;
 			this.abbrevGerman = abbrevGerman;
 		}
@@ -112,7 +113,7 @@ public class ShopsOf2005ToFacilities {
 			return this.abbrevGerman;
 		}
 
-		public String getAbbrevEnglish() {
+		public DayType getAbbrevEnglish() {
 			return this.abbrevEnglish;
 		}
 
@@ -954,7 +955,7 @@ public class ShopsOf2005ToFacilities {
 									}
 									break;
 								default:
-									String englishDayString = day.getAbbrevEnglish();
+									DayType englishDayString = day.getAbbrevEnglish();
 								System.out.println("Adding times to " + englishDayString + "...");
 								opentime = new OpeningTime(
 										englishDayString,
@@ -1074,7 +1075,7 @@ public class ShopsOf2005ToFacilities {
 									openingHour = time;
 								} else {
 
-									String englishDayString = days[dayPointer].getAbbrevEnglish();
+									DayType englishDayString = days[dayPointer].getAbbrevEnglish();
 									System.out.println("Adding times to " + englishDayString + "...");
 									opentime = new OpeningTime(
 											englishDayString,
@@ -1160,7 +1161,7 @@ public class ShopsOf2005ToFacilities {
 						if (isOpen) {
 							openingHour = time;
 						} else {
-							String englishDayString = days[dayIndex].getAbbrevEnglish();
+							DayType englishDayString = days[dayIndex].getAbbrevEnglish();
 							System.out.println("Open: " + openingHour);
 							System.out.println("Close: " + time);
 							System.out.println("Adding times to " + englishDayString + "...");

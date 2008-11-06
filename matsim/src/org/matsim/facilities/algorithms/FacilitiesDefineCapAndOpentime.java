@@ -22,6 +22,7 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
@@ -73,27 +74,27 @@ public class FacilitiesDefineCapAndOpentime {
 				Activity a = a_it.next();
 				if (a.getType().equals("home")) {
 					a.setCapacity(this.nof_persons/home_cnt);
-					a.addOpentime(new OpeningTime("wk","00:00","24:00"));
+					a.addOpentime(new OpeningTime(DayType.wk,"00:00","24:00"));
 				}
 				else if (a.getType().equals("work")) {
 					a.setCapacity(this.nof_persons/work_cnt);
-					a.addOpentime(new OpeningTime("wkday","08:00","18:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"08:00","18:00"));
 				}
 				else if (a.getType().equals("education")) {
 					a.setCapacity(this.nof_persons/educ_cnt);
-					a.addOpentime(new OpeningTime("wkday","08:00","12:00"));
-					a.addOpentime(new OpeningTime("wkday","13:00","17:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"08:00","12:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"13:00","17:00"));
 				}
 				else if (a.getType().equals("shop")) {
 					a.setCapacity(this.nof_persons/shop_cnt);
-					a.addOpentime(new OpeningTime("wkday","08:30","12:00"));
-					a.addOpentime(new OpeningTime("wkday","13:30","20:00"));
-					a.addOpentime(new OpeningTime("sat","09:00","17:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"08:30","12:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"13:30","20:00"));
+					a.addOpentime(new OpeningTime(DayType.sat,"09:00","17:00"));
 				}
 				else if (a.getType().equals("leisure")) {
 					a.setCapacity(this.nof_persons/leis_cnt);
-					a.addOpentime(new OpeningTime("wkday","17:00","24:00"));
-					a.addOpentime(new OpeningTime("wkend","20:00","24:00"));
+					a.addOpentime(new OpeningTime(DayType.wkday,"17:00","24:00"));
+					a.addOpentime(new OpeningTime(DayType.wkend,"20:00","24:00"));
 				}
 				else { Gbl.errorMsg("[something is wrong!]"); }
 			}
