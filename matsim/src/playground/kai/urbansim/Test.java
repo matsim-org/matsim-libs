@@ -3,34 +3,24 @@ package playground.kai.urbansim;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.* ;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicHouseholdImpl;
-import org.matsim.basic.v01.BasicIncomeImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
-import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.* ;
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.BasicIncome;
-import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
-import org.matsim.network.Link;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -276,7 +266,7 @@ public class Test {
 					int idx = idxFromKey.get("person_id:i4") ;
 					Id personId = new IdImpl( parts[idx] ) ;
 
-					Person person = new Person( personId ) ;
+					Person person = new PersonImpl( personId ) ;
 
 					idx = idxFromKey.get("age:i4") ;
 					person.setAge( Integer.parseInt( parts[idx] ) ) ;

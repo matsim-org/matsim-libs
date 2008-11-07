@@ -30,6 +30,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -83,7 +84,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		setupScoringConfig(Gbl.getConfig());
 
 		// score the same plan twice
-		Person person1 = new Person(new IdImpl(1));
+		Person person1 = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
 		Act act1a = plan1.createAct("home", (Link)null);//, 0, 7.0*3600, 7*3600, false);
 		Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);//, 7*3600, 100, 7*3600+100);

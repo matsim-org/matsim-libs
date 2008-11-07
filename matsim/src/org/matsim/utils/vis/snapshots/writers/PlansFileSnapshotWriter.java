@@ -23,6 +23,7 @@ package org.matsim.utils.vis.snapshots.writers;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -76,7 +77,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	}
 
 	public void addAgent(PositionInfo position) {
-		Person pers = new Person(position.getAgentId());
+		Person pers = new PersonImpl(position.getAgentId());
 
 		Plan plan = new Plan(pers);
 		Act actA = new Act("h", new CoordImpl(position.getEasting(), position.getNorthing()),

@@ -189,7 +189,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = new Person(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue("license"));

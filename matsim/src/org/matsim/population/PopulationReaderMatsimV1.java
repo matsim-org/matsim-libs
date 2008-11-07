@@ -136,7 +136,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
 		this.currperson.setSex(atts.getValue("sex"));
 		this.currperson.setAge(Integer.parseInt(atts.getValue("age")));
 		this.currperson.setLicence(atts.getValue("license"));

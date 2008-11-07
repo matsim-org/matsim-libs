@@ -30,6 +30,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -71,7 +72,7 @@ public class Plansgenerator {
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
-			Person p = new Person(new IdImpl(i));
+			Person p = new PersonImpl(new IdImpl(i));
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home

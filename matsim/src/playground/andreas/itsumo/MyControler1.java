@@ -34,6 +34,7 @@ import org.matsim.network.NetworkWriter;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -111,7 +112,7 @@ public class MyControler1 extends Controler {
 
 
 		for (int i=0; i<100; i++) {
-			Person p = new Person(new IdImpl(i+1));
+			Person p = new PersonImpl(new IdImpl(i+1));
 
 			try {
 				Plan plan1 = new Plan(p);
@@ -317,7 +318,7 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final LinkImpl sourceLink, final LinkImpl destLink, final Population population){
-		Person p = new Person(new IdImpl(ii));
+		Person p = new PersonImpl(new IdImpl(ii));
 		Plan plan = new Plan(p);
 		try {
 			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));

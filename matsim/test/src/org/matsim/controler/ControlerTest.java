@@ -32,6 +32,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -77,7 +78,7 @@ public class ControlerTest extends MatsimTestCase {
 		Population population = new Population(Population.NO_STREAMING);
 		Person person1 = null;
 
-		person1 = new Person(new IdImpl(1));
+		person1 = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person1.createPlan(true);
 		Act a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
@@ -87,7 +88,7 @@ public class ControlerTest extends MatsimTestCase {
 		plan1.createAct("h", link3);
 		population.addPerson(person1);
 
-		Person person2 = new Person(new IdImpl(2));
+		Person person2 = new PersonImpl(new IdImpl(2));
 		Plan plan2 = person2.createPlan(true);
 		Act a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
@@ -196,7 +197,7 @@ public class ControlerTest extends MatsimTestCase {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = new Person(new IdImpl(1));
+		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
 		Plan plan1 = person1.createPlan(true);
 		Act a1 = plan1.createAct("h", link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
@@ -275,7 +276,7 @@ public class ControlerTest extends MatsimTestCase {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = new Person(new IdImpl(1));
+		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
 		Plan plan1 = person1.createPlan(true);
 		act1a = plan1.createAct("h", new CoordImpl(-50.0, 10.0));

@@ -33,6 +33,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -64,7 +65,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		
 		// create one person with missing link in act
 		Population population = new Population(Population.NO_STREAMING);
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		Plan plan = person.createPlan(true);
 		Act a1 = plan.createAct("h", network.getLink(new IdImpl("1")));

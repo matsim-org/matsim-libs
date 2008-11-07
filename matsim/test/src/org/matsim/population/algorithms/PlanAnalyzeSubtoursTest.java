@@ -31,6 +31,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -66,7 +67,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
 
-		Person person = new Person(new IdImpl("1000"));
+		Person person = new PersonImpl(new IdImpl("1000"));
 
 		// test different types of activity plans
 		HashMap<String, String> expectedSubtourIndexations = new HashMap<String, String>();

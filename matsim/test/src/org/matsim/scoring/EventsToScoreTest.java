@@ -26,6 +26,7 @@ import org.matsim.events.Events;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,7 +41,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 */
 	public void testAddUtility() {
 		Population population = new Population(Population.NO_STREAMING);
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(population, sfFactory, 1.0);

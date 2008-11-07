@@ -78,7 +78,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public BasicPerson createPerson(Id id) {
-		Person p = new Person(id);
+		Person p = new PersonImpl(id);
 		this.population.addPerson(p);
 		return p;
 	}

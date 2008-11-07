@@ -14,6 +14,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -63,7 +64,7 @@ public class CreatePlans {
 
 		// create 100 persons
 		for (int i=0;i<5000;i++){
-			Person person = new Person(new IdImpl(i));
+			Person person = new PersonImpl(new IdImpl(i));
 			plans.addPerson(person);
 
 

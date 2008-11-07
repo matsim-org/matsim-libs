@@ -42,6 +42,7 @@ import org.matsim.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -195,7 +196,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			final int count) {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
-			Person person = new Person(new IdImpl(i + (int)depTime));
+			Person person = new PersonImpl(new IdImpl(i + (int)depTime));
 			Plan plan1 = person.createPlan(true);
 			Act a1 = plan1.createAct("h", depLink);
 			a1.setEndTime(depTime);

@@ -41,6 +41,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
@@ -137,7 +138,7 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private WithindayAgent createAgent(final Link homeLink, final Link workLink) {
-		Person p = new Person(new IdImpl("1"));
+		Person p = new PersonImpl(new IdImpl("1"));
 		this.plan = new Plan(p);
 		p.addPlan(this.plan);
 		this.leg = null;

@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 
 /**
@@ -52,7 +53,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta2() {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		Plan plan1 = person.createPlan(false); // weight: 0.0003.35462627902512
 		plan1.setScore(96.0);
@@ -104,7 +105,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta1() {
 		this.config.charyparNagelScoring().setBrainExpBeta(1.0);
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
 		Plan plan1 = person.createPlan(false); 

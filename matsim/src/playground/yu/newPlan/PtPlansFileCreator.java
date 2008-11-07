@@ -16,6 +16,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -136,7 +137,7 @@ public class PtPlansFileCreator {
 	private void createPtPerson(String startLinkId, String endTime,
 			String endLinkId, List<Node> srcRoute) {
 
-		Person p = new Person(new IdImpl("245-" + personCount));
+		Person p = new PersonImpl(new IdImpl("245-" + personCount));
 		try {
 			Plan pl = new Plan(p);
 			p.addPlan(pl);

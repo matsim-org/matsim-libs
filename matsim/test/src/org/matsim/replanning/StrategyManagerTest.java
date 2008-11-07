@@ -22,6 +22,7 @@ package org.matsim.replanning;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.replanning.selectors.PlanSelector;
@@ -41,7 +42,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		Population population = new Population(Population.NO_STREAMING);
 		for (int i = 0; i < 1000; i++) {
-			population.addPerson(new Person(new IdImpl(i)));
+			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
 
 		// setup StrategyManager
@@ -120,7 +121,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		Population population = new Population(Population.NO_STREAMING);
 		for (int i = 0; i < 100; i++) {
-			population.addPerson(new Person(new IdImpl(i)));
+			population.addPerson(new PersonImpl(new IdImpl(i)));
 		}
 
 		// setup StrategyManager
@@ -178,7 +179,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		person = new Person(new IdImpl(1));
+		person = new PersonImpl(new IdImpl(1));
 		plans[0] = person.createPlan(false);
 		plans[1] = person.createPlan(false);
 		plans[1].setScore(0.0);

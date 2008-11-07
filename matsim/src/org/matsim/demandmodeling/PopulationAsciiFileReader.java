@@ -28,6 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
@@ -101,7 +102,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			this.isFirstLine = false;
 		}
 		else {
-			Person p = new Person(new IdImpl(row[0]));
+			Person p = new PersonImpl(new IdImpl(row[0]));
 			p.setAge(Integer.parseInt(row[2]));
 			p.setSex(row[3]);
 			log.warn("Income is not supported by the current version of MATSim. Column 5 will be ignored");

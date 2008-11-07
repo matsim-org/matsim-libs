@@ -29,6 +29,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.router.PlansCalcRoute;
@@ -54,7 +55,7 @@ public class GuideAgentsGenerator {
 				continue;
 			}
 			Id id = new IdImpl("guide" + count++);
-			Person p = new Person(id);
+			Person p = new PersonImpl(id);
 			Plan plan  = new Plan(p);
 			Act actA = new Act("h", new CoordImpl(12000.0, -12000.0), l);
 			actA.setEndTime(3600 * 3);

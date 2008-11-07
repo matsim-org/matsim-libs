@@ -15,6 +15,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -158,7 +159,7 @@ public class Converter {
 					p.addPlan(nonCarPlan);
 				}
 
-				Person p = new Person(new IdImpl(personId));
+				Person p = new PersonImpl(new IdImpl(personId));
 				Plan pl = new Plan(p);
 				// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 				endTime = convertTime(tabs[3]);

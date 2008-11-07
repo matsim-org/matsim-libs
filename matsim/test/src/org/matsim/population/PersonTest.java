@@ -36,7 +36,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_nullType() {
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 
 		Plan plan1 = new Plan(person);
 		plan1.setScore(15.0);
@@ -89,7 +89,7 @@ public class PersonTest extends MatsimTestCase {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 
 		Plan plan1 = new Plan(person);
 		plan1.setScore(15.0);
@@ -143,7 +143,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_selectedPlan() {
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 
 		Plan plan1 = new Plan(person);
 		plan1.setScore(15.0);
@@ -192,7 +192,7 @@ public class PersonTest extends MatsimTestCase {
 		Person person = null;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		person = new Person(new IdImpl(1));
+		person = new PersonImpl(new IdImpl(1));
 		plans[0] = person.createPlan(false);
 		plans[1] = person.createPlan(false);
 		plans[1].setScore(0.0);
@@ -235,7 +235,7 @@ public class PersonTest extends MatsimTestCase {
 	 * @author mrieser 
 	 */
 	public void testRemoveUnselectedPlans() {
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		person.createPlan(false);
 		person.createPlan(false);
 		Plan selPlan = person.createPlan(true);

@@ -192,7 +192,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			this.idCnt++;
 			this.cnt++;
 			int age = this.pgMinAge[this.pg_] + (int)Math.round(MatsimRandom.random.nextDouble()*(this.pgMaxAge[this.pg_]+1 - this.pgMinAge[this.pg_]));
-			Person p = new Person(new IdImpl(id));
+			Person p = new PersonImpl(new IdImpl(id));
 			p.setSex(this.pgSex[this.pg_]);
 			p.setAge(age);
 			p.setLicence(this.pgLicense[this.pg_]);

@@ -8,6 +8,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
@@ -48,7 +49,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
-		this.person = new Person(new IdImpl(1));
+		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = person.createPlan(true);
 
 		Act act = plan.createAct("no type", testFacility);

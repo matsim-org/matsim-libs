@@ -35,6 +35,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
@@ -100,7 +101,7 @@ public class StaticPopulationGenerator {
 				final int li = (int) Math.round(inhabitants * fraction);
 				all += li;
 				for (int i = 0; i < li ; i++) {
-					final Person pers = new Person(new IdImpl(id++));
+					final Person pers = new PersonImpl(new IdImpl(id++));
 					final Plan plan = new Plan(pers);
 					final Act act = new Act("h",link.getCenter(),link);
 					act.setStartTime(3 * 3600.0);

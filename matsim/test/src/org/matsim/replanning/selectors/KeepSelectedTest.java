@@ -22,6 +22,7 @@ package org.matsim.replanning.selectors;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 
 /**
@@ -42,7 +43,7 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testSelected() {
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person.createPlan(false);
 		Plan plan2 = person.createPlan(true);
 		plan2.setScore(10.0);

@@ -31,6 +31,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.geometry.CoordImpl;
@@ -159,7 +160,7 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
-		Person p = new Person(new IdImpl(String.valueOf(ii)));
+		Person p = new PersonImpl(new IdImpl(String.valueOf(ii)));
 		Plan plan = new Plan(p);
 		try {
 			Act act1 = plan.createAct("h", new CoordImpl(100., 100.));

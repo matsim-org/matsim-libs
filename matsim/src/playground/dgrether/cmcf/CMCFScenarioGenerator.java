@@ -32,6 +32,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -165,7 +166,7 @@ public class CMCFScenarioGenerator {
 		Link l6 = network.getLink(IdFactory.get(6));
 		
 		for (int i = 1; i <= 3600; i++) {
-			Person p = new Person(new IdImpl(i));
+			Person p = new PersonImpl(new IdImpl(i));
 			Plan plan = new Plan(p);
 			p.addPlan(plan);
 			//home

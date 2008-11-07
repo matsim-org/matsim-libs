@@ -39,6 +39,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
@@ -501,7 +502,7 @@ public class PlansCreateFromCensus2000 {
 				if ((wkat == 1) && (gem2 == -9) && (partnr == -9)) {
 					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
-					p = new Person(pid);
+					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 					p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
@@ -511,7 +512,7 @@ public class PlansCreateFromCensus2000 {
 				else if ((wkat == 3) && (gem2 == -7) && (partnr == -7)) {
 					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
-					p = new Person(pid);
+					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 					p_atts.put(CAtts.HH_Z,null);
@@ -521,7 +522,7 @@ public class PlansCreateFromCensus2000 {
 				else if ((wkat == 4) && (gem2 == -7) && (partnr == -7)) {
 					Person p = plans.getPerson(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
-					p = new Person(pid);
+					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,null);
 					p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
@@ -532,7 +533,7 @@ public class PlansCreateFromCensus2000 {
 					Person p = plans.getPerson(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
-						p = new Person(pid);
+						p = new PersonImpl(pid);
 						Map<String,Object> p_atts = p.getCustomAttributes();
 						p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 						p_atts.put(CAtts.HH_Z,null);
@@ -551,7 +552,7 @@ public class PlansCreateFromCensus2000 {
 					Person p = plans.getPerson(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
-						p = new Person(pid);
+						p = new PersonImpl(pid);
 						Map<String,Object> p_atts = p.getCustomAttributes();
 						p_atts.put(CAtts.HH_W,null);
 						p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);

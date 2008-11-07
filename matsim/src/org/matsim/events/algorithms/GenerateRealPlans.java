@@ -44,6 +44,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -269,7 +270,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	private Plan getPlanForPerson(final Person person) {
 		Person realperson = this.realplans.getPerson(person.getId());
 		if (realperson == null) {
-			realperson = new Person(person.getId());
+			realperson = new PersonImpl(person.getId());
 			realperson.setSex(person.getSex());
 			realperson.setAge(person.getAge());
 			realperson.setLicence(person.getLicense());
@@ -284,7 +285,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 	private Plan getPlanForPerson(final String personId) {
 		Person realperson = this.realplans.getPerson(personId);
 		if (realperson == null) {
-			realperson = new Person(new IdImpl(personId));
+			realperson = new PersonImpl(new IdImpl(personId));
 			realperson.createPlan(true);
 			this.realplans.addPerson(realperson);
 		}

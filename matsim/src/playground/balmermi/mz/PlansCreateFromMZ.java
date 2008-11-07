@@ -36,6 +36,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.geometry.Coord;
@@ -196,7 +197,7 @@ public class PlansCreateFromMZ {
 				// creating/getting the matsim person
 				Person person = plans.getPerson(pid);
 				if (person == null) {
-					person = new Person(pid);
+					person = new PersonImpl(pid);
 					plans.addPerson(person);
 					person.setAge(age);
 					person.setLicence(licence);

@@ -32,6 +32,7 @@ import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 
 /**
@@ -88,7 +89,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		Link link5 = this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
 		Gbl.getWorld().setNetworkLayer(this.network);
 
-		this.person = new Person(new IdImpl(1));
+		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = this.person.createPlan(true);
 		try {
 			this.plan.createAct("h", link1);

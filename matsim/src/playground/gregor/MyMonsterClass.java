@@ -51,6 +51,7 @@ import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.Act;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -301,7 +302,7 @@ public class MyMonsterClass {
 		PopulationWriter writer = new PopulationWriter(population,"./output/evacuationplans_zurich_navteq1.xml","v4");
 		writer.writeStartPlans();
 		for (Person person : persons){
-			Person nperson = new Person(person.getId());
+			Person nperson = new PersonImpl(person.getId());
 			nperson.setSex(person.getSex());
 			nperson.setAge(person.getAge());
 			nperson.setLicence(person.getLicense());

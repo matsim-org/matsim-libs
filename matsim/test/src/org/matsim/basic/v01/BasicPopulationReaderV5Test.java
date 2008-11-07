@@ -23,6 +23,7 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.facilities.Facilities;
@@ -96,7 +97,35 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertTrue(pp.isEmployed());
 		assertEquals("ch-HT-2y", pp.getTravelcards().first());
 		assertEquals(id23, pp.getFiscalHouseholdId());
-		
+		//check knowledge
+		//TODO
+		BasicKnowledge knowledge = null;// = pp.getKnowledge();
+		assertNotNull(knowledge);
+		assertNotNull(knowledge.getDescription());
+		assertNotNull(knowledge.getActivities());
+		assertEquals(2, knowledge.getActivities().size());
+		BasicActivity activity = knowledge.getActivities().get(0);
+		assertNotNull(activity);
+		assertEquals(Integer.valueOf(4), activity.getFrequency());
+		assertNotNull(activity.getLocation());
+		assertEquals(id666, activity.getLocation().getLocationId());
+		assertEquals(true, activity.getLocation().isFacilityId());
+		assertEquals(40, activity.getCapacity());
+		assertNotNull(activity.getOpeningTime(DayType.wk));
+		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime());
+		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime());
+
+		activity = knowledge.getActivities().get(1);
+		assertNotNull(activity);
+		assertNull(activity.getFrequency());
+		assertNotNull(activity.getLocation());
+		assertNull(activity.getLocation().getLocationId());
+		assertNotNull(activity.getLocation().getCoord());
+		assertEquals(2.3, activity.getLocation().getCoord().getX());
+		assertEquals(4.2, activity.getLocation().getCoord().getY());
+		assertNull(activity.getCapacity());
+		assertNull(activity.getOpeningTime(DayType.wk));
+
 		
 		//now check the contents of plans
 		assertEquals(1, pp.getPlans().size());

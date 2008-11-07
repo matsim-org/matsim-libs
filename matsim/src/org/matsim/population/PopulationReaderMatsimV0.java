@@ -122,7 +122,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = new Person(new IdImpl(atts.getValue("id")));
+		this.currperson = new PersonImpl(new IdImpl(atts.getValue("id")));
 	}
 
 	private void startPlan(final Attributes atts) {

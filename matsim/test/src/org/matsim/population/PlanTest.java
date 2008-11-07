@@ -34,7 +34,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCreateLeg() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		try {
 			plan.createLeg(Mode.car);
 			fail("expected IllegalStateException when creating a leg in an empty plan.");
@@ -58,7 +58,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCreateAct() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
 		// don't allow a second act directly after the first
 		try {
@@ -76,7 +76,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_Between() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		Act homeAct = plan.createAct("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(Mode.car);
 		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
@@ -102,7 +102,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtEnd() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		Act homeAct = plan.createAct("h", new CoordImpl(0, 0));
 		Leg leg1 = plan.createLeg(Mode.car);
 		Act workAct = plan.createAct("w", new CoordImpl(100, 200));
@@ -128,7 +128,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtWrongPosition() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
 		plan.createLeg(Mode.car);
 		plan.createAct("w", new CoordImpl(100, 200));
@@ -151,7 +151,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_AtStart() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
 		plan.createLeg(Mode.car);
 		plan.createAct("w", new CoordImpl(100, 200));
@@ -175,7 +175,7 @@ public class PlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testInsertActLeg_BehindEnd() {
-		Plan plan = new Plan(new Person(new IdImpl(1)));
+		Plan plan = new Plan(new PersonImpl(new IdImpl(1)));
 		plan.createAct("h", new CoordImpl(0, 0));
 		plan.createLeg(Mode.car);
 		plan.createAct("w", new CoordImpl(100, 200));

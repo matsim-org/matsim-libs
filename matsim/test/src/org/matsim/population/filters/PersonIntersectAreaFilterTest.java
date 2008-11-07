@@ -31,6 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
@@ -63,7 +64,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Gbl.createWorld().setNetworkLayer(network);
 
 		// create a test person
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 
 		Act act1 = plan.createAct("h", link0);

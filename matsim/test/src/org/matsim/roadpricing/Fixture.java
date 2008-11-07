@@ -31,6 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -168,7 +169,7 @@ public class Fixture {
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final Link homeLink, final String routeNodes, final Link workLink) {
-		Person person = new Person(new IdImpl(personId));
+		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
@@ -181,7 +182,7 @@ public class Fixture {
 	}
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		Person person = new Person(new IdImpl(personId));
+		Person person = new PersonImpl(new IdImpl(personId));
 		Plan plan = new Plan(person);
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));//, "00:00", startTime, startTime, "no");

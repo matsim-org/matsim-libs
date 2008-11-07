@@ -28,6 +28,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.testcases.MatsimTestCase;
@@ -83,7 +84,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testAdd() {
 		Vehicle v = new Vehicle();
 
-		Person p = new Person(new IdImpl("1"));
+		Person p = new PersonImpl(new IdImpl("1"));
 		v.setDriver(new PersonAgent(p));
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
@@ -122,7 +123,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		new QueueSimulation(network, null, new Events());
 		Vehicle v1 = new Vehicle();
-		Person p = new Person(new IdImpl("1"));
+		Person p = new PersonImpl(new IdImpl("1"));
 		Plan plan = p.createPlan(true);
 		try {
 			plan.createAct("h", link1);

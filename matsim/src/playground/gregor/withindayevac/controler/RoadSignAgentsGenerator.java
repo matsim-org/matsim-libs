@@ -29,6 +29,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -50,7 +51,7 @@ public class RoadSignAgentsGenerator {
 				continue;
 			}
 			Id id = new IdImpl("guide" + count++);
-			Person p = new Person(id);
+			Person p = new PersonImpl(id);
 			Route route = dijkstra.calcLeastCostPath(node, network.getNode("en2"), 3*3600);
 			Link shortest = route.getLinkRoute()[0];
 			

@@ -30,6 +30,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
@@ -75,7 +76,7 @@ public class PlansCreateTripsFromODMatrix {
 				while (sum >= 1.0) {
 					counter++;
 					sum--;
-					Person person = new Person(new IdImpl(counter));
+					Person person = new PersonImpl(new IdImpl(counter));
 					person.setCarAvail("yes");
 					person.setEmployed("yes");
 					Plan plan = person.createPlan(true);

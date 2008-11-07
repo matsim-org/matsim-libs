@@ -26,6 +26,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Population;
 
 public class PlansCreateFromNetwork {
@@ -113,7 +114,7 @@ public class PlansCreateFromNetwork {
 					else if (rd2 < 0.4) { car_avail = "always"; }
 				}
 			}
-			Person p = new Person(new IdImpl(i));
+			Person p = new PersonImpl(new IdImpl(i));
 			p.setSex(sex);
 			p.setAge(age);
 			p.setLicence(license);

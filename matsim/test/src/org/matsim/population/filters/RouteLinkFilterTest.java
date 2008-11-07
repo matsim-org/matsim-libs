@@ -29,6 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
@@ -69,7 +70,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Leg leg;
 		Route route;
 
-		person = new Person(new IdImpl("1"));
+		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createPlan(true);
 		Act a = plan.createAct("h", link1);
 		a.setEndTime(7.0 * 3600);
@@ -80,7 +81,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAct("w", link20);
 		population.addPerson(person);
 
-		person = new Person(new IdImpl("2"));
+		person = new PersonImpl(new IdImpl("2"));
 		plan = person.createPlan(true);
 		Act a2 = plan.createAct("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
@@ -91,7 +92,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAct("w", link20);
 		population.addPerson(person);
 
-		person = new Person(new IdImpl("3"));
+		person = new PersonImpl(new IdImpl("3"));
 		plan = person.createPlan(true);
 		Act a3 = plan.createAct("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);

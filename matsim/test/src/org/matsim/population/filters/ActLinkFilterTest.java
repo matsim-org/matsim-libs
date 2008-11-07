@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,7 +54,7 @@ public class ActLinkFilterTest extends MatsimTestCase {
 		String linkId = null;
 		String actType = null;
 		for (String personId : new String[]{"1", "2"}) {
-			Person person = new Person(new IdImpl(personId));
+			Person person = new PersonImpl(new IdImpl(personId));
 			Plan plan = person.createPlan(true);
 			if (personId.equals("1")) {
 				linkId = "1";

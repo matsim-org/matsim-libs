@@ -31,6 +31,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
@@ -51,8 +52,8 @@ public class LegHistogramTest extends MatsimTestCase {
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
-		Person person1 = new Person(new IdImpl(1));
-		Person person2 = new Person(new IdImpl(2));
+		Person person1 = new PersonImpl(new IdImpl(1));
+		Person person2 = new PersonImpl(new IdImpl(2));
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(0);
 		leg.setDepTime(7*3600);
@@ -101,7 +102,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
-		Person person1 = new Person(new IdImpl(1));
+		Person person1 = new PersonImpl(new IdImpl(1));
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(0);
 		leg.setDepTime(7*3600);
@@ -139,7 +140,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 1.0, 1);
 
-		Person person1 = new Person(new IdImpl(1));
+		Person person1 = new PersonImpl(new IdImpl(1));
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(0);
 		leg.setDepTime(7*3600);

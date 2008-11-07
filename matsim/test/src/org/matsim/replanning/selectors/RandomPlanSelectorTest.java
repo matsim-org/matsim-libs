@@ -23,6 +23,7 @@ package org.matsim.replanning.selectors;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 
 /**
@@ -43,7 +44,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * Test that each of a person's plans is randomly selected.
 	 */
 	public void testRandom() {
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		Plan plan1 = person.createPlan(false);
 		Plan plan2 = person.createPlan(false);
 		plan2.setScore(10.0);

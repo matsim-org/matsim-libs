@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
@@ -42,7 +43,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testActLegIterator() throws Exception {
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 
 		// test with empty plan, should not produce an error/exception
@@ -121,7 +122,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLegIterator() throws Exception {
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 
 		// test with empty plan, should not produce an error/exception
@@ -178,7 +179,7 @@ public class BasicPlanTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetIteratorAct() throws Exception {
-		Person person = new Person(new IdImpl("1"));
+		Person person = new PersonImpl(new IdImpl("1"));
 		Plan plan = person.createPlan(true);
 
 		// test with empty plan, should not produce an error/exception

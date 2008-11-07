@@ -32,6 +32,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
 import org.matsim.utils.geometry.CoordImpl;
@@ -72,7 +73,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Node n4 = network.getNode("4");
 
 		// test with only one plan...
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new Plan(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
@@ -146,7 +147,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 		
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = new Person(new IdImpl(1));
+		person = new PersonImpl(new IdImpl(1));
 		p1 = new Plan(person);
 		a = new Act("h", l6);
 		b = new Act("w", l7);
@@ -180,7 +181,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Node n1 = network.getNode("1");
 		Node n3 = network.getNode("3");
 		
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new Plan(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
@@ -216,7 +217,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Node n3 = network.getNode("3");
 		Node n4 = network.getNode("4");
 
-		Person person = new Person(new IdImpl(1));
+		Person person = new PersonImpl(new IdImpl(1));
 		Plan p1 = new Plan(person);
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);

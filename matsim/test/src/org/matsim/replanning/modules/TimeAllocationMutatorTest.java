@@ -28,6 +28,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestCase;
@@ -116,7 +117,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = new Person(new IdImpl("1"));
+			Person person = new PersonImpl(new IdImpl("1"));
 			plan = person.createPlan(true);
 			act1 = plan.createAct("h", link1);
 			act1.setEndTime(4*3600);
