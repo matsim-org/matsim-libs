@@ -75,6 +75,7 @@ public class OnTheFlyClientQuad extends Thread {
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
