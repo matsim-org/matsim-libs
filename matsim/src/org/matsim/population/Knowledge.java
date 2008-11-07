@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
@@ -89,6 +90,12 @@ public class Knowledge extends CustomizableImpl {
 		public int hashCode() {
 			return this.activity.hashCode();
 		}
+	}
+	
+
+	public void addActivity(BasicActivity activity) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -431,4 +438,5 @@ public class Knowledge extends CustomizableImpl {
 		if (this.egoNet == null) { this.egoNet = new EgoNet(); }
 		return egoNet;
 	}
+
 }

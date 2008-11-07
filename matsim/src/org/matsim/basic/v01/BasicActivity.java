@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.interfaces.basic.v01.BasicLocation;
@@ -33,12 +33,16 @@ public interface BasicActivity {
 	
 	public BasicLocation getLocation();
 	
+	public Integer getFrequency();
+	
+	public void setFrequency(Integer freq);
+	
 	public int getCapacity();
 	
 	public void setCapacity(int cap);
 
 	public void addOpeningTime(DayType day, BasicOpeningTime openingTime);
 
-	public Set<BasicOpeningTime> getOpeningTime(DayType day);
+	public SortedSet<BasicOpeningTime> getOpeningTime(DayType day);
 	
 }

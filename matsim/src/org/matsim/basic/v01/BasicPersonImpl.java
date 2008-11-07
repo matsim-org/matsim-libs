@@ -44,7 +44,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	private String isEmployed;
 
 	private TreeSet<String> travelcards = null; 
-	private Knowledge knowledge = null;
+	protected Knowledge knowledge = null;
 	private Desires desires = null;
 
 	private Id householdId;
@@ -170,12 +170,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 		// Maybe use a "boolean" instead of a "String"?  kai, nov08
 	}
 
-	public final Knowledge createKnowledge(final String desc) {
-		if (this.knowledge == null) {
-			this.knowledge = new Knowledge(desc);
-		}
-		return this.knowledge;
-	}
+
 	
 	public final Desires createDesires(final String desc) {
 		if (this.desires == null) {

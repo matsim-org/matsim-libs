@@ -77,7 +77,7 @@ public interface BasicPerson<T extends BasicPlan> {
 
 	public void setEmployed(final String employed); 
 
-	public Knowledge createKnowledge(final String desc);
+//	public Knowledge createKnowledge(final String desc);
 
 	public Desires createDesires(final String desc);
 

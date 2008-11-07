@@ -30,7 +30,7 @@ public interface BasicKnowledge {
 
 	public void setDescription(String desc);
 	
-	public String getDescription(String desc);
+	public String getDescription();
 	
 	public List<BasicActivity> getActivities();
 	

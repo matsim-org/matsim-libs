@@ -232,6 +232,13 @@ public class Person extends BasicPersonImpl<Plan>{
 		}
 	}
 
+	public final Knowledge createKnowledge(final String desc) {
+		if (this.knowledge == null) {
+			this.knowledge = new Knowledge(desc);
+		}
+		return this.knowledge;
+	}
+	
 	/**
 	 * @param visualizerData sets the optional user data for visualizer
 	 */

@@ -20,7 +20,7 @@ public class BasicKnowledgeImpl implements BasicKnowledge {
 		return this.activities;
 	}
 
-	public String getDescription(String desc) {
+	public String getDescription() {
 		return this.description;
 	}
 
