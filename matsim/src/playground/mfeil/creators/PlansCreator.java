@@ -203,7 +203,7 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"home\" link=\""+(i)+"\" facility=\""+(2*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"0.0\" start_time=\"00:00:00\" dur=\"08:00:00\" end_time=\"08:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"0\" mode=\"car\" dep_time=\"08:00:00\" trav_time=\"00:00:00\" arr_time=\"08:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"work\" link=\""+(4*(networkSize-1)+j)+"\" facility=\""+(3*(networkSize-1)+j)+"\" x=\""+(j*distance-distance/2)+"\" y=\"9000.0\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"work\" link=\""+(9*(networkSize-1)+j)+"\" facility=\""+(3*(networkSize-1)+j)+"\" x=\""+(j*distance-distance/2)+"\" y=\"9000.0\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"1\" mode=\"car\" dep_time=\"16:00:00\" trav_time=\"00:00:00\" arr_time=\"16:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
@@ -257,7 +257,7 @@ public class PlansCreator {
 					 out.write("\t\t</knowledge>\n\n");
 					 
 					 out.write("\t\t<plan>\n");
-					 out.write("\t\t\t<act type=\"home\" link=\""+(4*(networkSize-1)+i)+"\" facility=\""+(3*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"9000.0\" start_time=\"00:00:00\" dur=\"08:00:00\" end_time=\"08:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"home\" link=\""+(9*(networkSize-1)+i)+"\" facility=\""+(3*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"9000.0\" start_time=\"00:00:00\" dur=\"08:00:00\" end_time=\"08:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"0\" mode=\"car\" dep_time=\"08:00:00\" trav_time=\"00:00:00\" arr_time=\"08:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"work\" link=\""+(j)+"\" facility=\""+(2*(networkSize-1)+j)+"\" x=\""+(j*distance-distance/2)+"\" y=\"0.0\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");

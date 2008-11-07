@@ -56,7 +56,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 10;
+		this.STOP_CRITERION			= 3;
 		this.minimumTime			= 3600;
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		//TODO @MF: constants to be configured externally
@@ -69,7 +69,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 	
 	public void run (Plan plan){
 		
-		long runStartTime = System.currentTimeMillis();
+	//	long runStartTime = System.currentTimeMillis();
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
@@ -77,7 +77,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		while (move!=0.0){
 			loops++;
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
-			log.info("Move = "+move);
+		//	log.info("Move = "+move);
 			if (loops>3) {
 				for (int i=2;i<plan.getActsLegs().size()-4;i+=2){
 					((Act)plan.getActsLegs().get(i)).setDur(this.minimumTime);
@@ -248,7 +248,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 			al.remove(i);
 			al.add(i, bestSolution.getActsLegs().get(i));	
 		}
-		log.info("Person "+plan.getPerson().getId()+" runtime: "+(System.currentTimeMillis()-runStartTime));
+		//log.info("Person "+plan.getPerson().getId()+" runtime: "+(System.currentTimeMillis()-runStartTime));
 		
 	}
 	
@@ -482,8 +482,9 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	public int swapDurations (PlanomatXPlan basePlan, int outer, int inner){
 		
-		((Act)(basePlan.getActsLegs().get(outer))).setDur(((Act)(basePlan.getActsLegs().get(inner))).getDur());
-		double now =((Act)(basePlan.getActsLegs().get(outer))).getStartTime()+((Act)(basePlan.getActsLegs().get(outer))).getDur();
+		double swaptime=((Act)(basePlan.getActsLegs().get(inner))).getDur();
+		((Act)(basePlan.getActsLegs().get(outer))).setDur(swaptime);
+		double now =((Act)(basePlan.getActsLegs().get(outer))).getStartTime()+swaptime;
 		((Act)(basePlan.getActsLegs().get(outer))).setEndTime(now);
 		
 		double travelTime;
@@ -573,7 +574,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		}
 		
 		// clean-up of plan (=bestIterSolution)
-		this.cleanActs(plan);
+		if (!warningOuter) this.cleanActs(plan);
 		//log.info("Clean actslegs: "+plan.getActsLegs());
 		
 		out[0]=plan;
