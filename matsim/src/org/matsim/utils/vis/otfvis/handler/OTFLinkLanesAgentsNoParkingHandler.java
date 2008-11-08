@@ -30,7 +30,7 @@ import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 
 public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 	
-	static public class Writer extends  OTFLinkAgentsNoParkingHandler.Writer {
+	static public class Writer extends  OTFLinkAgentsHandler.Writer {
 		/**
 		 * 
 		 */
