@@ -46,7 +46,7 @@ public class PTRouter2 {
 		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
-	public Route findRoute(Coord coord1, Coord coord2, int time, int distToWalk){
+	public Route findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
 		PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk);
 		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk);
 		PTNode ptNode1=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W1"), coord1);
@@ -54,21 +54,19 @@ public class PTRouter2 {
 		List <IdImpl> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
 		List <IdImpl> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
 		
-		Route route = dijkstra.calcLeastCostPath(ptNode1, ptNode2, new Double(time));
+		Route route = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
 		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList1);
 		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList2);
-		//this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W1"));
-		//this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W2"));
+		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W1"));
+		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W2"));
 		this.ptNetworkLayer.removeNode(ptNode1);
 		this.ptNetworkLayer.removeNode(ptNode2);
 
 		if (route!=null){
-			//System.out.println("route ==null");
 			route.getRoute().remove(ptNode1);
 			route.getRoute().remove(ptNode2);
 		}
-		//PrintRoute(route);
 		return route;
 	}
 
@@ -78,9 +76,17 @@ public class PTRouter2 {
 		return findRoute(node1, node2,time);
 	}
 	
-
 	public Route findRoute(Node ptNode1, Node ptNode2, double time){
 		return dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
+	}
+	
+	public Route forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+		Route route=null;
+		while (route==null && distToWalk<1300){
+			route= findRoute(coord1, coord2, time, distToWalk);
+			distToWalk= distToWalk+50;
+		}
+		return route;
 	}
 	
 	public List<Object> findLegActs(Route route, double depTime){
@@ -88,35 +94,47 @@ public class PTRouter2 {
 		if (route!=null){
 			double legTravTime =0;
 			double accumulatedTime=depTime;
-			double legArrTime=depTime;
+			//double legArrTime=depTime;
 			double routeTravelTime =0;
 			int num=0;
-	
+		
 			List<Link> linkList = new ArrayList<Link>();
+			boolean first=true;
 			for(int x=0; x< route.getLinkRoute().length;x++){
 				Link link = route.getLinkRoute()[x];
 				double linkTravelTime=ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 				accumulatedTime =accumulatedTime + linkTravelTime;
 				routeTravelTime =routeTravelTime+linkTravelTime;
 				
+
+				//insert first ptActivity: boarding first PTVehicle
+				if (first){ 
+					Coord coord = link.getFromNode().getCoord();
+					double startTime = 0; //this must be inmediately set when we know the passenger gets to the station
+					double dur= 0;        //this must be inmediately set when we know the passenger gets to the station
+					double endTime = depTime;
+					actLegList.add(newPTAct(coord, link, startTime, dur, endTime));
+					first=false;
+				}
+				
+				
 				if (link.getType().equals("Standard")){
 					legTravTime = legTravTime+ linkTravelTime; 
 					linkList.add(link);
 				}else{
 					Route legRoute = new Route();
-					legRoute.setTravTime(routeTravelTime*3600);
+					legRoute.setTravTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinkRoute(linkList);}
 					
 					//insert leg 
 					Leg leg = new Leg(Leg.Mode.pt);
-					routeTravelTime =routeTravelTime*3600;
+					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
+					leg.setDepTime(accumulatedTime);
+					leg.setTravTime(routeTravelTime);
 					leg.setArrTime((accumulatedTime + (routeTravelTime))); 
-					leg.setDepTime(accumulatedTime); 
 					leg.setNum(num); 		
 					leg.setRoute(legRoute);
-					leg.setTravTime(routeTravelTime);
 					actLegList.add(leg);		
-					
 					
 					//clean variables
 					linkList = new ArrayList<Link>();
@@ -124,20 +142,15 @@ public class PTRouter2 {
 					num++;
 					
 					//insert transfer activity  TODO: what about walking and other posibble "pt modal choices"
-
+					Coord coord = link.getToNode().getCoord();
 					double startTime=depTime + routeTravelTime;
-					Act act= new Act("Wait PT Vehicle", link.getToNode().getCoord());
-					act.setStartTime(startTime);
-					//act.setDur(linkTravelTime*60);
-					act.calculateDuration();
-					act.setEndTime(startTime + (linkTravelTime*60));
-//					act.setLinkId(link.getId());
-					//act.setCoord(coord)
-					actLegList.add(act);
-				
+					double dur= linkTravelTime; //double dur= linkTravelTime*60;  //Seconds
+					double endTime = startTime + dur;
+					actLegList.add(newPTAct(coord,link, startTime, dur, endTime));
+					
 				}//if link = standard
 				//set arrTime for the next loop:
-				legArrTime =  accumulatedTime;
+				//legArrTime =  accumulatedTime;
 				routeTravelTime=0;
 					
 				
@@ -147,6 +160,18 @@ public class PTRouter2 {
 		
 	}
 	
+	private Act newPTAct(Coord coord, Link link, double startTime, double dur, double endTime){
+		Act ptAct= new Act("Wait PT Vehicle", coord);
+		ptAct.setStartTime(startTime);
+		ptAct.setEndTime(endTime);
+		ptAct.setDur(dur);
+		ptAct.calculateDuration();
+		ptAct.setLink(link);
+		//act.setDur(linkTravelTime*60);
+		//act.setLinkId(link.getId());
+		//act.setCoord(coord)
+		return ptAct;
+	}
 		
 	private Leg createLeg(int num, Route legRoute, double depTime, double travTime, double arrTime){
 		Leg leg = new Leg(Leg.Mode.pt);
@@ -169,29 +194,32 @@ public class PTRouter2 {
 	}
 	
 	public void PrintRoute(Route route){
-		System.out.print("\nLinks: ");
-		for(int x=0; x< route.getLinkRoute().length;x++){
-			Link l =route.getLinkRoute()[x];
-			//System.out.println("link: "l.getId() + " cost: " + link.);
-		}
-	
-		IdImpl idPTLine = new IdImpl("");
-		for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){
-			PTNode ptNode= (PTNode)iter.next();
-			if(ptNode.getIdPTLine()==idPTLine){
-				System.out.print(ptNode.getId().toString() + " ");
-			}else{
-				System.out.println("\n" + ptNode.getIdPTLine().toString());
-				System.out.print(ptNode.getId().toString() + " ");
+		if (route!=null){
+			System.out.print("\nLinks: ");
+			for(int x=0; x< route.getLinkRoute().length;x++){
+				Link l =route.getLinkRoute()[x];
+				//System.out.println("link: "l.getId() + " cost: " + link.);
 			}
-			idPTLine= ptNode.getIdPTLine();	
-		}
-		System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravTime());
-	}
-}
+		
+			IdImpl idPTLine = new IdImpl("");
+			for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){
+				PTNode ptNode= (PTNode)iter.next();
+				if(ptNode.getIdPTLine()==idPTLine){
+					System.out.print(ptNode.getId().toString() + " ");
+				}else{
+					System.out.println("\n" + ptNode.getIdPTLine().toString());
+					System.out.print(ptNode.getId().toString() + " ");
+				}
+				idPTLine= ptNode.getIdPTLine();	
+			}
+			System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravTime());
+		}else{
+			System.out.println("The route is null");
+		}//if null
 
+	}//printroute
 
-
+}//class
 
 /*
 for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){

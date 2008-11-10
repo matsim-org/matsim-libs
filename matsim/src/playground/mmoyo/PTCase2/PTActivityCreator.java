@@ -18,10 +18,11 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.basic.v01.Id;
 
 public class PTActivityCreator {
 	private final String CONFIG;
-	private final Population plans;
+	private final Population population;
 	private final PTRouter2 ptRouter2;
 	private final NetworkLayer network;
 
@@ -36,16 +37,18 @@ public class PTActivityCreator {
 		Gbl.setConfig(config);
 		Gbl.getWorld().setNetworkLayer(ptNetworkLayer);
 
-		this.plans = new org.matsim.population.Population(false);
-		PopulationReaderMatsimV4 plansReader = new org.matsim.population.PopulationReaderMatsimV4(this.plans);
+		this.population = new org.matsim.population.Population(false);
+		PopulationReaderMatsimV4 plansReader = new org.matsim.population.PopulationReaderMatsimV4(this.population);
 		plansReader.readFile(plansFile);
 	}
 
-	public void createPTActs(final String outputFile){
+	public void createPTActs(final String outputFile, PTTimeTable2 ptTimetable){
+		Population newPopulation = new org.matsim.population.Population(false);
+		
 		int x=0;
-		for (Person person: this.plans.getPersons().values()) {
-			System.out.println(x);
-			//Person person = plans.getPerson("1008146");
+		//for (Person person: this.population.getPersons().values()) {
+			Person person = population.getPerson("1005733");
+			//System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 			
 			boolean val =false;
@@ -53,52 +56,84 @@ public class PTActivityCreator {
 			Act thisAct= null;
 			int legNum=0;
 			
-		
 			Plan newPlan = new Plan(person);
 			for (Iterator iter= plan.getIteratorAct(); iter.hasNext();) {
-				
 		    	Act ptAct=null;
 		    	Leg walkLeg=null;
-
 		    	thisAct= (Act)iter.next();
 				
 		    	if (val) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
-		    		Route legRoute = this.ptRouter2.findRoute(lastActCoord, actCoord, lastAct.getEndTime());
+		    		int distToWalk= distToWalk(person.getAge());
+		    		//Route legRoute = this.ptRouter2.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+		    		Route legRoute = this.ptRouter2.forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 		    		if(legRoute!=null){
-		    			if (legRoute.getRoute().size()>2){// if router didn't find a PT connection then walk
+		    			if (legRoute.getRoute().size()>2){
 			    			List<Object> listLegAct = new ArrayList<Object>();
-			    	    	listLegAct=this.ptRouter2.findLegActs(legRoute, lastAct.getEndTime());
 			    	    	
-			    	    	for (Iterator<Object> iter2 = listLegAct.iterator(); iter2.hasNext();) {
+			    			listLegAct=this.ptRouter2.findLegActs(legRoute, lastAct.getEndTime());
+
+		    				boolean first= true;
+			    	    	for (Iterator<Object> iter2 = listLegAct.iterator(); iter2.hasNext();){
 			    	    		Object legAct = iter2.next();
 			    	    		if(Leg.class.isInstance(legAct)){
 			    	    			Leg ptLeg= (Leg)legAct;
 			    	    			ptLeg.setNum(legNum++);
+			    	    			//System.out.println("adding ptleg");
 			    	    			newPlan.addLeg(ptLeg);
 			    	    		}else{
 			    	    			ptAct =(Act) legAct;
-			    	    			ptAct.setLink(this.network.getNearestLink(ptAct.getCoord()));
+					    	    	if (first){
+				    	    			//insert the walking leg from act location to bus stop and "waiting bus activity"
+					    				walkLeg = walkLeg(legNum++, lastAct, ptAct);
+					    				//System.out.println("adding walkleg1");
+					    				newPlan.addLeg(walkLeg);
+
+					    				/*
+					    				double distanice=lastAct.getCoord().calcDistance(toPTNode.getCoord()
+					    					lastAct.getEndTime()+ lastAct
+					    				double duration = 
+					    				*/
+					    				
+					    				//set values of first ptAct
+					    				double arrTime=walkLeg.getArrTime();
+					    				Id idPTNode = ptAct.getLink().getFromNode().getId();
+					    				double nextDeparture= ptTimetable.nextDeparture(idPTNode, arrTime);
+					    				double duration = nextDeparture- arrTime;
+					    				ptAct.setStartTime(walkLeg.getArrTime());
+					    				ptAct.setDur(duration);
+					    				ptAct.setEndTime(nextDeparture);
+					    				Route route  =null;
+					    					
+					    				first=false;
+					    	    	}
+			    	    			
+			    	    			//this should not be necesary anymore
+			    	    			//ptAct.setLink(this.network.getNearestLink(ptAct.getCoord()));
+			    	    			//System.out.println("adding ptAct");
 			    	    			newPlan.addAct(ptAct);
-			    	    		
 			    	    			lastAct= ptAct;
 			    	    		}//if act.classisinstance
 			    	    	}//for iterator
+			    	    	//System.out.println("adding Walkleg2");
 			    	    	newPlan.addLeg(walkLeg(legNum++,lastAct,thisAct));
 			    	    	
-		    			}else{
+		    			}else{     // if router didn't find a PT connection then walk
 		    				walkLeg = walkLeg(legNum++, lastAct,thisAct);
+		    				//System.out.println("adding Walkleg3");
 		    				newPlan.addLeg(walkLeg);
 		    			}//legRoute.getRoute().size()>2
 		    		}else{
 	    				walkLeg = walkLeg(legNum++, lastAct,thisAct);
+	    				//System.out.println("adding walkleg4");
 	    				newPlan.addLeg(walkLeg);
 		    		}//if(legRoute!=null)
 
 				}//if val
 				thisAct.setLink(this.network.getNearestLink(thisAct.getCoord()));
+				//System.out.println("adding thisAct");
 				newPlan.addAct(thisAct);
 				
 				lastAct = thisAct;
@@ -107,47 +142,67 @@ public class PTActivityCreator {
 			
 			person.exchangeSelectedPlan(newPlan, true);
 			person.removeUnselectedPlans();
-			
+			newPopulation.addPerson(person);
 			x++;
-		}//for person
+		//}//for person
 	
 		//Write outplan XML
 		System.out.println("writing output plan file...");
 		Gbl.getConfig().plans().setOutputFile(outputFile);
 		Gbl.getConfig().plans().setOutputVersion("v4");
-		new PopulationWriter(this.plans).write();
+		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
 		
-	/*
+		/*
 		System.out.println("writing pt network...");
 		new NetworkWriter(this.network).write();
 		System.out.println("done.");
 		*/
+		
 	}//createPTActs
 
 	
 	private Leg walkLeg(int legNum, Act act1, Act act2){
+		//set Walkleg
+		double walkDistance = walkDistance(act1.getCoord(), act2.getCoord());
+		double walkTravelTime = walkTravelTime(walkDistance); 
+		double depTime = act1.getEndTime();
+		double arrTime = depTime + walkTravelTime;
+
 		//Set walkRoute
-		CoordImpl coordImpl = new CoordImpl(act1.getCoord());
 		Route walkRoute= new Route();
-		double walkDistance= coordImpl.calcDistance(act2.getCoord()); //the swiss coordinate system with 6 digit means meters
-		double walkingSpeed= 0.9;   //3600/4000;   must be adecuated to agent's age. By the being time it is used the average 4 km/h 
-		double walkTravelTime = walkDistance * walkingSpeed;
-		//walkDistance = java.text.DecimalFormat df = new java.text.DecimalFormat("0.0");
 		walkRoute.setDist(walkDistance);
 		walkRoute.setTravTime(walkTravelTime);
 
-		//set Walkleg
-		double depTime = act1.getEndTime();
-		double arrTime = depTime + walkTravelTime;
-		
 		Leg walkLeg1= new Leg(Leg.Mode.walk);
 		walkLeg1.setNum(legNum);
 		walkLeg1.setDepTime(depTime);
 		walkLeg1.setTravTime(walkTravelTime); //walkLeg1.setTravTime(walkTravelTime);    
 		walkLeg1.setArrTime(arrTime);
 		walkLeg1.setRoute(walkRoute);
+		
 		return walkLeg1;
 	}
 	
+	private double walkDistance(Coord coord1, Coord coord2){
+		CoordImpl coordImpl = new CoordImpl(coord1);
+		return coordImpl.calcDistance(coord2); //the swiss coordinate system with 6 digit means meters
+	}
+	
+	private double walkTravelTime(double distance){
+		final double WALKING_SPEED = 0.9; //      4 km/h  human speed 
+		return distance * WALKING_SPEED;
+	}
+	
+
+	//TODO: Check this
+	private int distToWalk(int personAge){
+		int distance=0;
+		if (personAge>=60)distance=300; 
+		if (personAge>=40 || personAge<60)distance=400;
+		if (personAge>=18 || personAge<40)distance=800;
+		if (personAge<18)distance=300;
+		return distance;
+	}
+
 }

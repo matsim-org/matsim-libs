@@ -179,20 +179,20 @@ public class PTNetworkFactory2 {
 	public List <IdImpl> CreateWalkingLinks(NetworkLayer ptNetworkLayer, PTNode ptNode, PTNode[]nearNodes, boolean to){
 		List<IdImpl> NewWalkLinks = new ArrayList<IdImpl>();
 		String idLink;
-		String fromPTNode, toPTNode;
+		PTNode fromPTNode;
+		PTNode toPTNode;
 		
 		for (int x= 0; x<nearNodes.length;x++){
 			if (to==true){
-				fromPTNode= ptNode.getId().toString();
-				toPTNode= nearNodes[x].getId().toString();
+				fromPTNode= ptNode;
+				toPTNode= nearNodes[x];
 				idLink= "W" + String.valueOf(x);
 			}else{
-				fromPTNode=nearNodes[x].getId().toString();
-				toPTNode=  ptNode.getId().toString();
+				fromPTNode=nearNodes[x];
+				toPTNode=  ptNode;
 				idLink= "WW" + String.valueOf(x);
 			}
-
-			createPTLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
+			createWalkingLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
 			NewWalkLinks.add(new IdImpl(idLink));
 		}//for
 		return NewWalkLinks;
@@ -212,6 +212,19 @@ public class PTNetworkFactory2 {
 		String permlanes = "1";
 		String origid = "0";
 		ptNetworkLayer.createLink(idLink, from, to, length, freespeed, capacity, permlanes, origid, ptType);
+	}
+	
+	private void createWalkingLink(NetworkLayer ptNetworkLayer, String idLink, PTNode fromPTNode , PTNode toPTNode, String ptType ){
+		String idFromNode = fromPTNode.getId().toString();
+		String idToNode = toPTNode.getId().toString();
+		String length = Double.toString(fromPTNode.getCoord().calcDistance(toPTNode.getCoord()));
+
+		//For the time being these values are irrelevant in PTsimulation
+		String freespeed= "1";
+		String capacity = "1";
+		String permlanes = "1";
+		String origid = "0";
+		ptNetworkLayer.createLink(idLink, idFromNode, idToNode, length, freespeed, capacity, permlanes, origid, ptType);
 	}
 	
 	public static void printLinks(NetworkLayer ptNetworkLayer) {

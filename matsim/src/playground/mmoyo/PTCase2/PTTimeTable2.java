@@ -99,7 +99,7 @@ public class PTTimeTable2{
 			//count seconds between 01:00 am and firt departure  
 			transferTime= (86400-time)+ nodeDeparturesMap.get(idToNode)[0];
 		}
-		return transferTime/60;
+		return transferTime/60;///return transferTime/60;  //Seconds!
 	}
 	
 	public List<PTLine> getPtLineList() {

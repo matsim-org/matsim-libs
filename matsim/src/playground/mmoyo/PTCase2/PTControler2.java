@@ -11,11 +11,16 @@ import org.matsim.utils.geometry.CoordImpl;
 
 public class PTControler2 {
 
+	private static final String CONFIG= "../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml";
 	private static final String ZURICHPTN= "../shared-svn/studies/schweiz-ivtch/pt-experimental/TRAMnetwork.xml";
 	private static final String ZURICHPTTIMETABLE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/PTTimetable.xml";
 	private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
 	private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
-	private static final String CONFIG= "../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml";
+	
+	/*
+	private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	private static final String OUTPUTPLANS= "c://output_plans.xml";
+	*/
 	
 	/*
 	//Variables for the net 5x5
@@ -39,16 +44,16 @@ public class PTControler2 {
 	            ptRouter2.PrintRoute(ptRouter2.findRoute(ptNode, ptNode2, 10));
 	    		break;
 	    	case 1:
-    			Coord coord1= new CoordImpl(682275,263203);
-    			Coord coord2= new CoordImpl(683064,262261);
-	    		Route route = ptRouter2.findRoute(coord1, coord2,50700);
+    			Coord coord1= new CoordImpl(684573,246805);
+    			Coord coord2= new CoordImpl(680291,248300);
+	    		Route route = ptRouter2.forceRoute(coord1, coord2, 52260,100);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
 	    		//System.out.println(route.getRoute().toString());
 	    		ptRouter2.PrintRoute(route);
 	    		break;
 	    	case 2:
 	    		PTActivityCreator ptActivityCreator= new PTActivityCreator(ptNetworkLayer, CONFIG, ZURICHPTPLANS, ptRouter2);
-	    		ptActivityCreator.createPTActs(OUTPUTPLANS);
+	    		ptActivityCreator.createPTActs(OUTPUTPLANS,ptTimeTable);
 	    		break;
 	   
 		}//switch
