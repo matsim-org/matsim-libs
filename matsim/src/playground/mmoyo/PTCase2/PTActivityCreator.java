@@ -46,9 +46,9 @@ public class PTActivityCreator {
 		Population newPopulation = new org.matsim.population.Population(false);
 		
 		int x=0;
-		//for (Person person: this.population.getPersons().values()) {
-			Person person = population.getPerson("1005733");
-			//System.out.println(x + " id:" + person.getId());
+		for (Person person: this.population.getPersons().values()) {
+			//Person person = population.getPerson("1005733");
+			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 			
 			boolean val =false;
@@ -144,7 +144,7 @@ public class PTActivityCreator {
 			person.removeUnselectedPlans();
 			newPopulation.addPerson(person);
 			x++;
-		//}//for person
+		}//for person
 	
 		//Write outplan XML
 		System.out.println("writing output plan file...");
