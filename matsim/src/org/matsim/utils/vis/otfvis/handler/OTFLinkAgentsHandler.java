@@ -130,7 +130,6 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 
 	}
 	
-	private char[] idBuffer = new char[100];
 	
 	public void readAgent(ByteBuffer in, SceneGraph graph) {
 		int length = in.getInt();
@@ -138,7 +137,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			log.warn("Agent could not be read fully from stream");
 			return;
 		}
-		idBuffer = new char[length];
+		
+		char[] idBuffer = new char[length];
 		for(int i=0;i<length;i++) idBuffer[i] = in.getChar();
 		float x = in.getFloat();
 		float y = in.getFloat();
