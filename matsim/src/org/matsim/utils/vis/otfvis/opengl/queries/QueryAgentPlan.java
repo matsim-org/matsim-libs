@@ -98,7 +98,7 @@ public class QueryAgentPlan implements OTFQuery {
 				if (leg.getMode().equals(Mode.car)) {
 					Link[] route = leg.getRoute().getLinkRoute();
 					count += route.length;
-					count++; //last position
+					if(route.length != 0) count++; //add last position if there is a path
 				}
 			}
 		}
