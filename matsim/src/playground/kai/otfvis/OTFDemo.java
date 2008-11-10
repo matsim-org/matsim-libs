@@ -52,9 +52,12 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"/Users/nagel/vsp-cvs/studies/berlin-wip/bvg-demo_20081002/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Users/nagel/vsp-cvs/runs/run628/it.500/demo-config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"./output/ITERS/it.1/1.otfvis.mvi"});
-		org.matsim.run.OTFVis.main(new String[] {"./output/otfconfig.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"./output/otfconfig.xml"});
 
 //		org.matsim.run.OTFVis.main(new String[] {});
+		
+		// manuel
+		org.matsim.run.OTFVis.main(new String[] {"../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml"}) ;
 
 	}
 
