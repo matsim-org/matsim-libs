@@ -28,7 +28,12 @@ import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
-
+/**
+ * For comments see interface
+ * @see org.matsim.population.Person
+ * @author dgrether
+ *
+ */
 public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 
 	private final static Logger log = Logger.getLogger(Person.class);
@@ -51,9 +56,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		return p;
 	}
 	
-	/**
-	 * Removes all plans except the selected one.
-	 */
 	public void removeUnselectedPlans() {
 		for (Iterator<Plan> iter = this.plans.iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
@@ -63,11 +65,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		}
 	}
 
-	/**
-	 * Returns a random plan from the list of all plans this agent has.
-	 *
-	 * @return A random plan, or <code>null</code> if none such plan exists
-	 */
 	public Plan getRandomPlan() {
 		if (this.plans.size() == 0) {
 			return null;
@@ -76,12 +73,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		return this.plans.get(index);
 	}
 
-	/**
-	 * Returns a plan with undefined score, chosen randomly among all plans
-	 * with undefined score.
-	 *
-	 * @return A random plan with undefined score, or <code>null</code> if none such plan exists.
-	 */
 	public Plan getRandomUnscoredPlan() {
 		int cntUnscored = 0;
 		for (Plan plan : this.plans) {
@@ -117,11 +108,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		setSelectedPlan(newPlan);
 	}
 
-	/**
-	 * Makes a copy of the currently selected plan, marking the copy as selected.
-	 *
-	 * @return the copy of the selected plan. Returns null if there is no selected plan.
-	 */
 	public Plan copySelectedPlan() {
 		int i=0;
 		Plan oldPlan = this.getSelectedPlan();
@@ -140,9 +126,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		return newPlan;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
@@ -157,13 +140,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 				"[nof_plans=" + this.plans.size() + "]";
 	}
 
-	/**
-	 * Removes the specified plan from the agent. If the removed plan was the selected one,
-	 * a new random plan will be selected.
-	 * 
-	 * @param plan
-	 * @return <code>true</code> if the plan was removed from the person
-	 */
 	public boolean removePlan(final Plan plan) {
 		boolean result = this.plans.remove(plan);
 		if (this.selectedPlan == plan && result) {
@@ -172,23 +148,6 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		return result;
 	}
 	
-	/** Removes the plans with the worst score until only <code>maxSize</code> plans are left.
-	 * Plans with undefined scores are treated as plans with very bad scores and thus removed
-	 * first. If there are several plans with the same bad score, it can not be predicted which
-	 * one of them will be removed.<br>
-	 * This method insures that if there are different types of plans (see
-	 * {@link org.matsim.population.Plan#getType()}),
-	 * at least one plan of each type remains. This could lead to the worst plan being kept if
-	 * it is the only one of it's type. Plans with type <code>null</code> are handled like any
-	 * other type, and are differentiated from plans with the type set to an empty String.<br>
-	 *
-	 * If there are more plan-types than <code>maxSize</code>, it is not possible to reduce the
-	 * number of plans to the requested size.<br>
-	 *
-	 * If the selected plan is on of the deleted ones, a randomly chosen plan will be selected.
-	 *
-	 * @param maxSize The number of plans that should be left.
-	 */
 	public void removeWorstPlans(final int maxSize) {
 		if (this.plans.size() <= maxSize) {
 			return;
@@ -239,17 +198,10 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person{
 		return this.knowledge;
 	}
 	
-	/**
-	 * @param visualizerData sets the optional user data for visualizer
-	 */
 	public void setVisualizerData(final String visualizerData) {
 		this.visualizerData = visualizerData;
 	}
 
-	/**
-	 *
-	 * @return Returns the visualizer data
-	 */
 	public String getVisualizerData() {
 		return this.visualizerData ;
 	}
