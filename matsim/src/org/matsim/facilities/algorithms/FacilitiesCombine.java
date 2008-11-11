@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.OpeningTime;
 import org.matsim.world.Location;
 
 public class FacilitiesCombine {
@@ -61,13 +61,13 @@ public class FacilitiesCombine {
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
-			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpentimes().values().iterator();
+			Iterator<SortedSet<BasicOpeningTime>> ts_it = a.getOpentimes().values().iterator();
 			while (ts_it.hasNext()) {
-				SortedSet<OpeningTime> ts = ts_it.next();
-				Iterator<OpeningTime> o_it = ts.iterator();
+				SortedSet<BasicOpeningTime> ts = ts_it.next();
+				Iterator<BasicOpeningTime> o_it = ts.iterator();
 				while (o_it.hasNext()) {
-					OpeningTime o = o_it.next();
-					f2.getActivity(a.getType()).addOpentime(o);
+					BasicOpeningTime o = o_it.next();
+					f2.getActivity(a.getType()).addOpeningTime(o);
 				}
 			}
 		}

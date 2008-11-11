@@ -24,7 +24,7 @@ package org.matsim.basic.v01;
  * @author dgrether
  *
  */
-public interface BasicOpeningTime {
+public interface BasicOpeningTime extends Comparable<BasicOpeningTime> {
 	
 	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk};
 	

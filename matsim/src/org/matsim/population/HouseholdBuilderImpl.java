@@ -21,7 +21,6 @@ package org.matsim.population;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.HouseholdBuilder;
@@ -35,19 +34,33 @@ import org.matsim.interfaces.population.Household;
 public class HouseholdBuilderImpl implements HouseholdBuilder {
 
 	private List<Household> households;
+	private Population population;
 
-	public HouseholdBuilderImpl(List<Household> households) {
+	public HouseholdBuilderImpl(Population pop, List<Household> households) {
 		this.households = households;
+		this.population = pop;
 	}
 
 	public List<BasicHousehold> getHouseholds() {
 		return (List)this.households;
 	}
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
+	public BasicHousehold createHousehold(Id householdId,
 			List<Id> membersPersonIds, List<Id> vehicleIds) {
-		// TODO Auto-generated method stub
-		return null;
+		HouseholdImpl hh = new HouseholdImpl(householdId);
+		Person p;
+		for (Id id : membersPersonIds){
+			p = this.population.getPerson(id);
+			if (p !=  null) {
+				hh.addMember(p);
+			}
+			else {
+				throw new IllegalArgumentException("Household member with Id: " + id + " is not part of population!");
+			}
+		}
+		hh.setVehicleIds(vehicleIds);
+		this.households.add(hh);
+		return hh;
 	}
 
 }

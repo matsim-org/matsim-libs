@@ -87,7 +87,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpentime(new OpeningTime(DayType.wk, "9:00", "18:00"));
+				a.addOpeningTime(new OpeningTime(DayType.wk, "9:00", "18:00"));
 			}
 
 			for (int i=0; i<B01S3; i++) {
@@ -101,7 +101,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpentime(new OpeningTime(DayType.wk, "9:00", "18:00"));
+				a.addOpeningTime(new OpeningTime(DayType.wk, "9:00", "18:00"));
 			}
 
 			hectareCnt++;

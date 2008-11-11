@@ -11,7 +11,7 @@
   <!--todo-->
   <knowledge>
     <description>some additional information</description>
-    <activity frequency="4">
+    <activity type="w" frequency="4">
         <location>
           <actLocation>
             <facilityId refId="666" />
@@ -20,12 +20,11 @@
         <capacity persons="40" />
         <openingTime day="wk" startTime="08:00:00" endTime="17:00:00"/>
     </activity>
-    <activity>
+    <activity type="h">
         <location>
-          <coordinate>
-            <xCoord>2.3</xCoord>
-            <yCoord>4.2</yCoord>
-          </coordinate>
+          <actLocation>
+            <facilityId refId="666" />
+          </actLocation>
         </location>
     </activity>
   </knowledge>
@@ -82,6 +81,7 @@
 
   <household id="23">
     <members>
+      <personId refId="23" />
       <personId refId="42" />
       <personId refId="43" />
     </members>

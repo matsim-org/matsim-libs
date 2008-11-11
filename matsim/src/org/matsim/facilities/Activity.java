@@ -27,26 +27,31 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicLocationImpl;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 
-public class Activity {
+public class Activity implements BasicActivity {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-
+	private Integer frequency = null;
 	private final String type;
-	private int capacity = Integer.MAX_VALUE; // MAX_VALUE == unlimited capcacity
+	private Integer capacity = Integer.MAX_VALUE; // MAX_VALUE == unlimited capcacity
 	private final Facility facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
-	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+	private Map<DayType, SortedSet<BasicOpeningTime>> opentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
+	
 	public Activity(final String type, final Facility facility) {
 		this.type = type;
 		this.facility = facility;
@@ -59,28 +64,28 @@ public class Activity {
 	@Deprecated
 	public final void createOpentime(final DayType day, final double startTime, final double endTime) {
 		OpeningTime o = new OpeningTime(day, startTime, endTime);
-		this.addOpentime(o);
+		this.addOpeningTime(o);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void addOpentime(final OpeningTime opentime) {
+	public void addOpeningTime(BasicOpeningTime opentime) {
 		DayType day = opentime.getDay();
 		if (!this.opentimes.containsKey(day)) {
-			this.opentimes.put(day,new TreeSet<OpeningTime>());
+			this.opentimes.put(day,new TreeSet<BasicOpeningTime>());
 		}
-		SortedSet<OpeningTime> o_set = this.opentimes.remove(day);
+		SortedSet<BasicOpeningTime> o_set = this.opentimes.remove(day);
 		if (o_set.isEmpty()) {
 			o_set.add(opentime);
 			this.opentimes.put(day,o_set);
 		}
 		else {
-			TreeSet<OpeningTime> new_o_set = new TreeSet<OpeningTime>();
-			Iterator<OpeningTime> o_it = o_set.iterator();
+			TreeSet<BasicOpeningTime> new_o_set = new TreeSet<BasicOpeningTime>();
+			Iterator<BasicOpeningTime> o_it = o_set.iterator();
 			while (o_it.hasNext()) {
-				OpeningTime o = o_it.next();
+				BasicOpeningTime o = o_it.next();
 				int merge_type = o.compareTo(opentime); // see Opentime for the meaning
 				if ((merge_type == -6) || (merge_type == 6)) {
 					// complete disjoint
@@ -119,8 +124,8 @@ public class Activity {
 	// query methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final boolean containsOpentime(final OpeningTime o) {
-		Set<OpeningTime> o_set = this.getOpentimes(o.getDay());
+	public final boolean containsOpentime(final BasicOpeningTime o) {
+		Set<BasicOpeningTime> o_set = this.getOpeningTime(o.getDay());
 		if (o_set == null) {
 			return false;
 		}
@@ -138,14 +143,29 @@ public class Activity {
 		this.capacity = capacity;
 	}
 
-	public void setOpentimes(Map<DayType, SortedSet<OpeningTime>> opentimes) {
+	public void setOpentimes(Map<DayType, SortedSet<BasicOpeningTime>> opentimes) {
 		this.opentimes = opentimes;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-
+	
+	//FIXME dg: think about Location concept
+	public BasicLocation getLocation() {
+		BasicLocationImpl loc = new BasicLocationImpl();
+		loc.setLocationId(this.facility.getId(), true);
+		return loc;
+	}
+	
+	public Integer getFrequency() {
+		return this.frequency;
+	}
+	
+	public void setFrequency(Integer freq) {
+		this.frequency = freq;
+	}
+	
 	public final String getType() {
 		return this.type;
 	}
@@ -154,15 +174,15 @@ public class Activity {
 		return this.facility;
 	}
 
-	public final int getCapacity() {
+	public final Integer getCapacity() {
 		return this.capacity;
 	}
 
-	public final Map<DayType,SortedSet<OpeningTime>> getOpentimes() {
+	public final Map<DayType,SortedSet<BasicOpeningTime>> getOpentimes() {
 		return this.opentimes;
 	}
 
-	public final SortedSet<OpeningTime> getOpentimes(final DayType day) {
+	public final SortedSet<BasicOpeningTime> getOpeningTime(final DayType day) {
 		return this.opentimes.get(day);
 	}
 
@@ -176,5 +196,10 @@ public class Activity {
 				"[capacity=" + this.capacity + "]" +
 				"[facility_id=" + this.facility.getId() + "]" +
 				"[nof_opentimes=" + this.getOpentimes().size() + "]";
+	}
+
+
+	public void setCapacity(Integer cap) {
+		this.capacity = cap;
 	}
 }

@@ -23,9 +23,9 @@ package org.matsim.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
@@ -58,7 +58,7 @@ public class CharyparNagelOpenTimesScoringFunction extends
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-		Set<OpeningTime> opentimes = null;
+		Set<BasicOpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
@@ -69,9 +69,9 @@ public class CharyparNagelOpenTimesScoringFunction extends
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wed);
+				opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wkday);
+					opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:
@@ -80,7 +80,7 @@ public class CharyparNagelOpenTimesScoringFunction extends
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
 					
-					for (OpeningTime opentime : opentimes) {
+					for (BasicOpeningTime opentime : opentimes) {
 
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());

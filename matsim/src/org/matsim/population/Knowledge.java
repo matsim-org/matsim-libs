@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
@@ -35,7 +35,7 @@ import org.matsim.socialnetworks.mentalmap.MentalMap;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 import org.matsim.utils.customize.CustomizableImpl;
 
-public class Knowledge extends CustomizableImpl {
+public class Knowledge extends CustomizableImpl implements BasicKnowledge<Activity>{
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -54,9 +54,8 @@ public class Knowledge extends CustomizableImpl {
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
-
-	public Knowledge(final String desc) {
-		this.desc = desc;
+	
+	public Knowledge() {
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -93,11 +92,6 @@ public class Knowledge extends CustomizableImpl {
 	}
 	
 
-	public void addActivity(BasicActivity activity) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
@@ -144,6 +138,10 @@ public class Knowledge extends CustomizableImpl {
 		return activities.add(ka);
 	}
 
+	public void addActivity(Activity activity) {
+		this.addActivity(activity, false);
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////

@@ -6,6 +6,7 @@
   
   <household id="23">
     <members>
+      <personId refId="23" />
       <personId refId="42" />
       <personId refId="43" />
     </members>

@@ -24,15 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicLocationImpl;
 import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicRoute;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.PopulationBuilder;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -53,7 +56,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public BasicAct createAct(BasicPlan basicPlan, String currentActType,
-			BasicLocationImpl currentlocation) {
+			BasicLocation currentlocation) {
 		Act act = null;
 		if (currentlocation != null) {
 			if (currentlocation.getCoord() != null) {
@@ -100,6 +103,33 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		}
 		route.setLinkRoute(links);
 		return route;
+	}
+
+
+
+	public BasicActivity createActivity(String type, BasicLocation loc) {
+		Activity act = null;
+		if (loc != null) {
+			if (loc.isFacilityId() && this.facilities.getFacilities().containsKey(loc.getLocationId())) {
+				Facility fac = this.facilities.getFacilities().get(loc.getLocationId());
+				act = new Activity(type, fac);				
+				return act;
+			}
+			throw new IllegalArgumentException("No facility exists with id: " + loc.getLocationId());
+		}
+		throw new IllegalArgumentException("Can't create facility without location");
+	}
+
+	public BasicKnowledge createKnowledge(List<BasicActivity> acts) {
+		Knowledge knowledge = null;
+		if ((acts != null) && !acts.isEmpty()) {
+			knowledge = new Knowledge();
+			for (BasicActivity a : acts) {
+				knowledge.addActivity((Activity)a);
+			}
+			return knowledge;
+		}
+		throw new IllegalArgumentException("Knowledge must contain at least one Activity!");
 	}
 
 }

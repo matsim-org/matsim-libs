@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.Location;
@@ -107,12 +108,12 @@ public class FacilitiesWriter extends Writer {
 				this.handler.startActivity(a, this.out);
 				this.handler.startCapacity(a, this.out);
 				this.handler.endCapacity(this.out);
-				Iterator<SortedSet<OpeningTime>> o_set_it = a.getOpentimes().values().iterator();
+				Iterator<SortedSet<BasicOpeningTime>> o_set_it = a.getOpentimes().values().iterator();
 				while (o_set_it.hasNext()) {
-					SortedSet<OpeningTime> o_set = o_set_it.next();
-					Iterator<OpeningTime> o_it = o_set.iterator();
+					SortedSet<BasicOpeningTime> o_set = o_set_it.next();
+					Iterator<BasicOpeningTime> o_it = o_set.iterator();
 					while (o_it.hasNext()) {
-						OpeningTime o = o_it.next();
+						BasicOpeningTime o = o_it.next();
 						this.handler.startOpentime(o, this.out);
 						this.handler.endOpentime(this.out);
 					}

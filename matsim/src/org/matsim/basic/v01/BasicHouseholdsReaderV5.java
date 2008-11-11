@@ -46,7 +46,7 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 	
 	private List<BasicHousehold> households;
 
-	private BasicHouseholdImpl currentHousehold;
+	private BasicHousehold currentHousehold;
 
 	private List<Id> currentmembers;
 
@@ -73,6 +73,10 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 		}
 		this.households = households;
 		this.builder = new BasicHouseholdBuilder(this.households);
+	}
+	
+	protected void setHouseholdBuilder(HouseholdBuilder householdBuilder) {
+		this.builder = householdBuilder;
 	}
 	
 	

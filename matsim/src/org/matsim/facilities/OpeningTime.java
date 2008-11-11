@@ -20,17 +20,17 @@
 
 package org.matsim.facilities;
 
-import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.misc.Time;
 
-public class OpeningTime implements Comparable<OpeningTime> {
+public class OpeningTime implements BasicOpeningTime {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final DayType day;
+	private DayType day;
 	private double startTime;
 	private double endTime;
 
@@ -55,49 +55,49 @@ public class OpeningTime implements Comparable<OpeningTime> {
 	//
 	//////////////////////////////////////////////////////////////////////
 
-	public int compareTo(OpeningTime other) {
+	public int compareTo(BasicOpeningTime other) {
 		// two functionalities in one:
 		// 1. the earlier start_time comes before the other. If they're the same,
 		//    the end times decides which comes first
 		// 2. the meaning of the return value. See the ASCII figures for that.
-		if (this.startTime > other.endTime) {         // this:       |-----|
+		if (this.startTime > other.getEndTime()) {         // this:       |-----|
 			return -6;                                    // other: |--|
 		}
-		else if (this.startTime == other.endTime) {   // this:       |-----|
+		else if (this.startTime == other.getEndTime()) {   // this:       |-----|
 			return -5;                                    // other: |----|
 		}
-		else if (this.startTime > other.startTime) {
-			if (this.endTime > other.endTime) {         // this:       |-----|
+		else if (this.startTime > other.getStartTime()) {
+			if (this.endTime > other.getEndTime()) {         // this:       |-----|
 				return -4;                                  // other: |--------|
 			}
-			else if (this.endTime == other.endTime) {   // this:       |-----|
+			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
 				return -3;                                  // other: |----------|
 			}
 			else {                                        // this:       |-----|
 				return -2;                                  // other: |---------------|
 			}
 		}
-		else if (this.startTime == other.startTime) {
-			if (this.endTime > other.endTime) {         // this:       |-----|
+		else if (this.startTime == other.getStartTime()) {
+			if (this.endTime > other.getEndTime()) {         // this:       |-----|
 				return -1;                                  // other:      |---|
 			}
-			else if (this.endTime == other.endTime) {   // this:       |-----|
+			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
 				return 0;                                   // other:      |-----|
 			}
 			else {                                        // this:       |-----|
 				return 3;                                   // other:      |----------|
 			}
 		}
-		else if (this.endTime > other.endTime) {      // this:       |-----|
+		else if (this.endTime > other.getEndTime()) {      // this:       |-----|
 			return 2;                                     // other:        |-|
 		}
-		else if (this.endTime == other.endTime) {     // this:       |-----|
+		else if (this.endTime == other.getEndTime()) {     // this:       |-----|
 			return 1;                                     // other:        |---|
 		}
-		else if (this.endTime > other.startTime) {    // this:       |-----|
+		else if (this.endTime > other.getStartTime()) {    // this:       |-----|
 			return 4;                                     // other:        |--------|
 		}
-		else if (this.endTime == other.startTime) {   // this:       |-----|
+		else if (this.endTime == other.getStartTime()) {   // this:       |-----|
 			return 5;                                     // other:            |----|
 		}
 		else {                                          // this:       |-----|
@@ -137,14 +137,18 @@ public class OpeningTime implements Comparable<OpeningTime> {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	protected final void setStartTime(final double start_time) {
+	public final void setStartTime(final double start_time) {
 		this.startTime = start_time;
 		this.acceptTimes();
 	}
 
-	protected final void setEndTime(final double end_time) {
+	public final void setEndTime(final double end_time) {
 		this.endTime = end_time;
 		this.acceptTimes();
+	}
+	
+	public void setDay(DayType day) {
+		this.day = day;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -173,4 +177,5 @@ public class OpeningTime implements Comparable<OpeningTime> {
 				"[startTime=" + Time.writeTime(this.startTime) + "]" +
 				"[endTime=" + Time.writeTime(this.endTime) + "]";
 	}
+
 }

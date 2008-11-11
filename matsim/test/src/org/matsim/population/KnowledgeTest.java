@@ -143,7 +143,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("  done.");
 		
 		log.info("  creating test knowledge...");
-		Knowledge k = new Knowledge(null);
+		Knowledge k = new Knowledge();
 		log.info("  done.");
 
 		log.info("  ---------- add ----------");

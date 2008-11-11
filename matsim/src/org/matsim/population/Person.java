@@ -20,6 +20,7 @@
 package org.matsim.population;
 
 import org.matsim.basic.v01.BasicPerson;
+import org.matsim.interfaces.population.Household;
 import org.matsim.utils.customize.Customizable;
 
 
@@ -28,7 +29,7 @@ import org.matsim.utils.customize.Customizable;
  * @author dgrether
  *
  */
-public interface Person extends BasicPerson<Plan>, Customizable{
+public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
 	
 	public Plan createPlan(final boolean selected);
 	
@@ -89,6 +90,11 @@ public interface Person extends BasicPerson<Plan>, Customizable{
 	public void removeWorstPlans(final int maxSize);
 
 	public Knowledge createKnowledge(final String desc);
+	
+	public void setHousehold(Household hh);
+	
+	public Household getHousehold();
+	
 	/**
 	 * @param visualizerData sets the optional user data for visualizer
 	 */

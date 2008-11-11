@@ -23,6 +23,7 @@ package org.matsim.basic.v01;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.facilities.Facilities;
@@ -30,6 +31,7 @@ import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.population.Household;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReaderMatsimV5;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,15 +47,15 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 	
   private final Id id23 = new IdImpl("23");
   private final Id id24 = new IdImpl("24");
-//  private final Id id42 = new IdImpl("42");
-//  private final Id id43 = new IdImpl("43");
-//  private final Id id44 = new IdImpl("44");
-//  private final Id id45 = new IdImpl("45");
+  private final Id id42 = new IdImpl("42");
+  private final Id id43 = new IdImpl("43");
+  private final Id id44 = new IdImpl("44");
+  private final Id id45 = new IdImpl("45");
   private final Id id666 = new IdImpl("666");
   private final Coord coord = new CoordImpl(0.0, 0.0);
   
 	public void testBasicParser() {
-		BasicPopulation<BasicPerson<BasicPlan>> population = new BasicPopulationImpl<BasicPerson<BasicPlan>>();
+		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
 		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
@@ -64,6 +66,10 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 	
 	public void testParser() {
 		Population pop = new Population(Population.NO_STREAMING);
+		pop.addPerson(new PersonImpl(id42));
+		pop.addPerson(new PersonImpl(id43));
+		pop.addPerson(new PersonImpl(id44));
+		pop.addPerson(new PersonImpl(id45));
 		NetworkLayer net = new NetworkLayer();
 		createNetwork(net);
 		List<Household> households = new ArrayList<Household>();
@@ -98,32 +104,31 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertEquals(id23, pp.getFiscalHouseholdId());
 		//check knowledge
 		//TODO
-//		BasicKnowledge knowledge = null;// = pp.getKnowledge();
-//		assertNotNull(knowledge);
-//		assertNotNull(knowledge.getDescription());
-//		assertNotNull(knowledge.getActivities());
-//		assertEquals(2, knowledge.getActivities().size());
-//		BasicActivity activity = knowledge.getActivities().get(0);
-//		assertNotNull(activity);
-//		assertEquals(Integer.valueOf(4), activity.getFrequency());
-//		assertNotNull(activity.getLocation());
-//		assertEquals(id666, activity.getLocation().getLocationId());
-//		assertEquals(true, activity.getLocation().isFacilityId());
-//		assertEquals(40, activity.getCapacity());
-//		assertNotNull(activity.getOpeningTime(DayType.wk));
-//		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime());
-//		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime());
-//
-//		activity = knowledge.getActivities().get(1);
-//		assertNotNull(activity);
-//		assertNull(activity.getFrequency());
-//		assertNotNull(activity.getLocation());
-//		assertNull(activity.getLocation().getLocationId());
-//		assertNotNull(activity.getLocation().getCoord());
-//		assertEquals(2.3, activity.getLocation().getCoord().getX());
-//		assertEquals(4.2, activity.getLocation().getCoord().getY());
-//		assertNull(activity.getCapacity());
-//		assertNull(activity.getOpeningTime(DayType.wk));
+		BasicKnowledge<BasicActivity> knowledge = pp.getKnowledge();
+		assertNotNull(knowledge);
+		assertNotNull(knowledge.getDescription());
+		assertNotNull(knowledge.getActivities());
+		assertEquals(2, knowledge.getActivities().size());
+		BasicActivity activity = knowledge.getActivities().get(0);
+		assertNotNull(activity);
+		assertEquals(Integer.valueOf(4), activity.getFrequency());
+		assertNotNull(activity.getLocation());
+		assertEquals(id666, activity.getLocation().getLocationId());
+		assertEquals(true, activity.getLocation().isFacilityId());
+		assertEquals(new Integer(40), activity.getCapacity());
+		assertNotNull(activity.getOpeningTime(DayType.wk));
+		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime());
+		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime());
+
+		activity = knowledge.getActivities().get(1);
+		assertNotNull(activity);
+		assertNull(activity.getFrequency());
+		assertNotNull(activity.getLocation());
+		assertNotNull(activity.getLocation().getLocationId());
+		assertEquals(id666, activity.getLocation().getLocationId());
+		assertNull(activity.getLocation().getCoord());
+		assertNull(activity.getCapacity());
+		assertNull(activity.getOpeningTime(DayType.wk));
 
 		
 		//now check the contents of plans

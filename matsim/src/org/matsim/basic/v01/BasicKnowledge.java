@@ -26,15 +26,15 @@ import java.util.List;
  * @author dgrether
  *
  */
-public interface BasicKnowledge {
+public interface BasicKnowledge<A extends BasicActivity> {
 
 	public void setDescription(String desc);
 	
 	public String getDescription();
 	
-	public List<BasicActivity> getActivities();
+	public List<A> getActivities();
 	
-	public void addActivity(BasicActivity activity);
+	public void addActivity(A activity);
 	
 	
 	

@@ -26,11 +26,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
-import org.matsim.utils.customize.CustomizableImpl;
 
 // TODO [balmermi]: need discussion about 'extends CustomizableImpl'
-public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl implements BasicPerson<T> {
+public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, BasicKnowledge> {
 
 	private static final Logger log = Logger.getLogger(BasicPersonImpl.class);
 	
@@ -44,7 +42,7 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 	private String isEmployed;
 
 	private TreeSet<String> travelcards = null; 
-	protected Knowledge knowledge = null;
+	protected BasicKnowledge knowledge = null;
 	private Desires desires = null;
 
 	private Id householdId;
@@ -196,12 +194,16 @@ public class BasicPersonImpl<T extends BasicPlan> extends CustomizableImpl imple
 		return this.travelcards;
 	}
 
-	public final Knowledge getKnowledge() {
+	public final BasicKnowledge getKnowledge() {
 		return this.knowledge;
 	}
 
 	public final Desires getDesires() {
 		return this.desires;
+	}
+
+	public void setKnowledge(BasicKnowledge knowledge) {
+		this.knowledge = knowledge;
 	}
 	
 }

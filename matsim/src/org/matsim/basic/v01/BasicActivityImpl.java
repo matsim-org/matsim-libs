@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,12 +34,21 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
  */
 public class BasicActivityImpl implements BasicActivity {
 	
-	private int capacity;
+	private Integer capacity = null;
 	private BasicLocation location;
-	private Map<DayType,SortedSet<BasicOpeningTime>> openingTimes;
+	private Map<DayType,SortedSet<BasicOpeningTime>> openingTimes = new HashMap<DayType, SortedSet<BasicOpeningTime>>();
 	private Integer frequency = null;
+	private String type;
 	
-	public int getCapacity() {
+	public BasicActivityImpl(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+	
+	public Integer getCapacity() {
 		return this.capacity;
 	}
 	
@@ -54,7 +64,7 @@ public class BasicActivityImpl implements BasicActivity {
 		return this.location;
 	}
 
-	public void setCapacity(int cap) {
+	public void setCapacity(Integer cap) {
 		this.capacity = cap;
 	}
 
@@ -63,7 +73,11 @@ public class BasicActivityImpl implements BasicActivity {
 	}
 	
 
-	public void addOpeningTime(DayType day, BasicOpeningTime openingTime) {
+	public void addOpeningTime(BasicOpeningTime openingTime) {
+		DayType day = openingTime.getDay();
+		if (day == null) {
+			throw new IllegalArgumentException("OpeningTime instance must have a day set!");
+		}
 		SortedSet<BasicOpeningTime> ot;
 		if (!this.openingTimes.containsKey(day)) {
 			ot = new TreeSet<BasicOpeningTime>();
@@ -73,6 +87,10 @@ public class BasicActivityImpl implements BasicActivity {
 			ot = this.openingTimes.get(day);
 		}
 		ot.add(openingTime);
+	}
+
+	public void setLocation(BasicLocation location) {
+		this.location = location;
 	}
 
 

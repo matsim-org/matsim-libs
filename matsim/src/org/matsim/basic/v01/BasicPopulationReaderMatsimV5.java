@@ -27,9 +27,14 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.HouseholdBuilder;
 import org.matsim.interfaces.basic.v01.PopulationBuilder;
+import org.matsim.population.Knowledge;
+import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -62,7 +67,7 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 
 	private double currentEndTime;
 
-	private BasicLocationImpl currentlocation;
+	private BasicLocation currentlocation;
 
 	private Double currentXCoord;
 
@@ -85,6 +90,18 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 	private BasicHouseholdsReaderV5 householdsDelegate = null;
 
 	private List<BasicHousehold> households;
+
+	private List<BasicActivity> currentActivities = new ArrayList<BasicActivity>();
+
+	private String currentDescription;
+
+	private Integer currentCapacity;
+
+	private OpeningTime currentOpeningTime;
+
+	private BasicKnowledge currentKnowledge;
+
+	private Integer currentFrequency;
 	
 	protected BasicPopulationReaderMatsimV5() {
 	}
@@ -113,7 +130,7 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			this.householdsDelegate.endTag(name, content, context);
 		}
 		else if (PopulationSchemaV5Names.COORDINATE.equalsIgnoreCase(name)) {
-			this.currentlocation.setCoord(new CoordImpl(this.currentXCoord, this.currentYCoord));
+			((BasicLocationImpl)this.currentlocation).setCoord(new CoordImpl(this.currentXCoord, this.currentYCoord));
 			this.currentXCoord = null;
 			this.currentYCoord = null;
 		}
@@ -150,6 +167,42 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 		else if (PopulationSchemaV5Names.SWISSTRAVELCARD.equalsIgnoreCase(name)) {
 			this.currentPerson.addTravelcard(content.trim());
 		}
+		else if (PopulationSchemaV5Names.DESCRIPTION.equalsIgnoreCase(name)){
+			this.currentDescription = content.trim();
+		}
+		else if (PopulationSchemaV5Names.ACTIVITY.equalsIgnoreCase(name)){
+			BasicActivity act = populationBuilder.createActivity(this.currentActType, this.currentlocation);
+			this.currentActType = null;
+			act.setCapacity(this.currentCapacity);
+			this.currentCapacity = null;
+			if (this.currentOpeningTime != null) {
+				act.addOpeningTime(this.currentOpeningTime);
+				this.currentOpeningTime = null;
+			}
+			if (this.currentFrequency != null) {
+				act.setFrequency(this.currentFrequency);
+			}
+			this.currentActivities.add(act);
+		}
+		else if (PopulationSchemaV5Names.KNOWLEDGE.equalsIgnoreCase(name)){
+			System.err.println(this.currentActivities.size());
+			this.currentKnowledge = populationBuilder.createKnowledge(this.currentActivities);
+			this.currentActivities.clear();
+			if (this.currentDescription != null) {
+				this.currentKnowledge.setDescription(this.currentDescription);
+				this.currentDescription = null;
+			}
+			//the next lines should be placed in the PopulationReaderMatsim class
+			//however this conceptual cleaness would produce duplicate code 
+			//and is avoided in this case. dg nov 08
+			if (this.currentPerson instanceof BasicPersonImpl) {
+				((BasicPersonImpl)this.currentPerson).setKnowledge(this.currentKnowledge);				
+			}
+			else {
+				((PersonImpl)this.currentPerson).setKnowledge((Knowledge)this.currentKnowledge);				
+			}
+			this.currentKnowledge = null;
+		}
 		else {
 			log.warn("Ignoring endTag (beta implementation!): " + name);
 		}
@@ -159,6 +212,7 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (HouseholdsSchemaV5Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			this.householdsDelegate = new BasicHouseholdsReaderV5(this.households);
+			this.householdsDelegate.setHouseholdBuilder(this.householdBuilder);
 		  this.householdsDelegate.startTag(name, atts, context);
 		}
 		else if (this.householdsDelegate != null) {
@@ -243,20 +297,60 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 		}
 		else if (PopulationSchemaV5Names.FACILITYID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
-			this.currentlocation.setLocationId(id, true);
+			((BasicLocationImpl)this.currentlocation).setLocationId(id, true);
 		}
 		else if (PopulationSchemaV5Names.LINKID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
-			this.currentlocation.setLocationId(id, false);
+			((BasicLocationImpl)this.currentlocation).setLocationId(id, false);
 		}
 		else if (PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
 			((BasicPersonImpl)this.currentPerson).setHouseholdId(new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID)));
+		}
+		else if (PopulationSchemaV5Names.CAPACITY.equalsIgnoreCase(name)){
+			String capString = atts.getValue(PopulationSchemaV5Names.PERSONS);
+			if (capString == null) {
+				this.currentCapacity = null;
+			}
+			else {
+				this.currentCapacity = Integer.parseInt(capString);
+			}
+		}
+		else if (PopulationSchemaV5Names.OPENINGTIME.equalsIgnoreCase(name)){
+			String day = atts.getValue(PopulationSchemaV5Names.DAY);
+			String start = atts.getValue(PopulationSchemaV5Names.STARTTIME);
+			String end = atts.getValue(PopulationSchemaV5Names.ENDTIME);
+			if ((day != null) && (start != null) && (end != null)) {
+				DayType dayt = parseDay(day);
+				this.currentOpeningTime = new OpeningTime(dayt, this.parseTime(start), this.parseTime(end));
+			}
+			else {
+				this.currentOpeningTime = null;
+			}
+		}
+		else if (PopulationSchemaV5Names.ACTIVITY.equalsIgnoreCase(name)){
+			this.currentActType = atts.getValue(PopulationSchemaV5Names.TYPE);
+			String freq = atts.getValue(PopulationSchemaV5Names.FREQUENCY);
+			if (freq != null) {
+				this.currentFrequency = Integer.parseInt(freq);
+			}
+			else {
+				this.currentFrequency = null;
+			}
 		}
 		else {
 			log.warn("Ignoring startTag (beta implementation!): " + name);
 		}
 	} //end of startTag
 	
+	private DayType parseDay(String day) {
+		for (DayType dt : DayType.values()) {
+			if (dt.toString().equalsIgnoreCase(day)){
+				return dt;
+			}	
+		}
+		throw new IllegalArgumentException("Unknown DayType: " + day);
+	}
+
 	private BasicLeg.Mode getLegMode(String mode) {
 		if (BasicLeg.Mode.car.toString().equalsIgnoreCase(mode)){
 			return BasicLeg.Mode.car;

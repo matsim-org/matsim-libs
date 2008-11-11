@@ -37,12 +37,14 @@ public interface BasicActivity {
 	
 	public void setFrequency(Integer freq);
 	
-	public int getCapacity();
+	public Integer getCapacity();
 	
-	public void setCapacity(int cap);
+	public void setCapacity(Integer cap);
 
-	public void addOpeningTime(DayType day, BasicOpeningTime openingTime);
+	public void addOpeningTime(BasicOpeningTime openingTime);
 
 	public SortedSet<BasicOpeningTime> getOpeningTime(DayType day);
 	
+	public String getType();
+
 }

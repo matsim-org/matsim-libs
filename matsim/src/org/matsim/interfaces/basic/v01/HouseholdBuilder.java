@@ -21,7 +21,6 @@ package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
 
-import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.basic.v01.Id;
 
 
@@ -34,6 +33,6 @@ public interface HouseholdBuilder {
 	
 	public List<BasicHousehold> getHouseholds();
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
+	public BasicHousehold createHousehold(Id householdId,
 			List<Id> membersPersonIds, List<Id> vehicleIds);
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BasicKnowledgeImpl implements BasicKnowledge {
+public class BasicKnowledgeImpl implements BasicKnowledge<BasicActivity> {
 
 	private List<BasicActivity> activities;
 	private String description;

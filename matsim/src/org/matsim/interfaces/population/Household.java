@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.interfaces.population;
 
-import java.util.List;
+import java.util.Map;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.population.Person;
 
@@ -31,7 +32,10 @@ import org.matsim.population.Person;
  */
 public interface Household extends BasicHousehold {
 
-	public List<Person> getMembers();
+	
+	public void addMember(Person member);
+	
+	public Map<Id, Person> getMembers();
 	
 	
 	

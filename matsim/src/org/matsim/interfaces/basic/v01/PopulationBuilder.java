@@ -22,8 +22,9 @@ package org.matsim.interfaces.basic.v01;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicAct;
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicLocationImpl;
 import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.BasicRoute;
@@ -41,12 +42,16 @@ public interface PopulationBuilder {
 
 	BasicPlan createPlan(BasicPerson currentPerson);
 
-	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocationImpl currentlocation);
+	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
 
 	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
 
 	BasicRoute createRoute(List<Id> currentRouteLinkIds);
 
 	BasicPlan createPlan(BasicPerson person, boolean selected);
+
+	BasicActivity createActivity(String type, BasicLocation currentlocation);
+
+	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
 
 }

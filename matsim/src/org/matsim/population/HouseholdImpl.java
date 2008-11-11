@@ -19,43 +19,60 @@
  * *********************************************************************** */
 package org.matsim.population;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
+import java.util.Map;
 
-import org.matsim.basic.v01.BasicPopulationReaderMatsimV5;
-import org.matsim.basic.v01.PopulationSchemaV5Names;
-import org.matsim.facilities.Facilities;
+import org.matsim.basic.v01.BasicHouseholdImpl;
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.population.Household;
-import org.matsim.network.NetworkLayer;
-import org.xml.sax.Attributes;
 
 
 /**
  * @author dgrether
  *
  */
-public class PopulationReaderMatsimV5 extends BasicPopulationReaderMatsimV5 {
-	
+public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
-	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, List<Household> households, Facilities fac) {
-		super();
-		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
-		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households));
+	private Map<Id, Person> members;
+	
+	public HouseholdImpl(Id id) {
+		super(id);
+	}
+
+	
+	public void addMember(Person member) {
+		if (this.members == null) {
+			this.members = new HashMap<Id, Person>();
+		}
+		this.members.put(member.getId(), member);
+		member.setHousehold(this);
 	}
 
 	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
-			//do nothing as hhId is set by builder
+	public List<Id> getMemberIds() {
+		if (this.members == null) {
+			return null;
 		}
-		else {
-			super.startTag(name, atts, context);
-		}
+		return new ArrayList<Id>(this.members.keySet());
+	}
+	
+	
+	@Override
+	public void setMemberIds(List<Id> members) {
+		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
+				"Use method addMember(Person p) instead!");
+	}
+	
+	
+	/**
+	 * @see org.matsim.interfaces.population.Household#getMembers()
+	 */
+	public Map<Id, Person> getMembers() {
+		return this.members;
 	}
 
-	
-	
-	
-	
-	
+
+
 }

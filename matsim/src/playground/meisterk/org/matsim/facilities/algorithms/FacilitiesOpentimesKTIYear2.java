@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -73,7 +74,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
 		ArrayList<Location> closestShops = this.shopsOf2005.getNearestLocations(facility.getCenter());
 		Activity shopsOf2005ShopAct = ((Facility) closestShops.get(0)).getActivity(FacilitiesProductionKTI.ACT_TYPE_SHOP);
@@ -86,7 +87,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (Activity a : activities.values()) {
-			a.setOpentimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
+			a.setOpentimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
 		}
 		
 		// if only presence code and work are present
@@ -111,7 +112,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 			} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 				// eliminate lunch break
 				for (Day day : days) {
-					SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day.getAbbrevEnglish());
+					SortedSet<BasicOpeningTime> dailyOpentime = closestShopOpentimes.get(day.getAbbrevEnglish());
 					if (dailyOpentime != null) {
 						switch(dailyOpentime.size()) {
 						case 2:

@@ -28,12 +28,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
-import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
@@ -202,8 +202,8 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
 		readUtilityValues();
-		scoreActs = (marginalUtilityOfPerforming != 0 || marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
@@ -252,13 +252,13 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -297,13 +297,13 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			score += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			score += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
@@ -314,7 +314,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
-		if (minimalDuration >= 0 && duration < minimalDuration) {
+		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
@@ -432,7 +432,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		Facility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
 		String facilityActType = null;
-		Set<OpeningTime> opentimes = null;
+		Set<BasicOpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
@@ -443,9 +443,9 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wed);
+				opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivity(facilityActType).getOpentimes(DayType.wkday);
+					opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:
@@ -454,7 +454,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
 
-					for (OpeningTime opentime : opentimes) {
+					for (BasicOpeningTime opentime : opentimes) {
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
 					}

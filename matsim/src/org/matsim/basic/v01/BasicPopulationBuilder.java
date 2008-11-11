@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.PopulationBuilder;
 
 
@@ -39,7 +40,7 @@ public class BasicPopulationBuilder implements PopulationBuilder {
 	}
 
 	public BasicAct createAct(BasicPlan basicPlan, String currentActType,
-			BasicLocationImpl currentlocation) {
+			BasicLocation currentlocation) {
 		BasicActImpl act = new BasicActImpl(currentActType);
 		basicPlan.addAct(act);
 		if (currentlocation != null) {
@@ -88,6 +89,22 @@ public class BasicPopulationBuilder implements PopulationBuilder {
 		List<Id> r = new ArrayList<Id>(currentRouteLinkIds);
 		route.setLinkIds(r);
 		return route;
+	}
+
+
+
+	public BasicActivity createActivity(String type, BasicLocation currentlocation) {
+		BasicActivityImpl ba = new BasicActivityImpl(type);
+		ba.setLocation(currentlocation);
+		return ba;
+	}
+
+	public BasicKnowledge createKnowledge(List<BasicActivity> currentActivities) {
+		BasicKnowledgeImpl kn = new BasicKnowledgeImpl();
+		for (BasicActivity ba : currentActivities){
+			kn.addActivity(ba);
+		}
+		return kn;
 	}
 
 

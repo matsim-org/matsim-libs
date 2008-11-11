@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.utils.misc.Time;
 
 public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
@@ -104,7 +105,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
+	public void startOpentime(final BasicOpeningTime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<opentime");
 		out.write(" day=\"" + opentime.getDay() + "\"");
 		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");

@@ -56,6 +56,7 @@ import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
@@ -824,7 +825,7 @@ public class ShopsOf2005ToFacilities {
 
 						opentime = new OpeningTime(days[dayPointer].getAbbrevEnglish(), openTimeString, closeTimeString);
 
-						shopping.addOpentime(opentime);
+						shopping.addOpeningTime(opentime);
 
 					}
 				} else {
@@ -952,7 +953,7 @@ public class ShopsOf2005ToFacilities {
 										                             .getAbbrevEnglish(), Time
 										                             .writeTime(oldTime), Time
 										                             .writeTime(time));
-										shopping.addOpentime(opentime);
+										shopping.addOpeningTime(opentime);
 									}
 									break;
 								default:
@@ -962,7 +963,7 @@ public class ShopsOf2005ToFacilities {
 										englishDayString,
 										Time.writeTime(oldTime),
 										Time.writeTime(time));
-								shopping.addOpentime(opentime);
+								shopping.addOpeningTime(opentime);
 								break;
 								}
 							}
@@ -1082,7 +1083,7 @@ public class ShopsOf2005ToFacilities {
 											englishDayString,
 											Time.writeTime(openingHour),
 											Time.writeTime(time));
-									shopping.addOpentime(opentime);
+									shopping.addOpeningTime(opentime);
 
 								}
 
@@ -1170,7 +1171,7 @@ public class ShopsOf2005ToFacilities {
 									englishDayString,
 									openingHour,
 									time);
-							shopping.addOpentime(opentime);
+							shopping.addOpeningTime(opentime);
 						}
 
 						isOpen = !isOpen;
@@ -1264,7 +1265,7 @@ public class ShopsOf2005ToFacilities {
 														days[weekday].getAbbrevEnglish(),
 														Time.writeTime(openingHour),
 														Time.writeTime(time));
-												shopping.addOpentime(opentime);
+												shopping.addOpeningTime(opentime);
 											}
 											break;
 										case START_OPEN_TOKEN_INDEX + 2:
@@ -1274,7 +1275,7 @@ public class ShopsOf2005ToFacilities {
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													Time.writeTime(openingHour),
 													Time.writeTime(time));
-											shopping.addOpentime(opentime);
+											shopping.addOpeningTime(opentime);
 											break;
 										}
 									}
@@ -1416,7 +1417,7 @@ public class ShopsOf2005ToFacilities {
 														days[weekday].getAbbrevEnglish(),
 														Time.writeTime(openingHour),
 														Time.writeTime(time));
-												shopping.addOpentime(opentime);
+												shopping.addOpeningTime(opentime);
 											}
 										} else if (openTimeString.equals(saturdayToken)) {
 											System.out.println("Adding times to saturday...");
@@ -1424,7 +1425,7 @@ public class ShopsOf2005ToFacilities {
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													Time.writeTime(openingHour),
 													Time.writeTime(time));
-											shopping.addOpentime(opentime);
+											shopping.addOpeningTime(opentime);
 										}
 									}
 									isOpen = !isOpen;
@@ -1520,7 +1521,7 @@ public class ShopsOf2005ToFacilities {
 				// open times (variable length)
 				for (Day day : days) {
 
-					Set<OpeningTime> dailyOpentime = shopping.getOpentimes(day.getAbbrevEnglish());
+					Set<BasicOpeningTime> dailyOpentime = shopping.getOpeningTime(day.getAbbrevEnglish());
 
 					if (dailyOpentime != null) {
 
@@ -1666,9 +1667,9 @@ public class ShopsOf2005ToFacilities {
 				int dayCounter = 0;
 				for (Day day : days) {
 					if (facility.getActivity(ACTIVITY_TYPE_SHOP) != null) {
-						Set<OpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpentimes(day.getAbbrevEnglish());
+						Set<BasicOpeningTime> dailyOpentimes = facility.getActivity(ACTIVITY_TYPE_SHOP).getOpeningTime(day.getAbbrevEnglish());
 						if (dailyOpentimes != null) {
-							for (OpeningTime opentime : dailyOpentimes) {
+							for (BasicOpeningTime opentime : dailyOpentimes) {
 
 								// build up placemark structure
 								aShopOpeningPeriod = factory.createPlacemarkType();

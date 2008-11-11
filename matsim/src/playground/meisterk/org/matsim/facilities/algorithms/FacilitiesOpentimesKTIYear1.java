@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
@@ -51,11 +52,11 @@ public class FacilitiesOpentimesKTIYear1 {
 				String actType = a.getType();
 
 				// delete all existing open times info
-				Map<DayType, SortedSet<OpeningTime>> o = a.getOpentimes();
+				Map<DayType, SortedSet<BasicOpeningTime>> o = a.getOpentimes();
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {
-					a.addOpentime(openingTimes.get(actType));
+					a.addOpeningTime(openingTimes.get(actType));
 				} else {
 					log.warn("For activity type " + actType + " no opening time is defined");
 				}

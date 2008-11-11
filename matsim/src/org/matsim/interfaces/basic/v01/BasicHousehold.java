@@ -21,6 +21,7 @@ package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
 
+import org.matsim.basic.v01.BasicLocationImpl;
 import org.matsim.basic.v01.Id;
 
 
@@ -41,4 +42,13 @@ public interface BasicHousehold {
 	public String getLanguage();
 
 	public List<Id> getVehicleDefinitionIds();
+
+	public void setLanguage(String language);
+
+	public void setIncome(BasicIncome income);
+
+	public void setLocation(BasicLocation location);
+
+	
+	
 }

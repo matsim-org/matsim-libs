@@ -21,6 +21,7 @@
 package org.matsim.basic.v01;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
@@ -55,9 +56,12 @@ public class BasicHouseholdsReaderV5Test extends MatsimTestCase {
 		BasicHousehold hh = households.get(0);
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
-		assertEquals(2, hh.getMemberIds().size());
-		assertEquals(id42, hh.getMemberIds().get(0));
-		assertEquals(id43, hh.getMemberIds().get(1));
+		assertEquals(3, hh.getMemberIds().size());
+		List<Id> hhmemberIds = hh.getMemberIds();
+		Collections.sort(hhmemberIds);
+		assertEquals(id23, hhmemberIds.get(0));
+		assertEquals(id42, hhmemberIds.get(1));
+		assertEquals(id43, hhmemberIds.get(2));
 		
 		assertNotNull(hh.getBasicLocation());
 		assertNotNull(hh.getBasicLocation().getCoord());

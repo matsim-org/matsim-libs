@@ -112,6 +112,7 @@ xml:lang="en">
       </xs:complexType>
     </xs:element>
   </xs:sequence>
+  <xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
   <xs:attribute name="frequency" type="xs:nonNegativeInteger" use="optional">
     <xs:annotation>
       <xs:documentation>defines how often the person was at that place (in one year)</xs:documentation>

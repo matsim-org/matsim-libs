@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.matsim.population.Desires;
-import org.matsim.population.Knowledge;
 
 /**
 *
@@ -31,7 +30,7 @@ import org.matsim.population.Knowledge;
 *
 */
 
-public interface BasicPerson<T extends BasicPlan> {
+public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
 	public void addPlan(final T plan);
 
@@ -85,7 +84,7 @@ public interface BasicPerson<T extends BasicPlan> {
 
 	public TreeSet<String> getTravelcards();
 
-	public Knowledge getKnowledge();
+	public K getKnowledge();
 	
 	public Desires getDesires();
 	
