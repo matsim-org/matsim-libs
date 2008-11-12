@@ -125,10 +125,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		testee = new FixedRouteLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
 
-		double legTravelTimeEstimation = Time.UNDEFINED_TIME;
-
 		// this method does not do something useful, therefore the meaningless parameters
-		legTravelTimeEstimation = testee.getLegTravelTimeEstimation(new IdImpl("1"), 0.0, null, null, null);
+		double legTravelTimeEstimation = testee.getLegTravelTimeEstimation(new IdImpl("1"), 0.0, null, null, null);
 
 		assertEquals(legTravelTimeEstimation, Double.MIN_VALUE , EPSILON);
 	}

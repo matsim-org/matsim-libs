@@ -50,10 +50,10 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Plan plan;
-	private final LegTravelTimeEstimator legTravelTimeEstimator;
-	private final ScoringFunction sf;
-	private final PlanAnalyzeSubtours planAnalyzeSubtours;
+	private transient Plan plan;
+	private transient LegTravelTimeEstimator legTravelTimeEstimator;
+	private transient ScoringFunction sf;
+	private transient PlanAnalyzeSubtours planAnalyzeSubtours;
 
 	public PlanomatFitnessFunctionWrapper(
 			final ScoringFunction sf,

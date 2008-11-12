@@ -55,15 +55,13 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Act actOrigin, Act actDestination, Leg legIntermediate) {
 
-		double legTravelTimeEstimation = Double.MIN_VALUE;
-
 		double now = departureTime;
 
 		now = this.processDeparture(actOrigin.getLink(), now);
 		now = this.processLink(actOrigin.getLink(), now);
 		now = this.processRouteTravelTime(legIntermediate.getRoute(), now);
 		
-		legTravelTimeEstimation = now - departureTime;
+		double legTravelTimeEstimation = now - departureTime;
 
 		return legTravelTimeEstimation;
 	

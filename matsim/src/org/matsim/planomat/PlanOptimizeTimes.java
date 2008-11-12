@@ -162,7 +162,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 		IChromosome sampleChromosome = null;
 		try {
-			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes.toArray(new Gene[0]) );
+			sampleChromosome = new Chromosome( jgapConfiguration, sampleGenes.toArray(new Gene[sampleGenes.size()]) );
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
