@@ -52,7 +52,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
 	private NetworkLayer network = null;
-	private final int roleIndex;
+	private final HashMap<Link, LinearInterpolatingTravelTimeData> linkData;
 	private final int timeslice;
 
 	static private class EnterEvent /*implements Comparable<EnterEvent>*/ {
@@ -107,14 +107,14 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 			}
 		}
 */
-	};
+	}
 
-	private class LinearInterpolatingTravelTimeRole {
+	private class LinearInterpolatingTravelTimeData {
 		private HashMap<Integer, Double> timeSum = null;	// map<timeslot-index, sum-of-travel-times>
 		private HashMap<Integer, Integer> timeCnt = null;		// map<timeslot-index, count-of-travel-times>
 		private final Link link;
 
-		public LinearInterpolatingTravelTimeRole(final Link link) {
+		public LinearInterpolatingTravelTimeData(final Link link) {
 			this.link = link;
 			this.timeSum = new HashMap<Integer, Double>();
 		}
@@ -186,13 +186,13 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 			return tTravelEstimation;
 		}
 
-	};
+	}
 
 	public LinearInterpolatingTTCalculator(final NetworkLayer network, final int timeslice) {
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
-		this.roleIndex = network.requestLinkRole();
+		this.linkData = new HashMap(network.getLinks().size());
 		resetTravelTimes();
 	}
 
@@ -249,11 +249,11 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		return getTravelTimeRole(link).getTravelTime(time);
 	}
 
-	private LinearInterpolatingTravelTimeRole getTravelTimeRole(final Link l) {
-		LinearInterpolatingTravelTimeRole r = (LinearInterpolatingTravelTimeRole)l.getRole(this.roleIndex);
+	private LinearInterpolatingTravelTimeData getTravelTimeRole(final Link l) {
+		LinearInterpolatingTravelTimeData r = this.linkData.get(l);
 		if (null == r) {
-			r = new LinearInterpolatingTravelTimeRole(l);
-			l.setRole(this.roleIndex, r);
+			r = new LinearInterpolatingTravelTimeData(l);
+			this.linkData.put(l, r);
 		}
 		return r;
 	}
@@ -264,7 +264,6 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return this.getClass().getSimpleName();
 	}
 

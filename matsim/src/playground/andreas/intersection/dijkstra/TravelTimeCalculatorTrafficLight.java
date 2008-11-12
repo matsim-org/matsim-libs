@@ -14,7 +14,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
 	private NetworkLayer network = null;
-	final int roleIndex;
+	private final HashMap<Link, HashMap<Link, TravelTimeRole>> linkData;
 	private final int timeslice;
 	private final int numSlots;
 
@@ -32,7 +32,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 		this.network = network;
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.roleIndex = network.requestLinkRole();
+		this.linkData = new HashMap<Link, HashMap<Link, TravelTimeRole>>((int) (network.getLinks().size() * 1.4));
 		resetTravelTimes();
 	}
 
@@ -102,10 +102,10 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 
 	private TravelTimeRole getTravelTimeRole(final Link fromLink, final Link toLink) {
 		
-		HashMap<Link, TravelTimeRole> travelTimeMap = (HashMap<Link, TravelTimeRole>) fromLink.getRole(this.roleIndex);
+		HashMap<Link, TravelTimeRole> travelTimeMap = this.linkData.get(fromLink);
 		if(travelTimeMap == null){
 			travelTimeMap = new HashMap<Link, TravelTimeRole>();
-			fromLink.setRole(this.roleIndex, travelTimeMap);			
+			this.linkData.put(fromLink, travelTimeMap);
 		}
 		
 		TravelTimeRole r = travelTimeMap.get(toLink);		
@@ -116,7 +116,7 @@ public class TravelTimeCalculatorTrafficLight extends TravelTimeCalculator {
 		return r;
 	}
 
-	/*default*/ int getTimeSlotIndex(final double time) {
+	/*package*/ int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.timeslice;
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
 		return slice;

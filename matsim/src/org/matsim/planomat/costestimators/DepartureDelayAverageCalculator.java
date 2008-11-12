@@ -34,16 +34,14 @@ import org.matsim.network.NetworkLayer;
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
- *
  */
 public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
 
 	private NetworkLayer network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-
-	private int roleIndex;
-
+	private final HashMap<Link, DepartureDelayData> linkData;
+	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
@@ -52,7 +50,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
-		this.roleIndex = network.requestLinkRole();
+		this.linkData = new HashMap<Link, DepartureDelayData>(this.network.getLinks().size());
 		this.resetDepartureDelays();
 	}
 
@@ -71,7 +69,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	// Implementation of link role
 	//////////////////////////////////////////////////////////////////////
 
-	private class DepartureDelayRole {
+	/*package*/ class DepartureDelayData {
 		private double[] timeSum = null;
 		private int[] timeCnt = null;
 
@@ -113,11 +111,11 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 
 	}
 
-	private DepartureDelayRole getDepartureDelayRole(Link l) {
-		DepartureDelayRole r = (DepartureDelayRole)l.getRole(this.roleIndex);
+	private DepartureDelayData getDepartureDelayRole(Link l) {
+		DepartureDelayData r = this.linkData.get(l);
 		if (null == r) {
-			r = new DepartureDelayRole();
-			l.setRole(this.roleIndex, r);
+			r = new DepartureDelayData();
+			this.linkData.put(l, r);
 		}
 		return r;
 	}
@@ -161,10 +159,6 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	public void reset(int iteration) {
 		resetDepartureDelays();
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// Overriding Object
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public String toString() {

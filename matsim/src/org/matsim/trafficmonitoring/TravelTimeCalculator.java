@@ -40,7 +40,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
 	private NetworkLayer network = null;
-	final int roleIndex;
+	private final HashMap<Link, TravelTimeRole> linkData;
 	private final int timeslice;
 	private final int numSlots;
 	private final TravelTimeCalculatorFactory factory;
@@ -65,7 +65,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		this.network = network;
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
-		this.roleIndex = network.requestLinkRole();
+		this.linkData = new HashMap<Link, TravelTimeRole>((int) (this.network.getLinks().size() * 1.4));
 		this.aggregator = this.factory.createTravelTimeAggregator(this.numSlots, this.timeslice);
 		
 		resetTravelTimes();
@@ -130,10 +130,10 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	}
 	
 	private TravelTimeRole getTravelTimeRole(final Link link) {
-		TravelTimeRole r = (TravelTimeRole) link.getRole(this.roleIndex);
+		TravelTimeRole r = this.linkData.get(link);
 		if (null == r) {
 			r = this.factory.createTravelTimeRole(link, this.numSlots);
-			link.setRole(this.roleIndex, r);
+			this.linkData.put(link, r);
 		}
 		return r;
 	}

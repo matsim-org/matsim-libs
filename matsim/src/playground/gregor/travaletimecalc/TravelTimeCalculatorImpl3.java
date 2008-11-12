@@ -42,7 +42,7 @@ LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 	private final HashMap<String, EnterEvent> enterEvents = new HashMap<String, EnterEvent>();
 
 	private NetworkLayer network = null;
-	final int roleIndex;
+	private final HashMap<Link, TravelTimeRole> linkData;
 	private final int timeslice;
 	private final int expectNumSlots;
 
@@ -62,7 +62,7 @@ LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 		this.network  = network;
 		this.timeslice = timeslice;
 		this.expectNumSlots = ( (maxTime / this.timeslice) + 1); // TODO hard-coded max-time
-		this.roleIndex = network.requestLinkRole();
+		this.linkData = new HashMap<Link, TravelTimeRole>((int) (this.network.getLinks().size() * 1.4));
 	}
 
 	public void resetTravelTimes() {
@@ -107,10 +107,10 @@ LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 	}
 
 	private TravelTimeRole getTravelTimeRole(final Link link) {
-		TravelTimeRole r = (TravelTimeRole) link.getRole(this.roleIndex);
+		TravelTimeRole r = this.linkData.get(link);
 		if (null == r) {
 			r = new TravelTimeRole(link, this.expectNumSlots);
-			link.setRole(this.roleIndex, r);
+			this.linkData.put(link, r);
 		}
 		return r;
 	}
@@ -246,9 +246,9 @@ LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 				this.cnt = cnt;
 				this.timeSum = timeSum;
 			}
-		};
+		}
 
-	};
+	}
 
 
 
