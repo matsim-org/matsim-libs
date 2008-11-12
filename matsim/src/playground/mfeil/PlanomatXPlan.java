@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.gbl.Gbl;
 import org.matsim.population.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -45,5 +49,37 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 			return 1;
 		}
 		else return -1;
+	}
+	
+	public void setActsLegs (ArrayList<Object> actslegs){
+		this.actsLegs = actslegs;
+	}
+	
+	public void copyTimes (ArrayList<Object> in){
+		try {
+			Act a = (Act)this.actsLegs.get(0);
+			Act a0 = (Act)in.get(0);
+			a.setDur(a0.getDur());
+			a.setStartTime(a0.getStartTime());
+			a.setEndTime(a0.getEndTime());
+			
+			for (int i=1; i<in.size()-1; i+=2) {
+				Leg lx = (Leg)this.actsLegs.get(i);
+				Leg lx0 = (Leg)in.get(i);
+				lx.setTravTime(lx0.getTravTime());
+				lx.setDepTime(lx0.getDepTime());
+				lx.setArrTime(lx0.getArrTime());
+				
+				Act ax = (Act)this.actsLegs.get(i+1);
+				Act ax0 = (Act)in.get(i+1);
+				ax.setDur(ax0.getDur());
+				ax.setStartTime(ax0.getStartTime());
+				ax.setEndTime(ax0.getEndTime());
+			}
+		} catch (Exception e) {
+			// copying a plan is fairly basic. if an exception occurs here, something
+			// must be definitively wrong -- exit with an error
+			Gbl.errorMsg(e);
+		}
 	}
 }

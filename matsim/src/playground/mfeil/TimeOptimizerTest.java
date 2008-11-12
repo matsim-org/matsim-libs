@@ -20,7 +20,7 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 	private final PlanScorer		scorer;
 	
 	public TimeOptimizerTest (LegTravelTimeEstimator estimator, PlanScorer scorer){
-		this.timeOptAlgorithm = new TimeOptimizer11 (estimator, scorer);
+		this.timeOptAlgorithm = new TimeOptimizer10 (estimator, scorer);
 		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator);
 		this.scorer			  = scorer;
 	}
@@ -99,7 +99,8 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 		mean = mean/statistics.length;
 		double varianz=0;
 		for (int i=0;i<statistics.length;i++){
-			varianz += Math.exp(statistics[i][0]-mean);
+			//varianz += Math.exp(statistics[i][0]-mean);
+			varianz += (statistics[i][0]-mean)*(statistics[i][0]-mean);
 		}
 		stream.println(mean+"\t\t\t\t\t\t"+average/statistics.length);
 		stream.println(varianz/statistics.length);

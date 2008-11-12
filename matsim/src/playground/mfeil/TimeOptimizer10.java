@@ -57,10 +57,10 @@ public class TimeOptimizer10 implements org.matsim.population.algorithms.PlanAlg
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
-		this.MAX_ITERATIONS 		= 30;
-		this.STOP_CRITERION			= 5;
+		this.MAX_ITERATIONS 		= 50;
+		this.STOP_CRITERION			= 10;
 		this.minimumTime			= 3600;
-		this.NEIGHBOURHOOD_SIZE		= 10;
+		this.NEIGHBOURHOOD_SIZE		= 30;
 		//TODO @MF: constants to be configured externally
 	}
 	

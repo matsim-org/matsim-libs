@@ -75,7 +75,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		//this.planomatAlgorithm 	= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanScorer (factory);
-		this.timer					= new TimeOptimizer10(legTravelTimeEstimator, this.scorer);
+		this.timer					= new TimeOptimizer12(legTravelTimeEstimator, this.scorer);
 		
 		if (constrained) locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
 		else locationChoiceAlgorithm = new RandomLocationMutator(network, controler);
