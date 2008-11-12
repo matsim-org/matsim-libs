@@ -557,6 +557,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * returns the index to access roles on nodes of this network
 	 *
 	 * @return the index to access set and get a role on nodes of this network
+	 * @deprecated please use a Map yourself to match the role-data to the nodes
 	 */
 	public final synchronized int requestNodeRole() {
 		// first, check if there is an empty space somewhere
@@ -578,6 +579,10 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 		return index;
 	}
 
+	/**
+	 * @param roleIndex
+	 * @deprecated
+	 */
 	public final synchronized void releaseNodeRole(final int roleIndex) {
 		// clear all stored roles
 		for (Node node : this.nodes.values()) {
@@ -591,6 +596,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * returns the index to access roles on links of this network
 	 *
 	 * @return the index to access set and get a role on links of this network
+	 * @deprecated please use a Map yourself to match the role-data to the links
 	 */
 	public final int requestLinkRole() {
 		int index = this.linkRoles.size();
