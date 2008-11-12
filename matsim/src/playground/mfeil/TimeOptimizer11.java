@@ -109,26 +109,26 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		int lastImprovement 							= 0;
 		
 		
-		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-		Counter.timeOptCounter++;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		stream.print(plan.getScore()+"\t\t\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-		Act act = (Act)plan.getActsLegs().get(z);
-			stream.print(act.getType()+"\t");
-		}
-		stream.println();
-		stream.print("\t\t\t");
-		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
-		}
-		stream.println();
+	//	String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
+	//	Counter.timeOptCounter++;
+	//	PrintStream stream;
+	//	try {
+	//		stream = new PrintStream (new File(outputfile));
+	//	} catch (FileNotFoundException e) {
+	//		e.printStackTrace();
+	//		return;
+	//	}
+	//	stream.print(plan.getScore()+"\t\t\t");
+	//	for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+	//	Act act = (Act)plan.getActsLegs().get(z);
+	//		stream.print(act.getType()+"\t");
+	//	}
+	//	stream.println();
+	//	stream.print("\t\t\t");
+	//	for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+	//		stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
+	//	}
+	//	stream.println();
 		
 		
 		// Copy the plan into all fields of the array neighbourhood
@@ -146,7 +146,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		bestSolution.copyPlan(plan);
 		
 		// Iteration 1
-		stream.println("Iteration "+1);
+	//	stream.println("Iteration "+1);
 		this.createInitialNeighbourhood(InitialNeighbourhood, notNewInNeighbourhood, moves);
 		
 		// Check whether there are new solutions (is only necessary if there is no swap = versions 8 and 10)
@@ -162,10 +162,10 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 			return;
 		}
 		
-		solutions = this.checkForTabuSolutions (InitialNeighbourhood, notNewInNeighbourhood, tabuList, moves, position, stream);
+		solutions = this.checkForTabuSolutions (InitialNeighbourhood, notNewInNeighbourhood, tabuList, moves, position);
 		
 		tabuList.add((PlanomatXPlan)solutions[0]);
-		stream.println("Best score \t"+((PlanomatXPlan)solutions[0]).getScore());
+	//	stream.println("Best score \t"+((PlanomatXPlan)solutions[0]).getScore());
 		
 		if (((PlanomatXPlan)solutions[0]).getScore()>bestSolution.getScore()){
 			bestSolution = new PlanomatXPlan (((PlanomatXPlan)solutions[0]).getPerson());
@@ -184,7 +184,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		// Do Tabu Search iterations
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-			stream.println("Iteration "+currentIteration);
+	//		stream.println("Iteration "+currentIteration);
 			
 			// Define the neighbourhood			
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, moves, position);
@@ -203,7 +203,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 			}
 						
 			// Check whether plans are tabu	
-			solutions = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, moves, position, stream);
+			solutions = this.checkForTabuSolutions (neighbourhood, notNewInNeighbourhood, tabuList, moves, position);
 			
 			if (solutions[1].equals(true)) {
 				log.info("No non-tabu solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
@@ -212,7 +212,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		
 			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
 			tabuList.add((PlanomatXPlan)solutions[0]);
-			stream.println("Best score \t"+((PlanomatXPlan)solutions[0]).getScore());
+	//		stream.println("Best score \t"+((PlanomatXPlan)solutions[0]).getScore());
 			
 			if (((PlanomatXPlan)solutions[0]).getScore()>bestSolution.getScore()){
 				bestSolution = new PlanomatXPlan (((PlanomatXPlan)solutions[0]).getPerson());
@@ -241,7 +241,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		}
 	
 		// Update the plan with the final solution 		
-		stream.println("Selected solution\t"+bestSolution.getScore());
+	//	stream.println("Selected solution\t"+bestSolution.getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		plan.setScore(bestSolution.getScore());
 		
@@ -537,7 +537,7 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 	
 	
 	public Object[] checkForTabuSolutions (PlanomatXPlan [] neighbourhood, int [] notNewInNeighbourhood, 
-			ArrayList<PlanomatXPlan> tabuList, int [][] moves, int[]position, PrintStream stream){
+			ArrayList<PlanomatXPlan> tabuList, int [][] moves, int[]position){
 		
 		boolean warningOuter = true;
 		boolean warningInner = true;
@@ -545,17 +545,17 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 		PlanomatXPlan plan = new PlanomatXPlan (neighbourhood[0].getPerson());
 		plan.setScore(-100000);
 		for (int i=0;i<neighbourhood.length;i++){
-			stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
+	//		stream.print(neighbourhood[i].getScore()+"\t"+notNewInNeighbourhood[i]+"\t");
 			if (notNewInNeighbourhood[i]==0){
 				for (int j=0;j<tabuList.size();j++){
 					warningInner = checkForEquality (neighbourhood[i].getActsLegs(), tabuList.get(tabuList.size()-1-j).getActsLegs());
 					if (warningInner) {
-						stream.print("1\t");
+	//					stream.print("1\t");
 						break;
 					}
 				}
 				if (!warningInner) {
-					stream.print("0\t");
+	//				stream.print("0\t");
 					warningOuter = false;
 					
 					if (neighbourhood[i].getScore()>plan.getScore()){
@@ -565,13 +565,13 @@ public class TimeOptimizer11 implements org.matsim.population.algorithms.PlanAlg
 					}
 				}
 			}
-			else stream.print("1\t");
-			stream.print(((Leg)(neighbourhood[i].getActsLegs().get(1))).getDepTime()+"\t");
-			for (int z= 2;z<neighbourhood[i].getActsLegs().size()-1;z=z+2){
-				stream.print((((Leg)(neighbourhood[i].getActsLegs().get(z+1))).getDepTime()-((Leg)(neighbourhood[i].getActsLegs().get(z-1))).getArrTime())+"\t");
-			}
-			stream.print(86400-((Leg)(neighbourhood[i].getActsLegs().get(neighbourhood[i].getActsLegs().size()-2))).getArrTime()+"\t");
-			stream.println();
+	//		else stream.print("1\t");
+	//		stream.print(((Leg)(neighbourhood[i].getActsLegs().get(1))).getDepTime()+"\t");
+	//		for (int z= 2;z<neighbourhood[i].getActsLegs().size()-1;z=z+2){
+	//			stream.print((((Leg)(neighbourhood[i].getActsLegs().get(z+1))).getDepTime()-((Leg)(neighbourhood[i].getActsLegs().get(z-1))).getArrTime())+"\t");
+	//		}
+	//		stream.print(86400-((Leg)(neighbourhood[i].getActsLegs().get(neighbourhood[i].getActsLegs().size()-2))).getArrTime()+"\t");
+	//		stream.println();
 		}
 		
 		// clean-up of plan (=bestIterSolution)
