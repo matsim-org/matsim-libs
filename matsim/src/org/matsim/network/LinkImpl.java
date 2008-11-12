@@ -25,12 +25,7 @@ import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.misc.ResizableArray;
 
-/**
- * @author laemmel
- * @author illenberger
- */
 public class LinkImpl extends BasicLinkImpl implements Link {
 
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
@@ -39,19 +34,15 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-
 	private final double flowCapacity;
 
 	private final double freespeedTravelTime;
-
 
 	protected String type = null;
 
 	protected String origid = null;
 
 	protected double euklideanDist;
-
-	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -97,21 +88,25 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		double bx = zx-fx;        double by = zy-fy;
 		double la2 = ax*ax + ay*ay;
 		double lb2 = bx*bx + by*by;
-		if (la2 == 0.0) { return Math.sqrt(lb2); } // from == to
+		if (la2 == 0.0) {  // from == to
+			return Math.sqrt(lb2);
+		}
 		double xla = ax*bx+ay*by; // scalar product
-		if (xla <= 0.0) { return Math.sqrt(lb2); }
-		else if (xla >= la2) {
+		if (xla <= 0.0) {
+			return Math.sqrt(lb2);
+		}
+		if (xla >= la2) {
 			double cx = zx-tx;
 			double cy = zy-ty;
-			return Math.sqrt(cx*cx+cy*cy); }
-		else { // lb2-xla*xla/la2 = lb*lb-x*x
-			double tmp = xla*xla;
-			tmp = tmp/la2;
-			tmp = lb2 - tmp;
-			// tmp can be slightly negativ, likely due to rounding errors (coord lies on the link!). Therefore, use at least 0.0
-			tmp = Math.max(0.0, tmp);
-			return Math.sqrt(tmp);
+			return Math.sqrt(cx*cx+cy*cy);
 		}
+		// lb2-xla*xla/la2 = lb*lb-x*x
+		double tmp = xla*xla;
+		tmp = tmp/la2;
+		tmp = lb2 - tmp;
+		// tmp can be slightly negativ, likely due to rounding errors (coord lies on the link!). Therefore, use at least 0.0
+		tmp = Math.max(0.0, tmp);
+		return Math.sqrt(tmp);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -144,13 +139,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		return this.type;
 	}
 
-	public final Object getRole(final int idx) {
-		if (idx < this.roles.size() ) {
-			return this.roles.get(idx);
-		}
-		return null;
-	}
-
 	public final double getEuklideanDistance() {
 		return this.euklideanDist;
 	}
@@ -161,17 +149,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 
 	public final void setOrigId(final String id) {
 		this.origid = id;
-	}
-
-	public final void setRole(final int idx, final Object role) {
-		if (idx > this.roles.size()) {
-			this.roles.resize(idx+1);
-		}
-		this.roles.set(idx, role);
-	}
-
-	public void setMaxRoleIndex(final int index) {
-		this.roles.resize(index+1);
 	}
 
 	public void setType(final String type) {

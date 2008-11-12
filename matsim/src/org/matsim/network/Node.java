@@ -29,7 +29,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.misc.ResizableArray;
 
 public class Node extends BasicNodeImpl implements Comparable<Node> {
 
@@ -60,7 +59,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	 * inheritance would make more sense. topo_type is calculated by
 	 * org.matsim.network.algorithms.NetworkCalcTopoType */
 	private int topoType = Integer.MIN_VALUE;
-	private final ResizableArray<Object> roles = new ResizableArray<Object>(5);
 
 	private final static Logger log = Logger.getLogger(Node.class);
 
@@ -122,17 +120,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 		}
 		this.outlinks.put(linkid, outlink);
 		return true;
-	}
-
-	public final void setRole(final int idx, final Object role) {
-		if (idx > this.roles.size()) {
-			this.roles.resize(idx+1);
-		}
-		this.roles.set(idx, role);
-	}
-
-	protected final void setMaxRoleIndex(final int index) {
-		this.roles.resize(index+1);
 	}
 
 	public final void setOrigId(final String id) {
@@ -204,11 +191,6 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 
 	public int getTopoType() {
 		return this.topoType;
-	}
-
-	public final Object getRole(final int idx) {
-		if (idx < this.roles.size() ) return this.roles.get(idx);
-		return null;
 	}
 
 	@Override

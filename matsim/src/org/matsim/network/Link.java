@@ -18,8 +18,6 @@ public interface Link extends BasicLink, Location {
 
 	public String getType();
 
-	public Object getRole(final int idx);
-
 	/** @return Returns the euklidean distance between from- and to-node. */
 	public double getEuklideanDistance();
 
@@ -33,9 +31,6 @@ public interface Link extends BasicLink, Location {
 	 */
 	public double getFlowCapacity(double time);
 
-	public void setRole(final int idx, final Object role);
-
-	public void setMaxRoleIndex(final int index);
 	/**
 	 * Get the the freespeed travel time on this links in seconds.
 	 * @param time
