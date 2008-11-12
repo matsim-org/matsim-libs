@@ -554,45 +554,6 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	// ////////////////////////////////////////////////////////////////////
 
 	/**
-	 * returns the index to access roles on nodes of this network
-	 *
-	 * @return the index to access set and get a role on nodes of this network
-	 * @deprecated please use a Map yourself to match the role-data to the nodes
-	 */
-	public final synchronized int requestNodeRole() {
-		// first, check if there is an empty space somewhere
-		int index = this.nodeRoles.indexOf(Integer.valueOf(-1));
-		if (index == -1) {
-			// nope, no empty slot found, so add a new
-			index = this.nodeRoles.size();
-			this.nodeRoles.add(Integer.valueOf(index));
-			if (index > this.maxNodeRoleIndex) {
-				int newMax = (int) (1.2 * index) + 1;
-				for (Node node : this.nodes.values()) {
-					node.setMaxRoleIndex(newMax);
-				}
-				this.maxNodeRoleIndex = newMax;
-			}
-		} else {
-			this.nodeRoles.set(index, Integer.valueOf(index));
-		}
-		return index;
-	}
-
-	/**
-	 * @param roleIndex
-	 * @deprecated
-	 */
-	public final synchronized void releaseNodeRole(final int roleIndex) {
-		// clear all stored roles
-		for (Node node : this.nodes.values()) {
-			node.setRole(roleIndex, null);
-		}
-		// clear the index
-		this.nodeRoles.set(roleIndex, Integer.valueOf(-1));
-	}
-
-	/**
 	 * returns the index to access roles on links of this network
 	 *
 	 * @return the index to access set and get a role on links of this network
