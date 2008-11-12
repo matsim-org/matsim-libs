@@ -65,5 +65,6 @@ public interface PopulationSchemaV5Names {
 	public static String TRAVELCARD = "travelcard";
 	public static String FISCALHOUSEHOLDID = "fiscalHouseholdId";
 	public static String SWISSTRAVELCARD = "swissTravelCard";
+	public static String SCORE = "score";
 	
 }
