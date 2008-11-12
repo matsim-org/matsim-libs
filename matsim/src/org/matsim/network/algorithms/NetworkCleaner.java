@@ -21,8 +21,10 @@
 package org.matsim.network.algorithms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,13 +38,11 @@ import org.matsim.network.Node;
  * is not possible to reach all other links, are removed from the network.
  * Nodes with no incoming or outgoing links are removed as well from the 
  * network.
+ * 
+ * @author mrieser
+ * @author balmermi
  */
 public class NetworkCleaner {
-
-	private final TreeMap<Id, Node> visitedNodes = new TreeMap<Id, Node>();
-	private TreeMap<Id, Node> biggestCluster = new TreeMap<Id, Node>();
-	private NetworkLayer network = null;
-	private int roleIndex;
 	
 	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 
@@ -52,24 +52,19 @@ public class NetworkCleaner {
 	 * and from where it is also possible to return again to <code>startNode</code>.
 	 *
 	 * @param startNode the node to start building the cluster
+	 * @param network the network the startNode is part of
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private TreeMap<Id, Node> findCluster(Node startNode) {
+	private Map<Id, Node> findCluster(final Node startNode, final NetworkLayer network) {
 
-		for (Node node : this.network.getNodes().values()) {
-			DoubleFlagRole r = (DoubleFlagRole)node.getRole(this.roleIndex);
-			if (null != r) {
-				r.backwardFlag = false;
-				r.forwardFlag = false;
-			}
-		}
+		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
 
 		ArrayList<Node> pendingForward = new ArrayList<Node>();
 		ArrayList<Node> pendingBackward = new ArrayList<Node>();
 
 		TreeMap<Id, Node> clusterNodes = new TreeMap<Id, Node>();
 		clusterNodes.put(startNode.getId(), startNode);
-		DoubleFlagRole r = getDoubleFlag(startNode);
+		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;
 		r.backwardFlag = true;
 
@@ -81,7 +76,7 @@ public class NetworkCleaner {
 			int idx = pendingForward.size() - 1;
 			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Node node : currNode.getOutNodes().values()) {
-				r = getDoubleFlag(node);
+				r = getDoubleFlag(node, nodeRoles);
 				if (!r.forwardFlag) {
 					r.forwardFlag = true;
 					pendingForward.add(node);
@@ -94,7 +89,7 @@ public class NetworkCleaner {
 			int idx = pendingBackward.size()-1;
 			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
 			for (Node node : currNode.getInNodes().values()) {
-				r = getDoubleFlag(node);
+				r = getDoubleFlag(node, nodeRoles);
 				if (!r.backwardFlag) {
 					r.backwardFlag = true;
 					pendingBackward.add(node);
@@ -109,9 +104,10 @@ public class NetworkCleaner {
 		return clusterNodes;
 	}
 
-	public void run(NetworkLayer network) {
-		this.network = network;
-		this.roleIndex = network.requestNodeRole();
+	public void run(final NetworkLayer network) {
+		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
+		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
+
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
 		// search the biggest cluster of nodes in the network
@@ -121,19 +117,19 @@ public class NetworkCleaner {
 		Iterator<? extends Node> iter = network.getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
 			Node startNode = iter.next();
-			if (!this.visitedNodes.containsKey(startNode.getId())) {
-				TreeMap<Id, Node> cluster = this.findCluster(startNode);
-				this.visitedNodes.putAll(cluster);
-				if (cluster.size() > this.biggestCluster.size()) {
-					this.biggestCluster = cluster;
-					if (this.biggestCluster.size() >= (network.getNodes().size() - this.visitedNodes.size())) {
+			if (!visitedNodes.containsKey(startNode.getId())) {
+				Map<Id, Node> cluster = this.findCluster(startNode, network);
+				visitedNodes.putAll(cluster);
+				if (cluster.size() > biggestCluster.size()) {
+					biggestCluster = cluster;
+					if (biggestCluster.size() >= (network.getNodes().size() - visitedNodes.size())) {
 						// stop searching here, because we cannot find a bigger cluster in the lasting nodes
 						stillSearching = false;
 					}
 				}
 			}
 		}
-		log.info("    The biggest cluster consists of " + this.biggestCluster.size() + " nodes.");
+		log.info("    The biggest cluster consists of " + biggestCluster.size() + " nodes.");
 		log.info("  done.");
 
 		/* Reducing the network so it only contains nodes included in the biggest Cluster.
@@ -141,7 +137,7 @@ public class NetworkCleaner {
 		 */
 		List<Node> allNodes2 = new ArrayList<Node>(network.getNodes().values());
 		for (Node node : allNodes2) {
-			if (!this.biggestCluster.containsKey(node.getId())) {
+			if (!biggestCluster.containsKey(node.getId())) {
 				network.removeNode(node);		// removeNode takes care of removing links too in the network
 			}
 		}
@@ -150,22 +146,18 @@ public class NetworkCleaner {
 		log.info("done.");
 	}
 
-	private DoubleFlagRole getDoubleFlag(Node n) {
-		DoubleFlagRole r = (DoubleFlagRole)n.getRole(this.roleIndex);
+	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
+		DoubleFlagRole r = nodeRoles.get(n);
 		if (null == r) {
 			r = new DoubleFlagRole();
-			n.setRole(this.roleIndex, r);
+			nodeRoles.put(n, r);
 		}
 		return r;
 	}
 
-	static private class DoubleFlagRole {
+	static class DoubleFlagRole {
 		protected boolean forwardFlag = false;
 		protected boolean backwardFlag = false;
-		
-		public DoubleFlagRole() {
-			// make constructor public in private class
-		}
 	}
 
 }
