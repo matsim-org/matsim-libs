@@ -56,13 +56,13 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	private final TravelCost costFunction;
+	private final TravelCost costFunction; //TODO use
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and
 	 * time step. This is ignored.
 	 */
-	private final TravelTime timeFunction;
+	private final TravelTime timeFunction; //TODO use
 	
 	/**
 	 * Datastructure to to represent the flow on a network  
@@ -75,27 +75,27 @@ public class BellmanFordVertexIntervalls {
 	private HashMap<Node, VertexIntervalls> _labels;
 	
 	/**
-	 * 
+	 *TODO 
 	 */
 	private Flow _flow;
 
 	/**
-	 * 
+	 * TODO
 	 */
 	private final int _timehorizon;
 	
 	/**
-	 * 
+	 * TODO
 	 */
 	private final Node _sink;
 
 	/**
-	 * 
+	 * TODO
 	 */
 	final FakeTravelTimeCost length = new FakeTravelTimeCost();
 	
 	/**
-	 * 
+	 * TODO
 	 */
 	private static boolean _debug=false;
 
@@ -126,7 +126,7 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @param costFunction
 	 * @param timeFunction
 	 * @param flow
@@ -153,7 +153,7 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @return
 	 */
 	private LinkedList<Node> refreshLabels(){
@@ -170,7 +170,7 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @param node
 	 * @return
 	 */
@@ -182,7 +182,7 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @return
 	 */
 	private Path constructRoute()throws BFException{
@@ -203,7 +203,7 @@ public class BellmanFordVertexIntervalls {
 		VertexIntervall tolabel = tolabels.getIntervallAt(totime);
 		while(tolabel.getPredecessor()!=null){
 			Link edge = tolabel.getPredecessor();
-			//findout weather forward or backwards edge is used
+			//find out weather forward or backwards edge is used
 			boolean forward;
 			if(edge.getFromNode().equals(to)){
 				forward = false;
@@ -237,10 +237,10 @@ public class BellmanFordVertexIntervalls {
 	
 	/**
 	 * method for updating the labels of Node to
-	 * @param from Node from wich we start
+	 * @param from Node from which we start
 	 * @param to Node to which we want to go 
 	 * @param over Link upon which we travel
-	 * @param forward indicates, weather we use a forwar or backwards edge
+	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return true if any label of Node to has changed
 	 */
 	private boolean relabel(Node from, Node to, Link over,boolean forward){
@@ -279,7 +279,7 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * 
+	 * TODO
 	 * @return
 	 */
 	public Path doCalculations() {
@@ -335,7 +335,7 @@ public class BellmanFordVertexIntervalls {
 	}
 
 	/**
-	 * 
+	 * TODO
 	 *
 	 */
 	private void printStatus() {

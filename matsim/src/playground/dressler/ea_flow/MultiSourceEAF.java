@@ -114,7 +114,7 @@ public class MultiSourceEAF {
 			Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(travelcost, traveltime,fluss);
 			BellmanFordVertexIntervalls.debug(true);
-			for (int i=0; i<20; i++){
+			for (int i=0; i<20000; i++){
 				result = routingAlgo.doCalculations();
 				if (result==null){
 					break;

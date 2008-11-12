@@ -47,16 +47,15 @@ public class Flow {
 	private final NetworkLayer _network;
 	
 	/**
-	 * Edgerepresentation of flow on the network  
+	 * Edge representation of flow on the network  
 	 */
 	private HashMap<Link, EdgeIntervalls> _flow;
 	
 	/**
-	 * Pathrepresentation of flow on the network
+	 * Path representation of flow on the network
 	 */
 	private LinkedList<Path> _paths;
 	
-
 	/**
 	 * list of all sources
 	 */
@@ -99,7 +98,7 @@ public class Flow {
 	 * @param network network on which the flow will "live"
 	 * @param sources the potential sources of the flow		
 	 * @param demands the demands in the sources as nonnegative integers
-	 * @param sink the sink for al the flow
+	 * @param sink the sink for all the flow
 	 * @param horizon the timehorizon in which flow is admittable
 	 */
 	public Flow(final NetworkLayer network,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
@@ -107,7 +106,7 @@ public class Flow {
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			int l = (int)link.getLength()/(int)link.getFreespeed(1.); // TODO
+			int l = (int)link.getLength()/(int)link.getFreespeed(1.); // TODO Costfunktion
 			this._flow.put(link, new EdgeIntervalls(l));
 			//TODO achtung cast von double auf int
 		}
@@ -121,7 +120,7 @@ public class Flow {
 	}
 	
 	/**
-	 * Constructor for flow wich uses an already defined flow 
+	 * Constructor for flow which uses an already defined flow 
 	 * @param network network on which the flow will "live"
 	 * @param flow the preset flow on the network
 	 * @param sources the potential sources of the flow
@@ -249,7 +248,7 @@ public class Flow {
 	}
 	
 	/**
-	 * decides wheather a Node is an nonactive Source
+	 * decides whether a Node is an nonactive Source
 	 * @param node Node to check for	
 	 * @return true iff node is a Source with demand 0
 	 */
