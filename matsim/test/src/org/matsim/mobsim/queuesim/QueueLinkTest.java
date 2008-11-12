@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -38,7 +37,6 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class QueueLinkTest extends MatsimTestCase {
 
-	private NetworkLayer network = null;
 	private Link link = null;
 	private QueueNetwork queueNetwork = null;
 	private QueueLink qlink = null;
@@ -46,21 +44,20 @@ public class QueueLinkTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.network = new NetworkLayer();
-		this.network.setCapacityPeriod(1.0);
-		this.network.createNode("1", "0", "0", null);
-		this.network.createNode("2", "1", "0", null);
-		this.link = this.network.createLink("1", "1", "2", "1", "1",
+		NetworkLayer network = new NetworkLayer();
+		network.setCapacityPeriod(1.0);
+		network.createNode("1", "0", "0", null);
+		network.createNode("2", "1", "0", null);
+		this.link = network.createLink("1", "1", "2", "1", "1",
 				"1", "1", null, null);
 		super.loadConfig(null);
-		this.queueNetwork = new QueueNetwork(this.network);
+		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		this.network = null;
 		this.link = null;
 		this.queueNetwork = null;
 		this.qlink = null;

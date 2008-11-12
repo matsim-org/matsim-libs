@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.integration;
 
 import org.matsim.basic.v01.IdImpl;
@@ -34,16 +34,14 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
-
 /**
  * @author dgrether
- *
  */
 public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	private double agent1LeaveHomeTime, agent2LeaveHomeTime;
 
-	private EventsToScore planScorer;
+	/*package*/ EventsToScore planScorer;
 
 	/**
 	 * @see org.matsim.testcases.MatsimTestCase#setUp()
@@ -220,9 +218,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		}
 
-
-	};
-
-
+	}
 
 }

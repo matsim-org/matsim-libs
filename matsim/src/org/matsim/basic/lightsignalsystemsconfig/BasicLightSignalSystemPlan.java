@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.lightsignalsystemsconfig;
 
 import java.util.HashMap;
@@ -24,10 +24,8 @@ import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicLightSignalSystemPlan {
 
@@ -61,17 +59,14 @@ public class BasicLightSignalSystemPlan {
 		}
 		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
 	}
-
 	
 	public double getStartTime() {
 		return startTime;
 	}
-
 	
 	public double getEndTime() {
 		return endTime;
 	}
-
 	
 	public Map<Id, BasicLightSignalGroupConfiguration> getGroupConfigs() {
 		return groupConfigs;
@@ -85,17 +80,12 @@ public class BasicLightSignalSystemPlan {
 		this.syncronizationOffset = seconds;
 	}
 
-	
 	public Double getSyncronizationOffset() {
 		return syncronizationOffset;
 	}
 
-	
 	public Double getCirculationTime() {
 		return circulationTime;
 	}
-	
-	
-	
 
 }

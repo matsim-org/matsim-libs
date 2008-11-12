@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -43,10 +42,8 @@ import org.matsim.basic.xml.lightsignalsystems.XMLLightSignalSystems;
 import org.matsim.basic.xml.lightsignalsystems.XMLMatsimTimeAttributeType;
 import org.matsim.utils.io.IOUtils;
 
-
 /**
  * @author dgrether
- *
  */
 public class MatsimLightSignalSystemsWriter {
 	

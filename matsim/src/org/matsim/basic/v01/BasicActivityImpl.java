@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.HashMap;
@@ -27,10 +27,8 @@ import java.util.TreeSet;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicActivityImpl implements BasicActivity {
 	
@@ -71,7 +69,6 @@ public class BasicActivityImpl implements BasicActivity {
 	public SortedSet<BasicOpeningTime> getOpeningTime(DayType day) {
 		return this.openingTimes.get(day);
 	}
-	
 
 	public void addOpeningTime(BasicOpeningTime openingTime) {
 		DayType day = openingTime.getDay();
@@ -92,10 +89,5 @@ public class BasicActivityImpl implements BasicActivity {
 	public void setLocation(BasicLocation location) {
 		this.location = location;
 	}
-
-
-	
-	
-	
 
 }

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lightsignalsystems;
 
 import org.matsim.basic.lightsignalsystems.BasicLane;
@@ -28,13 +28,10 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
- *
  */
 public class LightSignalSystemsReaderTest extends MatsimTestCase {
-
 
   private static final String TESTXML  = "testLightSignalSystems.xml";
   
@@ -86,20 +83,20 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	BasicLane lane = l2la.getLanes().get(0);
   	assertEquals(id3, lane.getId());
   	assertEquals(id1, lane.getToLinkIds().get(0));
-  	assertEquals(45.0, lane.getLength());
+  	assertEquals(45.0, lane.getLength(), EPSILON);
   	assertEquals(1, lane.getNumberOfRepresentedLanes());
   	lane = l2la.getLanes().get(1);
   	assertEquals(id5, lane.getId());
-  	assertEquals(60.0, lane.getLength());
+  	assertEquals(60.0, lane.getLength(), EPSILON);
   	assertEquals(2, lane.getNumberOfRepresentedLanes());	
   	
   	BasicLightSignalSystemDefinition lssd;
   	lssd = lss.getLightSignalSystemDefinitions().get(0);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
-  	assertEquals(60.0, lssd.getDefaultCirculationTime());
-  	assertEquals(5.0, lssd.getDefaultSyncronizationOffset());
-  	assertEquals(3.0, lssd.getDefaultInterimTime());
+  	assertEquals(60.0, lssd.getDefaultCirculationTime(), EPSILON);
+  	assertEquals(5.0, lssd.getDefaultSyncronizationOffset(), EPSILON);
+  	assertEquals(3.0, lssd.getDefaultInterimTime(), EPSILON);
   	
   	BasicLightSignalGroupDefinition lsgd;
   	lsgd = lss.getLightSignalGroupDefinitions().get(1);
@@ -111,7 +108,5 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(id1, lsgd.getToLinkIds().get(0));
   	assertEquals(id2, lsgd.getToLinkIds().get(1));
   }
-  
- 
 
 }

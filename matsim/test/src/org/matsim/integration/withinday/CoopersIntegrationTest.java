@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.integration.withinday;
 
 import org.matsim.config.Config;
@@ -32,10 +32,10 @@ import org.matsim.withinday.coopers.CoopersControler;
  * network, items which are covered by the different test methods.
  * All tests use the ControlInputSB prediction model.
  * Tests for real time
+ * 
  * @author dgrether
  * @see org.matsim.integration.withinday.CoopersBerlinIntegrationTest for tests with a large scale network 
  * that are using the ControlInputMB prediction model too.
- *
  */
 public class CoopersIntegrationTest extends MatsimTestCase {
 

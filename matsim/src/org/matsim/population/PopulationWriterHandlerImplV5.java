@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population;
 
 import java.io.BufferedWriter;
@@ -33,10 +33,8 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
-
 /**
  * @author dgrether
- *
  */
 public class PopulationWriterHandlerImplV5 extends MatsimXmlWriter implements PopulationWriterHandler {
 
@@ -286,6 +284,5 @@ public class PopulationWriterHandlerImplV5 extends MatsimXmlWriter implements Po
 	}
 	public void endParam(BufferedWriter out) throws IOException {
 	}
-
 
 }

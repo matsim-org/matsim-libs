@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.interfaces.basic.v01;
 
 import java.util.List;
 
 import org.matsim.basic.v01.Id;
 
-
 /**
  * @author dgrether
- *
  */
 public interface HouseholdBuilder {
 
-	
 	public List<BasicHousehold> getHouseholds();
 
 	public BasicHousehold createHousehold(Id householdId,

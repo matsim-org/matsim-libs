@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population.algorithms;
 
 import java.util.HashSet;
@@ -24,17 +24,15 @@ import java.util.Set;
 
 import org.matsim.population.Plan;
 
-
 /**
  * @author dgrether
- *
  */
 public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 
 	private Set<Plan> plans;
 
 	public PlanCollectFromAlgorithm() {
-		this.plans = new HashSet();
+		this.plans = new HashSet<Plan>();
 	}
 
 	/**
@@ -44,7 +42,6 @@ public class PlanCollectFromAlgorithm implements PlanAlgorithm {
 	public void run(Plan plan) {
 		this.plans.add(plan);
 	}
-
 
 	public Set<Plan> getPlans() {
 		return this.plans;

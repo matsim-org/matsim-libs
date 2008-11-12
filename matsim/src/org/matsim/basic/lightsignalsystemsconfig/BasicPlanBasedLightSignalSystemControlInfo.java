@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.lightsignalsystemsconfig;
 
 import java.util.HashMap;
@@ -24,15 +24,12 @@ import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicPlanBasedLightSignalSystemControlInfo implements BasicLightSignalSystemControlInfo {
 
 	private Map<Id, BasicLightSignalSystemPlan> plans;
-
 	
 	public Map<Id, BasicLightSignalSystemPlan> getPlans() {
 		return plans;

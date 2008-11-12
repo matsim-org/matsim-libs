@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.network.filter;
 
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 
-
 /**
  * Implement this interface to filter the nodes of a network
  * using the NetworkFilterManager.
+ * 
  * @author dgrether
- *
  */
 public interface NetworkNodeFilter {
 

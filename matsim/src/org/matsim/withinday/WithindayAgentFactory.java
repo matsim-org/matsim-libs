@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.withinday;
 
 import org.matsim.config.groups.WithindayConfigGroup;
@@ -24,11 +24,10 @@ import org.matsim.mobsim.queuesim.AgentFactory;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.population.Person;
 
-
 /**
  * Factory for withinday replanning agents
+ * 
  * @author dgrether
- *
  */
 public class WithindayAgentFactory extends AgentFactory {
 	
@@ -52,6 +51,5 @@ public class WithindayAgentFactory extends AgentFactory {
 		agent.setReplanningThreshold(this.withindayConfigGroup.getContentmentThreshold());
 		return agent;
 	}
-	
-	
+
 }

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population;
 
 import java.util.ArrayList;
@@ -28,10 +28,8 @@ import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.population.Household;
 
-
 /**
  * @author dgrether
- *
  */
 public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
@@ -40,7 +38,6 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 	public HouseholdImpl(Id id) {
 		super(id);
 	}
-
 	
 	public void addMember(Person member) {
 		if (this.members == null) {
@@ -58,21 +55,14 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		return new ArrayList<Id>(this.members.keySet());
 	}
 	
-	
 	@Override
 	public void setMemberIds(List<Id> members) {
 		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
 				"Use method addMember(Person p) instead!");
 	}
 	
-	
-	/**
-	 * @see org.matsim.interfaces.population.Household#getMembers()
-	 */
 	public Map<Id, Person> getMembers() {
 		return this.members;
 	}
-
-
 
 }

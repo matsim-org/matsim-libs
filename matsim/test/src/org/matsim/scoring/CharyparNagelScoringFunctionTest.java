@@ -87,7 +87,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		Link link3 = this.network.createLink("3", "3", "4", "500", "25", "3600", "1", null, null);
 		this.network.createLink("4", "4", "5", "5000", "50", "3600", "1", null, null);
 		Link link5 = this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
-		Gbl.getWorld().setNetworkLayer(this.network);
+		Gbl.createWorld().setNetworkLayer(this.network);
 
 		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = this.person.createPlan(true);

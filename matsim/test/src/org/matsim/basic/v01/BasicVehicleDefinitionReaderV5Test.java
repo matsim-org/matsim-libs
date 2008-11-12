@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.ArrayList;
@@ -26,10 +26,8 @@ import java.util.Map;
 
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicVehicleDefinitionReaderV5Test extends MatsimTestCase {
 
@@ -54,23 +52,23 @@ public class BasicVehicleDefinitionReaderV5Test extends MatsimTestCase {
 		assertEquals(2, vehicleTypes.size());
 		BasicVehicleType vehType = vehicleTypes.get("normalCar");
 		assertNotNull(vehType);
-		assertEquals(9.5, vehType.getLength());
-		assertEquals(3.0, vehType.getWidth());
-		assertEquals(42.0, vehType.getMaximumVelocity());
+		assertEquals(9.5, vehType.getLength(), EPSILON);
+		assertEquals(3.0, vehType.getWidth(), EPSILON);
+		assertEquals(42.0, vehType.getMaximumVelocity(), EPSILON);
 		assertNotNull(vehType.getCapacity());
 		assertEquals(5, vehType.getCapacity().getSeats());
 		assertEquals(20, vehType.getCapacity().getStandingRoom());
 		assertNotNull(vehType.getCapacity().getFreightCapacity());
-		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume());
+		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(BasicEngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
-		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption());
+		assertEquals(0.23, vehType.getEngineInformation().getGasConsumption(), EPSILON);
 		
 		vehType = vehicleTypes.get("defaultValueCar");
 		assertNotNull(vehType);
-		assertEquals(7.5, vehType.getLength());
-		assertEquals(1.0, vehType.getWidth());
-		assertEquals(1.0, vehType.getMaximumVelocity());
+		assertEquals(7.5, vehType.getLength(), EPSILON);
+		assertEquals(1.0, vehType.getWidth(), EPSILON);
+		assertEquals(1.0, vehType.getMaximumVelocity(), EPSILON);
 		assertNull(vehType.getCapacity());
 	
 		assertNotNull(vehicles);

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lightsignalsystems;
 
 import java.io.FileNotFoundException;
@@ -46,18 +46,13 @@ import org.matsim.utils.io.IOUtils;
 
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 
-
 /**
  * @author dgrether
- *
  */
 public class MatsimLightSignalSystemConfigurationWriter {
 
-	
 	private List<BasicLightSignalSystemConfiguration> blssconfs;
 	private XMLLightSignalSystemConfig xmllssconfig;
-
-
 
 	public MatsimLightSignalSystemConfigurationWriter(List<BasicLightSignalSystemConfiguration> basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
@@ -163,16 +158,14 @@ public class MatsimLightSignalSystemConfigurationWriter {
 	private XMLGregorianCalendar getXmlGregorianCalendar(double seconds) {
 		XMLGregorianCalendar time = new XMLGregorianCalendarImpl();
 		int s = (int) seconds;
-		int h = (int)(s / 3600);
+		int h = (s / 3600);
 		s = s % 3600;
-		int m = (int)(s / 60);
+		int m = (s / 60);
 		s = s % 60;
 		time.setSecond(s);
 		time.setMinute(m);
 		time.setHour(h);
 		return time;
 	}
-	
-	
 	
 }

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.lightsignalsystems;
 
 import java.util.ArrayList;
@@ -30,10 +30,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
- *
  */
 public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 
@@ -83,16 +81,16 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		BasicLightSignalSystemPlan plan =   controlInfo.getPlans().get(id5);
 		assertNotNull(plan);
 		assertEquals(id5, plan.getId());
-		assertEquals(0.0, plan.getStartTime());
-		assertEquals(0.0, plan.getEndTime());
+		assertEquals(0.0, plan.getStartTime(), EPSILON);
+		assertEquals(0.0, plan.getEndTime(), EPSILON);
 		assertEquals(40.0, plan.getCirculationTime());
 		assertEquals(3.0, plan.getSyncronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
 		BasicLightSignalGroupConfiguration groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
-		assertEquals(0.0, groupConfig.getRoughCast());
-		assertEquals(45.0, groupConfig.getDropping());
+		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
+		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
 		assertEquals(2.0, groupConfig.getInterimTimeRoughcast());
 		assertEquals(3.0, groupConfig.getInterimTimeDropping());
 		
@@ -105,19 +103,17 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		plan =   controlInfo.getPlans().get(id8);
 		assertNotNull(plan);
 		assertEquals(id8, plan.getId());
-		assertEquals(0.0, plan.getStartTime());
-		assertEquals(0.0, plan.getEndTime());
+		assertEquals(0.0, plan.getStartTime(), EPSILON);
+		assertEquals(0.0, plan.getEndTime(), EPSILON);
 		assertNull(plan.getCirculationTime());
 		assertNull(plan.getSyncronizationOffset());
 		assertEquals(1, plan.getGroupConfigs().size());
 		groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
-		assertEquals(0.0, groupConfig.getRoughCast());
-		assertEquals(45.0, groupConfig.getDropping());
+		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
+		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
 		assertNull(groupConfig.getInterimTimeRoughcast());
 		assertNull(groupConfig.getInterimTimeDropping());
-		
-	}
-  
+	}  
 	
 }

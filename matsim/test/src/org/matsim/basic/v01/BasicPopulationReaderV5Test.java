@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -117,8 +116,8 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertEquals(true, activity.getLocation().isFacilityId());
 		assertEquals(new Integer(40), activity.getCapacity());
 		assertNotNull(activity.getOpeningTime(DayType.wk));
-		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime());
-		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime());
+		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime(), EPSILON);
+		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime(), EPSILON);
 
 		activity = knowledge.getActivities().get(1);
 		assertNotNull(activity);

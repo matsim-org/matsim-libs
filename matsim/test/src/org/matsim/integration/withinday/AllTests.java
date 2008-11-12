@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.integration.withinday;
 
 import junit.framework.Test;
@@ -24,14 +24,12 @@ import junit.framework.TestSuite;
 
 import org.matsim.testcases.TestDepth;
 
-
 /**
  * @author dgrether
- *
  */
 public class AllTests {
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.integration.withinday");
+		TestSuite suite = new TestSuite("Tests for org.matsim.integration.withinday");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(CoopersIntegrationTest.class);
 

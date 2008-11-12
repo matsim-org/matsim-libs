@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.List;
@@ -24,10 +24,8 @@ import java.util.List;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.HouseholdBuilder;
 
-
 /**
  * @author dgrether
- *
  */
 public class BasicHouseholdBuilder implements HouseholdBuilder {
 
@@ -40,7 +38,6 @@ public class BasicHouseholdBuilder implements HouseholdBuilder {
 	public List<BasicHousehold> getHouseholds() {
 		return this.households;
 	}
-
 
 	public BasicHouseholdImpl createHousehold(Id householdId,
 			List<Id> membersPersonIds, List<Id> vehicleIds) {

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.lightsignalsystems;
 
 import java.util.ArrayList;
@@ -28,17 +28,16 @@ import org.matsim.trafficlights.control.SignalSystemControler;
 
 /**
  * @author dgrether
- *
  */
 public class BasicLightSignalGroupDefinition {
   
-	private Id id;
+	private final Id id;
 	private Id lightSignalSystemDefinitionId;
 	private List<Id> laneIds;
 	private List<Id> toLinkIds;
-	private Id linkRefId;
+	private final Id linkRefId;
 	
-	private SignalSystemControler signalSystemControler;
+	private SignalSystemControler signalSystemControler = null;
 
 	public BasicLightSignalGroupDefinition(Id linkRefId, Id id) {
 		this.linkRefId = linkRefId;
@@ -49,38 +48,34 @@ public class BasicLightSignalGroupDefinition {
 		this.lightSignalSystemDefinitionId = id;
 	}
 
-	public void addLaneId(Id id) {
+	public void addLaneId(Id laneId) {
 		if (this.laneIds == null)
 			this.laneIds = new ArrayList<Id>();
-		this.laneIds.add(id);
+		this.laneIds.add(laneId);
 	}
 	
 	public Id getLinkRefId() {
 		return linkRefId;
 	}
 
-	public void addToLinkId(Id id) {
+	public void addToLinkId(Id linkId) {
 		if (this.toLinkIds == null)
 			this.toLinkIds = new ArrayList<Id>();
-		this.toLinkIds.add(id);
+		this.toLinkIds.add(linkId);
 	}
 
-	
 	public Id getId() {
 		return id;
 	}
 
-	
 	public Id getLightSignalSystemDefinitionId() {
 		return lightSignalSystemDefinitionId;
 	}
 
-	
 	public List<Id> getLaneIds() {
 		return laneIds;
 	}
 
-	
 	public List<Id> getToLinkIds() {
 		return toLinkIds;
 	}
@@ -92,9 +87,5 @@ public class BasicLightSignalGroupDefinition {
 	public boolean isGreen(){
 		return this.signalSystemControler.givenSignalGroupIsGreen(this);
 	}
-	
-	
-	
-	
 	
 }
