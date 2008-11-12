@@ -42,13 +42,11 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 
 	private Coord center = null;
 
-	private int roleIndex;
-
 	private final Rectangle2D.Double travelZone;
 
 	private static final Logger log = Logger.getLogger(LandmarkerPieSlices.class);
 
-	private final double zoneExpansion = 0.1;
+	private static final double ZONE_EXPANSION = 0.1;
 
 	LandmarkerPieSlices(final int landmarkCount, final Rectangle2D.Double travelZone) {
 		this.landmarks = new Node[landmarkCount];
@@ -63,7 +61,7 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		} else {
 			nodes = getNodesInTravelZone(network);
 		}
-		run(nodes, network.requestNodeRole());
+		run(nodes);
 	}
 
 	private Set<Node> getNodesInTravelZone(final NetworkLayer network) {
@@ -73,10 +71,10 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		double maxY = travelZone.getHeight() + minY;
 
 		// largen the zone...
-		maxX += (maxX - minX) * this.zoneExpansion;
-		minX -= (maxX - minX) * this.zoneExpansion;
-		maxY += (maxY - minY) * this.zoneExpansion;
-		minY -= (maxY - minY) * this.zoneExpansion;
+		maxX += (maxX - minX) * ZONE_EXPANSION;
+		minX -= (maxX - minX) * ZONE_EXPANSION;
+		maxY += (maxY - minY) * ZONE_EXPANSION;
+		minY -= (maxY - minY) * ZONE_EXPANSION;
 		Set<Node> resultNodes = new TreeSet<Node>();
 		for (Node n : network.getNodes().values()) {
 			if (n.getCoord().getX() <= maxX && n.getCoord().getX() >= minX
@@ -88,13 +86,12 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 		return resultNodes;
 	}
 
-	public void run(final Collection<? extends Node> nodes, final int roleIndex) {
-		this.roleIndex = roleIndex;
+	public void run(final Collection<? extends Node> nodes) {
 		this.center = getCenter(nodes);
 		putLandmarks(nodes, this.landmarks.length);
 	}
 
-	void putLandmarks(final Collection<? extends Node> nodes, final int landmarkCount) {
+	private void putLandmarks(final Collection<? extends Node> nodes, final int landmarkCount) {
 
 		ArrayList<ArrayList<Node>> sectors = new ArrayList<ArrayList<Node>>();
 
@@ -153,8 +150,6 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 				}
 				node = tmpNodes[k++];
 				sectors.get(angles.size()).add(node);
-				LandmarkerPieSlicesRole role = getLandmarkerRole(node);
-				role.setSectorIndex(i);
 			}
 			// Add the remaining nodes to the last sector
 			if (i == this.landmarks.length - 1) {
@@ -165,8 +160,6 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 					}
 					node = tmpNodes[k++];
 					sectors.get(angles.size()).add(node);
-					LandmarkerPieSlicesRole role = getLandmarkerRole(node);
-					role.setSectorIndex(i);
 				}
 			}
 			if (sectors.get(angles.size()).isEmpty()) {
@@ -278,15 +271,13 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 			double angle = Math.atan2(y, x) + Math.PI;
 			if (angle < sectorAngles[0] || angle > sectorAngles[1]) {
 				sector.remove(i);
-				LandmarkerPieSlicesRole r = getLandmarkerRole(node);
-				r.setSectorIndex(Integer.MIN_VALUE);
 			} else {
 				i++;
 			}
 		}
 	}
 
-	public Coord getCenter(final Collection<? extends Node> nodes) {
+	private Coord getCenter(final Collection<? extends Node> nodes) {
 		double[] bBox = NetworkUtils.getBoundingBox(nodes);
 		double maxX = bBox[0];
 		double minX = bBox[1];
@@ -301,42 +292,6 @@ class LandmarkerPieSlices extends NetworkAlgorithm {
 
 	public Node[] getLandmarks() {
 		return this.landmarks.clone();
-	}
-
-	private LandmarkerPieSlicesRole getLandmarkerRole(final Node n) {
-		LandmarkerPieSlicesRole r = (LandmarkerPieSlicesRole) n.getRole(this.roleIndex);
-
-		if (r == null) {
-			r = new LandmarkerPieSlicesRole();
-			n.setRole(this.roleIndex, r);
-		}
-		return r;
-	}
-
-	static class LandmarkerPieSlicesRole {
-		int sectorIndex = Integer.MIN_VALUE;
-
-		/**
-		 * @return the sectorIndex
-		 */
-		public int getSectorIndex() {
-			return this.sectorIndex;
-		}
-
-		/**
-		 * @param partitionIndex
-		 *            the partitionIndex to set
-		 */
-		public void setSectorIndex(final int partitionIndex) {
-			this.sectorIndex = partitionIndex;
-		}
-	}
-
-	/**
-	 * @return the middle
-	 */
-	public Coord getMiddle() {
-		return this.center;
 	}
 
 }

@@ -82,7 +82,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	/**
 	 * The network on which we find routes.
 	 */
-	final NetworkLayer network;
+	private final NetworkLayer network;
 
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
@@ -104,16 +104,10 @@ public class Dijkstra implements LeastCostPathCalculator {
 	private int iterationID = Integer.MIN_VALUE + 1;
 
 	/**
-	 * The role that contains the pre-process data this algorithm uses during
-	 * routing.
-	 */
-	int preProcRoleIndex = -1;
-
-	/**
 	 * Temporary field that is only used if dead ends are being pruned during
 	 * routing and is updated each time a new route has to be calculated.
 	 */
-	Node deadEndEntryNode;
+	private Node deadEndEntryNode;
 
 	/**
 	 * Determines whether we should mark nodes in dead ends during a
@@ -129,15 +123,17 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 	boolean doGatherInformation = false;
 
-	double avgRouteLength = 0;
+	private double avgRouteLength = 0;
 
-	double avgTravelTime = 0;
+	private double avgTravelTime = 0;
 
-	int routeCnt = 0;
+	private int routeCnt = 0;
 
-	int revisitNodeCount = 0;
+	private int revisitNodeCount = 0;
 
-	int visitNodeCount = 0;
+	private int visitNodeCount = 0;
+
+	private final PreProcessDijkstra preProcessData;
 
 	/**
 	 * Default constructor.
@@ -171,6 +167,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
+		this.preProcessData = preProcessData;
 
 		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.comparator = new ComparatorDijkstraCost(this.nodeData);
@@ -182,7 +179,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 				log.warn("Running without dead-end pruning.");
 			} else {
 				this.pruneDeadEnds = true;
-				this.preProcRoleIndex = preProcessData.roleIndex();
 			}
 		} else {
 			this.pruneDeadEnds = false;
@@ -210,7 +206,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		augmentIterationID();
 
 		if (this.pruneDeadEnds == true) {
-			this.deadEndEntryNode = getPreProcessRole(toNode).getDeadEndEntryNode();
+			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
 
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, this.comparator);
@@ -292,12 +288,12 @@ public class Dijkstra implements LeastCostPathCalculator {
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
 		double currCost = outData.getCost();
-		PreProcessDijkstra.DeadEndRole ddOutData = null;
+		PreProcessDijkstra.DeadEndData ddOutData = null;
 		if (this.pruneDeadEnds) {
-			ddOutData = getPreProcessRole(outNode);
+			ddOutData = getPreProcessData(outNode);
 			for (Link l : outNode.getOutLinks().values()) {
 				Node n = l.getToNode();
-				PreProcessDijkstra.DeadEndRole ddData = getPreProcessRole(n);
+				PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 
 				/* IF the current node n is not in a dead end
 				 * OR it is in the same dead end as the fromNode
@@ -435,7 +431,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Resets all nodes in the network as if they have not been visited yet if
 	 * the iterationID is equal to Integer.MIN_VALUE + 1.
 	 */
-	void checkToResetNetworkVisited() {
+	private void checkToResetNetworkVisited() {
 		// If the re-planning id passed the maximal possible value
 		// and has the same value as at the 'beginning', we reset all nodes of
 		// the network to avoid identifying a node falsely as visited for the
@@ -472,8 +468,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 		return r;
 	}
 
-	PreProcessDijkstra.DeadEndRole getPreProcessRole(final Node n) {
-		return (PreProcessDijkstra.DeadEndRole) n.getRole(this.preProcRoleIndex);
+	PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
+		return this.preProcessData.getNodeData(n);
 	}
 
 	/**
@@ -536,13 +532,13 @@ public class Dijkstra implements LeastCostPathCalculator {
 		}
 	}
 
-	public static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
+	static class ComparatorDijkstraCost implements Comparator<Node>, Serializable {
 
 		private static final long serialVersionUID = 1L;
 
 		protected Map<Id, ? extends DijkstraNodeData> nodeData;
 
-		public ComparatorDijkstraCost(final Map<Id, ? extends DijkstraNodeData> nodeData) {
+		ComparatorDijkstraCost(final Map<Id, ? extends DijkstraNodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 

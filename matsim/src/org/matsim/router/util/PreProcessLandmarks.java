@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
@@ -108,12 +109,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksRole r = (LandmarksRole) getRole(node);
+			LandmarksData r = (LandmarksData) getNodeData(node);
 			r.updateMinMaxTravelTimes();
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksRole r = (LandmarksRole) getRole(node);
+			LandmarksData r = (LandmarksData) getNodeData(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
 					log.info("Min > max for node " + node.getId() + " and landmark " + i);
@@ -124,25 +125,25 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 	}
 
-	void expandLandmark(final Node startNode, final int landmarkIndex) {
-		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(this.roleIndex, landmarkIndex);
+	private void expandLandmark(final Node startNode, final int landmarkIndex) {
+		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(this.nodeData, landmarkIndex);
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
-		LandmarksRole role = (LandmarksRole) getRole(startNode);
+		LandmarksData role = (LandmarksData) getNodeData(startNode);
 		role.setToLandmarkTravelTime(landmarkIndex, 0.0);
 		role.setFromLandmarkTravelTime(landmarkIndex, 0.0);
 		pendingNodes.add(startNode);
 		while (pendingNodes.isEmpty() == false) {
 			Node node = pendingNodes.poll();
-			double toTravTime = ((LandmarksRole) getRole(node)).getToLandmarkTravelTime(landmarkIndex);
+			double toTravTime = ((LandmarksData) getNodeData(node)).getToLandmarkTravelTime(landmarkIndex);
 			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(), toTravTime, false);
-			double fromTravTime = ((LandmarksRole) getRole(node)).getFromLandmarkTravelTime(landmarkIndex);
+			double fromTravTime = ((LandmarksData) getNodeData(node)).getFromLandmarkTravelTime(landmarkIndex);
 			expandLinks(landmarkIndex, pendingNodes, node.getOutLinks().values(), fromTravTime, true);
 		}
 	}
 
 	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
 			final Collection<? extends Link> links, final double travTime, final boolean expandFromLandmark) {
-		LandmarksRole role;
+		LandmarksData role;
 		Iterator<?> iter = links.iterator();
 		while (iter.hasNext()) {
 			Link l = (Link) iter.next();
@@ -153,7 +154,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 				n = l.getFromNode();
 			}
 			double linkTravTime = this.costFunction.getLinkMinimumTravelCost(l);
-			role = (LandmarksRole) getRole(n);
+			role = (LandmarksData) getNodeData(n);
 			double totalTravelTime = travTime + linkTravTime;
 			if (expandFromLandmark == true) {
 				if (role.getFromLandmarkTravelTime(landmarkIndex) > totalTravelTime) {
@@ -174,22 +175,21 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	DeadEndRole getRole(final Node n) {
-		LandmarksRole r = (LandmarksRole) n.getRole(this.roleIndex);
+	public DeadEndData getNodeData(final Node n) {
+		DeadEndData r = this.nodeData.get(n);
 		if (r == null) {
-			r = new LandmarksRole(this.landmarkCount);
-			n.setRole(this.roleIndex, r);
+			r = new LandmarksData(this.landmarkCount);
+			this.nodeData.put(n, r);
 		}
 		return r;
 	}
 
-	public class LandmarksRole extends DeadEndRole {
+	public class LandmarksData extends DeadEndData {
 
-		double[] landmarkTravelTime1;
+		private double[] landmarkTravelTime1;
+		private double[] landmarkTravelTime2;
 
-		double[] landmarkTravelTime2;
-
-		LandmarksRole(final int landmarkCount) {
+		LandmarksData(final int landmarkCount) {
 			this.landmarkTravelTime2 = new double[landmarkCount];
 			this.landmarkTravelTime1 = new double[landmarkCount];
 			for (int i = 0; i < this.landmarkTravelTime2.length; i++) {
@@ -220,7 +220,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			}
 		}
 
-		public void setTravelTimes(final int landmarkIndex, final double travelTime1,
+		private void setTravelTimes(final int landmarkIndex, final double travelTime1,
 				final double travelTime2) {
 			if (travelTime1 > travelTime2) {
 				this.landmarkTravelTime2[landmarkIndex] = travelTime1;
@@ -248,22 +248,21 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 *
 	 * @author lnicolas
 	 */
-	static public class LandmarksTravelTimeComparator implements Comparator<Node>, Serializable {
+	static class LandmarksTravelTimeComparator implements Comparator<Node>, Serializable {
 		private static final long serialVersionUID = 1L;
 
-		private final int roleIndex;
-
+		private final Map<Node, DeadEndData> roleData;
 		private final int landmarkIndex;
 
-		public LandmarksTravelTimeComparator(final int roleIndex, final int landmarkIndex) {
-			this.roleIndex = roleIndex;
+		protected LandmarksTravelTimeComparator(final Map<Node, DeadEndData> roleData, final int landmarkIndex) {
+			this.roleData = roleData;
 			this.landmarkIndex = landmarkIndex;
 		}
 
 		public int compare(final Node n1, final Node n2) {
 
-			double c1 = ((LandmarksRole) n1.getRole(this.roleIndex)).getToLandmarkTravelTime(this.landmarkIndex);
-			double c2 = ((LandmarksRole) n2.getRole(this.roleIndex)).getToLandmarkTravelTime(this.landmarkIndex);
+			double c1 = ((LandmarksData) this.roleData.get(n1)).getToLandmarkTravelTime(this.landmarkIndex);
+			double c2 = ((LandmarksData) this.roleData.get(n2)).getToLandmarkTravelTime(this.landmarkIndex);
 
 			if (c1 < c2) {
 				return -1;

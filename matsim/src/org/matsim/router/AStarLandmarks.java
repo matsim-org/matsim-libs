@@ -63,9 +63,9 @@ import org.matsim.utils.misc.Time;
  */
 public class AStarLandmarks extends AStarEuclidean {
 
-	int[] activeLandmarkIndexes;
+	private int[] activeLandmarkIndexes;
 
-	Node[] landmarks;
+	private final Node[] landmarks;
 
 	private static final int controlInterval = 40;
 	private int controlCounter = 0;
@@ -112,10 +112,6 @@ public class AStarLandmarks extends AStarEuclidean {
 		this.landmarks = preProcessData.getLandmarks();
 	}
 
-	/**
-	 * @see org.matsim.router.Dijkstra#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
-	 */
 	@Override
 	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		if (this.landmarks.length >= 2) {
@@ -150,10 +146,10 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param actLandmarkCount The number of active landmarks landmarks to
 	 * set.
 	 */
-	private void initializeActiveLandmarks(Node fromNode, Node toNode,
-			int actLandmarkCount) {
-		PreProcessLandmarks.LandmarksRole fromRole = getPreProcessRole(fromNode);
-		PreProcessLandmarks.LandmarksRole toRole = getPreProcessRole(toNode);
+	private void initializeActiveLandmarks(final Node fromNode, final Node toNode,
+			final int actLandmarkCount) {
+		final PreProcessLandmarks.LandmarksData fromData = getPreProcessData(fromNode);
+		final PreProcessLandmarks.LandmarksData toData = getPreProcessData(toNode);
 
 		// Sort the landmarks according to the accuracy of their
 		// distance estimation they yield
@@ -164,7 +160,7 @@ public class AStarLandmarks extends AStarEuclidean {
 		}
 		double tmpTravTime;
 		for (int i = 0; i < this.landmarks.length; i++) {
-			tmpTravTime = estimateRemainingTravelCost(fromRole, toRole, i);
+			tmpTravTime = estimateRemainingTravelCost(fromData, toData, i);
 			for (int j = 0; j < estTravelTimes.length; j++) {
 				if (tmpTravTime > estTravelTimes[j]) {
 					for (int k = estTravelTimes.length - 1; k > j; k--) {
@@ -180,11 +176,11 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	/**
-	 * @see org.matsim.router.Dijkstra#getPreProcessRole(org.matsim.network.Node)
+	 * @see org.matsim.router.Dijkstra#getPreProcessData(org.matsim.network.Node)
 	 */
 	@Override
-	PreProcessLandmarks.LandmarksRole getPreProcessRole(Node n) {
-		return (PreProcessLandmarks.LandmarksRole) n.getRole(this.preProcRoleIndex);
+	PreProcessLandmarks.LandmarksData getPreProcessData(Node n) {
+		return (PreProcessLandmarks.LandmarksData) super.getPreProcessData(n);
 	}
 
 	/**
@@ -197,8 +193,8 @@ public class AStarLandmarks extends AStarEuclidean {
 	@Override
 	double estimateRemainingTravelCost(Node fromNode, Node toNode) {
 
-		PreProcessLandmarks.LandmarksRole fromRole = getPreProcessRole(fromNode);
-		PreProcessLandmarks.LandmarksRole toRole = getPreProcessRole(toNode);
+		PreProcessLandmarks.LandmarksData fromRole = getPreProcessData(fromNode);
+		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
 		double tmpTravCost;
 		double travCost = 0;
 		for (int i = 0, n = this.activeLandmarkIndexes.length; i < n; i++) {
@@ -229,14 +225,14 @@ public class AStarLandmarks extends AStarEuclidean {
 	private void updatePendingNodes(final int newLandmarkIndex,
 			final Node toNode, final PriorityQueue<Node> pendingNodes) {
 		Iterator<Node> it = pendingNodes.iterator();
-		PreProcessLandmarks.LandmarksRole toRole = getPreProcessRole(toNode);
+		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
 		ArrayList<Double> newEstRemTravCosts = new ArrayList<Double>();
 		ArrayList<Node> nodesToBeUpdated = new ArrayList<Node>();
 		while (it.hasNext()) {
 			Node node = it.next();
 			AStarNodeData role = getData(node);
-			PreProcessLandmarks.LandmarksRole ppRole
-				= getPreProcessRole(node);
+			PreProcessLandmarks.LandmarksData ppRole
+				= getPreProcessData(node);
 			double estRemTravCost = role.getExpectedRemainingCost();
 			double newEstRemTravCost = estimateRemainingTravelCost(ppRole,
 					toRole, newLandmarkIndex);
@@ -269,9 +265,9 @@ public class AStarLandmarks extends AStarEuclidean {
 	 */
 	private int checkToAddLandmark(Node fromNode, Node toNode) {
 		double bestTravCostEst = estimateRemainingTravelCost(fromNode, toNode);
-		PreProcessLandmarks.LandmarksRole fromRole
-			= getPreProcessRole(fromNode);
-		PreProcessLandmarks.LandmarksRole toRole = getPreProcessRole(toNode);
+		PreProcessLandmarks.LandmarksData fromRole
+			= getPreProcessData(fromNode);
+		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
 		int bestIndex = -1;
 		for (int i = 0; i < this.landmarks.length; i++) {
 			double tmpTravTime
@@ -295,15 +291,15 @@ public class AStarLandmarks extends AStarEuclidean {
 	/**
 	 * Estimates the remaining travel cost from fromNode to toNode
 	 * using the landmark given by index.
-	 * @param fromNode The first node.
-	 * @param toNode The second node.
+	 * @param fromRole The first node/role.
+	 * @param toRole The second node/role.
 	 * @param index The index of the landmarks that should be used for
 	 * the estimation of the travel cost.
-	 * @return The travel cost when travelling between the two given nodes.
+	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	private double estimateRemainingTravelCost(
-			PreProcessLandmarks.LandmarksRole fromRole,
-			PreProcessLandmarks.LandmarksRole toRole, int index) {
+			PreProcessLandmarks.LandmarksData fromRole,
+			PreProcessLandmarks.LandmarksData toRole, int index) {
 		double tmpTravTime;
 		if (fromRole.getMinLandmarkTravelTime(index) > toRole
 				.getMaxLandmarkTravelTime(index)) {

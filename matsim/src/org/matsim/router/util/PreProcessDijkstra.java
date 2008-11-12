@@ -21,6 +21,7 @@
 package org.matsim.router.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -43,18 +44,12 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PreProcessDijkstra.class);
 
-	/**
-	 * The role this algorithm uses to store its data in the network.
-	 */
-	int roleIndex = -1;
+	private boolean containsData = false;
 
-	boolean containsData = false;
-
+	protected Map<Node, DeadEndData> nodeData = null;
+	
 	@Override
 	public void run(final NetworkLayer network) {
-		if (this.roleIndex == -1) {
-			this.roleIndex = network.requestNodeRole();
-		}
 		markDeadEnds(network);
 		this.containsData = true;
 	}
@@ -64,12 +59,14 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 	 * @param network
 	 * The network on which to process.
 	 */
-	protected void markDeadEnds(final NetworkLayer network) {
+	private void markDeadEnds(final NetworkLayer network) {
 		long now = System.currentTimeMillis();
 
-		DeadEndRole role;
+		this.nodeData = new HashMap<Node, DeadEndData>(network.getNodes().size());
+		
+		DeadEndData role;
 		for (Node node : network.getNodes().values()) {
-			role = getRole(node);
+			role = getNodeData(node);
 
 			Map<Id, ? extends Node> incidentNodes = node.getIncidentNodes();
 			if (incidentNodes.size() == 1) {
@@ -89,7 +86,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 					Iterator<? extends Node> it = incidentNodes.values().iterator();
 					while (role.getDeadEndEntryNode() != null && it.hasNext()) {
 						node = it.next();
-						role = getRole(node);
+						role = getNodeData(node);
 					}
 					if (role.getDeadEndEntryNode() == null) {
 						role.incrementInDeadEndCount();
@@ -106,9 +103,9 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 		// Now set the proper deadEndEntryNode for each node
 		int deadEndNodeCount = 0;
 		for (Node node : network.getNodes().values()) {
-			role = getRole(node);
+			role = getNodeData(node);
 			for (Node n : role.getDeadEndNodes()) {
-				DeadEndRole r = getRole(n);
+				DeadEndData r = getNodeData(n);
 				r.setDeadEndEntryNode(node);
 				deadEndNodeCount++;
 			}
@@ -124,33 +121,25 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 	 * @param n The Node for which to create a role.
 	 * @return The role for the given Node
 	 */
-	DeadEndRole getRole(final Node n) {
-		DeadEndRole r = (DeadEndRole) n.getRole(this.roleIndex);
+	public DeadEndData getNodeData(final Node n) {
+		DeadEndData r = this.nodeData.get(n);
 		if (null == r) {
-			r = new DeadEndRole();
-			n.setRole(this.roleIndex, r);
+			r = new DeadEndData();
+			this.nodeData.put(n, r);
 		}
 		return r;
-	}
-
-	/**
-	 * @return The index of the roles associated to each node
-	 * that are used to store the information of the pre processing.
-	 */
-	public int roleIndex() {
-		return this.roleIndex;
 	}
 
 	/**
 	 * Contains information whether the associated node is in a dead end.
 	 * @author lnicolas
 	 */
-	public class DeadEndRole {
-		Node deadEndEntryNode = null;
+	public class DeadEndData {
+		private Node deadEndEntryNode = null;
 
-		int inDeadEndCount = 0;
+		private int inDeadEndCount = 0;
 
-		ArrayList<Node> deadEndNodes = new ArrayList<Node>();
+		private ArrayList<Node> deadEndNodes = new ArrayList<Node>(2);
 
 		ArrayList<Node> getDeadEndNodes() {
 			return this.deadEndNodes;
@@ -159,7 +148,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 		/**
 		 * @return the inDeadEndCount
 		 */
-		private int getInDeadEndCount() {
+		/*package*/ int getInDeadEndCount() {
 			return this.inDeadEndCount;
 		}
 
@@ -167,7 +156,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 		 * @param inDeadEndCount
 		 *            the inDeadEndCount to set
 		 */
-		private void incrementInDeadEndCount() {
+		/*package*/ void incrementInDeadEndCount() {
 			this.inDeadEndCount++;
 		}
 
@@ -182,7 +171,7 @@ public class PreProcessDijkstra extends NetworkAlgorithm {
 			return this.deadEndEntryNode;
 		}
 
-		private void setDeadEndEntryNode(final Node node) {
+		/*package*/ void setDeadEndEntryNode(final Node node) {
 			this.deadEndEntryNode = node;
 		}
 	}
