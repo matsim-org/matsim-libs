@@ -35,7 +35,6 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 
 public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
@@ -547,31 +546,6 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 	public Link getLink(final Id linkId) {
 		return (Link) this.locations.get(linkId);
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// methods for RoleHandling
-	// ////////////////////////////////////////////////////////////////////
-
-	/**
-	 * returns the index to access roles on links of this network
-	 *
-	 * @return the index to access set and get a role on links of this network
-	 * @deprecated please use a Map yourself to match the role-data to the links
-	 */
-	public final int requestLinkRole() {
-		int index = this.linkRoles.size();
-		// if ever a function releaseLinkRole(int) is implemented, we could check here if there
-		// is an empty slot available. This would help keeping index-numbers small.
-		this.linkRoles.add(Integer.valueOf(index));
-		if (index > this.maxLinkRoleIndex) {
-			int newMax = (int) (1.2 * index) + 1;
-			for (Location location : this.locations.values()) {
-				((Link) location).setMaxRoleIndex(newMax);
-			}
-			this.maxLinkRoleIndex = newMax;
-		}
-		return index;
 	}
 
 }
