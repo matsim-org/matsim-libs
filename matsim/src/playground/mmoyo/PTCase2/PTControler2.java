@@ -12,15 +12,15 @@ import org.matsim.utils.geometry.CoordImpl;
 public class PTControler2 {
 
 	private static final String CONFIG= "../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml";
-	private static final String ZURICHPTN= "../shared-svn/studies/schweiz-ivtch/pt-experimental/TRAMnetwork.xml";
+	private static final String ZURICHPTN= "../shared-svn/studies/schweiz-ivtch/pt-experimental/network.xml";
 	private static final String ZURICHPTTIMETABLE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/PTTimetable.xml";
 	private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
 	private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
 	
-	/*
-	private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
-	private static final String OUTPUTPLANS= "c://output_plans.xml";
-	*/
+	
+	//private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	//private static final String OUTPUTPLANS= "c://output_plans.xml";
+	
 	
 	/*
 	//Variables for the net 5x5
@@ -31,31 +31,29 @@ public class PTControler2 {
 	 */	
 	
 	public static void main(String[] args){
-		PTTimeTable2 ptTimeTable = new PTTimeTable2(ZURICHPTTIMETABLE);
-		PTNetworkFactory2 ptNetworkFactory =new PTNetworkFactory2();
-		NetworkLayer ptNetworkLayer = ptNetworkFactory.createNetwork(ZURICHPTN, ptTimeTable);
-		PTRouter2 ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
-
+		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+		
 		int option =2;
 		switch (option){
 	    	case 0: 
-	    		Node ptNode = ptNetworkLayer.getNode("100821");
-	    		Node ptNode2 = ptNetworkLayer.getNode("100917");
-	            ptRouter2.PrintRoute(ptRouter2.findRoute(ptNode, ptNode2, 10));
+	    		Node ptNode = pt.getPtNetworkLayer().getNode("100821");
+	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("100917");
+	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 10));
 	    		break;
 	    	case 1:
     			Coord coord1= new CoordImpl(684573,246805);
     			Coord coord2= new CoordImpl(680291,248300);
-	    		Route route = ptRouter2.forceRoute(coord1, coord2, 52260,100);
+	    		Route route = pt.getPtRouter2().forceRoute(coord1, coord2, 52260,100);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
-	    		//System.out.println(route.getRoute().toString());
-	    		ptRouter2.PrintRoute(route);
+	    		pt.getPtRouter2().PrintRoute(route);
 	    		break;
 	    	case 2:
-	    		PTActivityCreator ptActivityCreator= new PTActivityCreator(ptNetworkLayer, CONFIG, ZURICHPTPLANS, ptRouter2);
-	    		ptActivityCreator.createPTActs(OUTPUTPLANS,ptTimeTable);
+	    		PTActivityCreator ptActivityCreator= new PTActivityCreator(pt.getPtNetworkLayer(), CONFIG, ZURICHPTPLANS, pt.getPtRouter2());
+	    		ptActivityCreator.createPTActs(OUTPUTPLANS,pt.getPtTimeTable());
 	    		break;
-	   
+	    	case 3:
+	    		//PTActWriter ptActWriter = new PTActWriter(pt);
+	    		
 		}//switch
 	}//main
 	

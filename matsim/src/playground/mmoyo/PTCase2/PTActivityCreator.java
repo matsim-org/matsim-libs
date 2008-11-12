@@ -105,7 +105,7 @@ public class PTActivityCreator {
 					    				ptAct.setStartTime(walkLeg.getArrTime());
 					    				ptAct.setDur(duration);
 					    				ptAct.setEndTime(nextDeparture);
-					    				Route route  =null;
+					    				//Route route  =null;
 					    					
 					    				first=false;
 					    	    	}

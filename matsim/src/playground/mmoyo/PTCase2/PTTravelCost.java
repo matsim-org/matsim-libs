@@ -17,10 +17,13 @@ public class PTTravelCost implements TravelCost {
 			cost= ptTimeTable.GetTransferTime(link, time);
 			//cost=1;
 		}else if (link.getType().equals("Walking")){
-			cost=0;
+			cost=1;
 		}else if (link.getType().equals("Standard")){
 			cost= ptTimeTable.GetTravelTime(link);
 		}
+		if (cost<0) {
+			cost=0.1;
+		}  //TODO: lok for negative values
 		return cost;
 	}
 }
