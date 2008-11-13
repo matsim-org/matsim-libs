@@ -49,16 +49,12 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	private final TravelCost 				travelCostCalc;
 	private final TravelTime 				travelTimeCalc;
 	private final ScoringFunctionFactory 	factory;
-//	public static ArrayList<String>			actTypes; 
 	private final Controler					controler;
-	private List<PlanAlgorithm>  			planAlgoInstances;
-	private boolean 						constrained;
 	private static final Logger 			log = Logger.getLogger(LocationChoice.class);
 
 	
 	public PlanomatX12Initialiser (final ControlerTest controlerTest, final LegTravelTimeEstimator estimator) {
 		
-		//this.estimator = estimator;
 		this.estimator = controlerTest.getLegTravelTimeEstimator();
 		this.preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.network = controlerTest.getNetwork();
@@ -67,8 +63,6 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		this.travelTimeCalc = controlerTest.getTravelTimeCalculator();
 		//factory = Gbl.getConfig().planomat().getScoringFunctionFactory();//TODO @MF: Check whether this is correct (Same scoring function as for Planomat)!
 		this.factory = new CharyparNagelScoringFunctionFactory();
-		
-		this.planAlgoInstances = new Vector<PlanAlgorithm>();
 		this.controler = controlerTest;
 		this.init(network, controler);
 		
@@ -85,7 +79,6 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		//else {
 		//	log.info("Doing random location choice on univ. choice set");
 		//}
-		this.constrained = true;
 		this.network.connect();
 	}
 
@@ -96,7 +89,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 
 		PlanAlgorithm planomatXAlgorithm = null;
 		planomatXAlgorithm =  new PlanomatX16 (this.estimator, this.network, this.travelCostCalc, 
-				this.travelTimeCalc, this.preProcessRoutingData, this.factory, this.constrained, this.controler);
+				this.travelTimeCalc, this.preProcessRoutingData, this.factory, this.controler);
 
 		return planomatXAlgorithm;
 	}
@@ -104,19 +97,5 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	@Override
 	public void finish() {
 		super.finish();
-		if (this.constrained) {
-			
-			int unsuccessfull = 0;
-			
-			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
-			while (planAlgo_it.hasNext()) {
-				PlanAlgorithm plan_algo = planAlgo_it.next();
-				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();
-				((LocationMutatorwChoiceSetSimultan)plan_algo).resetUnsuccsessfull();
-			}		
-			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);	
-				
-		}
-		this.planAlgoInstances.clear();
 	}
 }

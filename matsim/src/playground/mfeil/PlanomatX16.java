@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -57,7 +57,6 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
-	//private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlanAlgorithm				timer;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
@@ -69,17 +68,13 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 		
 	public PlanomatX16 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
-			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, 
-			boolean constrained, Controler controler) {
+			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, Controler controler) {
 
-		//this.planomatAlgorithm 	= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanScorer (factory);
 		this.timer					= new TimeOptimizer13(legTravelTimeEstimator, this.scorer);
 		
-		if (constrained) locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
-		else locationChoiceAlgorithm = new RandomLocationMutator(network, controler);
-		log.info("constrained = "+constrained);
+		this.locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
 		
 		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
