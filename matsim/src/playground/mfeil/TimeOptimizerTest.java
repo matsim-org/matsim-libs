@@ -20,7 +20,7 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 	private final PlanScorer		scorer;
 	
 	public TimeOptimizerTest (LegTravelTimeEstimator estimator, PlanScorer scorer){
-		this.timeOptAlgorithm = new TimeOptimizer10 (estimator, scorer);
+		this.timeOptAlgorithm = new TimeOptimizer13 (estimator, scorer);
 		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator);
 		this.scorer			  = scorer;
 	}

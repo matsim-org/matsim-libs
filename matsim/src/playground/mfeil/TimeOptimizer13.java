@@ -601,7 +601,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			for (int i= 0; i< in.size() ; i++) {
 				try {
 					if (i % 2 == 0) {
-						// activity
+						// Activity
 						Act a = new Act ((Act)in.get(i));
 						out.add(a);
 					} else {
@@ -611,7 +611,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 						l.setArrTime(inl.getArrTime());
 						l.setDepTime(inl.getDepTime());
 						l.setTravTime(inl.getTravTime());
-						l.setRoute(((Leg)in.get(i)).getRoute());
+						l.setRoute(inl.getRoute());
 						out.add(l);
 					}
 				} catch (Exception e) {
