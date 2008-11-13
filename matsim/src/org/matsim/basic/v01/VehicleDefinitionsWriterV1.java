@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.basic.v01.BasicVehicleCapacity.BasicFreightCapacity;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.writer.MatsimXmlWriter;
 

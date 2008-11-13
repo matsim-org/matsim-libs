@@ -35,13 +35,4 @@ public interface BasicVehicleCapacity {
 	public void setStandingRoom(Integer standingRoom);
 	
 	public void setFreightCapacity(BasicFreightCapacity freightCap);
-
-
-	public interface BasicFreightCapacity {
-		
-		public double getVolume();
-
-		public void setVolume(double cubicMeters);
-		
-	}
 }

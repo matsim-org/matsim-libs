@@ -19,7 +19,6 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.basic.v01.BasicVehicleCapacity.BasicFreightCapacity;
 
 /**
  * @author dgrether
