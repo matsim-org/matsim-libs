@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.misc;
+package playground.meisterk.org.matsim.facilities.algorithms;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 @Deprecated

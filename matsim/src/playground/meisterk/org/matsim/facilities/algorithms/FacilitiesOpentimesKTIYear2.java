@@ -35,7 +35,6 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.utils.misc.Day;
 import org.matsim.world.Location;
 
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
