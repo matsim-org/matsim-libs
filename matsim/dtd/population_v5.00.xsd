@@ -128,7 +128,12 @@ xml:lang="en">
   <xs:attribute name="startTime" type="xs:time" use="optional" />
   <xs:attribute name="endTime" type="xs:time" use="optional" />
   <!-- this could be coded with the xs:duration type would however be a change in the schema -->
-  <xs:attribute name="duration" type="xs:time" use="optional" />
+  <xs:attribute name="duration" type="xs:time" use="optional">
+    <xs:annotation>
+    <xs:documentation>Deprecated attribute! Don't use this attribute anymore. It is only in the dataformat
+    due to backwards compatibility reasons and will be removed in future versions.</xs:documentation>
+    </xs:annotation>
+  </xs:attribute>
 </xs:complexType>
 
 <xs:complexType name="legType">

@@ -28,14 +28,6 @@ import org.matsim.utils.geometry.Coord;
  */
 public interface BasicAct {
 
-//	public BasicLink getLink();
-
-//	public void setLink(final BasicLink link);
-
-//	public Facility getFacility();
-
-//	public void setFacility(final Facility facility);
-
 	public double getEndTime();
 
 	public void setEndTime(final double endTime);
@@ -55,9 +47,9 @@ public interface BasicAct {
 	public Id getLinkId();
 
 	public Id getFacilityId();
-	
+	@Deprecated
 	public double getDur();
-
+	@Deprecated
 	public void setDur(double duration);
 
 }
