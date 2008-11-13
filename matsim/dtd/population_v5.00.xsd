@@ -98,7 +98,7 @@ xml:lang="en">
 
 <xs:complexType name="activityType">
   <xs:sequence>
-    <xs:element ref="location" minOccurs="1" maxOccurs="1" />
+    <xs:element ref="location" minOccurs="0" maxOccurs="1" />
     <xs:element name="capacity" minOccurs="0" maxOccurs="1">
       <xs:complexType>
         <xs:attribute name="persons" type="xs:nonNegativeInteger" />
@@ -150,7 +150,7 @@ xml:lang="en">
     <xs:element name="link" type="idRefType" minOccurs="0" maxOccurs="unbounded" />
   </xs:sequence>
   <xs:attribute name="distance" type="xs:decimal" use="optional" />
-  <xs:attribute name="travelTime" type="xs:decimal" use="optional" />
+  <xs:attribute name="travelTime" type="xs:time" use="optional" />
 </xs:complexType>
 
 </xs:schema>

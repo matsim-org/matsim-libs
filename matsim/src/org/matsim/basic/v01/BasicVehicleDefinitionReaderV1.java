@@ -63,7 +63,7 @@ public class BasicVehicleDefinitionReaderV1 extends MatsimXmlParser {
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		if (VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase(name)){
+		if (VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase(name) && (content.trim().length() > 0)){
 			this.currentVehType.setDescription(content.trim());
 		}
 		else if (VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase(name)){
@@ -125,10 +125,10 @@ public class BasicVehicleDefinitionReaderV1 extends MatsimXmlParser {
 			this.currentCapacity = this.builder.createVehicleCapacity();
 		}
 		else if(VehicleSchemaV1Names.SEATS.equalsIgnoreCase(name)){
-			this.currentCapacity.setSeats(Integer.parseInt(atts.getValue(VehicleSchemaV1Names.PERSONS)));
+			this.currentCapacity.setSeats(Integer.valueOf(atts.getValue(VehicleSchemaV1Names.PERSONS)));
 		}
 		else if (VehicleSchemaV1Names.STANDINGROOM.equalsIgnoreCase(name)){
-			this.currentCapacity.setStandingRoom(Integer.parseInt(atts.getValue(VehicleSchemaV1Names.PERSONS)));
+			this.currentCapacity.setStandingRoom(Integer.valueOf(atts.getValue(VehicleSchemaV1Names.PERSONS)));
 		}
 		else if (VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase(name)){
 			this.currentFreightCap = this.builder.createFreigthCapacity();

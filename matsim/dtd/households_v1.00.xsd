@@ -32,7 +32,7 @@ xml:lang="en">
   <xs:complexContent>
     <xs:extension base="matsimObjectType">
     <xs:sequence>
-      <xs:element name="members">
+      <xs:element name="members" minOccurs="1" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="personId" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>

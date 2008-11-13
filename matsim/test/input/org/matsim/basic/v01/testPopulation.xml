@@ -8,7 +8,6 @@
   <travelcard>
     <swissTravelCard>ch-HT-2y</swissTravelCard>
   </travelcard>
-  <!--todo-->
   <knowledge>
     <description>some additional information</description>
     <activity type="w" frequency="4">
@@ -28,9 +27,7 @@
         </location>
     </activity>
   </knowledge>
- <!--end todo-->
-  
-	<plan selected="true">
+	<plan selected="true" score="42.42">
 		<act type="h" endTime="06:00:00">
       <location>
         <coordinate>
@@ -39,8 +36,8 @@
         </coordinate>
       </location>
     </act>
-		<leg mode="car">
-    	<route distance="45.5" travelTime="24.3">
+		<leg mode="car" departureTime="06:05:00" travelTime="00:25:00" arrivalTime="06:30:00">
+    	<route distance="45.5" travelTime="00:23:23">
 			  <link refId="23"/>
 			  <link refId="24"/>
 			</route>

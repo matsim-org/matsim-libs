@@ -57,12 +57,15 @@ public interface PopulationSchemaV5Names {
 	public static String ACTIVITY = "activity";
 	public static String CAPACITY = "capacity";
 	public static String PERSONS = "persons";
-	public static String OPENINGTIME = "openingtime";
+	public static String OPENINGTIME = "openingTime";
 	public static String DAY = "day";
 	public static String FREQUENCY = "frequency";
 	public static String TRAVELCARD = "travelcard";
 	public static String FISCALHOUSEHOLDID = "fiscalHouseholdId";
 	public static String SWISSTRAVELCARD = "swissTravelCard";
 	public static String SCORE = "score";
+	public static String DEPARTURETIME = "departureTime";
+	public static String ARRIVALTIME = "arrivalTime";
+	public static String ACTLOCATION = "actLocation";
 	
 }

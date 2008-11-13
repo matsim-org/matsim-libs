@@ -19,6 +19,8 @@
 
 package org.matsim.basic.v01;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +39,25 @@ public class BasicVehicleDefinitionReaderV5Test extends MatsimTestCase {
   private final Id id24 = new IdImpl("24");
   
 	public void testParser() {
-		
 		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
 		List<BasicVehicle> vehicles = new ArrayList<BasicVehicle>();
 		BasicVehicleDefinitionReaderV1 reader = new BasicVehicleDefinitionReaderV1(vehicleTypes, vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
 		checkContent(vehicleTypes, vehicles);
+	}
+	
+	public void testWriter() throws FileNotFoundException, IOException {
+		//read it
+		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
+		List<BasicVehicle> vehicles = new ArrayList<BasicVehicle>();
+		BasicVehicleDefinitionReaderV1 reader = new BasicVehicleDefinitionReaderV1(vehicleTypes, vehicles);
+		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+		//write it
+		VehicleDefinitionsWriterV1 writer = new VehicleDefinitionsWriterV1(vehicleTypes, vehicles);
+		writer.writeFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+		//check it, check it, check it now!
+		this.checkContent(vehicleTypes, vehicles);
 	}
 
 	private void checkContent(Map<String, BasicVehicleType> vehicleTypes,
@@ -56,8 +70,8 @@ public class BasicVehicleDefinitionReaderV5Test extends MatsimTestCase {
 		assertEquals(3.0, vehType.getWidth(), EPSILON);
 		assertEquals(42.0, vehType.getMaximumVelocity(), EPSILON);
 		assertNotNull(vehType.getCapacity());
-		assertEquals(5, vehType.getCapacity().getSeats());
-		assertEquals(20, vehType.getCapacity().getStandingRoom());
+		assertEquals(Integer.valueOf(5), vehType.getCapacity().getSeats());
+		assertEquals(Integer.valueOf(20), vehType.getCapacity().getStandingRoom());
 		assertNotNull(vehType.getCapacity().getFreightCapacity());
 		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());

@@ -31,6 +31,7 @@ public class AllTests {
 		suite.addTestSuite(BasicPlanTest.class);
 		suite.addTestSuite(BasicHouseholdsReaderV5Test.class);
 		suite.addTestSuite(BasicPopulationReaderV5Test.class);
+		suite.addTestSuite(BasicVehicleDefinitionReaderV5Test.class);
 		//$JUnit-END$
 		return suite;
 	}

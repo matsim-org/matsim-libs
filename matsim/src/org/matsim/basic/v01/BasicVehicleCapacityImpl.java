@@ -24,19 +24,19 @@ package org.matsim.basic.v01;
  */
 public class BasicVehicleCapacityImpl implements BasicVehicleCapacity {
 
-	private int seats;
-	private int standingRoom;
-	private BasicFreightCapacity freightCap;
+	private Integer seats = null;
+	private Integer standingRoom = null;
+	private BasicFreightCapacity freightCap = null;
 	
 	public BasicFreightCapacity getFreightCapacity() {
 		return freightCap;
 	}
 
-	public int getSeats() {
+	public Integer getSeats() {
 		return seats;
 	}
 
-	public int getStandingRoom() {
+	public Integer getStandingRoom() {
 		return standingRoom;
 	}
 
@@ -44,11 +44,11 @@ public class BasicVehicleCapacityImpl implements BasicVehicleCapacity {
 		this.freightCap = freightCap;
 	}
 
-	public void setSeats(int seats) {
+	public void setSeats(Integer seats) {
 		this.seats = seats;
 	}
 
-	public void setStandingRoom(int standingRoom) {
+	public void setStandingRoom(Integer standingRoom) {
 		this.standingRoom = standingRoom;
 	}
 	

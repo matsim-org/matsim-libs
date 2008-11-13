@@ -103,7 +103,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		} else if (version.equals("v0")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
 			this.handler = new PopulationWriterHandlerImplV0();
-		} else {
+		} 
+		else {
 			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
 	}
@@ -120,7 +121,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 			this.fileOpened = true;
-			this.writeHeader("plans");
+			this.handler.writeHeaderAndStartElement(this.out);
+//			this.writeHeader("plans");
 			this.handler.startPlans(this.population, this.out);
 			this.handler.writeSeparator(this.out);
 		}

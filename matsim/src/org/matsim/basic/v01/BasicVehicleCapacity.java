@@ -24,15 +24,15 @@ package org.matsim.basic.v01;
  */
 public interface BasicVehicleCapacity {
 	
-	public int getSeats();
+	public Integer getSeats();
 	
-	public int getStandingRoom();
+	public Integer getStandingRoom();
 	
 	public BasicFreightCapacity getFreightCapacity();
 	
-	public void setSeats(int seats);
+	public void setSeats(Integer seats);
 	
-	public void setStandingRoom(int standingRoom);
+	public void setStandingRoom(Integer standingRoom);
 	
 	public void setFreightCapacity(BasicFreightCapacity freightCap);
 

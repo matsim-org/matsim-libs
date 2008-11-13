@@ -19,6 +19,8 @@
 
 package org.matsim.basic.v01;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import org.matsim.network.Node;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReaderMatsimV5;
+import org.matsim.population.PopulationWriterV5;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -53,7 +56,8 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
   private final Id id666 = new IdImpl("666");
   private final Coord coord = new CoordImpl(0.0, 0.0);
   
-	public void testBasicParser() {
+  
+	public void estBasicParser() {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
 		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
@@ -63,7 +67,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		hhTest.checkContent(households);
 	}
 	
-	public void testParser() {
+	public void estParser() {
 		Population pop = new Population(Population.NO_STREAMING);
 		pop.addPerson(new PersonImpl(id42));
 		pop.addPerson(new PersonImpl(id43));
@@ -80,6 +84,28 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
 		hhTest.checkContent(households);
 	}
+	
+	public void testWriter() throws FileNotFoundException, IOException {
+		//read the file
+		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>();
+		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
+		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
+		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+		//write it
+		PopulationWriterV5 writer = new PopulationWriterV5(population, households);
+		writer.setPrettyPrint(true);
+		writer.useCompression(false);
+		writer.writeFile(this.getOutputDirectory() + "testPopulationOutput.xml");
+		//read it again and check the content
+		population = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>();
+		households = new ArrayList<BasicHousehold>();
+		reader = new BasicPopulationReaderMatsimV5(population, households);
+		reader.readFile(this.getOutputDirectory() + "testPopulationOutput.xml");
+		this.checkContent(population);
+		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
+		hhTest.checkContent(households);
+	}
+	
 	
 	private void createNetwork(NetworkLayer n) {
 		Node n23 = n.createNode(id23, this.coord);
@@ -135,7 +161,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		BasicPlan p = (BasicPlan) pp.getPlans().get(0);
 		assertNotNull(p);
 		assertTrue(p.isSelected());
-		assertTrue(p.hasUndefinedScore());
+		assertEquals(42.42d, p.getScore(), EPSILON);
 		int i = 0;
 		for (ActIterator it = p.getIteratorAct(); it.hasNext();) {
 			BasicAct act = it.next();
@@ -182,10 +208,13 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 			BasicRoute route;
 			if (i == 0) {
 				assertEquals(BasicLeg.Mode.car, leg.getMode());
+				assertEquals(6.0d * 3600.0d + 5.0d * 60.0d, leg.getDepTime(), EPSILON);
+				assertEquals(25.0d * 60.0d, leg.getTravTime(), EPSILON);
+				assertEquals(6.0d * 3600.0d + 30.0d * 60.0d, leg.getArrTime(), EPSILON);
 				assertNotNull(leg.getRoute());
 				route = leg.getRoute();
 				assertEquals(45.5d, route.getDist(), EPSILON);
-				assertEquals(24.3d, route.getTravTime(), EPSILON);
+				assertEquals(23.0d * 60.0d + 23.0d, route.getTravTime(), EPSILON);
 				assertEquals(2, route.getLinkIds().size());
 				assertEquals(id23, route.getLinkIds().get(0));
 				assertEquals(id24, route.getLinkIds().get(1));

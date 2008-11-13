@@ -118,13 +118,6 @@ public class Act extends BasicActImpl {
 				"[dur=" + Time.writeTime(this.dur) + "]";
 	}
 
-	public final double getDur() {
-		return this.dur;
-	}
-
-	public final void setDur(final double dur) {
-		this.dur = dur;
-	}
 
 	// here to return correct link type
 	public final Link getLink() {
@@ -161,18 +154,18 @@ public class Act extends BasicActImpl {
 	 * @return the duration in seconds
 	 */
 	public double calculateDuration() {
-		if (this.startTime == Time.UNDEFINED_TIME && this.endTime == Time.UNDEFINED_TIME) {
+		if ((this.startTime == Time.UNDEFINED_TIME) && (this.endTime == Time.UNDEFINED_TIME)) {
 			if (this.dur != Time.UNDEFINED_TIME) {
 				return this.dur;
 			}
 			throw new IllegalArgumentException("No valid time set to calculate duration of activity: StartTime: " + this.startTime + " EndTime : " + this.endTime + " Duration: " + this.dur);
 		}
 		//if only start time is set, assume this is the last activity of the day
-		else if (this.startTime != Time.UNDEFINED_TIME && this.endTime == Time.UNDEFINED_TIME) {
+		else if ((this.startTime != Time.UNDEFINED_TIME) && (this.endTime == Time.UNDEFINED_TIME)) {
 			return Time.MIDNIGHT - this.startTime;
 		}
 		//if only the end time is set, assume this is the first activity of the day
-		else if (this.startTime == Time.UNDEFINED_TIME && this.endTime != Time.UNDEFINED_TIME) {
+		else if ((this.startTime == Time.UNDEFINED_TIME) && (this.endTime != Time.UNDEFINED_TIME)) {
 			return this.endTime;
 		}
 		else {

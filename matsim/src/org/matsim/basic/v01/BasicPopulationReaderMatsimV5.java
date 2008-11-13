@@ -182,7 +182,6 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			this.currentActivities.add(act);
 		}
 		else if (PopulationSchemaV5Names.KNOWLEDGE.equalsIgnoreCase(name)){
-			System.err.println(this.currentActivities.size());
 			this.currentKnowledge = populationBuilder.createKnowledge(this.currentActivities);
 			this.currentActivities.clear();
 			if (this.currentDescription != null) {
@@ -199,9 +198,6 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 				((PersonImpl)this.currentPerson).setKnowledge((Knowledge)this.currentKnowledge);				
 			}
 			this.currentKnowledge = null;
-		}
-		else {
-			log.warn("Ignoring endTag (beta implementation!): " + name);
 		}
 	} //end of endTag
 
@@ -247,6 +243,10 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			else {
 				this.currentPlan = populationBuilder.createPlan(this.currentPerson);
 			}
+			String scoreString = atts.getValue(PopulationSchemaV5Names.SCORE);
+			if (null != scoreString) {
+				this.currentPlan.setScore(Double.parseDouble(scoreString));
+			}
 		}
 		else if (PopulationSchemaV5Names.ACT.equalsIgnoreCase(name)) {
 			this.currentActType = atts.getValue(PopulationSchemaV5Names.TYPE);
@@ -277,6 +277,18 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 		}
 		else if (PopulationSchemaV5Names.LEG.equalsIgnoreCase(name)){
 			this.currentLeg = populationBuilder.createLeg(this.currentPlan, getLegMode(atts.getValue(PopulationSchemaV5Names.MODE)));
+			String tts = atts.getValue(PopulationSchemaV5Names.DEPARTURETIME);
+			if (tts != null) {
+				this.currentLeg.setDepTime(this.parseTime(tts));
+			}
+			tts = atts.getValue(PopulationSchemaV5Names.TRAVELTIME);
+			if (tts != null) {
+				this.currentLeg.setTravTime(this.parseTime(tts));
+			}
+			tts = atts.getValue(PopulationSchemaV5Names.ARRIVALTIME);
+			if (tts != null) {
+				this.currentLeg.setArrTime(this.parseTime(tts));
+			}
 		}
 		else if (PopulationSchemaV5Names.ROUTE.equalsIgnoreCase(name)){
 			String dist = atts.getValue(PopulationSchemaV5Names.DISTANCE);
@@ -285,7 +297,7 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			}
 			String tt = atts.getValue(PopulationSchemaV5Names.TRAVELTIME);
 			if (tt != null) {
-				this.currentTravelTime = Double.valueOf(tt);
+				this.currentTravelTime = this.parseTime(tt);
 			}
 		}
 		else if (PopulationSchemaV5Names.LINK.equalsIgnoreCase(name)) {
@@ -333,9 +345,6 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			else {
 				this.currentFrequency = null;
 			}
-		}
-		else {
-			log.warn("Ignoring startTag (beta implementation!): " + name);
 		}
 	} //end of startTag
 	

@@ -28,6 +28,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
+import org.matsim.writer.MatsimXmlWriter;
 
 public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 
@@ -44,6 +45,11 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	//
 	//////////////////////////////////////////////////////////////////////
 
+	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+		out.write("<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v0.dtd\">\n\n");
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////

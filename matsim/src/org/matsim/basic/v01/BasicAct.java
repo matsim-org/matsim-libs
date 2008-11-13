@@ -56,8 +56,8 @@ public interface BasicAct {
 
 	public Id getFacilityId();
 	
-//	public double getDuration();
+	public double getDur();
 
-//	public void setDuration(double duration);
+	public void setDur(double duration);
 
 }

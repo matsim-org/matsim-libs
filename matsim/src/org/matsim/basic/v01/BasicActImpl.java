@@ -101,4 +101,12 @@ public class BasicActImpl implements BasicAct {
 		return this.facilityId;
 	}
 
+
+	public double getDur() {
+		return this.dur;
+	}
+
+	public void setDur(final double dur) {
+		this.dur = dur;
+	}
 }

@@ -5,7 +5,7 @@
   xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.00.xsd">
  
 <vehicleType typeId="normalCar">
-  <description> </description>
+  <description></description>
   <!-- capacity including driver -->
   <capacity>
     <seats persons="5"/>

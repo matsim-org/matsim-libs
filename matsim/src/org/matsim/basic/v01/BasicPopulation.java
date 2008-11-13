@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.basic.v01;
 
+import java.util.Map;
+
 /**
 *
 * @author dgrether
@@ -34,9 +36,11 @@ public interface BasicPopulation<T extends BasicPerson> {
 	public void addPerson(T person);
 
 	public T getPerson(Id personId);
-
+	@Deprecated
 	public T getPerson(String personId);
 
+	public Map<Id, T> getPersons();
+	
 	public void setRefLayer(String layer);
 	
 	public String getRefLayer();

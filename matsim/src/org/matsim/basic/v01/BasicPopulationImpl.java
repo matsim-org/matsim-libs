@@ -84,4 +84,8 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 		this.layerName = layer;
 	}
 
+	public Map<Id, T> getPersons() {
+		return this.persons;
+	}
+
 }

@@ -65,9 +65,9 @@ xml:lang="en">
     <xs:element name="freightCapacity" minOccurs="0" maxOccurs="1">
       <xs:complexType>
         <xs:sequence>
-          <xs:element name="volume" >
+          <xs:element name="volume" minOccurs="1" maxOccurs="1">
             <xs:complexType>
-              <xs:attribute name="cubicMeters" type="xs:double" />
+              <xs:attribute name="cubicMeters" type="xs:double" use="required"/>
             </xs:complexType>
           </xs:element>
         </xs:sequence>

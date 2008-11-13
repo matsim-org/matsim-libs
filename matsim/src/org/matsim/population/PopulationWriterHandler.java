@@ -164,4 +164,6 @@ public interface PopulationWriterHandler extends WriterHandler {
 	public void startRoute(final Route route, final BufferedWriter out) throws IOException;
 
 	public void endRoute(final BufferedWriter out) throws IOException;
+
+	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
 }

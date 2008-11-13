@@ -35,6 +35,7 @@ public class MyObject implements BasicLink,BasicAct {
 		return basicLink.downLocation(id);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return basicLink.equals(obj);
 	}
@@ -91,6 +92,7 @@ public class MyObject implements BasicLink,BasicAct {
 		return basicLink.getUpMapping();
 	}
 
+	@Override
 	public int hashCode() {
 		return basicLink.hashCode();
 	}
@@ -131,6 +133,7 @@ public class MyObject implements BasicLink,BasicAct {
 		return basicLink.setToNode(node);
 	}
 
+	@Override
 	public String toString() {
 		return basicLink.toString();
 	}
@@ -189,6 +192,14 @@ public class MyObject implements BasicLink,BasicAct {
 
 	public Id getLinkId() {
 		return basicAct.getLinkId();
+	}
+
+	public double getDur() {
+		return basicAct.getDur();
+	}
+
+	public void setDur(double duration) {
+		basicAct.setDur(duration);
 	}
 
 
