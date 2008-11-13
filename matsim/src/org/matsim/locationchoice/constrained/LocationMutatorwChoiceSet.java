@@ -23,10 +23,10 @@ package org.matsim.locationchoice.constrained;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.LocationMutator;
@@ -138,7 +138,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
-		ArrayList<Activity> secondaryTypes = plan.getPerson().getKnowledge().getActivities(false);
+		Set<String> secondaryTypes = plan.getPerson().getKnowledge().getActivityTypes(false);
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
