@@ -71,7 +71,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		this.unsuccessfullLC = 0;
 	}
 
-	protected void handleSubChains(final Plan plan, List<SubChain> subChains) {
+	public void handleSubChains(final Plan plan, List<SubChain> subChains) {
 		
 			
 		Iterator<SubChain> sc_it = subChains.iterator();
@@ -134,7 +134,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		return leg.getTravTime();
 	}
 		
-	protected List<SubChain> calcActChains(final Plan plan) {
+	public List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
