@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author dgrether
  */
-public class BasicVehicleDefinitionReaderV5Test extends MatsimTestCase {
+public class BasicVehicleDefinitionReaderV1Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testVehicles.xml";
 

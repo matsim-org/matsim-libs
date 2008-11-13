@@ -45,10 +45,10 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader{
+public class BasicPopulationReaderV5 extends MatsimXmlParser implements PopulationReader{
 	
 	private static final Logger log = Logger
-			.getLogger(BasicPopulationReaderMatsimV5.class);
+			.getLogger(BasicPopulationReaderV5.class);
 	
 	private PopulationBuilder populationBuilder;
 
@@ -84,7 +84,7 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 
 	private HouseholdBuilder householdBuilder;
 	
-	private BasicHouseholdsReaderV5 householdsDelegate = null;
+	private BasicHouseholdsReaderV1 householdsDelegate = null;
 
 	private List<BasicHousehold> households;
 
@@ -100,10 +100,10 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 
 	private Integer currentFrequency;
 	
-	protected BasicPopulationReaderMatsimV5() {
+	protected BasicPopulationReaderV5() {
 	}
 		
-  public BasicPopulationReaderMatsimV5(BasicPopulation pop, List<BasicHousehold> households) {
+  public BasicPopulationReaderV5(BasicPopulation pop, List<BasicHousehold> households) {
   	this.populationBuilder = new BasicPopulationBuilder(pop);
   	this.householdBuilder = new BasicHouseholdBuilder(households);
   	this.households = households;
@@ -203,8 +203,8 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (HouseholdsSchemaV5Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			this.householdsDelegate = new BasicHouseholdsReaderV5(this.households);
+		if (HouseholdsSchemaV1Names.HOUSEHOLD.equalsIgnoreCase(name)) {
+			this.householdsDelegate = new BasicHouseholdsReaderV1(this.households);
 			this.householdsDelegate.setHouseholdBuilder(this.householdBuilder);
 		  this.householdsDelegate.startTag(name, atts, context);
 		}

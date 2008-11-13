@@ -22,7 +22,7 @@ package org.matsim.basic.v01;
 /**
  * @author dgrether
  */
-public interface HouseholdsSchemaV5Names {
+public interface HouseholdsSchemaV1Names {
 
 	public static String HOUSEHOLDS = "households";
 	public static String HOUSEHOLD = "household";

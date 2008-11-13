@@ -60,10 +60,10 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 	public void estBasicParser() {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
-		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
+		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(population);
-		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
+		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
 		hhTest.checkContent(households);
 	}
 	
@@ -81,7 +81,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, fac);
 		parser.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(pop);
-		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
+		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
 		hhTest.checkContent(households);
 	}
 	
@@ -89,7 +89,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		//read the file
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
-		BasicPopulationReaderMatsimV5 reader = new BasicPopulationReaderMatsimV5(population, households);
+		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
 		PopulationWriterV5 writer = new PopulationWriterV5(population, households);
@@ -99,10 +99,10 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		//read it again and check the content
 		population = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>();
 		households = new ArrayList<BasicHousehold>();
-		reader = new BasicPopulationReaderMatsimV5(population, households);
+		reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getOutputDirectory() + "testPopulationOutput.xml");
 		this.checkContent(population);
-		BasicHouseholdsReaderV5Test hhTest = new BasicHouseholdsReaderV5Test();
+		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
 		hhTest.checkContent(households);
 	}
 	

@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
+public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	
 	private List<BasicHousehold> households;
 
@@ -62,7 +62,7 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 	private List<Id> currentVehicleIds;
 
 
-	public BasicHouseholdsReaderV5(List<BasicHousehold> households) {
+	public BasicHouseholdsReaderV1(List<BasicHousehold> households) {
 		if (households == null) {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}
@@ -92,7 +92,7 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 	 */
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		if (HouseholdsSchemaV5Names.HOUSEHOLD.equalsIgnoreCase(name)) {
+		if (HouseholdsSchemaV1Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			this.currentHousehold = this.builder.createHousehold(this.currentHhId, this.currentmembers, this.currentVehicleIds);
 			this.currentHhId = null;
 //			this.households.add(this.currentHousehold);
@@ -104,18 +104,18 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 			this.currentlocation = null;
 			this.currentVehicleIds = null;
 		}
-		else if (HouseholdsSchemaV5Names.INCOME.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.INCOME.equalsIgnoreCase(name)) {
 			this.currentincome.setIncome(Double.parseDouble(content.trim()));
 		}
-		else if (HouseholdsSchemaV5Names.COORDINATE.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.COORDINATE.equalsIgnoreCase(name)) {
 			this.currentlocation.setCoord(new CoordImpl(this.currentXCoord, this.currentYCoord));
 			this.currentXCoord = null;
 			this.currentYCoord = null;
 		}
-		else if (HouseholdsSchemaV5Names.XCOORD.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.XCOORD.equalsIgnoreCase(name)) {
 			this.currentXCoord = Double.valueOf(content);
 		}
-		else if (HouseholdsSchemaV5Names.YCOORD.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.YCOORD.equalsIgnoreCase(name)) {
 			this.currentYCoord = Double.valueOf(content);
 		}
 	}
@@ -125,37 +125,37 @@ public class BasicHouseholdsReaderV5 extends MatsimXmlParser {
 	 */
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (HouseholdsSchemaV5Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			this.currentHhId = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.ID));
+		if (HouseholdsSchemaV1Names.HOUSEHOLD.equalsIgnoreCase(name)) {
+			this.currentHhId = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.ID));
 		}
-		else if (HouseholdsSchemaV5Names.LANGUAGE.equalsIgnoreCase(name)) {
-			this.currentLanguage = atts.getValue(HouseholdsSchemaV5Names.NAME);
+		else if (HouseholdsSchemaV1Names.LANGUAGE.equalsIgnoreCase(name)) {
+			this.currentLanguage = atts.getValue(HouseholdsSchemaV1Names.NAME);
 		}
-		else if (HouseholdsSchemaV5Names.MEMBERS.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.MEMBERS.equalsIgnoreCase(name)) {
 			this.currentmembers = new ArrayList<Id>();
 		}
-		else if (HouseholdsSchemaV5Names.PERSONID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.REFID));
+		else if (HouseholdsSchemaV1Names.PERSONID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
 			this.currentmembers.add(id);
 		}
-		else if (HouseholdsSchemaV5Names.LOCATION.equalsIgnoreCase(name)) {
+		else if (HouseholdsSchemaV1Names.LOCATION.equalsIgnoreCase(name)) {
 			this.currentlocation = new BasicLocationImpl();
 		}
-		else if (HouseholdsSchemaV5Names.FACILITYID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.REFID));
+		else if (HouseholdsSchemaV1Names.FACILITYID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
 			this.currentlocation.setLocationId(id, true);
 		}
-		else if (HouseholdsSchemaV5Names.LINKID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.REFID));
+		else if (HouseholdsSchemaV1Names.LINKID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
 			this.currentlocation.setLocationId(id, false);
 		}
-		else if (HouseholdsSchemaV5Names.INCOME.equalsIgnoreCase(name)) {
-			IncomePeriod p = getIncomePeriod(atts.getValue(HouseholdsSchemaV5Names.PERIOD));
+		else if (HouseholdsSchemaV1Names.INCOME.equalsIgnoreCase(name)) {
+			IncomePeriod p = getIncomePeriod(atts.getValue(HouseholdsSchemaV1Names.PERIOD));
 			this.currentincome = new BasicIncomeImpl(p);
-			this.currentincome.setCurrency(atts.getValue(HouseholdsSchemaV5Names.CURRENCY));
+			this.currentincome.setCurrency(atts.getValue(HouseholdsSchemaV1Names.CURRENCY));
 		}
-		else if (HouseholdsSchemaV5Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
-			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV5Names.REFID));
+		else if (HouseholdsSchemaV1Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
 			if (this.currentVehicleIds == null) 
 				this.currentVehicleIds = new ArrayList<Id>();
 			this.currentVehicleIds.add(id);

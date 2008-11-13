@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author dgrether
  */
-public class BasicHouseholdsReaderV5Test extends MatsimTestCase {
+public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testHouseholds.xml";
 
@@ -44,7 +44,7 @@ public class BasicHouseholdsReaderV5Test extends MatsimTestCase {
   
 	public void testParser() {
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
-		BasicHouseholdsReaderV5 reader = new BasicHouseholdsReaderV5(households);
+		BasicHouseholdsReaderV1 reader = new BasicHouseholdsReaderV1(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
 		checkContent(households);
