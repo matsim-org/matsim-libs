@@ -344,6 +344,27 @@ public class Knowledge extends CustomizableImpl implements BasicKnowledge<Activi
 		}
 		return types;
 	}
+	
+	
+	/**
+	 * Returns if a specific activity of a specific facility is primary
+	 * @param act_type The activity type of the {@link Activity Activities}
+	 * @param facilityId The {@link Id} of a {@link Facility}
+	 */
+	public final boolean isPrimary(String act_type, Id facilityId) {
+		if (activities == null) { 
+			return false; 
+		}
+		for (KActivity ka : activities) {
+			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type)) &&
+					(ka.activity.getFacility().getId().equals(facilityId))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 
 	public final String getDescription() {
 		return this.desc;
