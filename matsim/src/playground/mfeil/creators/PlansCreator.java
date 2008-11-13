@@ -55,18 +55,18 @@ public class PlansCreator {
 				 for (int j=1;j<networkSize;j++){
 					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
 					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
-					 int linkIDShopping=0;
-					 if (locationIDShopping==37) linkIDShopping=5;
-					 if (locationIDShopping==38) linkIDShopping=14;
-					 if (locationIDShopping==39) linkIDShopping=23;
-					 if (locationIDShopping==40) linkIDShopping=32;
-					 if (locationIDShopping==41) linkIDShopping=41;
-					 int linkIDLeisure=0;
-					 if (locationIDLeisure==42) linkIDLeisure=50;
-					 if (locationIDLeisure==43) linkIDLeisure=59;
-					 if (locationIDLeisure==44) linkIDLeisure=68;
-					 if (locationIDLeisure==45) linkIDLeisure=77;
-					 if (locationIDLeisure==46) linkIDLeisure=86;
+					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
+					
+					 int[]IDs = getShoppingIDs (locationIDShopping);
+					 linkIDShopping=IDs[0];
+					 shoppingX=IDs[1];
+					 shoppingY=IDs[2];
+					 IDs = getLeisureIDs (locationIDLeisure);
+					 linkIDLeisure=IDs[0];
+					 leisureX=IDs[1];
+					 leisureY=IDs[2];
+					 
+					 
 					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
@@ -92,10 +92,10 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"work\" link=\""+(171+j)+"\" facility=\""+(networkSize-1+j)+"\" x=\"9000.0\" y=\""+(j*distance-distance/2)+"\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"1\" mode=\"car\" dep_time=\"16:00:00\" trav_time=\"00:00:00\" arr_time=\"16:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" x=\""+shoppingX+"\" y=\""+shoppingY+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"2\" mode=\"car\" dep_time=\"18:00:00\" trav_time=\"00:00:00\" arr_time=\"18:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" x=\""+leisureX+"\" y=\""+leisureY+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"3\" mode=\"car\" dep_time=\"20:00:00\" trav_time=\"00:00:00\" arr_time=\"20:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"home\" link=\""+(90+i)+"\" facility=\""+i+"\" x=\"0.0\" y=\""+(i*distance-distance/2)+"\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
@@ -112,18 +112,16 @@ public class PlansCreator {
 				 for (int j=1;j<networkSize;j++){
 					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
 					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
-					 int linkIDShopping=0;
-					 if (locationIDShopping==37) linkIDShopping=5;
-					 if (locationIDShopping==38) linkIDShopping=14;
-					 if (locationIDShopping==39) linkIDShopping=23;
-					 if (locationIDShopping==40) linkIDShopping=32;
-					 if (locationIDShopping==41) linkIDShopping=41;
-					 int linkIDLeisure=0;
-					 if (locationIDLeisure==42) linkIDLeisure=50;
-					 if (locationIDLeisure==43) linkIDLeisure=59;
-					 if (locationIDLeisure==44) linkIDLeisure=68;
-					 if (locationIDLeisure==45) linkIDLeisure=77;
-					 if (locationIDLeisure==46) linkIDLeisure=86;
+					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
+						
+					 int[]IDs = getShoppingIDs (locationIDShopping);
+					 linkIDShopping=IDs[0];
+					 shoppingX=IDs[1];
+					 shoppingY=IDs[2];
+					 IDs = getLeisureIDs (locationIDLeisure);
+					 linkIDLeisure=IDs[0];
+					 leisureX=IDs[1];
+					 leisureY=IDs[2];
 					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
@@ -149,10 +147,10 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"work\" link=\""+(90+j)+"\" facility=\""+j+"\" x=\"0.0\" y=\""+(j*distance-distance/2)+"\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"1\" mode=\"car\" dep_time=\"16:00:00\" trav_time=\"00:00:00\" arr_time=\"16:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" x=\""+shoppingX+"\" y=\""+shoppingY+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"2\" mode=\"car\" dep_time=\"18:00:00\" trav_time=\"00:00:00\" arr_time=\"18:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" x=\""+leisureX+"\" y=\""+leisureY+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"3\" mode=\"car\" dep_time=\"20:00:00\" trav_time=\"00:00:00\" arr_time=\"20:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"home\" link=\""+(171+i)+"\" facility=\""+(networkSize-1+i)+"\" x=\"9000.0\" y=\""+(i*distance-distance/2)+"\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
@@ -169,18 +167,16 @@ public class PlansCreator {
 				 for (int j=1;j<networkSize;j++){
 					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
 					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
-					 int linkIDShopping=0;
-					 if (locationIDShopping==37) linkIDShopping=5;
-					 if (locationIDShopping==38) linkIDShopping=14;
-					 if (locationIDShopping==39) linkIDShopping=23;
-					 if (locationIDShopping==40) linkIDShopping=32;
-					 if (locationIDShopping==41) linkIDShopping=41;
-					 int linkIDLeisure=0;
-					 if (locationIDLeisure==42) linkIDLeisure=50;
-					 if (locationIDLeisure==43) linkIDLeisure=59;
-					 if (locationIDLeisure==44) linkIDLeisure=68;
-					 if (locationIDLeisure==45) linkIDLeisure=77;
-					 if (locationIDLeisure==46) linkIDLeisure=86;
+					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
+						
+					 int[]IDs = getShoppingIDs (locationIDShopping);
+					 linkIDShopping=IDs[0];
+					 shoppingX=IDs[1];
+					 shoppingY=IDs[2];
+					 IDs = getLeisureIDs (locationIDLeisure);
+					 linkIDLeisure=IDs[0];
+					 leisureX=IDs[1];
+					 leisureY=IDs[2];
 					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
@@ -206,10 +202,10 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"work\" link=\""+(9*(networkSize-1)+j)+"\" facility=\""+(3*(networkSize-1)+j)+"\" x=\""+(j*distance-distance/2)+"\" y=\"9000.0\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"1\" mode=\"car\" dep_time=\"16:00:00\" trav_time=\"00:00:00\" arr_time=\"16:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" x=\""+shoppingX+"\" y=\""+shoppingY+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"2\" mode=\"car\" dep_time=\"18:00:00\" trav_time=\"00:00:00\" arr_time=\"18:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" x=\""+leisureX+"\" y=\""+leisureY+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"3\" mode=\"car\" dep_time=\"20:00:00\" trav_time=\"00:00:00\" arr_time=\"20:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"home\" link=\""+(i)+"\" facility=\""+(2*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"0.0\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
@@ -226,18 +222,16 @@ public class PlansCreator {
 				 for (int j=1;j<networkSize;j++){
 					 int locationIDShopping=(37+(int)(MatsimRandom.random.nextDouble()*(42-37)));
 					 int locationIDLeisure=(42+(int)(MatsimRandom.random.nextDouble()*(47-42)));
-					 int linkIDShopping=0;
-					 if (locationIDShopping==37) linkIDShopping=5;
-					 if (locationIDShopping==38) linkIDShopping=14;
-					 if (locationIDShopping==39) linkIDShopping=23;
-					 if (locationIDShopping==40) linkIDShopping=32;
-					 if (locationIDShopping==41) linkIDShopping=41;
-					 int linkIDLeisure=0;
-					 if (locationIDLeisure==42) linkIDLeisure=50;
-					 if (locationIDLeisure==43) linkIDLeisure=59;
-					 if (locationIDLeisure==44) linkIDLeisure=68;
-					 if (locationIDLeisure==45) linkIDLeisure=77;
-					 if (locationIDLeisure==46) linkIDLeisure=86;
+					 int shoppingX =0, shoppingY=0, leisureX=0, leisureY=0, linkIDShopping=0, linkIDLeisure = 0;
+						
+					 int[]IDs = getShoppingIDs (locationIDShopping);
+					 linkIDShopping=IDs[0];
+					 shoppingX=IDs[1];
+					 shoppingY=IDs[2];
+					 IDs = getLeisureIDs (locationIDLeisure);
+					 linkIDLeisure=IDs[0];
+					 leisureX=IDs[1];
+					 leisureY=IDs[2];
 					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
@@ -263,10 +257,10 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"work\" link=\""+(j)+"\" facility=\""+(2*(networkSize-1)+j)+"\" x=\""+(j*distance-distance/2)+"\" y=\"0.0\" start_time=\"00:8:00\" dur=\"08:00:00\" end_time=\"16:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"1\" mode=\"car\" dep_time=\"16:00:00\" trav_time=\"00:00:00\" arr_time=\"16:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"shopping\" link=\""+linkIDShopping+"\" facility=\""+locationIDShopping+"\" x=\""+shoppingX+"\" y=\""+shoppingY+"\" start_time=\"00:16:00\" dur=\"02:00:00\" end_time=\"18:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"2\" mode=\"car\" dep_time=\"18:00:00\" trav_time=\"00:00:00\" arr_time=\"18:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" x=\""+leisureX+"\" y=\""+leisureY+"\" start_time=\"00:18:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"3\" mode=\"car\" dep_time=\"20:00:00\" trav_time=\"00:00:00\" arr_time=\"20:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
 					 out.write("\t\t\t<act type=\"home\" link=\""+(4*(networkSize-1)+i)+"\" facility=\""+(3*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"9000.0\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
@@ -287,9 +281,19 @@ public class PlansCreator {
 		}catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-
-		
-		
 	}
-
+	public static int [] getShoppingIDs (int locationIDShopping){
+		 if (locationIDShopping==37) return (new int[]{5, 4500, 0});
+		 if (locationIDShopping==38) return (new int[]{14, 4500, 2000});
+		 if (locationIDShopping==39) return (new int[]{23, 4500, 4000});
+		 if (locationIDShopping==40) return (new int[]{32, 4500, 6000});
+		 else return (new int[]{41, 4500, 8000});
+	}
+	public static int [] getLeisureIDs (int locationIDShopping){
+		 if (locationIDShopping==42) return (new int[]{50, 4500, 1000});
+		 if (locationIDShopping==43) return (new int[]{59, 4500, 3000});
+		 if (locationIDShopping==44) return (new int[]{68, 4500, 5000});
+		 if (locationIDShopping==45) return (new int[]{77, 4500, 7000});
+		 else return (new int[]{86, 4500, 9000});
+	}
 }
