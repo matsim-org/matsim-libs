@@ -2,7 +2,7 @@
 <population
   xmlns="http://www.matsim.org/files/dtd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.00.xsd">
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.0.xsd">
 
 <person id="23" sex="m" age="23" license="true" carAvailable="sometimes" isEmployed="true">
   <travelcard>

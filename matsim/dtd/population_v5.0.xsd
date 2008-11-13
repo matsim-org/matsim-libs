@@ -7,7 +7,7 @@ xml:lang="en">
 
 <!--  <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 --><xs:include schemaLocation="http://www.matsim.org/files/dtd/populationEnumTypes.xsd"/>
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/households_v1.00.xsd" />
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/households_v1.0.xsd" />
 
 <xs:annotation>
   <xs:documentation>
