@@ -145,8 +145,8 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			final Act act = (Act)actslegs.get(j);	
 			
 			// found secondary activity
-			if (secondaryTypes.contains(act.getType()) && 
-					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId())) {
+			if (secondaryTypes.contains(act.getType()) && !(
+					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()))) {
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}		
 			// found primary activity
