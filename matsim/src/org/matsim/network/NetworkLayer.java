@@ -50,8 +50,9 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 	private QuadTree<Node> nodeQuadTree = null;
 
-	private double effectiveCellSize = 7.5; //TODO I've set this to 7.5 because - If one creates a network from scratch (means not using NetworkReader
-	// then effectiveCellSize will never be set  - might be this is just a workaround and we should look for a better solution?? [GL] feb 2008
+	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
+	
+	private double effectiveCellSize = DEFAULT_EFFECTIVE_CELL_SIZE;
 
 	private double effectiveLaneWidth = Double.NaN;
 
@@ -163,10 +164,14 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	}
 
 	public final void setEffectiveCellSize(final double effectiveCellSize) {
-		if (!Double.isNaN(this.effectiveCellSize)) {
-			log.warn(this + "[effectiveCellSize=" + effectiveCellSize + " already set. effectiveCellSize will be overwritten]");
+		if (this.effectiveCellSize != effectiveCellSize) {
+			if (effectiveCellSize != DEFAULT_EFFECTIVE_CELL_SIZE) {
+				log.warn("Setting effectiveCellSize to a non-default value of " + effectiveCellSize);
+			} else {
+				log.info("Setting effectiveCellSize to " + effectiveCellSize);
+			}
+			this.effectiveCellSize = effectiveCellSize;
 		}
-		this.effectiveCellSize = effectiveCellSize;
 	}
 
 	public final void setEffectiveLaneWidth(final double effectiveLaneWidth) {
