@@ -44,17 +44,12 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 	public static final Id LAYER_TYPE = new IdImpl("link");
 
-
 	protected int capperiod = Integer.MIN_VALUE ;
 
 	protected Map<Id, Node> nodes = new TreeMap<Id, Node>();
 
 	private QuadTree<Node> nodeQuadTree = null;
 
-	private final ArrayList<Integer> nodeRoles = new ArrayList<Integer>(5);
-	private final ArrayList<Integer> linkRoles = new ArrayList<Integer>(5);
-	private int maxNodeRoleIndex = 4;
-	private int maxLinkRoleIndex = 4;
 	private double effectiveCellSize = 7.5; //TODO I've set this to 7.5 because - If one creates a network from scratch (means not using NetworkReader
 	// then effectiveCellSize will never be set  - might be this is just a workaround and we should look for a better solution?? [GL] feb 2008
 
