@@ -93,8 +93,8 @@ public class NetworkExpandNode {
 
 	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		// check the input
-		if (r == Double.NaN) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
-		if (e == Double.NaN) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
+		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
+		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (network == null) { throw new IllegalArgumentException("network not defined."); }
 		Node node = network.getNode(nodeId);
 		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
