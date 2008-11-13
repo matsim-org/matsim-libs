@@ -35,7 +35,7 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 
 	protected final TravelTime timeCalculator;
 	private final double travelCostFactor;
-	private final double distanceCost;
+	private final double marginalUtlOfDistance;
 
 	public TravelTimeDistanceCostCalculator(final TravelTime timeCalculator) {
 		this.timeCalculator = timeCalculator;
@@ -43,15 +43,15 @@ public class TravelTimeDistanceCostCalculator implements TravelMinCost {
 		 * but the cost should be positive. Thus negate the utility.
 		 */
 		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
-		this.distanceCost = Gbl.getConfig().charyparNagelScoring().getDistanceCost() / 1000.0;
+		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistance();
 	}
 
 	public double getLinkTravelCost(final Link link, final double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
-		if (this.distanceCost == 0.0) {
+		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;
 		}
-		return travelTime * this.travelCostFactor + this.distanceCost * link.getLength();
+		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 
 	public double getLinkMinimumTravelCost(final Link link) {

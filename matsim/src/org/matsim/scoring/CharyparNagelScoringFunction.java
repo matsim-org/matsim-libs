@@ -183,7 +183,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
 	private static double marginalUtilityOfTravelingWalk = Double.NaN;
 	private static double marginalUtilityOfPerforming = Double.NaN;
-	private static double distanceCost = Double.NaN;
+	private static double marginalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
 
 	private static void init() {
@@ -199,7 +199,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
-		distanceCost = params.getDistanceCost() / 1000.0;
+		marginalUtilityOfDistance = params.getMarginalUtlOfDistance();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
@@ -339,7 +339,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
-		if (distanceCost != 0.0) {
+		if (marginalUtilityOfDistance != 0.0) {
 			/* we only as for the route when we have to calculate a distance cost,
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
@@ -356,14 +356,14 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		}
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingWalk - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingWalk + marginalUtilityOfDistance * dist;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
 		}
 
 		return tmpScore;

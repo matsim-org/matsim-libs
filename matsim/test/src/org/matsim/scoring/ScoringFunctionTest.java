@@ -58,7 +58,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 		scoring.setPerforming(6.0);
 		scoring.setTraveling(-6.0);
 		scoring.setTravelingPt(0.0);
-		scoring.setDistanceCost(0.0);
+		scoring.setMarginalUtlOfDistance(0.0);
 		scoring.setWaiting(0.0);
 
 		// setup activity types h and w for scoring

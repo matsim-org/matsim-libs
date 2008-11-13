@@ -20,7 +20,6 @@
 
 package playground.christoph.router.costcalculators;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -33,7 +32,6 @@ import org.matsim.router.util.TravelTime;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 import playground.christoph.router.util.KnowledgeTravelTime;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 
 /*
@@ -43,7 +41,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 
 	protected TravelTime timeCalculator;
 	protected double travelCostFactor;
-	protected double distanceCost;
+	protected double marginalUtlOfDistance;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
@@ -54,7 +52,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		 * but the cost should be positive. Thus negate the utility.
 		 */
 		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
-		this.distanceCost = Gbl.getConfig().charyparNagelScoring().getDistanceCost() / 1000.0;
+		this.marginalUtlOfDistance = Gbl.getConfig().charyparNagelScoring().getMarginalUtlOfDistance();
 	}
 	
 	public double getLinkTravelCost(final Link link, final double time) 
@@ -78,11 +76,11 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		// Person knows the link, so calculate it's costs
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 	
-		if (this.distanceCost == 0.0) 
+		if (this.marginalUtlOfDistance == 0.0) 
 		{
 			return travelTime * this.travelCostFactor;
 		}
-		return travelTime * this.travelCostFactor + this.distanceCost * link.getLength();
+		return travelTime * this.travelCostFactor - this.marginalUtlOfDistance * link.getLength();
 	}
 	
 	public KnowledgeTravelCostCalculator clone()
@@ -100,7 +98,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 		}
 		
 		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);
-		clone.distanceCost = this.distanceCost;
+		clone.marginalUtlOfDistance = this.marginalUtlOfDistance;
 		clone.travelCostFactor = this.travelCostFactor;
 		
 		return clone;

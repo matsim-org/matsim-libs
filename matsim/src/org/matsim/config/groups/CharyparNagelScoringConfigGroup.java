@@ -44,8 +44,10 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private static final String TRAVELING_PT = "travelingPt";
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String WAITING  = "waiting";
-	private static final String DISTANCE_COST = "distanceCost";
+	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance";
 
+	@Deprecated
+	private static final String DISTANCE_COST = "distanceCost";
 	@Deprecated
 	private static final String NUM_ACTIVITIES = "numActivities";
 
@@ -71,13 +73,13 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double traveling = -6.0;
 	private double travelingPt = -6.0;
 	private double travelingWalk = -6.0;
-	private double distanceCost = 0.0;
+	private double marginalUtlOfDistance = 0.0;
 	private double waiting = -0.0;
 
 	private final Map<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
+	/*package*/ static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
 
 	@Override
 	public String getValue(final String key) {
@@ -99,8 +101,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return Double.toString(getTravelingPt());
 		} else if (TRAVELING_WALK.equals(key)) {
 			return Double.toString(getTravelingWalk());
-		} else if (DISTANCE_COST.equals(key)) {
-			return Double.toString(getDistanceCost());
+		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
+			return Double.toString(getMarginalUtlOfDistance());
 		} else if (WAITING.equals(key)) {
 			return Double.toString(getWaiting());
 		} else if (key != null && key.startsWith(ACTIVITY_TYPE)) {
@@ -152,8 +154,14 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			setTravelingPt(Double.parseDouble(value));
 		} else if (TRAVELING_WALK.equals(key)) {
 			setTravelingWalk(Double.parseDouble(value));
+		} else if (MARGINAL_UTL_OF_DISTANCE.equals(key)) {
+			setMarginalUtlOfDistance(Double.parseDouble(value));
 		} else if (DISTANCE_COST.equals(key)) {
-			setDistanceCost(Double.parseDouble(value));
+			log.warn("The parameter " + DISTANCE_COST + " in module " + GROUP_NAME + " should be replaced by the parameter " + MARGINAL_UTL_OF_DISTANCE + ".");
+			log.warn("Please change your config file. Take care to also negate the value of the parameter! distanceCost was specified as 'Money per kilometer', marginalUtlOfDistance is 'Money per METER'!!!");
+			double newValue = -Double.parseDouble(value) / 1000.0;
+			log.warn("We will set now the parameter '" + MARGINAL_UTL_OF_DISTANCE + "' to the value " + newValue);
+			setMarginalUtlOfDistance(newValue);
 		} else if (WAITING.equals(key)) {
 			setWaiting(Double.parseDouble(value));
 		} else if (NUM_ACTIVITIES.equals(key)) {
@@ -203,7 +211,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		map.put(TRAVELING_PT, getValue(TRAVELING_PT));
 		map.put(TRAVELING_WALK, getValue(TRAVELING_WALK));
 		map.put(WAITING, getValue(WAITING));
-		map.put(DISTANCE_COST, getValue(DISTANCE_COST));
+		map.put(MARGINAL_UTL_OF_DISTANCE, getValue(MARGINAL_UTL_OF_DISTANCE));
 
 		for(Entry<String, ActivityParams> entry : this.activityTypesByNumber.entrySet()) {
 			String key = entry.getKey();
@@ -322,13 +330,19 @@ public class CharyparNagelScoringConfigGroup extends Module {
 		this.travelingWalk = travelingWalk;
 	}
 	
-	public double getDistanceCost() {
-		return this.distanceCost;
+	/**
+	 * @return the marginal utility of distance per meter
+	 */
+	public double getMarginalUtlOfDistance() {
+		return this.marginalUtlOfDistance;
 	}
-	public void setDistanceCost(final double distanceCost) {
-		this.distanceCost = distanceCost;
+	/**
+	 * @param marginalUtlOfDistance the marginal utility of distance per meter
+	 */
+	public void setMarginalUtlOfDistance(final double marginalUtlOfDistance) {
+		this.marginalUtlOfDistance = marginalUtlOfDistance;
 	}
-
+	
 	public double getWaiting() {
 		return this.waiting;
 	}
@@ -389,7 +403,7 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			return this.minimalDuration;
 		}
 		public void setMinimalDuration(final double minimalDuration) {
-			if ( minimalDuration != Time.UNDEFINED_TIME  ) {
+			if (minimalDuration != Time.UNDEFINED_TIME) {
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
 						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08");
 			}

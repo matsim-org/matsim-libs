@@ -114,7 +114,7 @@ public class NetworkDistance {
 		// set the config to only look at distance costs, not travel time costs
 		Config config = Gbl.createConfig(null);
 		config.charyparNagelScoring().setTraveling(0.0);
-		config.charyparNagelScoring().setDistanceCost(1.0);
+		config.charyparNagelScoring().setMarginalUtlOfDistance(-0.001); // -1 per kilometer == -0.001 per meter
 
 		// create the router algorithm
 		TravelTime travelTime = new FreespeedTravelTimeCost();

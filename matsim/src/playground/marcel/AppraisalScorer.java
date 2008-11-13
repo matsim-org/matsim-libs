@@ -84,7 +84,7 @@ public class AppraisalScorer implements ScoringFunction {
 	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
 	protected static double marginalUtilityOfTraveling = Double.NaN;
 	protected static double marginalUtilityOfPerforming = Double.NaN;
-	protected static double distanceCost = Double.NaN;
+	protected static double marginalUtilityOfDistance = Double.NaN;
 	protected static double abortedPlanScore = Double.NaN;
 	protected static double learningRate = Double.NaN;
 
@@ -125,7 +125,7 @@ public class AppraisalScorer implements ScoringFunction {
 		marginalUtilityOfTraveling = config.charyparNagelScoring().getTraveling() / 3600.0;
 		marginalUtilityOfPerforming = config.charyparNagelScoring().getPerforming() / 3600.0;
 
-		distanceCost = config.charyparNagelScoring().getDistanceCost() / 1000.0;
+		marginalUtilityOfDistance = config.charyparNagelScoring().getMarginalUtlOfDistance();
 
 		learningRate = config.charyparNagelScoring().getLearningRate();
 
@@ -146,7 +146,7 @@ public class AppraisalScorer implements ScoringFunction {
 			throw new RuntimeException("Could not find utility param for " + act.getType());
 		}
 
-		double score = 0.0;
+		double tmpScore = 0.0;
 
 		/* Calculate the times the agent actually performs the
 		 * activity.  The facility must be open for the agent to
@@ -202,7 +202,7 @@ public class AppraisalScorer implements ScoringFunction {
 			// agent arrives to early, has to wait
 			double partialScore = marginalUtilityOfWaiting * (activityStart - arrivalTime);
 			this.scoreWaiting += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		// disutility if too late
@@ -211,7 +211,7 @@ public class AppraisalScorer implements ScoringFunction {
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
 			double partialScore = marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 			this.scoreLateArrival += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
@@ -223,11 +223,11 @@ public class AppraisalScorer implements ScoringFunction {
 			double utilWait = marginalUtilityOfWaiting * duration;
 			double partialScore = Math.max(0, Math.max(utilPerf, utilWait));
 			this.scorePerforming += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		} else {
 			double partialScore = 2*marginalUtilityOfLateArrival*Math.abs(duration);
 			this.scorePerforming += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		// disutility if stopping too early
@@ -235,14 +235,14 @@ public class AppraisalScorer implements ScoringFunction {
 		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
 			double partialScore = marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 			this.scoreEarlyDeparture += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
 			double partialScore = marginalUtilityOfWaiting * (departureTime - activityEnd);
 			this.scoreWaiting += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		// disutility if duration was too short
@@ -250,7 +250,7 @@ public class AppraisalScorer implements ScoringFunction {
 		if (minimalDuration >= 0 && duration < minimalDuration) {
 			double partialScore = marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 			this.scoreEarlyDeparture += partialScore;
-			score += partialScore;
+			tmpScore += partialScore;
 		}
 
 		if (act.getType().equals("h")) {
@@ -259,15 +259,15 @@ public class AppraisalScorer implements ScoringFunction {
 			this.workduration = duration;
 		}
 
-		return score;
+		return tmpScore;
 	}
 
 	public double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double score = 0.0;
+		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
-		if (distanceCost != 0.0) {
+		if (marginalUtilityOfDistance != 0.0) {
 			/* we only as for the route when we have to calculate a distance cost,
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
@@ -280,13 +280,13 @@ public class AppraisalScorer implements ScoringFunction {
 			 */
 		}
 
-		double partialScore = travelTime * marginalUtilityOfTraveling	- distanceCost * dist;
+		double partialScore = travelTime * marginalUtilityOfTraveling	+ marginalUtilityOfDistance * dist;
 		this.scoreTraveling += partialScore;
-		score += partialScore;
+		tmpScore += partialScore;
 
 		this.traveltime[leg.getNum()] = travelTime;
 
-		return score;
+		return tmpScore;
 	}
 
 	public static double getStuckPenalty() {

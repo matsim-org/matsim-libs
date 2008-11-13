@@ -63,7 +63,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		scoring.setPerforming(0.0);
 		scoring.setTraveling(0.0);
 		scoring.setTravelingPt(0.0);
-		scoring.setDistanceCost(0.0);
+		scoring.setMarginalUtlOfDistance(0.0);
 		scoring.setWaiting(0.0);
 
 		// setup activity types h and w for scoring
@@ -362,11 +362,11 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		testee.finish();
 		testee.getScore();
 
-		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min travelling
+		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
 	}
 
-	public void testDistanceCost() {
-		this.config.charyparNagelScoring().setDistanceCost(0.01);
+	public void testMarginalUtilityOfDistance() {
+		this.config.charyparNagelScoring().setMarginalUtlOfDistance(-0.00001);
 		assertEquals(-0.45, calcScore(), EPSILON);
 	}
 

@@ -176,7 +176,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	protected static double marginalUtilityOfTraveling = Double.NaN;
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
 	private static double marginalUtilityOfPerforming = Double.NaN;
-	private static double distanceCost = Double.NaN;
+	private static double marignalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
 
 	private static void init() {
@@ -194,7 +194,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		marginalUtilityOfTravelingPT = params.getTravelingPt() / 3600.0;
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
-		distanceCost = params.getDistanceCost() / 1000.0;
+		marignalUtilityOfDistance = params.getMarginalUtlOfDistance();
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
@@ -214,7 +214,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
 
-		double score = 0.0;
+		double tmpScore = 0.0;
 
 		/* Calculate the times the agent actually performs the
 		 * activity.  The facility must be open for the agent to
@@ -275,15 +275,15 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 
 			double utilWait = marginalUtilityOfWaiting * duration;
-			score += Math.max(0, Math.max(utilPerf, utilWait));
+			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			score += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 		
 		// used arrival and departure time because of parking cap restr. before act actually starts
 		if (!act.getType().equalsIgnoreCase("home")) {
 			this.penalty.add(new Penalty(arrivalTime, departureTime, 
-					this.facilityPenalties.get(act.getFacility().getId()), score));
+					this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
 		}	
 		
 		// DISUTILITIES: -------------------------------------------------------------------------------
@@ -291,43 +291,43 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			score += marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			score += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-			score += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			score += marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-			score += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
+			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
 		
-		return score;
+		return tmpScore;
 	}
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double score = 0.0;
+		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
-		if (distanceCost != 0.0) {
+		if (marignalUtilityOfDistance != 0.0) {
 			/* we only as for the route when we have to calculate a distance cost,
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
@@ -344,15 +344,15 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		}
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marignalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			score += travelTime * marginalUtilityOfTravelingPT - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingPT + marignalUtilityOfDistance * dist;
 		} else {
 			// use the same values as for "car"
-			score += travelTime * marginalUtilityOfTraveling - distanceCost * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marignalUtilityOfDistance * dist;
 		}
 
-		return score;
+		return tmpScore;
 	}
 
 	private static double getStuckPenalty() {
