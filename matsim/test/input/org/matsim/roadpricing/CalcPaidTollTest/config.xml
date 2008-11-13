@@ -11,8 +11,6 @@
 		<param name="traveling" value="-6" />
 		<param name="waiting" value="-0" />
 
-		<param name="numActivities"             value="2" />
-
 		<param name="activityType_0"            value="h" />
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />

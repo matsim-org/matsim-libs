@@ -4,13 +4,11 @@
 
 	<module name="config" >
 		<param name="outputConfigFile" value="./testdata/tmp/output_config.xml" />
-		<param name="outputVersion" value="v1" />
 	</module>
 
 	<module name="counts">
 		<param name="inputCountsFile" value="test/scenarios/triangle/counts.xml" />
 		<param name="outputCountsFile" value="dummy/output_counts.xml" />
-		<param name="outputVersion" value="v1" />
 	</module>
 	
 	<module name="network">

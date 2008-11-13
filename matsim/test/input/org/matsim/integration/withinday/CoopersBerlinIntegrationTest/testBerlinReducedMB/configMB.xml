@@ -5,20 +5,7 @@
 <config>
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="coordinateSystem" value="Atlantis" />
-	</module>
-
-	<module name="world">
-	</module>
-
-	<module name="network">
-	</module>
-
-	<module name="plans">
-	</module>
-
-	<module name="events">
 	</module>
 
 	<module name="controler">
@@ -27,20 +14,18 @@
 	</module>
 
 	<module name="simulation">
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
 		<param name="flowCapacityFactor" value="0.13" />
 		<param name="storageCapacityFactor" value="0.13" />
 	</module>
 
-	  <module name="withinday">
-	    <param name="withindayIteration" value="0" />
-	    <param name="replanningInterval" value="1" />
-			<param name="agentVisibilityRange" value="1" />
-	    <param name="contentThreshold" value="0" />
-	  </module>
+	<module name="withinday">
+		<param name="withindayIteration" value="0" />
+		<param name="replanningInterval" value="1" />
+		<param name="agentVisibilityRange" value="1" />
+		<param name="contentThreshold" value="0" />
+	</module>
 
-		<module name="planCalcScore" >
+	<module name="planCalcScore">
 		<param name="BrainExpBeta" value="2.0" />
 		<param name="activityClosingTime_1" value="18:00:00" />
 		<param name="activityClosingTime_10" value="22:00:00" />

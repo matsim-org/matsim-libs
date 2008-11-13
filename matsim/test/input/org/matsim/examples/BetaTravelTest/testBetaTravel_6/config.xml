@@ -4,7 +4,6 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="outputTimeFormat" value="HH:mm:ss" />
 		<param name="localDTDBase" value="dtd/" />
 		<param name="numberOfThreads" value="0" />
 	</module>
@@ -24,8 +23,6 @@
 	</module>
 
 	<module name="simulation">
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
 		<param name = "flowCapacityFactor"	value = "0.20"/>
 		<param name = "storageCapacityFactor"	value = "1.00"/>
 	</module>
