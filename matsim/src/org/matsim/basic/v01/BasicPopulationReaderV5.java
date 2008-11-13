@@ -56,7 +56,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 
 	private String currentActType;
 
-//	private double currentDuration;
+	private double currentDuration;
 
 	private double currentStartTime;
 
@@ -139,7 +139,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			this.currentAct = this.populationBuilder.createAct(this.currentPlan, this.currentActType, this.currentlocation);		
 		  this.currentAct.setEndTime(currentEndTime);
 		  this.currentAct.setStartTime(currentStartTime);
-//		  this.currentAct.setDuration(currentDuration);
+		  this.currentAct.setDuration(currentDuration);
 		  this.currentActType = null;
 		  this.currentlocation = null;
 		}
@@ -250,7 +250,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			this.currentActType = atts.getValue(PopulationSchemaV5Names.TYPE);
 			String end = atts.getValue(PopulationSchemaV5Names.ENDTIME);
 			String start = atts.getValue(PopulationSchemaV5Names.STARTTIME);
-//			String dur = atts.getValue(PopulationSchemaV5Names.DURATION);
+			String dur = atts.getValue(PopulationSchemaV5Names.DURATION);
 			if (end != null) {
 				this.currentEndTime = parseTime(end);
 			}
@@ -263,12 +263,12 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			else {
 				this.currentStartTime = Time.UNDEFINED_TIME;
 			}
-//			if (dur != null) {
-//				this.currentDuration = parseTime(dur);
-//			}
-//			else {
-//				this.currentDuration = Time.UNDEFINED_TIME;
-//			}
+			if (dur != null) {
+				this.currentDuration = parseTime(dur);
+			}
+			else {
+				this.currentDuration = Time.UNDEFINED_TIME;
+			}
 		}
 		else if (PopulationSchemaV5Names.LOCATION.equalsIgnoreCase(name)) {
 			this.currentlocation = new BasicLocationImpl();

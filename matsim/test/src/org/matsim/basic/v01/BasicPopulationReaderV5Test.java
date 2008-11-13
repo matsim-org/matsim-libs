@@ -57,7 +57,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
   private final Coord coord = new CoordImpl(0.0, 0.0);
   
   
-	public void estBasicParser() {
+	public void testBasicParser() {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
 		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
 		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
@@ -67,7 +67,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		hhTest.checkContent(households);
 	}
 	
-	public void estParser() {
+	public void testParser() {
 		Population pop = new Population(Population.NO_STREAMING);
 		pop.addPerson(new PersonImpl(id42));
 		pop.addPerson(new PersonImpl(id43));
@@ -128,7 +128,6 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertEquals("ch-HT-2y", pp.getTravelcards().first());
 		assertEquals(id23, pp.getFiscalHouseholdId());
 		//check knowledge
-		//TODO
 		BasicKnowledge<BasicActivity> knowledge = pp.getKnowledge();
 		assertNotNull(knowledge);
 		assertNotNull(knowledge.getDescription());
@@ -174,6 +173,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 				assertEquals(48.28d, act.getCoord().getX(), EPSILON);
 				assertEquals(7.56d, act.getCoord().getY(), EPSILON);
 				assertEquals(6.0*3600.0d, act.getEndTime(), EPSILON);
+				assertEquals(23.0d*60.0d, act.getDuration(), EPSILON);
 			}
 			else if (i == 1) {
 				assertEquals("w", act.getType());

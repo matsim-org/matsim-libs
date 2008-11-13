@@ -28,7 +28,7 @@
     </activity>
   </knowledge>
 	<plan selected="true" score="42.42">
-		<act type="h" endTime="06:00:00">
+		<act type="h" duration="00:23:00" endTime="06:00:00">
       <location>
         <coordinate>
           <xCoord>48.28</xCoord>
