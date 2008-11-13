@@ -22,7 +22,6 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderTeleatlas;
@@ -41,9 +40,6 @@ public class TeleAtlas2Network {
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
-
-	private final static Logger log = Logger.getLogger(TeleAtlas2Network.class);
-	
 
 	private static NetworkReaderTeleatlas reader = null;
 	private static NetworkLayer network = null;
@@ -67,35 +63,35 @@ public class TeleAtlas2Network {
 	//////////////////////////////////////////////////////////////////////
 	
 	public static final NetworkLayer convert() throws Exception {
-		log.info("conversion settings...");
+		System.out.println("conversion settings...");
 		printSetting();
-		log.info("done.");
+		System.out.println("done.");
 		
 		reader.read();
 		if (srModule != null) { srModule.run(network); }
 		if (mrModule != null) { mrModule.run(network); }
 		
 		if (writeNetworkXmlFile) {
-			log.info("writing xml file...");
+			System.out.println("writing xml file...");
 			new NetworkWriter(network,outputDir+"/output_network.xml.gz").write();
-			log.info("done.");
+			System.out.println("done.");
 		}
 		if (writeNetworkTxtFile) {
-			log.info("writing txt files...");
+			System.out.println("writing txt files...");
 			NetworkWriteAsTable nwat = new NetworkWriteAsTable(outputDir);
 			nwat.run(network);
 			nwat.close();
-			log.info("done.");
+			System.out.println("done.");
 		}
 		if (writeNetworkShapeFile) {
-			log.info("writing shape file...");
+			System.out.println("writing shape file...");
 			if (Gbl.getConfig() == null) { Gbl.createConfig(null); }
 			Gbl.getConfig().global().setCoordinateSystem("WGS84");
 			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
 			new Network2ESRIShape(network,outputDir+"/output_links.shp",builder).write();
-			log.info("done.");
+			System.out.println("done.");
 		}
 		return network;
 	}
@@ -105,58 +101,14 @@ public class TeleAtlas2Network {
 	//////////////////////////////////////////////////////////////////////
 
 	private static final void printSetting() {
-		log.info("  input / output:");
-		log.info("    jcShpFileName: "+jcShpFileName);
-		log.info("    nwShpFileName: "+nwShpFileName);
-		log.info("    srDbfFileName: "+srDbfFileName);
-		log.info("    mnShpFileName: "+mnShpFileName);
-		log.info("    mpDbfFileName: "+mpDbfFileName);
-		log.info("    outputDir:     "+outputDir);
-		log.info("  options:");
-		log.info("    ignoreFrcType8:              "+reader.ignoreFrcType8);
-		log.info("    ignoreFrcType7onewayN:       "+reader.ignoreFrcType7onewayN);
-		log.info("    maxFrcTypeForDoubleLaneLink: "+reader.maxFrcTypeForDoubleLaneLink);
-		log.info("    minSpeedForNormalCapacity:   "+reader.minSpeedForNormalCapacity);
-		log.info("    removeUTurns:                "+mrModule.removeUTurns);
-		log.info("    expansionRadius:             "+mrModule.expansionRadius);
-		log.info("    linkSeparation:              "+mrModule.linkSeparation);
-		log.info("    writeNetworkXmlFile:         "+writeNetworkXmlFile);
-		log.info("    writeNetworkTxtFile:         "+writeNetworkTxtFile);
-		log.info("    writeNetworkShapeFile:       "+writeNetworkShapeFile);
-		log.info("  junction shape file attributes:");
-		log.info("    nodeIdName:      "+reader.nodeIdName);
-		log.info("    nodeFeattypName: "+reader.nodeFeattypName);
-		log.info("    nodeJncttypName: "+reader.nodeJncttypName);
-		log.info("  network shape file attributes:");
-		log.info("    linkIdName:             "+reader.linkIdName);
-		log.info("    linkFeatTypName:        "+reader.linkFeatTypName);
-		log.info("    linkFerryTypeName:      "+reader.linkFerryTypeName);
-		log.info("    linkFromJunctionIdName: "+reader.linkFromJunctionIdName);
-		log.info("    linkToJunctionIdName:   "+reader.linkToJunctionIdName);
-		log.info("    linkLengthName:         "+reader.linkLengthName);
-		log.info("    linkFrcTypeName:        "+reader.linkFrcTypeName);
-		log.info("    linkOnewayName:         "+reader.linkOnewayName);
-		log.info("    linkSpeedName:          "+reader.linkSpeedName);
-		log.info("    linkLanesName:          "+reader.linkLanesName);
-		if (srDbfFileName != null) {
-			log.info("  speed restriction dbf file attributes:");
-			log.info("    srIdName:       "+srModule.srIdName);
-			log.info("    srSpeedName:    "+srModule.srSpeedName);
-			log.info("    srValDirName:   "+srModule.srValDirName);
-			log.info("    srVerifiedName: "+srModule.srVerifiedName);
-		}
-		if (mrModule != null) {
-			log.info("  maneuver shape file attributes:");
-			log.info("    mnIdName:       "+mrModule.mnIdName);
-			log.info("    mnFeatTypeName: "+mrModule.mnFeatTypeName);
-			log.info("    mnJnctIdName:   "+mrModule.mnJnctIdName);
-		}
-		if (mrModule != null) {
-			log.info("  maneuver paths dbf file attributes:");
-			log.info("    mpIdName: "+mrModule.mpIdName);
-			log.info("    mpSeqNrName: "+mrModule.mpSeqNrName);
-			log.info("    mpTrpelIDName: "+mrModule.mpTrpelIDName);
-		}
+		reader.printInfo("  ");
+		if (srModule != null) { srModule.printInfo("  "); }
+		if (mrModule != null) { mrModule.printInfo("  "); }
+		System.out.println("  output:");
+		System.out.println("    outputDir:             "+outputDir);
+		System.out.println("    writeNetworkXmlFile:   "+writeNetworkXmlFile);
+		System.out.println("    writeNetworkTxtFile:   "+writeNetworkTxtFile);
+		System.out.println("    writeNetworkShapeFile: "+writeNetworkShapeFile);
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -260,8 +212,8 @@ public class TeleAtlas2Network {
 		if (mnShpFileName != null) {
 			mrModule = new NetworkTeleatlasAddManeuverRestrictions(mnShpFileName,mpDbfFileName);
 			mrModule.removeUTurns = removeUTurns;
-			if (expansionRadius != Double.NaN) { mrModule.expansionRadius = expansionRadius; }
-			if (linkSeparation != Double.NaN) { mrModule.linkSeparation = linkSeparation; }
+			if (!Double.isNaN(expansionRadius)) { mrModule.expansionRadius = expansionRadius; }
+			if (!Double.isNaN(linkSeparation)) { mrModule.linkSeparation = linkSeparation; }
 		}
 	}
 
@@ -286,11 +238,14 @@ public class TeleAtlas2Network {
 		System.out.println("srDbfFile:       Teleatlas speed restriction DBF File (typically called 'xyz________sr.dbf')");
 		System.out.println("mnShpFile:       Teleatlas maneuver Shape File (typically called 'xyz________mn.shp')");
 		System.out.println("mpShpFile:       Teleatlas maneuver paths DBF File (typically called 'xyz________mp.dbf')");
-		System.out.println("outputDirectory: Directory where output files (MATSim XML network file and shape files) are stored.");
+		System.out.println("outputDirectory: Directory where output files (MATSim XML network file, ASCII files and shape files) are stored.");
 		System.out.println("                 default: ./output");
-		System.out.println("                 If writing option is set (see below) the files will be stored in:");
+		System.out.println("                 If writing option is set (see below) the files will be stored as:");
 		System.out.println("                 <outputDirectory>/output_network.xml.gz");
-		System.out.println("                 <outputDirectory>/output_links.shp");
+		System.out.println("                 <outputDirectory>/output_links.shp (and related files)");
+		System.out.println("                 <outputDirectory>/nodes.txt");
+		System.out.println("                 <outputDirectory>/links.txt");
+		System.out.println("                 <outputDirectory>/linksET.txt");
 		System.out.println();
 		System.out.println("Options:");
 		System.out.println("--xml:           If set, a MATSim XML network file will be written to <outputDirectory>/output_network.xml.gz.");
@@ -353,7 +308,6 @@ public class TeleAtlas2Network {
 		
 		network = new NetworkLayer();
 		parseArguments(args);
-		printSetting();
 		convert();
 		// TODO balmermi: more options
 		// transform // -t WGS84toCH1903LV03

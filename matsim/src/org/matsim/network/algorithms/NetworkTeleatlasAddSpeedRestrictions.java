@@ -40,10 +40,10 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	
 	private final String srDbfFileName; // teleatlas speed restriction dbf file name
 	
-	public final String srIdName = "ID";
-	public final String srSpeedName = "SPEED";
-	public final String srValDirName = "VALDIR";
-	public final String srVerifiedName = "VERIFIED";
+	private static final String SR_ID_NAME = "ID";
+	private static final String SR_SPEED_NAME = "SPEED";
+	private static final String SR_VALDIR_NAME = "VALDIR";
+	private static final String SR_VERIFIED_NAME = "VERIFIED";
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -69,20 +69,20 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 		int srValDirNameIndex = -1;
 		int srVerifiedNameIndex = -1;
 		for (int i=0; i<r.getHeader().getNumFields(); i++) {
-			if (r.getHeader().getFieldName(i).equals(srIdName)) { srIdNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(srSpeedName)) { srSpeedNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(srValDirName)) { srValDirNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(srVerifiedName)) { srVerifiedNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(SR_ID_NAME)) { srIdNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(SR_SPEED_NAME)) { srSpeedNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(SR_VALDIR_NAME)) { srValDirNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(SR_VERIFIED_NAME)) { srVerifiedNameIndex = i; }
 		}
-		if (srIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+srIdName+"' not found."); }
-		if (srSpeedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+srSpeedName+"' not found."); }
-		if (srValDirNameIndex < 0) { throw new NoSuchFieldException("Field name '"+srValDirName+"' not found."); }
-		if (srVerifiedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+srVerifiedName+"' not found."); }
-		log.debug("  FieldName-->Index:");
-		log.debug("    "+srIdName+"-->"+srIdNameIndex);
-		log.debug("    "+srSpeedName+"-->"+srSpeedNameIndex);
-		log.debug("    "+srValDirName+"-->"+srValDirNameIndex);
-		log.debug("    "+srVerifiedName+"-->"+srVerifiedNameIndex);
+		if (srIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_ID_NAME+"' not found."); }
+		if (srSpeedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_SPEED_NAME+"' not found."); }
+		if (srValDirNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VALDIR_NAME+"' not found."); }
+		if (srVerifiedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VERIFIED_NAME+"' not found."); }
+		log.trace("  FieldName-->Index:");
+		log.trace("    "+SR_ID_NAME+"-->"+srIdNameIndex);
+		log.trace("    "+SR_SPEED_NAME+"-->"+srSpeedNameIndex);
+		log.trace("    "+SR_VALDIR_NAME+"-->"+srValDirNameIndex);
+		log.trace("    "+SR_VERIFIED_NAME+"-->"+srVerifiedNameIndex);
 	
 		int srCnt = 0;
 		int srIgnoreCnt = 0;
@@ -97,7 +97,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 					// Valid in Both Directions
 					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
 					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
-					if ((ftLink == null) || (tfLink == null)) { log.debug("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+					if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
@@ -108,7 +108,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 				else if (valdir == 2) {
 					// Valid Only in Positive Direction
 					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
-					if (ftLink == null) { log.debug("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+					if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
@@ -118,7 +118,7 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 				else if (valdir == 3) {
 					// Valid Only in Negative Direction
 					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
-					if (tfLink == null) { log.debug("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+					if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
 						// assigning speed restriction only if given freespeed is higher
@@ -131,5 +131,20 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 		log.info("  "+srCnt+" links with restricted speed assigned.");
 		log.info("  "+srIgnoreCnt+" speed restrictions ignored (while verified = 1).");
 		log.info("done.");
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final void printInfo(final String prefix) {
+		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
+		System.out.println(prefix+"  speed restrictions:");
+		System.out.println(prefix+"    srDbfFileName:    "+srDbfFileName);
+		System.out.println(prefix+"    SR_ID_NAME:       "+SR_ID_NAME);
+		System.out.println(prefix+"    SR_SPEED_NAME:    "+SR_SPEED_NAME);
+		System.out.println(prefix+"    SR_VALDIR_NAME:   "+SR_VALDIR_NAME);
+		System.out.println(prefix+"    SR_VERIFIED_NAME: "+SR_VERIFIED_NAME);
+		System.out.println(prefix+"done.");
 	}
 }

@@ -55,13 +55,13 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	public double expansionRadius = 0.000030; // WGS84
 	public double linkSeparation = 0.000005; // WGS84
 
-	public final String mnIdName = "ID";
-	public final String mnFeatTypeName = "FEATTYP";
-	public final String mnJnctIdName = "JNCTID";
+	private static final String MN_ID_NAME = "ID";
+	private static final String MN_FEATTYP_NAME = "FEATTYP";
+	private static final String MN_JNCTID_NAME = "JNCTID";
 	
-	public final String mpIdName = "ID";
-	public final String mpSeqNrName = "SEQNR";
-	public final String mpTrpelIDName = "TRPELID";
+	private static final String MP_ID_NAME = "ID";
+	private static final String MP_SEQNR_NAME = "SEQNR";
+	private static final String MP_TRPELID_NAME = "TRPELID";
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -87,17 +87,17 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 		int mpSeqNrNameIndex = -1;
 		int mpTrpelIDNameIndex = -1;
 		for (int i=0; i<r.getHeader().getNumFields(); i++) {
-			if (r.getHeader().getFieldName(i).equals(mpIdName)) { mpIdNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(mpSeqNrName)) { mpSeqNrNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(mpTrpelIDName)) { mpTrpelIDNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(MP_ID_NAME)) { mpIdNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(MP_SEQNR_NAME)) { mpSeqNrNameIndex = i; }
+			if (r.getHeader().getFieldName(i).equals(MP_TRPELID_NAME)) { mpTrpelIDNameIndex = i; }
 		}
-		if (mpIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+mpIdName+"' not found."); }
-		if (mpSeqNrNameIndex < 0) { throw new NoSuchFieldException("Field name '"+mpSeqNrName+"' not found."); }
-		if (mpTrpelIDNameIndex < 0) { throw new NoSuchFieldException("Field name '"+mpTrpelIDName+"' not found."); }
-		log.debug("  FieldName-->Index:");
-		log.debug("    "+mpIdName+"-->"+mpIdNameIndex);
-		log.debug("    "+mpSeqNrName+"-->"+mpSeqNrNameIndex);
-		log.debug("    "+mpTrpelIDName+"-->"+mpTrpelIDNameIndex);
+		if (mpIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_ID_NAME+"' not found."); }
+		if (mpSeqNrNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_SEQNR_NAME+"' not found."); }
+		if (mpTrpelIDNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_TRPELID_NAME+"' not found."); }
+		log.trace("  FieldName-->Index:");
+		log.trace("    "+MP_ID_NAME+"-->"+mpIdNameIndex);
+		log.trace("    "+MP_SEQNR_NAME+"-->"+mpSeqNrNameIndex);
+		log.trace("    "+MP_TRPELID_NAME+"-->"+mpTrpelIDNameIndex);
 
 		// create mp data structure
 		// TreeMap<mpId,TreeMap<mpSeqNr,linkId>>
@@ -110,7 +110,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 			Id linkId = new IdImpl(entries[mpTrpelIDNameIndex].toString());
 			TreeMap<Integer,Id> mSequence = mSequences.get(mpId);
 			if (mSequence == null) { mSequence = new TreeMap<Integer,Id>(); }
-			if (mSequence.put(mpSeqNr,linkId) != null) { throw new IllegalArgumentException(mpIdName+"="+mpId+": "+mpSeqNrName+" "+mpSeqNr+" already exists."); }
+			if (mSequence.put(mpSeqNr,linkId) != null) { throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists."); }
 			mSequences.put(mpId,mSequence);
 		}
 		log.info("    "+mSequences.size()+" maneuvers sequences stored.");
@@ -123,13 +123,13 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 		FeatureSource fs = ShapeFileReader.readDataFile(this.mnShpFileName);
 		for (Object o : fs.getFeatures()) {
 			Feature f = (Feature)o;
-			int featType = Integer.parseInt(f.getAttribute(mnFeatTypeName).toString());
+			int featType = Integer.parseInt(f.getAttribute(MN_FEATTYP_NAME).toString());
 			if ((featType == 2103) || (featType == 2102) || (featType == 2101)) {
 				// keep 'Prohibited Maneuver' (2103), 'Restricted Maneuver' (2102) and 'Calculated/Derived Prohibited Maneuver' (2101)
-				Id nodeId = new IdImpl(f.getAttribute(mnJnctIdName).toString());
+				Id nodeId = new IdImpl(f.getAttribute(MN_JNCTID_NAME).toString());
 				ArrayList<Tuple<Id,Integer>> ms = maneuvers.get(nodeId);
 				if (ms == null) { ms = new ArrayList<Tuple<Id,Integer>>(); }
-				Tuple<Id,Integer> m = new Tuple<Id,Integer>(new IdImpl(f.getAttribute(mnIdName).toString()),featType);
+				Tuple<Id,Integer> m = new Tuple<Id,Integer>(new IdImpl(f.getAttribute(MN_ID_NAME).toString()),featType);
 				ms.add(m);
 				maneuvers.put(nodeId,ms);
 			}
@@ -137,7 +137,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 				//ignore 'Bifurcation' (9401) and 'Priority Maneuver' (2104)
 			}
 			else {
-				throw new IllegalArgumentException("mnId="+f.getAttribute(mnIdName)+": "+mnFeatTypeName+"="+featType+" not known.");
+				throw new IllegalArgumentException("mnId="+f.getAttribute(MN_ID_NAME)+": "+MN_FEATTYP_NAME+"="+featType+" not known.");
 			}
 		}
 		log.info("    "+maneuvers.size()+" nodes with maneuvers stored.");
@@ -153,7 +153,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 		int virtualNodesCnt = 0;
 		int virtualLinksCnt = 0;
 		for (Id nodeId : maneuvers.keySet()) {
-			if (network.getNode(nodeId) == null) { log.debug("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
+			if (network.getNode(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
 				Node n = network.getNode(nodeId);
@@ -260,5 +260,28 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 		log.info("    "+maneuverIgnoredCnt+" maneuvers ignored (while node was found).");
 		log.info("  done.");
 		log.info("done.");
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final void printInfo(final String prefix) {
+		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
+		System.out.println(prefix+"  options:");
+		System.out.println(prefix+"    removeUTurns:    "+removeUTurns);
+		System.out.println(prefix+"    expansionRadius: "+expansionRadius);
+		System.out.println(prefix+"    linkSeparation:  "+linkSeparation);
+		System.out.println(prefix+"  maneuver shape:");
+		System.out.println(prefix+"    mnShpFileName:   "+mnShpFileName);
+		System.out.println(prefix+"    MN_ID_NAME:      "+MN_ID_NAME);
+		System.out.println(prefix+"    MN_FEATTYP_NAME: "+MN_FEATTYP_NAME);
+		System.out.println(prefix+"    MN_JNCTID_NAME:  "+MN_JNCTID_NAME);
+		System.out.println(prefix+"  maneuver path dbf:");
+		System.out.println(prefix+"    mpDbfFileName:   "+mpDbfFileName);
+		System.out.println(prefix+"    MP_ID_NAME:      "+MP_ID_NAME);
+		System.out.println(prefix+"    MP_SEQNR_NAME:   "+MP_SEQNR_NAME);
+		System.out.println(prefix+"    MP_TRPELID_NAME: "+MP_TRPELID_NAME);
+		System.out.println(prefix+"done.");
 	}
 }
