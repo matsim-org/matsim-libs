@@ -23,7 +23,19 @@ package org.matsim.network;
 import java.io.IOException;
 
 
+/**
+ * generic network reader interface
+ * 
+ * @author balmermi
+ */
 public interface NetworkReader {
 	
+	/**
+	 * read network from files.
+	 * No input file is given, since the number of input files can vary.
+	 * 
+	 * @throws IOException
+	 * @author balmermi
+	 */
 	void read() throws IOException;
 }

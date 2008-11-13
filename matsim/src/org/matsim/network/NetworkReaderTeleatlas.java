@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.geometry.CoordImpl;
@@ -32,6 +33,19 @@ import org.matsim.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/**
+ * A reader for TeleAtlas network description files.
+ * The reader is based on
+ * <strong>Tele Atlas MultiNet® Shapefile 4.3.2.1 Format Specifications
+ * document version Final v1.0, June 2007</strong>
+ * and uses the input shape files:
+ * <ul>
+ * <li><em>jc.shp</em>: junction shape file (typically called xyz________jc.shp)</li>
+ * <li><em>nw.shp</em>: junction shape file (typically called xyz________nw.shp)</li>
+ * </ul>
+ * 
+ * @author balmermi
+ */
 public class NetworkReaderTeleatlas implements NetworkReader {
 
 	//////////////////////////////////////////////////////////////////////
@@ -41,12 +55,45 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	private final static Logger log = Logger.getLogger(NetworkReaderTeleatlas.class);
 	
 	private final NetworkLayer network;
+
+	/**
+	 * path and name to the Tele Atlas MultiNet® junction (jc) Shapefile
+	 */
 	private final String jcShpFileName; // teleatlas junction shape file name
+
+	/**
+	 * path and name to the Tele Atlas MultiNet® network (nw) Shapefile
+	 */
 	private final String nwShpFileName; // teleatlas network shape file name
 	
+	/**
+	 * option flag: if set, the reader ignores all network links with
+	 * <pre>
+	 * <code>{@link #LINK_FRCTYP_NAME} == 8</code>
+	 * </pre>
+	 */
 	public boolean ignoreFrcType8 = false;
+
+	/**
+	 * option flag: if set, the reader ignores all network links with
+	 * <pre>
+	 * <code>{@link #LINK_FRCTYP_NAME} == 8 && {@link #LINK_ONEWAY_NAME} == "N"</code>
+	 * </pre>
+	 */
 	public boolean ignoreFrcType7onewayN = false;
+
+	/**
+	 * option parameter: the reader redefines the number of lanes (see permlanes in {@link BasicLinkImpl})
+	 * if the value of <code>{@link #LINK_LANES_NAME}<1</code>. In that case the link gets 2 lanes for
+	 * <code>{@link #LINK_FRCTYP_NAME}</code> less or equal this parameter, 1 lane otherwise.
+	 */
 	public int maxFrcTypeForDoubleLaneLink = 3;
+
+	/**
+	 * option parameter [in km/h]: Tele Atlas MultiNet® Shapefile does not define capacities for links. Therefore,
+	 * link flow capacities must be derived from the given data. Below the given parameter the link
+	 * gets capacity = 1000 [veh/h] per lane assigned, 2000 [veh/h] otherwise.
+	 */
 	public int minSpeedForNormalCapacity = 40; // km/h
 
 	private static final String NODE_ID_NAME = "ID";
@@ -84,6 +131,13 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Instantiate a new Tele Atlas MultiNet® Shapefile reader based on the junction and the network shape file.
+	 * 
+	 * @param network MATSim network database in which the reader stores the data
+	 * @param jcShpFileName Tele Atlas MultiNet® junction Shapefile
+	 * @param nwShpFileName Tele Atlas MultiNet® network Shapefile
+	 */
 	public NetworkReaderTeleatlas(final NetworkLayer network, final String jcShpFileName, final String nwShpFileName) {
 		this.network = network;
 		this.jcShpFileName = jcShpFileName;
@@ -95,6 +149,9 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	// read methods
 	//////////////////////////////////////////////////////////////////////
 
+	/* (non-Javadoc)
+	 * @see org.matsim.network.NetworkReader#read()
+	 */
 	public void read() throws IOException {
 		log.info("reading nodes from Junction Shape file '"+this.jcShpFileName+"'...");
 		this.readNodesFromJCshp();
@@ -108,6 +165,34 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Reads Tele Atlas MultiNet® junction Shapefile given in <code>{@link #jcShpFileName}</code>.
+	 * It uses the following feature attributes:
+	 * <ul>
+	 * <li>center coordinate</li>
+	 * <li><code>{@link #NODE_ID_NAME} (Feature Identification)</code></li>
+	 * <li><code>{@link #NODE_FEATTYP_NAME} (Feature Type)</code></li>
+	 *   <ul>
+	 *   <li><code>4120: Junction</code></li>
+	 *   <li><code>4220: Railway Element Junction</code></li>
+	 *   </ul>
+	 * <li><code>{@link #NODE_JNCTTYP_NAME} (Junction Type)</code></li>
+	 *   <ul>
+	 *   <li><code>0: Junction (default)</code></li>
+	 *   <li><code>2: Bifurcation</code></li>
+	 *   <li><code>3: Railway Crossing</code></li>
+	 *   <li><code>4: Country Border Crossing</code></li>
+	 *   <li><code>5: Ferry Operated by Train Crossing</code></li>
+	 *   <li><code>6: Internal Data Set Border Crossing</code></li>
+	 *   </ul>
+	 * </ul>
+	 * The MATSim {@link Node#type} is set as
+	 * <pre>
+	 * <code>{@link Node#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
+	 * </pre>
+	 * 
+	 * @throws
+	 */
 	private final void readNodesFromJCshp() throws IOException {
 		int nCnt = network.getNodes().size();
 		FeatureSource fs = ShapeFileReader.readDataFile(jcShpFileName);
@@ -130,6 +215,77 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Reads Tele Atlas MultiNet® network Shapefile given in <code>{@link #nwShpFileName}</code>.
+	 * It uses the following feature attributes:
+	 * <ul>
+	 * <li><code>{@link #LINK_ID_NAME} (Feature Identification)</code></li>
+	 * <li><code>{@link #LINK_FEATTYP_NAME} (Feature Type)</code></li>
+	 *   <ul>
+	 *   <li><code>4110: Road Element</code></li>
+	 *   <li><code>4130: Ferry Connection Element</code></li>
+	 *   <li><code>4165: Address Area Boundary Element</code></li>
+	 *   </ul>
+	 * <li><code>{@link #LINK_FERRYTYP_NAME} (Ferry Type)</code></li>
+	 *   <ul>
+	 *   <li><code>0: No Ferry (default)</code></li>
+	 *   <li><code>1: Ferry Operated by Ship or Hovercraft</code></li>
+	 *   <li><code>2: Ferry Operated by Train</code></li>
+	 *   </ul>
+	 * <li><code>{@link #LINK_FJNCTID_NAME} (From (Start) Junction Identification)</code></li>
+	 * <li><code>{@link #LINK_TJNCTID_NAME} (To (End) Junction Identification)</code></li>
+	 * <li><code>{@link #LINK_LENGTH_NAME} (Feature Length (meters))</code></li>
+	 * <li><code>{@link #LINK_FRCTYP_NAME} (Functional Road Class)</code></li>
+	 * <li><code>{@link #LINK_FERRYTYP_NAME} (Ferry Type)</code></li>
+	 *   <ul>
+	 *   <li><code>-1: Not Applicable (for {@link #LINK_FEATTYP_NAME} 4165)</code></li>
+	 *   <li><code>0: Motorway, Freeway, or Other Major Road</code></li>
+	 *   <li><code>1: a Major Road Less Important than a Motorway</code></li>
+	 *   <li><code>2: Other Major Road</code></li>
+	 *   <li><code>3: Secondary Road</code></li>
+	 *   <li><code>4: Local Connecting Road</code></li>
+	 *   <li><code>5: Local Road of High Importance</code></li>
+	 *   <li><code>6: Local Road</code></li>
+	 *   <li><code>7: Local Road of Minor Importance</code></li>
+	 *   <li><code>8: Other Road</code></li>
+	 *   </ul>
+	 * <li><code>{@link #LINK_ONEWAY_NAME} (Direction of Traffic Flow)</code></li>
+	 *   <ul>
+	 *   <li><code>Blank: Open in Both Directions (default)</code></li>
+	 *   <li><code>FT: Open in Positive Direction</code></li>
+	 *   <li><code>N: Closed in Both Directions</code></li>
+	 *   <li><code>TF: Open in Negative Direction</code></li>
+	 *   </ul>
+	 * <li><code>{@link #LINK_SPEED_NAME} (Calculated Average Speed (kilometers per hour))</code></li>
+	 * <li><code>{@link #LINK_LANES_NAME} (Number of Lanes)</code></li>
+	 * </ul>
+	 * 
+	 * <b>Conversion rules:</b>
+	 * <ul>
+	 * <li>Links that refer to not existing from- or to-link will be
+	 * ignored (produces a wanring message)</li>
+	 * <li>Links with {@link #LINK_FEATTYP_NAME} not equal to 4110 or 4130
+	 * will be ignored</li>
+	 * <li>Links with {@link #LINK_FRCTYP_NAME} less than zero will be ignored</li>
+	 * <li>Links with {@link #LINK_FRCTYP_NAME} equals 8 will be ignored if
+	 * {@link #ignoreFrcType8} flag is set</li>
+	 * <li>Links with {@link #LINK_FRCTYP_NAME} equals 7 and {@link #LINK_ONEWAY_NAME}
+	 * equals "N" will be ignored if {@link #ignoreFrcType7onewayN} is set</li>
+	 * <li>Links with {@link #LINK_LANES_NAME} less than 1 will get lanes according to
+	 * the rule defined by {@link #maxFrcTypeForDoubleLaneLink}</li>
+	 * <li>Links get capacities according to the rule defined by {@link #minSpeedForNormalCapacity}</li>
+	 * <li>Directed links in the MATSim network DB will be created according to
+	 * the information in {@link #LINK_ONEWAY_NAME} (two links if " " or "N", one link for "TF" or "FT").
+	 * The link id is defined as <code>{@link #LINK_ID_NAME}+"TF"</code>,
+	 * <code>{@link #LINK_ID_NAME}+"FT"</code> resp.</li>
+	 * <li>The {@link LinkImpl#type} is set as:
+	 * <pre>
+	 * <code>{@link LinkImpl#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
+	 * </pre></li>
+	 * </ul>
+	 * 
+	 * @throws IOException
+	 */
 	private final void readLinksFromNWshp() throws IOException {
 		int lCnt = network.getLinks().size();
 		int ignoreCnt = 0;
@@ -206,6 +362,11 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * prints the variable settings to the STDOUT
+	 * 
+	 * @param prefix a prefix for each line of the STDOUT
+	 */
 	public final void printInfo(final String prefix) {
 		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
 		System.out.println(prefix+"  MATSim network:");
