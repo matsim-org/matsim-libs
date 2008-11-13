@@ -17,39 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.basic.v01;
 
 import java.util.List;
+import java.util.Map;
 
-import org.matsim.basic.v01.BasicAct;
-import org.matsim.basic.v01.BasicActivity;
-import org.matsim.basic.v01.BasicKnowledge;
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicPerson;
-import org.matsim.basic.v01.BasicPlan;
-import org.matsim.basic.v01.BasicRoute;
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.basic.v01.BasicEngineInformation.FuelType;
 
 /**
  * @author dgrether
  */
-public interface PopulationBuilder {
+public class BasicVehicleDefinitionBuilder {
 
-	BasicPerson createPerson(Id id) throws Exception;
+	private Map<String, BasicVehicleType> vehicleTypes;
+	private List<BasicVehicle> vehicles;
 
-	BasicPlan createPlan(BasicPerson currentPerson);
 
-	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+	public BasicVehicleDefinitionBuilder(Map<String, BasicVehicleType> vehicleTypes,
+			List<BasicVehicle> vehicles) {
+		this.vehicleTypes = vehicleTypes;
+		this.vehicles = vehicles;
+	}
 
-	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
 
-	BasicRoute createRoute(List<Id> currentRouteLinkIds);
+	public BasicVehicleType createVehicleType(String type) {
+		if (!this.vehicleTypes.containsKey(type)) {
+			BasicVehicleType veh = new BasicVehicleTypeImpl(type);
+			this.vehicleTypes.put(type, veh);
+			return veh;
+		}
+		throw new IllegalArgumentException("Vehicle type with id: " + type + " already exists!");
+	}
 
-	BasicPlan createPlan(BasicPerson person, boolean selected);
 
-	BasicActivity createActivity(String type, BasicLocation currentlocation);
+	public BasicVehicleCapacity createVehicleCapacity() {
+		return new BasicVehicleCapacityImpl();
+	}
 
-	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
+
+	public BasicFreightCapacity createFreigthCapacity() {
+		return new BasicFreightCapacityImpl();
+	}
+
+
+	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new BasicEngineInformationImpl(fuelType, gasConsumption);
+	}
+
+
+	public BasicVehicle createVehicle(Id id, String type) {
+		BasicVehicle veh = new BasicVehicleImpl(id, type);
+		this.vehicles.add(veh);
+		return veh;
+	}
 
 }

@@ -17,19 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.basic.v01;
+package org.matsim.basic.v01;
 
 import java.util.List;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicLeg.Mode;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 
 /**
  * @author dgrether
  */
-public interface HouseholdBuilder {
+public interface PopulationBuilder {
 
-	public List<BasicHousehold> getHouseholds();
+	BasicPerson createPerson(Id id) throws Exception;
 
-	public BasicHousehold createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds);
+	BasicPlan createPlan(BasicPerson currentPerson);
+
+	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
+
+	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
+
+	BasicRoute createRoute(List<Id> currentRouteLinkIds);
+
+	BasicPlan createPlan(BasicPerson person, boolean selected);
+
+	BasicActivity createActivity(String type, BasicLocation currentlocation);
+
+	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
+
 }

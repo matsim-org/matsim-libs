@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.PopulationBuilder;
 
 /**
  * @author dgrether
