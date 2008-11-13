@@ -32,7 +32,6 @@ import org.matsim.basic.v01.BasicPersonImpl;
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.population.Household;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 /**

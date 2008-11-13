@@ -20,7 +20,6 @@
 package org.matsim.population;
 
 import org.matsim.basic.v01.BasicPerson;
-import org.matsim.interfaces.population.Household;
 import org.matsim.utils.customize.Customizable;
 
 /**

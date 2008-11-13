@@ -25,7 +25,6 @@ import java.util.Stack;
 import org.matsim.basic.v01.BasicPopulationReaderMatsimV5;
 import org.matsim.basic.v01.PopulationSchemaV5Names;
 import org.matsim.facilities.Facilities;
-import org.matsim.interfaces.population.Household;
 import org.matsim.network.NetworkLayer;
 import org.xml.sax.Attributes;
 

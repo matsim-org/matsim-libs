@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicHouseholdImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.population.Household;
 
 /**
  * @author dgrether
