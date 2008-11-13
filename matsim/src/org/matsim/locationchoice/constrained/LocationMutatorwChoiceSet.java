@@ -145,8 +145,10 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			final Act act = (Act)actslegs.get(j);	
 			
 			// found secondary activity
-			if (secondaryTypes.contains(act.getType()) && !(
-					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()))) {
+			if (secondaryTypes.contains(act.getType()) && (
+					!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId())) ||
+					this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
+				
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}		
 			// found primary activity
@@ -159,6 +161,14 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
 				}
 			}
+			
+			if (secondaryTypes.contains(act.getType()) &&
+					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) &&
+					!this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
+				
+				this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+			}
+			
 		}
 		return manager.getSubChains();
 	}
