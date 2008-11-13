@@ -105,7 +105,7 @@ public class CreatePlans1 {
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTimeHome);
 			a.setEndTime(depTimeWork);
-			a.setDur(depTimeWork-depTimeHome);
+			a.setDuration(depTimeWork-depTimeHome);
 			l = plan.createLeg(BasicLeg.Mode.car);
 			l.setArrivalTime(depTimeWork);
 			l.setTravelTime(0.0);
@@ -114,7 +114,7 @@ public class CreatePlans1 {
 			a.setLink(shop_facility.getLink());
 			a.setStartTime(depTimeWork);
 			a.setEndTime(depTimeShop);
-			a.setDur(depTimeShop-depTimeWork);
+			a.setDuration(depTimeShop-depTimeWork);
 			l = plan.createLeg(BasicLeg.Mode.car);
 			l.setArrivalTime(depTimeShop);
 			l.setTravelTime(0.0);

@@ -677,7 +677,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		Act actHelp = new Act ((Act)(actslegs.get((position*2)-2)));
-		actHelp.setDur(0);
+		actHelp.setDuration(0);
 		
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0;
 		

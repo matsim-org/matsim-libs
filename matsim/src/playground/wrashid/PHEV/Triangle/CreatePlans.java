@@ -91,7 +91,7 @@ public class CreatePlans {
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
-			a.setDur(duration);
+			a.setDuration(duration);
 			l = plan.createLeg(BasicLeg.Mode.car);
 			l.setArrivalTime(depTime+duration);
 			l.setTravelTime(0.0);

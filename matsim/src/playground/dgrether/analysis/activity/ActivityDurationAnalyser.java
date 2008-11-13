@@ -128,7 +128,7 @@ public class ActivityDurationAnalyser {
 			double dur, startTime, endTime;
 //			System.out.println("Processing activity type: " + actList.get(0).getType());
 			for (Act act : actList) {
-				dur = act.getDur();
+				dur = act.getDuration();
 				ActivityParams actParams = config.charyparNagelScoring().getActivityParams(act.getType());
 				if (!(Double.isInfinite(dur) || Double.isNaN(dur))) {
 					if (act.getStartTime() < actParams.getOpeningTime()) {

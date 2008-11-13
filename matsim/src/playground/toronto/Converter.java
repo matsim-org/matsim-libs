@@ -129,7 +129,7 @@ public class Converter {
 
 				Act act = pl.createAct(tabs[7], tmpCoord);
 				act.setEndTime(convertTime(tabs[3]));
-				act.setDur(dur);
+				act.setDuration(dur);
 
 			} else {
 				// it is a new person

@@ -111,7 +111,7 @@ public class Plan extends BasicPlanImpl {
 			a.setEndTime(Time.parseTime(endTime));
 		}
 		if (dur != null) {
-			a.setDur(Time.parseTime(dur));
+			a.setDuration(Time.parseTime(dur));
 		}
 		if( link != null) {
 			a.setLinkId(a.getLink().getId());
@@ -278,9 +278,9 @@ public class Plan extends BasicPlanImpl {
 		// the end time of act1 must be defined by definition, so take it as given
 		if (act1.getStartTime() == Time.UNDEFINED_TIME) {
 			act1.setStartTime(0);
-			act1.setDur(act1.getEndTime());
+			act1.setDuration(act1.getEndTime());
 		} else {
-			act1.setDur(act1.getEndTime() - act1.getStartTime());
+			act1.setDuration(act1.getEndTime() - act1.getStartTime());
 		}
 
 		for (int i = 2; i < this.actsLegs.size(); i = i+2) {
@@ -288,13 +288,13 @@ public class Plan extends BasicPlanImpl {
 			Leg leg = (Leg)this.actsLegs.get(i-1);
 			act1.setEndTime(leg.getDepartureTime());
 			act2.setStartTime(leg.getArrivalTime());
-			act1.setDur(act1.getEndTime() - act1.getStartTime());
+			act1.setDuration(act1.getEndTime() - act1.getStartTime());
 			act1 = act2;
 		}
 
 		double endTime = act1.getEndTime();
 		if ((endTime == Time.UNDEFINED_TIME) || (endTime < act1.getStartTime())) {
-			double duration = act1.getDur();
+			double duration = act1.getDuration();
 			if (duration == Time.UNDEFINED_TIME) {
 				// there was no planned duration
 				if (act1.getStartTime() < 24*3600) {	// TODO replace `24' with something like sim-duration
@@ -304,7 +304,7 @@ public class Plan extends BasicPlanImpl {
 				}
 			}
 			act1.setEndTime(act1.getStartTime() + duration);
-			act1.setDur(duration);
+			act1.setDuration(duration);
 		}
 	}
 

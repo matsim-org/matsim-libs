@@ -409,19 +409,19 @@ public class BetaTravelTest extends MatsimTestCase {
 					if (i == 0) {
 						act.setStartTime(now); // set start to midnight
 						act.setEndTime(mutateTime(act.getEndTime())); // mutate the end time of the first activity
-						act.setDur(act.getEndTime() - act.getStartTime()); // calculate resulting duration
+						act.setDuration(act.getEndTime() - act.getStartTime()); // calculate resulting duration
 						now += act.getEndTime(); // move now pointer
 					} else if (i < (max - 1)) {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
-						act.setDur(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
+						act.setDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
 						act.setEndTime(Time.UNDEFINED_TIME); // <-- This line differs from the original PlanMutateTimeAllocation
-						now += act.getDur();
+						now += act.getDuration();
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-						act.setDur(Time.UNDEFINED_TIME);
+						act.setDuration(Time.UNDEFINED_TIME);
 						act.setEndTime(Time.UNDEFINED_TIME);
 					}
 

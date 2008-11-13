@@ -118,7 +118,7 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			plan.createLeg(BasicLeg.Mode.car);
 
 			Act act2 = plan.createAct(row[5], primaryCoord);
-			act2.setDur(WORKDURATION);
+			act2.setDuration(WORKDURATION);
 
 			plan.createLeg(BasicLeg.Mode.car);
 

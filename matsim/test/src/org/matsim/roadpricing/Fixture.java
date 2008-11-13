@@ -187,7 +187,7 @@ public class Fixture {
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));//, "00:00", startTime, startTime, "no");
 		plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		plan.createAct("w", workLink).setDur(8.0 * 3600);//, null, "16:00", "08:00", "no");
+		plan.createAct("w", workLink).setDuration(8.0 * 3600);//, null, "16:00", "08:00", "no");
 		plan.createLeg(Mode.car);//"car", "16:00", null, null);
 		plan.createAct("h", finishLink);//, null, "24:00", "00:00", "no");
 		return person;

@@ -67,9 +67,9 @@ public class Act extends BasicActImpl {
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
 		this.setCoord(c);
 		this.link = act.link;
-		this.startTime = act.startTime;
-		this.endTime = act.endTime;
-		this.dur = act.dur;
+		this.setStartTime(act.getStartTime());
+		this.setEndTime(act.getEndTime());
+		this.setDuration(act.getDuration());
 		this.setFacility(act.getFacility());
 		this.setLinkId(this.link.getId());
 	}
@@ -113,9 +113,9 @@ public class Act extends BasicActImpl {
 		return "[type=" + this.getType() + "]" +
 				"[coord=" + this.getCoord() + "]" +
 				"[link=" + this.link + "]" +
-				"[startTime=" + Time.writeTime(this.startTime) + "]" +
-				"[endTime=" + Time.writeTime(this.endTime) + "]" +
-				"[dur=" + Time.writeTime(this.dur) + "]";
+				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
+				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
+				"[dur=" + Time.writeTime(this.getDuration()) + "]";
 	}
 
 
@@ -154,22 +154,22 @@ public class Act extends BasicActImpl {
 	 * @return the duration in seconds
 	 */
 	public double calculateDuration() {
-		if ((this.startTime == Time.UNDEFINED_TIME) && (this.endTime == Time.UNDEFINED_TIME)) {
-			if (this.dur != Time.UNDEFINED_TIME) {
-				return this.dur;
+		if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
+			if (this.getDuration() != Time.UNDEFINED_TIME) {
+				return this.getDuration();
 			}
-			throw new IllegalArgumentException("No valid time set to calculate duration of activity: StartTime: " + this.startTime + " EndTime : " + this.endTime + " Duration: " + this.dur);
+			throw new IllegalArgumentException("No valid time set to calculate duration of activity: StartTime: " + this.getStartTime() + " EndTime : " + this.getEndTime()+ " Duration: " + this.getDuration());
 		}
 		//if only start time is set, assume this is the last activity of the day
-		else if ((this.startTime != Time.UNDEFINED_TIME) && (this.endTime == Time.UNDEFINED_TIME)) {
-			return Time.MIDNIGHT - this.startTime;
+		else if ((this.getStartTime() != Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
+			return Time.MIDNIGHT - this.getStartTime();
 		}
 		//if only the end time is set, assume this is the first activity of the day
-		else if ((this.startTime == Time.UNDEFINED_TIME) && (this.endTime != Time.UNDEFINED_TIME)) {
-			return this.endTime;
+		else if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() != Time.UNDEFINED_TIME)) {
+			return this.getEndTime();
 		}
 		else {
-			return this.endTime - this.startTime;
+			return this.getEndTime() - this.getStartTime();
 		}
 	}
 

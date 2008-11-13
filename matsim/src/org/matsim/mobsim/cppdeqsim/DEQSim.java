@@ -174,15 +174,15 @@ public class DEQSim extends ExternalMobsim {
 
 			// TODO [MR] this is functionality that's regularly used, maybe generalize it?
 			// also see below
-			if (act.getEndTime() != Time.UNDEFINED_TIME && act.getDur() != Time.UNDEFINED_TIME) {
+			if (act.getEndTime() != Time.UNDEFINED_TIME && act.getDuration() != Time.UNDEFINED_TIME) {
 				// use min (endtime, time + dur)
-				time = Math.min(act.getEndTime(), time + act.getDur());
+				time = Math.min(act.getEndTime(), time + act.getDuration());
 			} else if (act.getEndTime() != Time.UNDEFINED_TIME) {
 				// use endtime
 				time = act.getEndTime();
-			} else if (act.getDur() != Time.UNDEFINED_TIME) {
+			} else if (act.getDuration() != Time.UNDEFINED_TIME) {
 				// use duration
-				time += act.getDur();
+				time += act.getDuration();
 			} else {
 				Gbl.errorMsg("endtime or duration must be specified!");
 			}

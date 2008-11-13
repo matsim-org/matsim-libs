@@ -236,7 +236,7 @@ public class PopulationReaderKutter implements PopulationReader {
 				Act a = this.currPlan.createAct(activity, coord);
 				a.setStartTime(arrTime);
 				a.setEndTime(this.currTime);
-				a.setDur(duration);
+				a.setDuration(duration);
 			}
 		}
 

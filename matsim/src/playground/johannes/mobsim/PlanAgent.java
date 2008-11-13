@@ -162,7 +162,7 @@ public class PlanAgent implements MobsimAgent {
 	 * Initializes the agent to its initial state, which is the first activity
 	 * in the selected plan.<br>
 	 * The first activity's start time is set to 00:00:00. If the end time is
-	 * undefined, it is set to {@link Act#getDur()}. If both, duration and end
+	 * undefined, it is set to {@link Act#getDuration()}. If both, duration and end
 	 * time are defined, the end time is set to min[end time, duration].<br>
 	 * The current link is set to {@link Act#getLink()}.
 	 */
@@ -174,10 +174,10 @@ public class PlanAgent implements MobsimAgent {
 				currentPlanIndex);
 		act.setStartTime(0);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
-				&& act.getDur() != Time.UNDEFINED_TIME) {
-			act.setEndTime(Math.min(act.getEndTime(), act.getDur()));
+				&& act.getDuration() != Time.UNDEFINED_TIME) {
+			act.setEndTime(Math.min(act.getEndTime(), act.getDuration()));
 		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-			act.setEndTime(act.getDur());
+			act.setEndTime(act.getDuration());
 		}
 
 		currentLink = act.getLink();
@@ -200,7 +200,7 @@ public class PlanAgent implements MobsimAgent {
 	 * travel time to <tt>time</tt> - arrival time.<br>
 	 * Sets the start time of the following activity to <tt>time</tt>. If the
 	 * activity's end time is undefined, it is set to <tt>time</tt> +
-	 * {@link Act#getDur()}. If both, duration and end time are defined, the
+	 * {@link Act#getDuration()}. If both, duration and end time are defined, the
 	 * end time is set to min[end time, <tt>time</tt> + duration].
 	 * 
 	 * @param time
@@ -218,10 +218,10 @@ public class PlanAgent implements MobsimAgent {
 				currentPlanIndex);
 		act.setStartTime(time);
 		if (act.getEndTime() != Time.UNDEFINED_TIME
-				&& act.getDur() != Time.UNDEFINED_TIME) {
-			act.setEndTime(Math.min(act.getEndTime(), time + act.getDur()));
+				&& act.getDuration() != Time.UNDEFINED_TIME) {
+			act.setEndTime(Math.min(act.getEndTime(), time + act.getDuration()));
 		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-			act.setEndTime(time + act.getDur());
+			act.setEndTime(time + act.getDuration());
 		}
 	}
 
@@ -238,7 +238,7 @@ public class PlanAgent implements MobsimAgent {
 		Act act = (Act) person.getSelectedPlan().getActsLegs().get(
 				currentPlanIndex);
 		act.setEndTime(time);
-		act.setDur(act.getEndTime() - act.getStartTime());
+		act.setDuration(act.getEndTime() - act.getStartTime());
 		currentPlanIndex++;
 
 		Leg leg = (Leg) person.getSelectedPlan().getActsLegs().get(

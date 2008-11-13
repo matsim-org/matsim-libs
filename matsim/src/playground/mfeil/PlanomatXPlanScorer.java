@@ -57,8 +57,8 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				for (int x = 0;x<i;x++){
 					if (x % 2 == 0){
 						Act actHelp = (Act) (plan.getActsLegs().get(x));
-						if (actHelp.getDur()>=0){
-								depTime = actHelp.getDur() + depTime;
+						if (actHelp.getDuration()>=0){
+								depTime = actHelp.getDuration() + depTime;
 						}
 						else if (actHelp.getEndTime()>=0){
 							depTime = actHelp.getEndTime() + depTime;

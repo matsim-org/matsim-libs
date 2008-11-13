@@ -162,7 +162,7 @@ public class SelectedPlans2ESRIShape {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
 		Double startTime = act.getStartTime();
-		Double dur = act.getDur();
+		Double dur = act.getDuration();
 		Double endTime = act.getEndTime();
 		double rx = MatsimRandom.random.nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.random.nextDouble() * this.actBlurFactor;

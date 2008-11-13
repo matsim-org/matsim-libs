@@ -25,11 +25,9 @@ import org.matsim.utils.misc.Time;
 
 public class BasicActImpl implements BasicAct {
 
-	// TODO: should be private but needs refactoring in derived classes
-	protected double endTime = Time.UNDEFINED_TIME;
-	protected double startTime = Time.UNDEFINED_TIME;
-	protected double dur = Time.UNDEFINED_TIME;
-
+	private double endTime = Time.UNDEFINED_TIME;
+	private double startTime = Time.UNDEFINED_TIME;
+	private double dur = Time.UNDEFINED_TIME;
 	private String type;
 	private Coord coord = null;
 	private Id linkId;
@@ -46,14 +44,6 @@ public class BasicActImpl implements BasicAct {
 	public final String getType() {
 		return this.type;
 	}
-//
-//	public BasicLink getLink() {
-//		return this.link;
-//	}
-
-//	public Facility getFacility() {
-//		return this.facility;
-//	}
 
 	public final void setEndTime(final double endTime) {
 		this.endTime = endTime;
@@ -102,11 +92,11 @@ public class BasicActImpl implements BasicAct {
 	}
 
 
-	public double getDur() {
+	public double getDuration() {
 		return this.dur;
 	}
 
-	public void setDur(final double dur) {
+	public void setDuration(final double dur) {
 		this.dur = dur;
 	}
 }

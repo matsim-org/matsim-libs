@@ -78,7 +78,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
 			if (loops>3) {
 				for (int i=2;i<plan.getActsLegs().size()-4;i+=2){
-					((Act)plan.getActsLegs().get(i)).setDur(this.minimumTime);
+					((Act)plan.getActsLegs().get(i)).setDuration(this.minimumTime);
 				}
 				move = this.cleanSchedule(this.minimumTime, plan);
 				if (move!=0.0){
@@ -199,7 +199,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 		
 		for (int i = 0; i<al.size();i++){
 			if (i%2==0){
-				((Act)al.get(i)).setDur(((Act)(bestSolution.get(i))).getDur());
+				((Act)al.get(i)).setDuration(((Act)(bestSolution.get(i))).getDuration());
 				((Act)al.get(i)).setStartTime(((Act)(bestSolution.get(i))).getStartTime());
 				((Act)al.get(i)).setEndTime(((Act)(bestSolution.get(i))).getEndTime());
 			}
@@ -330,7 +330,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 	
 	public double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
 		
-		if (((Act)(actslegs.get(inner))).getDur()>=(OFFSET+this.minimumTime)){
+		if (((Act)(actslegs.get(inner))).getDuration()>=(OFFSET+this.minimumTime)){
 			double now =((Act)(actslegs.get(outer))).getEndTime()+OFFSET;
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i+=2){
@@ -341,7 +341,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				now+=travelTime;
 				
 				if (i!=inner-1){
-					now+=((Act)(actslegs.get(i+1))).getDur();
+					now+=((Act)(actslegs.get(i+1))).getDuration();
 				}
 				else {
 					if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
@@ -375,7 +375,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 	
 	public double decreaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
 		
-		if (((Act)(actslegs.get(outer))).getDur()>=OFFSET+this.minimumTime){
+		if (((Act)(actslegs.get(outer))).getDuration()>=OFFSET+this.minimumTime){
 			double now =((Act)(actslegs.get(outer))).getEndTime()-OFFSET;			
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i+=2){
@@ -386,7 +386,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				now+=travelTime;
 				
 				if (i!=inner-1){
-					now+=((Act)(actslegs.get(i+1))).getDur();
+					now+=((Act)(actslegs.get(i+1))).getDuration();
 				}
 				else {
 					if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
@@ -418,7 +418,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	public double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
 		
-		double swaptime=((Act)(actslegs.get(inner))).getDur();
+		double swaptime=((Act)(actslegs.get(inner))).getDuration();
 		double now =((Act)(actslegs.get(outer))).getStartTime()+swaptime;
 		
 		double travelTime;
@@ -430,7 +430,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			now+=travelTime;
 			
 			if (i!=inner-1){
-				now+=((Act)(actslegs.get(i+1))).getDur();			
+				now+=((Act)(actslegs.get(i+1))).getDuration();			
 			}
 			else {
 				if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
@@ -491,7 +491,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 	public double cleanSchedule (double now, Plan plan){
 		
 		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
-		((Act)(plan.getActsLegs().get(0))).setDur(now);
+		((Act)(plan.getActsLegs().get(0))).setDuration(now);
 			
 		double travelTime;
 		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
@@ -503,8 +503,8 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			
 			if (i!=plan.getActsLegs().size()-2){
 				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDur()-travelTime, this.minimumTime);
-				((Act)(plan.getActsLegs().get(i+1))).setDur(travelTime);	
+				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()-travelTime, this.minimumTime);
+				((Act)(plan.getActsLegs().get(i+1))).setDuration(travelTime);	
 				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
 			}
@@ -512,7 +512,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
 				
 				if (86400>now){
-					((Act)(plan.getActsLegs().get(i+1))).setDur(86400-now);
+					((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
 				}
 				else {
 					return now-86400;
@@ -526,19 +526,19 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 	public void cleanActs (ArrayList<?> actslegs){
 		
 		((Act)(actslegs.get(0))).setEndTime(((Leg)(actslegs.get(1))).getDepartureTime());
-		((Act)(actslegs.get(0))).setDur(((Leg)(actslegs.get(1))).getDepartureTime());
+		((Act)(actslegs.get(0))).setDuration(((Leg)(actslegs.get(1))).getDepartureTime());
 		
 		for (int i=2;i<=actslegs.size()-1;i=i+2){
 			
 			if (i!=actslegs.size()-1){
 				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
 				((Act)(actslegs.get(i))).setEndTime(((Leg)(actslegs.get(i+1))).getDepartureTime());
-				((Act)(actslegs.get(i))).setDur(((Leg)(actslegs.get(i+1))).getDepartureTime()-((Leg)(actslegs.get(i-1))).getArrivalTime());
+				((Act)(actslegs.get(i))).setDuration(((Leg)(actslegs.get(i+1))).getDepartureTime()-((Leg)(actslegs.get(i-1))).getArrivalTime());
 				
 			}
 			else {
 				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
-				((Act)(actslegs.get(i))).setDur(86400-((Leg)(actslegs.get(i-1))).getArrivalTime());
+				((Act)(actslegs.get(i))).setDuration(86400-((Leg)(actslegs.get(i-1))).getArrivalTime());
 	
 			}
 		}

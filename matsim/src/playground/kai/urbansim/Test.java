@@ -322,7 +322,7 @@ public class Test {
 						
 						plan.createLeg(Mode.car);
 						act = plan.createAct(ACT_WORK, workCoord ) ;
-						act.setDur( 8.*3600. ) ;
+						act.setDuration( 8.*3600. ) ;
 
 						plan.createLeg(Mode.car) ;
 						plan.createAct(ACT_HOME, homeCoord ) ;				

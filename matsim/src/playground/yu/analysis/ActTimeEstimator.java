@@ -76,7 +76,7 @@ public class ActTimeEstimator extends AbstractPersonAlgorithm {
 				adc = new ActDurCounter();
 				actDurs.put(actType, adc);
 			}
-			adc.add(a.getDur());
+			adc.add(a.getDuration());
 			ActStartTimeCounter astc = actStarts.get(actType);
 			if (astc == null) {
 				astc = new ActStartTimeCounter();

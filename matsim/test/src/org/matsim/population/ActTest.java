@@ -33,7 +33,7 @@ public class ActTest extends MatsimTestCase {
 	public void testCalculateDuration() {
 		Act testee = new Act("h", new CoordImpl(0, 0));
 		testee.setStartTime(0.0);
-		testee.setDur(0.0);
+		testee.setDuration(0.0);
 		testee.setEndTime(0.0);
 
 		assertNotNull(testee);
@@ -44,7 +44,7 @@ public class ActTest extends MatsimTestCase {
 		assertEquals(5.5 * 3600.0, testee.calculateDuration(), EPSILON);
 		testee.setEndTime(Time.UNDEFINED_TIME);
 		assertEquals(0.0, testee.calculateDuration(), EPSILON);
-		testee.setDur(Time.UNDEFINED_TIME);
+		testee.setDuration(Time.UNDEFINED_TIME);
 		Exception e = null;
 		try {
 			testee.calculateDuration();

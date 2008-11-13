@@ -59,7 +59,7 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 		try {
 			Act a = (Act)this.actsLegs.get(0);
 			Act a0 = (Act)in.get(0);
-			a.setDur(a0.getDur());
+			a.setDuration(a0.getDuration());
 			a.setStartTime(a0.getStartTime());
 			a.setEndTime(a0.getEndTime());
 			
@@ -72,7 +72,7 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 				
 				Act ax = (Act)this.actsLegs.get(i+1);
 				Act ax0 = (Act)in.get(i+1);
-				ax.setDur(ax0.getDur());
+				ax.setDuration(ax0.getDuration());
 				ax.setStartTime(ax0.getStartTime());
 				ax.setEndTime(ax0.getEndTime());
 			}

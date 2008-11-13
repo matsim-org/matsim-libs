@@ -88,7 +88,7 @@ public class Plansgenerator {
 			//work
 			a = plan.createAct("w", workCoord);
 			a.setLink(link20);
-			a.setDur(2.5 * 3600);
+			a.setDuration(2.5 * 3600);
 			//leg to work
 			leg = plan.createLeg(Mode.car);
 			route = new Route();

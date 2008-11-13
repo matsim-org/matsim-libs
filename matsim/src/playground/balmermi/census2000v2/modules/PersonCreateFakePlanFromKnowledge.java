@@ -95,7 +95,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				Act act = p.createAct(home.getType(),home.getFacility().getCenter());
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
-				act.setDur(24*3600);
+				act.setDuration(24*3600);
 				act.setFacility(home.getFacility());
 			}
 			else {
@@ -107,7 +107,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				Act act = p.createAct(home.getType(),home.getFacility().getCenter());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
-				act.setDur(end_time);
+				act.setDuration(end_time);
 				act.setFacility(home.getFacility());
 				Leg leg = p.createLeg(BasicLeg.Mode.car);
 				leg.setDepartureTime(end_time);
@@ -123,7 +123,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act = p.createAct(work.getType(),work.getFacility().getCenter());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
-					act.setDur(end_time-start_time);
+					act.setDuration(end_time-start_time);
 					act.setFacility(work.getFacility());
 					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
 					leg2.setDepartureTime(end_time);
@@ -140,7 +140,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act = p.createAct(educ.getType(),educ.getFacility().getCenter());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
-					act.setDur(end_time-start_time);
+					act.setDuration(end_time-start_time);
 					act.setFacility(educ.getFacility());
 					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
 					leg2.setDepartureTime(end_time);
@@ -154,7 +154,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act = p.createAct(home.getType(),home.getFacility().getCenter());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
-				act.setDur(end_time-start_time);
+				act.setDuration(end_time-start_time);
 				act.setFacility(home.getFacility());
 			}
 		}

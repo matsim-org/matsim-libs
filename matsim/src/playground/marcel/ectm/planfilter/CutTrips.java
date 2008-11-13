@@ -166,8 +166,8 @@ public class CutTrips implements PersonAlgorithm {
 				}
 			}
 			Act fromAct = (Act) plan.getActsLegs().get(firstInsideLeg - 1);
-			if (fromAct.getDur() != Time.UNDEFINED_TIME) {
-				fromAct.setDur(fromAct.getDur() + traveltime);
+			if (fromAct.getDuration() != Time.UNDEFINED_TIME) {
+				fromAct.setDuration(fromAct.getDuration() + traveltime);
 			}
 			if (fromAct.getEndTime() != Time.UNDEFINED_TIME) {
 				fromAct.setEndTime(fromAct.getEndTime() + traveltime);

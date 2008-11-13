@@ -123,7 +123,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			act1.setEndTime(4*3600);
 			plan.createLeg(BasicLeg.Mode.car);
 			act2 = plan.createAct("w", link1);
-			act2.setDur(14*3600);
+			act2.setDuration(14*3600);
 			plan.createLeg(BasicLeg.Mode.car);
 			plan.createAct("h", link1);
 		} catch (Exception e) {
@@ -137,22 +137,22 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		double act1Dur = act1.getEndTime();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
-		double act2Dur = act2.getDur();
+		double act2Dur = act2.getDuration();
 		double minDiff2 = Double.POSITIVE_INFINITY;
 		double maxDiff2 = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < 150; i++) {
 			mutator.handlePlan(plan);
 			// test duration of act1
-			double diff = act1Dur - act1.getDur();
+			double diff = act1Dur - act1.getDuration();
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
-			act1Dur = act1.getDur();
+			act1Dur = act1.getDuration();
 			assertTrue("activity duration cannot be smaller than 0.", act1Dur >= 0.0);
 			// test duration of act2
-			diff = act2Dur - act2.getDur();
+			diff = act2Dur - act2.getDuration();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
-			act2Dur = act2.getDur();
+			act2Dur = act2.getDuration();
 			assertTrue("activity duration cannot be smaller than 0.", act2Dur >= 0.0);
 		}
 		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);

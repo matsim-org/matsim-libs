@@ -194,12 +194,12 @@ public class MyObject implements BasicLink,BasicAct {
 		return basicAct.getLinkId();
 	}
 
-	public double getDur() {
-		return basicAct.getDur();
+	public double getDuration() {
+		return basicAct.getDuration();
 	}
 
-	public void setDur(double duration) {
-		basicAct.setDur(duration);
+	public void setDuration(double duration) {
+		basicAct.setDuration(duration);
 	}
 
 

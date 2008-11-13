@@ -207,8 +207,8 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				if (ii < (max - 1)) {
 
 					activity.setStartTime(now);
-					activity.setDur(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
-					now += activity.getDur();
+					activity.setDuration(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
+					now += activity.getDuration();
 					activity.setEndTime(now);
 
 					// handle last activity
@@ -217,7 +217,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					activity.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					activity.setDur(Time.UNDEFINED_TIME);
+					activity.setDuration(Time.UNDEFINED_TIME);
 					activity.setEndTime(Time.UNDEFINED_TIME);
 
 				}

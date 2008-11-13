@@ -238,8 +238,8 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, act.getType()));		
 		if (act.getStartTime() != Time.UNDEFINED_TIME)
 			atts.add(this.createTimeTuple(PopulationSchemaV5Names.STARTTIME, act.getStartTime()));
-		if (act.getDur() != Time.UNDEFINED_TIME)
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DURATION, act.getDur()));
+		if (act.getDuration() != Time.UNDEFINED_TIME)
+			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DURATION, act.getDuration()));
 		if (act.getEndTime() != Time.UNDEFINED_TIME)
 			atts.add(this.createTimeTuple(PopulationSchemaV5Names.ENDTIME, act.getEndTime()));
 		

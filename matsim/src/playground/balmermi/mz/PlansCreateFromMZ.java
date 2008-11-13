@@ -216,7 +216,7 @@ public class PlansCreateFromMZ {
 				if (plan.getActsLegs().size() != 0) { // already lines parsed and added
 					Act from_act = (Act)plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					from_act.setEndTime(departure);
-					from_act.setDur(from_act.getEndTime()-from_act.getStartTime());
+					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
 					Leg leg = plan.createLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
@@ -368,7 +368,7 @@ public class PlansCreateFromMZ {
 				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
 					Act act2 = (Act)plan2.getActsLegs().get(plan2.getActsLegs().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
-					act2.setDur(act2.getEndTime()-act2.getStartTime());
+					act2.setDuration(act2.getEndTime()-act2.getStartTime());
 //					System.out.println("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
 					if (!curr_act.getType().equals(prev_act.getType())) {
 						if (curr_act.getType().equals(HOME)) { act2.setType(HOME); }
@@ -408,7 +408,7 @@ public class PlansCreateFromMZ {
 			// complete the last act with time info
 			if (p.getSelectedPlan().getActsLegs().size() == 1) {
 				Act act = (Act)p.getSelectedPlan().getActsLegs().get(0);
-				act.setStartTime(0); act.setDur(24*3600); act.setEndTime(24*3600);
+				act.setStartTime(0); act.setDuration(24*3600); act.setEndTime(24*3600);
 			}
 		}
 		System.out.println("        # round trips removed (with same act types) = " + cnt_sametypes);

@@ -216,8 +216,8 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 			out.write(" link=\"" + act.getLink().getId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act.getDur() != Integer.MIN_VALUE)
-			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
+		if (act.getDuration() != Integer.MIN_VALUE)
+			out.write(" dur=\"" + Time.writeTime(act.getDuration()) + "\"");
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");

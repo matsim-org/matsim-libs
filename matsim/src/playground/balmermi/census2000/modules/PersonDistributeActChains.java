@@ -231,7 +231,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					Act a = plan.createAct(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
-					a.setDur(dur);
+					a.setDuration(dur);
 					Leg l = plan.createLeg(BasicLeg.Mode.undefined);
 					l.setArrivalTime(end_time);
 					l.setTravelTime(0);

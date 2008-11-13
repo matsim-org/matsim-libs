@@ -106,7 +106,7 @@ public class StaticPopulationGenerator {
 					final Act act = new Act("h",link.getCenter(),link);
 					act.setStartTime(3 * 3600.0);
 					act.setEndTime(3 *3600.0);
-					act.setDur(0);
+					act.setDuration(0);
 					plan.addAct(act);
 					pers.addPlan(plan);
 					try {

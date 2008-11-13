@@ -30,7 +30,7 @@ public interface BasicAct {
 
 	public double getEndTime();
 
-	public void setEndTime(final double endTime);
+	public void setEndTime(final double seconds);
 
 	public String getType();
 
@@ -42,14 +42,14 @@ public interface BasicAct {
 
 	public double getStartTime();
 
-	public void setStartTime(double time);
+	public void setStartTime(double seconds);
 
 	public Id getLinkId();
 
 	public Id getFacilityId();
 	@Deprecated
-	public double getDur();
+	public double getDuration();
 	@Deprecated
-	public void setDur(double duration);
+	public void setDuration(double duration);
 
 }

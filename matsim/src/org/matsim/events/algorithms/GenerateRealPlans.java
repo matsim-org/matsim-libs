@@ -134,7 +134,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				Act a = plan.createAct(acttype, event.link);
 				a.setStartTime(starttime);
 				a.setEndTime(endtime);
-				a.setDur(endtime - starttime);
+				a.setDuration(endtime - starttime);
 			}
 
 			Leg leg;
@@ -234,7 +234,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 		}
 		try {
 			Act act = (Act)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
-			act.setDur(event.time - act.getStartTime());
+			act.setDuration(event.time - act.getStartTime());
 			act.setEndTime(event.time);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -314,7 +314,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 					Act act2 = plan.createAct(act.getType(), act.getLink());
 					act2.setStartTime(0.0);
 					act2.setEndTime(24.0*3600);
-					act2.setDur(24.0*3600);
+					act2.setDuration(24.0*3600);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -335,7 +335,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 					Act act2 = plan.createAct(act.getType(), act.getLink());
 					act2.setStartTime(startTime);
 					act2.setEndTime(endTime);
-					act2.setDur(endTime - startTime);
+					act2.setDuration(endTime - startTime);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -343,7 +343,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				// we have a final act, make sure it ends at 24:00
 				Act act = (Act)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
 				act.setEndTime(24*3600);
-				act.setDur(act.getEndTime() - act.getStartTime());
+				act.setDuration(act.getEndTime() - act.getStartTime());
 			}
 		}
 	}

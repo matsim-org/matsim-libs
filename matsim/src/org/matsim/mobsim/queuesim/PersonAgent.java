@@ -152,12 +152,12 @@ public class PersonAgent {
 		/* WELL, THAT'S IMPORTANT:
 		 * The person leaves the activity either 'actDur' later or
 		 * when the end is defined of the activity, whatever comes first. */
-		if (act.getDur() == Time.UNDEFINED_TIME) {
+		if (act.getDuration() == Time.UNDEFINED_TIME) {
 			departure = act.getEndTime();
 		} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-			departure = now + act.getDur();
+			departure = now + act.getDuration();
 		} else {
-			departure = Math.min(act.getEndTime(), now + act.getDur());
+			departure = Math.min(act.getEndTime(), now + act.getDuration());
 		}
 		if (departure < now) {
 			// we cannot depart before we arrived, thus change the time so the timestamp in events will be right

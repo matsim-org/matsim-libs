@@ -70,8 +70,8 @@ public class PlanFilterEmptyRoutes extends AbstractPersonAlgorithm implements Pl
 				Act act1 = (Act)actslegs.get(i-1);
 				Act act2 = (Act)actslegs.get(i+1);
 				
-				double dur1 = act1.getDur();
-				double dur2 = act2.getDur();
+				double dur1 = act1.getDuration();
+				double dur2 = act2.getDuration();
 				double start1 = act1.getStartTime();
 //				int start2 = act2.getStartTime();
 //				int end1 = act1.getEndTime();
@@ -80,10 +80,10 @@ public class PlanFilterEmptyRoutes extends AbstractPersonAlgorithm implements Pl
 				if (end2 != Time.UNDEFINED_TIME) {
 					act1.setEndTime(end2);
 					if (start1 != Time.UNDEFINED_TIME) {
-						act1.setDur(end2 - start1);
+						act1.setDuration(end2 - start1);
 					}
 				} else if (dur2 != Time.UNDEFINED_TIME && dur1 != Time.UNDEFINED_TIME) {
-					act1.setDur(dur1 + dur2);
+					act1.setDuration(dur1 + dur2);
 				}
 
 				actslegs.remove(i+1);

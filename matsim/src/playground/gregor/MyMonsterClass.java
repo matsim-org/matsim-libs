@@ -321,7 +321,7 @@ public class MyMonsterClass {
 			Act nact = new Act("w", act.getLink().getCenter(), act.getLink());
 			nact.setStartTime(0);
 			nact.setEndTime(39600);
-			nact.setDur(39600);
+			nact.setDuration(39600);
 			Plan plan = new Plan(nperson);
 			plan.addAct(nact);
 			nperson.addPlan(plan);

@@ -86,26 +86,26 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 			for (int j=2; j<acts_legs.size()-2; j+=2) {
 				Act act = (Act)acts_legs.get(j);
 				if (act.getType().equals("h")) {
-					if (act.getDur() < 3*3600) { act.setDur((int)(1.5*3600)); }
-					else { act.setDur(5*3600); }
+					if (act.getDuration() < 3*3600) { act.setDuration((int)(1.5*3600)); }
+					else { act.setDuration(5*3600); }
 				}
 				else if (act.getType().equals("w")) {
-					if (act.getDur() < 3*3600) { act.setDur(2*3600); }
-					else if (act.getDur() < 7*3600) { act.setDur(4*3600); }
-					else { act.setDur(8*3600); }
+					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
+					else if (act.getDuration() < 7*3600) { act.setDuration(4*3600); }
+					else { act.setDuration(8*3600); }
 				}
 				else if (act.getType().equals("e")) {
-					if (act.getDur() < 3*3600) { act.setDur(2*3600); }
-					else if (act.getDur() < 5*3600) { act.setDur(4*3600); }
-					else { act.setDur(8*3600); }
+					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
+					else if (act.getDuration() < 5*3600) { act.setDuration(4*3600); }
+					else { act.setDuration(8*3600); }
 				}
 				else if (act.getType().equals("s")) {
-					if (act.getDur() < 2*3600) { act.setDur(1*3600); }
-					else { act.setDur(4*3600); }
+					if (act.getDuration() < 2*3600) { act.setDuration(1*3600); }
+					else { act.setDuration(4*3600); }
 				}
 				else if (act.getType().equals("l")) {
-					if (act.getDur() < 3*3600) { act.setDur(2*3600); }
-					else { act.setDur(5*3600); }
+					if (act.getDuration() < 3*3600) { act.setDuration(2*3600); }
+					else { act.setDuration(5*3600); }
 				}
 				else {
 					Gbl.errorMsg("[something is wrong]");

@@ -104,7 +104,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 			toAct.setStartTime(now);
 
 			double endTime = toAct.getEndTime();
-			double dur = toAct.getDur();
+			double dur = toAct.getDuration();
 			if (endTime != Time.UNDEFINED_TIME && dur != Time.UNDEFINED_TIME) {
 				double min = Math.min(endTime, now + dur);
 				if (now < min) {
@@ -125,11 +125,11 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 			//                please check if you are happy with that
 			if ((j+1) != actslegs.size()) {
 				toAct.setEndTime(now);
-				toAct.setDur(now-toAct.getStartTime());
+				toAct.setDuration(now-toAct.getStartTime());
 			}
 			else {
 				// balmermi: remove durations and endtimes for the last act
-				toAct.setDur(Time.UNDEFINED_TIME);
+				toAct.setDuration(Time.UNDEFINED_TIME);
 				toAct.setEndTime(Time.UNDEFINED_TIME);
 			}
 			

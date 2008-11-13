@@ -128,7 +128,7 @@ public class PlansAnalyzer {
 					final Act act = (Act)actslegs.get(j);	
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString()+"\t"+
-								String.valueOf(act.getDur())+"\t"+
+								String.valueOf(act.getDuration())+"\t"+
 								act.getType().substring(1));
 						out.newLine();
 						

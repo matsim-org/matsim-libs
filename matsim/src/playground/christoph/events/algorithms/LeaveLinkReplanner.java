@@ -165,7 +165,7 @@ public class LeaveLinkReplanner {
 		Act newFromAct = new Act(type, fromLink.getToNode().getCoord(), fromLink);
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
-		newFromAct.setDur(0);
+		newFromAct.setDuration(0);
 		
 		Route route = leg.getRoute();
 		

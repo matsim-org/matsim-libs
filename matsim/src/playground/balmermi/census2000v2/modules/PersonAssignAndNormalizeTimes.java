@@ -68,16 +68,16 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				Act a = (Act)p.getActsLegs().get(i);
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				double dur = prev_ttime;
-				a.setStartTime(tod); a.setDur(dur); a.setEndTime(tod+dur);
+				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
 			else if (i % 2 == 0) { // in between acts
 				Act a = (Act)p.getActsLegs().get(i);
-				double dur = a.getDur();
+				double dur = a.getDuration();
 				if (prev_ttime == Time.UNDEFINED_TIME) { Gbl.errorMsg("That must not happen!"); }
 				dur += prev_ttime;
 				if (dur < 5*60.0) { dur = 5*60.0; } // NOTE: Sometimes the mz act duration is 0 sec.
-				a.setStartTime(tod); a.setDur(dur); a.setEndTime(tod+dur);
+				a.setStartTime(tod); a.setDuration(dur); a.setEndTime(tod+dur);
 				tod = a.getEndTime();
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
@@ -94,15 +94,15 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	private final void normalizeTimes(Plan p) {
 		if (p.getActsLegs().size() == 1) {
 			Act a = (Act)p.getActsLegs().get(0);
-			a.setStartTime(0.0); a.setDur(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
+			a.setStartTime(0.0); a.setDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
 		double home_dur = ((Act)p.getActsLegs().get(0)).getEndTime();
 		double othr_dur = 0.0;
-		for (int i=2; i<p.getActsLegs().size()-2; i=i+2) { othr_dur += ((Act)p.getActsLegs().get(i)).getDur(); }
+		for (int i=2; i<p.getActsLegs().size()-2; i=i+2) { othr_dur += ((Act)p.getActsLegs().get(i)).getDuration(); }
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
 			Act a = (Act)p.getActsLegs().get(p.getActsLegs().size()-1);
-			a.setDur(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
+			a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			return;
 		}
 		
@@ -112,13 +112,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		for (int i=1; i<p.getActsLegs().size(); i++) {
 			if (i == p.getActsLegs().size()-1) {
 				Act a = (Act)p.getActsLegs().get(i);
-				a.setStartTime(tod); a.setDur(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
+				a.setStartTime(tod); a.setDuration(Time.UNDEFINED_TIME); a.setEndTime(Time.UNDEFINED_TIME);
 			}
 			else if (i % 2 == 0) {
 				Act a = (Act)p.getActsLegs().get(i);
 				a.setStartTime(tod);
-				a.setDur((Time.MIDNIGHT - HOME_MIN)*a.getDur()/othr_dur);
-				a.setEndTime(tod+a.getDur());
+				a.setDuration((Time.MIDNIGHT - HOME_MIN)*a.getDuration()/othr_dur);
+				a.setEndTime(tod+a.getDuration());
 				tod = a.getEndTime();
 			}
 			else {
@@ -135,9 +135,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		double othr_dur = 0.0;
 		for (int i=2; i<p.getActsLegs().size()-2; i=i+2) {
 			Act a = (Act)p.getActsLegs().get(i);
-			if (a.getDur() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
-			d.accumulateActivityDuration(a.getType(),a.getDur());
-			othr_dur += a.getDur();
+			if (a.getDuration() <= 0.0) { log.fatal("pid="+p.getPerson().getId()+": That must not happen!"); }
+			d.accumulateActivityDuration(a.getType(),a.getDuration());
+			othr_dur += a.getDuration();
 		}
 		double home_dur = Time.MIDNIGHT - othr_dur;
 		if (home_dur <= 0.0) { Gbl.errorMsg("pid="+p.getPerson().getId()+": That must not happen!"); }
@@ -159,12 +159,12 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				Act act = (Act)acts_legs.get(i);
 				if (i == 0) { // first act
 					act.setStartTime(0.0);
-					act.setDur(act.getDur()+bias);
+					act.setDuration(act.getDuration()+bias);
 					act.setEndTime(act.getEndTime()+bias);
 				}
 				else if (i == acts_legs.size()-1) { // last act
 					act.setStartTime(act.getStartTime()+bias);
-					act.setDur(Time.UNDEFINED_TIME);
+					act.setDuration(Time.UNDEFINED_TIME);
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else { // in between acts

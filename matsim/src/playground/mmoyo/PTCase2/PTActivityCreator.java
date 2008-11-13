@@ -103,7 +103,7 @@ public class PTActivityCreator {
 					    				double nextDeparture= ptTimetable.nextDeparture(idPTNode, arrTime);
 					    				double duration = nextDeparture- arrTime;
 					    				ptAct.setStartTime(walkLeg.getArrivalTime());
-					    				ptAct.setDur(duration);
+					    				ptAct.setDuration(duration);
 					    				ptAct.setEndTime(nextDeparture);
 					    				//Route route  =null;
 					    					

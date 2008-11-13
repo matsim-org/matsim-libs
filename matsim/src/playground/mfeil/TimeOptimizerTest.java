@@ -43,7 +43,7 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 		stream.println();
 		stream.print("\t");
 		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-			stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
+			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
 		}
 		stream.println();
 		
@@ -57,21 +57,21 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 		}
 		for (int i = 0;i<variation.length;i++){
 			double time = 70000;
-			((Act)variation[i].getActsLegs().get(0)).setDur(MatsimRandom.random.nextDouble()*time);
-			((Act)variation[i].getActsLegs().get(0)).setEndTime(((Act)variation[i].getActsLegs().get(0)).getDur());
-			time -=((Act)variation[i].getActsLegs().get(0)).getDur();
+			((Act)variation[i].getActsLegs().get(0)).setDuration(MatsimRandom.random.nextDouble()*time);
+			((Act)variation[i].getActsLegs().get(0)).setEndTime(((Act)variation[i].getActsLegs().get(0)).getDuration());
+			time -=((Act)variation[i].getActsLegs().get(0)).getDuration();
 			for (int j=2; j<variation[i].getActsLegs().size()-2;j+=2){
 				((Act)variation[i].getActsLegs().get(j)).setStartTime(((Act)variation[i].getActsLegs().get(j-2)).getEndTime());
-				((Act)variation[i].getActsLegs().get(j)).setDur(MatsimRandom.random.nextDouble()*time);
-				((Act)variation[i].getActsLegs().get(j)).setEndTime(((Act)variation[i].getActsLegs().get(j)).getDur()+((Act)variation[i].getActsLegs().get(j)).getStartTime());
-				time -= ((Act)variation[i].getActsLegs().get(j)).getDur();
+				((Act)variation[i].getActsLegs().get(j)).setDuration(MatsimRandom.random.nextDouble()*time);
+				((Act)variation[i].getActsLegs().get(j)).setEndTime(((Act)variation[i].getActsLegs().get(j)).getDuration()+((Act)variation[i].getActsLegs().get(j)).getStartTime());
+				time -= ((Act)variation[i].getActsLegs().get(j)).getDuration();
 			}
 			((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-1)).setStartTime(((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-3)).getEndTime());
-			((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-1)).setDur(86400-((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-1)).getStartTime());
+			((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-1)).setDuration(86400-((Act)variation[i].getActsLegs().get(variation[i].getActsLegs().size()-1)).getStartTime());
 			
 			stream.print("\t");
 			for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-				stream.print(((Act)(variation[i].getActsLegs()).get(z)).getDur()+"\t");
+				stream.print(((Act)(variation[i].getActsLegs()).get(z)).getDuration()+"\t");
 			}
 			stream.println();
 		}
@@ -92,7 +92,7 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 			
 			stream.print(variation[i].getScore()+"\t");
 			for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-				stream.print(((Act)(variation[i].getActsLegs()).get(z)).getDur()+"\t");
+				stream.print(((Act)(variation[i].getActsLegs()).get(z)).getDuration()+"\t");
 			}
 			stream.println(statistics[i][1]);
 		}

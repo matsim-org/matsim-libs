@@ -164,7 +164,7 @@ public class PTRouter2 {
 		Act ptAct= new Act("Wait PT Vehicle", coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
-		ptAct.setDur(dur);
+		ptAct.setDuration(dur);
 		ptAct.calculateDuration();
 		ptAct.setLink(link);
 		//act.setDur(linkTravelTime*60);

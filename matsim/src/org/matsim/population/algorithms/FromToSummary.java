@@ -140,7 +140,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 						.getY());
 				this.travelZone.add(toNode.getCoord().getX(), toNode.getCoord()
 						.getY());
-			} else if (fromAct.getDur() < 0) {
+			} else if (fromAct.getDuration() < 0) {
 				System.out.println("act " + (j - 2)
 						+ " has neither end-time nor duration.");
 			}

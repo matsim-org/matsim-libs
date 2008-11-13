@@ -294,8 +294,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act.getDur() != Time.UNDEFINED_TIME)
-			out.write(" dur=\"" + Time.writeTime(act.getDur()) + "\"");
+		if (act.getDuration() != Time.UNDEFINED_TIME)
+			out.write(" dur=\"" + Time.writeTime(act.getDuration()) + "\"");
 		if (act.getEndTime() != Time.UNDEFINED_TIME)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");
