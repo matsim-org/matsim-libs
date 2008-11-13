@@ -49,11 +49,11 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		
-		ArrayList<Activity> secondaryTypes = plan.getPerson().getKnowledge().getActivities(false);
+		ArrayList<Activity> secondaryActivities = plan.getPerson().getKnowledge().getActivities(false);
 		
-		Iterator<Activity> iter_types = secondaryTypes.iterator();
-		while (iter_types.hasNext()){
-			Activity activity = iter_types.next();
+		Iterator<Activity> iter_activities = secondaryActivities.iterator();
+		while (iter_activities.hasNext()){
+			Activity activity = iter_activities.next();
 			String type = activity.getType();
 			exchangeFacilities(type ,this.quad_trees.get(type).values().toArray(), plan);
 		}
@@ -66,7 +66,7 @@ public class RandomLocationMutator extends LocationMutator {
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
-			if (act.getType().startsWith(type)) {
+			if (act.getType().equals(type) && !(plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()))) {
 				
 				final Facility facility=(Facility)exchange_facilities[
 				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];

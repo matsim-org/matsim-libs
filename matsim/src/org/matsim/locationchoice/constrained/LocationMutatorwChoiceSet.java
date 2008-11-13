@@ -134,7 +134,7 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		return leg.getTravTime();
 	}
 		
-	public List<SubChain> calcActChains(final Plan plan) {
+	protected List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
@@ -145,7 +145,8 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 			final Act act = (Act)actslegs.get(j);	
 			
 			// found secondary activity
-			if (secondaryTypes.contains(act.getType())) {
+			if (secondaryTypes.contains(act.getType()) && 
+					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId())) {
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}		
 			// found primary activity
