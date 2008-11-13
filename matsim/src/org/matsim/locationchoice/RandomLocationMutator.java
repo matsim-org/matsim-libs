@@ -22,6 +22,7 @@ package org.matsim.locationchoice;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
@@ -49,6 +50,10 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		
+		if (!this.personPrimaryActs.containsKey(plan.getPerson().getId())) {
+			this.personPrimaryActs.put(plan.getPerson().getId(), new TreeSet<String>());
+		}
+		
 		ArrayList<Activity> secondaryActivities = plan.getPerson().getKnowledge().getActivities(false);
 		
 		Iterator<Activity> iter_activities = secondaryActivities.iterator();
@@ -66,15 +71,25 @@ public class RandomLocationMutator extends LocationMutator {
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
-			if (act.getType().equals(type) && !(plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()))) {
+			if (act.getType().equals(type) && (
+					!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId())) ||
+					this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
 				
 				final Facility facility=(Facility)exchange_facilities[
 				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
 				
 				act.setFacility(facility);
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
-				act.setCoord(facility.getCenter());
+				act.setCoord(facility.getCenter());	
 			}
+			
+			if (act.getType().equals(type) && plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) &&
+					!this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
+				
+				this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+			}
+			
+			
 		}
 
 		// loop over all <leg>s, remove route-information

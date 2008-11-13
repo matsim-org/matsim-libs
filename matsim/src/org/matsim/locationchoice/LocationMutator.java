@@ -21,6 +21,7 @@
 package org.matsim.locationchoice;
 
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -43,6 +44,8 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected NetworkLayer network = null;
 	protected Controler controler = null;	
 	protected TreeMap<String, QuadTree<Facility>> quad_trees;
+	
+	protected TreeMap<Id, Set<String>> personPrimaryActs;
 		
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
@@ -92,6 +95,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.initTrees(controler.getFacilities());				
 		this.network = network;
 		this.controler = controler;
+		this.personPrimaryActs = new TreeMap<Id, Set<String>>();
 	}
 
 	public void handlePlan(final Plan plan){
