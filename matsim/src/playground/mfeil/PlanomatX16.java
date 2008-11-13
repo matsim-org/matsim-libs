@@ -120,8 +120,8 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
-		double [] xs;
-		double [] ys 									= new double [MAX_ITERATIONS+1];
+	//	double [] xs;
+	//	double [] ys 									= new double [MAX_ITERATIONS+1];
 		// NEW NEW NEW NEW NEW NEW 
 		ArrayList<Activity> primActs					= plan.getPerson().getKnowledge().getActivities(true);
 		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();	
@@ -159,7 +159,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		// Write the given plan into the tabuList
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
 	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
-		ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
+	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
 		
 		// Do Tabu Search iterations
 		int currentIteration;
@@ -237,7 +237,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			// Statistics
 	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
 			//streamOverview.println(bestIterSolution.getScore());
-			ys[currentIteration]=bestIterSolution.getScore();
+	//		ys[currentIteration]=bestIterSolution.getScore();
 			
 
 			if (this.MAX_ITERATIONS==currentIteration){
@@ -259,8 +259,8 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		ArrayList<Object> al = plan.getActsLegs();
 		
-		xs = new double [currentIteration];
-		for (int i = 0;i<xs.length;i++)xs[i]=i+1;
+	//	xs = new double [currentIteration];
+	//	for (int i = 0;i<xs.length;i++)xs[i]=i+1;
 		
 		if(al.size()>tabuList.get(tabuList.size()-1).getActsLegs().size()){ 
 			int i;
@@ -288,10 +288,10 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			al.add(i, tabuList.get(tabuList.size()-1).getActsLegs().get(i));	
 			}
 		}
-		XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
-		chart.addSeries("score", xs, ys);
-		chart.addMatsimLogo();
-		chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
+	//	XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
+	//	chart.addSeries("score", xs, ys);
+	//	chart.addMatsimLogo();
+	//	chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		
 	//	stream.println("\nDauer der Planomat-Aufrufe: "+planomatRunTime);
 	//	stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
