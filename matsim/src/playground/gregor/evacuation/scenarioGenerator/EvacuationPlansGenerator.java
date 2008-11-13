@@ -106,9 +106,9 @@ public class EvacuationPlansGenerator {
 
 			Leg leg = new Leg(BasicLeg.Mode.car);
 			leg.setNum(1);
-			leg.setDepTime(0.0);
-			leg.setTravTime(0.0);
-			leg.setArrTime(0.0);
+			leg.setDepartureTime(0.0);
+			leg.setTravelTime(0.0);
+			leg.setArrivalTime(0.0);
 			plan.addLeg(leg);
 
 			Act actB = new Act("h", new CoordImpl(12000.0, -12000.0), network.getLink(saveLinkId));

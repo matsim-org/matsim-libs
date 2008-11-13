@@ -125,13 +125,13 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	protected double computeTravelTime(Act fromAct, Act toAct) {	
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(0);
-		leg.setDepTime(0.0);
-		leg.setTravTime(0.0);
-		leg.setArrTime(0.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(0.0);
+		leg.setArrivalTime(0.0);
 		
 		PlansCalcRoute router = (PlansCalcRoute)this.controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
-		return leg.getTravTime();
+		return leg.getTravelTime();
 	}
 		
 	protected List<SubChain> calcActChains(final Plan plan) {

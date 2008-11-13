@@ -200,7 +200,7 @@ public class CompareSelectedPlansTable {
 		LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
 		while (leg_it.hasNext()) {
 			Leg leg = (Leg) leg_it.next();
-			travelTime += leg.getTravTime();
+			travelTime += leg.getTravelTime();
 		}
 		return travelTime;
 	}

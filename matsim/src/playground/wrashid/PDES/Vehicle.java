@@ -68,7 +68,7 @@ public class Vehicle extends SimUnit {
 		// the assumption here
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		// the leg the agent performs
-		double departureTime = getCurrentLeg().getDepTime(); // the time the agent
+		double departureTime = getCurrentLeg().getDepartureTime(); // the time the agent
 		// departs at this
 		// activity
 

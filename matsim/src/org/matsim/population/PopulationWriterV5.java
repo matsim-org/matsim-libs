@@ -198,14 +198,14 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 	private void writeLeg(BasicLeg leg) throws IOException {
 		atts.clear();
 		atts.add(this.createTuple(PopulationSchemaV5Names.MODE, leg.getMode().toString()));
-		if (leg.getDepTime() != Time.UNDEFINED_TIME) {
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DEPARTURETIME, leg.getDepTime()));
+		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DEPARTURETIME, leg.getDepartureTime()));
 		}
-		if (leg.getArrTime() != Time.UNDEFINED_TIME){
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.ARRIVALTIME, leg.getArrTime()));
+		if (leg.getArrivalTime() != Time.UNDEFINED_TIME){
+			atts.add(this.createTimeTuple(PopulationSchemaV5Names.ARRIVALTIME, leg.getArrivalTime()));
 		}
-		if (leg.getTravTime() != Time.UNDEFINED_TIME){
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, leg.getTravTime()));
+		if (leg.getTravelTime() != Time.UNDEFINED_TIME){
+			atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, leg.getTravelTime()));
 		}
 		
 		this.writeStartTag(PopulationSchemaV5Names.LEG, atts);

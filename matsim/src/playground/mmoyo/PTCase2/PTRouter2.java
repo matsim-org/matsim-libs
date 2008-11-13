@@ -129,9 +129,9 @@ public class PTRouter2 {
 					//insert leg 
 					Leg leg = new Leg(Leg.Mode.pt);
 					//routeTravelTime =routeTravelTime; // routeTravelTime =routeTravelTime*3600;  //Seconds
-					leg.setDepTime(accumulatedTime);
-					leg.setTravTime(routeTravelTime);
-					leg.setArrTime((accumulatedTime + (routeTravelTime))); 
+					leg.setDepartureTime(accumulatedTime);
+					leg.setTravelTime(routeTravelTime);
+					leg.setArrivalTime((accumulatedTime + (routeTravelTime))); 
 					leg.setNum(num); 		
 					leg.setRoute(legRoute);
 					actLegList.add(leg);		
@@ -177,9 +177,9 @@ public class PTRouter2 {
 		Leg leg = new Leg(Leg.Mode.pt);
 		leg.setNum(num);
 		leg.setRoute(legRoute);
-		leg.setArrTime(arrTime);
-		leg.setTravTime(travTime);
-		leg.setDepTime(depTime);
+		leg.setArrivalTime(arrTime);
+		leg.setTravelTime(travTime);
+		leg.setDepartureTime(depTime);
 		return leg;
 	}
 	

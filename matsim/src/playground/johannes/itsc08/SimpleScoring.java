@@ -61,14 +61,14 @@ public class SimpleScoring implements ScoringFunction {
 	}
 
 	public void endLeg(double time) {
-		if(time > currentLeg.getArrTime()) {
-			score += (currentLeg.getArrTime() - startTime) * beta_travel / 3600.0;
-			score += (time - currentLeg.getArrTime()) * beta_late / 3600.0;
-			lateTime += (time - currentLeg.getArrTime());
+		if(time > currentLeg.getArrivalTime()) {
+			score += (currentLeg.getArrivalTime() - startTime) * beta_travel / 3600.0;
+			score += (time - currentLeg.getArrivalTime()) * beta_late / 3600.0;
+			lateTime += (time - currentLeg.getArrivalTime());
 			lateCount++;
 		} else {
 			score += (time - startTime) * beta_travel;
-			earlyTime += (currentLeg.getArrTime() - time);
+			earlyTime += (currentLeg.getArrivalTime() - time);
 			earlyCount++;
 		}
 		currentLeg = null;

@@ -159,9 +159,9 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		act.setDur(time);
 
 		Leg leg = (Leg) plan.getActsLegs().get(1);
-		leg.setDepTime(time);
-		leg.setArrTime(time);
-		leg.setTravTime(0);
+		leg.setDepartureTime(time);
+		leg.setArrivalTime(time);
+		leg.setTravelTime(0);
 
 		act = (Act) plan.getActsLegs().get(2);
 		act.setStartTime(time);
@@ -172,9 +172,9 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// before duration is over when they arrived late
 
 		leg = (Leg) plan.getActsLegs().get(3);
-		leg.setDepTime(time + 8 * 3600);
-		leg.setArrTime(time + 8 * 3600);
-		leg.setTravTime(0);
+		leg.setDepartureTime(time + 8 * 3600);
+		leg.setArrivalTime(time + 8 * 3600);
+		leg.setTravelTime(0);
 
 		act = (Act) plan.getActsLegs().get(4);
 		act.setStartTime(time + 8 * 3600);

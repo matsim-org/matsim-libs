@@ -110,9 +110,9 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				act.setDur(end_time);
 				act.setFacility(home.getFacility());
 				Leg leg = p.createLeg(BasicLeg.Mode.car);
-				leg.setDepTime(end_time);
-				leg.setTravTime(0.0);
-				leg.setArrTime(end_time);
+				leg.setDepartureTime(end_time);
+				leg.setTravelTime(0.0);
+				leg.setArrivalTime(end_time);
 				leg_cnt++;
 				
 				if (work!=null) {
@@ -126,9 +126,9 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setDur(end_time-start_time);
 					act.setFacility(work.getFacility());
 					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
-					leg2.setDepTime(end_time);
-					leg2.setTravTime(0.0);
-					leg2.setArrTime(end_time);
+					leg2.setDepartureTime(end_time);
+					leg2.setTravelTime(0.0);
+					leg2.setArrivalTime(end_time);
 					leg_cnt++;
 				}
 				
@@ -143,9 +143,9 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					act.setDur(end_time-start_time);
 					act.setFacility(educ.getFacility());
 					Leg leg2 = p.createLeg(BasicLeg.Mode.car);
-					leg2.setDepTime(end_time);
-					leg2.setTravTime(0.0);
-					leg2.setArrTime(end_time);
+					leg2.setDepartureTime(end_time);
+					leg2.setTravelTime(0.0);
+					leg2.setArrivalTime(end_time);
 					leg_cnt++;
 				}
 				start_time = end_time;

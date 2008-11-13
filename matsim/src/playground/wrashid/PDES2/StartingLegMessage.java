@@ -40,7 +40,7 @@ public class StartingLegMessage extends EventMessage {
 			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
 			//System.out.println(".");
-			vehicle.scheduleEndLegMessage(messageArrivalTime+vehicle.getCurrentLeg().getTravTime(), road);
+			vehicle.scheduleEndLegMessage(messageArrivalTime+vehicle.getCurrentLeg().getTravelTime(), road);
 		}
 	}
 	

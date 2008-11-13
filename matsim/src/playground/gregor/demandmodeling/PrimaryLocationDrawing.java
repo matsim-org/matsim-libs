@@ -236,9 +236,9 @@ public class PrimaryLocationDrawing {
 //				Leg leg = new Leg(0,"car",Time.UNDEFINED_TIME,Time.UNDEFINED_TIME,Time.UNDEFINED_TIME);
 				Leg leg = new Leg(Mode.car);
 				leg.setNum(0);
-				leg.setArrTime(Time.UNDEFINED_TIME);
-				leg.setDepTime(Time.UNDEFINED_TIME);
-				leg.setTravTime(Time.UNDEFINED_TIME);
+				leg.setArrivalTime(Time.UNDEFINED_TIME);
+				leg.setDepartureTime(Time.UNDEFINED_TIME);
+				leg.setTravelTime(Time.UNDEFINED_TIME);
 				Act act = new Act("w",link.getCenter(),link);
 				pers.getSelectedPlan().addLeg(leg);
 				pers.getSelectedPlan().addAct(act);

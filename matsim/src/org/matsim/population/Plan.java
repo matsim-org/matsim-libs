@@ -148,9 +148,9 @@ public class Plan extends BasicPlanImpl {
 			mode = BasicLeg.Mode.undefined;
 		}
 		Leg leg = createLeg(mode);
-		leg.setDepTime(Time.parseTime(depTime));
-		leg.setTravTime(Time.parseTime(travTime));
-		leg.setArrTime(Time.parseTime(arrTime));
+		leg.setDepartureTime(Time.parseTime(depTime));
+		leg.setTravelTime(Time.parseTime(travTime));
+		leg.setArrivalTime(Time.parseTime(arrTime));
 		return leg;
 	}
 
@@ -215,9 +215,9 @@ public class Plan extends BasicPlanImpl {
 				// remove an in-between act
 				Leg prev_leg = (Leg)this.actsLegs.get(index-1); // prev leg
 				prev_leg.setNum(Integer.MIN_VALUE);
-				prev_leg.setDepTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravTime(Time.UNDEFINED_TIME);
-				prev_leg.setArrTime(Time.UNDEFINED_TIME);
+				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
 				prev_leg.removeRoute();
 
 				this.actsLegs.remove(index+1); // following leg
@@ -241,9 +241,9 @@ public class Plan extends BasicPlanImpl {
 				// not the last leg
 				Leg next_leg = (Leg)this.actsLegs.get(index+2);
 				next_leg.setNum(Integer.MIN_VALUE);
-				next_leg.setDepTime(Time.UNDEFINED_TIME);
-				next_leg.setTravTime(Time.UNDEFINED_TIME);
-				next_leg.setArrTime(Time.UNDEFINED_TIME);
+				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
 				next_leg.removeRoute();
 			}
 			this.actsLegs.remove(index+1); // following act
@@ -286,8 +286,8 @@ public class Plan extends BasicPlanImpl {
 		for (int i = 2; i < this.actsLegs.size(); i = i+2) {
 			act2 = (Act)this.actsLegs.get(i);
 			Leg leg = (Leg)this.actsLegs.get(i-1);
-			act1.setEndTime(leg.getDepTime());
-			act2.setStartTime(leg.getArrTime());
+			act1.setEndTime(leg.getDepartureTime());
+			act2.setStartTime(leg.getArrivalTime());
 			act1.setDur(act1.getEndTime() - act1.getStartTime());
 			act1 = act2;
 		}
@@ -350,9 +350,9 @@ public class Plan extends BasicPlanImpl {
 					// Leg
 					Leg l = (Leg) actl.get(i);
 					Leg l2 = createLeg(l.getMode());
-					l2.setDepTime(l.getDepTime());
-					l2.setTravTime(l.getTravTime());
-					l2.setArrTime(l.getArrTime());
+					l2.setDepartureTime(l.getDepartureTime());
+					l2.setTravelTime(l.getTravelTime());
+					l2.setArrivalTime(l.getArrivalTime());
 					if (l.getRoute() != null) {
 						Route r = new Route(l.getRoute());
 						l2.setRoute(r);

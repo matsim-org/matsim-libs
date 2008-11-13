@@ -1020,7 +1020,7 @@ public class MyRuns {
 			for (int i = 2, maxi = plan.getActsLegs().size(); i < maxi; i = i + 2) {
 				final Leg leg = ((Leg)plan.getActsLegs().get(i-1));
 				final Coord arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
-				final double depTime = leg.getDepTime();
+				final double depTime = leg.getDepartureTime();
 				try {
 					final Route route = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
 					leg.setRoute(route);
@@ -2028,7 +2028,7 @@ public class MyRuns {
 							final List actslegs = plan.getActsLegs();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final Leg leg = (Leg)actslegs.get(i);
-								run(leg.getRoute(), leg.getDepTime());
+								run(leg.getRoute(), leg.getDepartureTime());
 							}
 						}
 

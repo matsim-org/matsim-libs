@@ -145,7 +145,7 @@ public class PtPlansFileCreator {
 			Act a = pl.createAct("h", link);
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(Mode.car);
-			leg.setDepTime(Time.parseTime(endTime));
+			leg.setDepartureTime(Time.parseTime(endTime));
 			Route route = new Route();
 			leg.setRoute(route);
 			route.setRoute(srcRoute);

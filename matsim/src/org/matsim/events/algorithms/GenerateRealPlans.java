@@ -98,8 +98,8 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			plan = getPlanForPerson(event.agentId);
 		}
 		Leg leg = (Leg)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
-		leg.setTravTime(time - leg.getDepTime());
-		leg.setArrTime(time);
+		leg.setTravelTime(time - leg.getDepartureTime());
+		leg.setArrivalTime(time);
 		finishLeg(event.agentId, leg);
 	}
 
@@ -122,7 +122,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				double starttime = 0;
 				if (plan.getActsLegs().size() > 0) {
 					Leg lastLeg = (Leg)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
-					starttime = lastLeg.getArrTime();
+					starttime = lastLeg.getArrivalTime();
 				}
 				double endtime = time;
 				String acttype = "unknown";
@@ -140,13 +140,13 @@ public class GenerateRealPlans implements ActStartEventHandler,
 			Leg leg;
 			if (event.leg != null) {
 				leg = plan.createLeg(event.leg.getMode());
-				leg.setDepTime(time);
+				leg.setDepartureTime(time);
 			} else {
 				leg = plan.createLeg(BasicLeg.Mode.car); // maybe get the leg mode from oldplans if available?
-				leg.setDepTime(time);
+				leg.setDepartureTime(time);
 			}
 
-			leg.setDepTime(time);
+			leg.setDepartureTime(time);
 		} catch (Exception e) {
 			System.err.println("Agent # " + agentId);
 			Gbl.errorMsg(e);
@@ -169,9 +169,9 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				// not all agents must get stuck on a trip: if the simulation is ended early, some agents may still be doing some activity
 				// insert for those a dummy leg so we can safely create the stuck-act afterwards
 				Leg leg = plan.createLeg(event.leg.getMode());
-				leg.setDepTime(time);
-				leg.setTravTime(0.0);
-				leg.setArrTime(time);
+				leg.setDepartureTime(time);
+				leg.setTravelTime(0.0);
+				leg.setArrivalTime(time);
 				finishLeg(event.agentId, leg);
 			}
 			Link link = event.link;
@@ -323,11 +323,11 @@ public class GenerateRealPlans implements ActStartEventHandler,
 				try {
 					Act act = (Act)plan.getActsLegs().get(0);
 					Leg leg = (Leg)plan.getActsLegs().get(plan.getActsLegs().size() - 1);
-					double startTime = leg.getArrTime();
+					double startTime = leg.getArrivalTime();
 					double endTime = 24*3600;
 					if (startTime == Time.UNDEFINED_TIME) {
 						// maybe the agent never arrived on time?
-						startTime = leg.getDepTime() + 15*60; // just assume some travel time, e.g. 15 minutes.
+						startTime = leg.getDepartureTime() + 15*60; // just assume some travel time, e.g. 15 minutes.
 					}
 					if (endTime < startTime) {
 						endTime = startTime + 900; // startTime+15min

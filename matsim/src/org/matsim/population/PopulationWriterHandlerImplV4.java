@@ -313,12 +313,12 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		if (leg.getNum() != Integer.MIN_VALUE)
 			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepTime() != Time.UNDEFINED_TIME)
-			out.write(" dep_time=\"" + Time.writeTime(leg.getDepTime()) + "\"");
-		if (leg.getTravTime() != Time.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Time.writeTime(leg.getTravTime()) + "\"");
-		if (leg.getArrTime() != Time.UNDEFINED_TIME)
-			out.write(" arr_time=\"" + Time.writeTime(leg.getArrTime()) + "\"");
+		if (leg.getDepartureTime() != Time.UNDEFINED_TIME)
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
+		if (leg.getTravelTime() != Time.UNDEFINED_TIME)
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
+		if (leg.getArrivalTime() != Time.UNDEFINED_TIME)
+			out.write(" arr_time=\"" + Time.writeTime(leg.getArrivalTime()) + "\"");
 		out.write(">\n");
 	}
 

@@ -27,8 +27,9 @@ public interface BasicLeg {
 	
 	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
 	
+	@Deprecated
 	public int getNum();
-
+	@Deprecated
 	public void setNum(int num);
 
 	public Mode getMode();
@@ -39,17 +40,17 @@ public interface BasicLeg {
 
 	public void setRoute(BasicRoute route);
 
-	public double getDepTime();
+	public double getDepartureTime();
 
-	public void setDepTime(final double depTime);
+	public void setDepartureTime(final double seconds);
 
-	public double getTravTime();
+	public double getTravelTime();
 
-	public void setTravTime(final double travTime);
+	public void setTravelTime(final double seconds);
 
-	public double getArrTime();
+	public double getArrivalTime();
 
-	public void setArrTime(final double arrTime);
+	public void setArrivalTime(final double seconds);
 
 
 }

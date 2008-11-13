@@ -279,8 +279,8 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 				
 			} else if (o.getClass().equals(Leg.class)) {
 
-				depTime = ((Leg) o).getDepTime();
-				arrTime = ((Leg) o).getArrTime();
+				depTime = ((Leg) o).getDepartureTime();
+				arrTime = ((Leg) o).getArrivalTime();
 
 			}
 		}

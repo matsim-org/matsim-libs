@@ -38,9 +38,9 @@ public class Leg extends BasicLegImpl {
 	public Leg(final Leg leg) {
 		super(leg.getMode());
 		this.num = leg.num;
-		this.setDepTime(leg.getDepTime());
-		this.setTravTime(leg.getTravTime());
-		this.setArrTime(leg.getArrTime());
+		this.setDepartureTime(leg.getDepartureTime());
+		this.setTravelTime(leg.getTravelTime());
+		this.setArrivalTime(leg.getArrivalTime());
 		if (leg.route instanceof Route) {
 			this.route = new Route((Route) leg.route);
 		}
@@ -77,9 +77,9 @@ public class Leg extends BasicLegImpl {
 	public final String toString() {
 		return "[num=" + this.num + "]" +
 				"[mode=" + this.getMode().toString()  + "]" +
-				"[depTime=" + Time.writeTime(this.getDepTime()) + "]" +
-				"[travTime=" + Time.writeTime(this.getTravTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getArrTime()) + "]" +
+				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
+				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
+				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
 

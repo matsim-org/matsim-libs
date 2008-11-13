@@ -62,27 +62,27 @@ public class BasicLegImpl implements BasicLeg {
 		this.mode = mode;
 	}
 
-	public final double getDepTime() {
+	public final double getDepartureTime() {
 		return this.depTime;
 	}
 
-	public final void setDepTime(final double depTime) {
+	public final void setDepartureTime(final double depTime) {
 		this.depTime = depTime;
 	}
 
-	public final double getTravTime() {
+	public final double getTravelTime() {
 		return this.travTime;
 	}
 
-	public final void setTravTime(final double travTime) {
+	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
 
-	public final double getArrTime() {
+	public final double getArrivalTime() {
 		return this.arrTime;
 	}
 
-	public final void setArrTime(final double arrTime) {
+	public final void setArrivalTime(final double arrTime) {
 		this.arrTime = arrTime;
 	}
 }

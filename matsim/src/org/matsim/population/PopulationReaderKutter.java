@@ -229,9 +229,9 @@ public class PopulationReaderKutter implements PopulationReader {
 
 			if (!skipActivity) {
 				Leg l = this.currPlan.createLeg(mode);
-				l.setDepTime(this.currTime);
-				l.setTravTime(travTime);
-				l.setArrTime(arrTime);
+				l.setDepartureTime(this.currTime);
+				l.setTravelTime(travTime);
+				l.setArrivalTime(arrTime);
 				this.currTime = this.currTime + duration;
 				Act a = this.currPlan.createAct(activity, coord);
 				a.setStartTime(arrTime);

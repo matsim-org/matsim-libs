@@ -120,7 +120,7 @@ public class Converter {
 				double dur = endTime - this.tmpEndTime;
 
 				Leg leg = pl.createLeg(Mode.car);
-				leg.setDepTime(convertTime(this.tmpTabs[3]));
+				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
 				if (tabs[7].equals("H")) {
@@ -141,7 +141,7 @@ public class Converter {
 					Plan tmpPl = p.getSelectedPlan();
 
 					Leg leg = tmpPl.createLeg(Mode.car);
-					leg.setDepTime(convertTime(this.tmpTabs[3]));
+					leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
 					Coord tmpCoord2 = getRandomCoordInZone(tabs[12]);

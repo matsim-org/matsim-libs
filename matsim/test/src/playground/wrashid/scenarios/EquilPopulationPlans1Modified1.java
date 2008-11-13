@@ -24,9 +24,9 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 		Person p=population.getPerson("1");
 		Plan plan= p.getSelectedPlan();
 		ArrayList<Object> actsLegs =plan.getActsLegs();
-		((Leg)actsLegs.get(1)).setDepTime(360);
-		((Leg)actsLegs.get(3)).setDepTime(900); // this requires immediate departure after arrival
-		((Leg)actsLegs.get(5)).setDepTime(2000);
+		((Leg)actsLegs.get(1)).setDepartureTime(360);
+		((Leg)actsLegs.get(3)).setDepartureTime(900); // this requires immediate departure after arrival
+		((Leg)actsLegs.get(5)).setDepartureTime(2000);
 		return population;
 	}
 	

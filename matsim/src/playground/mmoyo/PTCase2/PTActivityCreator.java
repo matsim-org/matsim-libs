@@ -98,11 +98,11 @@ public class PTActivityCreator {
 					    				*/
 					    				
 					    				//set values of first ptAct
-					    				double arrTime=walkLeg.getArrTime();
+					    				double arrTime=walkLeg.getArrivalTime();
 					    				Id idPTNode = ptAct.getLink().getFromNode().getId();
 					    				double nextDeparture= ptTimetable.nextDeparture(idPTNode, arrTime);
 					    				double duration = nextDeparture- arrTime;
-					    				ptAct.setStartTime(walkLeg.getArrTime());
+					    				ptAct.setStartTime(walkLeg.getArrivalTime());
 					    				ptAct.setDur(duration);
 					    				ptAct.setEndTime(nextDeparture);
 					    				//Route route  =null;
@@ -176,9 +176,9 @@ public class PTActivityCreator {
 
 		Leg walkLeg1= new Leg(Leg.Mode.walk);
 		walkLeg1.setNum(legNum);
-		walkLeg1.setDepTime(depTime);
-		walkLeg1.setTravTime(walkTravelTime); //walkLeg1.setTravTime(walkTravelTime);    
-		walkLeg1.setArrTime(arrTime);
+		walkLeg1.setDepartureTime(depTime);
+		walkLeg1.setTravelTime(walkTravelTime); //walkLeg1.setTravTime(walkTravelTime);    
+		walkLeg1.setArrivalTime(arrTime);
 		walkLeg1.setRoute(walkRoute);
 		
 		return walkLeg1;

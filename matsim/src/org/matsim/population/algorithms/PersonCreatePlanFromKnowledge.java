@@ -54,9 +54,9 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		a.setEndTime(time);
 		a.setFacility(home_facility);
 		Leg l = p.createLeg(BasicLeg.Mode.car);
-		l.setDepTime(time);
-		l.setTravTime(0);
-		l.setArrTime(time);
+		l.setDepartureTime(time);
+		l.setTravelTime(0);
+		l.setArrivalTime(time);
 
 		int nof_acts = 1 + MatsimRandom.random.nextInt(3);
 		int dur = 12*3600/nof_acts;
@@ -74,9 +74,9 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			a.setFacility(f);
 			time += dur;
 			l = p.createLeg(BasicLeg.Mode.car);
-			l.setDepTime(time);
-			l.setTravTime(0);
-			l.setArrTime(time);
+			l.setDepartureTime(time);
+			l.setTravelTime(0);
+			l.setArrivalTime(time);
 		}
 
 		// last act (= home)

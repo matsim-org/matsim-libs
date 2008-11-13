@@ -75,7 +75,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setDur(act.getEndTime());
 					}
 					else if (j == acts_legs.size()-1) {
-						double time = leg.getArrTime();
+						double time = leg.getArrivalTime();
 						act.setStartTime(time);
 						if (time < 24*3600) {
 							time = 24*3600;
@@ -84,19 +84,19 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setDur(time - act.getStartTime());
 					}
 					else {
-						act.setStartTime(leg.getArrTime());
+						act.setStartTime(leg.getArrivalTime());
 						act.setEndTime(act.getStartTime()+act.getDur());
 					}
 				}
 				else {
 					leg = (Leg)acts_legs.get(j);
 
-					leg.setDepTime(act.getEndTime());
-					double ttime = leg.getTravTime();
+					leg.setDepartureTime(act.getEndTime());
+					double ttime = leg.getTravelTime();
 					if (ttime == Time.UNDEFINED_TIME) {
 						ttime = 0;
 					}
-					leg.setArrTime(leg.getDepTime() + ttime);
+					leg.setArrivalTime(leg.getDepartureTime() + ttime);
 				}
 			}
 		}

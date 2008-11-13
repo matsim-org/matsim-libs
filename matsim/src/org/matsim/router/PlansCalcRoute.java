@@ -184,9 +184,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = 0;
 		}
 
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -228,9 +228,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = 0;
 		}
 
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -243,9 +243,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -258,9 +258,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -273,9 +273,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 

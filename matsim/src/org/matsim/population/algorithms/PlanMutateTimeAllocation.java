@@ -101,13 +101,13 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 				Leg leg = (Leg)(plan.getActsLegs().get(i));
 
 				// assume that there will be no delay between end time of previous activity and departure time
-				leg.setDepTime(now);
+				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getTravTime() != Time.UNDEFINED_TIME) {
-					now += leg.getTravTime();
+				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+					now += leg.getTravelTime();
 				}
 				// set planned arrival time accordingly
-				leg.setArrTime(now);
+				leg.setArrivalTime(now);
 
 			}
 		}

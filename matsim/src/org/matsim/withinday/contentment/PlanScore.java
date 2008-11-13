@@ -167,7 +167,7 @@ public class PlanScore implements AgentContentment {
 		Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 
-		double score = calcPlanScore(time + duration, leg.getArrTime(), nextActDuration, this.zeroUtilDuration[planIdx]);
+		double score = calcPlanScore(time + duration, leg.getArrivalTime(), nextActDuration, this.zeroUtilDuration[planIdx]);
 		if (this.referenceScore[planIdx] == 0) {
 			this.planDeviation = 0;
 		} else {
@@ -222,7 +222,7 @@ public class PlanScore implements AgentContentment {
 				Leg leg = (Leg)o;
 				Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 				double actDur = Math.max((nextAct.getEndTime() - nextAct.getStartTime()), 0.0d);
-				double endTime = Math.max(leg.getArrTime(), 0.0d);
+				double endTime = Math.max(leg.getArrivalTime(), 0.0d);
 
 				this.zeroUtilDuration[index] =  (actDur / 3600.0) * Math
 						.exp(-10.0 / ((actDur / 3600.0) * priority));

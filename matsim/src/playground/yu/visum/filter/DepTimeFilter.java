@@ -20,8 +20,8 @@ public class DepTimeFilter extends PersonFilterA {
 			List actsLegs = plan.getActsLegs();
 			for (int i = 1; i < actsLegs.size(); i += 2) {
 				Leg leg = (Leg) actsLegs.get(i);
-				result = ((criterionMIN < leg.getDepTime()) && (leg
-						.getDepTime() < criterionMAX));
+				result = ((criterionMIN < leg.getDepartureTime()) && (leg
+						.getDepartureTime() < criterionMAX));
 				if (result)
 					return result;
 			}

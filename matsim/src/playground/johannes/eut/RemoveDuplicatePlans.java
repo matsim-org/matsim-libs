@@ -85,7 +85,7 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 					/*
 					 * Compare departure times.
 					 */
-					if (leg2.getDepTime() != leg1.getDepTime()) {
+					if (leg2.getDepartureTime() != leg1.getDepartureTime()) {
 						plansDiffer = true;
 						break;
 					}

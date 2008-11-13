@@ -180,9 +180,9 @@ public class SelectedPlans2ESRIShape {
 	private Feature getLegFeature(final Leg leg, final String id) {
 		Integer num = leg.getNum();
 		BasicLeg.Mode mode = leg.getMode();
-		Double depTime = leg.getDepTime();
-		Double travTime = leg.getTravTime();
-		Double arrTime = leg.getArrTime();
+		Double depTime = leg.getDepartureTime();
+		Double travTime = leg.getTravelTime();
+		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDist();
 
 		org.matsim.network.Link[] links = leg.getRoute().getLinkRoute();

@@ -220,9 +220,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		route.setRoute(nodes);
 		leg.setRoute(route);
 		
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -246,9 +246,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -261,9 +261,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 
@@ -276,9 +276,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 

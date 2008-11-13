@@ -84,18 +84,18 @@ public class CreatePlans {
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTime);
 			Leg l = plan.createLeg(BasicLeg.Mode.car);
-			l.setArrTime(depTime);
-			l.setTravTime(0.0);
-			l.setDepTime(depTime);
+			l.setArrivalTime(depTime);
+			l.setTravelTime(0.0);
+			l.setDepartureTime(depTime);
 			a = plan.createAct("work",work_facility.getCenter());
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
 			a.setDur(duration);
 			l = plan.createLeg(BasicLeg.Mode.car);
-			l.setArrTime(depTime+duration);
-			l.setTravTime(0.0);
-			l.setDepTime(depTime+duration);
+			l.setArrivalTime(depTime+duration);
+			l.setTravelTime(0.0);
+			l.setDepartureTime(depTime+duration);
 			a = plan.createAct("home",home_facility.getCenter());
 			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person

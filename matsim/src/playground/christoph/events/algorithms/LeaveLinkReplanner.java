@@ -207,9 +207,9 @@ public class LeaveLinkReplanner {
 		// die neue Route in neuem Leg hinterlegen
 		Leg newLeg = new Leg(leg.getMode());
 		newLeg.setNum(0);
-		newLeg.setDepTime(leg.getDepTime());
-		newLeg.setTravTime(leg.getTravTime());
-		newLeg.setArrTime(leg.getArrTime());
+		newLeg.setDepartureTime(leg.getDepartureTime());
+		newLeg.setTravelTime(leg.getTravelTime());
+		newLeg.setArrivalTime(leg.getArrivalTime());
 		newLeg.setRoute(subRoute);
 		newLeg.setRoute(subRoute);
 			

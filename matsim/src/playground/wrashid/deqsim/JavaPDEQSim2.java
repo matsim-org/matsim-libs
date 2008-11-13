@@ -158,7 +158,7 @@ public class JavaPDEQSim2 {
 					
 					
 					
-					double lookahead=leg.getDepTime();
+					double lookahead=leg.getDepartureTime();
 					Link link=null;
 					for (int j=0;j<links.length;j++){
 						link=links[j];

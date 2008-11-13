@@ -348,7 +348,7 @@ public class QueueSimulation {
 	}
 
 	protected static final void handleUnknownLegMode(final Vehicle veh) {
-		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravTime());
+		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravelTime());
 		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
 	}

@@ -234,7 +234,7 @@ public class CreateSelectedPlansTables {
 		final LegIterator leg_it = person.getSelectedPlan().getIteratorLeg();
 		while (leg_it.hasNext()) {
 			final Leg leg = (Leg)leg_it.next();
-			travelTime+=leg.getTravTime();
+			travelTime+=leg.getTravelTime();
 		}
 		return travelTime;
 	}

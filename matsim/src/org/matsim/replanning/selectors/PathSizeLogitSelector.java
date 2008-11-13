@@ -104,7 +104,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
 			while (it.hasNext()){
 					Leg leg = ((Leg)it.next());
-					currentEndTime = leg.getDepTime();
+					currentEndTime = leg.getDepartureTime();
 					Route r = leg.getRoute();
 					pathSize += r.getDist();
 					Link[] links = r.getLinkRoute();
@@ -128,7 +128,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			BasicPlanImpl.LegIterator it = plan.getIteratorLeg();
 			while(it.hasNext()){
 				Leg leg = (Leg) it.next();
-				double currentTime = leg.getDepTime();
+				double currentTime = leg.getDepartureTime();
 				for (Link link : leg.getRoute().getLinkRoute()){
 					double denominator = 0;
 					for (double dbl : linksInTime.get(link.getId())){

@@ -87,8 +87,8 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 			}
 			else {
 				Leg leg = (Leg)acts_legs.get(i);
-				leg.setDepTime(leg.getDepTime()+bias);
-				leg.setArrTime(leg.getArrTime()+bias);
+				leg.setDepartureTime(leg.getDepartureTime()+bias);
+				leg.setArrivalTime(leg.getArrivalTime()+bias);
 			}
 		} 
 	}

@@ -85,9 +85,9 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = 0;
 		}
 
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(depTime + travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
 		return travTime;
 	}
 }

@@ -125,9 +125,9 @@ System.out.println(count);
 		Leg oldLeg = pers.getSelectedPlan().getNextLeg(oldA);
 		Leg l = new Leg(oldLeg.getMode());
 		l.setNum(oldLeg.getNum());
-		l.setDepTime(oldLeg.getDepTime());
-		l.setTravTime(oldLeg.getTravTime());
-		l.setArrTime(oldLeg.getArrTime());
+		l.setDepartureTime(oldLeg.getDepartureTime());
+		l.setTravelTime(oldLeg.getTravelTime());
+		l.setArrivalTime(oldLeg.getArrivalTime());
 		
 		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Act b = new Act(oldB);

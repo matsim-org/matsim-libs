@@ -71,8 +71,8 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				
 				function.startLeg(depTime, leg);
 				
-				if (leg.getTravTime()>=0){
-					arrTime = depTime + leg.getTravTime();
+				if (leg.getTravelTime()>=0){
+					arrTime = depTime + leg.getTravelTime();
 				}
 				else{
 					arrTime = depTime;

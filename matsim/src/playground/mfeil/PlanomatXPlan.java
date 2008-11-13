@@ -66,9 +66,9 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 			for (int i=1; i<in.size()-1; i+=2) {
 				Leg lx = (Leg)this.actsLegs.get(i);
 				Leg lx0 = (Leg)in.get(i);
-				lx.setTravTime(lx0.getTravTime());
-				lx.setDepTime(lx0.getDepTime());
-				lx.setArrTime(lx0.getArrTime());
+				lx.setTravelTime(lx0.getTravelTime());
+				lx.setDepartureTime(lx0.getDepartureTime());
+				lx.setArrivalTime(lx0.getArrivalTime());
 				
 				Act ax = (Act)this.actsLegs.get(i+1);
 				Act ax0 = (Act)in.get(i+1);

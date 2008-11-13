@@ -172,8 +172,8 @@ public class CutTrips implements PersonAlgorithm {
 			if (fromAct.getEndTime() != Time.UNDEFINED_TIME) {
 				fromAct.setEndTime(fromAct.getEndTime() + traveltime);
 			}
-			if (leg.getDepTime() != Time.UNDEFINED_TIME) {
-				leg.setDepTime(leg.getDepTime() + traveltime);
+			if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+				leg.setDepartureTime(leg.getDepartureTime() + traveltime);
 			}
 
 			// adapt route of the leg that leads into the AOI

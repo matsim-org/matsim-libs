@@ -204,9 +204,9 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				((Act)al.get(i)).setEndTime(((Act)(bestSolution.get(i))).getEndTime());
 			}
 			else {
-				((Leg)al.get(i)).setTravTime(((Leg)(bestSolution.get(i))).getTravTime());
-				((Leg)al.get(i)).setDepTime(((Leg)(bestSolution.get(i))).getDepTime());
-				((Leg)al.get(i)).setArrTime(((Leg)(bestSolution.get(i))).getArrTime());
+				((Leg)al.get(i)).setTravelTime(((Leg)(bestSolution.get(i))).getTravelTime());
+				((Leg)al.get(i)).setDepartureTime(((Leg)(bestSolution.get(i))).getDepartureTime());
+				((Leg)al.get(i)).setArrivalTime(((Leg)(bestSolution.get(i))).getArrivalTime());
 			}
 		}
 		
@@ -334,10 +334,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			double now =((Act)(actslegs.get(outer))).getEndTime()+OFFSET;
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i+=2){
-				((Leg)(actslegs.get(i))).setDepTime(now);
+				((Leg)(actslegs.get(i))).setDepartureTime(now);
 				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i-1)), (Act)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
-				((Leg)(actslegs.get(i))).setArrTime(now+travelTime);
-				((Leg)(actslegs.get(i))).setTravTime(travelTime);
+				((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
+				((Leg)(actslegs.get(i))).setTravelTime(travelTime);
 				now+=travelTime;
 				
 				if (i!=inner-1){
@@ -347,10 +347,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 					if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
 						if (actslegs.size()>=i+3){
 							now+=this.minimumTime;
-							((Leg)(actslegs.get(i+2))).setDepTime(now);
+							((Leg)(actslegs.get(i+2))).setDepartureTime(now);
 							travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i+1)), (Act)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
-							((Leg)(actslegs.get(i+2))).setArrTime(now+travelTime);
-							((Leg)(actslegs.get(i+2))).setTravTime(travelTime);
+							((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
+							((Leg)(actslegs.get(i+2))).setTravelTime(travelTime);
 							now+=travelTime;
 						
 							if (((Act)(actslegs.get(i+3))).getEndTime()<now+this.minimumTime){
@@ -379,10 +379,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			double now =((Act)(actslegs.get(outer))).getEndTime()-OFFSET;			
 			double travelTime;
 			for (int i=outer+1;i<=inner-1;i+=2){
-				((Leg)(actslegs.get(i))).setDepTime(now);
+				((Leg)(actslegs.get(i))).setDepartureTime(now);
 				travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i-1)), (Act)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
-				((Leg)(actslegs.get(i))).setArrTime(now+travelTime);
-				((Leg)(actslegs.get(i))).setTravTime(travelTime);
+				((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
+				((Leg)(actslegs.get(i))).setTravelTime(travelTime);
 				now+=travelTime;
 				
 				if (i!=inner-1){
@@ -392,10 +392,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 					if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
 						if (actslegs.size()>=i+3){
 							now+=this.minimumTime;
-							((Leg)(actslegs.get(i+2))).setDepTime(now);
+							((Leg)(actslegs.get(i+2))).setDepartureTime(now);
 							travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i+1)), (Act)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
-							((Leg)(actslegs.get(i+2))).setArrTime(now+travelTime);
-							((Leg)(actslegs.get(i+2))).setTravTime(travelTime);
+							((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
+							((Leg)(actslegs.get(i+2))).setTravelTime(travelTime);
 							now+=travelTime;
 							if (((Act)(actslegs.get(i+3))).getEndTime()<now+this.minimumTime){
 								return -10000;
@@ -423,10 +423,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 		
 		double travelTime;
 		for (int i=outer+1;i<=inner-1;i+=2){
-			((Leg)(actslegs.get(i))).setDepTime(now);
+			((Leg)(actslegs.get(i))).setDepartureTime(now);
 			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i-1)), (Act)(actslegs.get(i+1)), (Leg)(actslegs.get(i)));
-			((Leg)(actslegs.get(i))).setArrTime(now+travelTime);
-			((Leg)(actslegs.get(i))).setTravTime(travelTime);
+			((Leg)(actslegs.get(i))).setArrivalTime(now+travelTime);
+			((Leg)(actslegs.get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=inner-1){
@@ -436,10 +436,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				if (((Act)(actslegs.get(i+1))).getEndTime()<now+this.minimumTime){
 					if (actslegs.size()>=i+3){
 						now+=this.minimumTime;
-						((Leg)(actslegs.get(i+2))).setDepTime(now);
+						((Leg)(actslegs.get(i+2))).setDepartureTime(now);
 						travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(actslegs.get(i+1)), (Act)(actslegs.get(i+3)), (Leg)(actslegs.get(i+2)));
-						((Leg)(actslegs.get(i+2))).setArrTime(now+travelTime);
-						((Leg)(actslegs.get(i+2))).setTravTime(travelTime);
+						((Leg)(actslegs.get(i+2))).setArrivalTime(now+travelTime);
+						((Leg)(actslegs.get(i+2))).setTravelTime(travelTime);
 						now+=travelTime;
 						if (((Act)(actslegs.get(i+3))).getEndTime()<now+this.minimumTime){
 							return -10000;
@@ -495,10 +495,10 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 			
 		double travelTime;
 		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
-			((Leg)(plan.getActsLegs().get(i))).setDepTime(now);
+			((Leg)(plan.getActsLegs().get(i))).setDepartureTime(now);
 			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
-			((Leg)(plan.getActsLegs().get(i))).setArrTime(now+travelTime);
-			((Leg)(plan.getActsLegs().get(i))).setTravTime(travelTime);
+			((Leg)(plan.getActsLegs().get(i))).setArrivalTime(now+travelTime);
+			((Leg)(plan.getActsLegs().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
 			
 			if (i!=plan.getActsLegs().size()-2){
@@ -525,20 +525,20 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 
 	public void cleanActs (ArrayList<?> actslegs){
 		
-		((Act)(actslegs.get(0))).setEndTime(((Leg)(actslegs.get(1))).getDepTime());
-		((Act)(actslegs.get(0))).setDur(((Leg)(actslegs.get(1))).getDepTime());
+		((Act)(actslegs.get(0))).setEndTime(((Leg)(actslegs.get(1))).getDepartureTime());
+		((Act)(actslegs.get(0))).setDur(((Leg)(actslegs.get(1))).getDepartureTime());
 		
 		for (int i=2;i<=actslegs.size()-1;i=i+2){
 			
 			if (i!=actslegs.size()-1){
-				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrTime());
-				((Act)(actslegs.get(i))).setEndTime(((Leg)(actslegs.get(i+1))).getDepTime());
-				((Act)(actslegs.get(i))).setDur(((Leg)(actslegs.get(i+1))).getDepTime()-((Leg)(actslegs.get(i-1))).getArrTime());
+				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
+				((Act)(actslegs.get(i))).setEndTime(((Leg)(actslegs.get(i+1))).getDepartureTime());
+				((Act)(actslegs.get(i))).setDur(((Leg)(actslegs.get(i+1))).getDepartureTime()-((Leg)(actslegs.get(i-1))).getArrivalTime());
 				
 			}
 			else {
-				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrTime());
-				((Act)(actslegs.get(i))).setDur(86400-((Leg)(actslegs.get(i-1))).getArrTime());
+				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
+				((Act)(actslegs.get(i))).setDur(86400-((Leg)(actslegs.get(i-1))).getArrivalTime());
 	
 			}
 		}
@@ -559,9 +559,9 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 						// Leg
 						Leg inl = ((Leg) in.get(i));
 						Leg l = new Leg (inl.getMode());
-						l.setArrTime(inl.getArrTime());
-						l.setDepTime(inl.getDepTime());
-						l.setTravTime(inl.getTravTime());
+						l.setArrivalTime(inl.getArrivalTime());
+						l.setDepartureTime(inl.getDepartureTime());
+						l.setTravelTime(inl.getTravelTime());
 						l.setRoute(inl.getRoute());
 						out.add(l);
 					}

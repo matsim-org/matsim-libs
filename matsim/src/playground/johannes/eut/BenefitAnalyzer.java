@@ -106,7 +106,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 //					totaltravelcosts += travelcosts;
 //				}
 				for (int i = 0; i < ttKnowledge.getTravelTimes().size(); i++) {
-					double traveltime = calcTravTime(ttKnowledge.getTravelTimes(i), route, leg.getDepTime());
+					double traveltime = calcTravTime(ttKnowledge.getTravelTimes(i), route, leg.getDepartureTime());
 					double travelcosts = utilFunc.evaluate(traveltime);
 					totaltravelcosts += travelcosts * ttKnowledge.getWeigth(i);
 					totaltraveltime += traveltime * ttKnowledge.getWeigth(i);

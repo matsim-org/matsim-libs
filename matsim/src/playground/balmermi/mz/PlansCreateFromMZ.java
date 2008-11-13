@@ -218,10 +218,10 @@ public class PlansCreateFromMZ {
 					from_act.setEndTime(departure);
 					from_act.setDur(from_act.getEndTime()-from_act.getStartTime());
 					Leg leg = plan.createLeg(mode);
-					leg.setDepTime(departure);
-					leg.setTravTime(arrival-departure);
-					leg.setArrTime(arrival);
-					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravTime()));
+					leg.setDepartureTime(departure);
+					leg.setTravelTime(arrival-departure);
+					leg.setArrivalTime(arrival);
+					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravelTime()));
 					Act act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 					
@@ -235,10 +235,10 @@ public class PlansCreateFromMZ {
 					Act homeAct = plan.createAct(HOME,from);
 					homeAct.setEndTime(departure);
 					Leg leg = plan.createLeg(mode);
-					leg.setDepTime(departure);
-					leg.setTravTime(arrival-departure);
-					leg.setArrTime(arrival);
-					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravTime()));
+					leg.setDepartureTime(departure);
+					leg.setTravelTime(arrival-departure);
+					leg.setArrivalTime(arrival);
+					leg.createRoute(Double.toString(distance),Double.toString(leg.getTravelTime()));
 					Act act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 				}

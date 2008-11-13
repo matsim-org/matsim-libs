@@ -227,7 +227,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				leg = ((Leg) o);
 
 				// assume that there will be no delay between end time of previous activity and departure time
-				leg.setDepTime(now);
+				leg.setDepartureTime(now);
 
 				// set mode to result from optimization
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
@@ -247,16 +247,16 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 						destination,
 						leg);
 
-				leg.setTravTime(travelTimeEstimation);
+				leg.setTravelTime(travelTimeEstimation);
 				
 				// correctly set route object
 				// restore original routes, because planomat must not alter routes at all
 				leg.setRoute(originalRoutes.get(leg));
 				leg.getRoute().setTravTime(travelTimeEstimation);
 
-				now += leg.getTravTime();
+				now += leg.getTravelTime();
 				// set planned arrival time accordingly
-				leg.setArrTime(now);
+				leg.setArrivalTime(now);
 
 			}
 		}

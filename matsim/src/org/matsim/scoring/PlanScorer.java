@@ -47,8 +47,8 @@ public class PlanScorer {
 		for (int i = 1; i < plan.getActsLegs().size(); i++) {
 			if (i % 2 != 0) {
 				leg = (Leg) plan.getActsLegs().get(i);
-				function.startLeg(leg.getDepTime(), leg);
-				function.endLeg(leg.getArrTime());
+				function.startLeg(leg.getDepartureTime(), leg);
+				function.endLeg(leg.getArrivalTime());
 			}
 		}
 		function.finish();

@@ -133,7 +133,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		// test that the plans have the correct times
 		assertEquals("ReRoute seems to have wrong travel times.",
-				151.0, ((Leg) (person1.getPlans().get(1).getActsLegs().get(1))).getTravTime(), 0.0);
+				151.0, ((Leg) (person1.getPlans().get(1).getActsLegs().get(1))).getTravelTime(), 0.0);
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class EndLegMessage extends EventMessage {
 		if ((actsLegs.size()>vehicle.getLegIndex())){	
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
 			// the leg the agent performs
-			double departureTime = vehicle.getCurrentLeg().getDepTime(); // the time the agent
+			double departureTime = vehicle.getCurrentLeg().getDepartureTime(); // the time the agent
 															// departs at this
 															// activity
 			

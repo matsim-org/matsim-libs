@@ -208,9 +208,9 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 			BasicRoute route;
 			if (i == 0) {
 				assertEquals(BasicLeg.Mode.car, leg.getMode());
-				assertEquals(6.0d * 3600.0d + 5.0d * 60.0d, leg.getDepTime(), EPSILON);
-				assertEquals(25.0d * 60.0d, leg.getTravTime(), EPSILON);
-				assertEquals(6.0d * 3600.0d + 30.0d * 60.0d, leg.getArrTime(), EPSILON);
+				assertEquals(6.0d * 3600.0d + 5.0d * 60.0d, leg.getDepartureTime(), EPSILON);
+				assertEquals(25.0d * 60.0d, leg.getTravelTime(), EPSILON);
+				assertEquals(6.0d * 3600.0d + 30.0d * 60.0d, leg.getArrivalTime(), EPSILON);
 				assertNotNull(leg.getRoute());
 				route = leg.getRoute();
 				assertEquals(45.5d, route.getDist(), EPSILON);

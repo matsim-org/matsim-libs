@@ -62,9 +62,9 @@ public class RoadSignAgentsGenerator {
 				actA.setEndTime(3600 * 3 - 2);
 				Leg leg = new Leg(BasicLeg.Mode.car);
 				leg.setNum(0);
-				leg.setDepTime(0.0);
-				leg.setTravTime(0.0);
-				leg.setArrTime(0.0);
+				leg.setDepartureTime(0.0);
+				leg.setTravelTime(0.0);
+				leg.setArrivalTime(0.0);
 				Act actB = new Act("h",dest.getCenter(), dest);
 				plan.addAct(actA);
 				plan.addLeg(leg);

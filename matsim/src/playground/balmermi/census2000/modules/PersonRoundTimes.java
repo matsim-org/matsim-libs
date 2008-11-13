@@ -121,9 +121,9 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 			act.setDur(dur);
 			plan_dur += dur;
 			act.setEndTime(plan_dur);
-			leg.setDepTime(plan_dur);
-			leg.setTravTime(0.0);
-			leg.setArrTime(plan_dur);
+			leg.setDepartureTime(plan_dur);
+			leg.setTravelTime(0.0);
+			leg.setArrivalTime(plan_dur);
 			
 			// types
 			if (i == 0) { dur = home_dur; }

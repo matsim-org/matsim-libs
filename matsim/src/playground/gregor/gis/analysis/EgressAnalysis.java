@@ -181,9 +181,9 @@ public class EgressAnalysis {
 				plan.addAct(person.getSelectedPlan().getFirstActivity());
 				Leg l = new Leg(BasicLeg.Mode.car);
 				l.setNum(1);
-				l.setDepTime(0.0);
-				l.setTravTime(0.0);
-				l.setArrTime(0.0);
+				l.setDepartureTime(0.0);
+				l.setTravelTime(0.0);
+				l.setArrivalTime(0.0);
 				plan.addLeg(l);
 				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 				router.run(plan);

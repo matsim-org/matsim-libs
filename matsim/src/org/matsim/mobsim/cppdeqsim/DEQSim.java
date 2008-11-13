@@ -206,8 +206,8 @@ public class DEQSim extends ExternalMobsim {
 			out.writeInt(Integer.parseInt(nextAct.getLink().getId().toString()));
 
 			// TODO [MR] see above
-			if (leg.getTravTime() != Time.UNDEFINED_TIME) {
-				time += leg.getTravTime();
+			if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+				time += leg.getTravelTime();
 			}
 
 		}

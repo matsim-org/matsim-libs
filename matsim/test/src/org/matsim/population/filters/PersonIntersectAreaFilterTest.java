@@ -71,8 +71,8 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		act1.setEndTime(8.0*3600);
 
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		leg.setDepTime(8.0*3600);
-		leg.setTravTime(2.0*60);
+		leg.setDepartureTime(8.0*3600);
+		leg.setTravelTime(2.0*60);
 
 		plan.createAct("w", link5);
 

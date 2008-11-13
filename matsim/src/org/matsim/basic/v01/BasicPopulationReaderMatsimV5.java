@@ -279,15 +279,15 @@ public class BasicPopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 			this.currentLeg = populationBuilder.createLeg(this.currentPlan, getLegMode(atts.getValue(PopulationSchemaV5Names.MODE)));
 			String tts = atts.getValue(PopulationSchemaV5Names.DEPARTURETIME);
 			if (tts != null) {
-				this.currentLeg.setDepTime(this.parseTime(tts));
+				this.currentLeg.setDepartureTime(this.parseTime(tts));
 			}
 			tts = atts.getValue(PopulationSchemaV5Names.TRAVELTIME);
 			if (tts != null) {
-				this.currentLeg.setTravTime(this.parseTime(tts));
+				this.currentLeg.setTravelTime(this.parseTime(tts));
 			}
 			tts = atts.getValue(PopulationSchemaV5Names.ARRIVALTIME);
 			if (tts != null) {
-				this.currentLeg.setArrTime(this.parseTime(tts));
+				this.currentLeg.setArrivalTime(this.parseTime(tts));
 			}
 		}
 		else if (PopulationSchemaV5Names.ROUTE.equalsIgnoreCase(name)){

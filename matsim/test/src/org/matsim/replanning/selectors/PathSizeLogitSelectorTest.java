@@ -79,9 +79,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 
 		Route r = new Route();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
@@ -102,9 +102,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		Plan p2 = new Plan(person);
 		r = new Route();
 		srcRoute = new ArrayList<Node>();
@@ -123,9 +123,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		Plan p3 = new Plan(person);
 		r = new Route();
 		srcRoute = new ArrayList<Node>();
@@ -153,9 +153,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		r = new Route();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
@@ -187,9 +187,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		
 		Route r = new Route();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
@@ -223,9 +223,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		Route r = new Route();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
@@ -242,9 +242,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		Plan p2 = new Plan(person);
 		r = new Route();
 		srcRoute = new ArrayList<Node>();
@@ -263,9 +263,9 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
 		leg.setNum(1);
-		leg.setDepTime(0.0);
-		leg.setTravTime(10.0);
-		leg.setArrTime(10.0);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(10.0);
+		leg.setArrivalTime(10.0);
 		Plan p3 = new Plan(person);
 		r = new Route();
 		srcRoute = new ArrayList<Node>();

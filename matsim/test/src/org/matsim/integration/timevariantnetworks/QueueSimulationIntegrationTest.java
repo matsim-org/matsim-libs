@@ -201,8 +201,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Act a1 = plan1.createAct("h", depLink);
 			a1.setEndTime(depTime);
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
-			leg1.setDepTime(depTime);
-			leg1.setTravTime(10);
+			leg1.setDepartureTime(depTime);
+			leg1.setTravelTime(10);
 			Route route = new Route();
 			route.setRoute("2 3");
 			leg1.setRoute(route);

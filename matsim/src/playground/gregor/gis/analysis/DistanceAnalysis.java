@@ -206,9 +206,9 @@ public class DistanceAnalysis {
 			plan.addAct(person.getSelectedPlan().getFirstActivity());
 			Leg ll = new Leg(BasicLeg.Mode.car);
 			ll.setNum(1);
-			ll.setArrTime(0.0);
-			ll.setDepTime(0.0);
-			ll.setTravTime(0.0);
+			ll.setArrivalTime(0.0);
+			ll.setDepartureTime(0.0);
+			ll.setTravelTime(0.0);
 			plan.addLeg(ll);
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 			router.run(plan);

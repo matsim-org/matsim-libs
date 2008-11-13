@@ -209,8 +209,8 @@ public class PlanAgent implements MobsimAgent {
 	public void arrival(double time) {
 		Leg leg = (Leg) person.getSelectedPlan().getActsLegs().get(
 				currentPlanIndex);
-		leg.setArrTime(time);
-		leg.setTravTime(leg.getArrTime() - leg.getDepTime());
+		leg.setArrivalTime(time);
+		leg.setTravelTime(leg.getArrivalTime() - leg.getDepartureTime());
 		currentRouteIndex = -1;
 		currentPlanIndex++;
 
@@ -243,7 +243,7 @@ public class PlanAgent implements MobsimAgent {
 
 		Leg leg = (Leg) person.getSelectedPlan().getActsLegs().get(
 				currentPlanIndex);
-		leg.setDepTime(time);
+		leg.setDepartureTime(time);
 		currentRouteIndex = 0;
 	}
 

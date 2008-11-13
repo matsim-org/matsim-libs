@@ -170,9 +170,9 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 				}
 				else {
 					Leg leg = (Leg)plan.getActsLegs().get(j);
-					leg.setDepTime(act_end_time);
-					leg.setTravTime(0);
-					leg.setArrTime(act_end_time);
+					leg.setDepartureTime(act_end_time);
+					leg.setTravelTime(0);
+					leg.setArrivalTime(act_end_time);
 				}
 			}
 		}
