@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
+ * PopulationWriterV5.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.population;
 
 import java.io.FileNotFoundException;
@@ -47,46 +48,43 @@ import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
-
 /**
  * @author dgrether
- *
  */
 public class PopulationWriterV5 extends MatsimXmlWriter  {
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	
-	private BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population;
+	private final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+
+	private final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population;
 
 	private List<BasicHousehold> households;
 
 	private MatsimCommonWriter matsimCommonWriter;
-	
-	public PopulationWriterV5(BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) {
+
+	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) {
 		this.population = pop;
 	}
-	
-	public PopulationWriterV5(BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, List<BasicHousehold> hh) {
+
+	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, final List<BasicHousehold> hh) {
 		this.population = pop;
 		this.households = hh;
 	}
-	
-	
-	public void writeFile(String filename) throws FileNotFoundException, IOException {
+
+	public void writeFile(final String filename) throws FileNotFoundException, IOException {
 		this.openFile(filename);
 		this.matsimCommonWriter = new MatsimCommonWriter(this.writer);
 		this.writeXmlHead();
 		this.writePopulation(this.population);
 		this.close();
 	}
-	
+
 	private void writePopulation(
-			BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) throws IOException {
-		atts.clear();
-		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
-		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "population_v5.00.xsd"));
-		this.writeStartTag(PopulationSchemaV5Names.POPULATION, atts);
+			final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop) throws IOException {
+		this.atts.clear();
+		this.atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+		this.atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+		this.atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "population_v5.0.xsd"));
+		this.writeStartTag(PopulationSchemaV5Names.POPULATION, this.atts);
 		this.writePersons(pop.getPersons().values());
 		if (this.households != null) {
 			HouseholdsWriterV1 hhwriter = new HouseholdsWriterV1(this.households);
@@ -95,39 +93,36 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.writeEndTag(PopulationSchemaV5Names.POPULATION);
 	}
 
-	
-	
-	private void writePersons(
-			Collection<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> persons) throws IOException {
+	private void writePersons(final Collection<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> persons) throws IOException {
 		for (BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>> p : persons) {
-			atts.clear();
-			atts.add(this.createTuple(PopulationSchemaV5Names.ID, p.getId().toString()));
+			this.atts.clear();
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.ID, p.getId().toString()));
 			if (p.getSex() != null) {
-				atts.add(this.createTuple(PopulationSchemaV5Names.SEX, p.getSex()));
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.SEX, p.getSex()));
 			}
 			if (p.getAge() != Integer.MIN_VALUE)
-				atts.add(this.createTuple(PopulationSchemaV5Names.AGE, p.getAge()));
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.AGE, p.getAge()));
 			if (p.getLicense() != null)
-				atts.add(this.createTuple(PopulationSchemaV5Names.LICENSE, p.hasLicense()));
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.LICENSE, p.hasLicense()));
 			if (p.getCarAvail() != null)
-				atts.add(this.createTuple(PopulationSchemaV5Names.CARAVAILABLE, p.getCarAvail()));
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.CARAVAILABLE, p.getCarAvail()));
 			if (p.getEmployed() != null)
-				atts.add(this.createTuple(PopulationSchemaV5Names.ISEMPLOYED, p.isEmployed()));
-			this.writeStartTag(PopulationSchemaV5Names.PERSON, atts);
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.ISEMPLOYED, p.isEmployed()));
+			this.writeStartTag(PopulationSchemaV5Names.PERSON, this.atts);
 			writeTravelCards(p.getTravelcards());
 			writeKnowledge(p.getKnowledge());
 			writePlans(p.getPlans());
-			//TODO
+			//TODO [DG]
 			if (p.getFiscalHouseholdId() != null) {
-				atts.clear();
-				atts.add(this.createTuple(PopulationSchemaV5Names.REFID, p.getFiscalHouseholdId().toString()));
-				this.writeStartTag(PopulationSchemaV5Names.FISCALHOUSEHOLDID, atts, true);
+				this.atts.clear();
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, p.getFiscalHouseholdId().toString()));
+				this.writeStartTag(PopulationSchemaV5Names.FISCALHOUSEHOLDID, this.atts, true);
 			}
 			this.writeEndTag(PopulationSchemaV5Names.PERSON);
 		}
 	}
 
-	private void writeKnowledge(BasicKnowledge<BasicActivity> k) throws IOException {
+	private void writeKnowledge(final BasicKnowledge<BasicActivity> k) throws IOException {
 		if (k != null) {
 			this.writeStartTag(PopulationSchemaV5Names.KNOWLEDGE, null);
 			if (k.getDescription() != null) {
@@ -144,18 +139,18 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		}
 	}
 
-	private void writeActivity(BasicActivity ba) throws IOException {
-		atts.clear();
-		atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, ba.getType()));
+	private void writeActivity(final BasicActivity ba) throws IOException {
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, ba.getType()));
 		if (ba.getFrequency() != null) {
-			atts.add(this.createTuple(PopulationSchemaV5Names.FREQUENCY, ba.getFrequency()));
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.FREQUENCY, ba.getFrequency()));
 		}
-		this.writeStartTag(PopulationSchemaV5Names.ACTIVITY, atts);
+		this.writeStartTag(PopulationSchemaV5Names.ACTIVITY, this.atts);
 		this.matsimCommonWriter.writeLocation(ba.getLocation(), this.getIndentationLevel());
 		if (ba.getCapacity() != null) {
-			atts.clear();
-			atts.add(this.createTuple(PopulationSchemaV5Names.PERSONS, ba.getCapacity()));
-			this.writeStartTag(PopulationSchemaV5Names.CAPACITY, atts, true);
+			this.atts.clear();
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.PERSONS, ba.getCapacity()));
+			this.writeStartTag(PopulationSchemaV5Names.CAPACITY, this.atts, true);
 		}
 		for (DayType dt : DayType.values()) {
 			SortedSet<BasicOpeningTime> ot = ba.getOpeningTime(dt);
@@ -168,93 +163,86 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.writeEndTag(PopulationSchemaV5Names.ACTIVITY);
 	}
 
-	private void writeOpeningTime(BasicOpeningTime bot) throws IOException {
-		atts.clear();
-		atts.add(this.createTuple(PopulationSchemaV5Names.DAY, bot.getDay().toString()));
-		atts.add(this.createTimeTuple(PopulationSchemaV5Names.STARTTIME, bot.getStartTime()));
-		atts.add(this.createTimeTuple(PopulationSchemaV5Names.ENDTIME, bot.getEndTime()));
-		this.writeStartTag(PopulationSchemaV5Names.OPENINGTIME, atts, true);
+	private void writeOpeningTime(final BasicOpeningTime bot) throws IOException {
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.DAY, bot.getDay().toString()));
+		this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.STARTTIME, bot.getStartTime()));
+		this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.ENDTIME, bot.getEndTime()));
+		this.writeStartTag(PopulationSchemaV5Names.OPENINGTIME, this.atts, true);
 	}
 
-
-	private void writePlans(List<BasicPlan> plans) throws IOException {
+	private void writePlans(final List<BasicPlan> plans) throws IOException {
 		for (BasicPlan p : plans) {
-			atts.clear();
+			this.atts.clear();
 			if (!p.hasUndefinedScore())
-				atts.add(this.createTuple(PopulationSchemaV5Names.SCORE, p.getScore()));
-			atts.add(this.createTuple(PopulationSchemaV5Names.SELECTED, p.isSelected()));
-			this.writeStartTag(PopulationSchemaV5Names.PLAN, atts);
-			ActLegIterator it = p.getIterator(); 
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.SCORE, p.getScore()));
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.SELECTED, p.isSelected()));
+			this.writeStartTag(PopulationSchemaV5Names.PLAN, this.atts);
+			ActLegIterator it = p.getIterator();
 			while (it.hasNextLeg()) {
 				this.writeAct(it.nextAct());
 				this.writeLeg(it.nextLeg());
 			}
 			this.writeAct(it.nextAct());
-			
+
 			this.writeEndTag(PopulationSchemaV5Names.PLAN);
 		}
 	}
 
-	private void writeLeg(BasicLeg leg) throws IOException {
-		atts.clear();
-		atts.add(this.createTuple(PopulationSchemaV5Names.MODE, leg.getMode().toString()));
+	private void writeLeg(final BasicLeg leg) throws IOException {
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.MODE, leg.getMode().toString()));
 		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DEPARTURETIME, leg.getDepartureTime()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.DEPARTURETIME, leg.getDepartureTime()));
 		}
 		if (leg.getArrivalTime() != Time.UNDEFINED_TIME){
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.ARRIVALTIME, leg.getArrivalTime()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.ARRIVALTIME, leg.getArrivalTime()));
 		}
 		if (leg.getTravelTime() != Time.UNDEFINED_TIME){
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, leg.getTravelTime()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, leg.getTravelTime()));
 		}
-		
-		this.writeStartTag(PopulationSchemaV5Names.LEG, atts);
+
+		this.writeStartTag(PopulationSchemaV5Names.LEG, this.atts);
 		if (leg.getRoute() != null) {
 			this.writeRoute(leg.getRoute());
 		}
 		this.writeEndTag(PopulationSchemaV5Names.LEG);
 	}
 
-	private void writeRoute(BasicRoute<BasicNode> route) throws IOException {
-		atts.clear();
+	private void writeRoute(final BasicRoute<BasicNode> route) throws IOException {
+		this.atts.clear();
 		if (route.getTravTime() != Time.UNDEFINED_TIME) {
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, route.getTravTime()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, route.getTravTime()));
 		}
 		if (!Double.isNaN(route.getDist())) {
-			atts.add(this.createTuple(PopulationSchemaV5Names.DISTANCE, route.getDist()));
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.DISTANCE, route.getDist()));
 		}
-		this.writeStartTag(PopulationSchemaV5Names.ROUTE, atts);
+		this.writeStartTag(PopulationSchemaV5Names.ROUTE, this.atts);
 		for (Id id : route.getLinkIds()) {
-			atts.clear();
-			atts.add(this.createTuple(PopulationSchemaV5Names.REFID, id.toString()));
-			this.writeStartTag(PopulationSchemaV5Names.LINK, atts, true);
+			this.atts.clear();
+			this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, id.toString()));
+			this.writeStartTag(PopulationSchemaV5Names.LINK, this.atts, true);
 		}
 		this.writeEndTag(PopulationSchemaV5Names.ROUTE);
 	}
 
-
-	private void writeAct(BasicAct act) throws IOException {
-		atts.clear();
-		atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, act.getType()));		
+	private void writeAct(final BasicAct act) throws IOException {
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.TYPE, act.getType()));
 		if (act.getStartTime() != Time.UNDEFINED_TIME)
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.STARTTIME, act.getStartTime()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.STARTTIME, act.getStartTime()));
 		if (act.getDuration() != Time.UNDEFINED_TIME)
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.DURATION, act.getDuration()));
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.DURATION, act.getDuration()));
 		if (act.getEndTime() != Time.UNDEFINED_TIME)
-			atts.add(this.createTimeTuple(PopulationSchemaV5Names.ENDTIME, act.getEndTime()));
-		
-		this.writeStartTag(PopulationSchemaV5Names.ACT, atts);
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.ENDTIME, act.getEndTime()));
+
+		this.writeStartTag(PopulationSchemaV5Names.ACT, this.atts);
 		this.matsimCommonWriter.writeLocation(act.getLinkId(), act.getFacilityId(), act.getCoord(), this.getIndentationLevel());
 
 		this.writeEndTag(PopulationSchemaV5Names.ACT);
 	}
 
-
-
-	
-
-	
-	private void writeTravelCards(TreeSet<String> travelcards) throws IOException {
+	private void writeTravelCards(final TreeSet<String> travelcards) throws IOException {
 		this.writeStartTag(PopulationSchemaV5Names.TRAVELCARD, null);
 		for (String tc : travelcards) {
 			this.writeStartTag(PopulationSchemaV5Names.SWISSTRAVELCARD, null);
