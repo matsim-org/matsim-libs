@@ -187,7 +187,7 @@ public class NetworkExpandNode {
 	 *                   32   31
 	 *                    |   |
 	 *                    |   |
-	 *                 v   |
+	 *                    v   |
 	 * </pre>
 	 * </li>
 	 * </ol>

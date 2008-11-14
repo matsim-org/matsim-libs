@@ -36,7 +36,10 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.Tuple;
+
+import playground.toronto.ttimematrix.SpanningTree.NodeData;
 
 public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
@@ -47,6 +50,8 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	private static final Logger log = Logger.getLogger(TTimeMatrixCalculator.class);
 	private final Map<Id,Id> l2zMapping;
 	private final Set<Integer> hours;
+	private final SpanningTree st;
+	private final NetworkLayer network;
 
 	private int hour = 0;
 	private Map<Id,Map<Id,Tuple<Double,Integer>>> ttimeMatrix = new HashMap<Id, Map<Id,Tuple<Double,Integer>>>();
@@ -58,9 +63,11 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours) {
+	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final SpanningTree st, final NetworkLayer network) {
 		log.info("init...");
 		this.l2zMapping = l2zMapping;
+		this.st = st;
+		this.network = network;
 		Set<Integer> hrs = new TreeSet<Integer>();
 		for (int i=0; i<hours.length; i++) { hrs.add(hours[i]); }
 		this.hours = hrs;
@@ -118,24 +125,33 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	//////////////////////////////////////////////////////////////////////
 
 	private final void storeMatrix() {
-		log.info("  store hourly ttimes to the matrix...");
+		log.info("  gather hourly ttimes to the matrix...");
+		System.out.println("0%       10%       20%       30%       40%       50%       60%       70%       80%       90%       100%");
+		System.out.println("+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+");
+		int nofZones = ttimeMatrix.size();
+		int cnt = 0;
 		for (Id fzone : ttimeMatrix.keySet()) {
+			st.setOrigin(network.getNode(fzone));
+			st.setDepartureTime(hour*3600);
+			st.run(network);
 			Map<Id,Tuple<Double,Integer>> tmap = ttimeMatrix.get(fzone);
 			for (Id tzone : tmap.keySet()) {
 				Tuple<Double,Integer> tuple = tmap.get(tzone);
 				String key = fzone.toString()+","+tzone.toString();
 				String values = matrix.get(key);
 				if (tuple.getSecond() == 0) {
-					// TODO blamermi: instead of -1 here should be the freespeed
-					// travel time from fzone to tzone
-					values = values + ",-1";
+					double ttime = st.getTree().get(tzone).getTime()-hour*3600;
+					values = values +  "," + Math.round(ttime);
 				}
 				else {
 					values = values + "," + Math.round(tuple.getFirst()/tuple.getSecond());
 				}
 				matrix.put(key,values);
 			}
+			cnt++;
+			if ((cnt % ((int)(nofZones/100.0))) == 0) { System.out.print("."); }
 		}
+		System.out.print("\n");
 		log.info("  done.");
 	}
 	
