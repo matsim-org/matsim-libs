@@ -22,6 +22,7 @@ package org.matsim.events;
 
 import java.util.Stack;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -48,60 +49,61 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	public void endTag(final String name, final String content, final Stack<String> context) {
 	}
 
-
-	private int optionalParseInt(final String input) {
-		if (input == null) return -1;
-		int result = -1;
-		try {
-			result = Integer.parseInt(input);
-		} catch (NumberFormatException e ) {
-			return -1;
-		}
-		return result;
-	}
-
 	private void startEvent(final Attributes atts) {
 		double time = Double.parseDouble(atts.getValue("time"));
-		String vehId = atts.getValue("agent");
-		int legNumber = optionalParseInt(atts.getValue("leg"));
-		String linkId = atts.getValue("link");
-		int activity = optionalParseInt(atts.getValue("activity"));
-		String acttype = atts.getValue("act_type");
-		int flag = getFlagFromName(atts.getValue("type"));
-		String desc = "";
-		if ("agentUtility".equals(atts.getValue("type"))) {
-			desc = atts.getValue("amount");
+		String eventType = atts.getValue("type");
+
+		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new LinkLeaveEvent(time,
+					atts.getValue(LinkLeaveEvent.ATTRIBUTE_AGENT),
+					atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LEG))));
+		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new LinkEnterEvent(time,
+					atts.getValue(LinkEnterEvent.ATTRIBUTE_AGENT),
+					atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(LinkEnterEvent.ATTRIBUTE_LEG))));
+		} else if (ActEndEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new ActEndEvent(time,
+					atts.getValue(ActEndEvent.ATTRIBUTE_AGENT),
+					atts.getValue(ActEndEvent.ATTRIBUTE_LINK),
+					0,
+					atts.getValue(ActEndEvent.ATTRIBUTE_ACTTYPE)));
+		} else if (ActStartEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new ActStartEvent(time,
+					atts.getValue(ActStartEvent.ATTRIBUTE_AGENT),
+					atts.getValue(ActStartEvent.ATTRIBUTE_LINK),
+					0,
+					atts.getValue(ActStartEvent.ATTRIBUTE_ACTTYPE)));
+		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new AgentArrivalEvent(time,
+					atts.getValue(AgentArrivalEvent.ATTRIBUTE_AGENT),
+					atts.getValue(AgentArrivalEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(AgentArrivalEvent.ATTRIBUTE_LEG))));
+		} else if (AgentDepartureEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new AgentDepartureEvent(time,
+					atts.getValue(AgentDepartureEvent.ATTRIBUTE_AGENT),
+					atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LEG))));
+		} else if (AgentWait2LinkEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new AgentWait2LinkEvent(time,
+					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_AGENT),
+					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LEG))));
+//		} else if (DepartureAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+//			this.events.processEvent(new DepartureAtFacilityEvent(time, null)); // FIXME [MR] replace null
+//		} else if (ArrivalAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+//			this.events.processEvent(new ArrivalAtFacilityEvent(time, null)); // FIXME [MR] replace null
+		} else if (AgentStuckEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new AgentStuckEvent(time,
+					atts.getValue(AgentStuckEvent.ATTRIBUTE_AGENT),
+					atts.getValue(AgentStuckEvent.ATTRIBUTE_LINK),
+					Integer.parseInt(atts.getValue(AgentStuckEvent.ATTRIBUTE_LEG))));
+		} else if (AgentUtilityEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new AgentUtilityEvent(time,
+					new IdImpl(atts.getValue(AgentStuckEvent.ATTRIBUTE_AGENT)),
+					Double.parseDouble(atts.getValue(AgentUtilityEvent.ATTRIBUTE_AMOUNT))));
 		}
-		EventsReaderTXTv1.createEvent(this.events, time, vehId, legNumber, linkId, flag, desc, activity, acttype);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// static methods
-	//////////////////////////////////////////////////////////////////////
-	private enum Flags {
-		ARRIVAL("arrival", 0),
-		LEAVE_LINK("left link", 2),
-		STUCK("stuckAndAbort", 3),
-		WAIT_TO_LINK("wait2link", 4),
-		ENTER_LINK("entered link", 5),
-		DEPARTURE("departure", 6),
-		ACTSTART("actstart", 7),
-		ACTEND("actend", 8),
-		AGENT_UTILITY("agentUtility", 9),
-		POSITION("position", 999);
-
-		public String name;
-		public int value;
-		Flags (final String name, final int value) {this.name = name; this.value = value;}
-	}
-
-	private static int getFlagFromName(final String flagname) {
-		for (Flags flag : Flags.values()) {
-			if (flagname.equals(flag.name)) {
-				return flag.value;
-			}
-		}
-		throw new RuntimeException("flagname `" + flagname + "' is not known!");
 	}
 
 }
