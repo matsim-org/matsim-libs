@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.locationchoice.RandomLocationMutator;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -40,7 +39,7 @@ import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.charts.XYLineChart;
 import java.util.ArrayList;
 import java.io.*;
-
+import org.matsim.planomat.PlanOptimizeTimes;
 
 
 
@@ -57,6 +56,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
+	//private final PlanAlgorithm 			planomatAlgorithm;
 	private final PlanAlgorithm				timer;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
@@ -69,7 +69,8 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		
 	public PlanomatX16 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
 			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, Controler controler) {
-
+		
+		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
 		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
 		this.scorer 				= new PlanScorer (factory);
 		this.timer					= new TimeOptimizer13(legTravelTimeEstimator, this.scorer);
@@ -160,7 +161,6 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
 	//		stream.println("Iteration "+currentIteration);
-			//streamOverview.print("Iteration "+currentIteration+"\t");
 			
 			// Define the neighbourhood
 			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, actTypes, primActs);	
@@ -181,7 +181,6 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 				if(scoredInNeighbourhood[x]==0){
 					
 					// Conduct location choice
-				//	System.out.println("Actslegs davor = "+neighbourhood[x].getActsLegs());
 					long lcStartTime=System.currentTimeMillis();
 					this.locationChoiceAlgorithm.run(neighbourhood[x]);
 					lcRunTime+=System.currentTimeMillis()-lcStartTime;
@@ -197,7 +196,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					timerRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
 					// Scoring
-					neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
+					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
 					// Write the solution into a list so that it can be retrieved for later iterations
