@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -114,7 +114,7 @@ import org.matsim.world.WorldWriter;
 public class Controler {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
-	private static final String FILENAME_EVENTS = "events.txt.gz";
+	/*package*/ static final String FILENAME_EVENTS = "events.txt.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt";
 	public static final String FILENAME_SCORESTATS = "scorestats.txt";
 	public static final String FILENAME_TRAVELDISTANCESTATS="traveldistancestats.txt";
@@ -156,9 +156,12 @@ public class Controler {
 	/** Stores data commonly used by all router instances. */
 	private PreProcessLandmarks commonRoutingData = null;
 
-	/*package*/ EventWriterTXT eventWriter = null;
-	/*package*/ boolean writeEvents = true;
-	private boolean eventWriterAdded = false;
+	/**
+	 * Defines in which iterations the events should be written. <tt>1</tt> is in every iteration,
+	 * <tt>2</tt> in every second, <tt>10</tt> in every 10th, and so forth. <tt>0</tt> disables the writing
+	 * of events completely.
+	 */
+	/*package*/ int writeEventsInterval = 1;
 
 	/* default analyses */
 	/*package*/ CalcLinkStats linkStats = null;
@@ -183,7 +186,7 @@ public class Controler {
 			shutdown(true);
 		}
 	};
-	
+
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -323,10 +326,6 @@ public class Controler {
 			}
 			fireControlerShutdownEvent(unexpected);
 
-			// closing events file
-			if (this.eventWriter != null) {
-				this.eventWriter.closefile();
-			}
 			// dump plans
 			new PopulationWriter(this.population, getOutputFilename("output_plans.xml.gz"),
 					this.config.plans().getOutputVersion()).write();
@@ -341,8 +340,8 @@ public class Controler {
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, getOutputFilename("output_facilities.xml.gz")).write();
 			}
-			
-			Runtime.getRuntime().removeShutdownHook(shutdownHook);
+
+			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
 			} else {
@@ -376,7 +375,6 @@ public class Controler {
 		this.events.addHandler(this.legTimes);
 
 		this.externalMobsim = this.config.simulation().getExternalExe();
-		this.writeEvents = this.externalMobsim == null; // do not write events when using an external mobsim
 
 		if (this.scoringFunctionFactory == null) {
 			this.scoringFunctionFactory = loadScoringFunctionFactory();
@@ -599,20 +597,6 @@ public class Controler {
 	private void resetRandomNumbers() {
 		MatsimRandom.reset(this.config.global().getRandomSeed() + iteration);
 		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
-	}
-
-	/*default*/ void enableEventsWriter() {
-		if ((this.eventWriter != null) && !this.eventWriterAdded) {
-			this.events.addHandler(this.eventWriter);
-			this.eventWriterAdded = true;
-		}
-	}
-
-	/*default*/ void disableEventsWriter() {
-		if (this.eventWriter != null) {
-			this.events.removeHandler(this.eventWriter);
-			this.eventWriterAdded = false;
-		}
 	}
 
 	/* ===================================================================
@@ -863,36 +847,20 @@ public class Controler {
 	}
 
 	/**
-	 * Sets whether the events should be written to a file or not.
-	 * External simulation usually write the events on their own,
-	 * so we don't need to write them out a second time when reading
-	 * them.<br />
-	 * The writing of events can be paused during a simulation by calling
-	 * <code>writeEvents(false)</code> and resumed later by calling
-	 * <code>writeEvents(true)</code>. It is however not possible to
-	 * start writing events during an iteration if the iteration started
-	 * without writing events, as the event writer is only initialized
-	 * at the beginning of an iteration if the writing of events is
-	 * activated at that time.
+	 * Sets in which iterations events should be written to a file.
+	 * If set to <tt>1</tt>, the events will be written in every iteration.
+	 * If set to <tt>2</tt>, the events are written every second iteration.
+	 * If set to <tt>10</tt>, the events are written in every 10th iteration.
+	 * To disable writing of events completely, set the interval to <tt>0</tt> (zero).
 	 *
-	 * @param writeEvents
+	 * @param interval in which iterations events should be written
 	 */
-	public final void setWriteEvents(final boolean writeEvents) {
-		if (this.writeEvents != writeEvents) {
-			this.writeEvents = writeEvents;
-			if (writeEvents) {
-				enableEventsWriter();
-			} else {
-				disableEventsWriter();
-			}
-		}
+	public final void setWriteEventsInterval(final int interval) {
+		this.writeEventsInterval = interval;
 	}
 
-	/**
-	 * @return <code>true</code> if events are written to a file.
-	 */
-	public final boolean getWriteEvents() {
-		return this.writeEvents;
+	public final int getWriteEventsInterval() {
+		return this.writeEventsInterval;
 	}
 
 	/**
@@ -1035,7 +1003,7 @@ public class Controler {
 	public final Events getEvents() {
 		return this.events;
 	}
-	
+
 	/**
 	 * @return real-world traffic counts if available, <code>null</code> if no data is available.
 	 */
@@ -1135,7 +1103,9 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	protected class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener {
+	protected static class CoreControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener, ShutdownListener {
+
+		private EventWriterTXT eventWriter = null;
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1152,49 +1122,57 @@ public class Controler {
 		}
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
-			Controler.this.events.resetHandlers(event.getIteration());
-			Controler.this.events.resetCounter();
+			Controler controler = event.getControler();
+			controler.events.resetHandlers(event.getIteration());
+			controler.events.resetCounter();
 		}
 
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-			Controler.this.travelTimeCalculator.resetTravelTimes();
+			Controler controler = event.getControler();
+			controler.travelTimeCalculator.resetTravelTimes();
 
-			if (Controler.this.writeEvents) {
-				if (Controler.this.eventWriter == null) {
-					Controler.this.eventWriter = new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS));
-				} else {
-					Controler.this.eventWriter.init(Controler.getIterationFilename(FILENAME_EVENTS));
-				}
-				enableEventsWriter(); // make sure it is added
+			if ((controler.writeEventsInterval > 0) && (event.getIteration() % controler.writeEventsInterval == 0)) {
+				this.eventWriter = new EventWriterTXT(Controler.getIterationFilename(FILENAME_EVENTS));
+				controler.getEvents().addHandler(this.eventWriter);
 			}
 
 			if (event.getIteration() % 10 == 6) {
-				Controler.this.volumes.reset(event.getIteration());
-				Controler.this.events.addHandler(Controler.this.volumes);
+				controler.volumes.reset(event.getIteration());
+				controler.events.addHandler(controler.volumes);
 			}
 		}
 
 		public void notifyAfterMobsim(final AfterMobsimEvent event) {
+			Controler controler = event.getControler();
 			int iteration = event.getIteration();
-			if (Controler.this.eventWriter != null) {
-				Controler.this.eventWriter.closefile();
+
+			if (this.eventWriter != null) {
+				this.eventWriter.closefile();
+				event.getControler().getEvents().removeHandler(this.eventWriter);
+				this.eventWriter = null;
 			}
 
 			if (((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) || (iteration % 10 >= 6)) {
-				Controler.this.linkStats.addData(Controler.this.volumes, Controler.this.travelTimeCalculator);
+				controler.linkStats.addData(controler.volumes, controler.travelTimeCalculator);
 			}
 
 			if ((iteration % 10 == 0) && (iteration > event.getControler().getFirstIteration())) {
-				Controler.this.events.removeHandler(Controler.this.volumes);
-				Controler.this.linkStats.writeFile(getIterationFilename(FILENAME_LINKSTATS));
+				controler.events.removeHandler(controler.volumes);
+				controler.linkStats.writeFile(getIterationFilename(FILENAME_LINKSTATS));
 			}
 
-			if (Controler.this.legTimes != null) {
-				Controler.this.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
+			if (controler.legTimes != null) {
+				controler.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
 				// - print average in log
 				log.info("[" + iteration + "] average trip duration is: "
-						+ (int)Controler.this.legTimes.getAverageTripDuration() + " seconds = "
-						+ Time.writeTime(Controler.this.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+						+ (int)controler.legTimes.getAverageTripDuration() + " seconds = "
+						+ Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
+			}
+		}
+
+		public void notifyShutdown(final ShutdownEvent event) {
+			if (this.eventWriter != null) {
+				this.eventWriter.closefile();
 			}
 		}
 
@@ -1217,7 +1195,7 @@ public class Controler {
 	}
 
 	public LegTravelTimeEstimator getLegTravelTimeEstimator() {
-		return legTravelTimeEstimator;
+		return this.legTravelTimeEstimator;
 	}
 
 }

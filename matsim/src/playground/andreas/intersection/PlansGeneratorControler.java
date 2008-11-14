@@ -45,24 +45,24 @@ public class PlansGeneratorControler extends Controler {
 	}
 
 	@Override
-	protected void runMobSim() {		
+	protected void runMobSim() {
 
 	}
 
 	/** Should be overwritten in case of artificial population */
 	@Override
 	protected Population loadPopulation() {
-		
+
 //		return generate4wPersons();
 		return generateSimplePlans();
 	}
-	
+
 	private Population generate4wPersons(){
-		
+
 		int numberOfPlans = 1;
 		Population pop = new Population(Population.NO_STREAMING);
 		log.info("  generating plans... ");
-		
+
 		for (int i = 0; i < 314; i++) {
 			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("9"), pop);
 			numberOfPlans++;
@@ -71,12 +71,12 @@ public class PlansGeneratorControler extends Controler {
 			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("7"), pop);
 			numberOfPlans++;
 		}
-		
+
 		for (int i = 0; i < 196; i++) {
 			generatePerson(numberOfPlans, this.network.getLink("20"), this.network.getLink("5"), pop);
 			numberOfPlans++;
 		}
-		
+
 		for (int i = 0; i < 56; i++) {
 			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("3"), pop);
 			numberOfPlans++;
@@ -89,7 +89,7 @@ public class PlansGeneratorControler extends Controler {
 			generatePerson(numberOfPlans, this.network.getLink("40"), this.network.getLink("7"), pop);
 			numberOfPlans++;
 		}
-		
+
 		for (int i = 0; i < 170; i++) {
 			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("5"), pop);
 			numberOfPlans++;
@@ -102,7 +102,7 @@ public class PlansGeneratorControler extends Controler {
 			generatePerson(numberOfPlans, this.network.getLink("60"), this.network.getLink("9"), pop);
 			numberOfPlans++;
 		}
-		
+
 		for (int i = 0; i < 150; i++) {
 			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("7"), pop);
 			numberOfPlans++;
@@ -115,48 +115,48 @@ public class PlansGeneratorControler extends Controler {
 			generatePerson(numberOfPlans, this.network.getLink("80"), this.network.getLink("3"), pop);
 			numberOfPlans++;
 		}
-		
+
 		log.info("  generated " + (numberOfPlans - 1) + " plans... ");
-		return pop;		
+		return pop;
 	}
-	
+
 	private Population generateSimplePlans(){
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
 		Population pop = new Population(Population.NO_STREAMING);
 		log.info("  generating plans... ");
-		
+
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
-		
+
 		fromLinks.add(this.network.getLink("1"));
 		fromLinks.add(this.network.getLink("2"));
-		
+
 		toLinks.add(this.network.getLink("6"));
-		
-		
+
+
 		for(int i=0; i < 1000; i++){
 			for (Link fromLink : fromLinks) {
-				
+
 				for (Link toLink : toLinks) {
-					
+
 					if (!fromLink.equals(toLink)){
-					
+
 						for (int ii = 1; ii <= agentsPerDest; ii++) {
 							generatePerson(numberOfPlans, fromLink, toLink, pop);
 							numberOfPlans++;
 						}
 					}
-				}			
-			}	
-			
+				}
+			}
+
 		}
-		
+
 		log.info("  generated " + (numberOfPlans - 1) + " plans... ");
 		return pop;
 	}
-	
+
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
@@ -179,15 +179,15 @@ public class PlansGeneratorControler extends Controler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	}	
+	}
 
 	public static void main(final String[] args) {
 
 		Config config = Gbl.createConfig(new String[] { "./src/playground/andreas/intersection/test/data/bottleneck/config.xml" });
-		
+
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
 		controler.setOverwriteFiles(true);
-		controler.setWriteEvents(true);
+		controler.setWriteEventsInterval(1);
 
 		controler.run();
 	}

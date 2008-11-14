@@ -20,6 +20,8 @@
 
 package org.matsim.controler;
 
+import java.io.File;
+
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
@@ -320,6 +322,61 @@ public class ControlerTest extends MatsimTestCase {
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		assertNotNull(leg1.getRoute());
 		assertNotNull(leg2.getRoute());
+	}
+
+	public void testSetWriteEventsInterval() {
+		final Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(10);
+
+		final Controler controler = new Controler(config);
+		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
+				3 == controler.getWriteEventsInterval());
+		controler.setWriteEventsInterval(3);
+		assertEquals(3, controler.getWriteEventsInterval());
+		controler.setCreateGraphs(false);
+		controler.run();
+
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 0)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 1)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 2)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 3)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 4)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 5)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 6)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 7)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 8)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 9)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 10)).exists());
+	}
+
+	public void testSetWriteEventsNever() {
+		final Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(1);
+
+		final Controler controler = new Controler(config);
+		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
+				0 == controler.getWriteEventsInterval());
+		controler.setWriteEventsInterval(0);
+		assertEquals(0, controler.getWriteEventsInterval());
+		controler.setCreateGraphs(false);
+		controler.run();
+
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 0)).exists());
+		assertFalse(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 1)).exists());
+	}
+
+	public void testSetWriteEventsAlways() {
+		final Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(1);
+		
+		final Controler controler = new Controler(config);
+		controler.setWriteEventsInterval(1);
+		assertEquals(1, controler.getWriteEventsInterval());
+		controler.setCreateGraphs(false);
+		controler.run();
+		
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 0)).exists());
+		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 1)).exists());
 	}
 
 	/** A helper class for testSetScoringFunctionFactory() */

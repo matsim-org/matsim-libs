@@ -37,7 +37,6 @@ import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
-import playground.balmermi.census2000.data.Persons;
 import playground.johannes.eut.EstimReactiveLinkTT;
 import playground.johannes.eut.GuidedAgentFactory;
 
@@ -134,7 +133,7 @@ public class Controler extends WithindayControler {
 		Controler controller = new Controler(args);
 		controller.setOverwriteFiles(true);
 		controller.setCreateGraphs(false);
-		controller.setWriteEvents(false);
+		controller.setWriteEventsInterval(0);
 		
 		
 		controller.run();

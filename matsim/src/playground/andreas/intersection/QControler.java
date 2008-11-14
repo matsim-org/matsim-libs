@@ -162,7 +162,7 @@ public class QControler extends Controler {
 		
 		final QControler controler = new QControler(config, false, newLSADef, newLSADefCfg);
 		controler.setOverwriteFiles(true);
-		controler.setWriteEvents(true);
+		controler.setWriteEventsInterval(1);
 //		controler.setTraveltimeBinSize(30*60);
 
 		controler.run();

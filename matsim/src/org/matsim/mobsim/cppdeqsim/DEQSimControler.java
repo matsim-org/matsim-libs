@@ -32,7 +32,7 @@ public class DEQSimControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		/* remove eventswriter, as the deqsim writes the (binary) events */
-		setWriteEvents(false);
+		setWriteEventsInterval(0);
 
 		DEQSim sim = new DEQSim(this.population, this.events);
 		sim.setIterationStopWatch(this.stopwatch);
