@@ -29,7 +29,7 @@ public class ActEndEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final ActEndEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new ActEndEvent(7893.14, "143", "293", -1, "home"));
+				new ActEndEvent(7893.14, "143", "293", "home"));
 		assertEquals(7893.14, event.time, EPSILON);
 		assertEquals("143", event.agentId);
 		assertEquals("293", event.linkId);

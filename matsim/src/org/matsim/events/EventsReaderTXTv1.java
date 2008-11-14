@@ -59,7 +59,7 @@ public class EventsReaderTXTv1 {
 	}
 
 	static public final void createEvent(final Events events, final double time, final String agentId, final int legNumber,
-			final String linkId, final int flag, final String desc, final int activity, final String acttype) {
+			final String linkId, final int flag, final String desc, final String acttype) {
 		BasicEvent data = null;
 
 		switch (flag) {
@@ -83,16 +83,16 @@ public class EventsReaderTXTv1 {
 				break;
 			case 7:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActStartEvent(time, agentId, linkId, activity, desc.replace("actstart ", ""));
+					data = new ActStartEvent(time, agentId, linkId, desc.replace("actstart ", ""));
 				} else {
-					data = new ActStartEvent(time, agentId, linkId, activity, acttype);
+					data = new ActStartEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && desc != null) {
-					data = new ActEndEvent(time, agentId, linkId, activity, desc.replace("actend ", ""));
+					data = new ActEndEvent(time, agentId, linkId, desc.replace("actend ", ""));
 				} else {
-					data = new ActEndEvent(time, agentId, linkId, activity, acttype);
+					data = new ActEndEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 9:
@@ -115,7 +115,7 @@ public class EventsReaderTXTv1 {
 									result[3],		// linkID
 									//Integer.parseInt(result[4]),		// nodeID
 									Integer.parseInt(result[5]),		// flag
-									result[6], 0, "");		// description
+									result[6], "");		// description
 		}
 	}
 

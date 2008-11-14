@@ -32,8 +32,8 @@ public class ActStartEvent extends ActEvent {
 		super(time, agent, link, act);
 	}
 
-	public ActStartEvent(final double time, final String agentId, final String linkId, final int actId, final String acttype) {
-		super(time, agentId, linkId, actId, acttype);
+	public ActStartEvent(final double time, final String agentId, final String linkId, final String acttype) {
+		super(time, agentId, linkId, acttype);
 	}
 
 	@Override

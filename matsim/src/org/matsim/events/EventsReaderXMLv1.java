@@ -67,13 +67,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(new ActEndEvent(time,
 					atts.getValue(ActEndEvent.ATTRIBUTE_AGENT),
 					atts.getValue(ActEndEvent.ATTRIBUTE_LINK),
-					0,
 					atts.getValue(ActEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActStartEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActStartEvent(time,
 					atts.getValue(ActStartEvent.ATTRIBUTE_AGENT),
 					atts.getValue(ActStartEvent.ATTRIBUTE_LINK),
-					0,
 					atts.getValue(ActStartEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentArrivalEvent(time,
@@ -90,10 +88,6 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_AGENT),
 					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK),
 					Integer.parseInt(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LEG))));
-//		} else if (DepartureAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
-//			this.events.processEvent(new DepartureAtFacilityEvent(time, null)); // FIXME [MR] replace null
-//		} else if (ArrivalAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
-//			this.events.processEvent(new ArrivalAtFacilityEvent(time, null)); // FIXME [MR] replace null
 		} else if (AgentStuckEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new AgentStuckEvent(time,
 					atts.getValue(AgentStuckEvent.ATTRIBUTE_AGENT),

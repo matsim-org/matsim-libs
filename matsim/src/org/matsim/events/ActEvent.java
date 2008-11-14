@@ -45,7 +45,7 @@ abstract class ActEvent extends PersonEvent {
 		this.acttype = act.getType();
 	}
 
-	ActEvent(final double time, final String agentId, final String linkId, final int actId, final String acttype) {
+	ActEvent(final double time, final String agentId, final String linkId, final String acttype) {
 		super(time, agentId);
 		this.linkId = linkId;
 		this.acttype = acttype == null ? "" : acttype;
