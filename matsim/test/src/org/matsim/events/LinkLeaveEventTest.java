@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * LinkLeaveEventTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,28 +20,19 @@
 
 package org.matsim.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+/**
+ * @author mrieser
+ */
+public class LinkLeaveEventTest extends MatsimTestCase {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.events");
-
-		suite.addTest(org.matsim.events.algorithms.AllTests.suite());
-		suite.addTestSuite(ActEndEventTest.class);
-		suite.addTestSuite(ActStartEventTest.class);
-		suite.addTestSuite(AgentArrivalEventTest.class);
-		suite.addTestSuite(AgentDepartureEventTest.class);
-		suite.addTestSuite(AgentStuckEventTest.class);
-		suite.addTestSuite(AgentUtilityEventTest.class);
-		suite.addTestSuite(AgentWait2LinkEventTest.class);
-		suite.addTestSuite(LinkEnterEventTest.class);
-		suite.addTestSuite(LinkLeaveEventTest.class);
-		suite.addTestSuite(EventsHandlerHierarchy.class);
-		suite.addTestSuite(EventsReadersTest.class);
-
-		return suite;
+	public void testWriteReadXml() {
+		final LinkLeaveEvent event1 = new LinkLeaveEvent(68423.98, "648", ".235", 5);
+		final LinkLeaveEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		assertEquals(event1.time, event2.time, EPSILON);
+		assertEquals(event1.agentId, event2.agentId);
+		assertEquals(event1.linkId, event2.linkId);
+		assertEquals(event1.legId, event2.legId);
 	}
-
 }
