@@ -35,8 +35,6 @@ public class PlansCreator {
 		
 		int networkSize 	= 10;
 		double distance 	= 1000;
-	
-		
 		int personID		= 1;
 	
 	
