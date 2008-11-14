@@ -24,16 +24,14 @@ import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
-import org.matsim.network.NetworkLayer;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteLandmarks;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.charts.XYLineChart;
@@ -48,7 +46,7 @@ import org.matsim.planomat.PlanOptimizeTimes;
  * New standard version. Features
  * calling of TimeOptimizer rather than Planomat
  * differentiation into primary and secondary activities
- * locationChoice
+ * locationChoice with full plan handling
  */
 
 public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorithm { 
@@ -56,28 +54,30 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
-	//private final PlanAlgorithm 			planomatAlgorithm;
+	private final PreProcessLandmarks		preProcessRoutingData;
+	private final ScoringFunctionFactory	factory;
 	private final PlanAlgorithm				timer;
+	private final PlanAlgorithm				locator;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
 	private static final Logger 			log = Logger.getLogger(PlanomatX16.class);
-	private final PlanAlgorithm				locationChoiceAlgorithm;
+	
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX16 (LegTravelTimeEstimator legTravelTimeEstimator, NetworkLayer network, TravelCost costCalculator,
-			TravelTime timeCalculator, PreProcessLandmarks commonRouterDatafinal, ScoringFunctionFactory factory, Controler controler) {
+	public PlanomatX16 (Controler controler) {
 		
-		//this.planomatAlgorithm 		= new PlanOptimizeTimes (legTravelTimeEstimator);
-		this.router 				= new PlansCalcRouteLandmarks (network, commonRouterDatafinal, costCalculator, timeCalculator);
-		this.scorer 				= new PlanScorer (factory);
-		this.timer					= new TimeOptimizer13(legTravelTimeEstimator, this.scorer);
-		
-		this.locationChoiceAlgorithm = new LocationMutatorwChoiceSetSimultan(network, controler);
-		
-		this.NEIGHBOURHOOD_SIZE 	= 10;				//TODO @MF: constants to be configured externally, sum must be smaller than or equal to 1.0
+		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
+		this.preProcessRoutingData.run(controler.getNetwork());
+		this.factory 				= new CharyparNagelScoringFunctionFactory();
+		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+		this.scorer 				= new PlanScorer (this.factory);
+		this.timer					= new TimeOptimizer13(controler.getLegTravelTimeEstimator(), this.scorer);
+		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator());
+		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
+		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
@@ -182,7 +182,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					
 					// Conduct location choice
 					long lcStartTime=System.currentTimeMillis();
-					this.locationChoiceAlgorithm.run(neighbourhood[x]);
+					this.locator.run(neighbourhood[x]);
 					lcRunTime+=System.currentTimeMillis()-lcStartTime;
 					
 					// Routing
@@ -191,7 +191,6 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					//Optimizing the start times
 					numberPlanomatCalls++;
 					long planomatStartTime = System.currentTimeMillis();
-					//this.planomatAlgorithm.run (neighbourhood[x]); //Calling standard Planomat to optimise start times and mode choice
 					this.timer.run(neighbourhood[x]);
 					timerRunTime += (System.currentTimeMillis()-planomatStartTime);
 					

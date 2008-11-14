@@ -61,7 +61,7 @@ public class ControlerTest extends org.matsim.planomat.PlanomatControler {
 			
 			if (classname.equals("PlanomatX")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this, legTravelTimeEstimator);
+				StrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this);
 				// Note that legTravelTimeEstimator is given as an argument here while all other arguments for the 
 				// router algorithm are retrieved in the PlanomatXInitialiser. Both is possible. Should be 
 				// harmonised later on.
