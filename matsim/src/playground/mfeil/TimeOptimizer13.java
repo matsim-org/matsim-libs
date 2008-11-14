@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeOptimizer12.java
+ * TimeOptimizer13.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -56,8 +56,8 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 		this.scorer 				= scorer;
 		this.estimator				= estimator;
 		this.OFFSET					= 1800;
-		this.MAX_ITERATIONS 		= 50;
-		this.STOP_CRITERION			= 10;
+		this.MAX_ITERATIONS 		= 30;
+		this.STOP_CRITERION			= 5;
 		this.minimumTime			= 3600;
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		//TODO @MF: constants to be configured externally
