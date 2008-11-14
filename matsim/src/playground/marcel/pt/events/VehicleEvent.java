@@ -34,9 +34,11 @@ public abstract class VehicleEvent extends BasicEvent {
 		super(time);
 		this.vehicle = vehicle;
 	}
-	
+
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put("type", getEventType());
 		attr.put("vehicle", "unknown");// TODO [MR] Vehicles should have an Id on their own...
 		return attr;
 	}

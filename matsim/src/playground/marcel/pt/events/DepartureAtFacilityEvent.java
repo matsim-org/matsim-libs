@@ -24,8 +24,15 @@ import playground.marcel.pt.interfaces.Vehicle;
 
 public class DepartureAtFacilityEvent extends VehicleEvent {
 
+	public static final String EVENT_TYPE = "departureAtFacility";
+	
 	public DepartureAtFacilityEvent(final double time, final Vehicle vehicle) {
 		super(time, vehicle);
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 	
 	@Override

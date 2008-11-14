@@ -28,8 +28,10 @@ import org.matsim.population.Person;
 
 public class PersonLeavesVehicleEvent extends PersonEvent {
 
+	public static final String EVENT_TYPE = "PersonLeavesVehicle";
+
 	final private Vehicle vehicle;
-	
+
 	public PersonLeavesVehicleEvent(final double time, final Person person, final Vehicle vehicle) {
 		super(time, person);
 		this.vehicle = vehicle;
@@ -38,18 +40,22 @@ public class PersonLeavesVehicleEvent extends PersonEvent {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
-		attrs.put("vehicle", vehicle.getId().toString());
-		attrs.put("type", "PersonLeavesVehicleEvent");
+		attrs.put("vehicle", this.vehicle.getId().toString());
 		return attrs;
 	}
 
-	public Vehicle getVehicle() {
-		return vehicle;
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
-	
+
+	public Vehicle getVehicle() {
+		return this.vehicle;
+	}
+
 	@Override
 	public String toString() {
-		return "[PersonLeavesVehicle: agent: " + this.agentId + "; vehicle: " + vehicle.getId() + "]";
+		return "[" + EVENT_TYPE + ": agent: " + this.agentId + "; vehicle: " + this.vehicle.getId() + "]";
 	}
 
 }

@@ -28,6 +28,9 @@ import org.matsim.population.Person;
 
 public abstract class AgentEvent extends PersonEvent {
 
+	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_LEG = "leg";
+
 	public Link link;
 	public Leg leg;
 
@@ -48,10 +51,11 @@ public abstract class AgentEvent extends PersonEvent {
 		this.linkId = linkId;
 	}
 
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put("link", this.linkId);
-		attr.put("leg", Integer.toString(this.legId));
+		attr.put(ATTRIBUTE_LINK, this.linkId);
+		attr.put(ATTRIBUTE_LEG, Integer.toString(this.legId));
 		return attr;
 	}
 

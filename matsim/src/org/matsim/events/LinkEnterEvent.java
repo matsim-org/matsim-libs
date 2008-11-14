@@ -20,13 +20,13 @@
 
 package org.matsim.events;
 
-import java.util.Map;
-
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 
 public class LinkEnterEvent extends LinkEvent {
+
+	public static final String EVENT_TYPE = "entered link";
 
 	public LinkEnterEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent, link, leg);
@@ -37,15 +37,13 @@ public class LinkEnterEvent extends LinkEvent {
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "entered link");
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "5\tentered link";
+		return asString() + "5\t" + EVENT_TYPE;
 	}
 
 }

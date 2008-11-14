@@ -19,8 +19,6 @@
 
 package org.matsim.events;
 
-import java.util.Map;
-
 import org.matsim.population.Route;
 
 /**
@@ -28,21 +26,18 @@ import org.matsim.population.Route;
  */
 public class AgentReplanEvent extends PersonEvent {
 
+	public static final String EVENT_TYPE = "replan";
+
 	public Route replannedRoute;
 
-	public AgentReplanEvent(double time, String agentId, Route alternativeRoute) {
+	public AgentReplanEvent(final double time, final String agentId, final Route alternativeRoute) {
 		super(time, agentId);
 		this.replannedRoute = alternativeRoute;
 	}
 
-	/**
-	 * @see org.matsim.events.BasicEvent#getAttributes()
-	 */
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "replan");
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	/**

@@ -28,8 +28,10 @@ import org.matsim.population.Person;
 
 abstract class ActEvent extends PersonEvent {
 
+	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_ACTTYPE = "actType";
+
 	public String linkId;
-	private int actId;
 	public String acttype;
 
 	public transient Link link;
@@ -46,16 +48,15 @@ abstract class ActEvent extends PersonEvent {
 	ActEvent(final double time, final String agentId, final String linkId, final int actId, final String acttype) {
 		super(time, agentId);
 		this.linkId = linkId;
-		this.actId = actId;
 		this.acttype = acttype == null ? "" : acttype;
 	}
 
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 
-		attr.put("link", this.linkId);
-		attr.put("activity", Integer.toString(this.actId));
-		attr.put("act_type", this.acttype);
+		attr.put(ATTRIBUTE_LINK, this.linkId);
+		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
 	}
 

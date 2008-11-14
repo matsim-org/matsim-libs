@@ -20,32 +20,30 @@
 
 package org.matsim.events;
 
-import java.util.Map;
-
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 
 public class ActEndEvent extends ActEvent {
 
-	public ActEndEvent(double time, Person agent, Link link, Act act) {
+	public static final String EVENT_TYPE = "actend";
+
+	public ActEndEvent(final double time, final Person agent, final Link link, final Act act) {
 		super(time, agent, link, act);
 	}
 
-	public ActEndEvent(double time, String agentId, String linkId, int actId, String acttype) {
+	public ActEndEvent(final double time, final String agentId, final String linkId, final int actId, final String acttype) {
 		super(time, agentId, linkId, actId, acttype);
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "actend");
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "8\tactend"+ " " + this.acttype;
+		return asString() + "8\t" + EVENT_TYPE + " " + this.acttype;
 	}
 
 }

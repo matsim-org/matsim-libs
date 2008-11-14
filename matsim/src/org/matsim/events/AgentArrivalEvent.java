@@ -20,32 +20,30 @@
 
 package org.matsim.events;
 
-import java.util.Map;
-
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 
 public class AgentArrivalEvent extends AgentEvent {
 
-	public AgentArrivalEvent(double time, Person agent, Link link, Leg leg) {
+	public static final String EVENT_TYPE = "arrival";
+
+	public AgentArrivalEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent, link, leg);
 	}
 
-	public AgentArrivalEvent(double time, String agentId, String linkId, int legId) {
+	public AgentArrivalEvent(final double time, final String agentId, final String linkId, final int legId) {
 		super(time, agentId, linkId, legId);
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "arrival");
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "0\tarrival";
+		return asString() + "0\t" + EVENT_TYPE;
 	}
 
 }

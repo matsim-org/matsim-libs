@@ -34,6 +34,10 @@ import org.matsim.population.Person;
  */
 public final class AgentUtilityEvent extends PersonEvent {
 
+	public static final String ATTRIBUTE_AMOUNT = "amount";
+
+	public static final String EVENT_TYPE = "agentUtility";
+
 	public final double amount;
 
 	public AgentUtilityEvent(final double time, final Person agent, final double amount) {
@@ -47,16 +51,20 @@ public final class AgentUtilityEvent extends PersonEvent {
 	}
 
 	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "agentUtility");
-		attr.put("amount", Double.toString(this.amount));
+		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
 		return attr;
 	}
 
 	@Override
 	public String toString() {
-		return getTimeString(this.time) + this.agentId + "\t0\t\t0\t9\tagentUtility\t" + amount;
+		return getTimeString(this.time) + this.agentId + "\t0\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
 	}
 
 }

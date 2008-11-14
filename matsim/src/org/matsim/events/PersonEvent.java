@@ -29,6 +29,8 @@ import org.matsim.population.Person;
  */
 public abstract class PersonEvent extends BasicEvent {
 
+	public static final String ATTRIBUTE_AGENT = "agent";
+
 	public Person agent;
 	public final String agentId;
 
@@ -37,15 +39,16 @@ public abstract class PersonEvent extends BasicEvent {
 		this.agent = person;
 		this.agentId = person.getId().toString();
 	}
-	
+
 	public PersonEvent(final double time, final String personId)	{
 		super(time);
 		this.agentId = personId;
 	}
-	
+
+	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put("agent", this.agentId);
+		attr.put(ATTRIBUTE_AGENT, this.agentId);
 		return attr;
 	}
 

@@ -28,7 +28,7 @@ import org.matsim.utils.misc.Time;
 public abstract class BasicEvent {
 
 	public final static String ATTRIBUTE_TYPE = "type";
-	
+
 	public final double time;
 
 	private static String timeString = null;
@@ -40,7 +40,8 @@ public abstract class BasicEvent {
 
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
-		attr.put("time", getTimeString(this.time));
+		attr.put("time", Double.toString(this.time));
+		attr.put("type", getEventType());
 		return attr;
 	}
 
@@ -51,6 +52,9 @@ public abstract class BasicEvent {
 	 */
 	@Override
 	public abstract String toString();
+
+	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
+	abstract public String getEventType();
 
 	/**
 	 * Returns the passed time as Seconds, including a trailing tab-character.

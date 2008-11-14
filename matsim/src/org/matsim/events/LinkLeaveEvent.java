@@ -20,13 +20,13 @@
 
 package org.matsim.events;
 
-import java.util.Map;
-
 import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 
 public class LinkLeaveEvent extends LinkEvent {
+
+	public static final String EVENT_TYPE = "left link";
 
 	public LinkLeaveEvent(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent, link, leg);
@@ -37,15 +37,13 @@ public class LinkLeaveEvent extends LinkEvent {
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(BasicEvent.ATTRIBUTE_TYPE, "left link");
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 	@Override
 	public String toString() {
-		return asString() + "2\tleft link";
+		return asString() + "2\t" + EVENT_TYPE;
 	}
 
 }
