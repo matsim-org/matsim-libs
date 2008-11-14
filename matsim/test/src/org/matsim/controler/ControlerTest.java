@@ -114,6 +114,7 @@ public class ControlerTest extends MatsimTestCase {
 		// Now run the simulation
 		Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 
 		// test if we got the right result
@@ -131,6 +132,7 @@ public class ControlerTest extends MatsimTestCase {
 		controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 
 		// test that the plans have the correct times
@@ -155,6 +157,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		final Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
@@ -231,6 +234,7 @@ public class ControlerTest extends MatsimTestCase {
 		// Now run the simulation
 		Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -309,6 +313,7 @@ public class ControlerTest extends MatsimTestCase {
 		// Now run the simulation
 		Controler controler = new Controler(config, network, population);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */

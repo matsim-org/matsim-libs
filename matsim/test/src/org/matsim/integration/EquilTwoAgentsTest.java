@@ -61,6 +61,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 
 		controler.addControlerListener(new StartupListener() {
 

@@ -61,6 +61,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
@@ -79,6 +80,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
 		controler.run();
@@ -104,6 +106,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		Gbl.reset();
 		controler = new Controler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		listener = new ControlerEventsTestListener(1, this);
 		// we know from the code above, that "add" works
 		controler.addControlerListener(listener);

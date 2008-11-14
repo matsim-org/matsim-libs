@@ -37,6 +37,7 @@ public class EvacuationQSimTest extends MatsimTestCase {
 
 		EvacuationQSimControler controler = new EvacuationQSimControler(new String[] {config});
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(10);
 		controler.run();
 
 		System.out.println("checking network file ...");

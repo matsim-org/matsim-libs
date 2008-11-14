@@ -177,6 +177,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		public TestControler(final Config config) {
 			super(config);
 			setCreateGraphs(false);
+			setWriteEventsInterval(0);
 		}
 
 		@Override

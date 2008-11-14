@@ -37,7 +37,10 @@ public class PlanomatControlerTest extends MatsimTestCase {
 		
 		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
 		
-		PlanomatControler.main(args);
+		PlanomatControler controler = new PlanomatControler(args);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+		controler.run();
 		
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
@@ -51,7 +54,10 @@ public class PlanomatControlerTest extends MatsimTestCase {
 
 		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
 
-		PlanomatControler.main(args);
+		PlanomatControler controler = new PlanomatControler(args);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+		controler.run();
 
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");

@@ -122,6 +122,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 			super(config);
 			this.strategyManager = manager;
 			this.setCreateGraphs(false);
+			this.setWriteEventsInterval(5);
 		}
 
 		@Override

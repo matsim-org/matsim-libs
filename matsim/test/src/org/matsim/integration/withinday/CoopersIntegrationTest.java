@@ -64,6 +64,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		
 		CoopersControler controler = new CoopersControler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("5");
@@ -94,6 +95,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		
 		CoopersControler controler = new CoopersControler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("5");
@@ -123,6 +125,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		
 		CoopersControler controler = new CoopersControler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
@@ -154,6 +157,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		
 		CoopersControler controler = new CoopersControler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
@@ -185,6 +189,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		
 		CoopersControler controler = new CoopersControler(config);
 		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
 		
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
