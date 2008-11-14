@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * A reader for TeleAtlas network description files.
  * The reader is based on
- * <strong>Tele Atlas MultiNet® Shapefile 4.3.2.1 Format Specifications
+ * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
  * document version Final v1.0, June 2007</strong>
  * and uses the input shape files:
  * <ul>
@@ -57,28 +57,26 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	private final NetworkLayer network;
 
 	/**
-	 * path and name to the Tele Atlas MultiNet® junction (jc) Shapefile
+	 * path and name to the Tele Atlas MultiNet junction (jc) Shapefile
 	 */
 	private final String jcShpFileName; // teleatlas junction shape file name
 
 	/**
-	 * path and name to the Tele Atlas MultiNet® network (nw) Shapefile
+	 * path and name to the Tele Atlas MultiNet network (nw) Shapefile
 	 */
 	private final String nwShpFileName; // teleatlas network shape file name
 	
 	/**
 	 * option flag: if set, the reader ignores all network links with
-	 * <pre>
-	 * <code>{@link #LINK_FRCTYP_NAME} == 8</code>
-	 * </pre>
+	 * <p><code>{@link #LINK_FRCTYP_NAME} == 8</code></p>
+	 * <p><b>Default:</b> <code>false</code></p>
 	 */
 	public boolean ignoreFrcType8 = false;
 
 	/**
 	 * option flag: if set, the reader ignores all network links with
-	 * <pre>
-	 * <code>{@link #LINK_FRCTYP_NAME} == 8 && {@link #LINK_ONEWAY_NAME} == "N"</code>
-	 * </pre>
+	 * <p><code>{@link #LINK_FRCTYP_NAME} == 8 && {@link #LINK_ONEWAY_NAME} == "N"</code></p>
+	 * <p><b>Default:</b> <code>false</code></p>
 	 */
 	public boolean ignoreFrcType7onewayN = false;
 
@@ -86,13 +84,15 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	 * option parameter: the reader redefines the number of lanes (see permlanes in {@link BasicLinkImpl})
 	 * if the value of <code>{@link #LINK_LANES_NAME}<1</code>. In that case the link gets 2 lanes for
 	 * <code>{@link #LINK_FRCTYP_NAME}</code> less or equal this parameter, 1 lane otherwise.
+	 * <p><b>Default:</b> <code>3</code></p>
 	 */
 	public int maxFrcTypeForDoubleLaneLink = 3;
 
 	/**
-	 * option parameter [in km/h]: Tele Atlas MultiNet® Shapefile does not define capacities for links. Therefore,
+	 * option parameter [in km/h]: Tele Atlas MultiNet Shapefile does not define capacities for links. Therefore,
 	 * link flow capacities must be derived from the given data. Below the given parameter the link
 	 * gets capacity = 1000 [veh/h] per lane assigned, 2000 [veh/h] otherwise.
+	 * <p><b>Default:</b> <code>40</code>(km/h)</p>
 	 */
 	public int minSpeedForNormalCapacity = 40; // km/h
 
@@ -132,11 +132,11 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Instantiate a new Tele Atlas MultiNet® Shapefile reader based on the junction and the network shape file.
+	 * Instantiate a new Tele Atlas MultiNet Shapefile reader based on the junction and the network shape file.
 	 * 
 	 * @param network MATSim network database in which the reader stores the data
-	 * @param jcShpFileName Tele Atlas MultiNet® junction Shapefile
-	 * @param nwShpFileName Tele Atlas MultiNet® network Shapefile
+	 * @param jcShpFileName Tele Atlas MultiNet junction Shapefile
+	 * @param nwShpFileName Tele Atlas MultiNet network Shapefile
 	 */
 	public NetworkReaderTeleatlas(final NetworkLayer network, final String jcShpFileName, final String nwShpFileName) {
 		this.network = network;
@@ -166,8 +166,9 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reads Tele Atlas MultiNet® junction Shapefile given in <code>{@link #jcShpFileName}</code>.
-	 * It uses the following feature attributes:
+	 * Reads Tele Atlas MultiNet junction Shapefile given in <code>{@link #jcShpFileName}</code>.
+	 * 
+	 * <p>It uses the following feature attributes:
 	 * <ul>
 	 * <li>center coordinate</li>
 	 * <li><code>{@link #NODE_ID_NAME} (Feature Identification)</code></li>
@@ -185,7 +186,7 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	 *   <li><code>5: Ferry Operated by Train Crossing</code></li>
 	 *   <li><code>6: Internal Data Set Border Crossing</code></li>
 	 *   </ul>
-	 * </ul>
+	 * </ul></p>
 	 * The MATSim {@link Node#type} is set as
 	 * <pre>
 	 * <code>{@link Node#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
@@ -216,8 +217,9 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reads Tele Atlas MultiNet® network Shapefile given in <code>{@link #nwShpFileName}</code>.
-	 * It uses the following feature attributes:
+	 * Reads Tele Atlas MultiNet network Shapefile given in <code>{@link #nwShpFileName}</code>.
+	 * 
+	 * <p>It uses the following feature attributes:
 	 * <ul>
 	 * <li><code>{@link #LINK_ID_NAME} (Feature Identification)</code></li>
 	 * <li><code>{@link #LINK_FEATTYP_NAME} (Feature Type)</code></li>
@@ -282,7 +284,7 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	 * <pre>
 	 * <code>{@link LinkImpl#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
 	 * </pre></li>
-	 * </ul>
+	 * </ul></p>
 	 * 
 	 * @throws IOException
 	 */
@@ -318,10 +320,10 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 			// ignore links FRC types = -1 [Not Applicable (for FeatTyp 4165)]
 			if (linksType < 0) { log.trace("  linkId="+id.toString()+": ignoring "+LINK_FRCTYP_NAME+"="+linksType+"."); ignore = true; }
 			// option flag: ignore links FRC type = 8 [Other Road]
-			if (this.ignoreFrcType8 && (7 < linksType)) { log.info("  linkId="+id.toString()+": ignoring "+LINK_FRCTYP_NAME+"="+linksType+"."); ignore = true; }
+			if (this.ignoreFrcType8 && (7 < linksType)) { log.trace("  linkId="+id.toString()+": ignoring "+LINK_FRCTYP_NAME+"="+linksType+"."); ignore = true; }
 			// ignore links FRC types = 7 [Local Road of Minor Importance] that are ONEWAY = N [Closed in Both Directions]
 			// links with type < 7 also contains ONEWAY = N but should be open anyway....
-			if (this.ignoreFrcType7onewayN && ((linksType == 7) && oneway.equals("N"))) { log.info("  linkId="+id.toString()+": ignoring "+LINK_FRCTYP_NAME+"="+linksType+" with "+LINK_ONEWAY_NAME+"="+oneway+""); ignore = true; }
+			if (this.ignoreFrcType7onewayN && ((linksType == 7) && oneway.equals("N"))) { log.trace("  linkId="+id.toString()+": ignoring "+LINK_FRCTYP_NAME+"="+linksType+" with "+LINK_ONEWAY_NAME+"="+oneway+""); ignore = true; }
 
 			// simple rule for number of lanes (a lot of them are = 0, so we need to define something)
 			if (lanes < 1) {
@@ -329,7 +331,7 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 				else { lanes = 1; }
 			}
 			// simple rule for setting capacities
-			double cap = -1;
+			double cap;
 			if (speed < minSpeedForNormalCapacity) { cap = lanes*1000; }
 			else { cap = lanes*2000; }
 			

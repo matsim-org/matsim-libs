@@ -23,7 +23,6 @@ package org.matsim.network.algorithms;
 import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -34,10 +33,19 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkReaderTeleatlas;
 import org.matsim.network.Node;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.gis.ShapeFileReader;
 
+/**
+ * Adds maneuver restrictions to a MATSim {@link NetworkLayer network} created
+ * by {@link NetworkReaderTeleatlas}. The input maneuver shape file and the maneuver path DBF file
+ * is based on <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
+ * document version Final v1.0, June 2007</strong>.
+ * 
+ * @author balmermi
+ */
 public class NetworkTeleatlasAddManeuverRestrictions {
 
 	//////////////////////////////////////////////////////////////////////
@@ -48,11 +56,37 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	
 	private final NetworkExpandNode neModule = new NetworkExpandNode();
 
+	/**
+	 * path and name to the Tele Atlas MultiNet maneuver (mn) Shape file
+	 */
 	private final String mnShpFileName; // teleatlas maneuvers shape file name
+
+	/**
+	 * path and name to the Tele Atlas MultiNet maneuver path (mp) DBF file
+	 */
 	private final String mpDbfFileName; // teleatlas maneuver paths dbf file name
 	
+	/**
+	 * option flag: if set, expanded {@link Node nodes} (nodes that contains maneuver restrictions)
+	 * will not include new virtual {@link Link links} providing a u-turn maneuver at the
+	 * junction.
+	 */
 	public boolean removeUTurns = false;
+
+	/**
+	 * option parameter: defines the radius how much a {@link Node node} will be expanded.
+	 * <p><b>Default:</b> <code>0.000030</code> (appropriate for world coordinate system WGS84)</p>
+	 * 
+	 * @see NetworkExpandNode
+	 */
 	public double expansionRadius = 0.000030; // WGS84
+
+	/**
+	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link Node node}.
+	 * <p><b>Default:</b> <code>0.000005</code> (appropriate for world coordinate system WGS84)</p>
+	 * 
+	 * @see NetworkExpandNode
+	 */
 	public double linkSeparation = 0.000005; // WGS84
 
 	private static final String MN_ID_NAME = "ID";
@@ -67,6 +101,12 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * To create maneuver restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
+	 * 
+	 * @param mnShpFileName Tele Atlas MultiNet maneuver Shape file
+	 * @param mpDbfFileName Tele Atlas MultiNet maneuver path DBF file
+	 */
 	public NetworkTeleatlasAddManeuverRestrictions(final String mnShpFileName, final String mpDbfFileName) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.mnShpFileName = mnShpFileName;
@@ -78,6 +118,42 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Reading and assigning (expanding {@link Node nodes}) maneuver restrictions to the {@link NetworkLayer network}.
+	 * 
+	 * <p>It uses the following attributes from the Tele Atlas MultiNet maneuver Shape file:
+	 * <ul>
+	 *   <li>{@link #MN_ID_NAME} (Feature Identification)</li>
+	 *   <li>
+	 *     {@link #MN_FEATTYP_NAME} (Feature Type)
+	 *     <ul>
+	 *       <li>9401: Bifurcation</li>
+	 *       <li>2104: Priority Maneuver</li>
+	 *       <li>2103: Prohibited Maneuver</li>
+	 *       <li>2102: Restricted Maneuver</li>
+	 *       <li>2101: Calculated/Derived Prohibited Maneuver</li>
+	 *     </ul>
+	 *   </li>
+	 *   <li>{@link #MN_JNCTID_NAME} (Junction Identification of the Location of the Maneuver Sign)</li>
+	 * </ul></p>
+	 * <p>And it uses the following attributes from the Tele Atlas MultiNet maneuver path DBF file:
+	 * <ul>
+	 *   <li>{@link #MP_ID_NAME} (Feature Identification)</li>
+	 *   <li>{@link #MP_SEQNR_NAME} (Transportation Element Sequential Number within the Maneuver)</li>
+	 *   <li>{@link #MP_TRPELID_NAME} (Transportation Element Identification)</li>
+	 * </ul></p>
+	 * <p><b>Conversion rules:</b>
+	 * <ul>
+	 *   <li>The maneuver types 'Bifurcation' (9401) and 'Priority Maneuver' (2104) are ignored</li>
+	 *   <li>Maneuver restriction sequences that contain links that are not incident to the given
+	 *   junction are ignored</li>
+	 *   <li>Maneuver restrictions will be modelled in the natwork topology by expanding
+	 *   {@link Node nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
+	 * </ul></p>
+	 * 
+	 * @param network MATSim {@link NetworkLayer network} created by {@link NetworkReaderTeleatlas}.
+	 * @throws Exception
+	 */
 	public void run(final NetworkLayer network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		FileChannel in = new FileInputStream(this.mpDbfFileName).getChannel();
@@ -162,23 +238,20 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
 				// assign maneuvers for given node to the matrix
 				ArrayList<Tuple<Id,Integer>> ms = maneuvers.get(nodeId);
-				for (int i=0; i<ms.size(); i++) {
-					Tuple<Id,Integer> m = ms.get(i);
+				for (Tuple<Id,Integer> m : ms) {
 					// get maneuver path sequence for given maneuver
 					TreeMap<Integer,Id> mSequence = mSequences.get(m.getFirst());
 					if (mSequence == null) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": no maneuver sequence given."); }
 					if (mSequence.size() < 2) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": mSequenceSize="+mSequence.size()+" not alowed!"); }
 					// get the first element of the sequence, defining the start link for the maneuver 
-					Iterator<Integer> snr_it = mSequence.keySet().iterator();
-					Integer snr = snr_it.next();
+					Id firstLinkid = mSequence.values().iterator().next();
 					// go through each other element (target link of the maneuver) of the sequence by sequence number
-					while (snr_it.hasNext()) {
-						Integer snr2 = snr_it.next();
+					for (Id otherLinkId : mSequence.values()) {
 						// get the start link and the target link of the maneuver
-						Link inLink = n.getInLinks().get(new IdImpl(mSequence.get(snr)+"FT"));
-						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(mSequence.get(snr)+"TF")); }
-						Link outLink = n.getOutLinks().get(new IdImpl(mSequence.get(snr2)+"FT"));
-						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(mSequence.get(snr2)+"TF")); }
+						Link inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
+						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(firstLinkid+"TF")); }
+						Link outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
+						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"TF")); }
 						if ((inLink != null) && (outLink != null)) {
 							// start and target link found and they are incident to the given node
 							if (m.getSecond() == 2102) {
@@ -266,6 +339,11 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * prints the variable settings to the STDOUT
+	 * 
+	 * @param prefix a prefix for each line of the STDOUT
+	 */
 	public final void printInfo(final String prefix) {
 		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
 		System.out.println(prefix+"  options:");

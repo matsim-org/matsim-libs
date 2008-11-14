@@ -38,6 +38,7 @@ import org.matsim.utils.misc.Time;
 
 /**
  * A Procedure to expand a node of the {@link NetworkLayer network}.
+ * 
  * <p><b>Note:</b> it is actually not completely clear that this should be a
  * MATSim network module. It could also be a method in the network layer
  * or---probably even better---a MATSim utility/procedure/algo/etc... The 
@@ -109,7 +110,9 @@ public class NetworkExpandNode {
 
 	/**
 	 * Expands the {@link Node node} that is part of the {@link NetworkLayer network} and holds
-	 * {@link Id nodeId} in the following way:
+	 * {@link Id nodeId}.
+	 * 
+	 * <p>It is done in the following way:
 	 * <ol>
 	 * <li>creates for each in- and out-{@link LinkImpl link} a new {@link Node node} with
 	 * <ul>
@@ -188,6 +191,7 @@ public class NetworkExpandNode {
 	 * </pre>
 	 * </li>
 	 * </ol>
+	 * </p>
 	 * 
 	 * @param network MATSim {@link NetworkLayer network} DB
 	 * @param nodeId the {@link Id} of the {@link Node} to expand

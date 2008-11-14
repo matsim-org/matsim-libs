@@ -27,9 +27,19 @@ import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkReaderTeleatlas;
 import org.matsim.utils.misc.Time;
 
+/**
+ * Adds additional speed restrictions to a MATSim {@link NetworkLayer network} created
+ * by {@link NetworkReaderTeleatlas}. The input speed restriction DBF file is based on
+ * <strong>Tele Atlas MultiNet Shapefile 4.3.2.1 Format Specifications
+ * document version Final v1.0, June 2007</strong>.
+ * 
+ * @author balmermi
+ */
 public class NetworkTeleatlasAddSpeedRestrictions {
 
 	//////////////////////////////////////////////////////////////////////
@@ -38,7 +48,10 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 
 	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddSpeedRestrictions.class);
 	
-	private final String srDbfFileName; // teleatlas speed restriction dbf file name
+	/**
+	 * path and name to the Tele Atlas MultiNet speed restriction (sr) DBF file
+	 */
+	private final String srDbfFileName;
 	
 	private static final String SR_ID_NAME = "ID";
 	private static final String SR_SPEED_NAME = "SPEED";
@@ -49,6 +62,11 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * To add speed restrictions to a Tele Atlas MultiNet {@link NetworkLayer network}.
+	 * 
+	 * @param srDbfFileName Tele Atlas MultiNet speed restriction DBF file
+	 */
 	public NetworkTeleatlasAddSpeedRestrictions(final String srDbfFileName) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.srDbfFileName = srDbfFileName;
@@ -59,6 +77,41 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Reading and assigning speed restrictions to the {@link Link links} of a {@link NetworkLayer network}.
+	 * 
+	 * <p>It uses the following attributes from the Tele Atlas MultiNet speed restriction DBF file:
+	 * <ul>
+	 *   <li>{@link #SR_ID_NAME} (Feature Identification)</li>
+	 *   <li>{@link #SR_SPEED_NAME} (Speed Restriction)</li>
+	 *   <li>
+	 *     {@link #SR_VALDIR_NAME} (Validity Direction)
+	 *     <ul>
+	 *       <li>1: Valid in Both Directions</li>
+	 *       <li>2: Valid Only in Positive Direction</li>
+	 *       <li>3: Valid Only in Negative Direction</li>
+	 *     </ul>
+	 *   </li>
+	 *   <li>
+	 *     {@link #SR_VERIFIED_NAME} (Verified)
+	 *     <ul>
+	 *       <li>0: Not Verified (default)</li>
+	 *       <li>1: Verified</li>
+	 *     </ul>
+	 *   </li>
+	 * </ul></p>
+	 * <p><b>Conversion rules:</b>
+	 * <ul>
+	 *   <li>speed restrictions that are not verified will be ignored.</li>
+	 *   <li>speed restrictions will be assigned in given directions ({@link #SR_VALDIR_NAME})</li>
+	 *   <li>speed restrictions will be ignored if the corresponding {@link LinkImpl link} is not found (produces a trace message).</li>
+	 *   <li>speed restrictions will not be assigned to the {@link LinkImpl link} if it already contains a speed that
+	 *   is lower then the one from the speed restrictions file.</li>
+	 * </ul></p>
+	 * 
+	 * @param network
+	 * @throws Exception
+	 */
 	public void run(final NetworkLayer network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		FileChannel in = new FileInputStream(this.srDbfFileName).getChannel();
@@ -137,6 +190,11 @@ public class NetworkTeleatlasAddSpeedRestrictions {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * prints the variable settings to the STDOUT
+	 * 
+	 * @param prefix a prefix for each line of the STDOUT
+	 */
 	public final void printInfo(final String prefix) {
 		System.out.println(prefix+"configuration of "+this.getClass().getName()+":");
 		System.out.println(prefix+"  speed restrictions:");
