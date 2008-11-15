@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanomatX16.java
+ * PlanomatX17.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,38 +36,43 @@ import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.charts.XYLineChart;
 import java.util.ArrayList;
+import java.util.List;
 import java.io.*;
 import org.matsim.planomat.PlanOptimizeTimes;
+import org.matsim.locationchoice.constrained.*;
+
 
 
 
 /**
  * @author Matthias Feil
- * New standard version. Features
+ * New standard version as of 14.11.2008. Features
  * calling of TimeOptimizer rather than Planomat
  * differentiation into primary and secondary activities
- * locationChoice with full plan handling
+ * locationChoice (can differentiate between full and reduced LC)
+ * Has new constructor structure to prepare for PlanomatXConfigGroup.
  */
 
-public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
+	private final String					LC_MODE;
 	private final PreProcessLandmarks		preProcessRoutingData;
 	private final ScoringFunctionFactory	factory;
 	private final PlanAlgorithm				timer;
-	private final PlanAlgorithm				locator;
+	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRouteLandmarks 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX16.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX17.class);
 	
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX16 (Controler controler) {
+	public PlanomatX17 (Controler controler) {
 		
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
@@ -80,9 +85,9 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
-		this.WEIGHT_INC_NUMBER 		= 0.5; 				//Weighing whether adding or removing activities in change number method.
+		this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
 		this.MAX_ITERATIONS 		= 20;
-		
+		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
 	}
 	
 		
@@ -103,7 +108,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			
 		// Instantiate all necessary lists and arrays
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
-		int [] notNewInNeighbourhood 					= new int [NEIGHBOURHOOD_SIZE];
+		int [][] infoOnNeighbourhood 					= new int [NEIGHBOURHOOD_SIZE][3];
 		int [] tabuInNeighbourhood 						= new int [NEIGHBOURHOOD_SIZE];
 		int [] scoredInNeighbourhood					= new int [NEIGHBOURHOOD_SIZE];
 		ArrayList<PlanomatXPlan> nonTabuNeighbourhood 	= new ArrayList<PlanomatXPlan>();
@@ -163,10 +168,10 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	//		stream.println("Iteration "+currentIteration);
 			
 			// Define the neighbourhood
-			this.createNeighbourhood(neighbourhood, notNewInNeighbourhood, actTypes, primActs);	
+			this.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);	
 			
 			// Check whether differing plans are tabu
-			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, notNewInNeighbourhood, tabuInNeighbourhood);
+			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, infoOnNeighbourhood, tabuInNeighbourhood);
 			if (warningTabu) {
 				log.info("No non-tabu solutions availabe for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break; 
@@ -181,9 +186,20 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 				if(scoredInNeighbourhood[x]==0){
 					
 					// Conduct location choice
-					long lcStartTime=System.currentTimeMillis();
-					this.locator.run(neighbourhood[x]);
-					lcRunTime+=System.currentTimeMillis()-lcStartTime;
+					
+					if (this.LC_MODE.equals("reducedLC")){
+						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
+							long lcStartTime=System.currentTimeMillis();
+							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
+							lcRunTime+=System.currentTimeMillis()-lcStartTime;
+						}
+					}
+					else if (this.LC_MODE.equals("fullLC")){
+						long lcStartTime=System.currentTimeMillis();
+						this.locator.run(neighbourhood[x]);
+						lcRunTime+=System.currentTimeMillis()-lcStartTime;
+					}
+					else throw new IllegalArgumentException(this.LC_MODE);
 					
 					// Routing
 					this.router.run(neighbourhood[x]);
@@ -211,13 +227,15 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					else solutionLong.add(solution);
 				}
 	//			stream.print(neighbourhood[x].getScore()+"\t");
-	//			stream.print(notNewInNeighbourhood[x]+"\t");
+	//			stream.print(infoOnNeighbourhood[x][0]+"\t");
 	//			stream.print(tabuInNeighbourhood[x]+"\t");
 	//			stream.print(scoredInNeighbourhood[x]+"\t");
 	//			for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
 	//				Act act = (Act)neighbourhood[x].getActsLegs().get(i);
 	//				stream.print(act.getType()+"\t");
 	//			}
+	//			stream.print(infoOnNeighbourhood[x][1]+"\t");
+	//			stream.print(infoOnNeighbourhood[x][2]+"\t");
 	//			stream.println();
 			}
 			
@@ -229,7 +247,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			// Statistics
 	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
-			//streamOverview.println(bestIterSolution.getScore());
+		
 	//		ys[currentIteration]=bestIterSolution.getScore();
 			
 
@@ -286,7 +304,7 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	//	chart.addMatsimLogo();
 	//	chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		
-	//	stream.println("\nDauer der Planomat-Aufrufe: "+planomatRunTime);
+	
 	//	stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
 	//	stream.println("Anzahl der Planomat-Aufrufe: "+numberPlanomatCalls);				
 	//	stream.close();
@@ -301,17 +319,17 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	// Neighbourhood definition 
 	//////////////////////////////////////////////////////////////////////
 	
-	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[] notNewInNeighbourhood, 
+	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, 
 			ArrayList<Activity> actTypes, ArrayList<Activity> primActs) {
 		int neighbourPos;
 		int [] changePositions = {2,4};
 		for (neighbourPos = 0; neighbourPos<(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeOrder(neighbourhood[neighbourPos], changePositions);
+			infoOnNeighbourhood[neighbourPos] = this.changeOrder(neighbourhood[neighbourPos], changePositions, primActs);
 		}
 		int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
 		int[] actsToBeAdded = new int [(int)(neighbourhood[0].getActsLegs().size()/2)+1];
 		for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes, primActs);
+			infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], WEIGHT_INC_NUMBER, numberPositions, actsToBeAdded, actTypes, primActs);
 		}
 		int [] typePosition = {(int)(MatsimRandom.random.nextDouble()*((int)(neighbourhood[0].getActsLegs().size()/2)-1))+1,1};
 		
@@ -320,18 +338,18 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			actsToBeChanged[i] = (int)(MatsimRandom.random.nextDouble()* actTypes.size());
 		}
 		for (neighbourPos = (int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos<NEIGHBOURHOOD_SIZE; neighbourPos++){
-			notNewInNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes, primActs);
+			infoOnNeighbourhood[neighbourPos] = this.changeType(neighbourhood[neighbourPos], typePosition, actsToBeChanged, actTypes, primActs);
 		}
 	}
 			
 	
 	
-	public int changeOrder (PlanomatXPlan basePlan, int [] positions){
+	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<Activity> primActs){
 	
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		
 		if (actslegs.size()<=5){	//If true the plan has not enough activities to change their order. Do nothing.		
-			return 1;
+			return (new int[]{1,0,0});
 		}
 		else {
 			for (int planBasePos = positions[0]; planBasePos < actslegs.size()-4; planBasePos=planBasePos+2){			
@@ -349,16 +367,21 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 						actslegs.set(planRunningPos, actHelp);
 						
 						positions[0] = planBasePos;
-						return 0;
+						int[]pointer = {0,0,0};
+						if (this.checkPrimary((Act)actslegs.get(planBasePos), primActs)) pointer [1]=-1;
+						else pointer[1]=planBasePos/2;
+						if (this.checkPrimary((Act)actslegs.get(planRunningPos), primActs)) pointer[2]=-1;
+						else pointer[2]=planRunningPos/2;
+						return pointer;
 					}
 				}
 				positions[1] = planBasePos+4;
 			}
-			return 1;
+			return (new int[]{1,0,0});
 		}
 	}
 	
-	public int changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
+	public int[] changeNumber (PlanomatXPlan basePlan, double weight, int [] positions, int [] actsToBeAdded, 
 			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
 				
 		if(MatsimRandom.random.nextDouble()>=weight){
@@ -366,11 +389,12 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			// NEW NEW NEW NEW NEW NEW NEW NEW NE
 			// removing an activity, "cycling"
 			if (basePlan.getActsLegs().size()==5){
-				if (this.checkPrimary((Act)basePlan.getActsLegs().get(2), primActs)) return 1;
+				if (this.checkPrimary((Act)basePlan.getActsLegs().get(2), primActs)) return (new int[]{1,0,0});
 				else {
 					this.removeAct(1, basePlan);
 					positions[3]++;
-					return 0;
+					//return (new int[]{0,-1,1});
+					return (new int[]{0,-1,-1});
 				}
 			}
 			if(positions[1]==0){
@@ -403,11 +427,12 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 					}
 					positions[1]++;
 					positions[3]++;
-					return 0;
+					//return (new int[]{0,-1,positions[1]-1});
+					return (new int[]{0,-1,-1});
 				}
-				return 1;
+			return (new int[]{1,0,0});
 			}
-			else return 1;
+			else return (new int[]{1,0,0});
 		}
 		
 		else{	
@@ -434,19 +459,19 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 				}
 				positions[0]++;
 				positions[2]++;
-				return 0;
+				return (new int[]{0,positions[0]-1,-1});
 			}
-			return 1;
+			return (new int[]{1,0,0});
 		}
 	}
 	
-	public int changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
+	public int[] changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
 			ArrayList<Activity> actTypes, ArrayList<Activity> primActs){
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
 		while (position[1]<=(actTypes.size()-1)*(((int)(basePlan.getActsLegs().size()/2))-1)){
-			if (position[0]>basePlan.getActsLegs().size()/2-1)position[0] = 1;		
+			if (position[0]>basePlan.getActsLegs().size()/2-1) position[0] = 1;		
 			
 			Act act = (Act) basePlan.getActsLegs().get(position[0]*2);
 			if (this.checkPrimary(act, primActs)	&&	!(this.checkForSamePrimary(basePlan, position[0]))){
@@ -465,33 +490,20 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 			act.setType(type);
 			position[0]++;
 			position[1]++;
-			return 0;
+			return (new int[]{0,position[0]-1,-1});
 		}
-		return 1;
+		return (new int[]{1,0,0});
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// Help methods 
 	//////////////////////////////////////////////////////////////////////
-	
-	public boolean checkForNoNewSolutions (int[] notNewInNeighbourhood){
-		boolean warningInner = true;
-		boolean warningOuter = true;
-		for (int x=0; x<notNewInNeighbourhood.length;x++){
-			if (notNewInNeighbourhood[x]==0){
-				warningInner = false;
-			}
-			if (!warningInner) warningOuter = false;
-		}
-		return warningOuter;
-	}
-	
-	
-	public boolean checkForTabuSolutions (ArrayList<PlanomatXPlan> tabuList, PlanomatXPlan[] neighbourhood, int[] notNewInNeighbourhood, int[] tabuInNeighbourhood){
+		
+	public boolean checkForTabuSolutions (ArrayList<PlanomatXPlan> tabuList, PlanomatXPlan[] neighbourhood, int[][]infoOnNeighbourhood, int[] tabuInNeighbourhood){
 		boolean warningInner = true;
 		boolean warningOuter = true;
 		for (int x=0; x<tabuInNeighbourhood.length;x++){	//go through all neighbourhood solutions
-			if (notNewInNeighbourhood[x]==1) {
+			if (infoOnNeighbourhood[x][0]==1) {
 				tabuInNeighbourhood[x] = 1;
 			}
 			else {
@@ -674,7 +686,8 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 	public void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<Activity> actTypes){
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
-		Act actHelp = new Act ((Act)(actslegs.get((position*2)-2)));
+		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
+		Act actHelp = new Act ((Act)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
 		
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0;
@@ -734,6 +747,29 @@ public class PlanomatX16 implements org.matsim.population.algorithms.PlanAlgorit
 		return false;
 	}
 	
+	
+	private List<SubChain> getSubChains (Plan plan, int first, int second){
+		ManageSubchains manager = new ManageSubchains();
+		if (second-first==1){	// one long subchain
+			manager.primaryActivityFound((Act)plan.getActsLegs().get((first-1)*2), (Leg)plan.getActsLegs().get((first-1)*2+1));
+			manager.secondaryActivityFound((Act)plan.getActsLegs().get(first*2), (Leg)plan.getActsLegs().get(first*2+1));
+			manager.secondaryActivityFound((Act)plan.getActsLegs().get(second*2), (Leg)plan.getActsLegs().get(second*2+1));
+			manager.primaryActivityFound((Act)plan.getActsLegs().get((second+1)*2), null);
+		}
+		else{					// tow short subchains
+			if (first!=-1){
+				manager.primaryActivityFound((Act)plan.getActsLegs().get((first-1)*2), (Leg)plan.getActsLegs().get((first-1)*2+1));
+				manager.secondaryActivityFound((Act)plan.getActsLegs().get(first*2), (Leg)plan.getActsLegs().get(first*2+1));
+				manager.primaryActivityFound((Act)plan.getActsLegs().get((first+1)*2), null);
+			}
+			if (second!=-1){
+				manager.primaryActivityFound((Act)plan.getActsLegs().get((second-1)*2), (Leg)plan.getActsLegs().get((second-1)*2+1));
+				manager.secondaryActivityFound((Act)plan.getActsLegs().get(second*2), (Leg)plan.getActsLegs().get(second*2+1));
+				manager.primaryActivityFound((Act)plan.getActsLegs().get((second+1)*2), null);
+			}
+		}
+		return manager.getSubChains();
+	}
 	
 }
 	

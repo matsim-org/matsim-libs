@@ -57,7 +57,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		
 
 		PlanAlgorithm planomatXAlgorithm = null;
-		planomatXAlgorithm =  new PlanomatX16 (this.controler);
+		planomatXAlgorithm =  new PlanomatX17 (this.controler);
 
 		return planomatXAlgorithm;
 	}
