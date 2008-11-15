@@ -2,13 +2,13 @@ package playground.kai.urbansim;
 
 import org.matsim.basic.v01.IdImpl;
 
-public class BldIdImpl extends IdImpl {
+public class ParcelId extends IdImpl {
 
-	public BldIdImpl(String id) {
+	public ParcelId(String id) {
 		super(id);
 	}
 
-	public BldIdImpl(long id) {
+	public ParcelId(long id) {
 		super(id);
 	}
 

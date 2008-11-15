@@ -1,12 +1,11 @@
 package playground.kai.urbansim;
 
-import playground.kai.IdBuilder;
 
 public class BldIdBuilder implements IdBuilder {
-	public BldIdImpl createId(String str) {
-		return new BldIdImpl(str) ;
+	public BldId createId(String str) {
+		return new BldId(str) ;
 	}
-	public BldIdImpl createId(long ii) {
-		return new BldIdImpl(ii) ;
+	public BldId createId(long ii) {
+		return new BldId(ii) ;
 	}
 }

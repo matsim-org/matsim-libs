@@ -28,7 +28,6 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.Location;
 
-import playground.kai.IdBuilder;
 
 public class Test {
 	private static final Logger log = Logger.getLogger(Test.class);
@@ -279,10 +278,10 @@ public class Test {
 //					}
 
 					idx = idxFromKey.get("household_id:i4") ;
-					HHIdImpl hhId = new HHIdImpl( parts[idx] ) ; 
-					BldIdImpl buildingId = (BldIdImpl) buildingFromHousehold.get( hhId ) ;
+					HHId hhId = new HHId( parts[idx] ) ; 
+					BldId buildingId = (BldId) buildingFromHousehold.get( hhId ) ;
 					assert( buildingId != null ) ;
-					ParcelIdImpl homeParcelId = (ParcelIdImpl) parcelFromBuilding.get( buildingId ) ;
+					ParcelId homeParcelId = (ParcelId) parcelFromBuilding.get( buildingId ) ;
 					if ( homeParcelId==null ) {
 						System.err.println( " personId: " + personId.toString() + " hhId: " + hhId.toString() + " buildingId: " + buildingId.toString() ) ;
 						continue ;
@@ -304,14 +303,14 @@ public class Test {
 						person.setEmployed("no") ;
 					} else {
 						person.setEmployed("yes") ;
-						JobIdImpl jobId = new JobIdImpl( parts[idx] ) ;
-						buildingId = (BldIdImpl) buildingFromJob.get( jobId ) ;
+						JobId jobId = new JobId( parts[idx] ) ;
+						buildingId = (BldId) buildingFromJob.get( jobId ) ;
 						if ( buildingId == null ) {
 							System.err.println ( " person_id: " + personId.toString() + " job_id: " + jobId.toString() ) ;
 							continue ;
 						}
 						assert( buildingId != null ) ;
-						ParcelIdImpl jobParcelId = (ParcelIdImpl) parcelFromBuilding.get( buildingId ) ;
+						ParcelId jobParcelId = (ParcelId) parcelFromBuilding.get( buildingId ) ;
 						assert( jobParcelId != null ) ;
 						Location jobLocation = parcels.getLocation( jobParcelId ) ;
 						assert( jobLocation != null ) ;

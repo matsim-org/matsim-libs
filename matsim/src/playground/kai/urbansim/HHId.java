@@ -2,13 +2,13 @@ package playground.kai.urbansim;
 
 import org.matsim.basic.v01.IdImpl;
 
-public class JobIdImpl extends IdImpl {
+public class HHId extends IdImpl {
 
-	public JobIdImpl(String id) {
+	public HHId(String id) {
 		super(id);
 	}
 
-	public JobIdImpl(long id) {
+	public HHId(long id) {
 		super(id);
 	}
 
