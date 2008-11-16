@@ -50,13 +50,14 @@ import org.matsim.locationchoice.constrained.*;
  * - calling of TimeOptimizer rather than Planomat
  * - differentiation into primary and secondary activities
  * - locationChoice (can differentiate between full and reduced LC)
+ * - iterating locationChoice
  * - refined statistics module (tracks improvement over iterations)
  * Has new constructor structure to prepare for PlanomatXConfigGroup.
  */
 
 public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
-	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS;
+	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS, LC_SET_SIZE;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
 	private final double 					WEIGHT_INC_NUMBER;
 	private final String					LC_MODE;
@@ -88,7 +89,8 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
 		this.MAX_ITERATIONS 		= 20;
-		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
+		this.LC_MODE				= "iteratingLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
+		this.LC_SET_SIZE			= 3;
 	}
 	
 		
@@ -101,7 +103,8 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		long runStartTime = System.currentTimeMillis();
 		long timerRunTime = 0;
 		long lcRunTime = 0;
-		int numberPlanomatCalls = 0;
+		int numberTimerCalls = 0;
+		int numberIterLC = 0;
 			
 		/* Instantiate all necessary lists and arrays*/
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
@@ -148,10 +151,9 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<Double> scoreStat = new ArrayList<Double>();
 				
 		/* Copy the plan into all fields of the array neighbourhood*/
-		int neighbourhoodInitialisation;
-		for (neighbourhoodInitialisation = 0; neighbourhoodInitialisation < neighbourhood.length; neighbourhoodInitialisation++){
-			neighbourhood[neighbourhoodInitialisation] = new PlanomatXPlan (plan.getPerson());
-			neighbourhood[neighbourhoodInitialisation].copyPlan(plan);			
+		for (int i = 0; i < neighbourhood.length; i++){
+			neighbourhood[i] = new PlanomatXPlan (plan.getPerson());
+			neighbourhood[i].copyPlan(plan);			
 		}
 		
 		/* Write the given plan into the tabuList*/
@@ -187,7 +189,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				if(scoredInNeighbourhood[x]==0){
 					
 					/* Conduct location choice*/					
-					if (this.LC_MODE.equals("reducedLC")){
+					if (this.LC_MODE.equals("reducedLC")	||	this.LC_MODE.equals("iteratingLC")){
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
 							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
@@ -205,7 +207,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 					this.router.run(neighbourhood[x]);
 										
 					/*Optimizing the start times*/
-					numberPlanomatCalls++;
+					numberTimerCalls++;
 					long planomatStartTime = System.currentTimeMillis();
 					this.timer.run(neighbourhood[x]);
 					timerRunTime += (System.currentTimeMillis()-planomatStartTime);
@@ -213,6 +215,11 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 					/* Scoring*/
 					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
 					nonTabuNeighbourhood.add(neighbourhood[x]);
+					
+					/* Do iterating location choice if requested*/
+					if (this.LC_MODE.equals("iteratingLC")){
+						numberIterLC += this.iterateLC (neighbourhood[x]);
+					}
 					
 					/* Write the solution into a list so that it can be retrieved for later iterations*/
 					PlanomatXPlan solution = new PlanomatXPlan (neighbourhood[x].getPerson());
@@ -313,14 +320,14 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.close();
 		
 		
-		statistics.print(Counter.counter+"_"+plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberPlanomatCalls+"\t");
+		statistics.print(Counter.counter+"_"+plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)+"\t");
 		}
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)/bestScore+"\t");
 		}
-		statistics.println();
+		statistics.println(numberIterLC);
 		statistics.close();
 	}
    
@@ -780,5 +787,44 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		return manager.getSubChains();
 	}
 	
+	
+	private int iterateLC (PlanomatXPlan plan) {
+		PlanomatXPlan [] LCset = new PlanomatXPlan [this.LC_SET_SIZE];
+		int bestScore=-1;
+		for (int i = 0; i < LCset.length; i++){
+			if (i==0){
+				LCset[i] = new PlanomatXPlan (plan.getPerson());
+				LCset[i].copyPlan(plan);
+			}
+			else {
+				LCset[i] = new PlanomatXPlan (LCset[i-1].getPerson());
+				LCset[i].copyPlan(LCset[i-1]);
+			}
+			
+			this.locator.run(LCset[i]);
+			this.router.run(LCset[i]);
+			this.timer.run(LCset[i]);
+			//LCset[i].setScore(scorer.getScore(LCset[i]));	
+			if (bestScore==-1){
+				if (plan.getScore()<LCset[i].getScore()) {
+					bestScore=i;
+					log.info("Besser als neighbourhood: "+(LCset[i].getScore()-plan.getScore()));
+				}
+			}
+			else if (LCset[bestScore].getScore()<LCset[i].getScore()) {
+				log.info("Besser als voriges LCset: "+(LCset[i].getScore()-LCset[bestScore].getScore()));
+				bestScore=i;
+			}
+		}
+		if (bestScore!=-1){
+			ArrayList<Object> al = plan.getActsLegs();
+			for (int i = 0; i<al.size();i++){
+				al.remove(i);
+				al.add(i, LCset[bestScore].getActsLegs().get(i));	
+				}
+			return 1;
+		}
+		return 0;
+	}
 }
 	
