@@ -47,9 +47,10 @@ import org.matsim.locationchoice.constrained.*;
 /**
  * @author Matthias Feil
  * New standard version as of 14.11.2008. Features
- * calling of TimeOptimizer rather than Planomat
- * differentiation into primary and secondary activities
- * locationChoice (can differentiate between full and reduced LC)
+ * - calling of TimeOptimizer rather than Planomat
+ * - differentiation into primary and secondary activities
+ * - locationChoice (can differentiate between full and reduced LC)
+ * - refined statistics module (tracks improvement over iterations)
  * Has new constructor structure to prepare for PlanomatXConfigGroup.
  */
 
