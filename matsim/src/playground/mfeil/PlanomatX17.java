@@ -95,10 +95,6 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	//Definition of control output file
-    
-
-	
 	public void run (Plan plan){
 		
 		long runStartTime = System.currentTimeMillis();
@@ -106,7 +102,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		long lcRunTime = 0;
 		int numberPlanomatCalls = 0;
 			
-		// Instantiate all necessary lists and arrays
+		/* Instantiate all necessary lists and arrays*/
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
 		int [][] infoOnNeighbourhood 					= new int [NEIGHBOURHOOD_SIZE][3];
 		int [] tabuInNeighbourhood 						= new int [NEIGHBOURHOOD_SIZE];
@@ -121,15 +117,13 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		ArrayList<PlanomatXPlan> solution13				= new ArrayList<PlanomatXPlan>();
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
-	//	double [] xs;
-	//	double [] ys 									= new double [MAX_ITERATIONS+1];
-		// NEW NEW NEW NEW NEW NEW 
 		ArrayList<Activity> primActs					= plan.getPerson().getKnowledge().getActivities(true);
 		ArrayList<Activity> actTypes					= plan.getPerson().getKnowledge().getActivities();	
 		
-	//	String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
-		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
+	//	double [] xs;
+	//	double [] ys 									= new double [MAX_ITERATIONS+1];		
 		
+	//	String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 	//	Counter.counter++;
 	//	PrintStream stream;
 	//	try {
@@ -140,53 +134,58 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//	}
 	//	stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
 		
+		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
-		PrintStream overview;
+		PrintStream statistics;
 		try {
 			fileOverview = new FileOutputStream(new File(outputfileOverview), true);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
-		overview = new PrintStream (fileOverview);
+		statistics = new PrintStream (fileOverview);
+		ArrayList<Double> scoreStat = new ArrayList<Double>();
 				
-		// Copy the plan into all fields of the array neighbourhood
+		/* Copy the plan into all fields of the array neighbourhood*/
 		int neighbourhoodInitialisation;
 		for (neighbourhoodInitialisation = 0; neighbourhoodInitialisation < neighbourhood.length; neighbourhoodInitialisation++){
 			neighbourhood[neighbourhoodInitialisation] = new PlanomatXPlan (plan.getPerson());
 			neighbourhood[neighbourhoodInitialisation].copyPlan(plan);			
 		}
 		
-		// Write the given plan into the tabuList
+		/* Write the given plan into the tabuList*/
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
 	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
+		double bestScore = plan.getScore();
+		scoreStat.add(bestScore);
 		
-		// Do Tabu Search iterations
+		
+		/* Do Tabu Search iterations*/
 		int currentIteration;
 		for (currentIteration = 1; currentIteration<=MAX_ITERATIONS;currentIteration++){
 	//		stream.println("Iteration "+currentIteration);
 			
-			// Define the neighbourhood
+			/* Define the neighbourhood*/
 			this.createNeighbourhood(neighbourhood, infoOnNeighbourhood, actTypes, primActs);	
 			
-			// Check whether differing plans are tabu
+			/* Check whether differing plans are tabu*/
 			warningTabu = this.checkForTabuSolutions(tabuList, neighbourhood, infoOnNeighbourhood, tabuInNeighbourhood);
 			if (warningTabu) {
 				log.info("No non-tabu solutions availabe for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break; 
 			}
 			
-			// Check whether a non-tabu solution has been scored in a previous iteration			
+			/* Check whether a non-tabu solution has been scored in a previous iteration*/		
 			this.checkForScoredSolution(neighbourhood, tabuInNeighbourhood, scoredInNeighbourhood, solution3, solution5, solution7, solution9,
 					solution11, solution13, solutionLong, nonTabuNeighbourhood);
 			
-			// Choose location, route, optimize and score all non-tabu/non-scored plans, write them into list nonTabuNeighbourhood and sort the list
+			/* Choose location, route, optimize and score all non-tabu/non-scored plans, 
+			 * write them into list nonTabuNeighbourhood and sort the list*/
 			for (int x=0; x<NEIGHBOURHOOD_SIZE;x++){
 				if(scoredInNeighbourhood[x]==0){
 					
-					// Conduct location choice
-					
+					/* Conduct location choice*/					
 					if (this.LC_MODE.equals("reducedLC")){
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
@@ -201,20 +200,20 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 					}
 					else throw new IllegalArgumentException(this.LC_MODE);
 					
-					// Routing
+					/* Routing*/
 					this.router.run(neighbourhood[x]);
 										
-					//Optimizing the start times
+					/*Optimizing the start times*/
 					numberPlanomatCalls++;
 					long planomatStartTime = System.currentTimeMillis();
 					this.timer.run(neighbourhood[x]);
 					timerRunTime += (System.currentTimeMillis()-planomatStartTime);
 					
-					// Scoring
+					/* Scoring*/
 					//neighbourhood[x].setScore(scorer.getScore(neighbourhood[x]));
 					nonTabuNeighbourhood.add(neighbourhood[x]);
 					
-					// Write the solution into a list so that it can be retrieved for later iterations
+					/* Write the solution into a list so that it can be retrieved for later iterations*/
 					PlanomatXPlan solution = new PlanomatXPlan (neighbourhood[x].getPerson());
 					solution.copyPlan(neighbourhood[x]);
 					
@@ -239,36 +238,39 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//			stream.println();
 			}
 			
-			// Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList
+			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
 			java.util.Collections.sort(nonTabuNeighbourhood);
 			PlanomatXPlan bestIterSolution = new PlanomatXPlan (nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1).getPerson());
 			bestIterSolution.copyPlan(nonTabuNeighbourhood.get(nonTabuNeighbourhood.size()-1));
 			tabuList.add(bestIterSolution);
 			
-			// Statistics
-	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());
-		
+			/* Statistics*/	
 	//		ys[currentIteration]=bestIterSolution.getScore();
+	//		stream.println("Iteration "+currentIteration+"\t"+bestIterSolution.getScore());	
+			if (bestIterSolution.getScore()>bestScore) bestScore=bestIterSolution.getScore();
+			if (currentIteration%5==0){
+				scoreStat.add(bestScore);
+			}
 			
-
 			if (this.MAX_ITERATIONS==currentIteration){
 				log.info("Tabu Search regularly finished for person "+plan.getPerson().getId()+" at iteration "+currentIteration);	
 			}
 			else {
-				// Write this iteration's solution into all neighbourhood fields for the next iteration
+				/* Write this iteration's solution into all neighbourhood fields for the next iteration*/
 				for (int initialisationOfNextIteration = 0;initialisationOfNextIteration<NEIGHBOURHOOD_SIZE+1; initialisationOfNextIteration++){
 					neighbourhood[initialisationOfNextIteration] = new PlanomatXPlan (bestIterSolution.getPerson());
 					neighbourhood[initialisationOfNextIteration].copyPlan(bestIterSolution);
 				}
-				// Reset the nonTabuNeighbourhood list
+				/* Reset the nonTabuNeighbourhood list*/
 				nonTabuNeighbourhood.clear();
 			}	
 		}
 		
-		// Update the plan with the final solution 		
+		/* Update the plan with the final solution*/ 		
 		java.util.Collections.sort(tabuList);
-	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		ArrayList<Object> al = plan.getActsLegs();
+		
+	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		
 	//	xs = new double [currentIteration];
 	//	for (int i = 0;i<xs.length;i++)xs[i]=i+1;
@@ -310,8 +312,15 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.close();
 		
 		
-		overview.println(Counter.counter+"_"+plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberPlanomatCalls);
-		overview.close();
+		statistics.print(Counter.counter+"_"+plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberPlanomatCalls+"\t");
+		for (int i=0;i<scoreStat.size();i++){
+			statistics.print(scoreStat.get(i)+"\t");
+		}
+		for (int i=0;i<scoreStat.size();i++){
+			statistics.print(scoreStat.get(i)/bestScore+"\t");
+		}
+		statistics.println();
+		statistics.close();
 	}
    
 				
@@ -356,7 +365,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				for (int planRunningPos = positions[1]; planRunningPos < actslegs.size()-2; planRunningPos=planRunningPos+2){ //Go through the "inner" acts only
 					positions[1] = positions[1]+2;
 					
-					//Activity swapping				
+					/*Activity swapping	*/		
 					Act act0 = (Act)(actslegs.get(planBasePos));
 					Act act1 = (Act)(actslegs.get(planRunningPos));
 					if (act0.getType()!=act1.getType()){
@@ -387,7 +396,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		if(MatsimRandom.random.nextDouble()>=weight){
 			
 			// NEW NEW NEW NEW NEW NEW NEW NEW NE
-			// removing an activity, "cycling"
+			/* removing an activity, "cycling"*/
 			if (basePlan.getActsLegs().size()==5){
 				if (this.checkPrimary((Act)basePlan.getActsLegs().get(2), primActs)) return (new int[]{1,0,0});
 				else {
@@ -437,8 +446,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		else{	
 			
-			// adding an activity, "cycling"
-			
+			/* adding an activity, "cycling"*/			
 			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getActsLegs().size()/2)-1)){
 			
 				if (positions[0]==0){
@@ -543,7 +551,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution3.get(solution3.size()-1-i));
 							neighbourhood[x].setScore(solution3.get(solution3.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution3 recycled!");
+						//	log.info("Solution3 recycled!");
 							break;
 						}
 					}					
@@ -555,7 +563,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution5.get(solution5.size()-1-i));
 							neighbourhood[x].setScore(solution5.get(solution5.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution5 recycled!");
+						//	log.info("Solution5 recycled!");
 							break;
 						}
 					}
@@ -568,7 +576,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution7.get(solution7.size()-1-i));
 							neighbourhood[x].setScore(solution7.get(solution7.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution7 recycled!");
+						//	log.info("Solution7 recycled!");
 							break;
 						}
 					}
@@ -581,7 +589,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution9.get(solution9.size()-1-i));
 							neighbourhood[x].setScore(solution9.get(solution9.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution9 recycled!");
+						//	log.info("Solution9 recycled!");
 							break;
 						}
 					}
@@ -594,7 +602,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution11.get(solution11.size()-1-i));
 							neighbourhood[x].setScore(solution11.get(solution11.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution11 recycled!");
+						//	log.info("Solution11 recycled!");
 							break;
 						}
 					}
@@ -607,7 +615,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solution13.get(solution13.size()-1-i));
 							neighbourhood[x].setScore(solution13.get(solution13.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("Solution13 recycled!");
+						//	log.info("Solution13 recycled!");
 							break;
 						}
 					}
@@ -620,7 +628,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 							nonTabuNeighbourhood.add(solutionLong.get(solutionLong.size()-1-i));
 							neighbourhood[x].setScore(solutionLong.get(solutionLong.size()-1-i).getScore());
 							scoredInNeighbourhood[x]=1;
-							log.info("SolutionLong recycled!");
+						//	log.info("SolutionLong recycled!");
 							break;
 						}
 					}
@@ -629,7 +637,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}
 	
-	// Method that returns true if two plans feature the same activity order, or false otherwise
+	/* Method that returns true if two plans feature the same activity order, or false otherwise*/
 	public boolean checkForEquality (PlanomatXPlan plan1, PlanomatXPlan plan2){
 		
 		if (plan1.getActsLegs().size()!=plan2.getActsLegs().size()){
@@ -650,7 +658,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}	
 	
-	// Same functionality as above but apparently slightly slower
+	/* Same functionality as above but apparently slightly slower*/
 	public boolean checkForEquality2 (PlanomatXPlan plan1, PlanomatXPlan plan2){
 		if (plan1.getActsLegs().size()!=plan2.getActsLegs().size()){
 			return false;
@@ -667,7 +675,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 	}
 	
-	// Same functionality as above but without length check (because not required by some calling methods, saves calculation time)
+	/* Same functionality as above but without length check (because not required by some calling methods, saves calculation time)*/
 	public boolean checkForEquality3 (PlanomatXPlan plan1, PlanomatXPlan plan2){
 		
 		ArrayList<String> acts1 = new ArrayList<String> ();
@@ -682,7 +690,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	}	
 	
 	
-	// Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)
+	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
 	public void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<Activity> actTypes){
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
@@ -710,7 +718,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		actslegs.add(position*2, actHelp);
 	}
 	
-	// Removes the activity at the given position
+	/* Removes the activity at the given position*/
 	public void removeAct (int position, PlanomatXPlan basePlan){
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		actslegs.remove(position*2);
@@ -718,7 +726,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
-	// Checks whether an act is primary
+	/* Checks whether an act is primary*/
 	public boolean checkPrimary (Act act, ArrayList<Activity> primActs){
 		
 		for (int i = 0; i<primActs.size();i++){
@@ -729,7 +737,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		return false;
 	}
 	
-	// Checks whether a primary act is several times in the plan so that it can be dropped as requested
+	/* Checks whether a primary act is several times in the plan so that it can be dropped as requested*/
 	public boolean checkForSamePrimary (PlanomatXPlan plan, int position){
 		
 		for (int i = 0; i<position*2;i+=2){
@@ -756,7 +764,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 			manager.secondaryActivityFound((Act)plan.getActsLegs().get(second*2), (Leg)plan.getActsLegs().get(second*2+1));
 			manager.primaryActivityFound((Act)plan.getActsLegs().get((second+1)*2), null);
 		}
-		else{					// tow short subchains
+		else{					// two short subchains
 			if (first!=-1){
 				manager.primaryActivityFound((Act)plan.getActsLegs().get((first-1)*2), (Leg)plan.getActsLegs().get((first-1)*2+1));
 				manager.secondaryActivityFound((Act)plan.getActsLegs().get(first*2), (Leg)plan.getActsLegs().get(first*2+1));
