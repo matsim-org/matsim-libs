@@ -28,11 +28,11 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
-import playground.christoph.router.util.RouteChecker;
 import playground.christoph.router.util.TabuSelector;
 
 
@@ -139,7 +139,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(nodes);
 		route.setDist(routeLength);
 		
@@ -178,10 +178,10 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		double phi = java.lang.Math.acos(cosPhi);
 
 		/* 
-		 * If the angle is exactly 180° return a value that is slightly smaller.
+		 * If the angle is exactly 180ï¿½ return a value that is slightly smaller.
 		 * Reason: if there are only links that return to the current node and links
-		 * with an angle of 180° a loop could be generated.
-		 * Solution: slightly reduce angles of 180° so one of them is chosen. 
+		 * with an angle of 180ï¿½ a loop could be generated.
+		 * Solution: slightly reduce angles of 180ï¿½ so one of them is chosen. 
 		 */
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		

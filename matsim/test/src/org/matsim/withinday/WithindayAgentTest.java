@@ -44,6 +44,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
@@ -92,9 +93,9 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private void createRoutes() {
-		this.route1 = new Route();
-		this.route2 = new Route();
-		this.agentRoute = new Route();
+		this.route1 = new RouteImpl();
+		this.route2 = new RouteImpl();
+		this.agentRoute = new RouteImpl();
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));

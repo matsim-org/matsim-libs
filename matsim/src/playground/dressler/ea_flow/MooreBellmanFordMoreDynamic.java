@@ -26,17 +26,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-// other imports
-import playground.dressler.Intervall.src.Intervalls.*;
-
-// matsim imports
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 
 // import org.apache.log4j.Logger;
 // import org.matsim.utils.identifiers.IdI;
@@ -220,7 +220,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes);
 
 		return route;
@@ -293,7 +293,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes);
 
 		return route;

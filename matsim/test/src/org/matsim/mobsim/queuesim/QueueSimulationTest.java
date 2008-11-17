@@ -41,6 +41,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 
@@ -79,7 +80,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute("2 3");
 		leg.setRoute(route);
 		plan.createAct("w", link3);
@@ -102,7 +103,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a = plan.createAct("h", link1);
 			a.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = new Route();
+			route = new RouteImpl();
 			route.setRoute("2 3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -164,7 +165,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute("2 3");
 		leg.setRoute(route);
 		plan.createAct("w", link3);
@@ -177,7 +178,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = new Route();
+			route = new RouteImpl();
 			route.setRoute("3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -238,7 +239,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute("2 3");
 		leg.setRoute(route);
 		plan.createAct("w", link3);
@@ -251,7 +252,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = new Route();
+			route = new RouteImpl();
 			route.setRoute("3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -264,7 +265,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link1);
 			a2.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = new Route();
+			route = new RouteImpl();
 			route.setRoute("2 3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -387,13 +388,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(nodes);
 		leg.setRoute(route);
 		Act a2 = plan.createAct("w", link5);
 		a2.setEndTime(9*3600);
 		leg = plan.createLeg(BasicLeg.Mode.car);
-		route = new Route();
+		route = new RouteImpl();
 		route.setRoute("6");
 		leg.setRoute(route);
 		plan.createAct("h", link6);

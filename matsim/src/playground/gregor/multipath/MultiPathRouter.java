@@ -31,6 +31,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -220,7 +221,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
 
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes, (int) (arrivalTime - startTime), cost);
 
 		if (this.doGatherInformation) {

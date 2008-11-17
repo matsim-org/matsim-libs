@@ -44,6 +44,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.scoring.ScoringFunction;
@@ -276,7 +277,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		LegIterator legIterator = plan.getIteratorLeg();
 		while (legIterator.hasNext()) {
 			Leg curLeg = (Leg) legIterator.next();
-			routes.put(curLeg, new Route(curLeg.getRoute()));
+			routes.put(curLeg, new RouteImpl(curLeg.getRoute()));
 		}
 		
 		return routes;

@@ -39,6 +39,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -143,7 +144,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		
 		for (Plan plan : plans) {
 			Leg leg = new Leg(Mode.car);
-			Route route = new Route();
+			Route route = new RouteImpl();
 			route.setRoute(evacRoute);
 			leg.setRoute(route);
 			leg.setNum(1);

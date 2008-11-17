@@ -35,6 +35,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
@@ -372,7 +373,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			actNode = (PtNode) actNode.shortestPath.getFromNode();
 		}
 
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(path);
 		route.setTravTime(arrTime - depTime);
 
@@ -461,7 +462,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 //				RUN;FROM_X;FROM_Y;TO_X;TO_Y;ABSCOORDDIST;NUM_FROMNODES;NUM_TONODES;FROMNODE_ID;TO_NODEID;DEPWALKDIST;ARRWALKDIST;ROUTELEMENTS;TOUCHEDNODES;PENDINGNODES;TRAVELTIME;TRAVELCOST;CALCTIME\n");
 
 			if(path.size()>0){
-				route = new Route();
+				route = new RouteImpl();
 				route.setRoute(path);
 				route.setTravTime(arrTime-depTime);
 				out.write(path.get(0).getId()+";"+arrNode.getId()+";"+path.get(0).getCoord().calcDistance(fromCoord)+";"+arrNode.getCoord().calcDistance(toCoord)+";"+path.size()+";"+touchedNodes+";"+pending.size()+";"+(arrTime-depTime)+";"+(int)((arrNode.actCost+(arrNode.getCoord().calcDistance(toCoord)/PEDESTRIAN_SPEED))-depTime)+";");

@@ -33,6 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
@@ -89,14 +90,14 @@ public class VDSSignTest extends TestCase {
 		this.controlInput = new EmptyControlInputImpl();
 		this.controlInput.setNashTime(0);
 
-		this.route1 = new Route();
+		this.route1 = new RouteImpl();
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setRoute(list);
 		this.controlInput.setMainRoute(this.route1);
-		this.route2 = new Route();
+		this.route2 = new RouteImpl();
 		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));

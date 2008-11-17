@@ -26,6 +26,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -45,9 +46,9 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		parser.readFile(getInputDirectory() + "network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
 
-		Route route1 = new Route();
+		Route route1 = new RouteImpl();
 		route1.setRoute("3 6 7 12");
-		Route route2 = new Route();
+		Route route2 = new RouteImpl();
 		route2.setRoute("3 8 9 12");
 
 		//control input test class

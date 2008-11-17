@@ -33,6 +33,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -92,14 +93,14 @@ public class CoopersRouteProviderTest extends TestCase {
 		EmptyControlInputImpl controlInput = new EmptyControlInputImpl();
 		controlInput.setNashTime(0);
 
-		this.route1 = new Route();
+		this.route1 = new RouteImpl();
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));
 		list.add(this.network.getNode("4"));
 		this.route1.setRoute(list);
 		controlInput.setMainRoute(this.route1);
-		this.route2 = new Route();
+		this.route2 = new RouteImpl();
 		list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("32"));
@@ -127,7 +128,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	 */
 	public void testProvidesRoute() {
 	  //create route which is driven by the person in the real simulated world
-		Route agentRoute = new Route();
+		Route agentRoute = new RouteImpl();
 	  ArrayList<Node> nodes = new ArrayList<Node>();
 	  nodes.add(this.network.getNode("3"));
 	  nodes.add(this.network.getNode("32"));
@@ -166,7 +167,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	 */
 	public void testRequestRouteLinkLinkDouble() {
 	  //create route which is driven by the person in the real simulated world
-		Route agentRoute = new Route();
+		Route agentRoute = new RouteImpl();
 	  ArrayList<Node> agentRouteNodes = new ArrayList<Node>();
 	  agentRouteNodes.add(this.network.getNode("2"));
 	  agentRouteNodes.add(this.network.getNode("3"));
@@ -174,7 +175,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	  agentRouteNodes.add(this.network.getNode("4"));
 	  agentRoute.setRoute(agentRouteNodes);
 	  //create the route which should be returned by the provider
-	  Route providerRoute = new Route();
+	  Route providerRoute = new RouteImpl();
 	  ArrayList<Node> providerRouteNodes = new ArrayList<Node>();
 	  providerRouteNodes.add(this.network.getNode("2"));
 	  providerRouteNodes.add(this.network.getNode("3"));

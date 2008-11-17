@@ -35,6 +35,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
@@ -45,7 +46,6 @@ import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
  * @author dgrether
- *
  */
 public class WithindayAgent extends PersonAgent {
 
@@ -150,10 +150,10 @@ public class WithindayAgent extends PersonAgent {
 		Leg currentLeg = this.getCurrentLeg();
 
 		//create Route of already passed Nodes
-		//TODO use Route.getSubroute method
+		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
 		List<Node> oldRouteNodes = currentLeg.getRoute().getRoute();
-		Route alreadyPassedNodes = new Route();
+		Route alreadyPassedNodes = new RouteImpl();
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setRoute(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
@@ -182,7 +182,7 @@ public class WithindayAgent extends PersonAgent {
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(alreadyPassedNodes.getRoute().size() + alternativeRoute.getRoute().size());
     newRouteConcatedList.addAll(alreadyPassedNodes.getRoute());
     newRouteConcatedList.addAll(alternativeRoute.getRoute());
-    Route newRoute = new Route();
+    Route newRoute = new RouteImpl();
     newRoute.setRoute(newRouteConcatedList);
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);

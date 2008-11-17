@@ -9,6 +9,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -70,7 +71,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 			
-			Route wrappedRoute = new Route();
+			Route wrappedRoute = new RouteImpl();
 			wrappedRoute.setRoute(realRouteNodeList);
 			wrappedRoute.setDist(route.getDist());
 			wrappedRoute.setTravTime(route.getTravTime());
@@ -79,7 +80,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = route.getTravTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new Route();
+			route = new RouteImpl();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;

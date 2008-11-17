@@ -11,6 +11,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.Dijkstra;
 import org.matsim.utils.geometry.Coord;
 
@@ -122,7 +123,7 @@ public class PTRouter2 {
 					legTravTime = legTravTime+ linkTravelTime; 
 					linkList.add(link);
 				}else{
-					Route legRoute = new Route();
+					Route legRoute = new RouteImpl();
 					legRoute.setTravTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinkRoute(linkList);}
 					

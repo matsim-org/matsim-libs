@@ -31,6 +31,7 @@ import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -259,15 +260,13 @@ public class VDSSign {
 							+ " is greater than the next update time of the sign: "
 							+ this.nextUpdate
 							+ ", thus the sign will never be updated and is not initialized correctly!");
-		}
-		else if (this.complianceRate < trust) {
+		} else if (this.complianceRate < trust) {
 			if (log.isTraceEnabled()) {
 				log.trace("trust in sign is less than compliance rate, i.e. "
 						+ this.complianceRate + " < " + trust);
 			}
 			return null;
-		}
-		else {
+		} else {
 			double deltaT = this.nextUpdate - time - 1;
 			int index;
 			index = (int) deltaT / this.messageHoldTime;
@@ -281,12 +280,8 @@ public class VDSSign {
 		}
 	}
 
-
-
-
-
 	private Route completeRoute(final Route r) {
-		Route ret = new Route();
+		Route ret = new RouteImpl();
 		ArrayList<Node> rNodes = new ArrayList<Node>(r.getRoute());
 		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
 			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {

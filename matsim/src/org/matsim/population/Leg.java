@@ -41,11 +41,10 @@ public class Leg extends BasicLegImpl {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.route instanceof Route) {
-			this.route = new Route((Route) leg.route);
-		}
-		else {
-			this.route = new Route();
+		if (leg.route instanceof RouteImpl) {
+			this.route = new RouteImpl((RouteImpl) leg.route);
+		} else {
+			this.route = new RouteImpl();
 			((Route)this.route).setRoute(leg.getRoute().getRoute());
 		}
 
@@ -56,7 +55,7 @@ public class Leg extends BasicLegImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Route createRoute(final String dist, final String time) {
-		this.route = new Route(dist, time);
+		this.route = new RouteImpl(dist, time);
 		return getRoute();
 	}
 

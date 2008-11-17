@@ -30,6 +30,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -124,7 +125,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, tollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
 				} else {
 					// do not drive/walk around, if we stay on the same link
-					tollRoute = new Route();
+					tollRoute = new RouteImpl();
 					tollRoute.setRoute(null, 0, 0.0);
 					// if we don't drive around, it doesn't matter  if we're in or out the toll area, so use "false"
 				}

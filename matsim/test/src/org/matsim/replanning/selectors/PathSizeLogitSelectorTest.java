@@ -35,6 +35,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**
@@ -83,7 +84,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 
-		Route r = new Route();
+		Route r = new RouteImpl();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -106,7 +107,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p2 = new Plan(person);
-		r = new Route();
+		r = new RouteImpl();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -127,7 +128,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p3 = new Plan(person);
-		r = new Route();
+		r = new RouteImpl();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -156,7 +157,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
-		r = new Route();
+		r = new RouteImpl();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -191,7 +192,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		
-		Route r = new Route();
+		Route r = new RouteImpl();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -226,7 +227,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
-		Route r = new Route();
+		Route r = new RouteImpl();
 		ArrayList<Node> srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n3);
@@ -246,7 +247,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p2 = new Plan(person);
-		r = new Route();
+		r = new RouteImpl();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);
@@ -267,7 +268,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
 		Plan p3 = new Plan(person);
-		r = new Route();
+		r = new RouteImpl();
 		srcRoute = new ArrayList<Node>();
 		srcRoute.add(n1);
 		srcRoute.add(n2);

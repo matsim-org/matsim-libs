@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkWriter;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -16,9 +16,9 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReaderMatsimV4;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.basic.v01.Id;
 
 public class PTActivityCreator {
 	private final String CONFIG;
@@ -170,7 +170,7 @@ public class PTActivityCreator {
 		double arrTime = depTime + walkTravelTime;
 
 		//Set walkRoute
-		Route walkRoute= new Route();
+		Route walkRoute= new RouteImpl();
 		walkRoute.setDist(walkDistance);
 		walkRoute.setTravTime(walkTravelTime);
 

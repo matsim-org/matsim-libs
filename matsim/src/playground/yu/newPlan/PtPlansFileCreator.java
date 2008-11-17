@@ -21,6 +21,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -146,7 +147,7 @@ public class PtPlansFileCreator {
 			a.setEndTime(Time.parseTime(endTime));
 			Leg leg = pl.createLeg(Mode.car);
 			leg.setDepartureTime(Time.parseTime(endTime));
-			Route route = new Route();
+			Route route = new RouteImpl();
 			leg.setRoute(route);
 			route.setRoute(srcRoute);
 			link = this.network.getLink(new IdImpl(endLinkId));

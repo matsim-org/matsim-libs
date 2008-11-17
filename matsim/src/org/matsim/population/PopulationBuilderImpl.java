@@ -95,7 +95,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public BasicRoute createRoute(List<Id> currentRouteLinkIds) {
-		Route route = new Route();
+		Route route = new RouteImpl();
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : currentRouteLinkIds) {
 			links.add(this.network.getLink(id));

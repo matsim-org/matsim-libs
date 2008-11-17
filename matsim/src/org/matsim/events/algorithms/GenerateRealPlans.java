@@ -48,6 +48,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.misc.Time;
 
 // "GeneratePlansFromEvents" would be more appropriate as class name...
@@ -262,7 +263,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	private void finishLeg(final String agentId, final Leg leg) {
 		ArrayList<Node> routeNodes = this.routes.remove(agentId);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes);
 		leg.setRoute(route);
 	}

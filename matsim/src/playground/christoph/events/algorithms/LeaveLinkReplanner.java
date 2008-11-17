@@ -33,6 +33,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
@@ -200,8 +201,8 @@ public class LeaveLinkReplanner {
 			}
 		}
 			
-		// neue, gek�rzte Route erstellen
-		Route subRoute = new Route();
+		// neue, gekuerzte Route erstellen
+		Route subRoute = new RouteImpl();
 		subRoute.setRoute(nodesRoute);
 
 		// die neue Route in neuem Leg hinterlegen
@@ -247,10 +248,10 @@ public class LeaveLinkReplanner {
 		// neu berechnete Route holen
 		Route newRoute = newLeg.getRoute();
 			
-		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenf�hren
+		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenfuehren
 		nodeBuffer.addAll(newRoute.getRoute());
 		
-		Route mergedRoute = new Route();
+		Route mergedRoute = new RouteImpl();
 		mergedRoute.setRoute(nodeBuffer);
 				
 		// Route ersetzen
@@ -263,10 +264,10 @@ public class LeaveLinkReplanner {
 	}
 	
 	// Holt den Link, auf dem der Agent zum aktuellen Node gefahren ist
-	// Eventuell w�re ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
+	// Eventuell waere ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
 	// ein Link mehrfach befahren wird :?
-	// Replanning sollte mit der aktuellen L�sung funktionieren, allerdings wird der gefahrene
-	// Weg allenfalls nicht voll �bernommen (Schlaufen werden rausgeschnitten).
+	// Replanning sollte mit der aktuellen Loesung funktionieren, allerdings wird der gefahrene
+	// Weg allenfalls nicht voll uebernommen (Schlaufen werden rausgeschnitten).
 	protected Link getFromLink()
 	{		
 		if (prevAct.getLink().getToNode().equals(node)) return prevAct.getLink();

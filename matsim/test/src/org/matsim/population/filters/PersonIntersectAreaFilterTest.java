@@ -34,6 +34,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -76,7 +77,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAct("w", link5);
 
-		Route route = new Route();
+		Route route = new RouteImpl();
 		leg.setRoute(route);
 
 		// prepare route
@@ -114,7 +115,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		// prepare bee-line tests
 		leg.setMode(BasicLeg.Mode.walk);
-		leg.setRoute(new Route()); // empty route
+		leg.setRoute(new RouteImpl()); // empty route
 
 		// test bee-line without alternative aoi
 		aoi.clear();

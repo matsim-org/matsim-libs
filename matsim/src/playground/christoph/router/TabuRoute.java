@@ -29,12 +29,11 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
-import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.population.RouteImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
-import playground.christoph.router.util.RouteChecker;
 import playground.christoph.router.util.TabuSelector;
 
 
@@ -120,7 +119,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(nodes);
 		route.setDist(routeLength);
 		

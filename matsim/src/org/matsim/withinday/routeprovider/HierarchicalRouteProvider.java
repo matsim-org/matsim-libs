@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 
 
 /**
@@ -55,7 +56,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 	@Override
 	public Route requestRoute(Link departureLink, final Link destinationLink, final double time) {
 		Route subRoute;
-		Route returnRoute = new Route();
+		Route returnRoute = new RouteImpl();
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {

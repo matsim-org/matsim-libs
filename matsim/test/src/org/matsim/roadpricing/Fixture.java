@@ -35,6 +35,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.geometry.CoordImpl;
@@ -174,7 +175,7 @@ public class Fixture {
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");

@@ -45,6 +45,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 
 import playground.gregor.withindayevac.debug.DebugDecisionTree;
 import playground.gregor.withindayevac.debug.DebugFollowFastestAgent;
@@ -132,7 +133,7 @@ System.out.println(count);
 		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Act b = new Act(oldB);
 		plan.addAct(a);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(nodes);
 		route.getDist();
 		l.setRoute(route);

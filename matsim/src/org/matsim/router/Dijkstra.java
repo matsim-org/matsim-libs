@@ -33,6 +33,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.TravelCost;
@@ -240,7 +241,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 		routeNodes.add(0, tmpNode); // add the fromNode at the beginning of the list
 
 		DijkstraNodeData toNodeData = getData(toNode);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(routeNodes, (int) (arrivalTime - startTime), toNodeData.cost);
 
 		if (this.doGatherInformation) {

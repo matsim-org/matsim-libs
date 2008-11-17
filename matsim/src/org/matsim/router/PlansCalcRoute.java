@@ -31,6 +31,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -178,7 +179,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = route.getTravTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new Route();
+			route = new RouteImpl();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -222,7 +223,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new Route();
+			route = new RouteImpl();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -239,7 +240,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new Route();
+		Route route = new RouteImpl();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -254,7 +255,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new Route();
+		Route route = new RouteImpl();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -269,7 +270,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new Route();
+		Route route = new RouteImpl();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);

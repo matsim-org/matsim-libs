@@ -37,6 +37,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordImpl;
@@ -120,7 +121,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 		List<Node> nodeRoute = leg.getRoute().getRoute();
 		nodeRoute.remove(nodeRoute.size()-1);
 		Leg l = new Leg(BasicLeg.Mode.car);
-		Route route = new Route();
+		Route route = new RouteImpl();
 		route.setRoute(nodeRoute);
 		l.setRoute(route);
 		return l;

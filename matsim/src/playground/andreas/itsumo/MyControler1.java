@@ -38,6 +38,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.netvis.NetVis;
@@ -120,7 +121,7 @@ public class MyControler1 extends Controler {
 				act1a.setLink(this.network.getLink("9"));
 				act1a.setEndTime(0*60*60.);
 				Leg leg = plan1.createLeg(BasicLeg.Mode.car);
-				Route route = new Route();
+				Route route = new RouteImpl();
 				route.setRoute("3 4");
 				leg.setRoute(route);
 				Act act1b = plan1.createAct("h", new CoordImpl(200., 200.));
@@ -133,7 +134,7 @@ public class MyControler1 extends Controler {
 				act2a.setLink(this.network.getLink("9"));
 				act2a.setEndTime(0*60*60.);
 				Leg leg2 = plan2.createLeg(BasicLeg.Mode.car);
-				Route route2 = new Route();
+				Route route2 = new RouteImpl();
 				route2.setRoute("3 6 4");
 				leg2.setRoute(route2);
 				Act act2b = plan1.createAct("h", new CoordImpl(200., 200.));

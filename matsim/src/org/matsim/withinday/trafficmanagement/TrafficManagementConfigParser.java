@@ -29,6 +29,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
@@ -228,12 +229,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	public void endTag(final String name, String content, final Stack<String> context) {
 		content = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			Route route = new Route();
+			Route route = new RouteImpl();
 			route.setRoute(this.currentRouteNodes);
 			this.controlInput.setMainRoute(route);
-		}
-		else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			Route route = new Route();
+		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
+			Route route = new RouteImpl();
 			route.setRoute(this.currentRouteNodes);
 			this.controlInput.setAlternativeRoute(route);
 		}

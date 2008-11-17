@@ -53,6 +53,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
@@ -297,7 +298,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 		
-		Route expectedRoute = new Route();
+		Route expectedRoute = new RouteImpl();
 		expectedRoute.setRoute("2 7 12");
 		
 		HashMap<Leg, Route> legsRoutes = PlanOptimizeTimes.getLegsRoutes(testPlan);
@@ -305,7 +306,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		// this code should changes to the route of the plan leg object, 
 		// but should not affect the previously saved routes 
 		Leg modifyMe = testPlan.getNextLeg(testPlan.getFirstActivity());
-		Route differentRoute = new Route();
+		Route differentRoute = new RouteImpl();
 		differentRoute.setRoute("2 10 12");
 		modifyMe.setRoute(differentRoute);
 		
