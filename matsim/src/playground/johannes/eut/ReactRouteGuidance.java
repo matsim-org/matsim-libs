@@ -23,6 +23,7 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Route;
@@ -53,13 +54,32 @@ public class ReactRouteGuidance implements RouteProvider {
 	}
 
 	public boolean providesRoute(Link currentLink, Route subRoute) {
-		return true;
+		if(currentLink.getId().toString().equals("1"))
+			return true;
+		else
+			return false;
 	}
 
 	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
 			double time) {
-		return this.algorithm.calcLeastCostPath(departureLink.getToNode(),
-					destinationLink.getFromNode(), time);
+		if(linkcost.traveltimes instanceof EventBasedTTProvider) {
+			((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
+		}
+		Route route = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
+				destinationLink.getFromNode(), time);
+		
+//		boolean isRisky = false;
+//		for(Id id : route.getLinkIds()) {
+//			if(id.toString().equals("2")) {
+//				isRisky = true;
+//				break;
+//			}
+//		}
+//		if(isRisky)
+//			System.err.println("Risky: " + route.getTravTime());
+//		else
+//			System.err.println("Safe: " + route.getTravTime());
+		return route;
 	}
 
 	public void setPriority(int p) {

@@ -23,16 +23,15 @@
  */
 package playground.johannes.itsc08;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,9 +40,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.events.IterationEndsEvent;
+import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ShutdownEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationEndsListener;
+import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.AgentArrivalEvent;
@@ -64,7 +65,7 @@ import playground.johannes.statistics.WeightedStatistics;
  *
  */
 public class Analyzer implements StartupListener, IterationEndsListener, AgentDepartureEventHandler,
-		AgentArrivalEventHandler, LinkEnterEventHandler, ShutdownListener {
+		AgentArrivalEventHandler, LinkEnterEventHandler, ShutdownListener, IterationStartsListener {
 
 	private Set<Person> riskyUsers;
 	
@@ -76,36 +77,47 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	
 	private HashMap<Person, AgentDepartureEvent> events;
 	
+	private HashMap<Person, AgentDepartureEvent> eventsReturn;
+	
 	private HashMap<Person, Double> traveltimes;
 	
 	private double riskyTriptime;
 	
 	private double safeTriptime;
 	
+	private double returnTripTime;
+	
 	private BufferedWriter writer;
 	
 	private Controler controler;
 	
-	private TIntObjectHashMap<TIntArrayList> riskyGoodTripTimes;
+	private TIntObjectHashMap<TDoubleArrayList> riskyGoodTripTimes;
 	
-	private TIntObjectHashMap<TIntArrayList> riskyBadTripTimes;
+	private TIntObjectHashMap<TDoubleArrayList> riskyBadTripTimes;
 	
-	private TIntObjectHashMap<TIntArrayList> guidedTripTimes;
+	private TIntObjectHashMap<TDoubleArrayList> guidedTripTimes;
+	
+//	private BufferedWriter arrivalTimeWriter;
 	
 	public Analyzer(Controler controler) {
 		this.controler = controler;
 	}
+
 	
 	public void notifyStartup(StartupEvent event) {
-		riskyGoodTripTimes = new TIntObjectHashMap<TIntArrayList>();
-		riskyBadTripTimes = new TIntObjectHashMap<TIntArrayList>();
-		guidedTripTimes = new TIntObjectHashMap<TIntArrayList>();
+		riskyGoodTripTimes = new TIntObjectHashMap<TDoubleArrayList>();
+		riskyBadTripTimes = new TIntObjectHashMap<TDoubleArrayList>();
+		guidedTripTimes = new TIntObjectHashMap<TDoubleArrayList>();
 		
 		event.getControler().getEvents().addHandler(this);
 		try {
 			writer = IOUtils.getBufferedWriter(event.getControler().getOutputFilename("analysis.txt"));
-			writer.write("it\tsafe\trisky\ttt_safe\ttt_risky\tscore_safe\tscore_risky\tscore_plan_safe\tscore_plan_risky\tscore_guided\tscore_unguided\ttt_guided\ttt_unguided");
+			writer.write("it\tsafe\trisky\ttt_safe\ttt_risky\ttt_return\ttt_avr\tscore_safe\tscore_risky\tscore_plan_safe\tscore_plan_risky\tscore_guided\tscore_unguided\ttt_guided\ttt_unguided");
+			writer.write("\tn_guidedSafe\ttt_guidedSafe\tn_guidedRisky\ttt_guidedRisky\tn_unguidedSafe\ttt_unguidedSafe\tn_unguidedRisky\ttt_unguidedRisky");
 			writer.newLine();
+			
+		
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -132,7 +144,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		safeUsers = new HashSet<Person>();
 		riskyTriptime = 0;
 		safeTriptime = 0;
+		returnTripTime = 0;
 		events = new HashMap<Person, AgentDepartureEvent>();
+		eventsReturn = new HashMap<Person, AgentDepartureEvent>();
 		traveltimes = new HashMap<Person, Double>();
 		
 		
@@ -145,9 +159,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			/*
 			 * Users
 			 */
-			writer.write(double2String(safeUsers.size()));
+			writer.write(String.valueOf(safeUsers.size()));
 			writer.write("\t");
-			writer.write(double2String(riskyUsers.size()));
+			writer.write(String.valueOf(riskyUsers.size()));
 			writer.write("\t");
 			/*
 			 * travel times
@@ -155,6 +169,15 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			writer.write(double2String(safeTriptime/safeUsers.size()));
 			writer.write("\t");
 			writer.write(double2String(riskyTriptime/riskyUsers.size()));
+			writer.write("\t");
+			writer.write(double2String(returnTripTime/(riskyUsers.size() + safeUsers.size())));
+			writer.write("\t");
+			
+			double sum = 0;
+			for(Double d : traveltimes.values()) {
+				sum += d;
+			}
+			writer.write(String.valueOf(sum/(double)traveltimes.size()));
 			writer.write("\t");
 			/*
 			 * scores executed
@@ -183,10 +206,40 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			writer.write(double2String(getAvrTripTime(guided)));
 			writer.write("\t");
 			writer.write(double2String(getAvrTripTime(unguided)));
+			writer.write("\t");
 			
+			Collection<Person> guidedSafe = CollectionUtils.intersection(guided, safeUsers);
+			Collection<Person> guidedRisky = CollectionUtils.intersection(guided, riskyUsers);
+			Collection<Person> unguidedSafe = CollectionUtils.intersection(unguided, safeUsers);
+			Collection<Person> unguidedRisky = CollectionUtils.intersection(unguided, riskyUsers);
+			
+			writer.write(String.valueOf(guidedSafe.size()));
+			writer.write("\t");
+			writer.write(double2String(getAvrTripTime(guidedSafe)));
+			writer.write("\t");
+			
+			writer.write(String.valueOf(guidedRisky.size()));
+			writer.write("\t");
+			writer.write(double2String(getAvrTripTime(guidedRisky)));
+			writer.write("\t");
+			
+			writer.write(String.valueOf(unguidedSafe.size()));
+			writer.write("\t");
+			writer.write(double2String(getAvrTripTime(unguidedSafe)));
+			writer.write("\t");
+			
+			writer.write(String.valueOf(unguidedRisky.size()));
+			writer.write("\t");
+			writer.write(double2String(getAvrTripTime(unguidedRisky)));
+						
 			writer.newLine();
-			
 			writer.flush();
+			
+			
+//			arrivalTimeWriter.close();
+			
+
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -195,12 +248,12 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	
 	private String double2String(double val) {
 		if(val == 0 || Double.isNaN(val) || Double.isInfinite(val))
-			return "";
+			return "NA";
 		else
 			return String.valueOf(val);
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) { 
 		if(event.link.getId().toString().equals("4"))
 			riskyUsers.add(event.agent);
 		else if(event.link.getId().toString().equals("5"))
@@ -248,7 +301,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	public void handleEvent(AgentDepartureEvent event) {
 		if(event.link.getId().toString().equals("1"))
 			events.put(event.agent, event);
-		
+		else
+			eventsReturn.put(event.agent, event);
 	}
 
 	public void handleEvent(AgentArrivalEvent event) {
@@ -261,26 +315,44 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day
-					addTravelTime(riskyBadTripTimes, (int)e.time, (int)triptime);
+					addTravelTime(riskyBadTripTimes, (int)e.time, triptime);
 				} else {
 					// good day
-					addTravelTime(riskyGoodTripTimes, (int)e.time, (int)triptime);
+					addTravelTime(riskyGoodTripTimes, (int)e.time, triptime);
 				}
 				
 			} else
 				safeTriptime += triptime;
 			
 			if(controler.getGuidedPersons().contains(event.agent))
-				addTravelTime(guidedTripTimes, (int)e.time, (int)triptime);
+				addTravelTime(guidedTripTimes, (int)e.time, triptime);
+			
+			
+//			
+//			try {
+//				arrivalTimeWriter.newLine();
+//				arrivalTimeWriter.write(String.valueOf(event.time));
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+			
 		}
 		
+		e = eventsReturn.get(event.agent);
+		if(e != null) {
+			events.remove(event.agent);
+			double triptime = event.time - e.time;
+			returnTripTime += triptime;
+//			System.err.println(triptime);
+		}
 	}
 	
-	private void addTravelTime(TIntObjectHashMap<TIntArrayList> map, int time, int traveltime) {
+	private void addTravelTime(TIntObjectHashMap<TDoubleArrayList> map, int time, double traveltime) {
 		if(controler.getIteration() >= 200) {
-			TIntArrayList list = map.get(time);
+			TDoubleArrayList list = map.get(time);
 			if(list == null) {
-				list = new TIntArrayList();
+				list = new TDoubleArrayList();
 				map.put(time, list);
 			}
 			list.add(traveltime);
@@ -292,38 +364,83 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		double beta_late = controler.getConfig().charyparNagelScoring().getLateArrival();
 		int t_act_start = 21600;
 		
-		TIntDoubleHashMap avrRiskyBadTriptimes = calcAvrTriptimes(riskyBadTripTimes);
-		TIntDoubleHashMap avrRiskyGoodTriptimes = calcAvrTriptimes(riskyGoodTripTimes);
-		TIntDoubleHashMap avrGuidedTriptimes = calcAvrTriptimes(guidedTripTimes);
+		TDoubleDoubleHashMap avrRiskyBadTriptimes = calcAvrTriptimes(riskyBadTripTimes);
+		TDoubleDoubleHashMap avrRiskyGoodTriptimes = calcAvrTriptimes(riskyGoodTripTimes);
+		TDoubleDoubleHashMap avrGuidedTriptimes = calcAvrTriptimes(guidedTripTimes);
 		
-		TIntDoubleHashMap pi_avr_map = new TIntDoubleHashMap();
-		TIntDoubleHashMap pi_guided_map = new TIntDoubleHashMap();
+		TDoubleArrayList pi_avr_list = new TDoubleArrayList();
+		TDoubleArrayList pi_guided_list = new TDoubleArrayList();
+		TDoubleArrayList pi_avr_list2 = new TDoubleArrayList();
+		TDoubleArrayList pi_guided_list2 = new TDoubleArrayList();
+		TDoubleArrayList t_ce_list = new TDoubleArrayList();
+		TDoubleArrayList pi_safe_list_plus = new TDoubleArrayList();
+		TDoubleArrayList pi_safe_list_minus = new TDoubleArrayList();
+		TDoubleArrayList pi_safe_list_avr = new TDoubleArrayList();
+		TIntObjectHashMap<TDoubleArrayList> pi_avr_map = new TIntObjectHashMap<TDoubleArrayList>();
+		TIntObjectHashMap<TDoubleArrayList> pi_guided_map = new TIntObjectHashMap<TDoubleArrayList>();
 		
+		int countPiAvrUsers = 0;
+		int countPiGuidedUsers = 0;
+		int t_last_guided = 327;
 		for(Person p : controler.getPopulation()) {
 			Plan plan = p.getSelectedPlan();
 			int starttime = (int) plan.getFirstActivity().getEndTime();
 			int t_good = (int)avrRiskyGoodTriptimes.get(starttime);
 			int t_bad = (int)avrRiskyBadTriptimes.get(starttime);
 			int t_guided = (int)avrGuidedTriptimes.get(starttime);
-			
+			if(t_guided == 0) { // works because departure times increasing with agent-id
+				t_guided = t_last_guided;
+			} else {
+				t_last_guided = t_guided;
+			}
+			if(t_good == 0 || t_bad == 0) {
+//				System.err.println("No value found." + (starttime));
+			} else {
+				
 			double utilGood = calcUtil(starttime, (int) (starttime + t_good), t_act_start, beta_travel, beta_late);
 			double utilBad =  calcUtil(starttime, (int) (starttime + t_bad), t_act_start, beta_travel, beta_late);
 //			double utilActStart =  calcUtil(starttime, t_act_start, t_act_start, beta_travel, beta_late);
 			double avrUtil = (utilGood + utilBad)/2.0;
 			
 			double t_ce = (avrUtil - (t_act_start - starttime)*beta_travel)/(beta_travel + beta_late) + t_act_start;
+			if(t_ce <= t_act_start) { // agent is in time or early
+				t_ce = avrUtil/beta_travel + starttime;
+			}
+			
+			t_ce_list.add(t_ce);
+			
 			double t_avr = (t_good + t_bad)/2.0;
 			
 			double pi_avr = t_ce - (t_avr + starttime);
 			double pi_guided = t_ce - (t_guided + starttime);
+			double pi_safe = t_ce - (435 + starttime);
+		
+			if(pi_avr > 0) {
+				pi_avr_list2.add(pi_avr);
+				countPiAvrUsers++;
+			}
+			if(pi_guided > 0) {
+				pi_guided_list2.add(pi_guided);
+				countPiGuidedUsers++;
+			}
 			
-			pi_avr_map.put(starttime, pi_avr);
-			pi_guided_map.put(starttime, pi_guided);
+			if(pi_safe > 0) {
+				pi_safe_list_plus.add(pi_safe);
+			} else {
+				pi_safe_list_minus.add(pi_safe);
+			}
+			pi_safe_list_avr.add(pi_safe);
+			
+			pi_avr_list.add(pi_avr);
+			pi_guided_list.add(pi_guided);
+			addTravelTime(pi_avr_map, starttime, pi_avr);
+			addTravelTime(pi_guided_map, starttime, pi_guided);
+			}
 		}
 		
 		try {
 			BufferedWriter w = IOUtils.getBufferedWriter(controler.getOutputFilename("ce_analysis.txt"));
-			w.write("tt_risky_good\ttt_risky_bad\ttt_guided\tpi_avr\tpi_guided");
+			w.write("tt_risky_good\ttt_risky_bad\ttt_guided\tpi_avr\tpi_guided\tn_pi_avr\tn_pi_guided\tpi_avr2\tpi_guided2\tt_ce\tpi_safe_plus\tn_pi_safe_plus\tpi_safe_minus\tn_pi_safe_minus\tpi_safe_avr");
 			w.newLine();
 			w.write(String.valueOf(StatUtils.mean(avrRiskyGoodTriptimes.getValues())));
 			w.write("\t");
@@ -331,12 +448,36 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			w.write("\t");
 			w.write(String.valueOf(StatUtils.mean(avrGuidedTriptimes.getValues())));
 			w.write("\t");
-			w.write(String.valueOf(StatUtils.mean(pi_avr_map.getValues())));
+			w.write(String.valueOf(StatUtils.mean(pi_avr_list.toNativeArray())));
 			w.write("\t");
-			w.write(String.valueOf(StatUtils.mean(pi_guided_map.getValues())));
+			w.write(String.valueOf(StatUtils.mean(pi_guided_list.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(countPiAvrUsers));
+			w.write("\t");
+			w.write(String.valueOf(countPiGuidedUsers));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(pi_avr_list2.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(pi_guided_list2.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(t_ce_list.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(pi_safe_list_plus.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(pi_safe_list_plus.size()));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(pi_safe_list_minus.toNativeArray())));
+			w.write("\t");
+			w.write(String.valueOf(pi_safe_list_minus.size()));
+			w.write("\t");
+			w.write(String.valueOf(StatUtils.mean(pi_safe_list_avr.toNativeArray())));
 			w.close();
 			
-			
+			WeightedStatistics.writeHistogram(avrRiskyGoodTriptimes, controler.getOutputFilename("riskyGood.txt"));
+			WeightedStatistics.writeHistogram(avrRiskyBadTriptimes, controler.getOutputFilename("riskyBad.txt"));
+			WeightedStatistics.writeHistogram(avrGuidedTriptimes, controler.getOutputFilename("guided.txt"));
+			dumpMap(calcAvrTriptimes(pi_guided_map), controler.getOutputFilename("pi_guided.txt"));
+			dumpMap(calcAvrTriptimes(pi_avr_map), controler.getOutputFilename("pi_avr.txt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -357,15 +498,47 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		return score;
 	}
 	
-	private TIntDoubleHashMap calcAvrTriptimes(TIntObjectHashMap<TIntArrayList> map) {
-		TIntDoubleHashMap ttmap = new TIntDoubleHashMap();
+	private TDoubleDoubleHashMap calcAvrTriptimes(TIntObjectHashMap<TDoubleArrayList> map) {
+		TDoubleDoubleHashMap ttmap = new TDoubleDoubleHashMap();
 		for(int time : map.keys()) {
-			int sum = 0;
-			int[] array = map.get(time).toNativeArray();
-			for(int tt : array)
+			double sum = 0;
+			double[] array = map.get(time).toNativeArray();
+			for(double tt : array)
 				sum += tt;
 			ttmap.put(time, sum/(double)array.length);
 		}
 		return ttmap;
+	}
+	
+	private void dumpMap(TDoubleDoubleHashMap map, String filename) {
+		try {
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("time\tvalue");
+		writer.newLine();
+		double keys[] = map.keys();
+		Arrays.sort(keys);
+		for(double key : keys) {
+			writer.write(String.valueOf(key));
+			writer.write("\t");
+			writer.write(String.valueOf(map.get(key)));
+			writer.newLine();
+		}
+		writer.close();
+		} catch (Exception e) {
+		e.printStackTrace();
+		}
+	}
+
+	public void notifyIterationStarts(IterationStartsEvent event) {
+//		try {
+//			arrivalTimeWriter = IOUtils.getBufferedWriter(event.getControler().getIterationFilename("arrivaltimes.txt"));
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 	}
 }

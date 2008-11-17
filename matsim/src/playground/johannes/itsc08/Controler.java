@@ -29,15 +29,18 @@ import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.StartupListener;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.population.Person;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.router.util.TravelTime;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 
 import playground.johannes.eut.EstimReactiveLinkTT;
+import playground.johannes.eut.EventBasedTTProvider;
 import playground.johannes.eut.GuidedAgentFactory;
 
 /**
@@ -54,7 +57,7 @@ public class Controler extends WithindayControler {
 
 //	private static final Logger log = Logger.getLogger(EUTController.class);
 
-	private EstimReactiveLinkTT reactTTs;
+	private TravelTime reactTTs;
 
 //	private double incidentProba;
 
@@ -84,9 +87,14 @@ public class Controler extends WithindayControler {
 		addControlerListener(new WithindayControlerListener());
 		
 		this.reactTTs = new EstimReactiveLinkTT(1);
-		this.events.addHandler(this.reactTTs);
-		this.reactTTs.reset(getIteration());
+//		this.reactTTs = new EventBasedTTProvider(10);
+		this.events.addHandler((EventHandler) this.reactTTs);
+		((EventHandler) this.reactTTs).reset(getIteration());
 
+//		LinkTTObserver obs = new LinkTTObserver(network, (EstimReactiveLinkTT) reactTTs);
+//		this.events.addHandler(obs);
+//		obs.reset(getIteration());
+//		addControlerListener(obs);
 	}
 
 	protected StrategyManager loadStrategyManager() {

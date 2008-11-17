@@ -45,7 +45,7 @@ public class UnweightedDijkstra<V extends Vertex> {
 	}
 	
 	public List<DijkstraVertex> run(V source) {
-		return run(source);
+		return run(source, null);
 	}
 	
 	public List<DijkstraVertex> run(V source, V target) {

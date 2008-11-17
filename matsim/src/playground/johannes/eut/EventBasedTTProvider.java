@@ -155,7 +155,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 			/*
 			 * TODO: Replace this with a free travel time provider!
 			 */
-			return (int) link.getFreespeed(Time.UNDEFINED_TIME);
+			return (int) (link.getLength()/link.getFreespeed(time_s));
 		} else {
 			return (int) a.getAvg();
 		}

@@ -97,7 +97,7 @@ public class TravelTimeHistogram {
 		System.out.println("Loading egos...");
 		HashMap<String, Ego> egos = new HashMap<String, Ego>();
 		WGS84toCH1903LV03 transform = new WGS84toCH1903LV03();
-		BufferedWriter writer2 = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/egocoors.txt");
+		
 		
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(egofile);
@@ -108,10 +108,6 @@ public class TravelTimeHistogram {
 				ego.id = tokens[0];
 				Coord coord = new CoordImpl(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
 				ego.homeloc = transform.transform(coord);
-				writer2.write(String.valueOf(ego.homeloc.getX() + Math.random()*100 - 50));
-				writer2.write("\t");
-				writer2.write(String.valueOf(ego.homeloc.getY() + Math.random()*100 - 50));
-				writer2.newLine();
 				if(ego.homeloc.getX() >= minX && ego.homeloc.getX() <= maxX &&
 						ego.homeloc.getY() >= minY && ego.homeloc.getY() <= maxY)
 					egos.put(ego.id, ego);
@@ -119,7 +115,7 @@ public class TravelTimeHistogram {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		writer2.close();
+		
 		/*
 		 * Load alters...
 		 */
@@ -149,6 +145,17 @@ public class TravelTimeHistogram {
 			e.printStackTrace();
 		}
 		writer3.close();
+		
+		BufferedWriter writer2 = IOUtils.getBufferedWriter("/Users/fearonni/vsp-work/socialnets/data-analysis/egocoors.txt");
+		for(Ego ego : egos.values()) {
+			writer2.write(String.valueOf(ego.homeloc.getX() + Math.random()*100 - 50));
+			writer2.write("\t");
+			writer2.write(String.valueOf(ego.homeloc.getY() + Math.random()*100 - 50));
+			writer2.write("\t");
+			writer2.write(String.valueOf(ego.alters.size()));
+			writer2.newLine();
+		}
+		writer2.close();
 		/*
 		 * Load dist distribution
 		 */
@@ -342,7 +349,7 @@ public class TravelTimeHistogram {
 	}
 	
 	
-	private static class Ego {
+	public static class Ego {
 		
 		String id;
 		

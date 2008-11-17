@@ -140,9 +140,10 @@ public class EstimReactiveLinkTT implements
 
 		private double currentTravelTime;
 
-		private double currentOutFlow;
+//		private double currentOutFlow;
 
 		private double feasibleOutFlow;
+		
 
 		private SortedSet<Sample> samples;
 
@@ -152,8 +153,8 @@ public class EstimReactiveLinkTT implements
 			this.samples = new TreeSet<Sample>();
 //			this.freeFlowTravTime = link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 //			this.currentTravelTime = this.freeFlowTravTime;
-			this.feasibleOutFlow = link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
-			this.currentOutFlow = this.feasibleOutFlow;
+			this.feasibleOutFlow = Double.NaN;//link.getFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) * capacityFactor;
+//			this.currentOutFlow = this.feasibleOutFlow;
 		}
 
 		public void enterLink(Person person, int time) {
@@ -178,9 +179,10 @@ public class EstimReactiveLinkTT implements
 //			this.samples.remove(sample);
 
 			int deltaT = time - this.lastEvent;
-			if(deltaT > 0) {
-				this.currentOutFlow = this.outCount/(double)deltaT;
-				this.lastEvent = time;
+			this.lastEvent = time;
+			if(deltaT > 4) {
+//				this.currentOutFlow = this.outCount/(double)deltaT;
+				
 				this.outCount = 0;
 
 				if(this.samples.isEmpty())
@@ -189,7 +191,7 @@ public class EstimReactiveLinkTT implements
 				else if(sample.linkLeaveTime >= time)
 					this.feasibleOutFlow = this.link.getFlowCapacity(time) * capacityFactor;
 				else
-					this.feasibleOutFlow = this.currentOutFlow;
+					this.feasibleOutFlow = this.outCount/(double)deltaT;
 			}
 		}
 
@@ -201,8 +203,13 @@ public class EstimReactiveLinkTT implements
 //					traveltime = link.getLength() /
 //											 link.getFreespeed(time);
 //				else {
-					double tt = this.samples.size() / this.feasibleOutFlow;
-					traveltime = Math.max(link.getFreespeedTravelTime(time), tt);
+				double tt = Double.NaN;
+				if(Double.isNaN(feasibleOutFlow)) {
+					tt = samples.size() / link.getFlowCapacity(time) * capacityFactor;
+				} else {
+					tt = this.samples.size() / this.feasibleOutFlow;
+				}
+				traveltime = Math.max(link.getFreespeedTravelTime(time), tt);
 //				}
 				currentTravelTime = traveltime;
 			}
