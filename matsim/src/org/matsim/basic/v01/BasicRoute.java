@@ -17,18 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.basic.v01;
 
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 /**
-*
 * @author dgrether
-*
 */
-
-public interface BasicRoute<T extends BasicNode> {
+public interface BasicRoute {
 
 	public double getDist();
 

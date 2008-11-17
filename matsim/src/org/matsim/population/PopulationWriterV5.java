@@ -43,7 +43,6 @@ import org.matsim.basic.v01.PopulationSchemaV5Names;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
@@ -209,7 +208,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.writeEndTag(PopulationSchemaV5Names.LEG);
 	}
 
-	private void writeRoute(final BasicRoute<BasicNode> route) throws IOException {
+	private void writeRoute(final BasicRoute route) throws IOException {
 		this.atts.clear();
 		if (route.getTravTime() != Time.UNDEFINED_TIME) {
 			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, route.getTravTime()));

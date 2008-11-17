@@ -32,7 +32,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 
-public class Route extends BasicRouteImpl<Node> {
+public class Route extends BasicRouteImpl {
 
 	
 	protected ArrayList<Node> route = new ArrayList<Node>();
