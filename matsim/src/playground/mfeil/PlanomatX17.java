@@ -78,7 +78,8 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
-		this.factory 				= new CharyparNagelScoringFunctionFactory();
+		/* NEW NEW NEW NEW NEW NEW NEW NEW */
+		this.factory 				= new JohScoringFunctionFactory();
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer 				= new PlanScorer (this.factory);
 		this.timer					= new TimeOptimizer13(controler.getLegTravelTimeEstimator(), this.scorer);
@@ -89,8 +90,8 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
 		this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
 		this.MAX_ITERATIONS 		= 20;
-		this.LC_MODE				= "iteratingLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
-		this.LC_SET_SIZE			= 3;
+		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
+		this.LC_SET_SIZE			= 1;
 	}
 	
 		
@@ -105,6 +106,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		long lcRunTime = 0;
 		int numberTimerCalls = 0;
 		int numberIterLC = 0;
+		//int numberUnsuccessfulLC = 0;
 			
 		/* Instantiate all necessary lists and arrays*/
 		PlanomatXPlan [] neighbourhood 					= new PlanomatXPlan [NEIGHBOURHOOD_SIZE+1];
@@ -193,6 +195,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
 							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
+							//this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
 							lcRunTime+=System.currentTimeMillis()-lcStartTime;
 						}
 					}
@@ -327,6 +330,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)/bestScore+"\t");
 		}
+		//statistics.println(numberIterLC+"\t"+numberUnsuccessfulLC);
 		statistics.println(numberIterLC);
 		statistics.close();
 	}
@@ -403,8 +407,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				
 		if(MatsimRandom.random.nextDouble()>=weight){
 			
-			// NEW NEW NEW NEW NEW NEW NEW NEW NE
-			/* removing an activity, "cycling"*/
+			/* Removing an activity, "cycling"*/
 			if (basePlan.getActsLegs().size()==5){
 				if (this.checkPrimary((Act)basePlan.getActsLegs().get(2), primActs)) return (new int[]{1,0,0});
 				else {
@@ -454,7 +457,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 		else{	
 			
-			/* adding an activity, "cycling"*/			
+			/* Adding an activity, "cycling"*/			
 			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getActsLegs().size()/2)-1)){
 			
 				if (positions[0]==0){
@@ -722,6 +725,9 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		actToBeAdded[position]++;
 
 		Leg legHelp = new Leg ((Leg)(actslegs.get((position*2)-1)));
+		// temporary!!!
+		//legHelp.setTravelTime(legHelp.getTravelTime()*2);
+		
 		actslegs.add(position*2, legHelp);
 		actslegs.add(position*2, actHelp);
 	}
@@ -808,11 +814,11 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 			if (bestScore==-1){
 				if (plan.getScore()<LCset[i].getScore()) {
 					bestScore=i;
-					log.info("Besser als neighbourhood: "+(LCset[i].getScore()-plan.getScore()));
+					//log.info("Besser als neighbourhood: "+(LCset[i].getScore()-plan.getScore()));
 				}
 			}
 			else if (LCset[bestScore].getScore()<LCset[i].getScore()) {
-				log.info("Besser als voriges LCset: "+(LCset[i].getScore()-LCset[bestScore].getScore()));
+				//log.info("Besser als voriges LCset: "+(LCset[i].getScore()-LCset[bestScore].getScore()));
 				bestScore=i;
 			}
 		}
