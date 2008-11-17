@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemControlInfo;
@@ -11,7 +12,6 @@ import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.trafficlights.control.SignalSystemControler;
 
 import playground.andreas.intersection.QControler;
 
@@ -45,7 +45,7 @@ public class NewSignalSystemControlerImpl extends SignalSystemControler {
 		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % this.defaultCirculationTime));
 		
 		BasicLightSignalGroupConfiguration tempSGConfig = this.activePlan.getGroupConfigs().get(signalGroup.getId());
-		if ( tempSGConfig.getRoughCast() < currentSecondInPlan && currentSecondInPlan <= tempSGConfig.getDropping()){
+		if ( (tempSGConfig.getRoughCast() < currentSecondInPlan) && (currentSecondInPlan <= tempSGConfig.getDropping())){
 			// Debug only
 //			System.out.println("green " + signalGroupSetting.getSignalGroupDefinition().toString());
 			return true;			

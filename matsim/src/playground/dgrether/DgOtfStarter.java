@@ -69,6 +69,9 @@ public class DgOtfStarter {
 		//cmcf runs full activity chains no time no cmcf routes
 //		String file = "612/it.100/100.events.mvi";
 		
+		//demo bmbf seminar 08
+//		String file = "646/it.1000/config.xml";
+		
 		String filename = base + file;
 		
 		//unit test for coopers withinday:
@@ -79,7 +82,7 @@ public class DgOtfStarter {
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);
 		}
-		else if (filename.endsWith(".mvi")) {
+		else if (filename.endsWith(".mvi") || filename.endsWith("xml") || filename.endsWith(".xml.gz")) {
 			OTFVis.main(new String[] {filename});
 		}
 		else {

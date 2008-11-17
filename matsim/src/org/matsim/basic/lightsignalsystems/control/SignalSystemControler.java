@@ -17,27 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.trafficlights.data;
+package org.matsim.basic.lightsignalsystems.control;
 
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 
 
 /**
  * @author dgrether
  *
  */
-public class AllTests {
+public abstract class SignalSystemControler {
 
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Test for org.matsim.trafficlights.data");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(SignalGroupDefinitionTest.class);
-		suite.addTestSuite(SignalSystemConfigurationTest.class);
-		//$JUnit-END$
-		return suite;
-	}
-
+	public abstract boolean givenSignalGroupIsGreen(BasicLightSignalGroupDefinition signalGroup);
 }

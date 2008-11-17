@@ -22,9 +22,9 @@ package org.matsim.basic.lightsignalsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.trafficlights.control.SignalSystemControler;
 
 /**
  * @author dgrether
@@ -37,7 +37,7 @@ public class BasicLightSignalGroupDefinition {
 	private List<Id> toLinkIds;
 	private final Id linkRefId;
 	
-	private SignalSystemControler signalSystemControler = null;
+	private org.matsim.basic.lightsignalsystems.control.SignalSystemControler signalSystemControler = null;
 
 	public BasicLightSignalGroupDefinition(Id linkRefId, Id id) {
 		this.linkRefId = linkRefId;
