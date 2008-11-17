@@ -20,12 +20,17 @@
 
 package org.matsim.planomat;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 public class PlanomatControler extends Controler {
+
+	public PlanomatControler(Config config) {
+		super(config);
+	}
 
 	public PlanomatControler(String[] args) {
 		super(args);

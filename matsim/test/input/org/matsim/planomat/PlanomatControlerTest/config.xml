@@ -21,7 +21,6 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/org/matsim/planomat/PlanomatControlerTest/testMainCarPt" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 	</module>
@@ -43,7 +42,6 @@
 		<param name="earlyDeparture" value="-0" />
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
-		<param name="travelingPt" value="-6" />
 		<param name="waiting" value="-0" />
 		
 		<param name="activityType_0"            value="h" /> <!-- home -->
@@ -69,10 +67,6 @@
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="Planomat" />
-	</module>
-
-	<module name="planomat">
-		<param name="possibleModes" value="car pt" />
 	</module>
 
 </config>
