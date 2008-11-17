@@ -75,9 +75,7 @@ public class RandomLocationMutator extends LocationMutator {
 			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
 			
 			
-			if (act.getType().equals(type)  && (!isPrimary || inPersonPrimaryActs)) {
-				
-				
+			if (act.getType().equals(type)  && (!isPrimary || inPersonPrimaryActs)) {			
 				final Facility facility=(Facility)exchange_facilities[
 				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
 				
@@ -86,9 +84,7 @@ public class RandomLocationMutator extends LocationMutator {
 				act.setCoord(facility.getCenter());	
 			}
 			
-			if (act.getType().equals(type) && plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) &&
-					!this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
-				
+			if (act.getType().equals(type) && isPrimary && (!inPersonPrimaryActs)) {
 				this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
 			}
 			
