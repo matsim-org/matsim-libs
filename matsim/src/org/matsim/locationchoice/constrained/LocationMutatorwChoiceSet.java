@@ -23,9 +23,6 @@ package org.matsim.locationchoice.constrained;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
@@ -139,22 +136,18 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
-		TreeSet<String> flexiblePrimaryActs = new TreeSet<String>();
+		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean inFlexiblePrimaryActs = flexiblePrimaryActs.contains(act.getType());
+			boolean movable = movablePrimaryActivities.contains(act);
 			
 			// found secondary activity
-			if (!isPrimary || inFlexiblePrimaryActs) {			
+			if (!isPrimary || movable) {			
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
-				
-				if (isPrimary && !inFlexiblePrimaryActs) {			
-					flexiblePrimaryActs.add(act.getType());
-				}
 			}		
 			// found primary activity
 			else {			

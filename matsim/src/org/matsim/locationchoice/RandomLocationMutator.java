@@ -21,7 +21,7 @@
 package org.matsim.locationchoice;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.List;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
@@ -46,16 +46,16 @@ public class RandomLocationMutator extends LocationMutator {
 	 */
 	@Override
 	public void handlePlan(final Plan plan){
-		
-		TreeSet<String> flexiblePrimaryActs = new TreeSet<String>();
+				
+		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean inFlexiblePrimaryActs = flexiblePrimaryActs.contains(act.getType());
+			boolean movable = movablePrimaryActivities.contains(act);
 			
-			if (!isPrimary || inFlexiblePrimaryActs) {	
+			if (!isPrimary || movable) {	
 							
 				Object [] exchange_facilities = this.quad_trees.get(act.getType()).values().toArray();
 								
@@ -66,9 +66,6 @@ public class RandomLocationMutator extends LocationMutator {
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());
 				
-				if (isPrimary && !inFlexiblePrimaryActs) {
-					flexiblePrimaryActs.add(act.getType());
-				}
 			}	
 		}
 		// loop over all <leg>s, remove route-information
@@ -77,5 +74,5 @@ public class RandomLocationMutator extends LocationMutator {
 			final Leg leg = (Leg)actslegs.get(j);
 			leg.setRoute(null);
 		}
-	}
+	}	
 }

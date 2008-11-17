@@ -20,8 +20,11 @@
 
 package org.matsim.locationchoice;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -30,7 +33,9 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -147,4 +152,36 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public void setControler(Controler controler) {
 		this.controler = controler;
 	}
+	
+	
+	protected List<Act>  defineMovablePrimaryActivities(final Plan plan) {
+
+		List<Act> movablePrimaryActivities = new Vector<Act>();
+			
+		TreeMap<String, List<Act>> primaryActivities = new TreeMap<String, List<Act>>();
+		
+		final ArrayList<?> actslegs = plan.getActsLegs();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Act act = (Act)actslegs.get(j);
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			
+			if (isPrimary && !primaryActivities.containsKey(act.getType())) {
+				primaryActivities.put(act.getType(), new Vector<Act>());
+			}
+			
+			if (isPrimary) {					
+				primaryActivities.get(act.getType()).add(act);
+			}
+		}
+		
+		Iterator<List<Act>> it = primaryActivities.values().iterator();
+		while (it.hasNext()) {
+			List<Act> list = it.next();
+			if (list.size() > 1) {
+				movablePrimaryActivities.add(list.get(MatsimRandom.random.nextInt(list.size())));
+			}
+		}
+		return movablePrimaryActivities;
+	}
+	
 }
