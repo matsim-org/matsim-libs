@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
-import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.network.Link;
-import org.matsim.network.Node;
 import org.matsim.population.Person;
 
 public class MyPersonAgent extends PersonAgent{
@@ -46,47 +42,14 @@ public class MyPersonAgent extends PersonAgent{
 	@Override
 	public Link chooseNextLink()
 	{	
+		/*
+		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
+		 * Link he/she may replan his/her Route so the cached Link would be wrong.
+		 */
+		super.cachedNextLink = null;
 		
 		return super.chooseNextLink();
 		
-		
-/*		Funktionalität wird vermutlich nicht mehr benötigt... to be removed...		
- 
-		// Falls überhaupt ein Wert hinterlegt ist
-		if (super.cachedNextLink != null)
-		{
-//			System.exit(0);
-			ArrayList<Node> route = this.getCurrentLeg().getRoute().getRoute();
-			
-			int index = this.getCurrentNodeIndex();
-			
-			// Element vorhanden?
-			if(route.size() >= index + 1)
-			{
-				// Hast sich der NextLink verändert?
-				if(!cachedNextLink.getToNode().equals(route.get(index + 1)))
-				{
-					log.error("NextLink has changed! - Update required!");
-					
-					Node fromNode = route.get(index);
-					Node toNode = route.get(index + 1);
-					
-					for (Link link : fromNode.getOutLinks().values()) 
-					{
-						if (link.getToNode() == toNode) 
-						{
-							cachedNextLink = link; //save time in later calls, if link is congested
-							log.info("Updated nextLink successfully");
-						}				
-					}
-				}
-		
-			}
-		
-//		log.info("Updated nextLink successfully");
-		}
-		return super.chooseNextLink();
-*/	
 	}
 	
 }

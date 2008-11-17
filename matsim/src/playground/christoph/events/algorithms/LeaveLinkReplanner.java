@@ -112,24 +112,11 @@ public class LeaveLinkReplanner {
 
 		prevAct = (Act)plan.getPreviousActivity(leg);
 		nextAct = (Act)plan.getNextActivity(leg);	
-
-		// get the Link from where the Person came
-		Link fromLink = getFromLink();
 		
 		// if there is a next Activity...
 		if(nextAct != null)
 		{
-			if(fromLink != null)
-			{
-				log.info("LeaveLinkReplanner....................." + this.person.getId());
-				// create new Route
-				routing(fromLink);
-			}
-			else
-			{
-				log.error("No Link to to the current Node found - this should not happen!");
-			}
-			
+			routing();			
 		}
 		else
 		{
@@ -139,99 +126,78 @@ public class LeaveLinkReplanner {
 	
 	
 	/*
-	 * Route am Ende jedes Links neu berechnen.
-	 * Ansatz:
-	 * - Neue Aktivit�t beim aktuellen Link generieren und Zielaktivit�t beibehalten.
-	 * - Route generieren 
-	 * - Alte Route mit neuer Route mergen
-	 *   -> Annahme: ein Link ist in jeder Route nur 1x vorhanden (was auch Sinn macht, da
-	 *      "Rundfahrten" wohl kaum die k�rzesten Wege von A nach B darstellen.
-	 *   -> K�nnte doch noch Probleme hervorrufen. Agenten k�nnten an Stellen gelangen, wo
-	 *      z.B. aufgrund von Staus umkehren sinnvoller w�re, was wiederum duplizierte Links
-	 *      in den Routen hervorrufen w�rde :?
+	 * Replan Route every time the End of a Link is reached.
+	 *
+	 * Idea:
+	 * - create a new Activity at the current Location
+	 * - create a new Route from the current Location to the Destionation
+	 * - merge allready passed parts of the current Route with the new created Route
 	 */
-	protected void routing(Link fromLink)
+	protected void routing()
 	{	
+		/*
+		 * Get the index and the currently next Node on the route.
+		 * Entries with a lower index have already been visited!
+		 */ 
+		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
+		Route route = this.leg.getRoute();
 
-		// Nodes der derzeit geplanten Route mit dem aktuellen Node vergleichen
-		if(!leg.getRoute().getRoute().contains(fromLink.getToNode())) 
-		{
-			log.error("Node " + fromLink.getToNode().getId() + " nicht Teil der Route!!!");
-			//System.exit(0);
-		}
 		
-		// Daten fuer die neue Aktivitaet generieren
+		// create dummy data for the "new" activities
 		String type = "w";
+		// This would be the "correct" Type - but it is slower and is not necessary
+		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		Act newFromAct = new Act(type, fromLink.getToNode().getCoord(), fromLink);
+		Act newFromAct = new Act(type, this.personAgent.getCurrentLink().getToNode().getCoord(), this.personAgent.getCurrentLink());
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 		newFromAct.setDuration(0);
 		
-		Route route = leg.getRoute();
-		
-		//ArrayList<Node> nodesRoute = route.getRoute();
-		// Kopie der ArrayList holen und nicht direkt die ArrayList der Route bearbeiten!
+		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
 		ArrayList<Node> nodesRoute = new ArrayList<Node>();
 		nodesRoute.addAll(route.getRoute());
 
 		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
-		Node newStartNode = fromLink.getToNode();
 		
-		// Alle Nodes aus der Route l�schen, die bereits "befahren" wurden
-		// Die gel�schten gleichzeitig in einer ArrayList ablegen - diese werden
-		// anschliessend mit der neue generierten Subroute wieder zusammengef�gt!
-		
-		// Achtung: derzeit k�nnen so keine "Schlaufen" gefahren werden, hierf�r
-		// w�rde ein Counter oder dergleichen ben�tigt werden!
-		while(nodesRoute.size() > 0)
+		/*
+		 *  Remove all Nodes from the Route that have already been passed.
+		 *  Correct index here because only already passed Nodes should be moved
+		 *  to the nodesBuffer.
+		 */
+		for (int i = 0; i < currentNodeIndex - 1; i++)
 		{
 			Node node = nodesRoute.get(0);
 			
-			if(!node.equals(newStartNode))
-			{
-//				log.info(node.getId() + " does not match " + newStartNode.getId());
-				nodeBuffer.add(node);
-				nodesRoute.remove(0);
-			}
-			// also ersten Knoten der Route gefunden, der noch nicht befahren wurde 
-			else
-			{
-				break;
-			}
+			nodeBuffer.add(node);
+			nodesRoute.remove(0);
 		}
-			
-		// neue, gekuerzte Route erstellen
+
+		// create new, shortend Route
 		Route subRoute = new RouteImpl();
 		subRoute.setRoute(nodesRoute);
 
-		// die neue Route in neuem Leg hinterlegen
+		// put the new route in a new leg
 		Leg newLeg = new Leg(leg.getMode());
-		newLeg.setNum(0);
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
 		newLeg.setArrivalTime(leg.getArrivalTime());
 		newLeg.setRoute(subRoute);
-		newLeg.setRoute(subRoute);
 			
-		// aktuell gew�hlter Plan
+		// currently selected Plan
 		Plan currentPlan = person.getSelectedPlan();
 		
-		// neuen Plan generieren und selektieren
+		// create new plan and select it
 		Plan newPlan = new Plan(person);
 		person.setSelectedPlan(newPlan);
 			
-		// Da sind wir gerade.
+		// here we are at the moment
 		newPlan.addAct(newFromAct);
 		
-		// Weg von der aktuellen Position bis zum Ziel
+		// Route from the current position to the next destination.
 		newPlan.addLeg(newLeg);
 		
-		// da wollen wir immer noch hin :)
+		// next Activity
 		newPlan.addAct(nextAct);
-		
-		// Route neu planen
-//		log.info("Replanning Route for Person ... " + person.getId() + " who is at Node " + node.getId());
 
 		/*
 		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
@@ -245,47 +211,61 @@ public class LeaveLinkReplanner {
 			
 		replanner.run(newPlan);			
 		
-		// neu berechnete Route holen
+		// get new calculated Route
 		Route newRoute = newLeg.getRoute();
 			
-		// bereits gefahrenen Teil der Route mit der neu erstellten Route zusammenfuehren
+		// Merge already driven parts of the Route with the new routed parts.
 		nodeBuffer.addAll(newRoute.getRoute());
 		
 		Route mergedRoute = new RouteImpl();
 		mergedRoute.setRoute(nodeBuffer);
 				
-		// Route ersetzen
+		// replace Route
 //		leg.setRoute(mergedRoute);
 		leg.getRoute().getRoute().clear();
 		leg.getRoute().getRoute().addAll(mergedRoute.getRoute());
-				
-		// bisher aktiven Plan wieder aktivieren
+		
+		// check new created Route
+//		checkRoute(mergedRoute);
+		
+		// Reselect previous selected plan... 
 		person.setSelectedPlan(currentPlan);
+		
+		// ... and remove temporary used plan.
+		person.removePlan(newPlan);
 	}
 	
-	// Holt den Link, auf dem der Agent zum aktuellen Node gefahren ist
-	// Eventuell waere ein einfacher Counter sinnvoller. Es sind Szenarien denkbar, in denen
-	// ein Link mehrfach befahren wird :?
-	// Replanning sollte mit der aktuellen Loesung funktionieren, allerdings wird der gefahrene
-	// Weg allenfalls nicht voll uebernommen (Schlaufen werden rausgeschnitten).
-	protected Link getFromLink()
-	{		
-		if (prevAct.getLink().getToNode().equals(node)) return prevAct.getLink();
+	/*
+	 * Checks, whether a new created Route is valid or not.
+	 */
+	protected boolean checkRoute(Route route)
+	{
+		ArrayList<Node> nodes = route.getRoute();
 		
-		// It should never be the first node because that's the same as the "toNode" from the previous Activity
-		for(int i = 1; i < leg.getRoute().getRoute().size(); i++)
-		{
-			if (leg.getRoute().getRoute().get(i).equals(node)) return leg.getRoute().getLinkRoute()[i-1];
-		}
-
-		// Should not be needed!
-		if (nextAct.getLink().getFromNode().equals(node)) 
-		{
-			log.error("This me be an error - please check!");
-			return nextAct.getLink();
-		}
-
+		if(nodes.size() == 0) return true;
+	
+		Node currentNode;
+		Node nextNode;
 		
-		return null;
+		for (int i = 1; i < nodes.size() - 1; i++)
+		{
+			currentNode = nodes.get(i);
+			nextNode = nodes.get(i + 1);
+
+			boolean foundLink = false;
+			
+			for (Link link : currentNode.getOutLinks().values())
+			{
+				if (link.getToNode() == nextNode)
+				{
+					foundLink = true;
+					break;
+				}
+			}
+			
+			if (!foundLink) return false;
+		}
+		
+		return true;
 	}
 }

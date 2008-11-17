@@ -21,6 +21,7 @@
 package playground.christoph.events;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
+import playground.christoph.knowledge.nodeselection.FileNameCreator;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
@@ -68,7 +70,8 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
  *
  * @author Christoph Dobler
  */
-
+//mysimulations/census2000_dilZh30km_miv_transitincl_10pct/config.xml
+//mysimulations/berlin/config.xml
 /* Example for the new entries in a config.xml file to read / write selected nodes from / to files.
 <module name="selection">
 	<param name="readSelection" value="true"/>
@@ -183,7 +186,7 @@ public class EventControler extends Controler{
 		nodeSelectors.add(new SelectNodesCircular(this.network));
 		
 		SelectNodesDijkstra selectNodesDijkstra = new SelectNodesDijkstra(this.network);
-		selectNodesDijkstra.setCostFactor(1.1);
+		selectNodesDijkstra.setCostFactor(1.3);
 		nodeSelectors.add(selectNodesDijkstra);
 	}
 
@@ -197,8 +200,8 @@ public class EventControler extends Controler{
 		// CostCalculator entsprechend setzen!
 //		setCostCalculator();
 
-//		log.info("Read known Nodes Maps from a File");
-//		readKnownNodesMap();
+		log.info("Read known Nodes Maps from a File");
+		readKnownNodesMap();
 		
 		log.info("Initialize Replanning Routers");
 		initReplanningRouter();
@@ -218,11 +221,11 @@ public class EventControler extends Controler{
 		log.info("Set Node Selectors");
 		setNodeSelectors();
 		
-		log.info("Create known Nodes Maps");
-		createKnownNodes();
+//		log.info("Create known Nodes Maps");
+//		createKnownNodes();
 
-		log.info("Write known Nodes Maps to a File");
-		writeKownNodesMap();
+//		log.info("Write known Nodes Maps to a File");
+//		writeKownNodesMap();
 		
 		/* 
 		 * Could be done before or after the creation of the activity rooms -
@@ -261,16 +264,16 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 			
 			counter++;
-			if(counter < 50000)
+			if(counter < 100000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
-				customAttributes.put("initialReplanning", new Boolean(true));
+				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning", new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(true));
 				
 				// (de)activate replanning
 				MyQueueNetwork.doLeaveLinkReplanning(false);
-				MyQueueNetwork.doActEndReplanning(false);
+				MyQueueNetwork.doActEndReplanning(true);
 			}
 			else
 			{
@@ -328,6 +331,7 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
+			if (counter++ < 100000) personNodeSelectors.add(nodeSelectors.get(1));
 			if (counter++ < 50) personNodeSelectors.add(nodeSelectors.get(1));
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
@@ -346,6 +350,26 @@ public class EventControler extends Controler{
 			String path = this.config.getModule("selection").getValue("inputSelectionFile");
 			log.info("Path: " + path);
 			//new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			//new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
+			
+/*	
+			FileNameCreator fileNameCreator = new FileNameCreator();
+			fileNameCreator.setBaseFileName(path);
+				
+			String nextFileName = fileNameCreator.getNextFileName();
+
+			SelectionReaderMatsim test = new SelectionReaderMatsim(this.network, this.population);
+			
+			while (new File(nextFileName).exists())
+			{
+				log.info(nextFileName);
+				test.readFile(nextFileName);
+				nextFileName = fileNameCreator.getNextFileName();
+			}
+			test = null;
+*/			
+			
+			//reading multiple Files automatically
 			new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
 			log.info("Read input selection file!");
 		}
@@ -362,6 +386,10 @@ public class EventControler extends Controler{
 		{
 			String outPutFile = this.config.getModule("selection").getValue("outputSelectionFile");
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
+			
+			//new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write();
+			new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write(5000);
+			//new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write(2500);
 			
 			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
 			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(5000);

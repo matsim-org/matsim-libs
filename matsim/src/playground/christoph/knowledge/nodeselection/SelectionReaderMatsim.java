@@ -21,6 +21,8 @@ package playground.christoph.knowledge.nodeselection;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -57,6 +59,10 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	public static String ID = "id";
 
 	public static boolean overwriteExistingSelection = true;
+	public static boolean writeNodesMap = true;
+	
+	// Writes a List Ids (Strings) - needs less memory while parsing a file but nodesMap has to be created afterwards.
+	public static boolean writeNodesList = false;
 	
 	protected Population population;
 	protected NetworkLayer network;
@@ -64,6 +70,8 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	protected Knowledge currentKnowledge;
 	protected Map<Id, Node> currentNodes;
 	protected Map<Id, Link> currentLinks;
+	protected List<String> currentNodesList;
+	protected List<String> currentLinksList;
 	
 	protected Id personId;
 	protected Id nodeId;
@@ -177,26 +185,52 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	
 				if (customAttributes != null)
 				{
-					if (customAttributes.containsKey("Nodes"))
+					if (writeNodesMap)
 					{
-						currentNodes = (Map<Id, Node>)customAttributes.get("Nodes");
-						
-						if(overwriteExistingSelection) currentNodes.clear();
+						if (customAttributes.containsKey("Nodes"))
+						{
+							currentNodes = (Map<Id, Node>)customAttributes.get("Nodes");
+							
+							if(overwriteExistingSelection) currentNodes.clear();
+						}
+						else
+						{
+							currentNodes = new TreeMap<Id, Node>();
+							customAttributes.put("Nodes", currentNodes);
+						}
 					}
 					else
 					{
-						currentNodes = new TreeMap<Id, Node>();
-						customAttributes.put("Nodes", currentNodes);
+						currentNodes = null;
 					}
-				}
+					
+					if (writeNodesList)
+					{
+						if (customAttributes.containsKey("NodesList"))
+						{
+							currentNodesList = (List<String>)customAttributes.get("NodesList");
+							
+							if(overwriteExistingSelection) currentNodesList.clear();
+						}
+						else
+						{
+							currentNodesList = new ArrayList<String>();
+							customAttributes.put("NodesList", currentNodesList);
+						}
+					}
+					
+				}	// customAttributes != null
 				else
 				{
 					currentNodes = null;
+					currentNodesList = null;
 				}
-			}
+			
+			}// currentKnowledge != null
 			else
 			{
 				currentNodes = null;
+				currentNodesList = null;
 			}
 			
 		}
@@ -217,6 +251,14 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 						{
 							currentNodes.put(nodeId, node);
 						}
+					}
+					
+					if (currentNodesList != null)
+					{
+//						if(!currentNodesList.contains(nodeId))
+//						{
+							currentNodesList.add(nodeId.toString());
+//						}
 					}
 				}
 			}

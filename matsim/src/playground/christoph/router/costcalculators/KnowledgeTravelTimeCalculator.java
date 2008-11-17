@@ -69,10 +69,16 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		
 		double length = link.getLength();
 		
+		// At least one car can be on a link at a time.
+		if (length < vehicleLength) length = vehicleLength;
+		
 		double vmax = link.getFreespeed(time);
 		
 		// velocity of a vehicle on the link
 		double v = (length/vehicles - vehicleLength)/tbuffer;
+		
+		// Vehicles don't drive backwards.
+		if (v < 0.0) v = 0.0;
 		
 		// limit the velocity if neccessary
 		if(v > vmax) v = vmax;

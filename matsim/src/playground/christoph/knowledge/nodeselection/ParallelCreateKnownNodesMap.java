@@ -204,7 +204,10 @@ public class ParallelCreateKnownNodesMap {
 				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
 				
 				numRuns++;
-				if (numRuns % 500 == 0) log.info("created Acivityrooms for " + numRuns + " persons in thread " + threadId);
+				if (numRuns % 500 == 0) 
+				{
+					log.info("created Acivityrooms for " + numRuns + " persons in thread " + threadId);
+				}
 			
 			}
 		

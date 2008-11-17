@@ -163,7 +163,8 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 				if (cost < minCosts*costFactor && !nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);
 			}
 		}
-		//return distances;
+		startMap.clear();
+		endMap.clear();
 	}
 	
 	@Override
