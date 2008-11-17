@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
@@ -138,19 +139,21 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
+		TreeSet<String> flexiblePrimaryActs = new TreeSet<String>();
+		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
+			boolean inFlexiblePrimaryActs = flexiblePrimaryActs.contains(act.getType());
 			
 			// found secondary activity
-			if (!isPrimary || inPersonPrimaryActs) {			
+			if (!isPrimary || inFlexiblePrimaryActs) {			
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 				
-				if (isPrimary && !inPersonPrimaryActs) {			
-					this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+				if (isPrimary && !inFlexiblePrimaryActs) {			
+					flexiblePrimaryActs.add(act.getType());
 				}
 			}		
 			// found primary activity

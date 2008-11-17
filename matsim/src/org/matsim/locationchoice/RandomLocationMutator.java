@@ -21,11 +21,8 @@
 package org.matsim.locationchoice;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeSet;
-
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
@@ -50,17 +47,15 @@ public class RandomLocationMutator extends LocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		
-		if (!this.personPrimaryActs.containsKey(plan.getPerson().getId())) {
-			this.personPrimaryActs.put(plan.getPerson().getId(), new TreeSet<String>());
-		}
+		TreeSet<String> flexiblePrimaryActs = new TreeSet<String>();
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
+			boolean inFlexiblePrimaryActs = flexiblePrimaryActs.contains(act.getType());
 			
-			if (!isPrimary || inPersonPrimaryActs) {	
+			if (!isPrimary || inFlexiblePrimaryActs) {	
 							
 				Object [] exchange_facilities = this.quad_trees.get(act.getType()).values().toArray();
 								
@@ -71,46 +66,11 @@ public class RandomLocationMutator extends LocationMutator {
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());
 				
-				if (isPrimary && !inPersonPrimaryActs) {
-					this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+				if (isPrimary && !inFlexiblePrimaryActs) {
+					flexiblePrimaryActs.add(act.getType());
 				}
 			}	
 		}
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (int j = 1; j < actslegs.size(); j=j+2) {
-			final Leg leg = (Leg)actslegs.get(j);
-			leg.setRoute(null);
-		}
-	}
-
-	public void exchangeFacilities(final String type, Object [] exchange_facilities, final Plan plan) {
-		
-		if (exchange_facilities.length == 0) return;
-		
-		final ArrayList<?> actslegs = plan.getActsLegs();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
-			
-			
-			if (act.getType().equals(type)  && (!isPrimary || inPersonPrimaryActs)) {			
-				final Facility facility=(Facility)exchange_facilities[
-				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
-				
-				act.setFacility(facility);
-				act.setLink(this.network.getNearestLink(facility.getCenter()));
-				act.setCoord(facility.getCenter());	
-			}
-			
-			if (act.getType().equals(type) && isPrimary && (!inPersonPrimaryActs)) {
-				this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
-			}
-			
-			
-		}
-
 		// loop over all <leg>s, remove route-information
 		// routing is done after location choice
 		for (int j = 1; j < actslegs.size(); j=j+2) {
