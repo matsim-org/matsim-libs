@@ -54,13 +54,33 @@ public class RandomLocationMutator extends LocationMutator {
 			this.personPrimaryActs.put(plan.getPerson().getId(), new TreeSet<String>());
 		}
 		
-		ArrayList<Activity> secondaryActivities = plan.getPerson().getKnowledge().getActivities(false);
-		
-		Iterator<Activity> iter_activities = secondaryActivities.iterator();
-		while (iter_activities.hasNext()){
-			Activity activity = iter_activities.next();
-			String type = activity.getType();
-			exchangeFacilities(type ,this.quad_trees.get(type).values().toArray(), plan);
+		final ArrayList<?> actslegs = plan.getActsLegs();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Act act = (Act)actslegs.get(j);
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
+			
+			if (!isPrimary || inPersonPrimaryActs) {	
+							
+				Object [] exchange_facilities = this.quad_trees.get(act.getType()).values().toArray();
+								
+				final Facility facility=(Facility)exchange_facilities[
+				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
+				
+				act.setFacility(facility);
+				act.setLink(this.network.getNearestLink(facility.getCenter()));
+				act.setCoord(facility.getCenter());
+				
+				if (isPrimary && !inPersonPrimaryActs) {
+					this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+				}
+			}	
+		}
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (int j = 1; j < actslegs.size(); j=j+2) {
+			final Leg leg = (Leg)actslegs.get(j);
+			leg.setRoute(null);
 		}
 	}
 

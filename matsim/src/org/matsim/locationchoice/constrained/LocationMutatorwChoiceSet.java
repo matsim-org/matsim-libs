@@ -138,22 +138,23 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 		ManageSubchains manager = new ManageSubchains();
 		
-		Set<String> secondaryTypes = plan.getPerson().getKnowledge().getActivityTypes(false);
-		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Act act = (Act)actslegs.get(j);	
+			final Act act = (Act)actslegs.get(j);
+			
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+			boolean inPersonPrimaryActs = this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType());
 			
 			// found secondary activity
-			if (secondaryTypes.contains(act.getType()) && (
-					!plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId())) ||
-					this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
-				
+			if (!isPrimary || inPersonPrimaryActs) {			
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+				
+				if (isPrimary && !inPersonPrimaryActs) {			
+					this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
+				}
 			}		
 			// found primary activity
-			else {
-				
+			else {			
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
@@ -161,14 +162,6 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
 				}
 			}
-			
-			if (secondaryTypes.contains(act.getType()) &&
-					plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId()) &&
-					!this.personPrimaryActs.get(plan.getPerson().getId()).contains(act.getType())) {
-				
-				this.personPrimaryActs.get(plan.getPerson().getId()).add(act.getType());
-			}
-			
 		}
 		return manager.getSubChains();
 	}
