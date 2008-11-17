@@ -93,4 +93,10 @@ public class ControlerTest extends org.matsim.planomat.PlanomatControler {
 		return manager;
 
 	}
+	
+	@Override
+		protected ScoringFunctionFactory loadScoringFunctionFactory() {
+			return new JohScoringFunctionFactory();
+	}
+	
 }
