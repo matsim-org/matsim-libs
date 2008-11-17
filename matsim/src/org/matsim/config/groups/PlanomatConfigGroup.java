@@ -11,8 +11,6 @@ import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEst
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.router.util.TravelTime;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 public class PlanomatConfigGroup extends Module {
 
@@ -22,12 +20,6 @@ public class PlanomatConfigGroup extends Module {
 	public static final String OPTIMIZATION_TOOLBOX_JGAP = "jgap";
 	public static final String DEFAULT_OPTIMIZATION_TOOLBOX = PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP;
 	private String optimizationToolbox;
-
-	public static final String SCORING_FUNCTION = "scoringFunction";
-	public static final String CHARYPAR_NAGEL_SCORING_FUNCTION = "CharyparNagel";
-	public static final String CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION = "CharyparNagelOpenTimes";
-	public static final ScoringFunctionFactory DEFAULT_SCORING_FUNCTION = new CharyparNagelScoringFunctionFactory();
-	private ScoringFunctionFactory scoringFunctionFactory;
 
 	public static final String POPSIZE = "populationSize";
 	public static final int DEFAULT_POPSIZE = 10; 
@@ -66,7 +58,6 @@ public class PlanomatConfigGroup extends Module {
 
 		// set defaults
 		this.optimizationToolbox = PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX;
-		this.scoringFunctionFactory = PlanomatConfigGroup.DEFAULT_SCORING_FUNCTION;
 		this.popSize = PlanomatConfigGroup.DEFAULT_POPSIZE;
 		this.jgapMaxGenerations = PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS;
 		this.possibleModes = PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES;
@@ -149,10 +140,6 @@ public class PlanomatConfigGroup extends Module {
 
 	public int getPopSize() {
 		return this.popSize;
-	}
-
-	public ScoringFunctionFactory getScoringFunctionFactory() {
-		return this.scoringFunctionFactory;
 	}
 
 	public ArrayList<BasicLeg.Mode> getPossibleModes() {

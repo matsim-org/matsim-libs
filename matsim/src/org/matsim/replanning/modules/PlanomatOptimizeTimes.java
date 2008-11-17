@@ -23,6 +23,7 @@ package org.matsim.replanning.modules;
 import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.scoring.ScoringFunctionFactory;
 
 /**
  * This class is just a multithreading wrapper for instances of the
@@ -33,16 +34,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 
 	private LegTravelTimeEstimator estimator = null;
+	private ScoringFunctionFactory scoringFunctionFactory = null;
 
-	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator) {
+	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator, ScoringFunctionFactory scoringFunctionFactory) {
 		this.estimator = estimator;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
 		PlanAlgorithm planomatAlgorithm = null;
-		planomatAlgorithm =  new PlanOptimizeTimes(this.estimator);
+		planomatAlgorithm = new PlanOptimizeTimes(this.estimator, this.scoringFunctionFactory);
 
 		return planomatAlgorithm;
 	}

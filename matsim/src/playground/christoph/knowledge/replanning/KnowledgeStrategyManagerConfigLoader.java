@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- // "LimitedKnowledge" Strategie eingefügt - kann später auch im org.matsim implementiert werden,
- // dann wäre diese Datei überflüssig!
+ // "LimitedKnowledge" Strategie eingefï¿½gt - kann spï¿½ter auch im org.matsim implementiert werden,
+ // dann wï¿½re diese Datei ï¿½berflï¿½ssig!
 
 package playground.christoph.knowledge.replanning;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.config.groups.StrategyConfigGroup;
@@ -53,6 +54,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
 
 import playground.christoph.knowledge.replanning.modules.LimitedKnowledge;
@@ -77,6 +79,7 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 		NetworkLayer network = controler.getNetwork();
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -136,12 +139,12 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator, scoringFunctionFactory);
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator, scoringFunctionFactory);
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);

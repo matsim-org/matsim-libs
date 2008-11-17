@@ -47,6 +47,7 @@ import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.scoring.ScoringFunction;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -64,12 +65,14 @@ import org.matsim.utils.misc.Time;
 public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
+	private ScoringFunctionFactory scoringFunctionFactory = null;
 
 	private Random seedGenerator = null;
 	
-	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator) {
+	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 		
 	}
@@ -94,7 +97,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			} catch (InvalidConfigurationException e1) {
 				e1.printStackTrace();
 			}
-			ScoringFunction sf = Gbl.getConfig().planomat().getScoringFunctionFactory().getNewScoringFunction(plan);
+			ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
 			PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( 
 					sf, 
 					plan, 

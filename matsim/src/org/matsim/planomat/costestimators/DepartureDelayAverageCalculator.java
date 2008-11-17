@@ -22,6 +22,7 @@ package org.matsim.planomat.costestimators;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -42,6 +43,8 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
 	private final HashMap<Link, DepartureDelayData> linkData;
 	
+	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
+
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
@@ -90,13 +93,18 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 		public double getDepartureDelay(double time) {
 			double departureDelay = 0.0;
 
-			int index = getTimeSlotIndex(time);
-			double sum = this.timeSum[index];
-			if (sum > 0.0) {
-				int cnt = this.timeCnt[index];
-				if (cnt > 0) {
-					departureDelay = sum / cnt;
+			try {
+				int index = getTimeSlotIndex(time);
+				double sum = 0.0;
+				sum = this.timeSum[index];
+				if (sum > 0.0) {
+					int cnt = this.timeCnt[index];
+					if (cnt > 0) {
+						departureDelay = sum / cnt;
+					}
 				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				log.warn("A departure delay for an invalid value of time was requested. Returning departureDelay = 0.0. time = " + Double.toString(time));
 			}
 
 			return departureDelay;

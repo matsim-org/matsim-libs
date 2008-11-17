@@ -29,6 +29,7 @@ import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.LocationChoice;
 import org.matsim.network.NetworkLayer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.modules.ExternalModule;
@@ -49,9 +50,9 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
-import org.matsim.locationchoice.LocationChoice;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -77,6 +78,7 @@ public class StrategyManagerConfigLoader {
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
+		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
 		Facilities facilities = controler.getFacilities();
 		
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
@@ -132,12 +134,12 @@ public class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator, scoringFunctionFactory);
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator, scoringFunctionFactory);
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);

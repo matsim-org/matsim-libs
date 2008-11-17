@@ -28,10 +28,8 @@ import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
-import org.matsim.replanning.modules.PlanomatOptimizeTimes;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
-import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.TimeAllocationMutator;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.ExpBetaPlanChanger;
@@ -119,19 +117,19 @@ public class SocialStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
 				strategy.addStrategyModule(new PlanomatExe(exePath));
-			} else if (classname.equals("Planomat")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
-				strategy.addStrategyModule(planomatStrategyModule);
-				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
-			} else if (classname.equals("PlanomatReRoute")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
-				strategy.addStrategyModule(planomatStrategyModule);
-				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
-				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
-				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
+//			} else if (classname.equals("Planomat")) {
+//				strategy = new PlanStrategy(new RandomPlanSelector());
+//				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+//				strategy.addStrategyModule(planomatStrategyModule);
+//				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
+//			} else if (classname.equals("PlanomatReRoute")) {
+//				strategy = new PlanStrategy(new RandomPlanSelector());
+//				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
+//				strategy.addStrategyModule(planomatStrategyModule);
+//				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
+//				preProcessRoutingData.run(network);
+//				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+//				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {

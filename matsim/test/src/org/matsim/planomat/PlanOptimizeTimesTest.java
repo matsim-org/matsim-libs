@@ -55,6 +55,8 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.router.util.TravelTime;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.CRCChecksum;
@@ -121,8 +123,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		events.addHandler(depDelayCalc);
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
 
 		for (PlanomatTestRun planomatTestRun : PlanomatTestRun.values()) {
 
@@ -192,7 +195,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		IChromosome testChromosome = null;
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(null);
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(null, null);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(testPlan);
@@ -261,7 +264,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc);
 
 		// run the method
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, null);
 
 		testee.writeChromosome2Plan(testChromosome, testPlan, planAnalyzeSubtours);
 
@@ -327,8 +330,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte);
+		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
 
 		for (Person person : this.population) {
 			
