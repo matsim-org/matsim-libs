@@ -58,10 +58,12 @@ public class RandomLocationMutator extends LocationMutator {
 			if (!isPrimary || movable) {	
 							
 				Object [] exchange_facilities = this.quad_trees.get(act.getType()).values().toArray();
-								
-				final Facility facility=(Facility)exchange_facilities[
-				           MatsimRandom.random.nextInt(exchange_facilities.length-1)];
 				
+				Facility facility = (Facility)exchange_facilities[0] ;
+				
+				if (exchange_facilities.length > 1) {
+					facility =(Facility)exchange_facilities[MatsimRandom.random.nextInt(exchange_facilities.length-1)];
+				}				
 				act.setFacility(facility);
 				act.setLink(this.network.getNearestLink(facility.getCenter()));
 				act.setCoord(facility.getCenter());

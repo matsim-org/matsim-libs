@@ -178,7 +178,8 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		while (it.hasNext()) {
 			List<Act> list = it.next();
 			if (list.size() > 1) {
-				list.remove(MatsimRandom.random.nextInt(list.size()-1));
+				int index = MatsimRandom.random.nextInt(list.size()-1);
+				list.remove(index);
 				movablePrimaryActivities.addAll(list);
 			}
 		}
