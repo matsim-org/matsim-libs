@@ -35,6 +35,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
@@ -44,7 +45,6 @@ import org.matsim.population.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
-import playground.anhorni.locationchoice.facilityLoad.FacilityPenalty;
 
 /* Scoring function factoring in:
  * - opentimes

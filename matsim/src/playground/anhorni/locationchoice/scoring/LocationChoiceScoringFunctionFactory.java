@@ -23,11 +23,11 @@ package playground.anhorni.locationchoice.scoring;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Plan;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
-import playground.anhorni.locationchoice.facilityLoad.FacilityPenalty;
 
 /**
  * A factory to create {@link LocationChoiceScoringFunction}s.

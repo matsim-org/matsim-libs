@@ -1,7 +1,7 @@
 package playground.anhorni.locationchoice.scoring;
 
 //import org.apache.log4j.Logger;
-import playground.anhorni.locationchoice.facilityLoad.FacilityPenalty;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 
 public class Penalty {
