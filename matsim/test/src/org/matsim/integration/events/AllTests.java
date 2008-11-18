@@ -29,7 +29,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Integration Tests for MATSim simulation events");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(AgentUtilityEventIntegrationTest.class);
+		suite.addTestSuite(AgentMoneyEventIntegrationTest.class);
 		//$JUnit-END$
 		return suite;
 	}

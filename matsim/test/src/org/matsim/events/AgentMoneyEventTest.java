@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentUtilityEventTest.java
+ * AgentMoneyEventTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,7 +26,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author mrieser
  */
-public class AgentUtilityEventTest extends MatsimTestCase {
+public class AgentMoneyEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final AgentMoneyEvent event1 = new AgentMoneyEvent(25560.23, new IdImpl("1"), 2.71828);
