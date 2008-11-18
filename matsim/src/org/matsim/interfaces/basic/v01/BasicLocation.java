@@ -29,7 +29,7 @@ public interface BasicLocation {
 	
 	public Coord getCoord();
 	
-	public Id getLocationId();
+	public Id getId();
 	
 	public boolean isFacilityId();
 	

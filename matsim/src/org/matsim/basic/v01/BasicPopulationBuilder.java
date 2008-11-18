@@ -44,12 +44,12 @@ public class BasicPopulationBuilder implements PopulationBuilder {
 			if (currentlocation.getCoord() != null) {
 				act.setCoord(currentlocation.getCoord());
 			}
-			else if (currentlocation.getLocationId() != null){
+			else if (currentlocation.getId() != null){
 				if (currentlocation.isFacilityId()) {
-					act.setFacilityId(currentlocation.getLocationId());
+					act.setFacilityId(currentlocation.getId());
 				}
 				else if (currentlocation.isLinkId()) {
-					act.setLinkId(currentlocation.getLocationId());
+					act.setLinkId(currentlocation.getId());
 				}
 			}
 		}

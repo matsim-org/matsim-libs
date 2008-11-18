@@ -49,10 +49,10 @@ public class MatsimCommonWriter extends MatsimXmlWriter {
 	 */
 	public void writeLocation(BasicLocation loc, int indentationLevel) throws IOException {
 		if (loc.isFacilityId()){
-			this.writeLocation(null, loc.getLocationId(), loc.getCoord(), indentationLevel);
+			this.writeLocation(null, loc.getId(), loc.getCoord(), indentationLevel);
 		}
 		else {
-			this.writeLocation(loc.getLocationId(), null, loc.getCoord(), indentationLevel);
+			this.writeLocation(loc.getId(), null, loc.getCoord(), indentationLevel);
 		}
 	}
 	/**

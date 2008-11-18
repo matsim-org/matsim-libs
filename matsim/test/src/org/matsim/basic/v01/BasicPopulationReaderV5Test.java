@@ -137,7 +137,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertNotNull(activity);
 		assertEquals(Integer.valueOf(4), activity.getFrequency());
 		assertNotNull(activity.getLocation());
-		assertEquals(id666, activity.getLocation().getLocationId());
+		assertEquals(id666, activity.getLocation().getId());
 		assertEquals(true, activity.getLocation().isFacilityId());
 		assertEquals(new Integer(40), activity.getCapacity());
 		assertNotNull(activity.getOpeningTime(DayType.wk));
@@ -148,8 +148,8 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertNotNull(activity);
 		assertNull(activity.getFrequency());
 		assertNotNull(activity.getLocation());
-		assertNotNull(activity.getLocation().getLocationId());
-		assertEquals(id666, activity.getLocation().getLocationId());
+		assertNotNull(activity.getLocation().getId());
+		assertEquals(id666, activity.getLocation().getId());
 		assertNull(activity.getLocation().getCoord());
 		assertNull(activity.getCapacity());
 		assertNull(activity.getOpeningTime(DayType.wk));

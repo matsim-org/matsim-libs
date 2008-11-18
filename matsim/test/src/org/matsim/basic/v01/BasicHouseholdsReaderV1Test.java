@@ -64,7 +64,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		
 		assertNotNull(hh.getBasicLocation());
 		assertNotNull(hh.getBasicLocation().getCoord());
-		assertNull(hh.getBasicLocation().getLocationId());
+		assertNull(hh.getBasicLocation().getId());
 		assertEquals(48.28d, hh.getBasicLocation().getCoord().getX(), EPSILON);
 		assertEquals(7.56d, hh.getBasicLocation().getCoord().getY(), EPSILON);
 	
@@ -92,9 +92,9 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		
 		assertNotNull(hh.getBasicLocation());
 		assertNull(hh.getBasicLocation().getCoord());
-		assertNotNull(hh.getBasicLocation().getLocationId()); 
+		assertNotNull(hh.getBasicLocation().getId()); 
 		assertTrue(hh.getBasicLocation().isFacilityId());
-		assertEquals(id666, hh.getBasicLocation().getLocationId());
+		assertEquals(id666, hh.getBasicLocation().getId());
 
 		assertNotNull(hh.getVehicleDefinitionIds());
 		assertEquals(1, hh.getVehicleDefinitionIds().size());

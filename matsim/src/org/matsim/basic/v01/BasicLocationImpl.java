@@ -47,7 +47,7 @@ public class BasicLocationImpl implements BasicLocation {
 		return this.coordinate;
 	}
 
-	public Id getLocationId() {
+	public Id getId() {
 		return this.locationId;
 	}
 

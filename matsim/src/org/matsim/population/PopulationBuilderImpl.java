@@ -61,13 +61,13 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 			if (currentlocation.getCoord() != null) {
 				act = ((Plan)basicPlan).createAct(currentActType, currentlocation.getCoord());
 			}
-			else if (currentlocation.getLocationId() != null){
+			else if (currentlocation.getId() != null){
 				if (currentlocation.isFacilityId()) {
-					Facility fac = facilities.getFacilities().get(currentlocation.getLocationId()); 
+					Facility fac = facilities.getFacilities().get(currentlocation.getId()); 
 					act = ((Plan)basicPlan).createAct(currentActType, fac);
 				}
 				else if (currentlocation.isLinkId()) {
-					Link link = this.network.getLink(currentlocation.getLocationId());
+					Link link = this.network.getLink(currentlocation.getId());
 					act = ((Plan)basicPlan).createAct(currentActType, link);
 				}
 			}
@@ -109,12 +109,12 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	public BasicActivity createActivity(String type, BasicLocation loc) {
 		Activity act = null;
 		if (loc != null) {
-			if (loc.isFacilityId() && this.facilities.getFacilities().containsKey(loc.getLocationId())) {
-				Facility fac = this.facilities.getFacilities().get(loc.getLocationId());
+			if (loc.isFacilityId() && this.facilities.getFacilities().containsKey(loc.getId())) {
+				Facility fac = this.facilities.getFacilities().get(loc.getId());
 				act = new Activity(type, fac);				
 				return act;
 			}
-			throw new IllegalArgumentException("No facility exists with id: " + loc.getLocationId());
+			throw new IllegalArgumentException("No facility exists with id: " + loc.getId());
 		}
 		throw new IllegalArgumentException("Can't create facility without location");
 	}
