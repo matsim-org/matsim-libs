@@ -19,11 +19,8 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.population.*;
-
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -54,7 +51,7 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 	public void setActsLegs (ArrayList<Object> actslegs){
 		this.actsLegs = actslegs;
 	}
-	
+	/*
 	public void copyTimes (ArrayList<Object> in){
 		try {
 			Act a = (Act)this.actsLegs.get(0);
@@ -81,5 +78,7 @@ public class PlanomatXPlan extends Plan implements Comparable<PlanomatXPlan>{
 			// must be definitively wrong -- exit with an error
 			Gbl.errorMsg(e);
 		}
+		
 	}
+	*/
 }
