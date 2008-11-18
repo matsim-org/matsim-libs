@@ -93,7 +93,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		Facilities facilities = controler.getFacilities();
 				
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, controler.getIterationPath(), event.getIteration(), 
+			this.printStatistics(facilities, Controler.getIterationPath(), event.getIteration(), 
 					this.eventsToFacilityLoad.getFacilityPenalties());
 		}	
 		this.eventsToFacilityLoad.resetAll(event.getIteration());
