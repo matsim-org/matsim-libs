@@ -21,7 +21,7 @@
 package org.matsim.scoring;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.Events;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -39,7 +39,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	/**
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
-	public void testAddUtility() {
+	public void testAddMoney() {
 		Population population = new Population(Population.NO_STREAMING);
 		Person person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
@@ -48,7 +48,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		Events events = new Events();
 		events.addHandler(e2s);
 
-		events.processEvent(new AgentUtilityEvent(3600.0, person, 3.4));
+		events.processEvent(new AgentMoneyEvent(3600.0, person, 3.4));
 
 		assertEquals("exactly one instance should have been requested.", 1, sfFactory.counter);
 		assertEquals(0, sfFactory.sf.cntEndAct);
@@ -59,7 +59,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		assertEquals(0, sfFactory.sf.cntGetScore);
 		assertEquals(0, sfFactory.sf.cntReset);
 		assertEquals(0, sfFactory.sf.cntStuck);
-		assertEquals(1, sfFactory.sf.cntUtility);
+		assertEquals(1, sfFactory.sf.cntMoney);
 	}
 
 	private static class MockScoringFunctionFactory implements ScoringFunctionFactory {
@@ -80,7 +80,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	private static class MockScoringFunction implements ScoringFunction {
 
-		public int cntUtility = 0;
+		public int cntMoney = 0;
 		public int cntStuck = 0;
 		public int cntEndAct = 0;
 		public int cntEndLeg = 0;
@@ -94,8 +94,8 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public void addUtility(double amount) {
-			this.cntUtility++;
+		public void addMoney(double amount) {
+			this.cntMoney++;
 		}
 
 		public void agentStuck(double time) {

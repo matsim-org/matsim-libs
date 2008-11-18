@@ -1,29 +1,23 @@
 package playground.wrashid.PHEV.Utility;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
-
-import playground.wrashid.PDES.util.ComparableEvent;
 
 
 //TODO: write tests for this class
 
-public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventHandler,ActEndEventHandler,AgentUtilityEventHandler {
+public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventHandler,ActEndEventHandler,AgentMoneyEventHandler {
 
 	private HashMap<Id,EnergyApplicatonSpecificState> energyLevel =new HashMap<Id,EnergyApplicatonSpecificState>();
 	private final double fullEnergyLevel=259000; // in [J]
@@ -57,7 +51,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventH
 		
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel<=0){
-			events.processEvent(new AgentUtilityEvent(event.time,event.agent,penaltyForRunningOutOfElectricEnergy));
+			events.processEvent(new AgentMoneyEvent(event.time,event.agent,penaltyForRunningOutOfElectricEnergy));
 		}
 	}
 	
@@ -145,14 +139,14 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,ActStartEventH
 		}
 		
 		
-		events.processEvent(new AgentUtilityEvent(event.time,event.agent,costOfEnergy));
+		events.processEvent(new AgentMoneyEvent(event.time,event.agent,costOfEnergy));
 				
 		state.energyLevel+=energyCharged;
 	}
 
 
-	public void handleEvent(AgentUtilityEvent event) {
-		//System.out.println("util:"+event.amount);
+	public void handleEvent(AgentMoneyEvent event) {
+		//System.out.println("money:"+event.amount);
 	}
 
 	

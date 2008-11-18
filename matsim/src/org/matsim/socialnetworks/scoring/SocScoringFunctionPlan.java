@@ -1,8 +1,6 @@
-package org.matsim.socialnetworks.scoring;
-
 /* *********************************************************************** *
  * project: org.matsim.*
- *  SocializingScoringFunction.java
+ * SocializingScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,6 +17,7 @@ package org.matsim.socialnetworks.scoring;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.socialnetworks.scoring;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -99,8 +98,8 @@ public class SocScoringFunctionPlan implements ScoringFunction{
 		this.scoringFunction.agentStuck(time);
 	}
 
-	public void addUtility(final double amount) {
-		this.scoringFunction.addUtility(amount);
+	public void addMoney(final double amount) {
+		this.scoringFunction.addMoney(amount);
 	}
 
 	public void endActivity(final double time) {

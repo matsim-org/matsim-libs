@@ -27,15 +27,15 @@ import java.util.HashMap;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.utils.io.IOUtils;
 
-public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentUtilityEventHandler {
+public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentMoneyEventHandler {
 
 	HashMap<String,Double> startTimes = new HashMap<String,Double>();
 	double oaTime = 0;
@@ -77,7 +77,7 @@ public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEve
 		this.numAgents++;
 	}
 	
-	public void handleEvent(final AgentUtilityEvent event) {
+	public void handleEvent(final AgentMoneyEvent event) {
 		this.numUtilityEvents++;
 		this.cumUt += event.amount;
 		

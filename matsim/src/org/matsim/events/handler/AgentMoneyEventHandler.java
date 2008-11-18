@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentUtilityEvent.java
+ * AgentMoneyEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,53 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.events;
+package org.matsim.events.handler;
 
-import java.util.Map;
+import org.matsim.events.AgentMoneyEvent;
 
-import org.matsim.basic.v01.Id;
-import org.matsim.population.Person;
-
-/**
- * This event specifies that an agent has gained some utility (or disutility).
- * Scoring functions should handle these Events and add the utilities specified
- * by such events to the agents' score.
- *
- * @author mrieser
- */
-public final class AgentUtilityEvent extends PersonEvent {
-
-	public static final String ATTRIBUTE_AMOUNT = "amount";
-
-	public static final String EVENT_TYPE = "agentUtility";
-
-	public final double amount;
-
-	public AgentUtilityEvent(final double time, final Person agent, final double amount) {
-		super(time, agent);
-		this.amount = amount;
-	}
-
-	public AgentUtilityEvent(final double time, final Id agentId, final double amount) {
-		super(time, agentId.toString());
-		this.amount = amount;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
-		return attr;
-	}
-
-	@Override
-	public String toString() {
-		return getTimeString(this.time) + this.agentId + "\t0\t\t0\t9\t" + EVENT_TYPE + "\t" + this.amount;
-	}
-
+public interface AgentMoneyEventHandler extends EventHandler {
+	public void handleEvent (AgentMoneyEvent event);
 }

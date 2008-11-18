@@ -44,7 +44,7 @@
  * own scoring function and scoring function factory, and add it to the
  * Controler with {@link org.matsim.controler.Controler#setScoringFunctionFactory(org.matsim.scoring.ScoringFunctionFactory)}.
  * But if you only plan to add or subtract some utility amounts from agents'
- * score, you can generate {@link org.matsim.events.AgentUtilityEvent}s.
+ * score, you can generate {@link org.matsim.events.AgentMoneyEvent}s.
  * Scoring functions should listen for <code>AgentUtilityEvent</code>s and just
  * add the utility amount specified in the event to the agent's score.
  *

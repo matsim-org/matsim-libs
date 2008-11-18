@@ -35,13 +35,13 @@ import org.matsim.controler.listener.ScoringListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentUtilityEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
@@ -50,7 +50,7 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
 public class AggregatedPlansScoring implements StartupListener, ScoringListener, IterationStartsListener,
-AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler, LinkEnterEventHandler {
+AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, LinkEnterEventHandler {
 
 
 	protected Population population;
@@ -195,24 +195,20 @@ AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, Ag
 
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.startLeg(event.time, event.leg);
+		getScoringFunctionForAgent(event.agentId).startLeg(event.time, event.leg);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.endLeg(event.time);
+		getScoringFunctionForAgent(event.agentId).endLeg(event.time);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.agentStuck(event.time);
+		getScoringFunctionForAgent(event.agentId).agentStuck(event.time);
 		this.agentMappings.put(event.agentId, "stuckAndAbord");
 	}
 
-	public void handleEvent(final AgentUtilityEvent event) {
-		final ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.addUtility(event.amount);
+	public void handleEvent(final AgentMoneyEvent event) {
+		getScoringFunctionForAgent(event.agentId).addMoney(event.amount);
 	}
 
 

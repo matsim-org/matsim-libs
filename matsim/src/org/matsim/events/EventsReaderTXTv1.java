@@ -96,7 +96,7 @@ public class EventsReaderTXTv1 {
 				}
 				break;
 			case 9:
-				data = new AgentUtilityEvent(time, new IdImpl(agentId), Double.parseDouble(desc.replace("agentUtility\t", "")));
+				data = new AgentMoneyEvent(time, new IdImpl(agentId), Double.parseDouble(desc.replace("agentMoney\t", "")));
 				break;
 			default:
 				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");

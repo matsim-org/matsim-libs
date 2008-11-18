@@ -51,7 +51,7 @@ public class SimpleScoring implements ScoringFunction {
 	
 	private double startTime;
 
-	public void addUtility(double amount) {
+	public void addMoney(double amount) {
 	}
 
 	public void agentStuck(double time) {

@@ -31,7 +31,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 
 
 /**
@@ -104,8 +103,8 @@ public class SocScoringFunctionEvent implements ScoringFunction{
 		this.scoringFunction.agentStuck(time);
 	}
 
-	public void addUtility(final double amount) {
-		this.scoringFunction.addUtility(amount);
+	public void addMoney(final double amount) {
+		this.scoringFunction.addMoney(amount);
 	}
 
 	public void endActivity(final double time) {

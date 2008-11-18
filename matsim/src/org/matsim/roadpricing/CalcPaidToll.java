@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
@@ -87,7 +87,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	}
 
 	/**
-	 * Sends {@link AgentUtilityEvent}s for all agents that must pay a toll.
+	 * Sends {@link AgentMoneyEvent}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
 	 *
 	 * <strong>Important note: </strong>Do not call this method twice without
@@ -99,7 +99,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	public void sendUtilityEvents(final double time, final Events events) {
 		for (Map.Entry<String, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new AgentUtilityEvent(time, new IdImpl(entries.getKey()), -entries.getValue().toll));
+			events.processEvent(new AgentMoneyEvent(time, new IdImpl(entries.getKey()), -entries.getValue().toll));
 		}
 	}
 

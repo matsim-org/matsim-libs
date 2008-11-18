@@ -355,7 +355,7 @@ public class AppraisalScorer implements ScoringFunction {
 		// we do not use this "event" at the moment
 	}
 
-	public void addUtility(final double utility) {
+	public void addMoney(final double utility) {
 		// not used at the moment
 	}
 

@@ -24,7 +24,7 @@ import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
@@ -72,7 +72,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests if the scoring function correctly handles {@link AgentUtilityEvent}.
+	 * Tests if the scoring function correctly handles {@link AgentMoneyEvent}.
 	 * It generates one person with one plan having two activities (home, work)
 	 * and a car-leg in between. It then tests the scoring function by calling
 	 * several methods on an instance of the scoring function with the
@@ -80,7 +80,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	 *
 	 * @throws Exception in case something goes wrong with creating the agent, should never happen
 	 */
-	public void testAddUtility() throws Exception {
+	public void testAddMoney() throws Exception {
 		setupScoringConfig(Gbl.getConfig());
 
 		// score the same plan twice
@@ -101,15 +101,15 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 
 		ScoringFunction sf2 = getScoringFunctionInstance(plan1);
 		sf2.startActivity(0, act1a);
-		sf2.addUtility(1.23);
+		sf2.addMoney(1.23);
 		sf2.endActivity(7*3600);
 		sf2.startLeg(7*3600, leg1);
-		sf2.addUtility(-2.46);
+		sf2.addMoney(-2.46);
 		sf2.endLeg(7*3600+100);
 		sf2.startActivity(7*3600+100, act1b);
-		sf2.addUtility(4.86);
+		sf2.addMoney(4.86);
 		sf2.endActivity(24*3600);
-		sf2.addUtility(-0.28);
+		sf2.addMoney(-0.28);
 		sf2.finish();
 		double score2 = sf2.getScore();
 

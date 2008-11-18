@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JohScoringFunction.java
+ * LocationChoiceScoringFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C)2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil;
+package playground.anhorni.locationchoice.scoring;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicOpeningTime;
+import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.BasicOpeningTime.DayType;
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
+import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.population.Act;
+import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
+import org.matsim.population.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
-/**
- * New scoring function following Joh's dissertation.
+
+/* Scoring function factoring in:
+ * - opentimes
+ * - facility attractivity
+ * - capacity restraints:
+ *  TODO: should be done for for arrival to departure time not act start to act end time,
+ *  because seraching for a parking lot possibly happens before the opening time
+ *  see EventsToFacilityLoad
  *
- * @author mfeil
+ *  TODO: extend CharyparNagel sf. instead of doing copy paste.
+ *  Need to change some private members to protected members.
  */
 
-public class JohScoringFunction implements ScoringFunction {
+public class LocationChoiceScoringFunction implements ScoringFunction {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -47,71 +69,42 @@ public class JohScoringFunction implements ScoringFunction {
 	private int index; // the current position in plan.actslegs
 	private double firstActTime;
 	private final int lastActIndex;
+	private List<ScoringPenalty> penalty = null;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
-
-	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
-	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
-	 * values each time from a string, this whole init() concept can be removed and with this
-	 * also this public member.  -marcel, 07aug07
-	 */
+	private TreeMap<Id, FacilityPenalty> facilityPenalties;
+	
 	public static boolean initialized = false;
 
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
-	
-	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6/3600;
-	private static double marginalUtilityOfLateArrival = -18/3600;
-	private static double marginalUtilityOfEarlyDeparture = -6/3600;
-	protected static double marginalUtilityOfTraveling = -12/3600;
-	private static double marginalUtilityOfTravelingPT = -12/3600; // public transport
-	private static double marginalUtilityOfTravelingWalk = -12/3600;
-	//private static double marginalUtilityOfPerforming = 18/3600;
-	private static double marginalUtilityOfDistance = 0/3600;
-	
-	private static final double uMin_home = 0;
-	private static final double uMin_work = 0;
-	private static final double uMin_shopping = 0;
-	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 120;
-	private static final double uMax_work= 100;
-	private static final double uMax_shopping = 40;
-	private static final double uMax_leisure = 80;
-	private static final double alpha_home = 6;
-	private static final double alpha_work = 4;
-	private static final double alpha_shopping = 1;
-	private static final double alpha_leisure = 2;
-	private static final double beta_home = 1.2;
-	private static final double beta_work = 1.2;
-	private static final double beta_shopping = 1.2;
-	private static final double beta_leisure = 1.2;
-	private static final double gamma_home = 1;
-	private static final double gamma_work = 1;
-	private static final double gamma_shopping = 1;
-	private static final double gamma_leisure = 1;
-	
+	private static final Logger log = Logger.getLogger(LocationChoiceScoringFunction.class);
 
-	public JohScoringFunction(final Plan plan) {
+	
+	public LocationChoiceScoringFunction(final Plan plan, TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		init();
 		this.reset();
 
 		this.plan = plan;
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
+		this.penalty = new Vector<ScoringPenalty>();
+		this.facilityPenalties = facilityPenalties;
 	}
+	
+
+	
+	
 
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.index = INITIAL_INDEX;
 		this.firstActTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
-
 	}
 
 	public void startActivity(final double time, final Act act) {
@@ -122,25 +115,21 @@ public class JohScoringFunction implements ScoringFunction {
 	}
 
 	public void startLeg(final double time, final Leg leg) {
-		
 		if (this.index % 2 == 0) {
-			//System.out.println("Aufruf startLeg f�r Person "+plan.getPerson().getId()+" mit time "+time);
-			
 			// it seems we were not informed about activities
-			//System.out.println("time in methode startLeg(): "+time+" zu leg "+leg);
 			handleAct(time);
 		}
 		this.lastTime = time;
 	}
 
 	public void endLeg(final double time) {
-		//System.out.println("Aufruf endLeg f�r Person "+plan.getPerson().getId()+" mit time "+time);
 		handleLeg(time);
 		this.lastTime = time;
 	}
 
 	public void agentStuck(final double time) {
 		this.lastTime = time;
+		this.score += getStuckPenalty();
 	}
 
 	public void addMoney(final double amount) {
@@ -151,6 +140,16 @@ public class JohScoringFunction implements ScoringFunction {
 		if (this.index == this.lastActIndex) {
 			handleAct(24*3600); // handle the last act
 		}
+
+		// reduce score by penalty from capacity restraints
+		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
+		while (pen_it.hasNext()){
+			ScoringPenalty penalty = pen_it.next();
+			
+			// TODO: check activity is secondary
+			this.score -=penalty.getPenalty();
+		}
+		this.penalty.clear();
 	}
 
 	public double getScore() {
@@ -160,53 +159,58 @@ public class JohScoringFunction implements ScoringFunction {
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
-	
-	/*private static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	public final static String CONFIG_MODULE = "planCalcScore";
+
+	public final static String CONFIG_WAITING = "waiting";
+	public final static String CONFIG_LATE_ARRIVAL = "lateArrival";
+	public final static String CONFIG_EARLY_DEPARTURE = "earlyDeparture";
+	public final static String CONFIG_TRAVELING = "traveling";
+	public final static String CONFIG_TRAVELING_PT = "travelingPT";
+	public final static String CONFIG_PERFORMING = "performing";
+	public final static String CONFIG_LEARNINGRATE = "learningRate";
+	public final static String CONFIG_DISTANCE_COST = "distanceCost";
+
+	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
 	private static double marginalUtilityOfWaiting = Double.NaN;
 	private static double marginalUtilityOfLateArrival = Double.NaN;
 	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
 	protected static double marginalUtilityOfTraveling = Double.NaN;
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
-	private static double marginalUtilityOfTravelingWalk = Double.NaN;
 	private static double marginalUtilityOfPerforming = Double.NaN;
-	private static double marginalUtilityOfDistance = Double.NaN;
+	private static double marignalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
-	*/
-	
-
-	//private static double abortedPlanScore = Double.NaN;
 
 	private static void init() {
-		if (initialized) return;
+		if (initialized) {
+			return;
+		}
 
-		utilParams.clear();
-	/*	CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
+		// TODO: change name
+		CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
+
 		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
 		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
 		marginalUtilityOfEarlyDeparture = params.getEarlyDeparture() / 3600.0;
 		marginalUtilityOfTraveling = params.getTraveling() / 3600.0;
 		marginalUtilityOfTravelingPT = params.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
 
-		marginalUtilityOfDistance = params.getMarginalUtlOfDistance();
-	*/
-	/*
+		marignalUtilityOfDistance = params.getMarginalUtlOfDistance();
+
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
 				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
-	*/
+
 		readUtilityValues();
-		scoreActs = (marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
 	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
-		
-		JohActUtilityParameters params = utilParams.get(act.getType());
-		
+
+		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
 		}
@@ -241,29 +245,21 @@ public class JohScoringFunction implements ScoringFunction {
 		 * assume O <= C
 		 * assume A <= D
 		 */
-
+		//double openingTime = params.getOpeningTime();
+		//double closingTime = params.getClosingTime();
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
-
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
-		
-		//if (act.getType()=="work"){
-			//System.out.println("openingTime = "+openingTime);
-		//	System.out.println("closingTime = "+closingTime);
-		//	System.out.println("activityStart = "+activityStart);
-		//	System.out.println("activityEnd = "+activityEnd);
-		//}
-		
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
-			//System.out.println("Anschlag! Neue activityEnd: "+activityEnd);
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -271,6 +267,28 @@ public class JohScoringFunction implements ScoringFunction {
 		}
 		double duration = activityEnd - activityStart;
 
+	
+		// utility of performing an action, duration is >= 1, thus log is no problem ----------------
+		double typicalDuration = params.getTypicalDuration();
+
+		if (duration > 0) {
+			double utilPerf = marginalUtilityOfPerforming * typicalDuration
+					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+
+			double utilWait = marginalUtilityOfWaiting * duration;
+			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+		} else {
+			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+		}
+		
+		// used arrival and departure time because of parking cap restr. before act actually starts
+		if (!act.getType().equalsIgnoreCase("home")) {
+			this.penalty.add(new ScoringPenalty(arrivalTime, departureTime, 
+					this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
+		}	
+		
+		// DISUTILITIES: -------------------------------------------------------------------------------
+		
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
@@ -280,28 +298,13 @@ public class JohScoringFunction implements ScoringFunction {
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
-		}
-
-		// utility of performing an action, duration is >= 1, thus log is no problem
-
-		if (duration > 0) {
-			//double utilPerf = marginalUtilityOfPerforming * typicalDuration
-			//		* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-			
-			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
-			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
-			//System.out.println(utilPerf+" f�r "+utilParams.get(act.getType()).getType()+" und duration = "+duration/3600);
-			double utilWait = marginalUtilityOfWaiting * duration;
-			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-		} else {
-			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 		}
 
@@ -310,25 +313,14 @@ public class JohScoringFunction implements ScoringFunction {
 			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
 		}
 
-		return tmpScore;
-	}
-
-	protected double[] getOpeningInterval(final Act act) {
-
-		JohActUtilityParameters params = utilParams.get(act.getType());
-		if (params == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
+		// disutility if duration was too short
+		double minimalDuration = params.getMinimalDuration();
+		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
+			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 		}
 
-		double openingTime = params.getOpeningTime();
-		double closingTime = params.getClosingTime();
-
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{openingTime, closingTime};
-
-		return openInterval;
+		
+		return tmpScore;
 	}
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
@@ -336,63 +328,70 @@ public class JohScoringFunction implements ScoringFunction {
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 
+		if (marignalUtilityOfDistance != 0.0) {
+			/* we only as for the route when we have to calculate a distance cost,
+			 * because route.getDist() may calculate the distance if not yet
+			 * available, which is quite an expensive operation
+			 */
+			Route route = leg.getRoute();
+			dist = route.getDist();
+			/* TODO the route-distance does not contain the length of the first or
+			 * last link of the route, because the route doesn't know those. Should
+			 * be fixed somehow, but how? MR, jan07
+			 */
+			/* TODO in the case of within-day replanning, we cannot be sure that the
+			 * distance in the leg is the actual distance driven by the agent.
+			 */
+		}
+
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marignalUtilityOfDistance * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfDistance * dist;
-		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingWalk + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingPT + marignalUtilityOfDistance * dist;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling + marignalUtilityOfDistance * dist;
 		}
 
 		return tmpScore;
 	}
-	
-	/*
+
 	private static double getStuckPenalty() {
 		return abortedPlanScore;
 	}
-	 */
-	
+
 	/**
 	 * reads all activity utility values from the config-file
 	 */
 	private static final void readUtilityValues() {
-		System.out.println("Reading utility values.");
-		String type;
-		JohActUtilityParameters actParams;
-			
-		type = "home";
-		actParams = new JohActUtilityParameters("home", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
-		utilParams.put(type, actParams);
-		
-		type = "work";
-		actParams = new JohActUtilityParameters("work", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
-		actParams.setOpeningTime(8*3600);
-		actParams.setClosingTime(18*3600);
-		actParams.setLatestStartTime(10*3600);
-		actParams.setEarliestEndTime(15*3600);
-		utilParams.put(type, actParams);
+		CharyparNagelScoringConfigGroup config = Gbl.getConfig().charyparNagelScoring();
 
-		type = "shopping";
-		actParams = new JohActUtilityParameters("shopping", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
-		actParams.setOpeningTime(10*3600);
-		actParams.setClosingTime(18*3600);
-		utilParams.put(type, actParams);
-
-		type = "leisure";
-		actParams = new JohActUtilityParameters("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure);
-		actParams.setOpeningTime(18*3600);
-		actParams.setClosingTime(22*3600);			
-		utilParams.put(type, actParams);
-		
+		for (ActivityParams params : config.getActivityParams()) {
+			String type = params.getType();
+			double priority = params.getPriority();
+			double typDurationSecs = params.getTypicalDuration();
+			ActUtilityParameters actParams = new ActUtilityParameters(type, priority, typDurationSecs);
+			if (params.getMinimalDuration() >= 0) {
+				actParams.setMinimalDuration(params.getMinimalDuration());
+			}
+			if (params.getOpeningTime() >= 0) {
+				actParams.setOpeningTime(params.getOpeningTime());
+			}
+			if (params.getLatestStartTime() >= 0) {
+				actParams.setLatestStartTime(params.getLatestStartTime());
+			}
+			if (params.getEarliestEndTime() >= 0) {
+				actParams.setEarliestEndTime(params.getEarliestEndTime());
+			}
+			if (params.getClosingTime() >= 0) {
+				actParams.setClosingTime(params.getClosingTime());
+			}
+			utilParams.put(type, actParams);
+		}
 	}
 
 	private void handleAct(final double time) {
 		Act act = (Act)this.plan.getActsLegs().get(this.index);
-
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
@@ -400,8 +399,6 @@ public class JohScoringFunction implements ScoringFunction {
 			if (lastActType.equals(((Act) this.plan.getActsLegs().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
-				//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcActScore(this.lastTime, this.firstActTime + 24*3600, act)+", act: "+act.getType());
-
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
@@ -414,7 +411,6 @@ public class JohScoringFunction implements ScoringFunction {
 			}
 		} else {
 			this.score += calcActScore(this.lastTime, time, act);
-			//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcActScore(this.lastTime, time, act)+", act: "+act.getType());
 		}
 		this.index++;
 	}
@@ -422,8 +418,54 @@ public class JohScoringFunction implements ScoringFunction {
 	private void handleLeg(final double time) {
 		Leg leg = (Leg)this.plan.getActsLegs().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
-		//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcLegScore(this.lastTime, time, leg)+", leg: "+leg.getNum()+", travTime: "+leg.getTravTime()+", �bergebene lastTime: "+lastTime+", �bergebene time: "+time);
 		this.index++;
+	}
+
+	private double[] getOpeningInterval(final Act act) {
+
+		// openInterval has two values
+		// openInterval[0] will be the opening time
+		// openInterval[1] will be the closing time
+		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+
+		boolean foundAct = false;
+
+		Facility facility = act.getFacility();
+		Iterator<String> facilityActTypeIterator = facility.getActivities().keySet().iterator();
+		String facilityActType = null;
+		Set<BasicOpeningTime> opentimes = null;
+
+		while (facilityActTypeIterator.hasNext() && !foundAct) {
+
+			facilityActType = facilityActTypeIterator.next();
+			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
+				foundAct = true;
+
+				// choose appropriate opentime:
+				// either wed or wkday
+				// if none is given, use undefined opentimes
+				opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wed);
+				if (opentimes == null) {
+					opentimes = facility.getActivity(facilityActType).getOpeningTime(DayType.wkday);
+				}
+				if (opentimes != null) {
+					// ignoring lunch breaks with the following procedure:
+					// if there is only one wed/wkday open time interval, use it
+					// if there are two or more, use the earliest start time and the latest end time
+					openInterval[0] = Double.MAX_VALUE;
+					openInterval[1] = Double.MIN_VALUE;
+
+					for (BasicOpeningTime opentime : opentimes) {
+						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+					}
+				}
+			}
+		}
+		if (!foundAct) {
+			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+		}
+		return openInterval;
 	}
 
 }

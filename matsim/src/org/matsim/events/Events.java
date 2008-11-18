@@ -35,7 +35,7 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentReplanEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
@@ -258,8 +258,8 @@ public class Events {
 		} else if (klass == AgentStuckEvent.class) {
 			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
 			return true;
-		} else if (klass == AgentUtilityEvent.class) {
-			((AgentUtilityEventHandler)handler).handleEvent((AgentUtilityEvent)ev);
+		} else if (klass == AgentMoneyEvent.class) {
+			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEvent)ev);
 			return true;
 		} else if (klass == AgentReplanEvent.class) {
 			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);

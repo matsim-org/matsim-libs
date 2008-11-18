@@ -29,8 +29,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class AgentUtilityEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final AgentUtilityEvent event1 = new AgentUtilityEvent(25560.23, new IdImpl("1"), 2.71828);
-		final AgentUtilityEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		final AgentMoneyEvent event1 = new AgentMoneyEvent(25560.23, new IdImpl("1"), 2.71828);
+		final AgentMoneyEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.time, event2.time, EPSILON);
 		assertEquals(event1.agentId, event2.agentId);
 		assertEquals(event1.amount, event2.amount, EPSILON);

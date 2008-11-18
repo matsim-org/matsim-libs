@@ -27,12 +27,12 @@ import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentUtilityEvent;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -47,7 +47,7 @@ import org.matsim.population.Population;
  *
  * @author mrieser
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler {
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
 	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -68,23 +68,19 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.startLeg(event.time, event.leg);
+		getScoringFunctionForAgent(event.agentId).startLeg(event.time, event.leg);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.endLeg(event.time);
+		getScoringFunctionForAgent(event.agentId).endLeg(event.time);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.agentStuck(event.time);
+		getScoringFunctionForAgent(event.agentId).agentStuck(event.time);
 	}
 
-	public void handleEvent(final AgentUtilityEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.agentId);
-		sf.addUtility(event.amount);
+	public void handleEvent(final AgentMoneyEvent event) {
+		getScoringFunctionForAgent(event.agentId).addMoney(event.amount);
 	}
 
 	/**

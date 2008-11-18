@@ -31,8 +31,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.AgentArrivalEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentUtilityEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -315,7 +315,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		while (tsOld.agentsLeftLink.size() > 0) {
 			String strId = tsOld.agentsLeftLink.poll();
 			Id id = new IdImpl(strId);
-			AgentUtilityEvent e = new AgentUtilityEvent(time,id,socCost);
+			AgentMoneyEvent e = new AgentMoneyEvent(time,id,socCost);
 			QueueSimulation.getEvents().processEvent(e);	
 			
 		}

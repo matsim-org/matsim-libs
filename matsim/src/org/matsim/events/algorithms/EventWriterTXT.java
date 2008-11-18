@@ -29,7 +29,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentReplanEvent;
 import org.matsim.events.AgentStuckEvent;
-import org.matsim.events.AgentUtilityEvent;
+import org.matsim.events.AgentMoneyEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
@@ -39,14 +39,14 @@ import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentReplanEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentUtilityEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.utils.io.IOUtils;
 
 public class EventWriterTXT implements ActEndEventHandler, ActStartEventHandler, AgentArrivalEventHandler, 
-		AgentDepartureEventHandler, AgentReplanEventHandler, AgentStuckEventHandler, AgentUtilityEventHandler, 
+		AgentDepartureEventHandler, AgentReplanEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
 		AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
@@ -134,7 +134,7 @@ public class EventWriterTXT implements ActEndEventHandler, ActStartEventHandler,
 		writeLine(event.toString());
 	}
 
-	public void handleEvent(AgentUtilityEvent event) {
+	public void handleEvent(AgentMoneyEvent event) {
 		writeLine(event.toString());		
 	}
 

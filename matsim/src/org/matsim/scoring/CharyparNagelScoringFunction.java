@@ -158,8 +158,8 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		this.score += getStuckPenalty();
 	}
 
-	public void addUtility(final double amount) {
-		this.score += amount;
+	public void addMoney(final double amount) {
+		this.score += amount; // linear mapping of money to score
 	}
 
 	public void finish() {

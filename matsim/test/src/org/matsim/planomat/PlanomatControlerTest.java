@@ -20,46 +20,35 @@
 
 package org.matsim.planomat;
 
-import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
 public class PlanomatControlerTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(PlanomatControlerTest.class);
-
 	private Config config;
 	
 	protected void setUp() throws Exception {
-
 		super.setUp();
 		this.config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
-		
 	}
 
 	public void testMainDefault() {
-
 		this.runControlerTest();
-		
 	}
 
 	public void testMainCarPt() {
-
 		this.config.charyparNagelScoring().setTravelingPt(-6);
 		this.config.planomat().setPossibleModes("car pt");
 		this.runControlerTest();
-		
 	}
 
 	public void testMainMultithreaded() {
-		
 		this.config.global().setNumberOfThreads(2);
 		this.runControlerTest();
 	}
 	
 	private void runControlerTest() {
-
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 		PlanomatControler testee = new PlanomatControler(config);
 		testee.setCreateGraphs(false);
@@ -69,10 +58,7 @@ public class PlanomatControlerTest extends MatsimTestCase {
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
 		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
-		log.info("Expected checksum: " + Long.toString(expectedChecksum));
-		log.info("Actual checksum: " + Long.toString(actualChecksum));
 		assertEquals(expectedChecksum, actualChecksum);
-
 	}
 	
 }
