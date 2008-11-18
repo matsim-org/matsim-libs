@@ -83,7 +83,7 @@ public class TimeOptimizer13 implements org.matsim.population.algorithms.PlanAlg
 				move = this.cleanSchedule(this.minimumTime, plan);
 				if (move!=0.0){
 					log.warn("No valid initial solution found for "+plan.getPerson().getId()+"!");
-					plan.setScore(-1000);
+					plan.setScore(-10000);
 					return;
 				}
 			}

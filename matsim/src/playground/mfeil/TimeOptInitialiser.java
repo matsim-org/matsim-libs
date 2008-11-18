@@ -48,8 +48,8 @@ public class TimeOptInitialiser extends MultithreadedModuleA{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerTest (this.estimator, this.scorer, this.factory);
-		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer11 (this.estimator, this.scorer);
+		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerPerformanceT (this.estimator, this.scorer, this.factory);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer13 (this.estimator, this.scorer);
 
 		return timeOptAlgorithm;
 	}

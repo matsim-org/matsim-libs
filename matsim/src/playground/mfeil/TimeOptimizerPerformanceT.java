@@ -14,12 +14,12 @@ import java.io.PrintStream;
 import org.matsim.population.Act;
 
 
-public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanAlgorithm {
+public class TimeOptimizerPerformanceT implements org.matsim.population.algorithms.PlanAlgorithm {
 	
 	private final PlanAlgorithm 	timeOptAlgorithm;
 	private final PlanScorer		scorer;
 	
-	public TimeOptimizerTest (LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
+	public TimeOptimizerPerformanceT (LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
 		this.timeOptAlgorithm = new TimeOptimizer13 (estimator, scorer);
 		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator, factory);
 		this.scorer			  = scorer;
