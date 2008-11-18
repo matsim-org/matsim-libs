@@ -32,7 +32,13 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.utils.misc.Time;
 
 /**
- * New scoring function following Joh's dissertation.
+ * New scoring function following Joh's dissertation:
+ * <blockquote>
+ *  <p>Joh, C.-H. (2004) <br>
+ *  Measuring and Predicting Adaptation in Multidimensional Activity-Travel Patterns,<br>
+ *  Bouwstenen 79, Eindhoven University Press, Eindhoven.</p>
+ * </blockquote>
+ *
  *
  * @author mfeil
  */
@@ -72,7 +78,6 @@ public class JohScoringFunction implements ScoringFunction {
 	protected static double marginalUtilityOfTraveling = -12/3600;
 	private static double marginalUtilityOfTravelingPT = -12/3600; // public transport
 	private static double marginalUtilityOfTravelingWalk = -12/3600;
-	//private static double marginalUtilityOfPerforming = 18/3600;
 	private static double marginalUtilityOfDistance = 0/3600;
 	
 	private static final double uMin_home = 0;
@@ -113,38 +118,34 @@ public class JohScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 
 	}
-
+	
+	// the activity is currently handled by startLeg()
 	public void startActivity(final double time, final Act act) {
-		// the activity is currently handled by startLeg()
 	}
 
 	public void endActivity(final double time) {
 	}
-
+	
+	
 	public void startLeg(final double time, final Leg leg) {
 		
 		if (this.index % 2 == 0) {
-			//System.out.println("Aufruf startLeg f�r Person "+plan.getPerson().getId()+" mit time "+time);
-			
-			// it seems we were not informed about activities
-			//System.out.println("time in methode startLeg(): "+time+" zu leg "+leg);
 			handleAct(time);
 		}
 		this.lastTime = time;
 	}
+	
+	public void addMoney(final double amount){
+		this.score+=amount; //linear mapping of money to utility
+	}
 
 	public void endLeg(final double time) {
-		//System.out.println("Aufruf endLeg f�r Person "+plan.getPerson().getId()+" mit time "+time);
 		handleLeg(time);
 		this.lastTime = time;
 	}
 
 	public void agentStuck(final double time) {
 		this.lastTime = time;
-	}
-
-	public void addMoney(final double amount) {
-		this.score += amount; // linear mapping of money to utility
 	}
 
 	public void finish() {
@@ -157,46 +158,9 @@ public class JohScoringFunction implements ScoringFunction {
 		return this.score;
 	}
 
-	/* At the moment, the following values are all static's. But in the longer run,
-	 * they should be agent-specific or facility-specific values...
-	 */
-	
-	/*private static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = Double.NaN;
-	private static double marginalUtilityOfLateArrival = Double.NaN;
-	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
-	protected static double marginalUtilityOfTraveling = Double.NaN;
-	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
-	private static double marginalUtilityOfTravelingWalk = Double.NaN;
-	private static double marginalUtilityOfPerforming = Double.NaN;
-	private static double marginalUtilityOfDistance = Double.NaN;
-	private static double abortedPlanScore = Double.NaN;
-	*/
-	
-
-	//private static double abortedPlanScore = Double.NaN;
-
 	private static void init() {
 		if (initialized) return;
-
 		utilParams.clear();
-	/*	CharyparNagelScoringConfigGroup params = Gbl.getConfig().charyparNagelScoring();
-		marginalUtilityOfWaiting = params.getWaiting() / 3600.0;
-		marginalUtilityOfLateArrival = params.getLateArrival() / 3600.0;
-		marginalUtilityOfEarlyDeparture = params.getEarlyDeparture() / 3600.0;
-		marginalUtilityOfTraveling = params.getTraveling() / 3600.0;
-		marginalUtilityOfTravelingPT = params.getTravelingPt() / 3600.0;
-		marginalUtilityOfTravelingWalk = params.getTravelingWalk() / 3600.0;
-		marginalUtilityOfPerforming = params.getPerforming() / 3600.0;
-
-		marginalUtilityOfDistance = params.getMarginalUtlOfDistance();
-	*/
-	/*
-		abortedPlanScore = Math.min(
-				Math.min(marginalUtilityOfLateArrival, marginalUtilityOfEarlyDeparture),
-				Math.min(marginalUtilityOfTraveling, marginalUtilityOfWaiting)) * 3600.0 * 24.0; // SCENARIO_DURATION
-		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
-	*/
 		readUtilityValues();
 		scoreActs = (marginalUtilityOfWaiting != 0 ||
 				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
@@ -249,19 +213,11 @@ public class JohScoringFunction implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 		
-		//if (act.getType()=="work"){
-			//System.out.println("openingTime = "+openingTime);
-		//	System.out.println("closingTime = "+closingTime);
-		//	System.out.println("activityStart = "+activityStart);
-		//	System.out.println("activityEnd = "+activityEnd);
-		//}
-		
 		if (openingTime >=  0 && arrivalTime < openingTime) {
 			activityStart = openingTime;
 		}
 		if (closingTime >= 0 && closingTime < departureTime) {
 			activityEnd = closingTime;
-			//System.out.println("Anschlag! Neue activityEnd: "+activityEnd);
 		}
 		if (openingTime >= 0 && closingTime >= 0
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
@@ -278,21 +234,15 @@ public class JohScoringFunction implements ScoringFunction {
 		}
 
 		// disutility if too late
-
 		double latestStartTime = params.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
 			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
-
 		if (duration > 0) {
-			//double utilPerf = marginalUtilityOfPerforming * typicalDuration
-			//		* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
-			
 			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
 			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
-			//System.out.println(utilPerf+" f�r "+utilParams.get(act.getType()).getType()+" und duration = "+duration/3600);
 			double utilWait = marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -360,7 +310,8 @@ public class JohScoringFunction implements ScoringFunction {
 	 * reads all activity utility values from the config-file
 	 */
 	private static final void readUtilityValues() {
-		System.out.println("Reading utility values.");
+		
+		/* TODO @MF To be replaced by config file*/
 		String type;
 		JohActUtilityParameters actParams;
 			
@@ -400,8 +351,7 @@ public class JohScoringFunction implements ScoringFunction {
 			if (lastActType.equals(((Act) this.plan.getActsLegs().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
-				//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcActScore(this.lastTime, this.firstActTime + 24*3600, act)+", act: "+act.getType());
-
+				
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
@@ -414,7 +364,6 @@ public class JohScoringFunction implements ScoringFunction {
 			}
 		} else {
 			this.score += calcActScore(this.lastTime, time, act);
-			//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcActScore(this.lastTime, time, act)+", act: "+act.getType());
 		}
 		this.index++;
 	}
@@ -422,7 +371,6 @@ public class JohScoringFunction implements ScoringFunction {
 	private void handleLeg(final double time) {
 		Leg leg = (Leg)this.plan.getActsLegs().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
-		//System.out.println("Person: "+this.plan.getPerson().getId()+" Score: "+calcLegScore(this.lastTime, time, leg)+", leg: "+leg.getNum()+", travTime: "+leg.getTravTime()+", �bergebene lastTime: "+lastTime+", �bergebene time: "+time);
 		this.index++;
 	}
 
