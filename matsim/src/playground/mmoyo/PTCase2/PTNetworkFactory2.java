@@ -214,7 +214,7 @@ public class PTNetworkFactory2 {
 		ptNetworkLayer.createLink(idLink, from, to, length, freespeed, capacity, permlanes, origid, ptType);
 	}
 	
-	private void createWalkingLink(NetworkLayer ptNetworkLayer, String idLink, PTNode fromPTNode , PTNode toPTNode, String ptType ){
+	public void createWalkingLink(NetworkLayer ptNetworkLayer, String idLink, PTNode fromPTNode , PTNode toPTNode, String ptType ){
 		String idFromNode = fromPTNode.getId().toString();
 		String idToNode = toPTNode.getId().toString();
 		String length = Double.toString(fromPTNode.getCoord().calcDistance(toPTNode.getCoord()));

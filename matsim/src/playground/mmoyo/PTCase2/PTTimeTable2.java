@@ -99,7 +99,7 @@ public class PTTimeTable2{
 			//count seconds between 01:00 am and firt departure  
 			transferTime= (86400-time)+ nodeDeparturesMap.get(idToNode)[0];
 		}
-		return transferTime/60;///return transferTime/60;  //Seconds!
+		return transferTime;///return transferTime/60;  //Seconds!
 	}
 	
 	public List<PTLine> getPtLineList() {
@@ -120,7 +120,7 @@ public class PTTimeTable2{
 		return time.writeTime(dblDeparture, "HH:mm");
 	}
 	
-	//in seconds
+	//in minutes
 	public double nextDeparture(Id idPTNode,  double dblTime){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
 		int x=0;
