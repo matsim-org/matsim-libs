@@ -30,12 +30,13 @@ public class AllTests {
 
 		suite.addTestSuite(ActTest.class);
 		suite.addTestSuite(DesiresTest.class);
+		suite.addTestSuite(KnowledgeTest.class);
 		suite.addTestSuite(PersonTest.class);
 		suite.addTestSuite(PlanTest.class);
-		suite.addTestSuite(KnowledgeTest.class);
+		suite.addTestSuite(RouteImplTest.class);
 		suite.addTest(org.matsim.population.algorithms.AllTests.suite());
 		suite.addTest(org.matsim.population.filters.AllTests.suite());
-		
+
 		return suite;
 	}
 
