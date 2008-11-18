@@ -110,7 +110,7 @@ public class CMCF2Matsim {
 			}
 			
 			//are we done?
-			if(_networkXML != null && _plansXML != null && _edges != null && _newOutDir != null && rand != null)
+			if((_networkXML != null) && (_plansXML != null) && (_edges != null) && (_newOutDir != null) && (rand != null))
 				break;
 		}
 		
@@ -125,6 +125,7 @@ public class CMCF2Matsim {
 	 */
 	public static Document getDocumentFromFile(File file){
 		SAXBuilder parser = new SAXBuilder();
+		parser.setValidation(false);
 		Document doc = null;
 		try {
 			doc = parser.build(file);
@@ -346,11 +347,13 @@ public class CMCF2Matsim {
 	public static void main(String[] args) {
 //		String config = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/cmcf/configCmcfPlansOneAct.xml";
 //		String solution = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/cmcf/plans/solution";
-		String config = "/Volumes/data/work/vspSvn/studies/dgrether/cmcf/daganzoConfig.xml";
-		String solution = "/Volumes/data/work/vspSvn/studies/dgrether/cmcf/solution_daganzo_SO";
+//		String config = "/Volumes/data/work/vspSvn/studies/dgrether/cmcf/daganzoConfig.xml";
+//		String solution = "/Volumes/data/work/vspSvn/studies/dgrether/cmcf/solution_daganzo_SO";
+//		String config = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/cmcf/configCmcfPlansOneAct.xml";
+//		String solution = "/Volumes/data/work/vspSvn/studies/schweiz-ivtch/cmcf/plans/flowG001.cmcf";
 
-		String[] args2 = {config, solution};
-		args = args2;
+//		String[] args2 = {config, solution};
+//		args = args2;
 		
 		if(args.length < 2)
 		{	System.out.println(	" Usage: java CMCF2Matsim CONFIG.xml SOLUTION [Probability] [Suffix]\n" +
@@ -369,7 +372,7 @@ public class CMCF2Matsim {
 				System.out.println(" Couldn't convert probability, setting 1.0");
 			}
 			
-		String suf = "_cmcf";
+		String suf = "_newcmcf";
 		if(args.length>3)
 			suf=args[3];
 		

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -86,7 +85,7 @@ public class EventModeActivityDurationAnalyser {
 
 		config = Gbl.createConfig(new String[] {CONFIGFILE});
 //		config = Gbl.createConfig(null);
-		Gbl.getWorld().setNetworkLayer((NetworkLayer) net);
+		Gbl.getWorld().setNetworkLayer(net);
 
 		Population plans = new Population(Population.NO_STREAMING);
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);

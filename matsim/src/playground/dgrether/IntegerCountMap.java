@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -64,6 +63,7 @@ public class IntegerCountMap<T> implements Map<T, Integer> {
 		return delegate.entrySet();
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		return delegate.equals(o);
 	}
@@ -72,6 +72,7 @@ public class IntegerCountMap<T> implements Map<T, Integer> {
 		return delegate.get(key);
 	}
 
+	@Override
 	public int hashCode() {
 		return delegate.hashCode();
 	}

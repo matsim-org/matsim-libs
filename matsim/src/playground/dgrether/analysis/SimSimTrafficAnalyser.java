@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -89,7 +88,7 @@ public class SimSimTrafficAnalyser {
 			double[] volumes = this.linkStats.getAvgLinkVolumes(l.getId().toString());
 			double[] volumes2 = this.linkStats2.getAvgLinkVolumes(l.getId().toString());
 			
-			if (volumes == null || volumes2 == null) {
+			if ((volumes == null) || (volumes2 == null)) {
 				log.warn("No volumes for link: " + l.getId().toString());
 				continue;
 			}

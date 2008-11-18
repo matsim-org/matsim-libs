@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KmlNetworkWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,7 +20,6 @@ package playground.dgrether.analysis;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -39,7 +37,7 @@ import org.matsim.world.World;
 public class ScenarioLoader {
 
 
-	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
+//	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
 	private NetworkLayer networkLayer;
 
