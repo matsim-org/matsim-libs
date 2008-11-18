@@ -169,7 +169,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 				primaryActivities.put(act.getType(), new Vector<Act>());
 			}
 			
-			if (isPrimary) {					
+			if (isPrimary && !act.getType().startsWith("h")) {					
 				primaryActivities.get(act.getType()).add(act);
 			}
 		}
