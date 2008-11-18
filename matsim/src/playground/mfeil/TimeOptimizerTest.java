@@ -4,7 +4,7 @@ package playground.mfeil;
 import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.scoring.PlanScorer;
+import org.matsim.scoring.*;
 import org.matsim.population.Plan;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.MatsimRandom;
@@ -19,9 +19,9 @@ public class TimeOptimizerTest implements org.matsim.population.algorithms.PlanA
 	private final PlanAlgorithm 	timeOptAlgorithm;
 	private final PlanScorer		scorer;
 	
-	public TimeOptimizerTest (LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizerTest (LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
 		this.timeOptAlgorithm = new TimeOptimizer13 (estimator, scorer);
-		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator);
+		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator, factory);
 		this.scorer			  = scorer;
 	}
 	
