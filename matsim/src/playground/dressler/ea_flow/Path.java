@@ -72,7 +72,7 @@ public class Path {
 		private final Link edge;
 		
 		/**
-		 * time upon wich the flow enters the dge
+		 * time upon which the flow enters the edge
 		 */
 		private final int time;
 		
@@ -94,7 +94,7 @@ public class Path {
 		}
 		
 		/**
-		 * Mehtod returning a String representation of the PathEdge
+		 * Method returning a String representation of the PathEdge
 		 */
 		public String toString(){
 			if(!this.forward){
@@ -120,7 +120,7 @@ public class Path {
 		}
 
 		/**
-		 * getter for the tim at which an edge is entered
+		 * getter for the time at which an edge is entered
 		 * @return the time
 		 */
 		public int getTime() {
@@ -129,7 +129,7 @@ public class Path {
 	}
 	
 	/**
-	 * Default Constuctor creating a Path with flow value 0 and no edges
+	 * Default Constructor creating a Path with flow value 0 and no edges
 	 */
 	public Path(){
 		this._flow = 0;
@@ -258,7 +258,7 @@ public class Path {
 	}
 	
 	/**
-	 * Setter for the ammount of flow on the path
+	 * Setter for the amount of flow on the path
 	 * @param flow nonnegative flow on the path
 	 * @exception throws an IllegalArgumentException iff flow is negative
 	 */
@@ -270,7 +270,7 @@ public class Path {
 	}
 	
 	/**
-	 * getter for the ammount of flow on a Path
+	 * getter for the amount of flow on a Path
 	 * @return flow on the Path
 	 */
 	public int getFlow(){
@@ -287,7 +287,7 @@ public class Path {
 	
 	/**
 	 * getter for arrival time if it is set
-	 * @return arrivel time
+	 * @return arrival time
 	 */
 	public int getArrival(){
 		return this._arrival;

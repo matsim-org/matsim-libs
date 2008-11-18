@@ -31,7 +31,7 @@ import org.matsim.network.Node;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.Path.PathEdge;
 /**
- * Class representing a dynamic flow on an network with multible sources and a single sink 
+ * Class representing a dynamic flow on an network with multiple sources and a single sink 
  * @author Manuel Schneider
  *
  */
@@ -45,6 +45,11 @@ public class Flow {
 	 * between runs!
 	 */
 	private final NetworkLayer _network;
+	
+	/**
+	 * used to calculate the length of every edge in the network
+	 */
+	private final FakeTravelTimeCost _lengths; 
 	
 	/**
 	 * Edge representation of flow on the network  
@@ -67,7 +72,7 @@ public class Flow {
 	private HashMap<Node,Integer> _demands;
 	
 	/**
-	 *stores for all nodes wheather they are an nonactive source 
+	 *stores for all nodes whether they are an non active source 
 	 */
 	private HashMap<Node,Boolean> _nonactives;
 
@@ -82,6 +87,7 @@ public class Flow {
 	private final  int _timeHorizon;
 	
 	/**
+	 * TODO use debug mode
 	 * flag for debug mode
 	 */
 	@SuppressWarnings("unused")
@@ -94,21 +100,22 @@ public class Flow {
 	
 	/**
 	 * Constructor that initializes a zero flow over time on the specified network
-	 * the length of the edges will be length/speed
+	 * the length of the edges will be as specified by FakeTravelTimeCost 
 	 * @param network network on which the flow will "live"
 	 * @param sources the potential sources of the flow		
 	 * @param demands the demands in the sources as nonnegative integers
 	 * @param sink the sink for all the flow
-	 * @param horizon the timehorizon in which flow is admittable
+	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
+	public Flow(final NetworkLayer network,final LinkedList<Node> sources,final FakeTravelTimeCost lengths, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
+		this._lengths = lengths;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			int l = (int)link.getLength()/(int)link.getFreespeed(1.); // TODO Costfunktion
+			int l = (int) _lengths.getLinkTravelCost(link, 1.);
+			//int l = (int)link.getLength()/(int)link.getFreespeed(1.); 
 			this._flow.put(link, new EdgeIntervalls(l));
-			//TODO achtung cast von double auf int
 		}
 		this._paths = new LinkedList<Path>();
 		this._sources = sources;
@@ -125,11 +132,12 @@ public class Flow {
 	 * @param flow the preset flow on the network
 	 * @param sources the potential sources of the flow
 	 * @param demands demands the demands in the sources as nonnegative integers
-	 * @param sink the sink for al the flow
-	 * @param horizon the timehorizon in which flow is admittable
+	 * @param sink the sink for all the flow
+	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network, HashMap<Link, EdgeIntervalls> flow,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
+	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Link, EdgeIntervalls> flow,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
+		this._lengths = lengths;
 		this._flow = flow;
 		this._paths = new LinkedList<Path>();
 		this._sources = sources;
@@ -140,7 +148,7 @@ public class Flow {
 	}
 
 	/**
-	 * for all Nodes it is specified if the node is an unactive source
+	 * for all Nodes it is specified if the node is an non active source
 	 */
 	private HashMap<Node,Boolean> nonActives(){
 		HashMap<Node,Boolean> nonactives = new HashMap<Node,Boolean>();
@@ -157,10 +165,10 @@ public class Flow {
 		}
 		return nonactives;
 	}
-//--------------------Flow handeling Methods-------------------------------------//	
+//--------------------Flow handling Methods-------------------------------------//	
 	
 	/**
-	 * Method to determen wheather a Node is a Source with positive demand
+	 * Method to determine whether a Node is a Source with positive demand
 	 * @param node Node that is checked
 	 * @return true iff Node is a Source and has positive demand
 	 */
@@ -178,21 +186,26 @@ public class Flow {
 	}
 	
 	/**
-	 * Mtehod for finding the minimum of the demand at the start node
+	 * Method for finding the minimum of the demand at the start node
 	 * and the minimal capacity along the Path
 	 * @param path
-	 * @return
+	 * @return minimum over all unused capacities and the demand in the first node
 	 */
 	private int bottleNeckCapacity(final Path path){
+		//check if first node is a source
 		Node source = path.getSource();
 		if(!this._demands.containsKey(source)){
 			throw new IllegalArgumentException("Startnode is no source " + path);
 		}
 		int result = this._demands.get(source);
+		//go through the pat edges
 		for(PathEdge edge : path.getPathEdges()){
 			Link link = edge.getEdge();
 			int cap =(int) link.getCapacity(1.);
 			int time = edge.getTime();
+			
+//TODO look if residual edges are handeled properly   !!!!!
+			
 			int flow = this._flow.get(link).getFlowAt(time);
 			int i = cap-flow;
 			if (i<0){
@@ -206,8 +219,8 @@ public class Flow {
 	}
 	
 	/**
-	 * Method to add another path to the flow. The Path will be added with flow equal to its bottlenec capacity
-	 * @param path the path on wich the maximal flow possible is augmented 
+	 * Method to add another path to the flow. The Path will be added with flow equal to its bottleneck capacity
+	 * @param path the path on which the maximal flow possible is augmented 
 	 */
 	public void augment(Path path){
 		int gamma = bottleNeckCapacity(path);
@@ -218,7 +231,11 @@ public class Flow {
 			if(edge.isForward()){
 				flow.augment(time, gamma, (int)link.getCapacity(1.));
 			}else{
-				//TODO look at what time to raise!!!!
+				
+				
+//TODO look at what time to raise!!!!
+				
+
 				flow.augmentreverse(time, gamma);
 			}
 		}
@@ -248,7 +265,7 @@ public class Flow {
 	}
 	
 	/**
-	 * decides whether a Node is an nonactive Source
+	 * decides whether a Node is an non active Source
 	 * @param node Node to check for	
 	 * @return true iff node is a Source with demand 0
 	 */
@@ -258,7 +275,9 @@ public class Flow {
 	
 	
 //-----------evaluation methods---------------------------------------------------//
-	
+	/**
+	 * gives back an array containing the amount of flow into the sink for all time steps from 0 to time horizon
+	 */
 	public int[] arrivals(){
 		int maxtime = 0;
 		int[] temp = new int[this._timeHorizon+1];
@@ -279,6 +298,10 @@ public class Flow {
 		
 	}
 	
+	/**
+	 * gives back an array containing the total amount of flow into the sink by a given time 
+	 * for all time steps from 0 to time horizon
+	 */
 	public int[] arrivalPattern(){
 		int[] result = this.arrivals();
 		int sum = 0;
@@ -288,10 +311,14 @@ public class Flow {
 		}
 		return result;
 	}
-	
+	/**
+	 * String representation of the arrivals specifying the amount of flow into the sink
+	 * for all time steps from 0 to time horizon
+	 * @return String representation of the arrivals
+	 */
 	public String arrivalsToString(){
 		//StringBuilder strb1 = new StringBuilder();
-		StringBuilder strb2 = new StringBuilder("       arrivals:");
+		StringBuilder strb2 = new StringBuilder("  arrivals:");
 		int[] a =this.arrivals();
 		for (int i=1; i<a.length;i++){
 			String temp = String.valueOf(a[i]);
@@ -300,6 +327,11 @@ public class Flow {
 		return strb2.toString();
 	}
 	
+	/**
+	 * a STring specifying the total amount of flow into the sink by a given time 
+	 * for all time steps from 0 to time horizon
+	 * @return String representation of the arrival pattern
+	 */
 	public String arrivalPatternToString(){
 		//StringBuilder strb1 = new StringBuilder();
 		StringBuilder strb2 = new StringBuilder("arrival pattern:");
@@ -324,10 +356,6 @@ public class Flow {
 		}
 		return strb.toString();
 	}
-	
-	
-	
-
 	
 	/**
 	 * @return the _demands

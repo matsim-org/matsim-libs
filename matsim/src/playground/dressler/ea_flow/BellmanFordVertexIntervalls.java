@@ -54,88 +54,60 @@ public class BellmanFordVertexIntervalls {
 	private final NetworkLayer network;
 
 	/**
-	 * The cost calculator. Provides the cost for each link and time step.
-	 */
-	private final TravelCost costFunction; //TODO use
-
-	/**
-	 * The travel time calculator. Provides the travel time for each link and
-	 * time step. This is ignored.
-	 */
-	private final TravelTime timeFunction; //TODO use
-	
-	/**
-	 * Datastructure to to represent the flow on a network  
+	 * data structure to to represent the flow on a network  
 	 */
 	private HashMap<Link, EdgeIntervalls> _flowlabels;
 	
 	/**
-	 * Datastructure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
+	 * data structure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
 	 */
 	private HashMap<Node, VertexIntervalls> _labels;
 	
 	/**
-	 *TODO 
+	 * data structure to hold the present flow
 	 */
 	private Flow _flow;
 
 	/**
-	 * TODO
+	 * maximal time horizon
 	 */
 	private final int _timehorizon;
 	
 	/**
-	 * TODO
+	 * sink node to which paths are searched
 	 */
 	private final Node _sink;
 
 	/**
-	 * TODO
-	 */
-	final FakeTravelTimeCost length = new FakeTravelTimeCost();
-	
-	/**
-	 * TODO
+	 * debug flag
 	 */
 	private static boolean _debug=false;
 
+	//--------------------CONSTRUCTORS-------------------------------------//
+	
 	/**
-	 * Default constructor.
-	 * 
-	 * @param network
-	 *            The network on which to route.
-	 * @param costFunction
-	 *            Determines the link cost defining the cheapest route. Note,
-	 *            comparisons are only made with accuraracy 0.001 due to
-	 *            numerical problems otherwise.
-	 * @param timeFunction
-	 *            Determines the travel time on links. This is ignored!
-	 */
+	 * Constructor
+	 * @param network network used for calculations
+	 * @param flow data structure to hold the flow on the network, must be initialized
+	 * @param timeHorizon maximal time allowed to be used
+	 * @param sink node to which demands are routed
+	 *//*
 	public BellmanFordVertexIntervalls(final NetworkLayer network,
-			final TravelCost costFunction, final TravelTime timeFunction,
 			HashMap<Link, EdgeIntervalls> flow, int timeHorizon,Node sink) {
-
 		this.network = network;
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
-
 		this._flowlabels = flow;
 		this._timehorizon = timeHorizon;
 		this._sink = sink;
 		this._labels = new HashMap<Node, VertexIntervalls>();
-	}
+	}*/
 	
 	/**
-	 * TODO
-	 * @param costFunction
-	 * @param timeFunction
-	 * @param flow
+	 * Constructor using all the data initialized in the Flow object use recommended
+	 * @param flow 
 	 */
-	public BellmanFordVertexIntervalls(final TravelCost costFunction, final TravelTime timeFunction, Flow flow) {
+	public BellmanFordVertexIntervalls( Flow flow) {
 		this._flow = flow;
 		this.network = flow.getNetwork();
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
 		this._flowlabels = flow.getFlow();
 		this._timehorizon = flow.getTimeHorizon(); 
 		this._sink = flow.getSink();
@@ -153,8 +125,8 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @return
+	 * refreshes all dist labels before one run of the algorithm
+	 * @return returns all active sources
 	 */
 	private LinkedList<Node> refreshLabels(){
 		LinkedList<Node> nodes = new LinkedList<Node>();
@@ -170,9 +142,9 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @param node
-	 * @return
+	 * decides whether a node is an active source
+	 * @param node to be checked
+	 * @return true if there is still demand on the node
 	 */
 	private boolean isActiveSource(Node node) {
 		if(_debug){
@@ -182,8 +154,8 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @return
+	 * Constructs  a Path based on the labels set by the algorithm 
+	 * @return shortest Path from one active source to the sink if it exists
 	 */
 	private Path constructRoute()throws BFException{
 		Node to = _sink;
@@ -236,7 +208,7 @@ public class BellmanFordVertexIntervalls {
 	
 	
 	/**
-	 * method for updating the labels of Node to
+	 * method for updating the labels of Node to during one iteration of the algorithm
 	 * @param from Node from which we start
 	 * @param to Node to which we want to go 
 	 * @param over Link upon which we travel
@@ -256,7 +228,7 @@ public class BellmanFordVertexIntervalls {
 			if(i.getDist()){
 				if(_debug){
 					System.out.println("wir kommen los:"+ from.getId());
-				}	//TODO cas auf int!!!
+				}	//TODO cast to int capacity handling!!!
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
 					if(_debug){
@@ -279,8 +251,8 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @return
+	 * main bellman ford algorithm calculating a shortest path
+	 * @return shortest Path from one active source to the sink if it exists
 	 */
 	public Path doCalculations() {
 		// queue to save nodes we have to scan
@@ -294,7 +266,7 @@ public class BellmanFordVertexIntervalls {
 		Node v, w;
 		// dist is the distance from the source to w over v
 
-		// mainloop
+		// main loop
 		while (!queue.isEmpty()) {
 			// gets the first vertex in the queue
 			v = queue.poll();
@@ -309,7 +281,7 @@ public class BellmanFordVertexIntervalls {
 					queue.add(w);
 				}
 			}
-			// link is incomming edge of v => backward edge
+			// link is incoming edge of v => backward edge
 			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
 				boolean changed = relabel(v,w,link,false);
@@ -327,15 +299,14 @@ public class BellmanFordVertexIntervalls {
 		try{ 
 			path = constructRoute();
 		}catch (BFException e){
-			System.out.println(e.getMessage());
-			//TODO better handling
+			System.out.println("stop reason: " + e.getMessage());
 		}
 		return path;
 		
 	}
 
 	/**
-	 * TODO
+	 * prints the Status on the console
 	 *
 	 */
 	private void printStatus() {

@@ -21,7 +21,7 @@ package playground.dressler.ea_flow;
 
 
 /**
- * Exception class for shortes path algorithems
+ * Exception class for shortest path algorithms
  * @author Manuel Schneider
  */
 public class BFException extends Exception {
@@ -31,23 +31,19 @@ public class BFException extends Exception {
 	 */
 	private static final long serialVersionUID = 1239419376L;
 
-	public BFException() {
-		// TODO Auto-generated constructor stub
+	public BFException() {		
 	}
 
 	public BFException(String arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
+		super(arg0);	
 	}
 
 	public BFException(Throwable arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	public BFException(String arg0, Throwable arg1) {
 		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
 	}
 
 }

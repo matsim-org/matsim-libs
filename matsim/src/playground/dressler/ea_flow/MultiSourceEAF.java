@@ -26,8 +26,6 @@ package playground.dressler.ea_flow;
 
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,6 +35,10 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.Node;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Population;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
@@ -48,10 +50,21 @@ import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
  */
 public class MultiSourceEAF {
 	
+	/**
+	 * debug flag
+	 */
+	private static boolean _debug = false;
 	
-	private boolean _debug = false;
 	
-	//TODO comment
+	/**
+	 * A method to read a file containing the information on demands in an evacuation scenario for a given network
+	 * the syntax of the file is as follows:
+	 * every line contains the ID of a node which must be contained in the network and its demand seperated by ";"
+	 * @param network the network for which the demands should be read	
+	 * @param filename the path of the demands file
+	 * @return A HashMap<Node,Integer> containing the demands for every node in the file
+	 * @throws IOException if file reading fails
+	 */
 	private static HashMap<Node,Integer> readDemands(NetworkLayer network, String filename) throws IOException{
 			BufferedReader in = new BufferedReader(new FileReader(filename));
 			HashMap<Node,Integer> demands = new HashMap<Node,Integer>();
@@ -64,34 +77,46 @@ public class MultiSourceEAF {
 			}
 		return demands;
 	}
+	
+	//TODO finish
+	/*
+	private static HashMap<Node,Integer> readPopulation(NetworkLayer network, String filename){
+		Population population = new Population();
+		MatsimPopulationReader reader = new MatsimPopulationReader(population);
+		reader.readFile(filename);
+		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
+		for(Person person : population.getPersons().values() ){
+			Plan plan = person.getPlans().get(0);
+			plan.getFirstActivity();
+		}
+		
+		return null;
+	}
+	*/
+	
 	/**
-	 * @param args blub
+	 * main method to run an EAF algorithm on the specified cenarion
+	 * @param args b
 	 * 
 	 */
 	public static void main(String[] args) {
 		 System.out.println("Ich lebe");
 		 NetworkLayer network = new NetworkLayer();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
-		 
 		 HashMap<Link, EdgeIntervalls> flow;
+		 HashMap<Node, Integer> demands;
 		 int timeHorizon = 90;
 		 
-		 //TODO choose the one you need
-		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/equil/network.xml");
-		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/two-routes/network.xml");
-		 //networkReader.readFile("/homes/combi/olthoff/.eclipse/Matsim/examples/roundabout/network.xml");
-		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/equil/network.xml");
-		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/two-routes/network.xml");
-		 //networkReader.readFile("C:/Documents and Settings/Administrator/workspace/matsim/examples/roundabout/network.xml");
-		 //networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
-		 networkReader.readFile("/Users/manuel/Documents/meine_EA/manu2.xml");
-		 HashMap<Node, Integer> demands;
+		//Read the data 
+		//networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
+		networkReader.readFile("/Users/manuel/Documents/meine_EA/manu2.xml");
 		try {
 			demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu2.dem");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+		
 		flow = new HashMap<Link, EdgeIntervalls>();
 		for(Link link : network.getLinks().values()){
 			int l = (int)link.getLength()/(int)link.getFreespeed(1.);//TOTO traveltime
@@ -112,7 +137,7 @@ public class MultiSourceEAF {
 			TravelTime traveltime = (TravelTime) travelcost;
 
 			Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
-			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(travelcost, traveltime,fluss);
+			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 			BellmanFordVertexIntervalls.debug(true);
 			for (int i=0; i<20000; i++){
 				result = routingAlgo.doCalculations();
