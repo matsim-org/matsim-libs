@@ -3,9 +3,10 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.gbl.MatsimRandom;
 
 public class PersonsRandomizeId {
 
@@ -32,7 +33,7 @@ public class PersonsRandomizeId {
 //			if(maxId<id){
 //				maxId=id;
 //			}
-			p.setId(newIds.get(j).toString());
+			p.setId(new IdImpl(newIds.get(j)));
 			j++;
 		}
 	}

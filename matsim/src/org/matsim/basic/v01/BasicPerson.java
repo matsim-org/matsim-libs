@@ -49,9 +49,7 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 	public Id getId();
 
 	public void setId(final Id id);
-
-	public void setId(final String idstring);
-
+	
 	public String getSex();
 
 	public int getAge();

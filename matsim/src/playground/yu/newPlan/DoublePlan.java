@@ -20,6 +20,7 @@
 
 package playground.yu.newPlan;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 
@@ -54,7 +55,7 @@ public class DoublePlan extends NewPlan {
 		// produce new Person with bigger Id
 		for (int i = 0; i < 17; i++) {
 			newPersonId = Integer.parseInt(person.getId().toString()) + 1000;
-			person.setId(Integer.toString(newPersonId));
+			person.setId(new IdImpl(newPersonId));
 			pw.writePerson(person);
 		}
 	}

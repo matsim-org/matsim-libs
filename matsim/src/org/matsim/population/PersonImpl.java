@@ -329,10 +329,6 @@ public class PersonImpl implements Person{
 		delegate.setId(id);
 	}
 
-	public void setId(String idstring) {
-		delegate.setId(idstring);
-	}
-
 	public void setLicence(String licence) {
 		delegate.setLicence(licence);
 	}
