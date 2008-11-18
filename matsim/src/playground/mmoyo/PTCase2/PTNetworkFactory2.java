@@ -13,19 +13,20 @@ import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkWriter;
 import org.matsim.utils.geometry.Coord;
 
 import playground.mmoyo.PTRouter.*;
 
 public class PTNetworkFactory2 {
 	public Map <Id,Double> linkTravelTimeMap = new TreeMap <Id,Double>();
-	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
+	//private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	
 	public PTNetworkFactory2(){
 		super();
 	}
 	
-	public NetworkLayer createNetwork(String PTNetFile, PTTimeTable2 ptTimeTable){
+	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
 		NetworkLayer ptNetworkLayer;
 
 		//PTLinesReader2 ptLinesReader = new PTLinesReader2();
@@ -34,7 +35,7 @@ public class PTNetworkFactory2 {
 		
 		//Create a temporal network with normal Nodes
 		NetworkLayer tempNet= new NetworkLayer(networkFactory);
-		new MatsimNetworkReader(tempNet).readFile(PTNetFile);
+		new MatsimNetworkReader(tempNet).readFile(inFileName);
 		
 		//Create the PTNetwork with PTNodes
 		List<PTNode> ptNodeList = new ArrayList<PTNode>();
@@ -165,9 +166,20 @@ public class PTNetworkFactory2 {
 		}// while
 		it = null;
 		/*******************/
-		//this.printLinks(ptNetworkLayer);
+	
+		
+		//write the conplete PTNetwork (with transfers) into the definitive PT Network File
+		System.out.println("writing pt network...");
+		new NetworkWriter(ptNetworkLayer, OutFileName).write();
+		System.out.println("done.");
+		
+		
+		
 		return ptNetworkLayer;
 	}//Create Ptnetwork
+	
+	
+	
 	
 	public PTNode CreateWalkingNode(NetworkLayer ptNetworkLayer,IdImpl idNode, Coord coord) {
 		PTNode ptNode = new PTNode(idNode, coord, "Walking");

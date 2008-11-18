@@ -11,13 +11,14 @@ import org.matsim.utils.geometry.CoordImpl;
 public class PTControler2 {
 
 	private static final String CONFIG= "../shared-svn/studies/schweiz-ivtch/pt-experimental/config.xml";
+	private static final String INPTNETFILE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml";
 	private static final String ZURICHPTN= "../shared-svn/studies/schweiz-ivtch/pt-experimental/network.xml";
 	private static final String ZURICHPTTIMETABLE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/PTTimetable.xml";
-	//private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
-	//private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
+	private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
+	private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
 	
-	private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
-	private static final String OUTPUTPLANS= "c://output_plans.xml";
+	//private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	//private static final String OUTPUTPLANS= "c://output_plans.xml";
 	
 	/*
 	//Variables for the net 5x5
@@ -28,7 +29,7 @@ public class PTControler2 {
 	 */	
 	
 	public static void main(String[] args){
-		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
+		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
 		int option =2;
 		switch (option){
@@ -48,8 +49,6 @@ public class PTControler2 {
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
 	    		break;
-	    	
-	    	
 		}//switch
 	}//main
 	
@@ -64,9 +63,3 @@ public class PTControler2 {
 	}
 	
 }//Class
-
-
-/*
- PTActivityCreator ptActivityCreator= new PTActivityCreator(pt.getPtNetworkLayer(), CONFIG, ZURICHPTPLANS, pt.getPtRouter2());
-ptActivityCreator.createPTActs(OUTPUTPLANS,pt.getPtTimeTable());
-*/

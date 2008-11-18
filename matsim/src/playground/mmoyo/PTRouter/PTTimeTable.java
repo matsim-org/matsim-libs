@@ -113,42 +113,7 @@ public class PTTimeTable {
 				}
 			}
 		}
-	
-	
-	/*new methods
-	 * They accomplish the tecnik of a "single file information" and calculate the departure of all stations
-	 * 
-	 * 
-	 */
-	
-	
-	
-	
-	}
-	
-	/*OLD CODE
-	private IdImpl idPTLine;
-	private int[] departureTime;
-	
-	public PTTimeTable(IdImpl idPTLine,int[] departures) {
-		this.idPTLine= idPTLine;	
-		this.departureTime = departures;
+
 	}
 
-	public IdImpl getIdPtLine() {
-		return idPTLine;
-	}
-
-	public void setIdPtLine(IdImpl idPtLine) {
-		this.idPTLine = idPtLine;
-	}
-
-	public int[] getDepartureTime() {
-		return departureTime;
-	}
-
-	public void setDeparture(int[] departureTime) {
-		this.departureTime = departureTime;
-	}
-	*/
 }

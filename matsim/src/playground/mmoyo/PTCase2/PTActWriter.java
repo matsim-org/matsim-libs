@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -85,8 +87,11 @@ public class PTActWriter {
 		    		}//if(legRoute!=null)
 
 				}//if val
-				thisAct.setLink(this.pt.getPtNetworkLayer().getNearestLink(thisAct.getCoord()));
-				newPlan.addAct(thisAct);
+				
+		    	//TODO: this must be read from the city network not from pt network!!! 
+		    	thisAct.setLink(this.pt.getPtNetworkLayer().getNearestLink(thisAct.getCoord()));
+				
+		    	newPlan.addAct(thisAct);
 				lastAct = thisAct;
 				val=true;
 			}
@@ -104,12 +109,7 @@ public class PTActWriter {
 		Gbl.getConfig().plans().setOutputVersion("v4");
 		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
-		
-		/*
-		System.out.println("writing pt network...");
-		new NetworkWriter(this.network).write();
-		System.out.println("done.");
-		*/
+
 		
 	}//createPTActs
 
@@ -149,7 +149,9 @@ public class PTActWriter {
 		return route;
 	}
 		
+	//TODO  use  this.pt.getPtNetworkLayer().getNearestNodes(coord, distance) and get ride of proximity object		
 	public Route findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+		
 		PTNode[] NearStops1=  ptnProximity.getNearestBusStops(coord1, distToWalk);
 		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk);
 		ptNode1= this.pt.getPtNetworkFactory().CreateWalkingNode(this.pt.getPtNetworkLayer(), new IdImpl("W1"), coord1);
@@ -271,7 +273,7 @@ public class PTActWriter {
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
 		
-		//ptAct.setDur(dur);
+		ptAct.setDuration(dur);
 		ptAct.calculateDuration();
 		ptAct.setLink(link);
 		//act.setLinkId(link.getId());
@@ -290,9 +292,9 @@ public class PTActWriter {
 		Leg leg = new Leg(mode);
 		leg.setNum(num);
 		leg.setRoute(legRoute);
-		///leg.setDepTime(depTime);
-		///leg.setTravTime(travTime);
-		///leg.setArrTime(arrTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(arrTime);
 		return leg;
 	}
 	
