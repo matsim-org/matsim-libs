@@ -26,7 +26,7 @@ import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl {
 
-	public Leg(BasicLeg.Mode mode) {
+	public Leg(final BasicLeg.Mode mode) {
 		super(mode);
 	}
 
@@ -55,7 +55,13 @@ public class Leg extends BasicLegImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Route createRoute(final String dist, final String time) {
-		this.route = new RouteImpl(dist, time);
+		this.route = new RouteImpl();
+		if (dist != null) {
+			this.route.setDist(Double.parseDouble(dist));
+		}
+		if (time != null) {
+			this.route.setTravTime(Time.parseTime(time));
+		}
 		return getRoute();
 	}
 

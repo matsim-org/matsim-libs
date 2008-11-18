@@ -34,31 +34,12 @@ import org.matsim.utils.misc.Time;
 
 public class RouteImpl extends BasicRouteImpl implements Route {
 
-	
 	protected ArrayList<Node> route = new ArrayList<Node>();
-
-	
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
 
 	private double cost = Double.NaN;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
 	public RouteImpl() {
-	}
-
-	public RouteImpl(final String dist, final String travTime) {
-
-		if (dist != null) {
-			super.setDist(Double.parseDouble(dist));
-		}
-		if (travTime != null) {
-			super.setTravTime(Time.parseTime(travTime));
-		}
+		// default constructor
 	}
 
 	public RouteImpl(final Route route) {
@@ -66,10 +47,6 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		super.setTravTime(route.getTravTime());
 		this.route = new ArrayList<Node>(route.getRoute());
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
 
 	public final void setRoute(final String route) {
 		NetworkLayer layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
@@ -100,12 +77,12 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		this.cost = Double.NaN;
 	}
 
-	
+
 	public ArrayList<Node> getRoute() {
 		return this.route;
 	}
-	
-	public void setLinkRoute(List<Link> srcRoute) {
+
+	public void setLinkRoute(final List<Link> srcRoute) {
 		this.route.clear();
 		if (srcRoute != null) {
 			Link l = srcRoute.get(0);
@@ -114,33 +91,26 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 				l = srcRoute.get(i);
 				this.route.add(l.getToNode());
 			}
-		}	
+		}
 	}
 
-	public void setRoute(List<Node> srcRoute) {
+	public void setRoute(final List<Node> srcRoute) {
 		if (srcRoute == null) {
 			this.route.clear();
-		}
-		else if (srcRoute instanceof ArrayList) {
-			this.route = (ArrayList<Node>) srcRoute;
-		}
-		else {
+		} else {
 			this.route.clear();
 			this.route.addAll(srcRoute);
 		}
 		this.route.trimToSize();
 	}
 
-	
+
 	public final void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
 		setRoute(route);
 		super.setTravTime(travelTime);
 		this.cost = travelCost;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
 	@Override
 	public final double getDist() {
 		if (Double.isNaN(super.getDist())) {
@@ -162,7 +132,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Returns the list of links that build the route. The links where the route
 	 * starts and ends (the links where the activities are on) are <b>not</b>
@@ -223,11 +193,12 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 	}
 
 	/**
-	 * This method returns a new Route object with the subroute of this beginning at fromNode
-	 * till toNode. If from or twoNode are not found in this, an IllegalArgumentException is thrown.
+	 * This method returns a new Route object with the subroute of this beginning at fromNode and
+	 * ending at toNode.
 	 * @param fromNode
 	 * @param toNode
 	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route!
+	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
 	public Route getSubRoute(final Node fromNode, final Node toNode) {
 		int fromIndex = -1;
@@ -257,10 +228,6 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		ret.route = new ArrayList<Node>(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public final String toString() {
