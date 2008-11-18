@@ -175,18 +175,18 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
-	private static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = Double.NaN;
-	private static double marginalUtilityOfLateArrival = Double.NaN;
-	private static double marginalUtilityOfEarlyDeparture = Double.NaN;
+	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	protected static double marginalUtilityOfWaiting = Double.NaN;
+	protected static double marginalUtilityOfLateArrival = Double.NaN;
+	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
 	protected static double marginalUtilityOfTraveling = Double.NaN;
 	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
 	private static double marginalUtilityOfTravelingWalk = Double.NaN;
-	private static double marginalUtilityOfPerforming = Double.NaN;
+	protected static double marginalUtilityOfPerforming = Double.NaN;
 	private static double marginalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
 
-	private static void init() {
+	protected static void init() {
 		if (initialized) return;
 
 		utilParams.clear();
@@ -212,7 +212,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		initialized = true;
 	}
 
-	private final double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Act act) {
 
 		ActUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -403,7 +403,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		}
 	}
 
-	private void handleAct(final double time) {
+	protected void handleAct(final double time) {
 		Act act = (Act)this.plan.getActsLegs().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
