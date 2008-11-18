@@ -36,6 +36,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
@@ -68,7 +69,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 	private int index; // the current position in plan.actslegs
 	private double firstActTime;
 	private final int lastActIndex;
-	private List<Penalty> penalty = null;
+	private List<ScoringPenalty> penalty = null;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 0;
@@ -91,7 +92,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		this.plan = plan;
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
-		this.penalty = new Vector<Penalty>();
+		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
 	}
 	
@@ -141,9 +142,9 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		}
 
 		// reduce score by penalty from capacity restraints
-		Iterator<Penalty> pen_it = this.penalty.iterator();
+		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
 		while (pen_it.hasNext()){
-			Penalty penalty = pen_it.next();
+			ScoringPenalty penalty = pen_it.next();
 			
 			// TODO: check activity is secondary
 			this.score -=penalty.getPenalty();
@@ -282,7 +283,7 @@ public class LocationChoiceScoringFunction implements ScoringFunction {
 		
 		// used arrival and departure time because of parking cap restr. before act actually starts
 		if (!act.getType().equalsIgnoreCase("home")) {
-			this.penalty.add(new Penalty(arrivalTime, departureTime, 
+			this.penalty.add(new ScoringPenalty(arrivalTime, departureTime, 
 					this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
 		}	
 		
