@@ -30,7 +30,7 @@ public class PTControler2 {
 	public static void main(String[] args){
 		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
-		int option =3;
+		int option =2;
 		switch (option){
 	    	case 0: 
 	    		Node ptNode = pt.getPtNetworkLayer().getNode("100048");

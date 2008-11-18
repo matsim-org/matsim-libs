@@ -15,6 +15,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReaderMatsimV4;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
+import org.matsim.population.RouteImpl;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.router.Dijkstra;
@@ -269,7 +270,8 @@ public class PTActWriter {
 		Act ptAct= new Act(type, coord);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);
-		ptAct.setDur(dur);
+		
+		//ptAct.setDur(dur);
 		ptAct.calculateDuration();
 		ptAct.setLink(link);
 		//act.setLinkId(link.getId());
@@ -278,7 +280,7 @@ public class PTActWriter {
 	}
 		
 	private Leg newPTLeg(int num, Leg.Mode mode, List<Link> routeLinks, double distance, double depTime, double travTime, double arrTime){
-		Route legRoute = new Route();
+		Route legRoute = new RouteImpl();
 		if (mode!=Leg.Mode.walk){
 			legRoute.setLinkRoute(routeLinks);
 		}
@@ -288,9 +290,9 @@ public class PTActWriter {
 		Leg leg = new Leg(mode);
 		leg.setNum(num);
 		leg.setRoute(legRoute);
-		leg.setDepTime(depTime);
-		leg.setTravTime(travTime);
-		leg.setArrTime(arrTime);
+		///leg.setDepTime(depTime);
+		///leg.setTravTime(travTime);
+		///leg.setArrTime(arrTime);
 		return leg;
 	}
 	
