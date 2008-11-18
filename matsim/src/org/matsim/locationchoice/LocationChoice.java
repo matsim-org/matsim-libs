@@ -44,6 +44,7 @@ public class LocationChoice extends MultithreadedModuleA {
 	
 	private boolean constrained = false;
 	
+	
 	public LocationChoice() {
 	}
 
@@ -115,4 +116,14 @@ public class LocationChoice extends MultithreadedModuleA {
 	public List<PlanAlgorithm> getPlanAlgoInstances() {
 		return planAlgoInstances;
 	}
+	
+	// getters and setters needed exclusively for test cases
+	public boolean isConstrained() {
+		return constrained;
+	}
+
+	public void setConstrained(boolean constrained) {
+		this.constrained = constrained;
+	}
+	
 }
