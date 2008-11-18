@@ -79,7 +79,7 @@ public class MultiSourceEAF {
 	}
 	
 	//TODO finish
-	/*
+	
 	private static HashMap<Node,Integer> readPopulation(NetworkLayer network, String filename){
 		Population population = new Population();
 		MatsimPopulationReader reader = new MatsimPopulationReader(population);
@@ -88,11 +88,12 @@ public class MultiSourceEAF {
 		for(Person person : population.getPersons().values() ){
 			Plan plan = person.getPlans().get(0);
 			plan.getFirstActivity();
+			network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
 		}
 		
 		return null;
 	}
-	*/
+	
 	
 	/**
 	 * main method to run an EAF algorithm on the specified cenarion
