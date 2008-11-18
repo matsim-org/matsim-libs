@@ -26,8 +26,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.scoring.LocationChoiceScoringFunctionFactory;
 
-import playground.anhorni.locationchoice.scoring.LocationChoiceScoringFunctionFactory;
 
 public class LCControler extends Controler {
 	
