@@ -136,7 +136,8 @@ public class MultiSourceEAF {
 			TravelCost travelcost = new FakeTravelTimeCost();
 			TravelTime traveltime = (TravelTime) travelcost;
 
-			Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
+			//Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
+			Flow fluss = new Flow(network,null, flow, sources, demands, sink, timeHorizon);
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 			BellmanFordVertexIntervalls.debug(true);
 			for (int i=0; i<20000; i++){
