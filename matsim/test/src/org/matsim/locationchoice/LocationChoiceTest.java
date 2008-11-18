@@ -6,11 +6,11 @@ import org.matsim.locationchoice.LocationChoice;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 public class LocationChoiceTest  extends MatsimTestCase {
 	
-	private static final Logger log = Logger.getLogger(LocationChoiceTest.class);
+	//private static final Logger log = Logger.getLogger(LocationChoiceTest.class);
 
 	LocationChoice locationchoice = null;
 	
@@ -46,6 +46,5 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
 		locationchoice.setConstrained(true);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), LocationMutatorwChoiceSetSimultan.class);
-	}
-	
+	}	
 }
