@@ -83,7 +83,7 @@ public class ControlerTest extends org.matsim.planomat.PlanomatControler {
 			}
 			else if (classname.equals("TimeOptimizer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, new CharyparNagelScoringFunctionFactory());
+				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, new JohScoringFunctionFactory());
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 		
