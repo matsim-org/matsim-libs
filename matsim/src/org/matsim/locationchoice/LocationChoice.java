@@ -52,11 +52,11 @@ public class LocationChoice extends MultithreadedModuleA {
 			final NetworkLayer network,
 			Controler controler) {
 
-		this.init(network, controler);
+		this.initLocal(network, controler);
 	}
 
 
-	private void init(
+	private void initLocal(
 			final NetworkLayer network,
 			final Controler controler) {
 		
