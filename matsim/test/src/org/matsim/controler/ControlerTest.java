@@ -85,7 +85,7 @@ public class ControlerTest extends MatsimTestCase {
 		Act a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
 		Leg leg1 = plan1.createLeg(Mode.car);
-		Route route1 = leg1.createRoute(null, null);
+		Route route1 = leg1.createRoute();
 		route1.setRoute("2 3");
 		plan1.createAct("h", link3);
 		population.addPerson(person1);
@@ -95,7 +95,7 @@ public class ControlerTest extends MatsimTestCase {
 		Act a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
 		Leg leg2 = plan2.createLeg(Mode.car);
-		Route route2 = leg2.createRoute(null, null);
+		Route route2 = leg2.createRoute();
 		route2.setRoute("2 3");
 		plan2.createAct("h", link3);
 		population.addPerson(person2);
@@ -373,13 +373,13 @@ public class ControlerTest extends MatsimTestCase {
 	public void testSetWriteEventsAlways() {
 		final Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(1);
-		
+
 		final Controler controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
 		assertEquals(1, controler.getWriteEventsInterval());
 		controler.setCreateGraphs(false);
 		controler.run();
-		
+
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 0)).exists());
 		assertTrue(new File(Controler.getIterationFilename(Controler.FILENAME_EVENTS, 1)).exists());
 	}

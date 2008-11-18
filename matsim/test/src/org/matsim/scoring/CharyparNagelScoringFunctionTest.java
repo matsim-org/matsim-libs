@@ -34,6 +34,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
+import org.matsim.population.Route;
 
 /**
  * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
@@ -94,10 +95,14 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		try {
 			this.plan.createAct("h", link1);
 			Leg leg = this.plan.createLeg(Mode.car);
-			leg.createRoute("25000", "00:30:00");
+			Route route = leg.createRoute();
+			route.setDist(25000.0);
+			route.setTravTime(0.5*3600);
 			this.plan.createAct("w", link3);
 			leg = this.plan.createLeg(Mode.pt);
-			leg.createRoute("20000", "00:15:00");
+			route = leg.createRoute();
+			route.setDist(20000.0);
+			route.setTravTime(0.25*3600);
 			this.plan.createAct("h", link5);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

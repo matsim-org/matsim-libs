@@ -38,7 +38,7 @@ import org.matsim.utils.misc.Time;
 
 public class CutTrips implements PersonAlgorithm {
 
-	private PersonAlgorithm nextAlgorithm;
+	private final PersonAlgorithm nextAlgorithm;
 	private final Map<Id, Link> aoi;
 
 	public CutTrips(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> aoi) {
@@ -152,7 +152,7 @@ public class CutTrips implements PersonAlgorithm {
 			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
 			for (int legNr = 1; legNr < firstInsideLeg; legNr += 2) {
 				Leg leg = (Leg) plan.getActsLegs().get(legNr);
-				leg.createRoute("0.0", "00:00:00");
+				leg.createRoute();
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
 			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
@@ -198,7 +198,7 @@ public class CutTrips implements PersonAlgorithm {
 			// remove all routes from legs after firstOutsideLeg, as they are now all at the same location
 			for (int legNr = firstOutsideLeg + 2; legNr < plan.getActsLegs().size(); legNr += 2) {
 				Leg leg = (Leg) plan.getActsLegs().get(legNr);
-				leg.createRoute("0.0", "00:00:00");
+				leg.createRoute();
 			}
 
 			// adapt route of leg that leads out of the AOI

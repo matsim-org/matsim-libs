@@ -36,7 +36,6 @@ import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -95,9 +94,11 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 //		Route oldRoute = leg.getRoute();
 		Route newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
-			newRoute = leg.createRoute(null, Time.writeTime(beeLineWalkTime));
+			newRoute = leg.createRoute();
+			newRoute.setTravTime(beeLineWalkTime);
 		} else {
-			newRoute = leg.createRoute(null, Time.writeTime(timeInVehicle + walkTime));
+			newRoute = leg.createRoute();
+			newRoute.setTravTime(timeInVehicle + walkTime);
 		}
 //		System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
 		return newRoute.getTravTime();

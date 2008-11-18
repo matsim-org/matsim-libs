@@ -162,7 +162,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(null, null);
+		this.currroute = this.currleg.createRoute();
 	}
 
 }

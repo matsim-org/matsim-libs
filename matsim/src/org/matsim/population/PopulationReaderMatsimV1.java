@@ -28,12 +28,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v1.dtd</code>.
- * 
+ *
  * @author mrieser
  * @author balmermi
  */
@@ -115,7 +116,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	/**
 	 * Parses the specified plans file. This method calls {@link #parse(String)},
 	 * but handles all possible exceptions on its own.
-	 * 
+	 *
 	 * @param filename
 	 *          The name of the file to parse.
 	 */
@@ -180,7 +181,13 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts.getValue("trav_time"));
+		this.currroute = this.currleg.createRoute();
+		if (atts.getValue("dist") != null) {
+			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
+		}
+		if (atts.getValue("trav_time") != null) {
+			this.currroute.setTravTime(Time.parseTime(atts.getValue("trav_time")));
+		}
 	}
 
 }

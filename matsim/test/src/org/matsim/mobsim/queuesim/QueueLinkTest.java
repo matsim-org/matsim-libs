@@ -125,7 +125,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAct("h", link1);
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = leg.createRoute("1", "00:00:01");
+			Route route = leg.createRoute();
 			route.setRoute("2");
 			leg.setRoute(route);
 			plan.createAct("w", link2);
@@ -136,7 +136,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.initialize();
-		
+
 		Vehicle v2 = new Vehicle();
 		PersonAgent pa2 = new PersonAgent(p);
 		v2.setDriver(pa2);

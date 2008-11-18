@@ -33,6 +33,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -327,7 +328,13 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute(atts.getValue("dist"), atts.getValue("trav_time"));
+		this.currroute = this.currleg.createRoute();
+		if (atts.getValue("dist") != null) {
+			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
+		}
+		if (atts.getValue("trav_time") != null) {
+			this.currroute.setTravTime(Time.parseTime(atts.getValue("trav_time")));
+		}
 	}
 
 }
