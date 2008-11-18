@@ -22,7 +22,7 @@ package playground.mfeil;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.scoring.PlanScorer;
 
 
@@ -35,19 +35,21 @@ public class TimeOptInitialiser extends MultithreadedModuleA{
 	
 	private final PlanScorer 				scorer;
 	private final LegTravelTimeEstimator	estimator;
+	private final ScoringFunctionFactory	factory;
 
 	
-	public TimeOptInitialiser (LegTravelTimeEstimator estimator, CharyparNagelScoringFunctionFactory factory) {
+	public TimeOptInitialiser (LegTravelTimeEstimator estimator, ScoringFunctionFactory factory) {
 		this.scorer = new PlanScorer(factory);
 		this.estimator = estimator;
+		this.factory = factory;
 	}
 
 	
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		
+	public PlanAlgorithm getPlanAlgoInstance() {		
 
-		PlanAlgorithm timeOptAlgorithm = new TimeOptimizerTest (this.estimator, this.scorer);
+		//PlanAlgorithm timeOptAlgorithm = new TimeOptimizerTest (this.estimator, this.scorer, this.factory);
+		PlanAlgorithm timeOptAlgorithm = new TimeOptimizer11 (this.estimator, this.scorer);
 
 		return timeOptAlgorithm;
 	}
