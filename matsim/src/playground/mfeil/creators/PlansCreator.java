@@ -39,7 +39,7 @@ public class PlansCreator {
 	
 	
 		try{
-			 FileWriter fw = new FileWriter("output/Plans_Test1.xml");
+			 FileWriter fw = new FileWriter("output/plans.xml");
 			 BufferedWriter out = new BufferedWriter(fw);
 			 
 			 out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");

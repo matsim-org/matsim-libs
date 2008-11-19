@@ -40,7 +40,7 @@ public class FacilitiesCreator {
 	
 	
 		try{
-			 FileWriter fw = new FileWriter("output/Facilities_Test1.xml");
+			 FileWriter fw = new FileWriter("output/facilities.xml");
 			 BufferedWriter out = new BufferedWriter(fw);
 			 
 			 out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
