@@ -33,11 +33,11 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 
-/**
- *
+/*
  * @author anhorni
- * 
+ * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
+
 public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
@@ -66,6 +66,10 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 		}
 	}
 	
+	/*
+	 * Add an arrival event in "FacilityLoad" for every start of an activity
+	 * Home activities are excluded.
+	 */
 	public void handleEvent(final ActStartEvent event) {
 		Facility facility = event.act.getFacility();
 		if (!event.act.getType().startsWith("h")) {
@@ -73,6 +77,10 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 		}
 	}
 
+	/*
+	 * Add a departure event in "FacilityLoad" for every ending of an activity
+	 * Home activities are excluded
+	 */
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
 		if (!event.act.getType().startsWith("h")) {
@@ -81,7 +89,6 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	}
 
 	public void finish() {
-		//log.info(this.facilityPenalties.values().size()+ " facilitiespenalties");
 		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
 		while (iter_fp.hasNext()){
 			FacilityPenalty fp = iter_fp.next();
