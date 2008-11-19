@@ -61,34 +61,33 @@ public class FacilityLoad {
 		int numberOfVisitors = 0;
 		for (int i = 0; i < this.numberOfTimeBins; i++) {
 			numberOfVisitors += this.arrivals[i];
-			//log.info("timebin: " + i + "load: "+  this.load[i]);
 			this.load[i] = numberOfVisitors * this.scaleNumberOfPersons;
 			numberOfVisitors -= this.departures[i];			
 		}
 	}
 	
-	
-	// time in seconds from midnight
 	public void addArrival(double time) {		
 		this.addToAllVisitors(this.scaleNumberOfPersons);
-		// we do not handle times > 24h
-		// we do not care about #arrivals==#departures after the last time bin
+		/* We do not handle times > 24h
+		 * We do not care about #arrivals==#departures after the last time bin
+		 */
 		if (time > 24.0*3600.0) {		
 			return;
 		}
-		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(3600/(this.numberOfTimeBins/24))));		
+		int timeBinIndex = this.timeBinIndex(time);		
 		this.arrivals[timeBinIndex] += 1;
 		log.info("arrival at: " + time + "bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
 	
 	public void addDeparture(double time) {
-		// we do not handle times > 24h
-		// we do not care about #arrivals==#departures after the last time bin
+		/* We do not handle times > 24h
+		 * We do not care about #arrivals==#departures after the last time bin
+		 */
 		if (time > 24.0*3600.0) {
 			return;
 		}
-		int timeBinIndex=Math.min(this.numberOfTimeBins-1, (int)(time/(3600/(this.numberOfTimeBins/24))));
+		int timeBinIndex = this.timeBinIndex(time);
 		this.departures[timeBinIndex]+=1;
 		log.info("departure at: " + time + "bin: " + timeBinIndex);
 	}
@@ -148,5 +147,15 @@ public class FacilityLoad {
 		}
 		this.numberOfVisitorsPerDay = 0;
 		this.allVisitors = 0;
+	}
+	
+	/* 
+	 * All values >= 86400s (24h) are merged into the last time bin
+	 */
+	public int timeBinIndex(double time) {
+		int lastBinIndex = this.numberOfTimeBins-1;
+		int numberOfBinsPerHour = this.numberOfTimeBins/24;
+		int secondsPerBin = (int)3600/numberOfBinsPerHour;
+		return Math.min(lastBinIndex, (int)(time/secondsPerBin));
 	}
 }
