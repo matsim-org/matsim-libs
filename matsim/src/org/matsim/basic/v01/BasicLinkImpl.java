@@ -20,7 +20,6 @@
 
 package org.matsim.basic.v01;
 
-import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
 import org.matsim.network.NetworkLayer;

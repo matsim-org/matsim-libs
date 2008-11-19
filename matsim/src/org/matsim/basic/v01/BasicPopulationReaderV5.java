@@ -31,7 +31,6 @@ import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.BasicLocation;
-import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationReader;

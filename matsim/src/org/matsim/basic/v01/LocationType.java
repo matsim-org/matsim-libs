@@ -1,4 +1,4 @@
-package org.matsim.interfaces.basic.v01;
+package org.matsim.basic.v01;
 
 /**
  * LocationType is a first step to reorganize the framework

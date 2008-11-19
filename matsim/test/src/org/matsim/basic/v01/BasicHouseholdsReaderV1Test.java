@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.interfaces.basic.v01.BasicIncome.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
 

@@ -29,7 +29,6 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Household;
