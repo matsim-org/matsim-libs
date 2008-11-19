@@ -54,7 +54,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
 		this.quad_trees = new TreeMap<String, QuadTree<Facility>>();
-		this.initialize(network, controler);		
+		this.initiLocal(network, controler);		
 	}
 	
 	/*
@@ -92,7 +92,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		}	
 	}
 
-	private void initialize(final NetworkLayer network, Controler controler) {		
+	private void initiLocal(final NetworkLayer network, Controler controler) {		
 		//create a quadtree for every activity type
 		this.initTrees(controler.getFacilities());				
 		this.network = network;

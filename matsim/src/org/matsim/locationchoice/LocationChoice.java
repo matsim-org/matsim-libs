@@ -126,4 +126,12 @@ public class LocationChoice extends MultithreadedModuleA {
 		this.constrained = constrained;
 	}
 	
+	public void setNetwork(NetworkLayer network) {
+		this.network = network;
+	}
+
+	public void setControler(Controler controler) {
+		this.controler = controler;
+	}
+	
 }
