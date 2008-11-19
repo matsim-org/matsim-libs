@@ -68,14 +68,14 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 	
 	public void handleEvent(final ActStartEvent event) {
 		Facility facility = event.act.getFacility();
-		if (!event.act.getType().equalsIgnoreCase("home")) {
+		if (!event.act.getType().startsWith("h")) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.time);
 		}
 	}
 
 	public void handleEvent(final ActEndEvent event) {
 		Facility facility = event.act.getFacility();
-		if (!event.act.getType().equalsIgnoreCase("home")) {
+		if (!event.act.getType().startsWith("h")) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.time);
 		}
 	}
