@@ -69,9 +69,9 @@ public class FacilityPenalty {
 			capPenaltyFactor += restraintFcnFactor*Math.pow(
 					(double)facilityload[i]/(this.capacity), restraintFcnExp);
 			}
-			else {
-				// do nothing: is penalized by costs for waiting time
-			}
+			/* 
+			 * else: do nothing: is penalized by costs for waiting time
+			 */
 		}
 
 		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
