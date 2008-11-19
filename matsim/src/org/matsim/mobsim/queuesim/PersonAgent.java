@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,9 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.mobsim.queuesim;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -32,84 +32,81 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.utils.misc.Time;
 
-
 /**
  * @author dgrether
- *
  */
 public class PersonAgent {
-	
+
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
-	
-	private Person person;
+
+	private final Person person;
 	private Vehicle vehicle;
-//	private double currentDepartureTime = 0;
 	protected Link cachedNextLink = null;
-	
+
 	private Link currentLink;
 	/**
-	 * int specifing the position of the next activity in the acts legs list
+	 * specifies the position of the next activity in the acts legs list
 	 */
 	private int nextActivity;
-	
+
 	private transient Link destinationLink;
 
 	private Leg currentLeg;
 
 	private int currentNodeIndex;
-	
-	public PersonAgent(Person p) {
+
+	public PersonAgent(final Person p) {
 		this.person = p;
 	}
 
 	public Person getPerson() {
-		return person;
+		return this.person;
 	}
-	
+
 	/**
 	 * Convenience method delegating to person's selected plan
-	 * @return
+	 * @return list of {@link Act}s and {@link Leg}s of this agent's plan
 	 */
 	public List<Object> getActsLegs() {
 		return this.person.getSelectedPlan().getActsLegs();
 	}
 
-	public void setVehicle(Vehicle veh) {
+	public void setVehicle(final Vehicle veh) {
 		this.vehicle = veh;
 	}
 
 	public Vehicle getVehicle() {
 		return this.vehicle;
 	}
-	
+
 	public double getDepartureTime() {
 		return this.vehicle.getDepartureTime_s();
 	}
 
-	public void setDepartureTime(double seconds) {
+	public void setDepartureTime(final double seconds) {
 		this.vehicle.setDepartureTime_s(seconds);
 	}
 
-	public void setCurrentLink(Link link) {
+	public void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
-	
+
 	public Link getCurrentLink() {
 		return this.currentLink;
 	}
-	
+
 	public Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
-	
-	protected void setCurrentLeg(Leg leg) {
+
+	protected void setCurrentLeg(final Leg leg) {
 		this.currentLeg  = leg;
 	}
-	
+
 	public int getCurrentNodeIndex() {
 		return this.currentNodeIndex;
 	}
-	
+
 	public int getNextActivity() {
 		return this.nextActivity;
 	}
@@ -132,7 +129,7 @@ public class PersonAgent {
 		}
 		return false;
 	}
-	
+
 	private boolean initNextLeg() {
 		double now = SimulationTimer.getTime();
 		Act act = (Act)this.getActsLegs().get(this.nextActivity);
@@ -176,7 +173,7 @@ public class PersonAgent {
 		this.nextActivity += 2;
 		return true;
 	}
-	
+
 	/**
 	 * Notifies the agent that it leaves its current activity location (and
 	 * accordingly starts moving on its current route).
@@ -187,14 +184,14 @@ public class PersonAgent {
 		Act act = (Act)this.getActsLegs().get(this.nextActivity - 2);
 		QueueSimulation.getEvents().processEvent(new ActEndEvent(now, this.getPerson(), this.currentLink, act));
 	}
-	
+
 	/**
 	 * Notifies the agent that it reaches its aspired activity location.
 	 *
 	 * @param now the current time
 	 * @param currentQueueLink
 	 */
-	 public void reachActivity(final double now, QueueLink currentQueueLink) {
+	public void reachActivity(final double now, final QueueLink currentQueueLink) {
 		Act act = (Act)this.getActsLegs().get(this.nextActivity);
 		// no actStartEvent for first act.
 		QueueSimulation.getEvents().processEvent(new ActStartEvent(now, this.getPerson(), this.currentLink, act));
@@ -206,52 +203,45 @@ public class PersonAgent {
 			currentQueueLink.addParking(this.vehicle);
 		}
 	}
-	 
-		public void incCurrentNode() {
-			this.currentNodeIndex++;
-			this.cachedNextLink = null; //reset cached nextLink
-		} 
-		
-		/**
-		 * Returns the next link the vehicle will drive along.
-		 *
-		 * @return The next link the vehicle will drive on, or null if an error has happened.
-		 */
-		public Link chooseNextLink() {
-			if (this.cachedNextLink != null) {
+
+	public void incCurrentNode() {
+		this.currentNodeIndex++;
+		this.cachedNextLink = null; //reset cached nextLink
+	}
+
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public Link chooseNextLink() {
+		if (this.cachedNextLink != null) {
+			return this.cachedNextLink;
+		}
+		List<Node> route = this.currentLeg.getRoute().getRoute();
+
+		if (this.currentNodeIndex >= route.size() ) {
+			// we have no more information for the route, so we should have arrived at the destination link
+			if (this.currentLink.getToNode().equals(this.destinationLink.getFromNode())) {
+				this.cachedNextLink = this.destinationLink;
 				return this.cachedNextLink;
 			}
-			ArrayList<?> route = this.currentLeg.getRoute().getRoute();
-
-			if (this.currentNodeIndex >= route.size() ) {
-				// we have no more information for the route, so we should have arrived at the destination link
-				if (this.currentLink.getToNode().equals(this.destinationLink.getFromNode())) {
-					this.cachedNextLink = this.destinationLink;
-					return this.cachedNextLink;
-				}
-				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
-				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLink.getId().toString()
+			// there must be something wrong. Maybe the route is too short, or something else, we don't know...
+			log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLink.getId().toString()
 					+ ", is at the end of its route, but has not yet reached its destination link " + this.destinationLink.getId().toString());
-				return null;
-			}
-
-			Node destNode = (Node)route.get(this.currentNodeIndex);
-
-			for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
-				if (link.getToNode() == destNode) {
-					this.cachedNextLink = link; //save time in later calls, if link is congested
-					return this.cachedNextLink;
-				}
-			}
-			log.warn(this + " [no link to next routenode found: routeindex= " + this.currentNodeIndex + " ]");
 			return null;
 		}
 
+		Node destNode = route.get(this.currentNodeIndex);
 
+		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
+			if (link.getToNode() == destNode) {
+				this.cachedNextLink = link; //save time in later calls, if link is congested
+				return this.cachedNextLink;
+			}
+		}
+		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentNodeIndex + " ]");
+		return null;
+	}
 
-
-
-
-
-	
 }
