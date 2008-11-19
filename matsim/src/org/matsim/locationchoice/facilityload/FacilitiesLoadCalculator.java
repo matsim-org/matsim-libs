@@ -43,9 +43,7 @@ import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 
 /**
- *  Basically it integrates the
- * {@link org.matsim.locationchoice.facilityload.EventsToFacilityLoad} with the
- * {@link org.matsim.controler.Controler}.
+ * Prints statistics of facility load
  *
  * @author anhorni
  */
@@ -55,8 +53,10 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = null;
 	private final static Logger log = Logger.getLogger(FacilitiesLoadCalculator.class);
 	
-	// scales the load of the facilities (for e.g. 10 % runs)
-	// assume that only integers can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
+	/* 
+	 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers 
+	 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
+	 */ 
 	private int scaleNumberOfPersons = 1;
 	
 	//--------------------------------------------------------------------------------------------------
@@ -84,10 +84,13 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
-		//log.info("notifyAfterMobsim");
 		this.eventsToFacilityLoad.finish();		
 	}
 	
+	/*
+	 * At the end of an iteration the statistics of the facility load are printed and
+	 * the load values are set to zero afterwards.
+	 */
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
 		Facilities facilities = controler.getFacilities();
@@ -99,13 +102,18 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		this.eventsToFacilityLoad.resetAll(event.getIteration());
 	}
 
+	/*
+	 * Print daily load of every facility and aggregated hourly load 
+	 */	
 	private void printStatistics(Facilities facilities, String iterationPath, int iteration, 
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
 				final String header="Facility_id\tx\ty\tNumberOfVisitorsPerDay\tAllVisitors\tCapacity\tsumPenaltyFactor";
-				final BufferedWriter out = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
-				final BufferedWriter out_summary = IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
+				final BufferedWriter out = 
+					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies.txt");
+				final BufferedWriter out_summary = 
+					IOUtils.getBufferedWriter(iterationPath+"/"+iteration+".facFrequencies_summary.txt");
 	
 				out.write(header);
 				out.newLine();
