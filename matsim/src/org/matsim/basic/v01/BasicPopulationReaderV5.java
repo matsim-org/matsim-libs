@@ -31,6 +31,7 @@ import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.population.Knowledge;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.PopulationReader;
@@ -304,11 +305,11 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 		}
 		else if (PopulationSchemaV5Names.FACILITYID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
-			((BasicLocationImpl)this.currentlocation).setLocationId(id, true);
+			((BasicLocationImpl)this.currentlocation).setLocationId(id, LocationType.FACILITY);
 		}
 		else if (PopulationSchemaV5Names.LINKID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
-			((BasicLocationImpl)this.currentlocation).setLocationId(id, false);
+			((BasicLocationImpl)this.currentlocation).setLocationId(id, LocationType.LINK);
 		}
 		else if (PopulationSchemaV5Names.FISCALHOUSEHOLDID.equalsIgnoreCase(name)){
 			((BasicPersonImpl)this.currentPerson).setHouseholdId(new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID)));

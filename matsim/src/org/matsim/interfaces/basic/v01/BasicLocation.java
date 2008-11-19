@@ -27,12 +27,10 @@ import org.matsim.utils.geometry.Coord;
  */
 public interface BasicLocation {
 	
-	public Coord getCoord();
+	public Coord getCenter();
 	
 	public Id getId();
 	
-	public boolean isFacilityId();
-	
-	public boolean isLinkId();
+	public LocationType getLocationType();
 	
 }

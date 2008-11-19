@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.LocationType;
 
 /**
  * @author dgrether
@@ -41,14 +42,14 @@ public class BasicPopulationBuilder implements PopulationBuilder {
 		BasicActImpl act = new BasicActImpl(currentActType);
 		basicPlan.addAct(act);
 		if (currentlocation != null) {
-			if (currentlocation.getCoord() != null) {
-				act.setCoord(currentlocation.getCoord());
+			if (currentlocation.getCenter() != null) {
+				act.setCoord(currentlocation.getCenter());
 			}
 			else if (currentlocation.getId() != null){
-				if (currentlocation.isFacilityId()) {
+				if (currentlocation.getLocationType() == LocationType.FACILITY) {
 					act.setFacilityId(currentlocation.getId());
 				}
-				else if (currentlocation.isLinkId()) {
+				else if (currentlocation.getLocationType() == LocationType.LINK) {
 					act.setLinkId(currentlocation.getId());
 				}
 			}

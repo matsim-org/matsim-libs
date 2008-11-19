@@ -36,6 +36,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -58,15 +59,15 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 			BasicLocation currentlocation) {
 		Act act = null;
 		if (currentlocation != null) {
-			if (currentlocation.getCoord() != null) {
-				act = ((Plan)basicPlan).createAct(currentActType, currentlocation.getCoord());
+			if (currentlocation.getCenter() != null) {
+				act = ((Plan)basicPlan).createAct(currentActType, currentlocation.getCenter());
 			}
 			else if (currentlocation.getId() != null){
-				if (currentlocation.isFacilityId()) {
+				if (currentlocation.getLocationType() == LocationType.FACILITY) {
 					Facility fac = facilities.getFacilities().get(currentlocation.getId()); 
 					act = ((Plan)basicPlan).createAct(currentActType, fac);
 				}
-				else if (currentlocation.isLinkId()) {
+				else if (currentlocation.getLocationType() == LocationType.LINK) {
 					Link link = this.network.getLink(currentlocation.getId());
 					act = ((Plan)basicPlan).createAct(currentActType, link);
 				}
@@ -109,7 +110,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	public BasicActivity createActivity(String type, BasicLocation loc) {
 		Activity act = null;
 		if (loc != null) {
-			if (loc.isFacilityId() && this.facilities.getFacilities().containsKey(loc.getId())) {
+			if ((loc.getLocationType() == LocationType.FACILITY) && this.facilities.getFacilities().containsKey(loc.getId())) {
 				Facility fac = this.facilities.getFacilities().get(loc.getId());
 				act = new Activity(type, fac);				
 				return act;

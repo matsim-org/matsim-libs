@@ -27,6 +27,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.interfaces.basic.v01.BasicIncome.IncomePeriod;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -142,11 +143,11 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 		}
 		else if (HouseholdsSchemaV1Names.FACILITYID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
-			this.currentlocation.setLocationId(id, true);
+			this.currentlocation.setLocationId(id, LocationType.FACILITY);
 		}
 		else if (HouseholdsSchemaV1Names.LINKID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV1Names.REFID));
-			this.currentlocation.setLocationId(id, false);
+			this.currentlocation.setLocationId(id, LocationType.LINK);
 		}
 		else if (HouseholdsSchemaV1Names.INCOME.equalsIgnoreCase(name)) {
 			IncomePeriod p = getIncomePeriod(atts.getValue(HouseholdsSchemaV1Names.PERIOD));

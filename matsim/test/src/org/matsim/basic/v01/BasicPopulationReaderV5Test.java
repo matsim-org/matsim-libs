@@ -29,6 +29,7 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Household;
@@ -138,7 +139,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertEquals(Integer.valueOf(4), activity.getFrequency());
 		assertNotNull(activity.getLocation());
 		assertEquals(id666, activity.getLocation().getId());
-		assertEquals(true, activity.getLocation().isFacilityId());
+		assertEquals(LocationType.FACILITY, activity.getLocation().getLocationType());
 		assertEquals(new Integer(40), activity.getCapacity());
 		assertNotNull(activity.getOpeningTime(DayType.wk));
 		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime(), EPSILON);
@@ -150,7 +151,16 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertNotNull(activity.getLocation());
 		assertNotNull(activity.getLocation().getId());
 		assertEquals(id666, activity.getLocation().getId());
-		assertNull(activity.getLocation().getCoord());
+		System.out.println(activity.getLocation());
+		System.out.println(activity.getLocation().getCenter());
+		//here we have to branch the test, as the basic classes don't need a coordinate for a location
+		//the derived classes however do -> there is still an artificial null value of 0.0, 0.0
+		if (activity.getLocation().getCenter() == null) {
+			assertTrue(true);
+		}
+		else {
+			assertEquals(new CoordImpl(0.0d, 0.0d), activity.getLocation().getCenter());
+		}
 		assertNull(activity.getCapacity());
 		assertNull(activity.getOpeningTime(DayType.wk));
 

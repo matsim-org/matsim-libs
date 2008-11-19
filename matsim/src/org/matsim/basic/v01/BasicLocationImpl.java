@@ -20,6 +20,7 @@
 package org.matsim.basic.v01;
 
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.utils.geometry.Coord;
 
 /**
@@ -31,31 +32,28 @@ public class BasicLocationImpl implements BasicLocation {
 	
 	private Id locationId;
 	
-	private boolean isFacilityId;
+	private LocationType type;
 
 	
 	public void setCoord(Coord coord) {
 		this.coordinate = coord;
 	}
 	
-	public void setLocationId(Id id, boolean isFacilityId) {
+	public void setLocationId(Id id, LocationType type) {
 		this.locationId = id;
-		this.isFacilityId = isFacilityId;
-	}
-
-	public Coord getCoord() {
-		return this.coordinate;
+		this.type = type;
 	}
 
 	public Id getId() {
 		return this.locationId;
 	}
 
-	public boolean isFacilityId() {
-		return isFacilityId;
+	public Coord getCenter() {
+		return this.coordinate;
 	}
 
-	public boolean isLinkId() {
-		return !isFacilityId;
+	public LocationType getLocationType() {
+		return this.type;
 	}
+
 }

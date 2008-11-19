@@ -3,9 +3,10 @@ package org.matsim.world;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.utils.geometry.Coord;
 
-public interface Location {
+public interface Location extends BasicLocation {
 
 	/**
 	 * Calculates the distance from a given coordinate to that location.
@@ -38,11 +39,7 @@ public interface Location {
 	// TODO [balmermi] I do not like that (see above why)
 	public abstract void setId(Id id);
 
-	public abstract Id getId();
-
 	public abstract Layer getLayer();
-
-	public abstract Coord getCenter();
 
 	public abstract Location getUpLocation(Id id);
 

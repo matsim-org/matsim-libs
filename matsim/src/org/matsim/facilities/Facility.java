@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.network.Link;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.world.AbstractLocation;
@@ -106,5 +107,9 @@ public class Facility extends AbstractLocation {
 	public final String toString() {
 		return super.toString() +
 		       "[nof_activities=" + this.activities.size() + "]";
+	}
+
+	public LocationType getLocationType() {
+		return LocationType.FACILITY;
 	}
 }

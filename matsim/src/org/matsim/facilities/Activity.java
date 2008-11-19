@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.basic.v01.BasicActivity;
-import org.matsim.basic.v01.BasicLocationImpl;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.gbl.Gbl;
@@ -151,11 +150,8 @@ public class Activity implements BasicActivity {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 	
-	//FIXME dg: think about Location concept
 	public BasicLocation getLocation() {
-		BasicLocationImpl loc = new BasicLocationImpl();
-		loc.setLocationId(this.facility.getId(), true);
-		return loc;
+		return this.getFacility();
 	}
 	
 	public Integer getFrequency() {

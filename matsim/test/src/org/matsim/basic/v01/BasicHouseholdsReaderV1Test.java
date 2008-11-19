@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.interfaces.basic.v01.BasicIncome.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -63,10 +64,10 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals(id43, hhmemberIds.get(2));
 		
 		assertNotNull(hh.getBasicLocation());
-		assertNotNull(hh.getBasicLocation().getCoord());
+		assertNotNull(hh.getBasicLocation().getCenter());
 		assertNull(hh.getBasicLocation().getId());
-		assertEquals(48.28d, hh.getBasicLocation().getCoord().getX(), EPSILON);
-		assertEquals(7.56d, hh.getBasicLocation().getCoord().getY(), EPSILON);
+		assertEquals(48.28d, hh.getBasicLocation().getCenter().getX(), EPSILON);
+		assertEquals(7.56d, hh.getBasicLocation().getCenter().getY(), EPSILON);
 	
 		assertNotNull(hh.getVehicleDefinitionIds());
 		assertEquals(2, hh.getVehicleDefinitionIds().size());
@@ -91,9 +92,9 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals(id45, hh.getMemberIds().get(1));
 		
 		assertNotNull(hh.getBasicLocation());
-		assertNull(hh.getBasicLocation().getCoord());
+		assertNull(hh.getBasicLocation().getCenter());
 		assertNotNull(hh.getBasicLocation().getId()); 
-		assertTrue(hh.getBasicLocation().isFacilityId());
+		assertEquals(LocationType.FACILITY, hh.getBasicLocation().getLocationType());
 		assertEquals(id666, hh.getBasicLocation().getId());
 
 		assertNotNull(hh.getVehicleDefinitionIds());

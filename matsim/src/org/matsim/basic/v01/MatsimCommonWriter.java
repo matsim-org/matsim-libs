@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.interfaces.basic.v01.LocationType;
 import org.matsim.utils.collections.Tuple;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.writer.MatsimXmlWriter;
@@ -48,11 +49,11 @@ public class MatsimCommonWriter extends MatsimXmlWriter {
 	 * @throws IOException
 	 */
 	public void writeLocation(BasicLocation loc, int indentationLevel) throws IOException {
-		if (loc.isFacilityId()){
-			this.writeLocation(null, loc.getId(), loc.getCoord(), indentationLevel);
+		if (loc.getLocationType() == LocationType.FACILITY){
+			this.writeLocation(null, loc.getId(), loc.getCenter(), indentationLevel);
 		}
 		else {
-			this.writeLocation(loc.getId(), null, loc.getCoord(), indentationLevel);
+			this.writeLocation(loc.getId(), null, loc.getCenter(), indentationLevel);
 		}
 	}
 	/**
