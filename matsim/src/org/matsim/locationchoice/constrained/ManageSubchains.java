@@ -22,17 +22,12 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 import java.util.Vector;
-
-//import org.apache.log4j.Logger;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 
 public class ManageSubchains {
-	
-	//private static final Logger log = Logger.getLogger(ManageSubchains.class);
-	
+
 	private List<SubChain> subChains = new Vector<SubChain>();
-	
 	private int subChainIndex = -1;
 	boolean chainStarted = false;
 	boolean secondaryActFound = false;
@@ -41,7 +36,9 @@ public class ManageSubchains {
 	private double totalTravelDistance = 0.0;
 	
 	public void secondaryActivityFound(Act act, Leg leg) {
-		// no plan starts with secondary activity!
+		/* 
+		 * No plan starts with secondary activity!
+		 */
 		this.subChains.get(subChainIndex).addAct(act);
 		this.secondaryActFound = true;	
 		this.ttBudget += leg.getTravelTime();
@@ -49,7 +46,9 @@ public class ManageSubchains {
 	}
 	
 	public void primaryActivityFound(Act act, Leg leg) {
-		// close chain
+		/* 
+		 * close chain
+		 */
 		if (chainStarted) {
 			if (secondaryActFound) {
 				this.subChains.get(subChainIndex).setTotalTravelDistance(this.totalTravelDistance);
