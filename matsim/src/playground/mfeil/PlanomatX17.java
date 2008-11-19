@@ -37,6 +37,7 @@ import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.charts.XYLineChart;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.io.*;
 import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.locationchoice.constrained.*;
@@ -70,6 +71,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	private static final Logger 			log = Logger.getLogger(PlanomatX17.class);
 	
 	
+	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
@@ -83,7 +85,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer 				= new PlanScorer (this.factory);
 		this.timer					= new TimeOptimizer13(controler.getLegTravelTimeEstimator(), this.scorer);
-		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator());
+		//this.timer		 			= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
 		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -92,6 +94,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.MAX_ITERATIONS 		= 20;
 		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
 		this.LC_SET_SIZE			= 1;
+		
 	}
 	
 		
@@ -100,6 +103,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	public void run (Plan plan){
+		MatsimRandom.getLocalInstance();
 		
 		long runStartTime = System.currentTimeMillis();
 		long timerRunTime = 0;
@@ -195,7 +199,6 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
 							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
-							//this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
 							lcRunTime+=System.currentTimeMillis()-lcStartTime;
 						}
 					}
@@ -831,6 +834,6 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 			return 1;
 		}
 		return 0;
-	}
+	}	
 }
 	
