@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-//import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
@@ -33,20 +32,14 @@ import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Plan;
 
-/* Scoring function factoring in:
- * - opentimes
- * - facility attractivity
- * - capacity restraints:
- *  TODO: should be done for for arrival to departure time not act start to act end time,
- *  because seraching for a parking lot possibly happens before the opening time
- *  see EventsToFacilityLoad
+/* 
+ * Scoring function factoring in capacity restraints
  */
 
 public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoringFunction {
 
 	private List<ScoringPenalty> penalty = null;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	//private static final Logger log = Logger.getLogger(LocationChoiceScoringFunction.class);
 
 	public LocationChoiceScoringFunction(final Plan plan, TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(plan);
@@ -62,8 +55,6 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		Iterator<ScoringPenalty> pen_it = this.penalty.iterator();
 		while (pen_it.hasNext()){
 			ScoringPenalty penalty = pen_it.next();
-			
-			// TODO: check activity is secondary
 			this.score -=penalty.getPenalty();
 		}
 		this.penalty.clear();
@@ -77,34 +68,6 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		}
 		double tmpScore = 0.0;
 
-		/* Calculate the times the agent actually performs the
-		 * activity.  The facility must be open for the agent to
-		 * perform the activity.  If it's closed, but the agent is
-		 * there, the agent must wait instead of performing the
-		 * activity (until it opens).
-		 *
-		 *                                             Interval during which
-		 * Relationship between times:                 activity is performed:
-		 *
-		 *      O________C A~~D  ( 0 <= C <= A <= D )   D...D (not performed)
-		 * A~~D O________C       ( A <= D <= O <= C )   D...D (not performed)
-		 *      O__A+++++C~~D    ( O <= A <= C <= D )   A...C
-		 *      O__A++D__C       ( O <= A <= D <= C )   A...D
-		 *   A~~O++++++++C~~D    ( A <= O <= C <= D )   O...C
-		 *   A~~O+++++D__C       ( A <= O <= D <= C )   O...D
-		 *
-		 * Legend:
-		 *  A = arrivalTime    (when agent gets to the facility)
-		 *  D = departureTime  (when agent leaves the facility)
-		 *  O = openingTime    (when facility opens)
-		 *  C = closingTime    (when facility closes)
-		 *  + = agent performs activity
-		 *  ~ = agent waits (agent at facility, but not performing activity)
-		 *  _ = facility open, but agent not there
-		 *
-		 * assume O <= C
-		 * assume A <= D
-		 */
 		double[] openingInterval = this.getOpeningInterval(act);
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
@@ -131,20 +94,29 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		if (duration > 0) {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+			
+			
 
 			double utilWait = marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+					
+			/* Penalty due to facility load: --------------------------------------------
+			 * Store the temporary score to reduce it in finish() proportionally 
+			 * to score and dep. on facility load.
+			 * TODO: maybe checking if activity is movable for this person (discussion)
+			 */
+			if (!act.getType().startsWith("h")) {
+				this.penalty.add(new ScoringPenalty(activityStart, activityEnd, 
+						this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
+			}
+			//---------------------------------------------------------------------------
+				
 		} else {
 			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 		
-		// used arrival and departure time because of parking cap restr. before act actually starts
-		if (!act.getType().equalsIgnoreCase("home")) {
-			this.penalty.add(new ScoringPenalty(arrivalTime, departureTime, 
-					this.facilityPenalties.get(act.getFacility().getId()), tmpScore));
-		}	
-		
-		// DISUTILITIES: -------------------------------------------------------------------------------	
+				
+		// DISUTILITIES: ==============================================================================	
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
