@@ -195,18 +195,18 @@ public class WithindayAgentTest extends TestCase {
 		//going into the details
 	  // first testing the plan of the person
 		Leg newPlansLeg = (Leg) agent.getPerson().getSelectedPlan().getActsLegs().get(1);
-		ArrayList<Node> newPlansRoute = newPlansLeg.getRoute().getRoute();
+		List<Node> newPlansRoute = newPlansLeg.getRoute().getRoute();
 		assertTrue("the agent's new route should have the same size as the old one", newPlansRoute.size() == this.agentRoute.getRoute().size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newPlansRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newPlansRoute.get(newPlansRoute.size()-1));
 		//second testing the vehicle
 		assertNotSame("The current leg should be exchanged by a new one", this.leg, agent.getVehicle().getCurrentLeg());
-		ArrayList<Node> newLegsRoute = agent.getVehicle().getCurrentLeg().getRoute().getRoute();
+		List<Node> newLegsRoute = agent.getVehicle().getCurrentLeg().getRoute().getRoute();
 		assertTrue("the agent's new route should have the same size as the old one", newLegsRoute.size() == this.agentRoute.getRoute().size());
 		assertEquals("agent should be rerouted via node 31", this.network.getNode("31"), newLegsRoute.get(1));
 		assertEquals("check the last node of rerouting!", this.network.getNode("4"), newLegsRoute.get(newLegsRoute.size()-1));		
 		//enlarge scenario
-		ArrayList<Node> list = this.agentRoute.getRoute();
+		List<Node> list = this.agentRoute.getRoute();
 		list.add(0, this.network.getNode("2"));
 		agent = createAgent(this.network.getLink(new IdImpl("1")), this.network.getLink(new IdImpl("7")));
 		agent.replan();

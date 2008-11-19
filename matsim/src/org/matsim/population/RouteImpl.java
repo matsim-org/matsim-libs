@@ -78,7 +78,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 	}
 
 
-	public ArrayList<Node> getRoute() {
+	public List<Node> getRoute() {
 		return this.route;
 	}
 

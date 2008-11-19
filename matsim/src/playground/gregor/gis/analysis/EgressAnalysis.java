@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -174,7 +175,7 @@ public class EgressAnalysis {
 			log.info("handle plans");
 			for (Person person : this.population) {
 				Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-				ArrayList<Node> route = leg.getRoute().getRoute();
+				List<Node> route = leg.getRoute().getRoute();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new Plan(person);
@@ -188,7 +189,7 @@ public class EgressAnalysis {
 				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 				router.run(plan);
 				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
-				ArrayList<Node> route2 = leg2.getRoute().getRoute();
+				List<Node> route2 = leg2.getRoute().getRoute();
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
 

@@ -20,9 +20,9 @@
 
 package playground.balmermi.algos;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -74,10 +74,10 @@ public class RouteSetGenerator {
 	}
 
 	private boolean containsRoute(Route route, LinkedList<Route> routes) {
-		ArrayList<Node> nodes = route.getRoute();
+		List<Node> nodes = route.getRoute();
 		Iterator<Route> r_it = routes.iterator();
 		while (r_it.hasNext()) {
-			ArrayList<Node> ns = r_it.next().getRoute();
+			List<Node> ns = r_it.next().getRoute();
 			if (ns.size() == nodes.size()) {
 				boolean is_equal = true;
 				for (int i=0; i<ns.size(); i++) {

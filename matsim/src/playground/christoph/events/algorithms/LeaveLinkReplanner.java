@@ -21,6 +21,7 @@
 package playground.christoph.events.algorithms;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.PersonAgent;
@@ -240,7 +241,7 @@ public class LeaveLinkReplanner {
 	 */
 	protected boolean checkRoute(Route route)
 	{
-		ArrayList<Node> nodes = route.getRoute();
+		List<Node> nodes = route.getRoute();
 		
 		if(nodes.size() == 0) return true;
 	

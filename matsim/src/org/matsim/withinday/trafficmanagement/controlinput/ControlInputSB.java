@@ -69,9 +69,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * will thus not be usable with real time dependent networks.
  */
 
-public class ControlInputSB extends AbstractControlInputImpl implements
-		LinkLeaveEventHandler, LinkEnterEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
+public class ControlInputSB extends AbstractControlInputImpl {
 
 	// User parameters:
 
@@ -117,7 +115,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 
 	private List<Link> outLinksMainRoute = new ArrayList<Link>();
 
-	private ArrayList<Node> nodesMainRoute = new ArrayList<Node>();
+	private List<Node> nodesMainRoute = new ArrayList<Node>();
 
 	private Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
 
@@ -125,7 +123,7 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 
 	private List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
 
-	private ArrayList<Node> nodesAlternativeRoute = new ArrayList<Node>();
+	private List<Node> nodesAlternativeRoute = new ArrayList<Node>();
 
 	// private Map<String, Double> flowLinkDistances = new HashMap<String,
 	// Double>();
@@ -580,12 +578,12 @@ public class ControlInputSB extends AbstractControlInputImpl implements
 					}
 				}
 			}
-			if (guidanceObjectWillQueue) {
+//			if (guidanceObjectWillQueue) {
 //				log.debug("The guidance object will queue with agents ahead.");
-			}
-			else {
+//			}
+//			else {
 //						.debug("The guidance object will not queue at the bottleneck. No critical congested link was found.");
-			}
+//			}
 			// log.debug("Distribution check performed: " + agentsToQueueAtBottleNeck
 			// + " will queue at link " + criticalCongestedLink.getId().toString());
 		}

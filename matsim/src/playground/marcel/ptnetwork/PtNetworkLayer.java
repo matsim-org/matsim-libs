@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -483,7 +484,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 	 */
 	public void markRoute(final Route route) {
 		if(route.getRoute()!=null){
-			ArrayList<Node> routeNodes = route.getRoute();
+			List<Node> routeNodes = route.getRoute();
 			for(int i=0; i<(routeNodes.size()-1);i++){
 				for(Iterator<? extends Link> it = routeNodes.get(i).getOutLinks().values().iterator();it.hasNext();){
 					Link link = it.next();

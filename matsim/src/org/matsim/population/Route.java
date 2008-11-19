@@ -31,7 +31,7 @@ public interface Route extends BasicRoute {
 
 	public abstract void setRoute(final String route);
 
-	public abstract ArrayList<Node> getRoute();
+	public abstract List<Node> getRoute();
 
 	public abstract void setLinkRoute(List<Link> srcRoute);
 

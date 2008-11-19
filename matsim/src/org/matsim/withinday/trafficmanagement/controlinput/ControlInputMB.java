@@ -33,17 +33,12 @@ import org.matsim.basic.v01.Id;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.handler.AgentArrivalEventHandler;
-import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.events.handler.LinkEnterEventHandler;
-import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
-import org.matsim.withinday.trafficmanagement.ControlInput;
 
 /**
  * @author abergsten and dzetterberg
@@ -68,9 +63,7 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  * will thus not be usable with real time dependent networks.
  */
 
-public class ControlInputMB extends AbstractControlInputImpl implements
-		LinkLeaveEventHandler, LinkEnterEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, ControlInput {
+public class ControlInputMB extends AbstractControlInputImpl {
 
 	// User parameters:
 
@@ -114,7 +107,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private List<Link> outLinksMainRoute = new ArrayList<Link>();
 
-	private ArrayList<Node> nodesMainRoute = new ArrayList<Node>();
+	private List<Node> nodesMainRoute = new ArrayList<Node>();
 
 	private Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
 
@@ -122,7 +115,7 @@ public class ControlInputMB extends AbstractControlInputImpl implements
 
 	private List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
 
-	private ArrayList<Node> nodesAlternativeRoute = new ArrayList<Node>();
+	private List<Node> nodesAlternativeRoute = new ArrayList<Node>();
 
 	// private Map<String, Double> flowLinkDistances = new HashMap<String,
 	// Double>();

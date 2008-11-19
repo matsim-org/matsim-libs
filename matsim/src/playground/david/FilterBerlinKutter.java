@@ -20,8 +20,8 @@
 
 package playground.david;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.basic.v01.IdImpl;
@@ -71,7 +71,7 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				Leg leg = (Leg)plan.getActsLegs().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					ArrayList<Node> nodes = leg.getRoute().getRoute();
+					List<Node> nodes = leg.getRoute().getRoute();
 					int count = 0;
 					for (Node node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;

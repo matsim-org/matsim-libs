@@ -20,8 +20,8 @@
 
 package org.matsim.planomat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
@@ -310,7 +310,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		differentRoute.setRoute("2 10 12");
 		modifyMe.setRoute(differentRoute);
 		
-		ArrayList<Node> actualRoute = legsRoutes.get(modifyMe).getRoute();
+		List<Node> actualRoute = legsRoutes.get(modifyMe).getRoute();
 		assertEquals(expectedRoute.getRoute(), actualRoute);
 		
 	}

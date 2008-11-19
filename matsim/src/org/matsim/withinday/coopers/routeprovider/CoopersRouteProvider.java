@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.coopers.routeprovider;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,13 +34,10 @@ import org.matsim.withinday.trafficmanagement.VDSSign;
 
 /**
  * @author dgrether
- *
  */
-public class CoopersRouteProvider extends AbstractRouteProvider implements
-		RouteProvider {
+public class CoopersRouteProvider extends AbstractRouteProvider {
 
-	private static final Logger log = Logger
-			.getLogger(CoopersRouteProvider.class);
+	private static final Logger log = Logger.getLogger(CoopersRouteProvider.class);
 
 	private List<VDSSign> signs;
 
@@ -65,16 +61,14 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 	public boolean providesRoute(final Link currentLink, final Route subRoute) {
 		for (VDSSign s : this.signs) {
 			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLink.getId());
-			if (s.getSignLink().equals(currentLink)) {
-				if (containsLink(subRoute, s.getDirectionLinks())) {
-					this.currentRoute = s.requestRoute();
-					if (this.currentRoute == null) {
-						log.trace("Sign is currently switched off!");
-						return false;
-					}
-					log.trace("Sign provides route!");
-					return true;
+			if (s.getSignLink().equals(currentLink) && containsLink(subRoute, s.getDirectionLinks())) {
+				this.currentRoute = s.requestRoute();
+				if (this.currentRoute == null) {
+					log.trace("Sign is currently switched off!");
+					return false;
 				}
+				log.trace("Sign provides route!");
+				return true;
 			}
 		}
 		return false;
@@ -92,7 +86,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 		// Route.getLinkRoute() method
 		// we have to check if the last node of the subRoute has an outgoing link
 		// which is equal to the direction link
-		ArrayList<Node> route = subRoute.getRoute();
+		List<Node> route = subRoute.getRoute();
 		for (Link link : route.get(route.size() - 1).getOutLinks().values()) {
 			if (link.equals(directionLink)) {
 				return true;
@@ -125,8 +119,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider implements
 	@Override
 	protected Route requestRoute(final Node departureNode,
 			final Node destinationNode, final double time) {
-		throw new UnsupportedOperationException(
-				"This method is not supported by this class.");
+		throw new UnsupportedOperationException();
 	}
 
 	private static class CurrentSignRouteProvider implements RouteProvider {

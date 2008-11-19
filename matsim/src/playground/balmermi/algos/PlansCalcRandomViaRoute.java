@@ -21,6 +21,7 @@
 package playground.balmermi.algos;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
@@ -214,7 +215,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 			travTime += route2.getTravTime();
 		}
 		
-		ArrayList<Node> nodes = route1.getRoute();
+		List<Node> nodes = route1.getRoute();
 		if (!nodes.isEmpty()) { nodes.remove(nodes.size()-1); } // remove the via node
 		nodes.addAll(route2.getRoute());
 		Route route = new RouteImpl();

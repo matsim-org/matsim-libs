@@ -20,7 +20,6 @@
 
 package playground.marcel.ectm.planfilter;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -177,7 +176,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// adapt route of the leg that leads into the AOI
-			ArrayList<Node> nodes = route.getRoute();
+			List<Node> nodes = route.getRoute();
 			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
 				Node node = iter.next();
@@ -205,7 +204,7 @@ public class CutTrips implements PersonAlgorithm {
 			boolean removing = false;
 			Leg leg = (Leg) plan.getActsLegs().get(firstOutsideLeg);
 			Route route = leg.getRoute();
-			ArrayList<Node> nodes = route.getRoute();
+			List<Node> nodes = route.getRoute();
 			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
 				Node node = iter.next();

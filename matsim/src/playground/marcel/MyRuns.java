@@ -542,7 +542,7 @@ public class MyRuns {
 				for (int i = 1, max = plan.getActsLegs().size(); i < max; i +=2) {
 					final Leg leg = (Leg)plan.getActsLegs().get(i);
 					final Route route = leg.getRoute();
-					final ArrayList<Node> nodes = route.getRoute();
+					final List<Node> nodes = route.getRoute();
 					final int fromNodeIdx = nodes.indexOf(fromNode);
 					final int toNodeIdx = nodes.indexOf(toNode);
 					if (toNodeIdx == fromNodeIdx + 1) {
