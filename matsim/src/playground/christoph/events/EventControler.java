@@ -269,11 +269,11 @@ public class EventControler extends Controler{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
 				
 				// (de)activate replanning
 				MyQueueNetwork.doLeaveLinkReplanning(false);
-				MyQueueNetwork.doActEndReplanning(true);
+				MyQueueNetwork.doActEndReplanning(false);
 			}
 			else
 			{
@@ -349,28 +349,13 @@ public class EventControler extends Controler{
 		{
 			String path = this.config.getModule("selection").getValue("inputSelectionFile");
 			log.info("Path: " + path);
-			//new SelectionReaderMatsim(this.network, this.population).readFile(path);
-			//new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
-			
-/*	
-			FileNameCreator fileNameCreator = new FileNameCreator();
-			fileNameCreator.setBaseFileName(path);
-				
-			String nextFileName = fileNameCreator.getNextFileName();
 
-			SelectionReaderMatsim test = new SelectionReaderMatsim(this.network, this.population);
-			
-			while (new File(nextFileName).exists())
-			{
-				log.info(nextFileName);
-				test.readFile(nextFileName);
-				nextFileName = fileNameCreator.getNextFileName();
-			}
-			test = null;
-*/			
+			// reading single File
+			//new SelectionReaderMatsim(this.network, this.population).readFile(path);
 			
 			//reading multiple Files automatically
 			new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
+			
 			log.info("Read input selection file!");
 		}
 	}
@@ -387,12 +372,13 @@ public class EventControler extends Controler{
 			String outPutFile = this.config.getModule("selection").getValue("outputSelectionFile");
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 			
-			//new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write();
-			new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write(5000);
-			//new SelectionWriter(this.population, outPutFile, dtdFile , "1.0", "dummy").write(2500);
-			
+			// write single File
 			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
-			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(5000);
+			
+			// write multiple Files automatically
+			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(5000);
+
+			
 			//new SelectionWriter(this.population, getOutputFilename("selection.xml.gz"), "1.0", "dummy").write();	
 						
 			log.info("Path: " + outPutFile);

@@ -249,7 +249,8 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 					{
 						if(!currentNodes.containsKey(nodeId))
 						{
-							currentNodes.put(nodeId, node);
+							//currentNodes.put(nodeId, node);
+							currentNodes.put(node.getId(), node);
 						}
 					}
 					
@@ -257,7 +258,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 					{
 //						if(!currentNodesList.contains(nodeId))
 //						{
-							currentNodesList.add(nodeId.toString());
+							currentNodesList.add(nodeId.toString().intern());
 //						}
 					}
 				}
@@ -288,8 +289,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	
 	private Id getId(Attributes atts) 
 	{
-		Id id = new IdImpl(atts.getValue(ID));
-		return id;
+		return new IdImpl(atts.getValue(ID).intern());
 	}
 	
 	public void readFile(String fileName)
