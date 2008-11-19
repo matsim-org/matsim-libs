@@ -239,7 +239,7 @@ public class JohScoringFunction implements ScoringFunction {
 			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 		}
 
-		// utility of performing an action, duration is >= 1, thus log is no problem
+		// utility of performing an action
 		if (duration > 0) {
 			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
 			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
