@@ -320,6 +320,14 @@ public class Plan extends BasicPlanImpl {
 		return this.person.getSelectedPlan() == this;
 	}
 
+	
+	@Override
+	public void setSelected(boolean selected) {
+		this.getPerson().setSelectedPlan(this);
+		super.setSelected(selected);
+	}
+	
+	
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////

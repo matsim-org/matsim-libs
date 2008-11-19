@@ -34,16 +34,6 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
 	public void addPlan(final T plan);
 
-	public T getSelectedPlan();
-
-	/**
-	 * Sets the selected plan of a person. If the plan is not part of the person,
-	 * nothing is changed.
-	 *
-	 * @param selectedPlan the plan to be the selected one of the person
-	 */
-	public void setSelectedPlan(final T selectedPlan);
-
 	public List<T> getPlans();
 
 	public Id getId();

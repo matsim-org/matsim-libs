@@ -33,7 +33,6 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 	private static final Logger log = Logger.getLogger(BasicPersonImpl.class);
 	
 	protected List<T> plans = new ArrayList<T>(6);
-	protected T selectedPlan = null;
 	protected Id id;
 	private String sex;
 	private int age = Integer.MIN_VALUE;
@@ -59,30 +58,13 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 		return this.householdId;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.matsim.basic.v01.BasicPerson#addPlan(T)
 	 */
 	public void addPlan(final T plan) {
 		this.plans.add(plan);
-		// Make sure there is a selected plan if there is at least one plan
-		if (this.selectedPlan == null) this.selectedPlan = plan;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#getSelectedPlan()
-	 */
-	public T getSelectedPlan() {
-		return this.selectedPlan;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPerson#setSelectedPlan(T)
-	 */
-	public void setSelectedPlan(final T selectedPlan) {
-		if (this.plans.contains(selectedPlan)) {
-			this.selectedPlan = selectedPlan;
-		}
-	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.basic.v01.BasicPerson#getPlans()

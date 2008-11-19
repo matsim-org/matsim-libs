@@ -52,11 +52,42 @@ public class PersonImpl implements Person{
 
 	private Household household;
 
-	
+	protected Plan selectedPlan = null;
+
 	public PersonImpl(Id id) {
 		this.delegate = new BasicPersonImpl(id);
-//		super(id);
 	}
+	
+	public void addPlan(final Plan plan) {
+		this.delegate.addPlan(plan);
+		// Make sure there is a selected plan if there is at least one plan
+		if (this.selectedPlan == null) this.selectedPlan = plan;
+	}
+	
+	/**
+	 * @see org.matsim.population.Person#getSelectedPlan()
+	 */
+	public Plan getSelectedPlan() {
+		return this.selectedPlan;
+	}
+
+	/**
+	 * @see org.matsim.population.Person#setSelectedPlan(T)
+	 */
+	public void setSelectedPlan(final Plan selectedPlan) {
+		if (delegate.getPlans().contains(selectedPlan)) {
+			this.selectedPlan = selectedPlan;
+		}
+		//FIXME dg nov 08: we should think about the following: the
+		//methods comment states that nothing is changed if the plan
+		//is not contained in the db, however from my point of view
+		//this could be reason for bugs -> Exception???
+		//
+//		else {
+//			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
+//		}
+	}
+	
 	
 	public Plan createPlan(final boolean selected) {
 		Plan p = new Plan(this);
@@ -65,8 +96,8 @@ public class PersonImpl implements Person{
 			setSelectedPlan(p);
 		}
 		// Make sure there is a selected plan if there is at least one plan
-		if (this.delegate.getSelectedPlan() == null) 
-			this.delegate.setSelectedPlan(p);
+		if (this.getSelectedPlan() == null) 
+			this.setSelectedPlan(p);
 		return p;
 	}
 	
@@ -156,7 +187,7 @@ public class PersonImpl implements Person{
 
 	public boolean removePlan(final Plan plan) {
 		boolean result = this.delegate.getPlans().remove(plan);
-		if ((this.delegate.getSelectedPlan() == plan) && result) {
+		if ((this.getSelectedPlan() == plan) && result) {
 			this.setSelectedPlan(this.getRandomPlan());
 		}
 		return result;
@@ -249,10 +280,6 @@ public class PersonImpl implements Person{
 		return this.visualizerData ;
 	}
 
-	public void addPlan(Plan plan) {
-		delegate.addPlan(plan);
-	}
-
 	public void addTravelcard(String type) {
 		delegate.addTravelcard(type);
 	}
@@ -293,10 +320,6 @@ public class PersonImpl implements Person{
 		return delegate.getPlans();
 	}
 
-	public Plan getSelectedPlan() {
-		return delegate.getSelectedPlan();
-	}
-
 	public String getSex() {
 		return delegate.getSex();
 	}
@@ -331,10 +354,6 @@ public class PersonImpl implements Person{
 
 	public void setLicence(String licence) {
 		delegate.setLicence(licence);
-	}
-
-	public void setSelectedPlan(Plan selectedPlan) {
-		delegate.setSelectedPlan(selectedPlan);
 	}
 
 	public void setSex(String sex) {

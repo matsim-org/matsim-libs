@@ -29,6 +29,17 @@ public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
 	
 	public Plan createPlan(final boolean selected);
 	
+	public Plan getSelectedPlan();
+
+	/**
+	 * Sets the selected plan of a person. If the plan is not part of the person,
+	 * nothing is changed.
+	 *
+	 * @param selectedPlan the plan to be the selected one of the person
+	 */
+	public void setSelectedPlan(final Plan selectedPlan);
+	
+	
 	/**
 	 * Removes all plans except the selected one.
 	 */
