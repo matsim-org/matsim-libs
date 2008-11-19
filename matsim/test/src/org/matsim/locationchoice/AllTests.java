@@ -29,7 +29,10 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.locationchoice");
 		//$JUnit-BEGIN$
 
-//		suite.addTestSuite(LocationChoiceTest.class);
+		suite.addTestSuite(LocationChoiceTest.class);
+		suite.addTestSuite(LocationMutatorwChoiceSetTest.class);
+		suite.addTestSuite(RandomLocationMutatorTest.class);
+		suite.addTestSuite(SubChainTest.class);
 
 		//$JUnit-END$
 		return suite;
