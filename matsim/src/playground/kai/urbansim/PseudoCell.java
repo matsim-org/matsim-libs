@@ -16,7 +16,7 @@ public class PseudoCell {
 		ySum += yy ; yCnt++ ;
 	}
 	public double getX() {
-		return xSum/xCnt ;  // possibly NaN
+		return xSum/xCnt ;  // FIXME: possibly NaN
 	}
 	public double getY() {
 		return ySum/yCnt ;
