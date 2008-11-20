@@ -1,5 +1,6 @@
 package org.matsim.locationchoice;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.matsim.network.NetworkLayer;
 import org.matsim.controler.Controler;
@@ -43,14 +44,30 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		
 		Gbl.getConfig().locationchoice();
 		
+        Method method = null;
 		try {
-            Method method = this.locationchoice.getClass().getDeclaredMethod("initLocal", new Class[]{NetworkLayer.class, Controler.class});
-            method.setAccessible(true);
-            method.invoke(this.locationchoice, new Object[]{controler.getNetwork(), controler});
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+			method = this.locationchoice.getClass().getDeclaredMethod("initLocal", new Class[]{NetworkLayer.class, Controler.class});
+			method.setAccessible(true);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			fail();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			fail();
+		}
+        
+        try {
+			method.invoke(this.locationchoice, new Object[]{controler.getNetwork(), controler});
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			fail();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			fail();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+			fail();
+		}
 		assertNotNull("controler not initialized", this.locationchoice.getControler());
 		assertNotNull("network not initialized", this.locationchoice.getNetwork());
 	}
