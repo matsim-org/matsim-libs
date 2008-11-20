@@ -107,19 +107,19 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final LinkedList<Node> sources,final FakeTravelTimeCost lengths, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
+	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Node, Integer> demands, final Node sink, final int horizon) {
 		this._network = network;
 		this._lengths = lengths;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
 		// initialize distances
 		for(Link link : network.getLinks().values()){
 			int l = (int) _lengths.getLinkTravelCost(link, 1.);
-			//int l = (int)link.getLength()/(int)link.getFreespeed(1.); 
 			this._flow.put(link, new EdgeIntervalls(l));
 		}
 		this._paths = new LinkedList<Path>();
-		this._sources = sources;
 		this._demands = demands;
+		this._sources = new LinkedList<Node>();
+		this._sources.addAll(demands.keySet());
 		this._sink = sink;
 		_timeHorizon = horizon;
 		this._nonactives = this.nonActives();
@@ -135,13 +135,15 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Link, EdgeIntervalls> flow,final LinkedList<Node> sources, HashMap<Node, Integer> demands,final Node sink,final int horizon) {
+	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Link, EdgeIntervalls> flow,
+			HashMap<Node, Integer> demands,final Node sink,final int horizon) {
 		this._network = network;
 		this._lengths = lengths;
 		this._flow = flow;
 		this._paths = new LinkedList<Path>();
-		this._sources = sources;
 		this._demands = demands;
+		this._sources = new LinkedList<Node>();
+		this._sources.addAll(demands.keySet());
 		this._sink = sink;
 		_timeHorizon = horizon;
 		this._nonactives = this.nonActives();
@@ -204,7 +206,7 @@ public class Flow {
 			int cap =(int) link.getCapacity(1.);
 			int time = edge.getTime();
 			
-//TODO look if residual edges are handeled properly   !!!!!
+//TODO look if residual edges are handled properly   !!!!!
 			
 			int flow = this._flow.get(link).getFlowAt(time);
 			int i = cap-flow;

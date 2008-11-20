@@ -108,52 +108,47 @@ public class MultiSourceEAF {
 	
 	
 	/**
-	 * main method to run an EAF algorithm on the specified cenarion
+	 * main method to run an EAF algorithm on the specified cenario
 	 * @param args b
 	 * 
 	 */
 	public static void main(String[] args) {
 		 System.out.println("Ich lebe");
+		 
+		 
+		 //read network
 		 NetworkLayer network = new NetworkLayer();
 		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
-		 HashMap<Link, EdgeIntervalls> flow;
-		 HashMap<Node, Integer> demands;
-		 int timeHorizon = 90;
-		 
-		//Read the data 
+		 networkReader.readFile("/Users/manuel/Documents/meine_EA/manu/manu2.xml");
 		//networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
-		networkReader.readFile("/Users/manuel/Documents/meine_EA/manu2.xml");
-		try {
-			demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu2.dem");
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
 		
-		flow = new HashMap<Link, EdgeIntervalls>();
-		for(Link link : network.getLinks().values()){
-			int l = (int)link.getLength()/(int)link.getFreespeed(1.);//TOTO traveltime
-			flow.put(link, new EdgeIntervalls(l));
-			//TODO achtung cast von double auf int
-		}
-		
-		// find source and sink
-		LinkedList<Node> sources = new LinkedList<Node>();
-		sources.addAll(demands.keySet());
-		
+		 //read demands 
+		 HashMap<Node, Integer> demands;
+		 try {
+				demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu/manu2.dem");
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+
+		//set parameters
+		int timeHorizon = 90;
 		Node sink = network.getNode("5");
-		Path result;
-		if (sources.isEmpty() || sink == null) {
+		Path result = null;
+		int rounds = 2000;
+		
+		//check if demands and sink are set 
+		if (demands.isEmpty() || sink == null) {
 			System.out.println("nicht da");
 		} else {
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
 			
 
 			//Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
-			Flow fluss = new Flow(network,travelcost, flow, sources, demands, sink, timeHorizon);
+			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 			BellmanFordVertexIntervalls.debug(true);
-			for (int i=0; i<20000; i++){
+			for (int i=0; i<rounds; i++){
 				result = routingAlgo.doCalculations();
 				if (result==null){
 					break;
