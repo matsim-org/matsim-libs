@@ -20,11 +20,11 @@
 
 package org.matsim.locationchoice.facilityload;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 public class FacilityLoad {
 	
-	private final static Logger log = Logger.getLogger(FacilityLoad.class);
+	//private final static Logger log = Logger.getLogger(FacilityLoad.class);
 	
 	private int [] arrivals = null;
 	private int [] departures = null;
@@ -135,7 +135,7 @@ public class FacilityLoad {
 	}
 
 	public void finish() {
-		log.info("FacilityLoad finished");
+		//log.info("FacilityLoad finished");
 		this.calculateFacilityLoad24();
 	}
 	
