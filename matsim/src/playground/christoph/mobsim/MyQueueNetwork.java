@@ -33,7 +33,7 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNetworkFactory;
 import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -138,7 +138,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	protected void leaveLinkReplanning(double time)
 	{
 		// Leave Link Replanning Objects
-		ArrayList<Vehicle> vehiclesToReplanLeaveLink = new ArrayList<Vehicle>();
+		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = new ArrayList<QueueVehicle>();
 		ArrayList<QueueNode> currentNodesLeaveLink = new ArrayList<QueueNode>();
 		
 		for (QueueNode queueNode : this.getNodes().values())
@@ -149,9 +149,9 @@ public class MyQueueNetwork extends QueueNetwork{
 				
 				for (int i = 0; i < queueLinks.length; i++)
 				{
-					Queue<Vehicle> inBufferVehiclesQueue = queueLinks[i].getVehiclesInBuffer();
+					Queue<QueueVehicle> inBufferVehiclesQueue = queueLinks[i].getVehiclesInBuffer();
 					
-					for (Vehicle vehicle : inBufferVehiclesQueue) 
+					for (QueueVehicle vehicle : inBufferVehiclesQueue) 
 					{	
 						// check if Leave Link Replanning flag is set
 						boolean leaveLinkReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
@@ -182,7 +182,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	protected void actEndReplanning(double time)
 	{
 		// Act End Replanning Objects
-		ArrayList<Vehicle> vehiclesToReplanActEnd = new ArrayList<Vehicle>();
+		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
 		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
 		/*
 		 * Checking only Links that leed to active Nodes is not allowed here!
@@ -199,9 +199,9 @@ public class MyQueueNetwork extends QueueNetwork{
 			 * the vehicle is going to end it's current activity in this SimStep,
 			 * so Act End Replanning is needed.
 			 */
-			PriorityQueue<Vehicle> onParkingListVehiclesQueue = queueLink.getVehiclesOnParkingList();
+			PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLink.getVehiclesOnParkingList();
 							
-			for (Vehicle vehicle : onParkingListVehiclesQueue)
+			for (QueueVehicle vehicle : onParkingListVehiclesQueue)
 			{	
 				// check if Act End Replanning flag is set
 				boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");
@@ -248,7 +248,7 @@ public class MyQueueNetwork extends QueueNetwork{
 	protected void actEndReplanningV2(double time)
 	{
 		// Act End Replanning Objects
-		ArrayList<Vehicle> vehiclesToReplanActEnd = new ArrayList<Vehicle>();
+		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
 		ArrayList<Act> fromActActEnd = new ArrayList<Act>();
 		/*
 		 * Checking if the current QueueNode is active is not allowed here!
@@ -269,9 +269,9 @@ public class MyQueueNetwork extends QueueNetwork{
 				 * the vehicle is going to end it's current activity in this SimStep,
 				 * so Act End Replanning is needed.
 				 */
-				PriorityQueue<Vehicle> onParkingListVehiclesQueue = queueLinks[i].getVehiclesOnParkingList();
+				PriorityQueue<QueueVehicle> onParkingListVehiclesQueue = queueLinks[i].getVehiclesOnParkingList();
 								
-				for (Vehicle vehicle : onParkingListVehiclesQueue)
+				for (QueueVehicle vehicle : onParkingListVehiclesQueue)
 				{	
 					// check if Act End Replanning flag is set
 					boolean actEndReplanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("endActivityReplanning");

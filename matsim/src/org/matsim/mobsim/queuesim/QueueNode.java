@@ -85,7 +85,7 @@ public class QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
-	public boolean moveVehicleOverNode(final Vehicle veh, final double now) {
+	public boolean moveVehicleOverNode(final QueueVehicle veh, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
 		QueueLink currentQueueLink = this.queueNetwork.getQueueLink(currentLink.getId());
@@ -196,7 +196,7 @@ public class QueueNode {
 					this.tempLinks[i] = null;
 					//move the link
 					while (!link.bufferIsEmpty()) {
-						Vehicle veh = link.getFirstFromBuffer();
+						QueueVehicle veh = link.getFirstFromBuffer();
 						if (!moveVehicleOverNode(veh, now)) {
 							break;
 						}

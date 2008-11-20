@@ -18,7 +18,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -58,7 +58,7 @@ public class QLink extends QueueLink {
 	}
 
 	@Override
-	public void addParking(Vehicle veh) {
+	public void addParking(QueueVehicle veh) {
 		this.originalLink.addVehicle2ParkingQueue(veh);
 	}
 
@@ -96,7 +96,7 @@ public class QLink extends QueueLink {
 	}
 
 	@Override
-	public void add(final Vehicle veh) {
+	public void add(final QueueVehicle veh) {
 		double now = SimulationTimer.getTime();
 		activateLink();
 		veh.getDriver().setCurrentLink(this.getLink());

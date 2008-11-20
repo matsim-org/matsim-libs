@@ -12,7 +12,7 @@ import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.Simulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
@@ -43,7 +43,7 @@ public class QNode extends QueueNode{
 
 				for (PseudoLink pseudoLink : qLink.getNodePseudoLinks()) {
 					while (pseudoLink.firstVehCouldMove()) {
-						Vehicle veh = pseudoLink.getFirstFromBuffer();
+						QueueVehicle veh = pseudoLink.getFirstFromBuffer();
 						if (!moveVehicleOverNode(veh, pseudoLink)) {
 							break;
 						}
@@ -84,7 +84,7 @@ public class QNode extends QueueNode{
 						this.tempLinks[i] = null;
 						for (PseudoLink pseudoLink : link.getNodePseudoLinks()) {
 							while (!pseudoLink.flowQueueIsEmpty()) {
-								Vehicle veh = pseudoLink.getFirstFromBuffer();
+								QueueVehicle veh = pseudoLink.getFirstFromBuffer();
 								if (!moveVehicleOverNode(veh, pseudoLink)) {
 									break;
 								}
@@ -99,7 +99,7 @@ public class QNode extends QueueNode{
 	}
 
 	/** Simple moveNode, Complex one can be found in {@link QueueNode} */
-	public boolean moveVehicleOverNode(final Vehicle veh, PseudoLink pseudoLink) {
+	public boolean moveVehicleOverNode(final QueueVehicle veh, PseudoLink pseudoLink) {
 		double now = SimulationTimer.getTime();
 		// veh has to move over node
 		Link nextLink = veh.getDriver().chooseNextLink();

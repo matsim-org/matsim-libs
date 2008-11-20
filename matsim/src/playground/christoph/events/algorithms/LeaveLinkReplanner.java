@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
@@ -70,13 +70,13 @@ public class LeaveLinkReplanner {
 	protected Node node;
 	protected Plan plan;
 	protected QueueNode queueNode;
-	protected Vehicle vehicle;
+	protected QueueVehicle vehicle;
 	
 	protected PlanAlgorithm replanner; 
 	
 	private static final Logger log = Logger.getLogger(LeaveLinkReplanner.class);
 	
-	public LeaveLinkReplanner(QueueNode queueNode, Vehicle vehicle, double time, PlanAlgorithm replanner)
+	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
 		this.queueNode = queueNode;
 		this.node = queueNode.getNode();
@@ -89,7 +89,7 @@ public class LeaveLinkReplanner {
 		init();
 	}
 	
-	public LeaveLinkReplanner(QueueNode queueNode, Vehicle vehicle, double time)
+	public LeaveLinkReplanner(QueueNode queueNode, QueueVehicle vehicle, double time)
 	{
 		this.queueNode = queueNode;
 		this.node = queueNode.getNode();

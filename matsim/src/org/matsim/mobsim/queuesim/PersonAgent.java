@@ -40,7 +40,7 @@ public class PersonAgent {
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
 	private final Person person;
-	private Vehicle vehicle;
+	private QueueVehicle vehicle;
 	protected Link cachedNextLink = null;
 
 	private Link currentLink;
@@ -71,11 +71,11 @@ public class PersonAgent {
 		return this.person.getSelectedPlan().getActsLegs();
 	}
 
-	public void setVehicle(final Vehicle veh) {
+	public void setVehicle(final QueueVehicle veh) {
 		this.vehicle = veh;
 	}
 
-	public Vehicle getVehicle() {
+	public QueueVehicle getVehicle() {
 		return this.vehicle;
 	}
 

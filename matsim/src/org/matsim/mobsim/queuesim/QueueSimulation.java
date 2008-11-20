@@ -67,7 +67,7 @@ public class QueueSimulation {
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
-	private Class<? extends Vehicle> vehiclePrototype = Vehicle.class;
+	private Class<? extends QueueVehicle> vehiclePrototype = QueueVehicle.class;
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
@@ -75,7 +75,7 @@ public class QueueSimulation {
 	 * Includes all vehicle that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private static PriorityQueue<Vehicle> teleportationList = new PriorityQueue<Vehicle>(30, new VehicleDepartureTimeComparator());
+	private static PriorityQueue<QueueVehicle> teleportationList = new PriorityQueue<QueueVehicle>(30, new QueueVehicleDepartureTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -120,7 +120,7 @@ public class QueueSimulation {
 		for (Person p : this.plans.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
 
-			Vehicle veh;
+			QueueVehicle veh;
 			try {
 				veh = this.vehiclePrototype.newInstance();
 				//not needed in new agent class
@@ -138,12 +138,12 @@ public class QueueSimulation {
 		}
 	}
 
-	protected void setVehiclePrototye(final Class<? extends Vehicle> proto) {
+	protected void setVehiclePrototye(final Class<? extends QueueVehicle> proto) {
 		this.vehiclePrototype = proto;
 	}
 
 	//TODO remove this method when agent representation is completely implemented
-	protected void addVehicleToLink(final Vehicle veh) {
+	protected void addVehicleToLink(final QueueVehicle veh) {
 		Link link = veh.getCurrentLink();
 		QueueLink qlink = this.network.getQueueLink(link.getId());
 		qlink.addParking(veh);
@@ -263,7 +263,7 @@ public class QueueSimulation {
 	protected void cleanupSim() {
 		this.network.afterSim();
 		double now = SimulationTimer.getTime();
-		for (Vehicle veh : teleportationList) {
+		for (QueueVehicle veh : teleportationList) {
 			new AgentStuckEvent(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getCurrentLeg());
 		}
 		QueueSimulation.teleportationList.clear();
@@ -347,7 +347,7 @@ public class QueueSimulation {
 		QueueSimulation.events = events;
 	}
 
-	protected static final void handleUnknownLegMode(final Vehicle veh) {
+	protected static final void handleUnknownLegMode(final QueueVehicle veh) {
 		veh.setDepartureTime_s(SimulationTimer.getTime() + veh.getCurrentLeg().getTravelTime());
 		veh.getDriver().setCurrentLink(veh.getDriver().getDestinationLink());
 		teleportationList.add(veh);
@@ -355,7 +355,7 @@ public class QueueSimulation {
 
 	private final void moveVehiclesWithUnknownLegMode(final double now) {
 	  	while (teleportationList.peek() != null ) {
-	  		Vehicle veh = teleportationList.peek();
+	  		QueueVehicle veh = teleportationList.peek();
 	  		if (veh.getDepartureTime_s() <= now) {
 	  			teleportationList.poll();
 

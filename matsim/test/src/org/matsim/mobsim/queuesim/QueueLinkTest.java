@@ -79,7 +79,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 
 	public void testAdd() {
-		Vehicle v = new Vehicle();
+		QueueVehicle v = new QueueVehicle();
 
 		Person p = new PersonImpl(new IdImpl("1"));
 		v.setDriver(new PersonAgent(p));
@@ -119,7 +119,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		this.qlink.finishInit();
 
 		new QueueSimulation(network, null, new Events());
-		Vehicle v1 = new Vehicle();
+		QueueVehicle v1 = new QueueVehicle();
 		Person p = new PersonImpl(new IdImpl("1"));
 		Plan plan = p.createPlan(true);
 		try {
@@ -137,7 +137,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		pa1.setVehicle(v1);
 		pa1.initialize();
 
-		Vehicle v2 = new Vehicle();
+		QueueVehicle v2 = new QueueVehicle();
 		PersonAgent pa2 = new PersonAgent(p);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);

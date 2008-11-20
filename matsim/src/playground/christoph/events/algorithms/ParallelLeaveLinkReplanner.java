@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -46,7 +46,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 * @param vehicles
 	 * @param time
 	 */
-	public static void run(ArrayList<QueueNode> currentNodes, ArrayList<Vehicle> vehicles, double time)
+	public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -66,7 +66,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		//for (Vehicle vehicle : vehicles)
 		for(int j = 0; j < vehicles.size(); j++)
 		{
-			Vehicle vehicle = vehicles.get(i);
+			QueueVehicle vehicle = vehicles.get(i);
 			QueueNode queueNode = currentNodes.get(i);
 			
 			replannerThreads[i % numOfThreads].handleVehicle(vehicle, queueNode);
@@ -103,7 +103,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		private double time = 0.0;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
-		private final List<Vehicle> vehicles = new LinkedList<Vehicle>();
+		private final List<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
 		private final List<QueueNode> currentNodes = new LinkedList<QueueNode>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
@@ -114,7 +114,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
-		public void handleVehicle(final Vehicle vehicle, final QueueNode currentNode)
+		public void handleVehicle(final QueueVehicle vehicle, final QueueNode currentNode)
 		{
 			this.vehicles.add(vehicle);
 			this.currentNodes.add(currentNode);
@@ -127,7 +127,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			//for (Vehicle vehicle : this.vehicles)
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
-				Vehicle vehicle = vehicles.get(i);
+				QueueVehicle vehicle = vehicles.get(i);
 				QueueNode queueNode = currentNodes.get(i);
 				
 				// If replanning flag is set in the Person

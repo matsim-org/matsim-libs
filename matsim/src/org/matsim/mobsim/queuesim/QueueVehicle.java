@@ -26,7 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 
-public class Vehicle implements DrawableAgentI {
+public class QueueVehicle implements DrawableAgentI {
 
 //	private final static Logger log = Logger.getLogger(Vehicle.class);
 
@@ -38,7 +38,7 @@ public class Vehicle implements DrawableAgentI {
 
 	private final Id id = new IdImpl(globalID++);
 
-	public Vehicle() {}
+	public QueueVehicle() {}
 
 
 	public double getDepartureTime_s() {

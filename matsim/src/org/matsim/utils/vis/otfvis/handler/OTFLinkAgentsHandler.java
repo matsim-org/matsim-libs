@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueLink;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Leg;
 import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
@@ -70,7 +70,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
 			if (pos.getVehicleState()== VehicleState.Parking) {
 				// What is the next legs mode?
-				Vehicle veh = src.getVehicle(pos.getAgentId());
+				QueueVehicle veh = src.getVehicle(pos.getAgentId());
 				if (veh == null) {
 					out.putInt(1);
 				} else {

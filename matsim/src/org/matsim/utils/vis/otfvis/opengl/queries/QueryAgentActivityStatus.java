@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -57,8 +57,8 @@ public class QueryAgentActivityStatus implements OTFQuery {
 		for (int i=0;i< plan.getActsLegs().size(); i+=2) {
 			Act act = (Act)plan.getActsLegs().get(i);
 			QueueLink link = net.getQueueLink(act.getLinkId());
-			Collection<Vehicle> vehs = link.getAllVehicles();
-			for (Vehicle info : vehs) {
+			Collection<QueueVehicle> vehs = link.getAllVehicles();
+			for (QueueVehicle info : vehs) {
 				if (info.getDriver().getPerson().getId().toString().compareTo(this.agentID) == 0) {
 					// we found the little nutty, now lets reason about the length of 1st activity
 					double departure = info.getDepartureTime_s();

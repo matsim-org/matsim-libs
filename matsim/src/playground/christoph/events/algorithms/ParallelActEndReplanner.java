@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Act;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -38,7 +38,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelActEndReplanner.class);
 	
-	public static void run(ArrayList<Act> fromActs, ArrayList<Vehicle> vehicles, double time)
+	public static void run(ArrayList<Act> fromActs, ArrayList<QueueVehicle> vehicles, double time)
 	{		
 		Thread[] threads = new Thread[numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
@@ -57,7 +57,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		int i = 0;
 		for(int j = 0; j < vehicles.size(); j++)
 		{
-			Vehicle vehicle = vehicles.get(i);
+			QueueVehicle vehicle = vehicles.get(i);
 			Act fromAct = fromActs.get(i);
 			
 			replannerThreads[i % numOfThreads].handleVehicle(vehicle, fromAct);
@@ -94,7 +94,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 		private double time = 0.0;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
-		private final List<Vehicle> vehicles = new LinkedList<Vehicle>();
+		private final List<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
 		private final List<Act> fromActs = new LinkedList<Act>();
 
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners, final double time)
@@ -105,7 +105,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
-		public void handleVehicle(final Vehicle vehicle, final Act fromAct)
+		public void handleVehicle(final QueueVehicle vehicle, final Act fromAct)
 		{
 			this.vehicles.add(vehicle);
 			this.fromActs.add(fromAct);
@@ -117,7 +117,7 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			
 			for(int i = 0; i < vehicles.size(); i++)
 			{	
-				Vehicle vehicle = vehicles.get(i);
+				QueueVehicle vehicle = vehicles.get(i);
 				Act fromAct = fromActs.get(i);
 				
 				// replanner of the person

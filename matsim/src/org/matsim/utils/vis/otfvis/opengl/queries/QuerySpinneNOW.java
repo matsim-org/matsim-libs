@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
@@ -19,8 +19,8 @@ public class QuerySpinneNOW extends QuerySpinne {
 	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		QueueLink link = net.getLinks().get(linkId);
-		Collection<Vehicle> vehs = link.getAllVehicles();
-		for( Vehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
+		Collection<QueueVehicle> vehs = link.getAllVehicles();
+		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
 		
 		return actPersons;
 	}

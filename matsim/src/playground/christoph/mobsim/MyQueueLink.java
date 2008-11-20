@@ -26,7 +26,7 @@ import java.util.Queue;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 
 public class MyQueueLink extends QueueLink {
@@ -34,14 +34,14 @@ public class MyQueueLink extends QueueLink {
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private final Queue<Vehicle> buffer = new LinkedList<Vehicle>();
+	private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 	
 	public MyQueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) 
 	{
 		super(l, queueNetwork, toNode);
 	}
 	
-	public Queue<Vehicle> getBuffer()
+	public Queue<QueueVehicle> getBuffer()
 	{
 		return buffer;
 	}

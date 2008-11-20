@@ -34,7 +34,7 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -167,7 +167,7 @@ public class WithindayAgentTest extends TestCase {
 		CoopersAgentLogicFactory factory = new CoopersAgentLogicFactory(
 				this.network, scoringFunctionConfig, signs);
 		//create the vehicle
-		Vehicle v = new Vehicle();
+		QueueVehicle v = new QueueVehicle();
 		
 		//create the agent
 		int sightDistance = 1;

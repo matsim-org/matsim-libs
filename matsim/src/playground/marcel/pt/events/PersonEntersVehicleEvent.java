@@ -23,16 +23,16 @@ package playground.marcel.pt.events;
 import java.util.Map;
 
 import org.matsim.events.PersonEvent;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Person;
 
 public class PersonEntersVehicleEvent extends PersonEvent {
 
 	public static final String EVENT_TYPE = "PersonEntersVehicle";
 
-	final private Vehicle vehicle;
+	final private QueueVehicle vehicle;
 
-	public PersonEntersVehicleEvent(final double time, final Person person, final Vehicle vehicle) {
+	public PersonEntersVehicleEvent(final double time, final Person person, final QueueVehicle vehicle) {
 		super(time, person);
 		this.vehicle = vehicle;
 	}
@@ -44,7 +44,7 @@ public class PersonEntersVehicleEvent extends PersonEvent {
 		return attrs;
 	}
 
-	public Vehicle getVehicle() {
+	public QueueVehicle getVehicle() {
 		return this.vehicle;
 	}
 

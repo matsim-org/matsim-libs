@@ -29,16 +29,16 @@ import java.util.Comparator;
  * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
  * according to their departure time
  */
-public class VehicleDepartureTimeComparator implements Comparator<Vehicle>,
+public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehicle>,
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public VehicleDepartureTimeComparator() {
+	public QueueVehicleDepartureTimeComparator() {
 
 	}
 
-	public int compare(final Vehicle veh1, final Vehicle veh2) {
+	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
 		if (veh1.getDepartureTime_s() > veh2.getDepartureTime_s())
 			return 1;
 		if (veh1.getDepartureTime_s() < veh2.getDepartureTime_s())

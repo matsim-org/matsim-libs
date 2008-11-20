@@ -23,7 +23,7 @@ package playground.christoph.events.algorithms;
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.handler.ActEndEventHandler;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -55,7 +55,7 @@ public class ActEndReplanner implements ActEndEventHandler {
 	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
 
 	// used when starting the Replanner "by hand"
-	public ActEndReplanner(Act fromAct, Vehicle vehicle, double time, PlanAlgorithm replanner)
+	public ActEndReplanner(Act fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
 		this.fromAct = fromAct;
 		this.person = vehicle.getDriver().getPerson();

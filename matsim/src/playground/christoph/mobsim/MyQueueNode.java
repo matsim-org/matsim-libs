@@ -30,7 +30,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
-import org.matsim.mobsim.queuesim.Vehicle;
+import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Node;
 
 import playground.christoph.events.algorithms.LeaveLinkReplanner;
@@ -48,7 +48,7 @@ public class MyQueueNode extends QueueNode{
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
 	@Override
-	public boolean moveVehicleOverNode(final Vehicle veh, final double now) 
+	public boolean moveVehicleOverNode(final QueueVehicle veh, final double now) 
 	{
 		/*
 		 * This is just a workaround!
