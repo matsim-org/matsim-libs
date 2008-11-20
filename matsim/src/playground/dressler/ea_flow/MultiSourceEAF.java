@@ -78,8 +78,14 @@ public class MultiSourceEAF {
 		return demands;
 	}
 	
-	//TODO finish
 	
+
+	/**
+	 * generates demand from an population by placing demand 1 for every person on the node in the Persons first plan first activity edges ToNode
+	 * @param network network for the demands node
+	 * @param filename path of the Population file
+	 * @return 
+	 */
 	private static HashMap<Node,Integer> readPopulation(NetworkLayer network, String filename){
 		Population population = new Population();
 		MatsimPopulationReader reader = new MatsimPopulationReader(population);
@@ -88,10 +94,16 @@ public class MultiSourceEAF {
 		for(Person person : population.getPersons().values() ){
 			Plan plan = person.getPlans().get(0);
 			plan.getFirstActivity();
-			network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
+			Node node = network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
+			if(allnodes.containsKey(node)){
+				int temp = allnodes.get(node);
+				allnodes.put(node, temp + 1);
+			}else{
+				allnodes.put(node, 1);
+			}
 		}
 		
-		return null;
+		return allnodes;
 	}
 	
 	
@@ -134,11 +146,11 @@ public class MultiSourceEAF {
 		if (sources.isEmpty() || sink == null) {
 			System.out.println("nicht da");
 		} else {
-			TravelCost travelcost = new FakeTravelTimeCost();
-			TravelTime traveltime = (TravelTime) travelcost;
+			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
+			
 
 			//Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
-			Flow fluss = new Flow(network,null, flow, sources, demands, sink, timeHorizon);
+			Flow fluss = new Flow(network,travelcost, flow, sources, demands, sink, timeHorizon);
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
 			BellmanFordVertexIntervalls.debug(true);
 			for (int i=0; i<20000; i++){
