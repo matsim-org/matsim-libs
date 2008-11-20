@@ -46,6 +46,9 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
 				Act act = act_it.next();
+				/* 
+				 * TODO: Shoot into a growing circle instead of into the universal choice set
+				 */
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
 			return true;
