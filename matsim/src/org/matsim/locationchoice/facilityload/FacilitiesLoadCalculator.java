@@ -131,7 +131,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 							facilityPenalty.getFacilityLoad().getNumberOfVisitorsPerDay() + "\t" +
 							facilityPenalty.getFacilityLoad().getAllVisitors() + "\t" +
 							facilityPenalty.getCapacity() + "\t" +
-							String.valueOf(facilityPenalty.getSumCapacityPenaltyFactor()));
+							facilityPenalty.getSumCapacityPenaltyFactor());
 					out.newLine();
 					
 					for (int i = 0; i < 24; i++) {
@@ -144,7 +144,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 				out_summary.write("Hour\tLoad");
 				out_summary.newLine();
 				for (int i = 0; i<24; i++) {
-					out_summary.write(String.valueOf(i)+"\t"+String.valueOf(loadPerHourSum[i]));
+					out_summary.write(i + "\t" + loadPerHourSum[i]);
 					out_summary.newLine();
 					out_summary.flush();
 				}
