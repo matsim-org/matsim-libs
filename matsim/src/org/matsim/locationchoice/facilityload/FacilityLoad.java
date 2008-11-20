@@ -76,7 +76,7 @@ public class FacilityLoad {
 		}
 		int timeBinIndex = this.timeBinIndex(time);		
 		this.arrivals[timeBinIndex] += 1;
-		log.info("arrival at: " + time + "bin: " + timeBinIndex);
+		//log.info("arrival at: " + time + " bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
 	
@@ -89,7 +89,7 @@ public class FacilityLoad {
 		}
 		int timeBinIndex = this.timeBinIndex(time);
 		this.departures[timeBinIndex]+=1;
-		log.info("departure at: " + time + "bin: " + timeBinIndex);
+		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
 	
 	public void addToAllVisitors(int scaleNumberOfPersons) {
