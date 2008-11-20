@@ -54,6 +54,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
 		}
 
+		this.route.clear();
 		String[] parts = route.split("[ \t\n]+");
 		// IMPORTANT NOTE:
 		// split does not always work as one would expect!
@@ -152,12 +153,11 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 			return new Link[0];
 		}
 
-		boolean notfirst = false;
 		Node prevNode = null;
 		Link[] links = new Link[this.route.size() - 1];
 		int idx = 0;
 		for (Node node : this.route) {
-			if (notfirst) {
+			if (prevNode != null) {
 				// search link from prevNode to node
 				boolean linkFound = false;
 				for (Iterator<? extends Link> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
@@ -171,8 +171,6 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 				if (!linkFound) {
 					throw new RuntimeException("No link found from node " + prevNode.getId() + " to node " + node.getId());
 				}
-			} else {
-				notfirst = true;
 			}
 			prevNode = node;
 		}

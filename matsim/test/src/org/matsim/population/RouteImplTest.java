@@ -113,6 +113,38 @@ public class RouteImplTest extends MatsimTestCase {
 		assertEquals("number of nodes in route.", 0, nodes.size());
 	}
 
+	/**
+	 * Tests that the several methods for setting a route overwrite the previous
+	 * route information and not only extend the route.
+	 */
+	public void testSetRouteOverwrites() {
+		NetworkLayer network = createTestNetwork();
+		Gbl.createWorld().setNetworkLayer(network);
+		Route route = getRouteInstance();
+		route.setRoute("2 12 13 3 4");
+		assertEquals("number of nodes in route.", 5, route.getRoute().size());
+
+		route.setRoute("2 12 13");
+		assertEquals("setRoute(String) does likely not clear existing route.", 3, route.getRoute().size());
+
+		List<Node> nodes = new ArrayList<Node>();
+		nodes.add(network.getNode(new IdImpl("12")));
+		nodes.add(network.getNode(new IdImpl("13")));
+		nodes.add(network.getNode(new IdImpl("3")));
+		nodes.add(network.getNode(new IdImpl("4")));
+		route.setRoute(nodes);
+		assertEquals("setRoute(List<Node>) does likely not clear existing route.", 4, route.getRoute().size());
+
+		List<Link> links = new ArrayList<Link>();
+		links.add(network.getLink(new IdImpl("-22")));
+		links.add(network.getLink(new IdImpl("2")));
+		links.add(network.getLink(new IdImpl("3")));
+		links.add(network.getLink(new IdImpl("24")));
+		links.add(network.getLink(new IdImpl("14")));
+		route.setLinkRoute(links);
+		assertEquals("setLinkRoute(List<Link>) does likely not clear existing route.", 6, route.getRoute().size());
+	}
+
 	public void testGetDist() {
 		NetworkLayer network = createTestNetwork();
 		Gbl.createWorld().setNetworkLayer(network);
