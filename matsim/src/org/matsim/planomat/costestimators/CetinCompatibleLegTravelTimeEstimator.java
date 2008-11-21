@@ -25,7 +25,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 /**
@@ -47,17 +47,11 @@ import org.matsim.router.util.TravelTime;
  */
 public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTimeEstimator {
 
-	private PlansCalcRoute plansCalcRoute;
-	
 	public CetinCompatibleLegTravelTimeEstimator(
-			final TravelTime linkTravelTimeEstimator,
-			final DepartureDelayAverageCalculator depDelayCalc,
-			final NetworkLayer network) {
-
-		super(linkTravelTimeEstimator, depDelayCalc);
-
-		this.plansCalcRoute = new PlansCalcRoute(network, null, linkTravelTimeEstimator);
-
+			TravelTime linkTravelTimeEstimator,
+			TravelCost linkTravelCostEstimator,
+			DepartureDelayAverageCalculator depDelayCalc, NetworkLayer network) {
+		super(linkTravelTimeEstimator, linkTravelCostEstimator, depDelayCalc, network);
 	}
 
 	@Override
@@ -77,8 +71,8 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 			legTravelTimeEstimation = (now - departureTime);
 
 		} else if (legIntermediate.getMode().equals(BasicLeg.Mode.pt)) {
-			
-			legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+	
+			legTravelTimeEstimation = super.getLegTravelTimeEstimation(personId, departureTime, actOrigin, actDestination, legIntermediate);
 			
 		}
 		

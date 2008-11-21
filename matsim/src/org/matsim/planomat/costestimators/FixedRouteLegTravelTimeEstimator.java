@@ -22,9 +22,12 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Route;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 /**
@@ -37,23 +40,29 @@ import org.matsim.router.util.TravelTime;
 public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator {
 
 	protected TravelTime linkTravelTimeEstimator;
+	protected TravelCost linkTravelCostEstimator;
 	protected DepartureDelayAverageCalculator tDepDelayCalc;
+	private PlansCalcRoute plansCalcRoute;
 
 	public FixedRouteLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
-			DepartureDelayAverageCalculator depDelayCalc) {
+			TravelCost linkTravelCostEstimator,
+			DepartureDelayAverageCalculator depDelayCalc,
+			final NetworkLayer network) {
 
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		this.tDepDelayCalc = depDelayCalc;
+		this.plansCalcRoute = new PlansCalcRoute(network, linkTravelCostEstimator, linkTravelTimeEstimator);
 
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Act actOrigin, Act actDestination, Leg legIntermediate) {
-
-		double legTravelTimeEstimation = 0.0;
 		
-		return legTravelTimeEstimation;
+		synchronized(this) {
+			double legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
+			return legTravelTimeEstimation;
+		}
 		
 	}
 

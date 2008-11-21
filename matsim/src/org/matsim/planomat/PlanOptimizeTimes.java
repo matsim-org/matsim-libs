@@ -65,6 +65,11 @@ import org.matsim.utils.misc.Time;
  */
 public class PlanOptimizeTimes implements PlanAlgorithm {
 
+	/**
+	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome. 
+	 */
+	private static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
+	
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
@@ -123,7 +128,6 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		DefaultConfiguration jgapConfiguration = new DefaultConfiguration();
 
 		try {
-			// the following settings are copied from org.jgap.DefaultConfiguration
 			// TODO configuration shouldnt be inited for every plan, but once
 			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
 			Configuration.reset();
@@ -147,13 +151,11 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	protected IChromosome initSampleChromosome(final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
 
-		double planLength = 24.0 * 3600;
-
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
 		try {
 
 			for (int ii=0; ii < planAnalyzeSubtours.getSubtourIndexation().length; ii++) {
-				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, planLength));
+				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, PlanOptimizeTimes.MAX_ACTIVITY_DURATION));
 			}
 
 			for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {

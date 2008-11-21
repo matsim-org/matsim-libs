@@ -55,6 +55,8 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.Route;
 import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
@@ -117,13 +119,14 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 	public void testRun() {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 
 		Events events = new Events();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
@@ -261,8 +264,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		// init LegTravelTimeEstimator
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(network, 900);
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
-		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc);
+		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 
 		// run the method
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, null);
@@ -328,9 +332,10 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		Gbl.getConfig().planomat().setPossibleModes(BasicLeg.Mode.car.toString() + " " + BasicLeg.Mode.pt.toString());
 		
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
+		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 
-		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);

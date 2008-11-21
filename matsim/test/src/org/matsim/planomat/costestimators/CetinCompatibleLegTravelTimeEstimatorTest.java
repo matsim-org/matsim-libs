@@ -44,7 +44,11 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 	@Override
 	public void testGetLegTravelTimeEstimation() {
 
-		testee = new CetinCompatibleLegTravelTimeEstimator(this.linkTravelTimeEstimator, this.tDepDelayCalc, this.network);
+		testee = new CetinCompatibleLegTravelTimeEstimator(
+				super.linkTravelTimeEstimator,
+				super.linkTravelCostEstimator,
+				super.tDepDelayCalc, 
+				super.network);
 
 		Events events = new Events();
 		events.addHandler(tDepDelayCalc);

@@ -10,6 +10,7 @@ import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 public class PlanomatConfigGroup extends Module {
@@ -76,16 +77,6 @@ public class PlanomatConfigGroup extends Module {
 
 		// TODO add remaining config parameters to test
 
-//		if (SCORING_FUNCTION.equals(param_name)) {
-
-//		if (CHARYPAR_NAGEL_SCORING_FUNCTION.equals(value)) {
-//		this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
-//		} else if (CHARYPAR_NAGEL_OPEN_TIMES_SCORING_FUNCTION.equals(value)) {
-//		this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory();
-//		} else {
-//		Gbl.errorMsg("Unknown scoring function identifier. Aborting...");
-//		}
-
 //		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
 //		this.setLegTravelTimeEstimatorName(value);
 ////		} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
@@ -115,14 +106,14 @@ public class PlanomatConfigGroup extends Module {
 
 	// getters/setters
 
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(TravelTime travelTime, DepartureDelayAverageCalculator tDepDelayCalc, NetworkLayer network) {
+	public LegTravelTimeEstimator getLegTravelTimeEstimator(TravelTime travelTime, TravelCost travelCost, DepartureDelayAverageCalculator tDepDelayCalc, NetworkLayer network) {
 
 		LegTravelTimeEstimator legTravelTimeEstimator = null;
 
 		if (this.legTravelTimeEstimatorName.equalsIgnoreCase(PlanomatConfigGroup.CETIN_COMPATIBLE)) {
-			legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc, network);
+			legTravelTimeEstimator = new CetinCompatibleLegTravelTimeEstimator(travelTime, travelCost, tDepDelayCalc, network);
 		} else if (this.legTravelTimeEstimatorName.equalsIgnoreCase(PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE)) {
-			legTravelTimeEstimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(travelTime, tDepDelayCalc);
+			legTravelTimeEstimator = new CharyparEtAlCompatibleLegTravelTimeEstimator(travelTime, travelCost, tDepDelayCalc, network);
 		} else {
 			throw new RuntimeException("legTravelTimeEstimator value: \"" + this.legTravelTimeEstimatorName + "\" is not allowed.");
 		}
@@ -144,24 +135,13 @@ public class PlanomatConfigGroup extends Module {
 
 	public ArrayList<BasicLeg.Mode> getPossibleModes() {
 
-		ArrayList<BasicLeg.Mode> possibleModes = new ArrayList<BasicLeg.Mode>();
+		ArrayList<BasicLeg.Mode> possibleModesArrayList = new ArrayList<BasicLeg.Mode>();
 
-		if (
-				PlanomatConfigGroup.POSSIBLE_MODES_CAR.equals(this.possibleModes) ||
-				PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT.equals(this.possibleModes)) {
-			for (String possibleMode : this.possibleModes.split(" ")) {
-				if (possibleMode.equalsIgnoreCase(BasicLeg.Mode.car.toString())) {
-					possibleModes.add(BasicLeg.Mode.car);
-				}
-				else if (possibleMode.equalsIgnoreCase(BasicLeg.Mode.pt.toString())) {
-					possibleModes.add(BasicLeg.Mode.pt);
-				}
-			}
-		} else {
-			throw new RuntimeException("possibleModes value: \"" + this.possibleModes + "\" is not allowed.");
+		for (String possibleMode : this.possibleModes.split(" ")) {
+			possibleModesArrayList.add(BasicLeg.Mode.valueOf(possibleMode));
 		}
 
-		return possibleModes;
+		return possibleModesArrayList;
 	}
 
 	public void setPopSize(int popSize) {

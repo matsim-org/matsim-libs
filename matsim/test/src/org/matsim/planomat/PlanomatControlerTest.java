@@ -43,11 +43,6 @@ public class PlanomatControlerTest extends MatsimTestCase {
 		this.runControlerTest();
 	}
 
-	public void testMainMultithreaded() {
-		this.config.global().setNumberOfThreads(2);
-		this.runControlerTest();
-	}
-	
 	private void runControlerTest() {
 		config.controler().setOutputDirectory(this.getOutputDirectory());
 		PlanomatControler testee = new PlanomatControler(config);

@@ -39,10 +39,10 @@ public class PlanomatControler extends Controler {
 	@Override
 	protected void setup() {
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
-		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = this.config.controler().getTravelTimeCalculator(this.network, (int)endTime);
+		if (super.travelTimeCalculator == null) {
+			super.travelTimeCalculator = super.config.controler().getTravelTimeCalculator(super.network, (int)endTime);
 		}
-		this.legTravelTimeEstimator = initLegTravelTimeEstimator();
+		super.legTravelTimeEstimator = initLegTravelTimeEstimator();
 		super.setup();
 	}
 	
@@ -51,10 +51,14 @@ public class PlanomatControler extends Controler {
 		LegTravelTimeEstimator estimator = null;
 
 		int timeBinSize = 900;
-		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, timeBinSize);
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(super.network, timeBinSize);
 		this.events.addHandler(tDepDelayCalc);
 
-		estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(this.travelTimeCalculator, tDepDelayCalc, network);
+		estimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				super.travelTimeCalculator, 
+				super.travelCostCalculator, 
+				tDepDelayCalc, 
+				super.network);
 		
 		return estimator;
 	}

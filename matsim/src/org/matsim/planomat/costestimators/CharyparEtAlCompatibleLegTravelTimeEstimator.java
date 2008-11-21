@@ -21,8 +21,10 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 /**
@@ -46,9 +48,11 @@ import org.matsim.router.util.TravelTime;
  */
 public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTimeEstimator {
 
-	public CharyparEtAlCompatibleLegTravelTimeEstimator(TravelTime linkTravelTimeEstimator,
-			DepartureDelayAverageCalculator depDelayCalc) {
-		super(linkTravelTimeEstimator, depDelayCalc);
+	public CharyparEtAlCompatibleLegTravelTimeEstimator(
+			TravelTime linkTravelTimeEstimator,
+			TravelCost linkTravelCostEstimator,
+			DepartureDelayAverageCalculator depDelayCalc, NetworkLayer network) {
+		super(linkTravelTimeEstimator, linkTravelCostEstimator, depDelayCalc, network);
 	}
 
 	@Override

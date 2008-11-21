@@ -28,7 +28,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
 import org.matsim.population.Route;
-import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 
 public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTravelTimeEstimatorTest {
@@ -43,14 +42,18 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 
 	@Override
 	public void testGetLegTravelTimeEstimation() {
-		DepartureDelayAverageCalculator tDepDelayCalc = super.getTDepDelayCalc();
-		TravelTimeCalculator linkTravelTimeEstimator = super.getLinkTravelTimeEstimator();
+//		DepartureDelayAverageCalculator tDepDelayCalc = super.getTDepDelayCalc();
+//		TravelTimeCalculator linkTravelTimeEstimator = super.getLinkTravelTimeEstimator();
 
-		testee = new CharyparEtAlCompatibleLegTravelTimeEstimator(linkTravelTimeEstimator, tDepDelayCalc);
+		testee = new CharyparEtAlCompatibleLegTravelTimeEstimator(
+				super.linkTravelTimeEstimator,
+				super.linkTravelCostEstimator,
+				super.tDepDelayCalc,
+				super.network);
 
 		Events events = new Events();
-		events.addHandler(tDepDelayCalc);
-		events.addHandler(linkTravelTimeEstimator);
+		events.addHandler(super.tDepDelayCalc);
+		events.addHandler(super.linkTravelTimeEstimator);
 		events.printEventHandlers();
 
 		Route route = testLeg.getRoute();
