@@ -75,7 +75,7 @@ public class JohScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfWaiting = -6/3600;
 	private static double marginalUtilityOfLateArrival = -18/3600;
 	private static double marginalUtilityOfEarlyDeparture = -6/3600;
-	protected static double marginalUtilityOfTraveling = -12/3600;
+	private static double marginalUtilityOfTraveling = -12/3600;
 	private static double marginalUtilityOfTravelingPT = -12/3600; // public transport
 	private static double marginalUtilityOfTravelingWalk = -12/3600;
 	private static double marginalUtilityOfDistance = 0/3600;
