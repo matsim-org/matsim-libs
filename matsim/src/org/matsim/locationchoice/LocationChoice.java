@@ -75,6 +75,8 @@ public class LocationChoice extends MultithreadedModuleA {
 	
 	@Override
 	public void finish() {
+		Gbl.printMemoryUsage();
+		
 		super.finish();
 		if (this.constrained) {
 			
