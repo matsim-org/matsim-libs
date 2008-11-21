@@ -1,0 +1,182 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * LinkRoute.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.marcel;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.basic.v01.BasicRouteImpl;
+import org.matsim.basic.v01.Id;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
+import org.matsim.population.Route;
+
+public class LinkRoute extends BasicRouteImpl implements Route {
+
+	private final ArrayList<Link> route = new ArrayList<Link>();
+	private double travelCost = Double.NaN;
+
+	@Override
+	public double getDist() {
+		double dist = super.getDist();
+		if (Double.isNaN(dist)) {
+			dist = 0;
+			for (Link link : this.route) {
+				dist += link.getLength();
+			}
+			this.setDist(dist);
+		}
+		return dist;
+	}
+
+	@Override
+	public void setLinkIds(final List<Id> linkIds) {
+		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		if (network == null) {
+			throw new RuntimeException("NetworkLayer does not exist in world.");
+		}
+
+		this.route.clear();
+		for (Id id : linkIds) {
+			this.route.add(network.getLink(id));
+		}
+		this.route.trimToSize();
+	}
+
+	@Override
+	public List<Id> getLinkIds() {
+		ArrayList<Id> ids = new ArrayList<Id>(this.route.size());
+		for (Link link : this.route) {
+			ids.add(link.getId());
+		}
+		ids.trimToSize();
+		return ids;
+	}
+
+	public Link[] getLinkRoute() {
+		return this.route.toArray(new Link[this.route.size()]);
+	}
+
+	public List<Node> getRoute() {
+		ArrayList<Node> nodes = new ArrayList<Node>(this.route.size() + 1);
+		if (this.route.size() > 0) {
+			nodes.add(this.route.get(0).getFromNode());
+		}
+		for (Link link : this.route) {
+			nodes.add(link.getToNode());
+		}
+		nodes.trimToSize();
+		return nodes;
+	}
+
+	public Route getSubRoute(final Node fromNode, final Node toNode) {
+		int fromIndex = -1;
+		int toIndex = -1;
+		int max = this.route.size();
+		for (int i = 0; i < max; i++) {
+			Node node = this.route.get(i).getFromNode();
+			if (node.equals(fromNode)) {
+				fromIndex = i;
+				break;
+			}
+		}
+		if (fromIndex == -1) {
+			throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+		}
+		for (int i = fromIndex; i < max; i++) {
+			Node node = this.route.get(i).getToNode();
+			if (node.equals(toNode)) {
+				toIndex = i;
+				break;
+			}
+		}
+		if (toIndex == -1) {
+			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
+		}
+		LinkRoute ret = new LinkRoute();
+		ret.setLinkRoute(this.route.subList(fromIndex, toIndex + 1));
+		return ret;
+	}
+
+	public double getTravelCost() {
+		return this.travelCost;
+	}
+
+	public void setLinkRoute(final List<Link> srcRoute) {
+		this.route.clear();
+		if (srcRoute != null) {
+			this.route.addAll(srcRoute);
+		}
+		this.route.trimToSize();
+	}
+
+	public void setRoute(final String route) {
+		this.route.clear();
+		String[] parts = route.trim().split("[ \t\n]+");
+
+		Node prevNode = null;
+		for (String id : parts) {
+			if (prevNode != null) {
+				// find link from prevNode to node
+				for (Link link : prevNode.getOutLinks().values()) {
+					if (id.equals(link.getToNode().getId().toString())) {
+						this.route.add(link);
+						prevNode = link.getToNode();
+						break;
+					}
+				}
+			} else {
+				NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+				if (network == null) {
+					throw new RuntimeException("NetworkLayer does not exist in world.");
+				}
+				prevNode = network.getNode(id);
+			}
+		}
+		this.route.trimToSize();
+	}
+
+	public void setRoute(final List<Node> srcRoute) {
+		this.route.clear();
+		Node prevNode = null;
+		for (Node node : srcRoute) {
+			if (prevNode != null) {
+				// find link from prevNode to node
+				for (Link link : prevNode.getOutLinks().values()) {
+					if (link.getToNode().equals(node)) {
+						this.route.add(link);
+						break;
+					}
+				}
+			}
+			prevNode = node;
+		}
+		this.route.trimToSize();
+	}
+
+	public void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
+		setRoute(route);
+		this.setTravTime(travelTime);
+		this.travelCost = travelCost;
+	}
+}

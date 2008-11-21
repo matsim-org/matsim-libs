@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,213 +20,130 @@
 
 package playground.yu.compressRoute;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
-import org.matsim.basic.v01.Id;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.writer.MatsimXmlWriter;
+import org.matsim.utils.misc.Time;
 
 /**
- * analyses MATSim networkfile
+ * Analyzes the network to find for each link the "logical subsequent link",
+ * i.e. the link that most people are likely to continue driving on when
+ * crossing the next node.  This could depend on the geometry (assuming it
+ * is more likely to continue straight on instead of making a U-turn), the
+ * capacity of links (likely to continue on links with the same or larger
+ * capacity instead of using small bumpy roads), the speed limit, other
+ * attributes or combinations there of.
  *
  * @author ychen
- *
+ * @author mrieser
  */
-public class Subsequent extends MatsimXmlWriter {
+public class Subsequent {
 
-	private Map<Id, ? extends Link> links;
+	private final NetworkLayer network;
 
-	/**
-	 * Criterion to judge Capacity
-	 */
+	/** Criterion to judge Capacity */
 	private static double BETA = 0.0;
 
-	/**
-	 * The important intermediate result.
-	 *
-	 * (arg0) - ssLinkId: the "default next" linkId of the "current" Link (arg1) -
-	 * linkId: the "current" Link
-	 */
-	private TreeMap<String, String> ssLinks = new TreeMap<String, String>();
+	private final static LinkComparator linkComparator = new LinkComparator();
 
-	/**
-	 * Constructor transfers the links of network to local links
-	 *
-	 * @param network
-	 */
-	public Subsequent(NetworkLayer network) {
-		this.links = network.getLinks();
+	/** Stores the logical subsequent link (value) for a given link (key). */
+	private final TreeMap<Link, Link> subsequentLinks = new TreeMap<Link, Link>(linkComparator);
+
+	public Subsequent(final NetworkLayer network) {
+		this.network = network;
+		compute();
 	}
 
 	/**
-	 * @return Returns the ssLinks.
+	 * @return a map, giving for each link (key in map) the computed subsequent link (value in map).
 	 */
-	public TreeMap<String, String> getSsLinks() {
-		return this.ssLinks;
+	public Map<Link, Link> getSubsequentLinks() {
+		return this.subsequentLinks;
 	}
 
 	/**
-	 * calculates the "default next" linkId of the current link with respect to
+	 * calculates the "default next" link of the current link with respect to
 	 * geometry and Capacity (depending on BETA) and writes the result in
 	 * ssLinks.
 	 */
-	public void compute() {
-		/**
-		 * @param String -
-		 *            outNodeId;
-		 * @param Double -
-		 *            |deltaTheta of outLink-link|
-		 */
-		Map<String, Double> absDeltaThetas = new TreeMap<String, Double>();
-		for (Link l : this.links.values()) {
+	private void compute() {
+		Map<Link, Double> absDeltaThetas = new TreeMap<Link, Double>(linkComparator);
+		for (Link l : this.network.getLinks().values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
-			Collection<? extends Node> outNodes = to.getOutNodes().values();
+			Coord cFrom = from.getCoord();
+			Coord cTo = to.getCoord();
+			double xTo = cTo.getX();
+			double yTo = cTo.getY();
+			double thetaL = Math.atan2(yTo - cFrom.getY(), xTo - cFrom.getX());
+			Collection<? extends Link> outLinks = to.getOutLinks().values();
 			absDeltaThetas.clear();
-			if (outNodes.size() > 1) {
+			if (outLinks.size() > 1) {
 
-				for (Node out : outNodes) {
-					Coord cFrom = from.getCoord();
-					Coord cTo = to.getCoord();
-					double xTo = cTo.getX();
-					double yTo = cTo.getY();
-					Coord cOut = out.getCoord();
-					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut
-							.getX()
-							- xTo)
-							- Math
-									.atan2(yTo - cFrom.getY(), xTo
-											- cFrom.getX());
-					while (deltaTheta < -Math.PI)
+				for (Link out : outLinks) {
+					Coord cOut = out.getToNode().getCoord();
+					double deltaTheta = Math.atan2(cOut.getY() - yTo, cOut.getX()	- xTo) - thetaL;
+					while (deltaTheta < -Math.PI) {
 						deltaTheta += 2.0 * Math.PI;
-					while (deltaTheta > Math.PI)
+					}
+					while (deltaTheta > Math.PI) {
 						deltaTheta -= 2.0 * Math.PI;
-					absDeltaThetas.put(out.getId().toString(), Math.abs(deltaTheta));
+					}
+					absDeltaThetas.put(out, Math.abs(deltaTheta));
 				}
-				this.ssLinks.put(computeSubsequentLink(l, absDeltaThetas), l.getId()
-						.toString());
-
-			} else if (outNodes.size() == 1) {
-				// Node[] outNodesArray = (Node[]) outNodes.toArray();----bad
-				// code. throws ClassCastException
-				// findOutLink(((Node)outNodesArray[0]).getId().toString(), l);
-				this.ssLinks.put(findOutLink(
-						((Node) outNodes.iterator().next()).getId().toString(),
-						l).getId().toString(), l.getId().toString());
+				this.subsequentLinks.put(l, computeSubsequentLink(l, absDeltaThetas));
+			} else if (outLinks.size() == 1) {
+				this.subsequentLinks.put(l, outLinks.iterator().next());
 			}
 		}
 	}
 
-	/**
-	 * Calculates the "default next" linkId intermediately
-	 *
-	 * @param thetas
-	 * @return
-	 */
-	public String computeSubsequentLink(Link l, Map<String, Double> thetas) {
-		String outLinkId = "";
-		/**
-		 * @param String -
-		 *            id of outNode, whose |deltaTheta| is the smallest one.
-		 */
-		List<String> minThetaOutNodeIds = new ArrayList<String>();
-		while (outLinkId.equals("")) {
-			minThetaOutNodeIds.clear();
-			double absMin = Collections.min(thetas.values());
-			for (Iterator<Entry<String, Double>> kVPairs = thetas.entrySet()
-					.iterator(); kVPairs.hasNext();) {
-				Map.Entry<String, Double> entry = kVPairs.next();
+	private Link computeSubsequentLink(final Link l, final Map<Link, Double> thetas) {
+		Link finalOutLink = null;
+		List<Link> minThetaOutLinks = new ArrayList<Link>();
+		while (finalOutLink == null) {
+			minThetaOutLinks.clear();
+			double absMin = Collections.min(thetas.values()).doubleValue();
+			for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
 				if (absMin == (entry.getValue()).doubleValue())
-					minThetaOutNodeIds.add(entry.getKey());
+					minThetaOutLinks.add(entry.getKey());
 			}
-			if (minThetaOutNodeIds.size() == 1) {
-				String outNodeId = minThetaOutNodeIds.get(0);
-				Link outLink = findOutLink(outNodeId, l);
-				if (outLink.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) >= BETA * l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME))
-					outLinkId = outLink.getId().toString();
+			if (minThetaOutLinks.size() == 1) {
+				Link outLink = minThetaOutLinks.get(0);
+				if (outLink.getCapacity(Time.UNDEFINED_TIME) >= BETA * l.getCapacity(Time.UNDEFINED_TIME))
+					finalOutLink = outLink;
 				else {
-					thetas.remove(outNodeId);
+					thetas.remove(outLink);
 				}
-			} else if (minThetaOutNodeIds.size() == 2) {
-				String outNodeIdA = minThetaOutNodeIds.get(0);
-				String outNodeIdB = minThetaOutNodeIds.get(1);
-				Link outLinkA = findOutLink(outNodeIdA, l);
-				Link outLinkB = findOutLink(outNodeIdB, l);
-				double capA = outLinkA.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-				double capB = outLinkB.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-				String outLinkAId = outLinkA.getId().toString();
-				String outLinkBId = outLinkB.getId().toString();
-				if (l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) > Math.min(capA, capB)) {
-					outLinkId = (capA == Math.max(capA, capB)) ? outLinkAId
-							: outLinkBId;
+			} else if (minThetaOutLinks.size() == 2) {
+				Link outLinkA = minThetaOutLinks.get(0);
+				Link outLinkB = minThetaOutLinks.get(1);
+				double capA = outLinkA.getCapacity(Time.UNDEFINED_TIME);
+				double capB = outLinkB.getCapacity(Time.UNDEFINED_TIME);
+				if (l.getCapacity(Time.UNDEFINED_TIME) > Math.min(capA, capB)) {
+					finalOutLink = (capA >= capB) ? outLinkA : outLinkB;
 				} else {
-					outLinkId = (Math.random() < 0.5) ? outLinkAId : outLinkBId;
+					finalOutLink = (MatsimRandom.random.nextDouble() < 0.5) ? outLinkA : outLinkB;
 				}
 			}
 		}
-		return outLinkId;
+		return finalOutLink;
 	}
 
-	/**
-	 * gets the link, who has suitable fromNode(Id) and toNode(Id)
-	 *
-	 * @param outNodeId -
-	 *            one of outNodeIds of a toNode
-	 * @param l -
-	 *            the link in process
-	 * @return the link, whose toNodeId="outNodeId" and fromNodeId = l.toNode-Id
-	 */
-	public Link findOutLink(String outNodeId, Link l) {
-		for (Link outL : l.getToNode().getOutLinks().values()) {
-			if (outL.getToNode().getId().toString().equals(outNodeId))
-				return outL;
+	/*package*/ static class LinkComparator implements Comparator<Link> {
+		public int compare(final Link o1, final Link o2) {
+			return o1.getId().compareTo(o2.getId());
 		}
-		System.err
-				.println("[WARNING]The link you are looking for doesn'/t exist in the network!");
-		return null;
 	}
 
-	/**
-	 * writes linkId and the "default next" linkId into a .xml-file
-	 *
-	 * @param filename
-	 * @throws IOException
-	 */
-	public void writeFile(final String filename) throws IOException {
-		System.out.println("@write beginning");
-		openFile(filename);
-		writeXmlHead();
-		write();
-		close();
-	}
-
-	/**
-	 * writes contents (ssLinkId-linkId-pair) into the writer.
-	 *
-	 * @throws IOException
-	 */
-	private void write() throws IOException {
-		this.writer.write("<subsequent>\n");
-		// links
-		this.writer.write("\t<links>\n");
-		for (Iterator<Entry<String, String>> it = this.ssLinks.entrySet().iterator(); it
-				.hasNext();) {
-			Entry<String, String> next = it.next();
-			this.writer.write("\t\t<link id=\"" + next.getValue()
-					+ "\" subsequentLinkId=\"" + next.getKey() + "\" />\n");
-		}
-		this.writer.write("\t</links>\n" + "</subsequent>");
-		System.out.println("@write done.");
-	}
 }
