@@ -20,7 +20,7 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	private final PlanScorer		scorer;
 	
 	public TimeOptimizerPerformanceT (LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
-		this.timeOptAlgorithm = new TimeOptimizer13 (estimator, scorer);
+		this.timeOptAlgorithm = new TimeOptimizer14 (estimator, scorer);
 		//this.timeOptAlgorithm = new PlanOptimizeTimes (estimator, factory);
 		this.scorer			  = scorer;
 	}
