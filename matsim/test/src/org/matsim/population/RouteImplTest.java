@@ -67,7 +67,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testSetRoute_asString() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 
@@ -102,7 +101,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testSetLinkRoute_Null() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 		List<Node> nodes = route.getRoute();
@@ -119,7 +117,6 @@ public class RouteImplTest extends MatsimTestCase {
 	 */
 	public void testSetRouteOverwrites() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 		assertEquals("number of nodes in route.", 5, route.getRoute().size());
@@ -147,7 +144,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetDist() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 
@@ -156,7 +152,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetLinkIds() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 
@@ -170,7 +165,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetSubRoute() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("1 2 12 13 3 4 14 15");
 
@@ -190,7 +184,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetSubRoute_fromStart() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("1 2 12 13 3 4 14 15");
 
@@ -212,7 +205,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetSubRoute_toEnd() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("1 2 12 13 3 4 14 15");
 
@@ -230,7 +222,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetSubRoute_wrongStart() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("1 2 12 13 3 4 14 15");
 
@@ -246,7 +237,6 @@ public class RouteImplTest extends MatsimTestCase {
 
 	public void testGetSubRoute_wrongEnd() {
 		NetworkLayer network = createTestNetwork();
-		Gbl.createWorld().setNetworkLayer(network);
 		Route route = getRouteInstance();
 		route.setRoute("1 2 12 13 3 4 14 15");
 
@@ -296,6 +286,8 @@ public class RouteImplTest extends MatsimTestCase {
 		network.createLink(new IdImpl("-22"), node12, node2, 1000.0, 100.0, 3600.0, 1);
 		network.createLink(new IdImpl("-23"), node13, node3, 1000.0, 100.0, 3600.0, 1);
 		network.createLink(new IdImpl("-24"), node14, node4, 1000.0, 100.0, 3600.0, 1);
+
+		Gbl.createWorld().setNetworkLayer(network);
 
 		return network;
 	}
