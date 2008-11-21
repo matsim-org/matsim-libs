@@ -33,7 +33,9 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.router.util.TravelCost;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -49,11 +51,12 @@ public class TimeOptimizerTest extends MatsimTestCase{
 	final String TEST_PERSON_ID = "1";
 	private PlansCalcRouteLandmarks router;
 	private PreProcessLandmarks	preProcessRoutingData;
-	TravelTimeCalculator tTravelEstimator;
-	DepartureDelayAverageCalculator depDelayCalc;
-	Events events;
-	LegTravelTimeEstimator ltte;
-	TimeOptimizer13 testee;
+	private TravelTimeCalculator tTravelEstimator;
+	private TravelCost travelCostEstimator;
+	private DepartureDelayAverageCalculator depDelayCalc;
+	private Events events;
+	private LegTravelTimeEstimator ltte;
+	private TimeOptimizer13 testee;
 
 	protected void setUp() throws Exception {
 
@@ -84,13 +87,14 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		this.router = new PlansCalcRouteLandmarks (network, this.preProcessRoutingData, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
 	
 		this.tTravelEstimator = new TravelTimeCalculator(network, 900);
+		this.travelCostEstimator = new TravelTimeDistanceCostCalculator(this.tTravelEstimator);
 		this.depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 
 		this.events = new Events();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		this.ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, depDelayCalc, network);
+		this.ltte = new CetinCompatibleLegTravelTimeEstimator(this.tTravelEstimator, this.travelCostEstimator, this.depDelayCalc, this.network);
 		
 		this.testee = new TimeOptimizer13 (ltte, new PlanScorer(new JohScoringFunctionFactory()));
 		
