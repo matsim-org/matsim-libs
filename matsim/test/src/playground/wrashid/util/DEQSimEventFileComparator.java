@@ -17,8 +17,12 @@ TestHandlerDetailedEventChecker {
 		pathToDEQSimEventsFile=path;
 	}
 	
-	// compare events to event file
-	public void checkAssertions() {
+	/* compare events to deq event file
+	 * The order of events must also be the same.
+	 *  (this test will only succeed for simple tests with one car often!!!)
+	 *  => reason: at junctions the order of cars can change + stuck vehicles are dealt with in different ways
+	 */ 
+ 	public void checkAssertions() {
 		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(pathToDEQSimEventsFile);
 		for (int i=0;i<allEvents.size();i++){
 			assertEquals(true,CppEventFileParser.equals(allEvents.get(i), deqSimLog.get(i)));
