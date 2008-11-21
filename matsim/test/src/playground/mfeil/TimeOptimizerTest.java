@@ -56,7 +56,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 	private DepartureDelayAverageCalculator depDelayCalc;
 	private Events events;
 	private LegTravelTimeEstimator ltte;
-	private TimeOptimizer13 testee;
+	private TimeOptimizer14 testee;
 
 	protected void setUp() throws Exception {
 
@@ -96,7 +96,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 
 		this.ltte = new CetinCompatibleLegTravelTimeEstimator(this.tTravelEstimator, this.travelCostEstimator, this.depDelayCalc, this.network);
 		
-		this.testee = new TimeOptimizer13 (ltte, new PlanScorer(new JohScoringFunctionFactory()));
+		this.testee = new TimeOptimizer14 (ltte, new PlanScorer(new JohScoringFunctionFactory()));
 		
 		
 
