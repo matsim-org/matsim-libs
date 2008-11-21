@@ -245,8 +245,9 @@ public class JohScoringFunction implements ScoringFunction {
 			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
 			double utilWait = marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-		} else {
-			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+		} else if (duration<0){
+			//tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += -100000; // Negative durations results in refusal of plan
 		}
 
 		// disutility if stopping too early
