@@ -93,6 +93,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 				this.route.add(l.getToNode());
 			}
 		}
+		this.route.trimToSize();
 	}
 
 	public void setRoute(final List<Node> srcRoute) {
