@@ -115,55 +115,69 @@ public class CppEventFileParser {
 	
 	public static boolean equals(PersonEvent personEvent,EventLog deqSimEvent){
 		if (Integer.parseInt(personEvent.agentId)!=deqSimEvent.getVehicleId()){
+			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}
 		if (personEvent.time!=deqSimEvent.getTime()){
+			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}
 		
 		if (personEvent instanceof AgentDepartureEvent){
 			if (Integer.parseInt(((AgentDepartureEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 			
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.START_LEG)){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 		
 		if (personEvent instanceof LinkEnterEvent){
 			if (Integer.parseInt(((LinkEnterEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 			
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 		
 		if (personEvent instanceof LinkLeaveEvent){
 			if (Integer.parseInt(((LinkLeaveEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 			
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 		
 		if (personEvent instanceof AgentArrivalEvent){
 			if (Integer.parseInt(((AgentArrivalEvent) personEvent).linkId)!=deqSimEvent.getLinkId()){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 			
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.END_LEG)){
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 		
-		
-		
 		return true;
+	}
+	
+	private static void printNotEqualEvents(PersonEvent personEvent,EventLog deqSimEvent){
+		System.out.println("POSSIBLE PROBLEM: EVENTS NOT EQUAL");
+		System.out.println(personEvent.toString());
+		deqSimEvent.print();
 	}
 
 }
