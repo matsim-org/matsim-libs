@@ -61,7 +61,7 @@ public class BasicHouseholdImpl implements BasicHousehold {
 		return this.memberIds;
 	}
 
-	public List<Id> getVehicleDefinitionIds() {
+	public List<Id> getVehicleIds() {
 		return this.vehicleDefinitionIds;
 	}
 

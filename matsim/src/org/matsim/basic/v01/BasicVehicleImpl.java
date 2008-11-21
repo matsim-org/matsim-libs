@@ -3,16 +3,16 @@ package org.matsim.basic.v01;
 
 public class BasicVehicleImpl implements BasicVehicle {
 
-	private String type;
+	private String typeId;
 	private Id id;
 
 	public BasicVehicleImpl(Id id, String type) {
 		this.id = id;
-		this.type = type;
+		this.typeId = type;
 	}
 
-	public String getType() {
-		return type;
+	public String getTypeId() {
+		return typeId;
 	}
 	
 	public Id getId() {

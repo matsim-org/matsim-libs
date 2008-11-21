@@ -19,10 +19,12 @@
 
 package org.matsim.population;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPopulationReaderV5;
+import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.PopulationSchemaV5Names;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
@@ -32,11 +34,21 @@ import org.xml.sax.Attributes;
  * @author dgrether
  */
 public class PopulationReaderMatsimV5 extends BasicPopulationReaderV5 {
-
-	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, List<Household> households, Facilities fac) {
+	
+	private static final Logger log = Logger
+			.getLogger(PopulationReaderMatsimV5.class);
+	
+	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, Map<Id, Household> households, Facilities fac) {
 		super();
 		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
-		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households));
+		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac));
+		log.warn("Using the PopulationReader without vehicle informations will ignore all vehicle information stored in the households db!");
+	}
+
+	public PopulationReaderMatsimV5(final NetworkLayer network, final Population population, Map<Id, Household> households, Facilities fac, Map<Id, Vehicle> vehicles) {
+		super();
+		super.setPopulationBuilder(new PopulationBuilderImpl(network, population, fac));
+		super.setHouseholdBuilder(new HouseholdBuilderImpl(population, households, fac, vehicles));		
 	}
 
 	@Override

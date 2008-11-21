@@ -38,7 +38,7 @@ public interface BasicHousehold {
 	
 	public String getLanguage();
 
-	public List<Id> getVehicleDefinitionIds();
+	public List<Id> getVehicleIds();
 
 	public void setLanguage(String language);
 

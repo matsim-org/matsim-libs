@@ -33,4 +33,8 @@ public interface Household extends BasicHousehold {
 	
 	public Map<Id, Person> getMembers();
 	
+	public Map<Id, Vehicle> getVehicles();
+	
+	public void addVehicle(Vehicle v);
+	
 }

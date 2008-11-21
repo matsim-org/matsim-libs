@@ -21,47 +21,67 @@ package org.matsim.basic.v01;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.matsim.population.Vehicle;
+import org.matsim.population.VehicleReaderV1;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author dgrether
  */
-public class BasicVehicleDefinitionReaderV1Test extends MatsimTestCase {
+public class VehicleReaderWriterV1Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testVehicles.xml";
 
   private final Id id23 = new IdImpl("23");
-  private final Id id24 = new IdImpl("24");
+  private final Id id42 = new IdImpl("42");
   
-	public void testParser() {
+	public void testBasicParser() {
 		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
-		List<BasicVehicle> vehicles = new ArrayList<BasicVehicle>();
-		BasicVehicleDefinitionReaderV1 reader = new BasicVehicleDefinitionReaderV1(vehicleTypes, vehicles);
+		Map<Id, BasicVehicle> vehicles = new HashMap<Id, BasicVehicle>();
+		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicleTypes, vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
 		checkContent(vehicleTypes, vehicles);
 	}
 	
+	public void testParser(){
+		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
+		Map<Id, Vehicle> vehicles = new HashMap<Id, Vehicle>();
+		VehicleReaderV1 reader = new VehicleReaderV1(vehicleTypes, vehicles);
+		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+		
+		checkContent(vehicleTypes, (Map)vehicles);
+		checkReferences(vehicles);
+	}
+	
+	
+	private void checkReferences(Map<Id, Vehicle> vehicles) {
+		for (Vehicle v : vehicles.values()){
+			assertNotNull(v);
+			assertNotNull(v.getTypeId());
+			assertNotNull(v.getType());
+			assertEquals(v.getTypeId(), v.getType().getTypeId());
+		}
+	}
+
 	public void testWriter() throws FileNotFoundException, IOException {
 		//read it
 		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
-		List<BasicVehicle> vehicles = new ArrayList<BasicVehicle>();
-		BasicVehicleDefinitionReaderV1 reader = new BasicVehicleDefinitionReaderV1(vehicleTypes, vehicles);
+		Map<Id, BasicVehicle> vehicles = new HashMap<Id, BasicVehicle>();
+		BasicVehicleReaderV1 reader = new BasicVehicleReaderV1(vehicleTypes, vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
-		VehicleDefinitionsWriterV1 writer = new VehicleDefinitionsWriterV1(vehicleTypes, vehicles);
+		VehicleWriterV1 writer = new VehicleWriterV1(vehicleTypes, vehicles);
 		writer.writeFile(this.getOutputDirectory() + "testOutputVehicles.xml");
 		//check it, check it, check it now!
 		this.checkContent(vehicleTypes, vehicles);
 	}
 
 	private void checkContent(Map<String, BasicVehicleType> vehicleTypes,
-			List<BasicVehicle> vehicles) {
+			Map<Id, BasicVehicle> vehicles) {
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
 		BasicVehicleType vehType = vehicleTypes.get("normalCar");
@@ -88,13 +108,13 @@ public class BasicVehicleDefinitionReaderV1Test extends MatsimTestCase {
 		assertNotNull(vehicles);
 		assertEquals(2, vehicles.size());
 	
-		assertNotNull(vehicles.get(0));
-		assertEquals(id23, vehicles.get(0).getId());
-		assertEquals("normalCar", vehicles.get(0).getType());
+		assertNotNull(vehicles.get(id23));
+		assertEquals(id23, vehicles.get(id23).getId());
+		assertEquals("normalCar", vehicles.get(id23).getTypeId());
 
-		assertNotNull(vehicles.get(1));
-		assertEquals(id24, vehicles.get(1).getId());
-		assertEquals("defaultValueCar", vehicles.get(1).getType());
+		assertNotNull(vehicles.get(id42));
+		assertEquals(id42, vehicles.get(id42).getId());
+		assertEquals("defaultValueCar", vehicles.get(id42).getTypeId());
 	}
 
 }

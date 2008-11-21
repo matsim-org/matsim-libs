@@ -19,35 +19,63 @@
 
 package org.matsim.basic.v01;
 
-import java.util.List;
 import java.util.Map;
 
-import org.matsim.interfaces.basic.v01.BasicHousehold;
-import org.matsim.interfaces.basic.v01.BasicLocation;
+import org.matsim.basic.v01.BasicEngineInformation.FuelType;
 
 /**
  * @author dgrether
  */
-public class BasicHouseholdBuilder implements HouseholdBuilder {
+public class BasicVehicleBuilder implements VehicleBuilder {
 
-	private Map<Id, BasicHousehold> households;
+	private Map<String, BasicVehicleType> vehicleTypes;
+	private Map<Id, BasicVehicle> vehicles;
 
-	public BasicHouseholdBuilder(Map<Id, BasicHousehold> map) {
-		this.households = map;
+
+	public BasicVehicleBuilder(Map<String, BasicVehicleType> vehicleTypes,
+			Map<Id, BasicVehicle> vehicles) {
+		this.vehicleTypes = vehicleTypes;
+		this.vehicles = vehicles;
 	}
 
-	public Map<Id, BasicHousehold> getHouseholds() {
-		return this.households;
+
+	public BasicVehicleType createVehicleType(String type) {
+		if (!this.vehicleTypes.containsKey(type)) {
+			BasicVehicleType veh = new BasicVehicleTypeImpl(type);
+			this.vehicleTypes.put(type, veh);
+			return veh;
+		}
+		throw new IllegalArgumentException("Vehicle type with id: " + type + " already exists!");
 	}
 
-	public BasicHouseholdImpl createHousehold(Id householdId,
-			List<Id> membersPersonIds, BasicLocation loc, List<Id> vehicleIds) {
-		BasicHouseholdImpl hh = new BasicHouseholdImpl(householdId);
-		hh.setLocation(loc);
-		hh.setMemberIds(membersPersonIds);
-		hh.setVehicleIds(vehicleIds);
-		this.households.put(householdId, hh);
-		return hh;
+
+	public BasicVehicleCapacity createVehicleCapacity() {
+		return new BasicVehicleCapacityImpl();
 	}
 
+
+	public BasicFreightCapacity createFreigthCapacity() {
+		return new BasicFreightCapacityImpl();
+	}
+
+
+	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new BasicEngineInformationImpl(fuelType, gasConsumption);
+	}
+
+
+	public BasicVehicle createVehicle(Id id, String type) {
+		BasicVehicle veh = new BasicVehicleImpl(id, type);
+		this.vehicles.put(id, veh);
+		return veh;
+	}
+
+	public Map<String, BasicVehicleType> getVehicleTypes() {
+		return this.vehicleTypes;
+	}
+
+	public Map<Id, BasicVehicle> getVehicles() {
+		return this.vehicles;
+	}
 }

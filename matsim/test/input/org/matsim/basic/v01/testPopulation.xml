@@ -83,10 +83,9 @@
       <personId refId="43" />
     </members>
     <location>
-      <coordinate>
-        <xCoord>48.28</xCoord>
-        <yCoord>7.56</yCoord>
-      </coordinate>
+      <actLocation>
+        <facilityId refId="666" />
+      </actLocation>
     </location>
     <vehicleDefinitionId refId="23" />
     <vehicleDefinitionId refId="42" />
@@ -102,9 +101,10 @@
       <personId refId="45" />
     </members>
     <location>
-      <actLocation>
-        <facilityId refId="666" />
-      </actLocation>
+      <coordinate>
+        <xCoord>48.28</xCoord>
+        <yCoord>7.56</yCoord>
+      </coordinate>
     </location>
     <vehicleDefinitionId refId="23" />
     <income currency="eur" period="day">

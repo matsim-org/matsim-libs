@@ -33,14 +33,14 @@ import org.matsim.writer.MatsimXmlWriter;
  * @author dgrether
  *
  */
-public class VehicleDefinitionsWriterV1 extends MatsimXmlWriter {
+public class VehicleWriterV1 extends MatsimXmlWriter {
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Map<String, BasicVehicleType> vehicleTypes;
-	private List<BasicVehicle> vehicles;
+	private Map<Id, BasicVehicle> vehicles;
 
 	
-	public VehicleDefinitionsWriterV1(Map<String, BasicVehicleType> vehicleTypes, List<BasicVehicle> vehicles) {
+	public VehicleWriterV1(Map<String, BasicVehicleType> vehicleTypes, Map<Id, BasicVehicle> vehicles) {
 		this.vehicleTypes = vehicleTypes;
 		this.vehicles = vehicles;
 	}
@@ -63,11 +63,11 @@ public class VehicleDefinitionsWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS);
 	}
 
-	private void writeVehicles(List<BasicVehicle> veh) throws IOException {
-		for (BasicVehicle v : veh) {
+	private void writeVehicles(Map<Id, BasicVehicle> veh) throws IOException {
+		for (BasicVehicle v : veh.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
-			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getTypeId()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLE, atts, true);
 		}
 	}

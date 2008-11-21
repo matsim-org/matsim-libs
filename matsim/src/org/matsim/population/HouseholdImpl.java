@@ -33,6 +33,8 @@ import org.matsim.basic.v01.Id;
 public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 
 	private Map<Id, Person> members;
+
+	private Map<Id, Vehicle> vehicles;
 	
 	public HouseholdImpl(Id id) {
 		super(id);
@@ -62,6 +64,31 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 	
 	public Map<Id, Person> getMembers() {
 		return this.members;
+	}
+
+	@Override
+	public void setVehicleIds(List<Id> vehicleIds) {
+		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
+		"Use method addVehicle() instead!");
+	}
+	
+	@Override
+	public List<Id> getVehicleIds() {
+		if (this.vehicles == null) {
+			return null;
+		}
+		return new ArrayList<Id>(this.vehicles.keySet());
+	}
+	
+	public Map<Id, Vehicle> getVehicles() {
+		return this.vehicles;
+	}
+
+	public void addVehicle(Vehicle v) {
+		if (this.vehicles == null) {
+			this.vehicles = new HashMap<Id, Vehicle>();
+		}
+		this.vehicles.put(v.getId(), v);
 	}
 
 }

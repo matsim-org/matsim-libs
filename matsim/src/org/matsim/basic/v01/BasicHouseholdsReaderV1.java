@@ -22,6 +22,7 @@ package org.matsim.basic.v01;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	
-	private List<BasicHousehold> households;
+	private Map<Id, BasicHousehold> households;
 
 	private BasicHousehold currentHousehold;
 
@@ -61,7 +62,7 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	private List<Id> currentVehicleIds;
 
 
-	public BasicHouseholdsReaderV1(List<BasicHousehold> households) {
+	public BasicHouseholdsReaderV1(Map<Id, BasicHousehold> households) {
 		if (households == null) {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}
@@ -92,14 +93,13 @@ public class BasicHouseholdsReaderV1 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if (HouseholdsSchemaV1Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			this.currentHousehold = this.builder.createHousehold(this.currentHhId, this.currentmembers, this.currentVehicleIds);
+			this.currentHousehold = this.builder.createHousehold(this.currentHhId, this.currentmembers, this.currentlocation, this.currentVehicleIds);
 			this.currentHhId = null;
 //			this.households.add(this.currentHousehold);
 			this.currentHousehold.setLanguage(this.currentLanguage);
 			this.currentLanguage = null;
 			this.currentHousehold.setIncome(this.currentincome);
 			this.currentincome = null;
-			this.currentHousehold.setLocation(this.currentlocation);
 			this.currentlocation = null;
 			this.currentVehicleIds = null;
 		}

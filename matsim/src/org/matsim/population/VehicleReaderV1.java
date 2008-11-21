@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * VehilceReaderV1
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.population;
 
-package org.matsim.basic.v01;
+import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.BasicVehicleReaderV1;
+import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.basic.v01.Id;
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.basic.v01");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicPlanTest.class);
-		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
-		suite.addTestSuite(PopulationReaderWriterV5Test.class);
-		suite.addTestSuite(VehicleReaderWriterV1Test.class);
-		//$JUnit-END$
-		return suite;
+/**
+ * @author dgrether
+ *
+ */
+public class VehicleReaderV1 extends BasicVehicleReaderV1 {
+
+	/**
+	 * @param vehicleTypes
+	 * @param vehicles
+	 */
+	public VehicleReaderV1(Map<String, BasicVehicleType> vehicleTypes,
+			Map<Id, Vehicle> vehicles) {
+		super(new VehicleBuilderImpl(vehicleTypes, vehicles));
 	}
 
 }

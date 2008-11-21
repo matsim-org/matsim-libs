@@ -22,6 +22,7 @@ package org.matsim.basic.v01;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -84,7 +85,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 	
 	private BasicHouseholdsReaderV1 householdsDelegate = null;
 
-	private List<BasicHousehold> households;
+	private Map<Id, BasicHousehold> households;
 
 	private List<BasicActivity> currentActivities = new ArrayList<BasicActivity>();
 
@@ -101,7 +102,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 	protected BasicPopulationReaderV5() {
 	}
 		
-  public BasicPopulationReaderV5(BasicPopulation pop, List<BasicHousehold> households) {
+  public BasicPopulationReaderV5(BasicPopulation pop, Map<Id, BasicHousehold> households) {
   	this.populationBuilder = new BasicPopulationBuilder(pop);
   	this.householdBuilder = new BasicHouseholdBuilder(households);
   	this.households = households;

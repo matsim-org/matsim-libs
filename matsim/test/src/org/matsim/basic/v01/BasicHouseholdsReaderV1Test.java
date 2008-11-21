@@ -19,9 +19,10 @@
 
 package org.matsim.basic.v01;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
 import org.matsim.interfaces.basic.v01.BasicIncome.IncomePeriod;
@@ -42,17 +43,17 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
   private final Id id45 = new IdImpl("45");
   private final Id id666 = new IdImpl("666");
   
-	public void testParser() {
-		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
+	public void testBasicParser() {
+		Map<Id, BasicHousehold> households = new HashMap<Id, BasicHousehold>();
 		BasicHouseholdsReaderV1 reader = new BasicHouseholdsReaderV1(households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
-		
 		checkContent(households);
 	}
-
-	public void checkContent(List<? extends BasicHousehold> households) {
+	
+	
+	public void checkContent(Map<Id, BasicHousehold> households) {
 		assertEquals(2, households.size());
-		BasicHousehold hh = households.get(0);
+		BasicHousehold hh = households.get(id23);
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
 		assertEquals(3, hh.getMemberIds().size());
@@ -61,17 +62,18 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals(id23, hhmemberIds.get(0));
 		assertEquals(id42, hhmemberIds.get(1));
 		assertEquals(id43, hhmemberIds.get(2));
-		
+
 		assertNotNull(hh.getBasicLocation());
-		assertNotNull(hh.getBasicLocation().getCenter());
-		assertNull(hh.getBasicLocation().getId());
-		assertEquals(48.28d, hh.getBasicLocation().getCenter().getX(), EPSILON);
-		assertEquals(7.56d, hh.getBasicLocation().getCenter().getY(), EPSILON);
-	
-		assertNotNull(hh.getVehicleDefinitionIds());
-		assertEquals(2, hh.getVehicleDefinitionIds().size());
-		assertEquals(id23, hh.getVehicleDefinitionIds().get(0));
-		assertEquals(id42, hh.getVehicleDefinitionIds().get(1));
+		assertNotNull(hh.getBasicLocation().getId()); 
+		assertEquals(LocationType.FACILITY, hh.getBasicLocation().getLocationType());
+		assertEquals(id666, hh.getBasicLocation().getId());
+
+		assertNotNull(hh.getVehicleIds());
+		List<Id> vehIds = hh.getVehicleIds();
+		Collections.sort(vehIds);
+		assertEquals(2, vehIds.size());
+		assertEquals(id23, vehIds.get(0));
+		assertEquals(id42, vehIds.get(1));
 		
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());
@@ -83,7 +85,7 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals("german", hh.getLanguage());
 		
 	
-		hh = households.get(1);
+		hh = households.get(id24);
 		assertNotNull(hh);
 		assertEquals(id24, hh.getId());
 		assertEquals(2, hh.getMemberIds().size());
@@ -91,14 +93,14 @@ public class BasicHouseholdsReaderV1Test extends MatsimTestCase {
 		assertEquals(id45, hh.getMemberIds().get(1));
 		
 		assertNotNull(hh.getBasicLocation());
-		assertNull(hh.getBasicLocation().getCenter());
-		assertNotNull(hh.getBasicLocation().getId()); 
-		assertEquals(LocationType.FACILITY, hh.getBasicLocation().getLocationType());
-		assertEquals(id666, hh.getBasicLocation().getId());
+		assertNotNull(hh.getBasicLocation().getCenter());
+		assertNull(hh.getBasicLocation().getId());
+		assertEquals(48.28d, hh.getBasicLocation().getCenter().getX(), EPSILON);
+		assertEquals(7.56d, hh.getBasicLocation().getCenter().getY(), EPSILON);
 
-		assertNotNull(hh.getVehicleDefinitionIds());
-		assertEquals(1, hh.getVehicleDefinitionIds().size());
-		assertEquals(id23, hh.getVehicleDefinitionIds().get(0));
+		assertNotNull(hh.getVehicleIds());
+		assertEquals(1, hh.getVehicleIds().size());
+		assertEquals(id23, hh.getVehicleIds().get(0));
 
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());

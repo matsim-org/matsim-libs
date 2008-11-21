@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * VehicleBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.population;
 
-package org.matsim.basic.v01;
+import java.util.Map;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.BasicVehicle;
+import org.matsim.basic.v01.BasicVehicleBuilder;
+import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.basic.v01.Id;
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.basic.v01");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicPlanTest.class);
-		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
-		suite.addTestSuite(PopulationReaderWriterV5Test.class);
-		suite.addTestSuite(VehicleReaderWriterV1Test.class);
-		//$JUnit-END$
-		return suite;
+
+/**
+ * @author dgrether
+ *
+ */
+public class VehicleBuilderImpl extends BasicVehicleBuilder {
+
+	public VehicleBuilderImpl(Map<String, BasicVehicleType> vehicleTypes,
+			Map<Id, Vehicle> vehicles) {
+		super(vehicleTypes, (Map)vehicles);
 	}
 
+	@Override
+	public BasicVehicle createVehicle(Id id, String type) {
+		BasicVehicleType t = this.getVehicleTypes().get(type);
+		if (t == null) {
+			throw new IllegalArgumentException("Cannot create vehicle for unknown VehicleType: "+ type);
+		}
+		Vehicle v = new VehicleImpl(id, t);
+		this.getVehicles().put(id, v);
+		return v;
+	}
 }

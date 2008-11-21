@@ -24,7 +24,7 @@ package org.matsim.basic.v01;
  */
 public interface BasicVehicle {
 
-	public String getType();
+	public String getTypeId();
 	
 	public Id getId();
 	

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * VehicleImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.population;
 
-package org.matsim.basic.v01;
+import org.matsim.basic.v01.BasicVehicleImpl;
+import org.matsim.basic.v01.BasicVehicleType;
+import org.matsim.basic.v01.Id;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
-public class AllTests {
+/**
+ * @author dgrether
+ *
+ */
+public class VehicleImpl extends BasicVehicleImpl implements Vehicle {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.basic.v01");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BasicPlanTest.class);
-		suite.addTestSuite(BasicHouseholdsReaderV1Test.class);
-		suite.addTestSuite(PopulationReaderWriterV5Test.class);
-		suite.addTestSuite(VehicleReaderWriterV1Test.class);
-		//$JUnit-END$
-		return suite;
+	private BasicVehicleType type;
+
+	/**
+	 * @param id
+	 * @param type
+	 */
+	public VehicleImpl(Id id, BasicVehicleType type) {
+		super(id, type.getTypeId());
+		this.type = type;
+	}
+
+	public BasicVehicleType getType() {
+		return this.type;
 	}
 
 }

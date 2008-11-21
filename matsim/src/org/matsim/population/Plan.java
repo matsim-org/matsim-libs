@@ -404,6 +404,7 @@ public class Plan extends BasicPlanImpl {
 		return null;
 	}
 
+	//FIXME NAME SHOULD be getPreviousAct!!!
 	public Act getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {

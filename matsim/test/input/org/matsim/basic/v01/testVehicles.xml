@@ -26,10 +26,8 @@
 <vehicleType typeId="defaultValueCar">
 </vehicleType>
 
-
-
 <vehicle id="23" type="normalCar" />
-<vehicle id="24" type="defaultValueCar" />
+<vehicle id="42" type="defaultValueCar" />
 
 
 </vehicleDefinitions>

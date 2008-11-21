@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -56,7 +57,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 
 	private final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population;
 
-	private List<BasicHousehold> households;
+	private Map<Id, BasicHousehold> households;
 
 	private MatsimCommonWriter matsimCommonWriter;
 
@@ -64,7 +65,7 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.population = pop;
 	}
 
-	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, final List<BasicHousehold> hh) {
+	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, final Map<Id, BasicHousehold> hh) {
 		this.population = pop;
 		this.households = hh;
 	}

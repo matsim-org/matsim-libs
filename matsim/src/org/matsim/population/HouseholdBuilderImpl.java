@@ -20,30 +20,43 @@
 package org.matsim.population;
 
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.basic.v01.HouseholdBuilder;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.LocationType;
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 
 /**
  * @author dgrether
  */
 public class HouseholdBuilderImpl implements HouseholdBuilder {
 
-	private List<Household> households;
+	private Map<Id, Household> households;
 	private Population population;
+	private Map<Id, Vehicle> vehicles = null;
+	private Facilities facilities;
 
-	public HouseholdBuilderImpl(Population pop, List<Household> households) {
+	public HouseholdBuilderImpl(Population pop, Map<Id, Household> households, Facilities fac) {
 		this.households = households;
 		this.population = pop;
+		this.facilities = fac;
+	}
+	
+	public HouseholdBuilderImpl(Population pop, Map<Id, Household> households, Facilities fac, Map<Id, Vehicle> vehicles) {
+		this(pop, households, fac);
+		this.vehicles = vehicles;
 	}
 
-	public List<BasicHousehold> getHouseholds() {
-		return (List)this.households;
+	public Map<Id, BasicHousehold> getHouseholds() {
+		return (Map)this.households;
 	}
 
 	public BasicHousehold createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds) {
+			List<Id> membersPersonIds, BasicLocation loc, List<Id> vehicleIds) {
 		HouseholdImpl hh = new HouseholdImpl(householdId);
 		Person p;
 		for (Id id : membersPersonIds){
@@ -55,8 +68,28 @@ public class HouseholdBuilderImpl implements HouseholdBuilder {
 				throw new IllegalArgumentException("Household member with Id: " + id + " is not part of population!");
 			}
 		}
-		hh.setVehicleIds(vehicleIds);
-		this.households.add(hh);
+		if (loc.getLocationType() == LocationType.FACILITY){
+			Facility f = this.facilities.getFacilities().get(loc.getId());
+			if (f != null) {
+				hh.setLocation(f);
+			}
+			else {
+				throw new IllegalStateException("Facility with Id: " + loc.getId() + " doesn't exist, however household with Id: "+ householdId + " is specified to be located there!");
+			}
+		}
+		else {
+			hh.setLocation(loc);
+		}
+		if (this.vehicles != null) {
+			for (Id id : vehicleIds) {
+				Vehicle v = this.vehicles.get(id);
+				if (v == null) {
+					throw new IllegalStateException("The specified Vehicle with Id: " + id.toString() + " is not part of the vehicle database.");
+				}
+				hh.addVehicle(v);
+			}
+		}
+		this.households.put(householdId, hh);
 		return hh;
 	}
 

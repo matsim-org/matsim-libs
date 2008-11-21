@@ -20,7 +20,6 @@
 package org.matsim.basic.v01;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -34,18 +33,22 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class BasicVehicleDefinitionReaderV1 extends MatsimXmlParser {
+public class BasicVehicleReaderV1 extends MatsimXmlParser {
 
-	private BasicVehicleDefinitionBuilder builder;
+	private VehicleBuilder builder;
 	private BasicVehicleType currentVehType;
 	private BasicVehicleCapacity currentCapacity;
 	private BasicFreightCapacity currentFreightCap;
 	private BasicEngineInformation.FuelType currentFuelType;
 	private double currentGasConsumption;
 	
+	public BasicVehicleReaderV1(VehicleBuilder vb) {
+		this.builder = vb;
+	}
 	
-	public BasicVehicleDefinitionReaderV1(Map<String, BasicVehicleType> vehicleTypes, List<BasicVehicle> vehicles) {
-		this.builder = new BasicVehicleDefinitionBuilder(vehicleTypes, vehicles);
+	
+	public BasicVehicleReaderV1(Map<String, BasicVehicleType> vehicleTypes, Map<Id, BasicVehicle> vehicles) {
+		this.builder = new BasicVehicleBuilder(vehicleTypes, vehicles);
 	}
 	
 	public void readFile(String filename) {

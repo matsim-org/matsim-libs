@@ -20,16 +20,18 @@
 package org.matsim.basic.v01;
 
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.interfaces.basic.v01.BasicLocation;
 
 /**
  * @author dgrether
  */
 public interface HouseholdBuilder {
 
-	public List<BasicHousehold> getHouseholds();
+	public Map<Id, BasicHousehold> getHouseholds();
 
 	public BasicHousehold createHousehold(Id householdId,
-			List<Id> membersPersonIds, List<Id> vehicleIds);
+			List<Id> membersPersonIds, BasicLocation location, List<Id> vehicleIds);
 }

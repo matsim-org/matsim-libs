@@ -21,31 +21,44 @@ package org.matsim.basic.v01;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.interfaces.basic.v01.BasicHousehold;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.Act;
 import org.matsim.population.Household;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
+import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReaderMatsimV5;
 import org.matsim.population.PopulationWriterV5;
+import org.matsim.population.Vehicle;
+import org.matsim.population.VehicleReaderV1;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
+
 /**
  * @author dgrether
  */
-public class BasicPopulationReaderV5Test extends MatsimTestCase {
+public class PopulationReaderWriterV5Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testPopulation.xml";
+  
+  private static final String TESTVEHICLESXML = "testVehicles.xml";
 	
   private final Id id23 = new IdImpl("23");
   private final Id id24 = new IdImpl("24");
@@ -59,7 +72,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
   
 	public void testBasicParser() {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge>>();
-		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
+		Map<Id, BasicHousehold> households = new HashMap<Id, BasicHousehold>();
 		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(population);
@@ -68,27 +81,100 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 	}
 	
 	public void testParser() {
+		//read vehicles
+		Map<String, BasicVehicleType> vehicleTypes = new HashMap<String, BasicVehicleType>();
+		Map<Id, Vehicle> vehicles = new HashMap<Id, Vehicle>();
+		VehicleReaderV1 reader = new VehicleReaderV1(vehicleTypes, vehicles);
+		reader.readFile(this.getPackageInputDirectory() + TESTVEHICLESXML);
+		//create pop and add missing persons refered from testHouseholds.xml
 		Population pop = new Population(Population.NO_STREAMING);
 		pop.addPerson(new PersonImpl(id42));
 		pop.addPerson(new PersonImpl(id43));
 		pop.addPerson(new PersonImpl(id44));
 		pop.addPerson(new PersonImpl(id45));
+		//create the network layer containing the referenced links
 		NetworkLayer net = new NetworkLayer();
 		createNetwork(net);
-		List<Household> households = new ArrayList<Household>();
-		Facilities fac = new Facilities();
-		fac.createFacility(id666, coord);
-		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, fac);
+		//create the household and facility data structures
+		Map<Id, Household> households = new HashMap<Id, Household>();
+		Facilities facilities = new Facilities();
+		facilities.createFacility(id666, coord);
+		//do it, do it, do it now
+		PopulationReaderMatsimV5 parser = new PopulationReaderMatsimV5(net, pop, households, facilities, vehicles);
 		parser.readFile(this.getPackageInputDirectory() + TESTXML);
 		checkContent(pop);
 		BasicHouseholdsReaderV1Test hhTest = new BasicHouseholdsReaderV1Test();
-		hhTest.checkContent(households);
+		hhTest.checkContent((Map)households);
+		checkReferences(pop, facilities, net, vehicles);
 	}
 	
+	private void checkReferences(Population pop, Facilities fac, NetworkLayer net, Map<Id, Vehicle> vehicles) {
+		Person person = pop.getPerson(id23);
+		assertNotNull(person);
+		assertNotNull(person.getKnowledge());
+		assertNotNull(person.getKnowledge().getActivities());
+		for (Activity a : person.getKnowledge().getActivities()) {
+			assertNotNull(a);
+			assertNotNull(a.getFacility());
+			assertEquals(fac.getFacilities().get(id666), a.getFacility());
+		}
+		Plan p = person.getPlans().get(0);
+		Act a = p.getFirstActivity();
+		assertNotNull(a.getCoord());
+		assertNull(a.getFacility());
+		assertNull(a.getFacilityId());
+		assertNull(a.getLink());
+		assertNull(a.getLinkId());
+		Leg l = p.getNextLeg(a);
+		assertNotNull(l.getRoute());
+		assertNotNull(l.getRoute().getRoute());
+		assertNotNull(l.getRoute().getLinkIds());
+		assertNotNull(l.getRoute().getLinkRoute());
+		for (Node n : l.getRoute().getRoute()) {
+			assertNotNull(n);
+		}
+		for (Link ll : l.getRoute().getLinkRoute()){
+			assertNotNull(ll);
+			assertTrue((ll.equals(net.getLink(id23))) || ll.equals(net.getLink(id24)));
+		}
+		a = p.getNextActivity(l);
+		assertNotNull(a);
+		assertNull(a.getCoord());
+		assertNull(a.getLink());
+		assertNull(a.getLinkId());
+		assertNotNull(a.getFacility());
+		assertNotNull(a.getFacilityId());
+		assertEquals(fac.getFacilities().get(id666), a.getFacility());
+		assertEquals(id666, a.getFacilityId());
+		//...one could test the complete plan however this gets boring so step to the households
+		Household h = person.getHousehold();
+		assertNotNull(h);
+		assertEquals(id23, h.getId());
+		assertNotNull(h.getMembers());
+		assertNotNull(h.getMemberIds());
+		List<Id> memberIds = h.getMemberIds();
+		Collections.sort(memberIds);
+		assertEquals(id23, memberIds.get(0));
+		assertEquals(id42, memberIds.get(1));
+		assertEquals(id43, memberIds.get(2));
+		for (Person per : h.getMembers().values()){
+			assertNotNull(per);
+			assertTrue(per.equals(pop.getPerson(id23)) || per.equals(pop.getPerson(id42)) || per.equals(pop.getPerson(id43)));
+		}
+		assertNotNull(h.getBasicLocation());
+		assertEquals(fac.getFacilities().get(id666), h.getBasicLocation());
+		assertNotNull(h.getVehicles());
+		assertEquals(2, h.getVehicles().size());
+		for (Vehicle v : h.getVehicles().values()) {
+			assertNotNull(v);
+			assertTrue(v.equals(vehicles.get(id23)) || v.equals(vehicles.get(id42)));
+		}
+	}
+
 	public void testWriter() throws FileNotFoundException, IOException {
 		//read the file
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = new BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>();
-		List<BasicHousehold> households = new ArrayList<BasicHousehold>();
+		Map<Id, BasicHousehold> households = new HashMap<Id, BasicHousehold>();
 		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
@@ -98,7 +184,7 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		writer.writeFile(this.getOutputDirectory() + "testPopulationOutput.xml");
 		//read it again and check the content
 		population = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>();
-		households = new ArrayList<BasicHousehold>();
+		households = new HashMap<Id, BasicHousehold>();
 		reader = new BasicPopulationReaderV5(population, households);
 		reader.readFile(this.getOutputDirectory() + "testPopulationOutput.xml");
 		this.checkContent(population);
@@ -150,8 +236,6 @@ public class BasicPopulationReaderV5Test extends MatsimTestCase {
 		assertNotNull(activity.getLocation());
 		assertNotNull(activity.getLocation().getId());
 		assertEquals(id666, activity.getLocation().getId());
-		System.out.println(activity.getLocation());
-		System.out.println(activity.getLocation().getCenter());
 		//here we have to branch the test, as the basic classes don't need a coordinate for a location
 		//the derived classes however do -> there is still an artificial null value of 0.0, 0.0
 		if (activity.getLocation().getCenter() == null) {

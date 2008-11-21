@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.basic.v01.HouseholdsSchemaV1Names;
 import org.matsim.basic.v01.Id;
@@ -41,10 +42,10 @@ import org.matsim.writer.MatsimXmlWriter;
 public class HouseholdsWriterV1 extends MatsimXmlWriter {
 	
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private List<BasicHousehold> households;
+	private Map<Id, BasicHousehold> households;
 	private MatsimCommonWriter matsimCommonWriter;
 	
-	public HouseholdsWriterV1(List<BasicHousehold> households) {
+	public HouseholdsWriterV1(Map<Id, BasicHousehold> households) {
 		this.households = households;
 	}
 	
@@ -57,13 +58,13 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 		this.close();
 	}
 	
-	private void writeHouseholds(List<BasicHousehold> hh) throws IOException {
+	private void writeHouseholds(Map<Id, BasicHousehold> hh) throws IOException {
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.00.xsd"));
 		this.writeStartTag(HouseholdsSchemaV1Names.HOUSEHOLDS, atts);
-		for (BasicHousehold h : hh) {
+		for (BasicHousehold h : hh.values()) {
 			this.writeHousehold(h);
 		}
 		this.writeEndTag(HouseholdsSchemaV1Names.HOUSEHOLDS);
@@ -73,7 +74,7 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 		this.writer = writer;
 		this.setIndentationLevel(indentationLevel);
 		this.matsimCommonWriter = new MatsimCommonWriter(this.writer);
-		for (BasicHousehold h : this.households) {
+		for (BasicHousehold h : this.households.values()) {
 			this.writeHousehold(h);
 		}
 	}
@@ -84,8 +85,8 @@ public class HouseholdsWriterV1 extends MatsimXmlWriter {
 		this.writeStartTag(HouseholdsSchemaV1Names.HOUSEHOLD, atts);
 		this.writeMembers(h.getMemberIds());
 		this.matsimCommonWriter.writeLocation(h.getBasicLocation(), this.getIndentationLevel());
-		if (h.getVehicleDefinitionIds() != null) {
-			for (Id id : h.getVehicleDefinitionIds()){
+		if (h.getVehicleIds() != null) {
+			for (Id id : h.getVehicleIds()){
 				atts.clear();
 				atts.add(this.createTuple(HouseholdsSchemaV1Names.REFID, id.toString()));
 				this.writeStartTag(HouseholdsSchemaV1Names.VEHICLEDEFINITIONID, atts, true);
