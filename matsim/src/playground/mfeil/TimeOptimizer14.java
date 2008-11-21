@@ -566,7 +566,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				}
 				else {
 					((Act)(actslegs.get(i))).setDuration(86400-((Leg)(actslegs.get(i-1))).getArrivalTime());
-					((Act)(actslegs.get(i))).setDuration(86400);
+					((Act)(actslegs.get(i))).setEndTime(86400);
 				}
 			}
 		}
