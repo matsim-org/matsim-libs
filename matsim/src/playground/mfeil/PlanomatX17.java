@@ -81,10 +81,10 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
 		/* NEW NEW NEW NEW NEW NEW NEW NEW */
-		this.factory 				= new JohScoringFunctionFactory();
+		this.factory 				= controler.getScoringFunctionFactory();
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer 				= new PlanScorer (this.factory);
-		this.timer					= new TimeOptimizer13(controler.getLegTravelTimeEstimator(), this.scorer);
+		this.timer					= new TimeOptimizer14(controler.getLegTravelTimeEstimator(), this.scorer);
 		//this.timer		 			= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
 		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
@@ -133,16 +133,17 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//	double [] xs;
 	//	double [] ys 									= new double [MAX_ITERATIONS+1];		
 		
-	//	String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
-	//	Counter.counter++;
-	//	PrintStream stream;
-	//	try {
-	//		stream = new PrintStream (new File(outputfile));
-	//	} catch (FileNotFoundException e) {
-	//		e.printStackTrace();
-	//		return;
-	//	}
-	//	stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
+	/*	String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
+		Counter.counter++;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
+		*/
 		
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
@@ -194,7 +195,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 			for (int x=0; x<NEIGHBOURHOOD_SIZE;x++){
 				if(scoredInNeighbourhood[x]==0){
 					
-					/* Conduct location choice*/					
+					/* Conduct location choice*/	
 					if (this.LC_MODE.equals("reducedLC")	||	this.LC_MODE.equals("iteratingLC")){
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
@@ -239,17 +240,18 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 					else if (solution.getActsLegs().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-	//			stream.print(neighbourhood[x].getScore()+"\t");
-	//			stream.print(infoOnNeighbourhood[x][0]+"\t");
-	//			stream.print(tabuInNeighbourhood[x]+"\t");
-	//			stream.print(scoredInNeighbourhood[x]+"\t");
-	//			for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
-	//				Act act = (Act)neighbourhood[x].getActsLegs().get(i);
-	//				stream.print(act.getType()+"\t");
-	//			}
-	//			stream.print(infoOnNeighbourhood[x][1]+"\t");
-	//			stream.print(infoOnNeighbourhood[x][2]+"\t");
-	//			stream.println();
+	/*			stream.print(neighbourhood[x].getScore()+"\t");
+				stream.print(infoOnNeighbourhood[x][0]+"\t");
+				stream.print(tabuInNeighbourhood[x]+"\t");
+				stream.print(scoredInNeighbourhood[x]+"\t");
+				for (int i= 0;i<neighbourhood[x].getActsLegs().size();i=i+2){
+					Act act = (Act)neighbourhood[x].getActsLegs().get(i);
+					stream.print(act.getType()+"\t");
+				}
+				stream.print(infoOnNeighbourhood[x][1]+"\t");
+				stream.print(infoOnNeighbourhood[x][2]+"\t");
+				stream.println();
+				*/
 			}
 			
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
@@ -322,7 +324,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 	
 	//	stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
-	//	stream.println("Anzahl der Planomat-Aufrufe: "+numberPlanomatCalls);				
+	//	stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);				
 	//	stream.close();
 		
 		
@@ -708,9 +710,11 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	public void insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, ArrayList<Activity> actTypes){
 		
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
-		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
+		//Act actHelp = new Act ((Act)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
 		Act actHelp = new Act ((Act)(actslegs.get((position*2))));
 		actHelp.setDuration(0);
+		actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
+		actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
 		
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0;
 		
