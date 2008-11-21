@@ -13,7 +13,6 @@ import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkWriter;
 import org.matsim.utils.geometry.Coord;
 
 import playground.mmoyo.PTRouter.*;
@@ -27,50 +26,61 @@ public class PTNetworkFactory2 {
 	}
 	
 	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
-		NetworkLayer ptNetworkLayer;
-
-		//PTLinesReader2 ptLinesReader = new PTLinesReader2();
+		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer, ptTimeTable);
+		createTransferLinks(ptNetworkLayer, ptTimeTable);
+		return ptNetworkLayer;
+	}
+	
+	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
+		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer, ptTimeTable);
+		return ptNetworkLayer;
+	}
+	
+	private NetworkLayer readNetFile(String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
-		ptNetworkLayer= new NetworkLayer(networkFactory);
+		NetworkLayer tempNet= new NetworkLayer(networkFactory);
+		NetworkLayer ptNetworkLayer= new NetworkLayer(networkFactory);
 		
 		//Create a temporal network with normal Nodes
-		NetworkLayer tempNet= new NetworkLayer(networkFactory);
-		new MatsimNetworkReader(tempNet).readFile(inFileName);
+		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(tempNet);
+		matsimNetworkReader.readFile(inFileName);
 		
 		//Create the PTNetwork with PTNodes
-		List<PTNode> ptNodeList = new ArrayList<PTNode>();
+		//List<PTNode> ptNodeList = new ArrayList<PTNode>();
 		for (Node node: tempNet.getNodes().values()){
-			ptNodeList.add(new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType()));
+			PTNode ptNode = new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType());
+			ptNetworkLayer.getNodes().put(node.getId(),ptNode);
 		}
 	
-		//add ptNodes
-		for (Iterator<PTNode> iter = ptNodeList.iterator(); iter.hasNext();) {
-			PTNode ptNode= iter.next();	
-			ptNetworkLayer.getNodes().put(ptNode.getId(),ptNode);
-		}
-
 		//Add Links
 		for (Link l: tempNet.getLinks().values()){
-			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), "Standard");
+			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
 		}
+
 		tempNet= null;
-		
-		//Read all nodes
-		Map<String, ArrayList<String>> IntersectionMap = new TreeMap<String, ArrayList<String>>();
-		PTNode ptLastNode= null;
+		networkFactory= null;
+		matsimNetworkReader= null;
+		return ptNetworkLayer;
+	}
+	
+	private PTTimeTable2 readTimeTable(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable){
+		PTNode ptLastNode = null;
 		for (Iterator<PTLine> iterPTLines = ptTimeTable.getPtLineList().iterator(); iterPTLines.hasNext();) {
 			PTLine ptLine = iterPTLines.next();
 			//Test code
-			//System.out.println(ptLine.getId().toString());
-			//System.out.println(ptLine.getDirection());
-			//System.out.println(ptLine.getDepartures().toString());
-			//System.out.println(ptLine.getMinutes().toString() + "\n");
-			
+			/*
+			System.out.println(ptLine.getId().toString());
+			System.out.println(ptLine.getDirection());
+			System.out.println(ptLine.getDepartures().toString());
+			System.out.println(ptLine.getMinutes().toString() + "\n");
+			*/
 			//Create a map with travel times for every link
 			int indexMin=0;
 			double travelTime=0;
 			double lastTravelTime=0;
-			boolean check=false;
+			boolean first=true;
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
@@ -78,7 +88,7 @@ public class PTNetworkFactory2 {
 
 				double min = ptLine.getMinutes().get(indexMin);
 				travelTime=min-lastTravelTime;
-				if (check){
+				if (!first){
 					for (Link link : (ptNode.getInLinks().values())) {
 						if (link.getFromNode().equals(ptLastNode)){
 							linkTravelTimeMap.put(link.getId(), travelTime);
@@ -87,11 +97,24 @@ public class PTNetworkFactory2 {
 				}
 				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
 				lastTravelTime= min;
-				check=true;
+				first=false;
 				indexMin++;
-				///////////////////////////////////////////////////////////////////////
-				//example of possible node values at intersection:   999, _999, 999b, _999b
-				if(Character.isLetter(strIdNode.charAt(strIdNode.length()-1))){
+			}//for interator String
+		}//for interator ptline
+	
+		//Calculates the travel time of each link and stores these data in ptTimeTable
+		ptTimeTable.calculateTravelTimes(ptNetworkLayer);  //??
+		ptTimeTable.setMaps(linkTravelTimeMap);
+		return ptTimeTable;
+	}
+	
+	private void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
+		Map<String, ArrayList<String>> IntersectionMap = new TreeMap<String, ArrayList<String>>();
+		for (Iterator<PTLine> iterPTLines = ptTimeTable.getPtLineList().iterator(); iterPTLines.hasNext();) {
+			PTLine ptLine = iterPTLines.next();
+			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
+				String strIdNode = iter.next();
+				if(Character.isLetter(strIdNode.charAt(strIdNode.length()-1))){ 	//example of possible node values at intersection:   999, _999, 999b, _999b
 					String keyNode = strIdNode;
 					if (keyNode.charAt(0)=='_'){
 						keyNode = keyNode.substring(1, keyNode.length()-1);
@@ -107,39 +130,15 @@ public class PTNetworkFactory2 {
 	    			}// if IntersectionMap
 	    			IntersectionMap.get(keyNode).add(strIdNode);
 				}//if Character
-
-				/*
-				//correct code at 12:11    10/Oct/200
-				if(Character.isLetter(strIdNode.charAt(strIdNode.length()-1))){
-					String keyNode= strIdNode.substring(0,strIdNode.length()-1);
-	    			if (!IntersectionMap.containsKey(keyNode)){
-	    				ArrayList<String> ch = new ArrayList<String>();
-	    				IntersectionMap.put(keyNode, ch);
-	    				IntersectionMap.get(keyNode).add(keyNode);
-	    			}// if IntersectionMap
-	    			IntersectionMap.get(keyNode).add(strIdNode);
-				}//if Character
-				*/
-			
 			}//for interator String
 		}//for interator ptline
-
-		/*****************************************************************************
-		*Calculates the travel time of each link and stores these data in ptTimeTable
-		******************************************************************************/
-		ptTimeTable.calculateTravelTimes(ptNetworkLayer);  //??
-		ptTimeTable.setMaps(linkTravelTimeMap);
 		
-		/*********************************
-		 *Create Transfer Links
-		 *********************************/
+		// *Create Transfer Links
 		int maxLinkKey=0;
-		Iterator it = IntersectionMap.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
-			List chList1 = (ArrayList) pairs.getValue();
-			List chList2 = (ArrayList) pairs.getValue();
 
+		for (ArrayList chList : IntersectionMap.values()) {
+			List chList1 = chList;
+			List chList2 = chList;
 			if (chList1.size() > 1) {
 				for (Iterator<String> iter1 = chList1.iterator(); iter1.hasNext();) {
 					String idNode1 = iter1.next();
@@ -164,22 +163,7 @@ public class PTNetworkFactory2 {
 				}// for iter1
 			}// if chlist
 		}// while
-		it = null;
-		/*******************/
-	
-		
-		//write the conplete PTNetwork (with transfers) into the definitive PT Network File
-		System.out.println("writing pt network...");
-		new NetworkWriter(ptNetworkLayer, OutFileName).write();
-		System.out.println("done.");
-		
-		
-		
-		return ptNetworkLayer;
-	}//Create Ptnetwork
-	
-	
-	
+	}//createTransferLinks
 	
 	public PTNode CreateWalkingNode(NetworkLayer ptNetworkLayer,IdImpl idNode, Coord coord) {
 		PTNode ptNode = new PTNode(idNode, coord, "Walking");

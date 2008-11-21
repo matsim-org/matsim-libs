@@ -5,6 +5,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.Node;
+import org.matsim.network.Link;
 import java.util.Iterator;
 import java.util.Map;
 import playground.mmoyo.PTRouter.PTNode;
@@ -25,25 +26,10 @@ public class PTOb {
 	    this.plansFile= plansFile;
 	    this.ptNetFile= ptNetFileName;
 	    this.ptTimeTable = new PTTimeTable2(timeTableFile);
-		readPTNet();
+	    this.ptNetworkLayer= this.ptNetworkFactory.readNetwork(ptNetFileName,ptTimeTable);
 		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
 	}
 
-	//TODO Create a file with TimeTable information. Why create it memory in every run?
-	
-	private void readPTNet(){
-		this.ptNetworkLayer= new NetworkLayer(new NetworkFactory());
-		new MatsimNetworkReader(this.ptNetworkLayer).readFile(this.ptNetFile);
-		Iterator iter = ptNetworkLayer.getNodes().entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			Node node= (Node) entry.getValue();
-			PTNode ptNode= new PTNode(new IdImpl(node.getId().toString()),node.getCoord(),node.getType());
-			entry.setValue(ptNode);
-		}
-		iter = null;
-	}
-	
 	public void createPTNet(String inNetFile){
 		this.ptNetworkLayer = ptNetworkFactory.createNetwork(inNetFile, this.ptTimeTable, ptNetFile);
 	}

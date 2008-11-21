@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -52,10 +51,9 @@ public class PTActWriter {
 	
 	public void writePTActsLegs(){
 		Population newPopulation = new org.matsim.population.Population(false);
-		
 		int x=0;
 		for (Person person: this.population.getPersons().values()) {
-			//Person person = population.getPerson("1005733");
+			//Person person = population.getPerson("2237901");
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 			
@@ -100,7 +98,6 @@ public class PTActWriter {
 			person.removeUnselectedPlans();
 			newPopulation.addPerson(person);
 			x++;
-			
 		}//for person
 	
 		//Write outplan XML
@@ -109,8 +106,6 @@ public class PTActWriter {
 		Gbl.getConfig().plans().setOutputVersion("v4");
 		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
-
-		
 	}//createPTActs
 
 	
@@ -213,7 +208,7 @@ public class PTActWriter {
 			
 			if (link.getType().equals("Standard")){
 				if (first){ //first PTAct: getting on
-					newPlan.addAct(newPTAct("Wait PT Vehicle", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));	
+					newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime , linkTravelTime, accumulatedTime + linkTravelTime));	
 					accumulatedTime =accumulatedTime+ linkTravelTime;
 					first=false;
 				}
@@ -229,7 +224,7 @@ public class PTActWriter {
 					arrTime= depTime+ legTravelTime;
 					legDistance=legDistance + linkDistance;  
 					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.pt, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));	
-					newPlan.addAct(newPTAct("Getting off the PT Vehicle", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
+					newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
 				}
 				
 			
@@ -238,7 +233,7 @@ public class PTActWriter {
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
 					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.pt, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
-					newPlan.addAct(newPTAct("Wait PT Vehicle", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
+					newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					first=false;
 				}
 				/*

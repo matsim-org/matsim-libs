@@ -85,7 +85,7 @@ public class PTTimeTable2{
 	}
 	
 	public double GetTravelTime(Link link){
-		return linkTravelTimeMap.get(link.getId());
+		return linkTravelTimeMap.get(link.getId()); 
 	}
 
 	//minutes

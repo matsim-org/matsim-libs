@@ -14,11 +14,11 @@ public class PTControler2 {
 	private static final String INPTNETFILE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/inptnetfile.xml";
 	private static final String ZURICHPTN= "../shared-svn/studies/schweiz-ivtch/pt-experimental/network.xml";
 	private static final String ZURICHPTTIMETABLE= "../shared-svn/studies/schweiz-ivtch/pt-experimental/PTTimetable.xml";
-	private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
-	private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
+	//private static final String ZURICHPTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/plans.xml";
+	//private static final String OUTPUTPLANS= "../shared-svn/studies/schweiz-ivtch/pt-experimental/output_plans.xml";
 	
-	//private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
-	//private static final String OUTPUTPLANS= "c://output_plans.xml";
+	private static final String ZURICHPTPLANS= "C://Users/manuel/Desktop/TU/Zuerich/plans.xml";
+	private static final String OUTPUTPLANS= "c://output_plans.xml";
 	
 	/*
 	//Variables for the net 5x5
