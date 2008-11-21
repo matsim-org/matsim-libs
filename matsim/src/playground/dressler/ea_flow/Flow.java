@@ -37,9 +37,9 @@ import playground.dressler.ea_flow.Path.PathEdge;
  */
 
 public class Flow {
-	
+////////////////////////////////////////////////////////////////////////////////////////	
 //--------------------------FIELDS----------------------------------------------------//
-	
+////////////////////////////////////////////////////////////////////////////////////////	
 	/**
 	 * The network on which we find routes. We expect the network to change
 	 * between runs!
@@ -91,12 +91,11 @@ public class Flow {
 	 * flag for debug mode
 	 */
 	@SuppressWarnings("unused")
-	private static boolean _debug = false;
+	private static int _debug = 0;
 	
-	
-//-------------------------------Methods-----------------------------------------//
-	
+///////////////////////////////////////////////////////////////////////////////////	
 //-----------------------------Constructors--------------------------------------//	
+///////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Constructor that initializes a zero flow over time on the specified network
@@ -167,8 +166,10 @@ public class Flow {
 		}
 		return nonactives;
 	}
-//--------------------Flow handling Methods-------------------------------------//	
 	
+//////////////////////////////////////////////////////////////////////////////////
+//--------------------Flow handling Methods-------------------------------------//	
+//////////////////////////////////////////////////////////////////////////////////	
 	/**
 	 * Method to determine whether a Node is a Source with positive demand
 	 * @param node Node that is checked
@@ -205,16 +206,23 @@ public class Flow {
 			Link link = edge.getEdge();
 			int cap =(int) link.getCapacity(1.);
 			int time = edge.getTime();
-			
-//TODO look if residual edges are handled properly   !!!!!
-			
-			int flow = this._flow.get(link).getFlowAt(time);
-			int i = cap-flow;
-			if (i<0){
-				throw new IllegalArgumentException("too much flow on " + edge);
+			//check forward capacity
+			if(edge.isForward()){
+				int flow = this._flow.get(link).getFlowAt(time);
+				int i = cap-flow;
+				if (i<0){
+					throw new IllegalArgumentException("too much flow on " + edge);
+				}
+				if(i<result ){
+					result= i;
+				}
 			}
-			if(i<result ){
-				result= i;
+			// backwards capacity
+			else{
+				int flow = this._flow.get(link).getFlowAt(time-(this._flow.get(link).getTravelTime()));
+				if(flow<result){
+					result= flow;
+				}
 			}
 		}
 		return result;
@@ -233,12 +241,7 @@ public class Flow {
 			if(edge.isForward()){
 				flow.augment(time, gamma, (int)link.getCapacity(1.));
 			}else{
-				
-				
-//TODO look at what time to raise!!!!
-				
-
-				flow.augmentreverse(time, gamma);
+				flow.augmentreverse((time-this._flow.get(link).getTravelTime()), gamma);
 			}
 		}
 		path.setFlow(gamma);
@@ -275,8 +278,10 @@ public class Flow {
 		return this._nonactives.get(node);
 	}
 	
-	
+////////////////////////////////////////////////////////////////////////////////////
 //-----------evaluation methods---------------------------------------------------//
+////////////////////////////////////////////////////////////////////////////////////
+	
 	/**
 	 * gives back an array containing the amount of flow into the sink for all time steps from 0 to time horizon
 	 */
@@ -344,9 +349,13 @@ public class Flow {
 		}
 		return strb2.toString();
 	}
-	
-//-------------------Getters Setters toString---------------------------------------//	
 
+	
+//////////////////////////////////////////////////////////////////////////////////////
+//-------------------Getters Setters toString---------------------------------------//	
+//////////////////////////////////////////////////////////////////////////////////////
+	
+	
 	/**
 	 * returns a String representation of a Path
 	 */
@@ -358,7 +367,7 @@ public class Flow {
 		}
 		return strb.toString();
 	}
-	
+
 	/**
 	 * @return the _demands
 	 */
@@ -419,12 +428,8 @@ public class Flow {
 	 * setter for debug mode
 	 * @param debug debug mode true is on
 	 */
-	public static void debug(boolean debug){
+	public static void debug(int debug){
 		Flow._debug=debug;
 	}
-	
-//---------------Commented out stuff---------------------------------------------------//	
-	
-	
-	
+
 }

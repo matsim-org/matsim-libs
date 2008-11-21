@@ -414,7 +414,7 @@ public class EdgeIntervalls {
 		}
 		int oldflow= i.getFlow();
 		if(oldflow-f <0){
-			throw new IllegalArgumentException("flow wold get negative");
+			throw new IllegalArgumentException("flow would get negative");
 		}
 		i.setFlow(oldflow-f);
 		if (before!=null){
