@@ -17,6 +17,8 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 
+import playground.kai.urbansim.ids.LocationId;
+
 /**
  * @author nagel
  *

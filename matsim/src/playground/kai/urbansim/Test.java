@@ -17,6 +17,7 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
@@ -38,6 +39,7 @@ import org.matsim.world.Location;
  * 
  * Not all "parcel" models work, however.  For example, seattle_parcel in oct08 seemed to be "cut out" from
  * psrc_parcel, and care was not taken to make sure that the JobIds in the persons still point to something.
+ * Or maybe I made a mistake on my side.
  * 
  * @author nagel
  *
@@ -54,10 +56,10 @@ public class Test {
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
 		
 		ReadFromUrbansim readFromUrbansim ;
-		if ( U_MODEL_TYPE==U_CELL ) {
-//			readFromUrbansim = new ReadFromUrbansimCellModel() ;
-		} else if ( U_MODEL_TYPE==U_PARCEL ) {
+		if ( U_MODEL_TYPE==U_PARCEL ) {
 			readFromUrbansim = new ReadFromUrbansimParcelModel() ;
+//		} else if ( U_MODEL_TYPE==U_CELL ) {
+//			readFromUrbansim = new ReadFromUrbansimCellModel() ;
 		} else {
 			log.fatal("not implemented" ) ;	System.exit(-1);
 		}
@@ -73,18 +75,39 @@ public class Test {
 		Population population = new Population(Population.NO_STREAMING);
 		readFromUrbansim.readPersons( population, facilities, 0.01 ) ;
 				
-//		PopulationWriter popWriter = new PopulationWriter(population,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
-//		popWriter.write();
+		PopulationWriter popWriter = new PopulationWriter(population,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
+		popWriter.write();
+		
+		// construct urbansim zones (need them for output later)
+		Facilities zones = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
+		readFromUrbansim.readZones( zones, facilities ) ;
 
 		System.out.println("### DONE with demand generation from urbansim ###") ;
+		System.gc() ;
 		
 		Config config = Gbl.createConfig(args);
 		ScenarioData scenarioData = new ScenarioData(config) ;
 		NetworkLayer network = scenarioData.getNetwork() ;
+		
+		log.info("cleaning network ...");
+		NetworkCleaner nwCleaner = new NetworkCleaner() ;
+		nwCleaner.run( network ) ;
+		log.info("... finished cleaning network.\n") ;
+
+		config.controler().setOutputDirectory(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"output") ;
+		log.warn("matsim output path set to fixed value to make sure that it is at correct place for feedback to urbansim");
 
 		Controler controler = new Controler(config,network,population) ;
 		controler.setOverwriteFiles(true) ;
 		controler.run() ;
 
+		for ( Iterator it = zones.getFacilities().values().iterator(); it.hasNext(); ) {
+			Facility fromZone = (Facility) it.next();
+			Node fromNode = network.getNearestNode(fromZone.getCenter()) ; 
+			for ( Iterator it2 = zones.getFacilities().values().iterator(); it.hasNext(); ) {
+				Facility toZone = (Facility) it.next();
+				Node toNode = network.getNearestNode( toZone.getCenter() ) ;
+			}
+		}
 	}
 }

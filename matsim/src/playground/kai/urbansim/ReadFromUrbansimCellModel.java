@@ -22,7 +22,13 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.ExeRunner;
+import org.matsim.world.Layer;
 import org.matsim.world.Location;
+
+import playground.kai.urbansim.ids.HHId;
+import playground.kai.urbansim.ids.JobIdFactory;
+import playground.kai.urbansim.ids.LocationId;
+import playground.kai.urbansim.ids.LocationIdFactory;
 
 /**
  * This is meant to read urbansim input from the cell model.  Since in those models the persons don't know where they work,
@@ -73,7 +79,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 	public void readPersons( Population population, Facilities facilities, double fraction) {
 		Map<Id,Id> gridcellFromJob = new HashMap<Id,Id>() ;
-		Utils.readKV( gridcellFromJob, "job_id:i4", new JobIdBuilder(), "grid_id:i4", new LocationIdBuilder(), 
+		Utils.readKV( gridcellFromJob, "job_id:i4", new JobIdFactory(), "grid_id:i4", new LocationIdFactory(), 
 				"../opus/opus_matsim/tmp/jobs.tab" ) ;
 		readPersonsFromHouseholds( population, facilities, fraction ) ;
 		PseudoGravityModel gravMod = new PseudoGravityModel( population, facilities, gridcellFromJob ) ;
@@ -146,6 +152,11 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void readZones(Facilities zones, Layer parcels) {
+		log.fatal("not implemented; aborting ...") ;
+		System.exit(-1);
 	}
 
 

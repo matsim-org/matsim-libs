@@ -18,6 +18,8 @@ import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.IOUtils;
 
+import playground.kai.urbansim.ids.IdFactory;
+
 /**
  * Various standalone utilities that don't need to be inside a specific package
  * 
@@ -26,7 +28,7 @@ import org.matsim.utils.io.IOUtils;
  */
 public class Utils {
 
-	public static void readKV( Map<Id,Id> yFromX, String key, IdBuilder keyIdBuilder, String value, IdBuilder valueIdBuilder, String filename ) {
+	public static void readKV( Map<Id,Id> yFromX, String key, IdFactory keyIdBuilder, String value, IdFactory valueIdBuilder, String filename ) {
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
 	

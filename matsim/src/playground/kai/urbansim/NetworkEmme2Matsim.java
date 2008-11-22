@@ -36,7 +36,7 @@ public class NetworkEmme2Matsim {
 	private static final int PSRC = 0 ;
 	private static final int EUGENE = 1 ;
 
-	private static final int NW_NAME = EUGENE ;
+	private static final int NW_NAME = PSRC ;
 
 	public static void readNetwork( NetworkLayer network ) {
 		network.setCapacityPeriod(3600.) ;
@@ -45,7 +45,8 @@ public class NetworkEmme2Matsim {
 
 		// read emme3 network
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader("/home/nagel/tmp/tab/net1.out" ) ;
+//			BufferedReader reader = IOUtils.getBufferedReader("/home/nagel/tmp/tab/net1.out" ) ;
+			BufferedReader reader = IOUtils.getBufferedReader("/Users/nagel/eclipse/shared-svn/studies/north-america/us/psrc/network/emme-export/net1.out" ) ;
 
 			boolean weAreReadingNodes = true ;
 			long linkCnt = 0 ;
