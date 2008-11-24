@@ -6,15 +6,19 @@ import java.util.LinkedList;
 import org.matsim.events.PersonEvent;
 
 import playground.wrashid.DES.EventLog;
+import playground.wrashid.DES.utils.EventLibrary;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class DEQSimEventFileTravelTimeComparator extends
 TestHandlerDetailedEventChecker {
 	
 	public String pathToDEQSimEventsFile=null;
+	private double tolerenzPercentValue=0.0;
+	private ArrayList<EventLog> deqSimLog=null;
 	
-	public DEQSimEventFileTravelTimeComparator(String path){
-		pathToDEQSimEventsFile=path;
+	public DEQSimEventFileTravelTimeComparator(String path, double tolerenzPercentValue){
+		this.pathToDEQSimEventsFile=path;
+		this.tolerenzPercentValue=tolerenzPercentValue;
 	}
 	
 	/*
@@ -25,7 +29,26 @@ TestHandlerDetailedEventChecker {
 	 * done in different ways by the two simulations 
 	 */
 	public void checkAssertions() {
-		// TODO: implement this.
+		deqSimLog=CppEventFileParser.parseFile(pathToDEQSimEventsFile);
+		assertEquals(true,checkDifferenceTravelTime());
 	}
+	
+	
+	
+	/*
+	 * - The difference in travel time should be smaller than the tolerenz percent value	 * 
+	 */
+	private boolean checkDifferenceTravelTime(){
+		boolean result=false;
+		double deqSimTravelSum=EventLog.getSumTravelTime(deqSimLog);
+		double javaSimTravelSum=EventLibrary.getSumTravelTime(allEvents);
+		
+		if ((Math.abs(deqSimTravelSum - javaSimTravelSum)/deqSimTravelSum)<tolerenzPercentValue){
+			result=true;
+		}
+		
+		return result;
+	}
+	
 
 }
