@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.Utility;
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 
 /**

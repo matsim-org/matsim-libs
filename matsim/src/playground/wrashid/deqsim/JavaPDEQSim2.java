@@ -42,7 +42,7 @@ import playground.wrashid.PDES2.Road;
 import playground.wrashid.PDES2.Scheduler;
 import playground.wrashid.PDES2.SimulationParameters;
 import playground.wrashid.PDES2.Vehicle;
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 public class JavaPDEQSim2 {
 

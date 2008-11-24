@@ -15,7 +15,7 @@ import org.matsim.network.Link;
 
 import org.matsim.gbl.Gbl;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 public class Scheduler {
 	private double simTime=0;

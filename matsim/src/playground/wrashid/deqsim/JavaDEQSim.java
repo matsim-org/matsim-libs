@@ -43,7 +43,7 @@ import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.Vehicle;
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 public class JavaDEQSim {
 

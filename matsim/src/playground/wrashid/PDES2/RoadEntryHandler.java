@@ -8,7 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.network.Link;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 public class RoadEntryHandler {
 

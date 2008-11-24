@@ -1,4 +1,4 @@
-package playground.wrashid.DES.utils;
+package playground.wrashid.DES.util;
 public class Timer {
 	private long startTime = 0;
 	private long endTime = 0;

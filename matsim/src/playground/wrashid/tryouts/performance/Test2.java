@@ -1,5 +1,5 @@
 package playground.wrashid.tryouts.performance;
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 public class Test2 {
 

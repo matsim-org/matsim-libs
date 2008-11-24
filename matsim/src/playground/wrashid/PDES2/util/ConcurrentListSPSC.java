@@ -3,7 +3,7 @@ package playground.wrashid.PDES2.util;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 // optimized for single producer, single consumer
 // it can be used by multiple producers, but it is not optimized for that case
 public class ConcurrentListSPSC<T> {

@@ -2,7 +2,7 @@ package playground.wrashid.deqsim;
 
 import org.matsim.controler.Controler;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 
 class DESController extends Controler {
 	public DESController(final String[] args) {

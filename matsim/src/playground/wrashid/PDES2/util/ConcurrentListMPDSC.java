@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import playground.wrashid.DES.utils.Timer;
+import playground.wrashid.DES.util.Timer;
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
 // the application allows for this case

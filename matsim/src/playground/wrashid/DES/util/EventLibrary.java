@@ -1,4 +1,4 @@
-package playground.wrashid.DES.utils;
+package playground.wrashid.DES.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
