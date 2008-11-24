@@ -23,19 +23,22 @@
  */
 package playground.johannes.snowball;
 
+import org.matsim.gbl.Gbl;
 import org.xml.sax.Attributes;
 
-import playground.johannes.graph.GraphMLReader;
-import playground.johannes.graph.SparseGraph;
+import playground.johannes.graph.AbstractSparseGraph;
+import playground.johannes.graph.SparseEdge;
+import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.io.AbstractGraphMLReader;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphMLReader extends GraphMLReader {
+public class SampledGraphMLReader extends AbstractGraphMLReader {
 
 	@Override
-	protected SparseGraph newGraph(Attributes attrs) {
+	protected AbstractSparseGraph newGraph(Attributes attrs) {
 		return new SampledGraph();
 	}
 
@@ -44,5 +47,21 @@ public class SampledGraphMLReader extends GraphMLReader {
 		return (SampledGraph) super.readGraph(file);
 	}
 
-	
+	@Override
+	protected SparseEdge addEdge(SparseVertex v1, SparseVertex v2, Attributes attrs) {
+		return ((SampledGraph)graph).addEdge((SampledVertex)v1, (SampledVertex)v2);
+	}
+
+	@Override
+	protected SparseVertex addVertex(Attributes attrs) {
+		return ((SampledGraph)graph).addVertex();
+	}
+
+	public static void main(String args[]) {
+		Gbl.startMeasurement();
+		AbstractSparseGraph g = new SampledGraphMLReader().readGraph("/Users/fearonni/vsp-work/socialnets/devel/snowball/data/networks/cond-mat-2005-gc.graphml");
+		Gbl.printElapsedTime();
+		System.out.println(g.toString());
+		Gbl.printMemoryUsage();
+	}
 }

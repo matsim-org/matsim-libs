@@ -25,23 +25,28 @@ package playground.johannes.snowball;
 
 import java.util.Set;
 
-import playground.johannes.graph.SparseGraph;
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.AbstractSparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraph extends SparseGraph {
+public class SampledGraph extends AbstractSparseGraph {
 
-	@Override
-	public SampledEdge addEdge(SparseVertex v1, SparseVertex v2) {
-		return (SampledEdge) super.addEdge(v1, v2);
+	public SampledEdge addEdge(SampledVertex v1, SampledVertex v2) {
+		SampledEdge e = new SampledEdge(v1, v2);
+		if(insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
 	}
 
-	@Override
 	public SampledVertex addVertex() {
-		return (SampledVertex) super.addVertex();
+		SampledVertex v = new SampledVertex();
+		if(insertVertex(v))
+			return v;
+		else
+			return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -54,19 +59,6 @@ public class SampledGraph extends SparseGraph {
 	@Override
 	public Set<? extends SampledVertex> getVertices() {
 		return (Set<? extends SampledVertex>) super.getVertices();
-	}
-
-	@Override
-	protected SampledEdge newEdge(SparseVertex v1, SparseVertex v2) {
-		if(v1 instanceof SampledVertex && v2 instanceof SampledVertex)
-			return new SampledEdge((SampledVertex)v1, (SampledVertex)v2);
-		else
-			throw new IllegalArgumentException("Vertex must be instance of SampledVertex.");
-	}
-
-	@Override
-	protected SampledVertex newVertex() {
-		return new SampledVertex();
 	}
 	
 	public void reset() {

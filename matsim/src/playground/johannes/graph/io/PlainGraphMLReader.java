@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseEdge.java
+ * PlainGraphMLReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,33 +21,35 @@
 /**
  * 
  */
-package playground.johannes.graph;
+package playground.johannes.graph.io;
 
-import org.matsim.utils.collections.Tuple;
+import org.xml.sax.Attributes;
+
+import playground.johannes.graph.AbstractSparseGraph;
+import playground.johannes.graph.PlainGraph;
+import playground.johannes.graph.SparseEdge;
+import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SparseEdge implements Edge {
+public class PlainGraphMLReader extends AbstractGraphMLReader {
 
-	private Tuple<SparseVertex, SparseVertex> vertices;
-	
-	public SparseEdge(SparseVertex v1, SparseVertex v2) {
-		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
-	}
-	
-	public SparseVertex getOpposite(Vertex v) {
-		if(vertices.getFirst().equals(v))
-			return vertices.getSecond();
-		else if(vertices.getSecond().equals(v))
-			return vertices.getFirst();
-		else
-			return null;
+	@Override
+	protected SparseEdge addEdge(SparseVertex v1, SparseVertex v2,
+			Attributes attrs) {
+		return ((PlainGraph)graph).addEdge(v1, v2);
 	}
 
-	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
-		return vertices;
+	@Override
+	protected SparseVertex addVertex(Attributes attrs) {
+		return ((PlainGraph)graph).addVertex();
+	}
+
+	@Override
+	protected AbstractSparseGraph newGraph(Attributes attrs) {
+		return new PlainGraph();
 	}
 
 }

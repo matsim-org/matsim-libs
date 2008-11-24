@@ -35,8 +35,8 @@ import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 
 import playground.johannes.graph.Graph;
-import playground.johannes.graph.GraphMLReader;
 import playground.johannes.graph.Vertex;
+import playground.johannes.graph.io.PlainGraphMLReader;
 import playground.johannes.statistics.WeightedStatistics;
 
 /**
@@ -54,7 +54,7 @@ public class NTransitivity {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		logger.info("Loading graph " + args[0] + "...");
-		Graph g = new GraphMLReader().readGraph(args[0]);
+		Graph g = new PlainGraphMLReader().readGraph(args[0]);
 		Gbl.printMemoryUsage();
 
 		TDoubleDoubleHashMap hist = getNTransitivity(g, Integer.parseInt(args[2]));

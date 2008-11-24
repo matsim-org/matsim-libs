@@ -139,15 +139,27 @@ public class UnweightedDijkstra<V extends Vertex> {
 			decorate(delegate);
 		}
 
+		/* (non-Javadoc)
+		 * @see playground.johannes.graph.GraphProjection#addVertex(playground.johannes.graph.Vertex)
+		 */
+		@Override
+		public VertexDecorator<V> addVertex(V delegate) {
+			VertexDecorator<V> v = new DijkstraVertex(delegate);
+			if(insertVertex(v))
+				return v;
+			else 
+				return null;
+		}
+
 		public DijkstraVertex getVertex(V v) {
 //			return vMapping.get(v);
 			return (DijkstraVertex) super.getVertex(v);
 		}
 
-		@Override
-		protected VertexDecorator<V> newVertex() {
-			return new DijkstraVertex();
-		}
+//		@Override
+//		protected VertexDecorator<V> newVertex() {
+//			return new DijkstraVertex();
+//		}
 	}
 	
 	public class DijkstraVertex extends VertexDecorator<V> implements Comparable<DijkstraVertex>{
@@ -158,12 +170,10 @@ public class UnweightedDijkstra<V extends Vertex> {
 		
 		private int distance;
 		
-//		private ArrayList<DijkstraVertex> predecessors;
-//		private LinkedList<DijkstraVertex> predecessors;
 		private DijkstraVertex[] predecessors;
 		
-		public DijkstraVertex() {
-			super();
+		public DijkstraVertex(V delegate) {
+			super(delegate);
 		}
 		
 		public boolean isSettled() {

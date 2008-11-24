@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseEdge.java
+ * GraphML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,33 +21,35 @@
 /**
  * 
  */
-package playground.johannes.graph;
-
-import org.matsim.utils.collections.Tuple;
+package playground.johannes.graph.io;
 
 /**
  * @author illenberger
  *
  */
-public class SparseEdge implements Edge {
+interface GraphML {
 
-	private Tuple<SparseVertex, SparseVertex> vertices;
+	static final String GRAPHML_TAG = "graphml";
 	
-	public SparseEdge(SparseVertex v1, SparseVertex v2) {
-		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
-	}
+	static final String XMLNS_TAG = "xmlns";
 	
-	public SparseVertex getOpposite(Vertex v) {
-		if(vertices.getFirst().equals(v))
-			return vertices.getSecond();
-		else if(vertices.getSecond().equals(v))
-			return vertices.getFirst();
-		else
-			return null;
-	}
-
-	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
-		return vertices;
-	}
-
+	static final String XMLNS_URL = "http://graphml.graphdrawing.org/xmlns";
+	
+	static final String GRAPH_TAG = "graph"; 
+	
+	static final String EDGEDEFAULT_TAG = "edgedefault";
+	
+	static final String UNDIRECTED = "undirected";
+	
+	static final String DIRECTED = "directed";
+	
+	static final String ID_TAG = "id";
+	
+	static final String SOURCE_TAG = "source";
+	
+	static final String TARGET_TAG = "target";
+	
+	static final String NODE_TAG = "node";
+	
+	static final String EDGE_TAG = "edge";
 }

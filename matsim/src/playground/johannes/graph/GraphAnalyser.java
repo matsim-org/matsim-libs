@@ -32,6 +32,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.graph.GraphStatistics.GraphDistance;
+import playground.johannes.graph.io.PlainGraphMLReader;
 
 /**
  * @author illenberger
@@ -47,7 +48,7 @@ public class GraphAnalyser {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		logger.info("Loading graph " + args[0] + "...");
-		Graph g = new GraphMLReader().readGraph(args[0]);
+		Graph g = new PlainGraphMLReader().readGraph(args[0]);
 		Gbl.printMemoryUsage();
 		
 		int numEdges = g.getEdges().size();
@@ -123,5 +124,4 @@ public class GraphAnalyser {
 			writer.close();
 		}
 	}
-
 }

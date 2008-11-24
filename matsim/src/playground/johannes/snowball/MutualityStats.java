@@ -28,6 +28,7 @@ import gnu.trove.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -62,12 +63,12 @@ public class MutualityStats extends GraphPropertyEstimator {
 		TIntObjectHashMap<TDoubleArrayList> degreeMCorrelation = new TIntObjectHashMap<TDoubleArrayList>();
 		for (VertexDecorator<SampledVertex> v : graph.getVertices()) {
 			if (!v.getDelegate().isAnonymous()) {
-				Set<? extends Vertex> n1Set = v.getNeighbours();
+				List<? extends Vertex> n1List = v.getNeighbours();
 				Set<Vertex> n2Set = new HashSet<Vertex>();
 				int numPaths = 0;
-				for (Vertex n1 : n1Set) {
+				for (Vertex n1 : n1List) {
 					for (Vertex n2 : n1.getNeighbours()) {
-						if (n2 != v && !n1Set.contains(n2)) {
+						if (n2 != v && !n1List.contains(n2)) {
 							n2Set.add(n2);
 							numPaths++;
 						}

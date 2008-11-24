@@ -23,7 +23,8 @@
  */
 package playground.johannes.graph;
 
-import playground.johannes.ArraySet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author illenberger
@@ -31,15 +32,20 @@ import playground.johannes.ArraySet;
  */
 public class SparseVertex implements Vertex {
 
-	private ArraySet<SparseEdge> edges = new ArraySet<SparseEdge>();
+	private ArrayList<SparseEdge> edges;
 	
-	private ArraySet<SparseVertex> neighbours = new ArraySet<SparseVertex>();
+	private ArrayList<SparseVertex> neighbours;
 	
-	public ArraySet<? extends SparseEdge> getEdges() {
+	protected SparseVertex() {
+		edges = new ArrayList<SparseEdge>();
+		neighbours = new ArrayList<SparseVertex>();
+	}
+	
+	public List<? extends SparseEdge> getEdges() {
 		return edges;
 	}
 
-	public ArraySet<? extends SparseVertex> getNeighbours() {
+	public List<? extends SparseVertex> getNeighbours() {
 		return neighbours;
 	}
 

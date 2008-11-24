@@ -29,12 +29,10 @@ import org.matsim.utils.collections.Tuple;
  * @author illenberger
  *
  */
-public interface Edge<T> {
+public interface Edge {
 
 	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
 	
 	public Vertex getOpposite(Vertex v);
-	
-	public T getAttribute();
 	
 }

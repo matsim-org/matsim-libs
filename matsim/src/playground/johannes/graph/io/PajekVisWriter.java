@@ -118,7 +118,7 @@ public class PajekVisWriter {
 			writer.write(NEW_LINE);
 			
 			for(Object e : g.getEdges()) {
-				Tuple<Ego, Ego> t = ((Edge)e).getVertices();				
+				Tuple<Ego, Ego> t = (Tuple<Ego, Ego>) ((Edge)e).getVertices();				
 				Vertex source = t.getFirst();
 				Vertex target = t.getSecond();
 				writer.write(vertexIds.get(source));

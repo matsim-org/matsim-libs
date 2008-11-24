@@ -20,12 +20,12 @@
 
 package playground.johannes.graph;
 
-import java.util.Set;
+import java.util.List;
 
 public interface Vertex {
 	
-	public Set<? extends Edge> getEdges();
+	public List<? extends Edge> getEdges();
 	
-	public Set<? extends Vertex> getNeighbours();
+	public List<? extends Vertex> getNeighbours();
 
 }

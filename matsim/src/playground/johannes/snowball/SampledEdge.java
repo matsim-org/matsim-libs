@@ -37,7 +37,7 @@ public class SampledEdge extends SparseEdge {
 
 	private EdgeDecorator<SampledEdge> projection;
 	
-	public SampledEdge(SampledVertex v1, SampledVertex v2) {
+	protected SampledEdge(SampledVertex v1, SampledVertex v2) {
 		super(v1, v2);
 	}
 

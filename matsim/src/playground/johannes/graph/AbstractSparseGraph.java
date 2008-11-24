@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseEdge.java
+ * SparseGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,31 +23,57 @@
  */
 package playground.johannes.graph;
 
-import org.matsim.utils.collections.Tuple;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author illenberger
  *
  */
-public class SparseEdge implements Edge {
+public abstract class AbstractSparseGraph implements Graph {
 
-	private Tuple<SparseVertex, SparseVertex> vertices;
+	private LinkedHashSet<SparseVertex> vertices;
 	
-	public SparseEdge(SparseVertex v1, SparseVertex v2) {
-		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
+	private LinkedHashSet<SparseEdge> edges;
+	
+	public AbstractSparseGraph() {
+		vertices = new LinkedHashSet<SparseVertex>();
+		edges = new LinkedHashSet<SparseEdge>();
 	}
 	
-	public SparseVertex getOpposite(Vertex v) {
-		if(vertices.getFirst().equals(v))
-			return vertices.getSecond();
-		else if(vertices.getSecond().equals(v))
-			return vertices.getFirst();
-		else
-			return null;
+	public Set<? extends SparseEdge> getEdges() {
+		return edges;
 	}
 
-	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
+	public Set<? extends SparseVertex> getVertices() {
 		return vertices;
 	}
 
+	protected boolean insertVertex(SparseVertex v) {
+		return vertices.add(v);
+	}
+	
+	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
+		if(!v1.getNeighbours().contains(v2)) {
+			v1.addEdge(e);
+			v2.addEdge(e);
+			return edges.add(e);
+		} else 
+			return false;
+	}
+		
+	public void optimize() {
+		for(SparseVertex v : vertices)
+			v.optimize();
+	}
+	
+	public String toString() {
+		StringBuilder builder = new StringBuilder(60);
+		builder.append("SparseGraph: ");
+		builder.append(String.valueOf(vertices.size()));
+		builder.append(" vertices, ");
+		builder.append(String.valueOf(edges.size()));
+		builder.append(" edges");
+		return builder.toString();
+	}
 }

@@ -35,7 +35,7 @@ public class Ego extends SparseVertex {
 
 	private Person person;
 	
-	public Ego(Person person) {
+	protected Ego(Person person) {
 		this.person = person;
 	}
 	
@@ -43,7 +43,7 @@ public class Ego extends SparseVertex {
 		return person;
 	}
 	
-	public void setPerson(Person person) {
-		this.person = person;
-	}
+//	public void setPerson(Person person) {
+//		this.person = person;
+//	}
 }

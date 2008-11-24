@@ -32,7 +32,8 @@ public class VertexDecorator<V extends Vertex> extends SparseVertex {
 
 	private V delegate;
 	
-	public void setDelegate(V delegate) {
+	protected VertexDecorator(V delegate) {
+		super();
 		this.delegate = delegate;
 	}
 	

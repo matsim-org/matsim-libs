@@ -27,41 +27,35 @@ import java.util.Set;
 
 import org.matsim.population.Person;
 
-import playground.johannes.graph.SparseGraph;
+import playground.johannes.graph.AbstractSparseGraph;
+import playground.johannes.graph.Edge;
+import playground.johannes.graph.SparseEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork extends SparseGraph {
-
+public class SocialNetwork extends AbstractSparseGraph {
+	
 	public Ego addEgo(Person person) {
-		Ego e = (Ego)addVertex();
-		e.setPerson(person);
-		return e;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Set<? extends Ego> getVertices() {
-		return (Set<? extends Ego>) super.getVertices();
-	}
-
-
-	@Override
-	protected Ego newVertex() {
-		return new Ego(null);
+		Ego e = new Ego(person);
+		if(insertVertex(e))
+			return e;
+		else
+			return null;
 	}
 	
-	protected Ego newEgo(Person person) {
-		return new Ego(person);
+	public Edge addEdge(Ego e1, Ego e2) {
+		SparseEdge e = new SparseEdge(e1, e2);
+		if(insertEdge(e, e1, e2))
+			return e;
+		else
+			return null;
 	}
-
-	/**
-	 * 
-	 */
-	public SocialNetwork() {
-		// TODO Auto-generated constructor stub
+	
+	@SuppressWarnings("unchecked")
+	public Set<? extends Ego> getVertices() {
+		return (Set<? extends Ego>) super.getVertices();
 	}
 
 }

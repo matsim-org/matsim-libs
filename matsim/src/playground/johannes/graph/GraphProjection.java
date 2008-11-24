@@ -31,7 +31,7 @@ import java.util.Set;
  * @author illenberger
  *
  */
-public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> extends SparseGraph {
+public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> extends AbstractSparseGraph {
 
 	private G delegate;
 	
@@ -55,36 +55,36 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 		for(Edge e : g.getEdges()) {
 			VertexDecorator<V> v1 = vMapping.get(e.getVertices().getFirst());
 			VertexDecorator<V> v2 = vMapping.get(e.getVertices().getSecond());
-			addEdge(v1, v2);
+			addEdge(v1, v2, (E) e);
 		}
 	}
 	
 	public VertexDecorator<V> getVertex(V v) {
 		return vMapping.get(v);
 	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public EdgeDecorator<E> addEdge(SparseVertex v1, SparseVertex v2) {
-		return (EdgeDecorator<E>) super.addEdge(v1, v2);
-	}
 
 	public EdgeDecorator<E> addEdge(VertexDecorator<V> v1, VertexDecorator<V> v2, E delegate) {
-		EdgeDecorator<E> edge = addEdge(v1, v2);
-		edge.setDelegate(delegate);
-		return edge;
+		EdgeDecorator<E> e = new EdgeDecorator<E>(v1, v2, delegate);
+//		e.setDelegate(delegate);
+		if(insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public VertexDecorator<V> addVertex() {
-		return (VertexDecorator<V>) super.addVertex();
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public VertexDecorator<V> addVertex() {
+//		return (VertexDecorator<V>) super.addVertex();
+//	}
 
 	public VertexDecorator<V> addVertex(V delegate) {
-		VertexDecorator<V> v = addVertex();
-		v.setDelegate(delegate);
-		return v;
+		VertexDecorator<V> v = new VertexDecorator<V>(delegate);
+//		v.setDelegate(delegate);
+		if(insertVertex(v))
+			return v;
+		else
+			return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -99,15 +99,15 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 		return (Set<? extends VertexDecorator<V>>) super.getVertices();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected EdgeDecorator<E> newEdge(SparseVertex v1, SparseVertex v2) {
-		return new EdgeDecorator<E>((VertexDecorator<V>)v1, (VertexDecorator<V>)v2);
-	}
-
-	@Override
-	protected VertexDecorator<V> newVertex() {
-		return new VertexDecorator<V>();
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	protected EdgeDecorator<E> newEdge(SparseVertex v1, SparseVertex v2) {
+//		return new EdgeDecorator<E>((VertexDecorator<V>)v1, (VertexDecorator<V>)v2);
+//	}
+//
+//	@Override
+//	protected VertexDecorator<V> newVertex() {
+//		return new VertexDecorator<V>();
+//	}
 
 }

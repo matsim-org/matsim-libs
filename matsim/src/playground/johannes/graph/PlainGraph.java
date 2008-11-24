@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseEdge.java
+ * PlainGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,31 +23,26 @@
  */
 package playground.johannes.graph;
 
-import org.matsim.utils.collections.Tuple;
-
 /**
  * @author illenberger
  *
  */
-public class SparseEdge implements Edge {
+public class PlainGraph extends AbstractSparseGraph {
 
-	private Tuple<SparseVertex, SparseVertex> vertices;
-	
-	public SparseEdge(SparseVertex v1, SparseVertex v2) {
-		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
-	}
-	
-	public SparseVertex getOpposite(Vertex v) {
-		if(vertices.getFirst().equals(v))
-			return vertices.getSecond();
-		else if(vertices.getSecond().equals(v))
-			return vertices.getFirst();
+	public SparseVertex addVertex() {
+		SparseVertex v = new SparseVertex();
+		if(insertVertex(v))
+			return v;
 		else
 			return null;
 	}
-
-	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
-		return vertices;
+	
+	public SparseEdge addEdge(SparseVertex v1, SparseVertex v2) {
+		SparseEdge e = new SparseEdge(v1, v2);
+		if(insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
 	}
-
+	
 }

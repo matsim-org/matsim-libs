@@ -108,11 +108,11 @@ public class GraphStatistics {
 		int nVertex2Steps = 0;
 
 		for (Vertex v : g.getVertices()) {
-			Set<? extends Vertex> n1Set = v.getNeighbours();
+			List<? extends Vertex> n1List = v.getNeighbours();
 			Set<Vertex> n2Set = new HashSet<Vertex>();
-			for (Vertex n1 : n1Set) {
+			for (Vertex n1 : n1List) {
 				for (Vertex n2 : n1.getNeighbours()) {
-					if (n2 != v && !n1Set.contains(n2)) {
+					if (n2 != v && !n1List.contains(n2)) {
 						n2Set.add(n2);
 						len2Paths++;
 					}
@@ -129,7 +129,7 @@ public class GraphStatistics {
 		double sum = 0;
 		double squareSum = 0;
 
-		for (Edge<?> e : g.getEdges()) {
+		for (Edge e : g.getEdges()) {
 			Vertex v1 = e.getVertices().getFirst();
 			Vertex v2 = e.getVertices().getSecond();
 			int d_v1 = v1.getEdges().size();
@@ -262,8 +262,12 @@ public class GraphStatistics {
 		}
 
 		@Override
-		protected VertexDecorator<V> newVertex() {
-			return new CentralityVertex<V>();
+		public VertexDecorator<V> addVertex(V delegate) {
+			VertexDecorator<V> v = new CentralityVertex<V>(delegate);
+			if(insertVertex(v))
+				return v;
+			else
+				return null;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -276,10 +280,14 @@ public class GraphStatistics {
 	}
 	
 	public static class CentralityVertex<V extends Vertex> extends VertexDecorator<V> {
-		
+
 		private double closeness;
 
 		private double betweenness;
+		
+		protected CentralityVertex(V delegate) {
+			super(delegate);
+		}
 
 		public double getCloseness() {
 			return closeness;
