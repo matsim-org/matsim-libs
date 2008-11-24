@@ -26,7 +26,6 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.MultithreadedModuleA;
@@ -46,6 +45,7 @@ public class ClusterModule implements StrategyModule {
 	private final LegTravelTimeEstimator	estimator;
 	private static int						i=0;
 	private final double					minimumTime;
+	private final ScheduleCleaner			cleaner;
 	
 	
 	
@@ -64,6 +64,7 @@ public class ClusterModule implements StrategyModule {
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.minimumTime			= 1800;
+		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);
 		
 	}
 	
@@ -86,6 +87,7 @@ public class ClusterModule implements StrategyModule {
 	}
 
 	public void finish(){
+
 		if (!aList.isEmpty()){
 			module.handlePlan(aList.get(0));
 		}
@@ -97,153 +99,76 @@ public class ClusterModule implements StrategyModule {
 		if (aList.size()>1){
 			
 			for (int x=1;x<aList.size();x++){
-				Plan bestPlan = new Plan (aList.get(0).getPerson());
-				bestPlan.copyPlan(aList.get(0));
-				ArrayList<Object> al = aList.get(x).getActsLegs();
-				if(al.size()>bestPlan.getActsLegs().size()){ 
-					int i;
-					for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
-						al.remove(i);
-						al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-					for (int j = i; j<al.size()-2;j=j+0){
-						al.remove(j);
-					}
-				}
-				else if(al.size()<bestPlan.getActsLegs().size()){
-					int i;
-					for (i = 2; i<al.size()-2;i++){
-						al.remove(i);
-						al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-					for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
-						al.add(j, bestPlan.getActsLegs().get(j));
-					}
-				}
-				else {
-					for (int i = 2; i<al.size()-2;i++){
-					al.remove(i);
-					al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-				}
+				
+				this.writePlan(aList.get(0), aList.get(x));
+			
 				this.locator.handlePlan(aList.get(x));
 				this.router.run(aList.get(x));
-				double move = this.cleanSchedule(((Act)(aList.get(x).getActsLegs().get(0))).getEndTime(), aList.get(x));
-				int loops=1;
-				while (move!=0.0){
-					loops++;
-					move = this.cleanSchedule(java.lang.Math.max(((Act)(aList.get(x).getActsLegs().get(0))).getEndTime()-move,0), aList.get(x));
-					if (loops>3) {
-						for (int i=2;i< aList.get(x).getActsLegs().size()-4;i+=2){
-							((Act)aList.get(x).getActsLegs().get(i)).setDuration(this.minimumTime);
-						}
-						move = this.cleanSchedule(this.minimumTime, bList.get(x));
-						if (move!=0.0){
-							throw new IllegalArgumentException("No valid plan possible for person "+aList.get(x).getPerson().getId());
-						}
-					}
-				}
-				
+				this.cleanUpPlan(aList.get(x));
 			}
 		}
 		if (bList.size()>1){
 			
 			for (int x=1;x<bList.size();x++){
-				Plan bestPlan = new Plan (bList.get(0).getPerson());
-				bestPlan.copyPlan(bList.get(0));
-				ArrayList<Object> al = bList.get(x).getActsLegs();
-				if(al.size()>bestPlan.getActsLegs().size()){ 
-					int i;
-					for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
-						al.remove(i);
-						al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-					for (int j = i; j<al.size()-2;j=j+0){
-						al.remove(j);
-					}
-				}
-				else if(al.size()<bestPlan.getActsLegs().size()){
-					int i;
-					for (i = 2; i<al.size()-2;i++){
-						al.remove(i);
-						al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-					for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
-						al.add(j, bestPlan.getActsLegs().get(j));
-					}
-				}
-				else {
-					for (int i = 2; i<al.size()-2;i++){
-					al.remove(i);
-					al.add(i, bestPlan.getActsLegs().get(i));	
-					}
-				}
+				
+				this.writePlan(bList.get(0), bList.get(x));
+				
 				this.locator.handlePlan(bList.get(x));
 				this.router.run(bList.get(x));
-				double move = this.cleanSchedule(((Act)(bList.get(x).getActsLegs().get(0))).getEndTime(), bList.get(x));
-				int loops=1;
-				while (move!=0.0){
-					loops++;
-					move = this.cleanSchedule(java.lang.Math.max(((Act)(bList.get(x).getActsLegs().get(0))).getEndTime()-move,0), bList.get(x));
-					if (loops>3) {
-						for (int i=2;i< bList.get(x).getActsLegs().size()-4;i+=2){
-							((Act)bList.get(x).getActsLegs().get(i)).setDuration(this.minimumTime);
-						}
-						move = this.cleanSchedule(this.minimumTime, bList.get(x));
-						if (move!=0.0){
-							throw new IllegalArgumentException("No valid plan possible for person "+bList.get(x).getPerson().getId());
-						}
-					}
-				}
+				this.cleanUpPlan(bList.get(x));
 			}
 		}
-		
-		
 	}
 	
-	public double cleanSchedule (double now, Plan plan){
-		
-		((Act)(plan.getActsLegs().get(0))).setEndTime(now);
-		((Act)(plan.getActsLegs().get(0))).setDuration(now);
-			
-		double travelTime;
-		for (int i=1;i<=plan.getActsLegs().size()-2;i=i+2){
-			((Leg)(plan.getActsLegs().get(i))).setDepartureTime(now);
-			travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), now, (Act)(plan.getActsLegs().get(i-1)), (Act)(plan.getActsLegs().get(i+1)), (Leg)(plan.getActsLegs().get(i)));
-			((Leg)(plan.getActsLegs().get(i))).setArrivalTime(now+travelTime);
-			((Leg)(plan.getActsLegs().get(i))).setTravelTime(travelTime);
-			now+=travelTime;
-			
-			if (i!=plan.getActsLegs().size()-2){
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()-travelTime, 0);
-				((Act)(plan.getActsLegs().get(i+1))).setDuration(travelTime);	
-				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
-				now+=travelTime;
-			}
-			else {
-				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
-				if (86400>now){
-					((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
-					((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
+	private void cleanUpPlan (Plan plan){
+		double move = this.cleaner.run(((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
+		int loops=1;
+		while (move!=0.0){
+			loops++;
+			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
+			if (loops>3) {
+				for (int i=2;i< plan.getActsLegs().size()-4;i+=2){
+					((Act)(plan.getActsLegs().get(i))).setDuration(this.minimumTime);
 				}
-				else if (86400+((Act)(plan.getActsLegs().get(0))).getDuration()>now){
-					if (now<86400){
-						((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
-						((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
-					}
-					else {
-					((Act)(plan.getActsLegs().get(i+1))).setDuration(0);
-					((Act)(plan.getActsLegs().get(i+1))).setEndTime(now);
-					}
-				}
-				else {
-					return (now-(86400+((Act)(plan.getActsLegs().get(0))).getDuration()));
+				move = this.cleaner.run(this.minimumTime, plan);
+				if (move!=0.0){
+					throw new IllegalArgumentException("No valid plan possible for person "+plan.getPerson().getId());
 				}
 			}
 		}
-		return 0;
+	}
+	
+	
+	private void writePlan (Plan in, Plan out){
+		Plan bestPlan = new Plan (in.getPerson());
+		bestPlan.copyPlan(in);
+		ArrayList<Object> al = out.getActsLegs();
+		if(al.size()>bestPlan.getActsLegs().size()){ 
+			int i;
+			for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
+				al.remove(i);
+				al.add(i, bestPlan.getActsLegs().get(i));	
+			}
+			for (int j = i; j<al.size()-2;j=j+0){
+				al.remove(j);
+			}
+		}
+		else if(al.size()<bestPlan.getActsLegs().size()){
+			int i;
+			for (i = 2; i<al.size()-2;i++){
+				al.remove(i);
+				al.add(i, bestPlan.getActsLegs().get(i));	
+			}
+			for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
+				al.add(j, bestPlan.getActsLegs().get(j));
+			}
+		}
+		else {
+			for (int i = 2; i<al.size()-2;i++){
+			al.remove(i);
+			al.add(i, bestPlan.getActsLegs().get(i));	
+			}
+		}
 	}
 
 }
