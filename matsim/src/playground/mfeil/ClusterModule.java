@@ -32,6 +32,8 @@ import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.scoring.PlanScorer;
 
 import java.util.ArrayList;
 
@@ -46,6 +48,8 @@ public class ClusterModule implements StrategyModule {
 	private static int						i=0;
 	private final double					minimumTime;
 	private final ScheduleCleaner			cleaner;
+	private final String					mode;
+	private final PlanAlgorithm				timer;
 	
 	
 	
@@ -65,6 +69,8 @@ public class ClusterModule implements StrategyModule {
 				controler.getNetwork());
 		this.minimumTime			= 1800;
 		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);
+		this.mode					= "timer";
+		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
 		
 	}
 	
@@ -104,7 +110,10 @@ public class ClusterModule implements StrategyModule {
 			
 				this.locator.handlePlan(aList.get(x));
 				this.router.run(aList.get(x));
-				this.cleanUpPlan(aList.get(x));
+				if (mode.equals("timer")){
+					this.timer.run(aList.get(x));
+				}
+				else this.cleanUpPlan(aList.get(x));
 			}
 		}
 		if (bList.size()>1){
@@ -115,7 +124,10 @@ public class ClusterModule implements StrategyModule {
 				
 				this.locator.handlePlan(bList.get(x));
 				this.router.run(bList.get(x));
-				this.cleanUpPlan(bList.get(x));
+				if (mode.equals("timer")){
+					this.timer.run(bList.get(x));
+				}
+				else this.cleanUpPlan(bList.get(x));
 			}
 		}
 	}
