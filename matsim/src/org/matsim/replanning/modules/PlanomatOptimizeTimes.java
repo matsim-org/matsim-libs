@@ -20,10 +20,9 @@
 
 package org.matsim.replanning.modules;
 
+import org.matsim.controler.Controler;
 import org.matsim.planomat.PlanOptimizeTimes;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 /**
  * This class is just a multithreading wrapper for instances of the
@@ -33,19 +32,23 @@ import org.matsim.scoring.ScoringFunctionFactory;
  */
 public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 
-	private LegTravelTimeEstimator estimator = null;
-	private ScoringFunctionFactory scoringFunctionFactory = null;
+	private Controler controler;
 
-	public PlanomatOptimizeTimes(final LegTravelTimeEstimator estimator, ScoringFunctionFactory scoringFunctionFactory) {
-		this.estimator = estimator;
-		this.scoringFunctionFactory = scoringFunctionFactory;
+	public PlanomatOptimizeTimes(Controler controler) {
+		super();
+		this.controler = controler;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
+		// legTravelTimeEstimator hier instantiieren, und nicht mehr im Controler/PlanomatControler
+		// PlanomatControler dann evtl. löschen, und PlanomatControlerTest-Methoden woanders hin tun
+		
 		PlanAlgorithm planomatAlgorithm = null;
-		planomatAlgorithm = new PlanOptimizeTimes(this.estimator, this.scoringFunctionFactory);
+		planomatAlgorithm = new PlanOptimizeTimes(
+				this.controler.getLegTravelTimeEstimator(), 
+				this.controler.getScoringFunctionFactory());
 
 		return planomatAlgorithm;
 	}
