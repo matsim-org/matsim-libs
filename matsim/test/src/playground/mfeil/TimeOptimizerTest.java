@@ -138,16 +138,10 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		}
 	}
 	
-	public void copyActslegsTest (){
+	public void testCopyActslegs (){
+		
 		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
-		
-		double planActTime = ((Act)(plan.getActsLegs().get(0))).getEndTime();
-		
-		ArrayList<Object> newPlanActsLegs = this.testee.copyActsLegs(plan.getActsLegs()); 
-		
-		// deep copy of acts (complete act) and leg times (only times!) so that time change in newPlan does not affect plan
-		((Act)(newPlanActsLegs.get(0))).setEndTime(0);
 		
 		RouteImpl route = new RouteImpl();
 		route.setRoute("1 2 3");
@@ -155,10 +149,68 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		// but flat copy of leg routes so that change in plan does also affect newPlan
 		((Leg)(plan.getActsLegs().get(1))).setRoute(route);
 		
+		double planActTime = ((Act)(plan.getActsLegs().get(0))).getEndTime();
+		
+		ArrayList<Object> newPlanActsLegs = this.testee.copyActsLegs(plan.getActsLegs()); 
+		
+		// deep copy of acts (complete act) and leg times (only times!) so that time change in newPlan does not affect plan
+		((Act)(newPlanActsLegs.get(0))).setEndTime(0.0);
+		
+		// but flat copy of leg routes so that change in plan does also affect newPlan
+		route.setRoute("3 2 1");
+		
 		assertEquals(((Act)plan.getActsLegs().get(0)).getEndTime(), planActTime);
-		assertEquals(((Act)(newPlanActsLegs.get(0))).getEndTime(), 0);
+		assertEquals(((Act)(newPlanActsLegs.get(0))).getEndTime(), 0.0);
 		assertEquals(((Leg)(plan.getActsLegs().get(1))).getRoute(), route);
 		assertEquals(((Leg)(newPlanActsLegs.get(1))).getRoute(), route);
+	}
+	
+	public void testIncreaseTime (){
+		
+		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
+		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		
+		ArrayList<Object> alIn = this.testee.copyActsLegs(plan.getActsLegs()); 
+		ArrayList<Object> alCheck = this.testee.copyActsLegs(plan.getActsLegs()); 
+		
+		this.testee.increaseTime(plan, alIn, 2, 4);
+		this.testee.cleanActs(alIn);
+		
+		((Act)(alCheck.get(2))).setDuration(((Act)(alCheck.get(2))).getDuration()+this.testee.getOffset());
+		((Act)(alCheck.get(2))).setEndTime(((Act)(alCheck.get(2))).getEndTime()+this.testee.getOffset());
+		
+		((Leg)(alCheck.get(3))).setTravelTime(this.ltte.getLegTravelTimeEstimation(plan.getPerson().getId(), ((Act)(alCheck.get(2))).getEndTime(), (Act)(alCheck.get(2)), (Act)(alCheck.get(4)), (Leg)(alCheck.get(3))));
+		((Act)(alCheck.get(4))).setDuration(((Act)(alCheck.get(4))).getEndTime()-(((Act)(alCheck.get(2))).getEndTime()+((Leg)(alCheck.get(3))).getTravelTime()));
+	
+		for (int i=0;i<alIn.size();i+=2){
+			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
+		}
+		
+		
+	}
+	
+	public void testDecreaseTime (){
+		
+		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
+		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		
+		ArrayList<Object> alIn = this.testee.copyActsLegs(plan.getActsLegs()); 
+		ArrayList<Object> alCheck = this.testee.copyActsLegs(plan.getActsLegs()); 
+		
+		this.testee.decreaseTime(plan, alIn, 2, 4);
+		this.testee.cleanActs(alIn);
+		
+		((Act)(alCheck.get(2))).setDuration(((Act)(alCheck.get(2))).getDuration()-this.testee.getOffset());
+		((Act)(alCheck.get(2))).setEndTime(((Act)(alCheck.get(2))).getEndTime()-this.testee.getOffset());
+		
+		((Leg)(alCheck.get(3))).setTravelTime(this.ltte.getLegTravelTimeEstimation(plan.getPerson().getId(), ((Act)(alCheck.get(2))).getEndTime(), (Act)(alCheck.get(2)), (Act)(alCheck.get(4)), (Leg)(alCheck.get(3))));
+		((Act)(alCheck.get(4))).setDuration(((Act)(alCheck.get(4))).getEndTime()-(((Act)(alCheck.get(2))).getEndTime()+((Leg)(alCheck.get(3))).getTravelTime()));
+	
+		for (int i=0;i<alIn.size();i+=2){
+			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
+		}
+		
+		
 	}
 	
 }
