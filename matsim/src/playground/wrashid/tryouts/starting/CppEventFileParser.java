@@ -113,6 +113,9 @@ public class CppEventFileParser {
 		return rows;
 	}
 	
+	/*
+	 * Compares events produced by java and by C++ simulation
+	 */
 	public static boolean equals(PersonEvent personEvent,EventLog deqSimEvent){
 		if (Integer.parseInt(personEvent.agentId)!=deqSimEvent.getVehicleId()){
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
@@ -179,5 +182,7 @@ public class CppEventFileParser {
 		System.out.println(personEvent.toString());
 		deqSimEvent.print();
 	}
+	
+	
 
 }
