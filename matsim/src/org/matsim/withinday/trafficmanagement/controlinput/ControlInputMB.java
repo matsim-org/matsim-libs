@@ -94,31 +94,13 @@ public class ControlInputMB extends AbstractControlInputImpl {
 	// For distribution heterogenity check:
 	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
 
-	private Map<String, Double> intraFlows = new HashMap<String, Double>();
-
-	private Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
-
 	private Map<Id, Double> capacities = new HashMap<Id, Double>();
-
-	// For in/outlinks disturbance check:
-	private Map<String, Double> extraFlowsMainRoute = new HashMap<String, Double>();
-
-	private List<Link> inLinksMainRoute = new ArrayList<Link>();
-
-	private List<Link> outLinksMainRoute = new ArrayList<Link>();
 
 	private List<Node> nodesMainRoute = new ArrayList<Node>();
 
-	private Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
-
-	private List<Link> inLinksAlternativeRoute = new ArrayList<Link>();
-
-	private List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
 
 	private List<Node> nodesAlternativeRoute = new ArrayList<Node>();
 
-	// private Map<String, Double> flowLinkDistances = new HashMap<String,
-	// Double>();
 
 	private Map<String, Double> ttFreeSpeedUpToAndIncludingLink = new HashMap<String, Double>();
 
@@ -281,19 +263,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		}
 	}
 
-	private double sumUpTTFreeSpeed(Node node, Route route) {
 
-		double ttFS = 0;
-		Link[] routeLinks = route.getLinkRoute();
-		for (int i = 0; i < routeLinks.length; i++) {
-			Link l = routeLinks[i];
-			ttFS += this.ttFreeSpeeds.get(l.getId());
-			if (l.getToNode() == node) {
-				break;
-			}
-		}
-		return ttFS;
-	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
@@ -344,49 +314,50 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		super.handleEvent(event);
 	}
 
-	private void updateFlow(int flowResolution, LinkLeaveEvent event) {
-
-		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.linkId);
-		if (list.size() == flowResolution) {
-			list.removeFirst();
-			list.add(event.time);
-		}
-		else if ((1 < list.size()) || (list.size() < flowResolution)) {
-			list.add(event.time);
-		}
-		else if (list.size() == 0) {
-			list.add(event.time - 1);
-			list.add(event.time);
-		}
-		else {
-			System.err
-					.println("Error: number of enter event times stored exceeds numberofflowevents!");
-		}
-
-		// Flow = agents / seconds:
-		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
-
-		if (this.intraFlows.containsKey(event.linkId)) {
-			this.intraFlows.put(event.linkId, flow);
-		}
-		if (this.inLinksMainRoute.contains(event.link)) {
-			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.linkId, inFlow);
-		}
-		if (this.outLinksMainRoute.contains(event.link)) {
-			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.linkId, outFlow);
-		}
-		if (this.inLinksAlternativeRoute.contains(event.link)) {
-			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
-		}
-		if (this.outLinksAlternativeRoute.contains(event.link)) {
-			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
-		}
-	}
+//	@Override
+//	private void updateFlow(int flowResolution, LinkLeaveEvent event) {
+//
+//		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
+//				.get(event.linkId);
+//		if (list.size() == flowResolution) {
+//			list.removeFirst();
+//			list.add(event.time);
+//		}
+//		else if ((1 < list.size()) || (list.size() < flowResolution)) {
+//			list.add(event.time);
+//		}
+//		else if (list.size() == 0) {
+//			list.add(event.time - 1);
+//			list.add(event.time);
+//		}
+//		else {
+//			System.err
+//					.println("Error: number of enter event times stored exceeds numberofflowevents!");
+//		}
+//
+//		// Flow = agents / seconds:
+//		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
+//
+//		if (this.intraFlows.containsKey(event.linkId)) {
+//			this.intraFlows.put(event.linkId, flow);
+//		}
+//		if (this.inLinksMainRoute.contains(event.link)) {
+//			double inFlow = flow;
+//			this.extraFlowsMainRoute.put(event.linkId, inFlow);
+//		}
+//		if (this.outLinksMainRoute.contains(event.link)) {
+//			double outFlow = -flow;
+//			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+//		}
+//		if (this.inLinksAlternativeRoute.contains(event.link)) {
+//			double inFlow = flow;
+//			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+//		}
+//		if (this.outLinksAlternativeRoute.contains(event.link)) {
+//			double outFlow = -flow;
+//			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+//		}
+//	}
 
 	private void updateFlow(double flowUpdateTime, LinkLeaveEvent event) {
 
@@ -430,9 +401,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		if (route.equals(this.mainRoute)) {
 			return this.predTTMainRoute;
 		}
-		else {
-			return this.predTTAlternativeRoute;
-		}
+		return this.predTTAlternativeRoute;
 	}
 
 	@Override
@@ -742,18 +711,14 @@ public class ControlInputMB extends AbstractControlInputImpl {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
-		else {
-			return this.outLinksAlternativeRoute;
-		}
+		return this.outLinksAlternativeRoute;
 	}
 
 	private List<Link> getInlinks(Route route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}
-		else {
-			return this.inLinksAlternativeRoute;
-		}
+		return this.inLinksAlternativeRoute;
 	}
 
 	private double getInOutFlow(Link inLink, Route route) {

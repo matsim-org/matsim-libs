@@ -21,7 +21,10 @@
 package org.matsim.withinday.trafficmanagement.controlinput;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -36,6 +39,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.Node;
 import org.matsim.population.Route;
 import org.matsim.utils.misc.Time;
 import org.matsim.withinday.trafficmanagement.ControlInput;
@@ -90,6 +94,26 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	protected Map<Double, Double> ttMeasuredAlternativeRoute = new HashMap<Double, Double>();
 
 	private ControlInputWriter writer;
+	
+	protected Map<String, Double> intraFlows = new HashMap<String, Double>();
+
+	protected Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
+
+	protected List<Link> inLinksMainRoute = new ArrayList<Link>();
+
+	protected List<Link> outLinksMainRoute = new ArrayList<Link>();
+
+	
+	protected List<Link> inLinksAlternativeRoute = new ArrayList<Link>();
+
+	protected List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
+
+	// For in/outlinks disturbance check:
+	protected Map<String, Double> extraFlowsMainRoute = new HashMap<String, Double>();
+
+	protected Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
+
+	
 
 	public AbstractControlInputImpl() {
 		this.numberOfAgents = new HashMap<String, Integer>();
@@ -336,5 +360,65 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 		return naturalBottleNeck;
 	}
+	
+	protected void updateFlow(int flowResolution, LinkLeaveEvent event) {
+
+		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
+				.get(event.linkId);
+		if (list.size() == flowResolution) {
+			list.removeFirst();
+			list.addLast(event.time);
+		}
+		else if ((1 < list.size()) || (list.size() < flowResolution)) {
+			list.add(event.time);
+		}
+		else if (list.size() == 0) {
+			list.addLast(event.time - 1);
+			list.addLast(event.time);
+		}
+		else {
+			System.err
+					.println("Error: number of enter event times stored exceeds numberofflowevents!");
+		}
+
+		// Flow = agents / seconds:
+		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
+
+		if (this.intraFlows.containsKey(event.linkId)) {
+			this.intraFlows.put(event.linkId, flow);
+		}
+		if (this.inLinksMainRoute.contains(event.link)) {
+			double inFlow = flow;
+			this.extraFlowsMainRoute.put(event.linkId, inFlow);
+		}
+		if (this.outLinksMainRoute.contains(event.link)) {
+			double outFlow = -flow;
+			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+		}
+		if (this.inLinksAlternativeRoute.contains(event.link)) {
+			double inFlow = flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+		}
+		if (this.outLinksAlternativeRoute.contains(event.link)) {
+			double outFlow = -flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+		}
+	}
+	
+	protected double sumUpTTFreeSpeed(Node node, Route route) {
+
+		double ttFS = 0;
+		Link[] routeLinks = route.getLinkRoute();
+		for (int i = 0; i < routeLinks.length; i++) {
+			Link l = routeLinks[i];
+			ttFS += this.ttFreeSpeeds.get(l.getId());
+			if (l.getToNode() == node) {
+				break;
+			}
+		}
+		return ttFS;
+	}
+	
+
 
 }
