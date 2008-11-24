@@ -16,8 +16,8 @@ import org.matsim.network.Link;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Person;
 
-import playground.wrashid.PDES.util.ConcurrentListMPDSC;
-import playground.wrashid.PDES.util.ConcurrentListMPSC;
+import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
+import playground.wrashid.PDES2.util.ConcurrentListMPSC;
 
 
 public class ZoneMessageQueue {
