@@ -61,9 +61,4 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 
 		return planomatXAlgorithm;
 	}
-	
-	@Override
-	public void finish() {
-		super.finish();
-	}
 }
