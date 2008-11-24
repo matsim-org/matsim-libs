@@ -30,7 +30,6 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.router.PlansCalcRoute;
@@ -135,16 +134,14 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 		
 	protected List<SubChain> calcActChains(final Plan plan) {
 		
-		ManageSubchains manager = new ManageSubchains();
-		Knowledge knowledge = plan.getPerson().getKnowledge();
-		
+		ManageSubchains manager = new ManageSubchains();	
 		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			
-			boolean isPrimary = knowledge.isPrimary(act.getType(), act.getFacilityId());
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			boolean movable = movablePrimaryActivities.contains(act);
 			
 			// found secondary activity

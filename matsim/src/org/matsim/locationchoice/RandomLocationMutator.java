@@ -27,7 +27,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.Knowledge;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 //import org.apache.log4j.Logger;
@@ -49,12 +48,11 @@ public class RandomLocationMutator extends LocationMutator {
 	public void handlePlan(final Plan plan){
 				
 		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
-		Knowledge knowledge = plan.getPerson().getKnowledge();
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
-			boolean isPrimary = knowledge.isPrimary(act.getType(), act.getFacilityId());
+			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			boolean movable = movablePrimaryActivities.contains(act);
 			
 			if (!isPrimary || movable) {
