@@ -80,7 +80,6 @@ public class ControlerMFeil extends org.matsim.controler.Controler {
 			}
 			else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				ScoringFunctionFactory scoringFunctionFactory = this.getScoringFunctionFactory();
 				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(this);
 				strategy.addStrategyModule(planomatStrategyModule);
 			}
@@ -97,6 +96,11 @@ public class ControlerMFeil extends org.matsim.controler.Controler {
 				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, this.scoringFunctionFactory);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
+			else if (classname.equals("Clustering")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModule module = new ClusterModule(this);
+				strategy.addStrategyModule(module);
+			}
 		
 			manager.addStrategy(strategy, rate);
 		}
@@ -107,7 +111,7 @@ public class ControlerMFeil extends org.matsim.controler.Controler {
 	
 	@Override
 		protected ScoringFunctionFactory loadScoringFunctionFactory() {
-			return new CharyparNagelScoringFunctionFactory();
+			return new JohScoringFunctionFactory();
 	}
 	
 }
