@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.demandmodeling");
 		//$JUnit-BEGIN$
+		suite.addTest(org.matsim.demandmodeling.primloc.AllTests.suite());
 		suite.addTestSuite(PopulationAsciiFileReaderTest.class);
 		suite.addTestSuite(ShapeFile2ZoneLayerTest.class);
 		//$JUnit-END$
