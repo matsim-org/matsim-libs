@@ -9,6 +9,7 @@ import org.matsim.events.PersonEvent;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.DES.EventLog;
+import playground.wrashid.DES.util.EventLibrary;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class TestEventLibrary extends MatsimTestCase {
