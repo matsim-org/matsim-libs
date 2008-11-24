@@ -1,6 +1,6 @@
 package playground.wrashid.PDES.util;
 
-import playground.wrashid.PDES.SimulationParameters;
+
 
 public abstract class CyclicBarrier {
 	
