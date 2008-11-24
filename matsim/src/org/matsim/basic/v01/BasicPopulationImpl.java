@@ -27,19 +27,10 @@ import java.util.TreeMap;
 public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulation<T> {
 	
 	private String name = null;
-
 	
-	protected Map<Id, T> persons = new TreeMap<Id, T>();
+	private Map<Id, T> persons = new TreeMap<Id, T>();
 
-
-	private String layerName;
-
-	
-    /////////////////////////////////////////////////
-	// Population related methods
-    /////////////////////////////////////////////////
-
-	/* (non-Javadoc)
+	/**
 	 * @see org.matsim.basic.v01.BasicPopulation#addPerson(T)
 	 */
 	public void addPerson(T person) {
@@ -50,16 +41,10 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 		persons.put(person.getId(), person);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPopulation#getPerson(org.matsim.utils.identifiers.IdI)
-	 */
 	public final T getPerson(Id personId) {
 		return this.persons.get(personId);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.basic.v01.BasicPopulation#getPerson(java.lang.String)
-	 */
 	public final T getPerson(String personId) {
 		return this.persons.get(new IdImpl(personId));
 	}
@@ -74,14 +59,6 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 
 	public final void setName(final String name) {
 		this.name = name;
-	}
-
-	public String getRefLayer() {
-		return this.layerName;
-	}
-
-	public void setRefLayer(String layer) {
-		this.layerName = layer;
 	}
 
 	public Map<Id, T> getPersons() {

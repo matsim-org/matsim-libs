@@ -71,7 +71,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	@Override
 	public final void addPerson(final Person p) {
 		// validation
-		if (this.persons.containsKey(p.getId())) {
+		if (this.getPersons().containsKey(p.getId())) {
 			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
 		}
 
@@ -84,14 +84,14 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 
 		if (!this.isStreaming) {
 			// streaming is off, just add the person to our list
-			this.persons.put(p.getId(), p);
+			this.getPersons().put(p.getId(), p);
 		} else {
 			// streaming is on, run algorithm on the person and write it to file.
 
 			/* Add Person to map, for algorithms might reference to the person
 			 * with "agent = population.getPersons().get(personId);"
 			 * remove it after running the algorithms! */
-			this.persons.put(p.getId(), p);
+			this.getPersons().put(p.getId(), p);
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {
@@ -99,13 +99,13 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 			}
 
 			// remove again as we are streaming
-			this.persons.remove(p.getId());
+			this.getPersons().remove(p.getId());
 		}
 	}
 
 	@Override
 	protected final void clearPersons() {
-		this.persons.clear();
+		super.clearPersons();
 		this.counter = 0;
 		this.nextMsg = 1;
 	}
@@ -120,7 +120,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 				PersonAlgorithm algo = this.personAlgos.get(i);
 				log.info("running algorithm " + algo.getClass().getName());
 				Counter cntr = new Counter(" person # ");
-				for (Person person : this.persons.values()) {
+				for (Person person : this.getPersons().values()) {
 					cntr.incCounter();
 					algo.run(person);
 				}
@@ -158,8 +158,9 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	//////////////////////////////////////////////////////////////////////
 
 
+	@Override
 	public final Map<Id, Person> getPersons() {
-		return this.persons;
+		return super.getPersons();
 	}
 
 	public final boolean isStreaming() {
@@ -170,7 +171,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	 * @return the size of the population, i.e. the number of persons in this population.
 	 */
 	public int size() {
-		return this.persons.size();
+		return this.getPersons().size();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -181,7 +182,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	public final String toString() {
 		return "[name=" + this.getName() + "]" +
 				"[is_streaming=" + this.isStreaming + "]" +
-				"[nof_persons=" + this.persons.size() + "]" +
+				"[nof_persons=" + this.getPersons().size() + "]" +
 				"[nof_plansalgos=" + this.personAlgos.size() + "]";
 	}
 
@@ -190,7 +191,7 @@ public class Population extends BasicPopulationImpl<Person> implements Iterable<
 	}
 
 	public Iterator<Person> iterator() {
-		return this.persons.values().iterator();
+		return this.getPersons().values().iterator();
 	}
 
 }
