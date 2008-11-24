@@ -67,7 +67,11 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (Plan plan){
+	public void run (Plan basePlan){
+		
+		/* TODO: just as long as PlanomatXPlan exists. Needs then to be removed!!! */ 
+		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
+		plan.copyPlan(basePlan);
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
@@ -193,8 +197,13 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	
 		// Update the plan with the final solution 		
 	//	stream.println("Selected solution\t"+bestScore);
+		ArrayList<Object> al = basePlan.getActsLegs();
+		basePlan.setScore(bestScore);
+		
+		/* TODO: remove this!! 
 		ArrayList<Object> al = plan.getActsLegs();
 		plan.setScore(bestScore);
+		*/
 		
 		for (int i = 0; i<al.size();i++){
 			if (i%2==0){
@@ -208,8 +217,6 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				((Leg)al.get(i)).setArrivalTime(((Leg)(bestSolution.get(i))).getArrivalTime());
 			}
 		}
-		
-		
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -525,6 +532,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
 				if (86400>now+this.minimumTime){
 					((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
+					((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
 				}
 				else if (86400+((Act)(plan.getActsLegs().get(0))).getDuration()>now+this.minimumTime){
 					if (now<86400){
@@ -641,6 +649,10 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		}
 		plan.setActsLegs((ArrayList<Object>)actslegs);
 		return scorer.getScore(plan);
+	}
+	
+	public double getOffset (){
+		return this.OFFSET;
 	}
 
 }
