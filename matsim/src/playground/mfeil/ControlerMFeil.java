@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerTest.java
+ * ControlerMFeil.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,9 +36,9 @@ import org.matsim.scoring.ScoringFunctionFactory;
  * @author Matthias Feil
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
-public class ControlerTest extends org.matsim.planomat.PlanomatControler {
+public class ControlerMFeil extends org.matsim.planomat.PlanomatControler {
 	
-	public ControlerTest (String [] args){
+	public ControlerMFeil (String [] args){
 		super(args);
 	}
 		/*

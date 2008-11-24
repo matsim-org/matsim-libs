@@ -39,10 +39,10 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 
 	
 	
-	public PlanomatX12Initialiser (final ControlerTest controlerTest) {
+	public PlanomatX12Initialiser (final ControlerMFeil controler) {
 		
-		this.network = controlerTest.getNetwork();
-		this.controler = controlerTest;
+		this.network = controler.getNetwork();
+		this.controler = controler;
 		this.init(network);
 		
 	}
