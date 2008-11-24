@@ -34,7 +34,7 @@ import org.matsim.utils.misc.Time;
 
 public class RouteImpl extends BasicRouteImpl implements Route {
 
-	protected ArrayList<Node> route = new ArrayList<Node>();
+	protected final ArrayList<Node> route = new ArrayList<Node>();
 
 	private double cost = Double.NaN;
 
@@ -45,7 +45,8 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 	public RouteImpl(final Route route) {
 		super.setDist(route.getDist());
 		super.setTravTime(route.getTravTime());
-		this.route = new ArrayList<Node>(route.getRoute());
+		this.route.addAll(route.getRoute());
+		this.route.trimToSize();
 	}
 
 	public final void setRoute(final String route) {
@@ -147,9 +148,6 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		 * Thus it should be changed sooner or later to links instead of nodes
 		 * This function is a first step for this as it helps to create the
 		 * list of links the route leads through */
-		if (this.route == null) {
-			return new Link[0];
-		}
 		if (this.route.size() == 0) {
 			return new Link[0];
 		}
@@ -224,7 +222,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
 		RouteImpl ret = new RouteImpl();
-		ret.route = new ArrayList<Node>(this.route.subList(fromIndex, toIndex + 1));
+		ret.setRoute(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
 
