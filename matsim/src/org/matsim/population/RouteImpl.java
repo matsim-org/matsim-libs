@@ -48,6 +48,13 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		this.route.addAll(route.getRoute());
 		this.route.trimToSize();
 	}
+	
+	@Override
+	public void setLinkIds(List<Id> linkids) {
+		throw new UnsupportedOperationException("Setting only the link ids is not possible at this " +
+				"level in the inheritance hierachy! If the Interfaces Link/Node/Route are used you " +
+				"have to set the route by object references not by Ids.");
+	}
 
 	public final void setRoute(final String route) {
 		NetworkLayer layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
