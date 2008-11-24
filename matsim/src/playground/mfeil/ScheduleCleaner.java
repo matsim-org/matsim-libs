@@ -49,7 +49,7 @@ public class ScheduleCleaner {
 			
 			if (i!=plan.getActsLegs().size()-2){
 				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
-				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()-travelTime, 0);
+				travelTime = java.lang.Math.max(((Act)(plan.getActsLegs().get(i+1))).getDuration()-travelTime, this.minimumTime);
 				((Act)(plan.getActsLegs().get(i+1))).setDuration(travelTime);	
 				((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+travelTime);	
 				now+=travelTime;
@@ -57,22 +57,22 @@ public class ScheduleCleaner {
 			else {
 				((Act)(plan.getActsLegs().get(i+1))).setStartTime(now);
 				/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW*/
-				if (86400>now){
+				if (86400>now+this.minimumTime){
 					((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
 					((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
 				}
-				else if (86400+((Act)(plan.getActsLegs().get(0))).getDuration()>now){
+				else if (86400+((Act)(plan.getActsLegs().get(0))).getDuration()>now+this.minimumTime){
 					if (now<86400){
 						((Act)(plan.getActsLegs().get(i+1))).setDuration(86400-now);
 						((Act)(plan.getActsLegs().get(i+1))).setEndTime(86400);
 					}
 					else {
-					((Act)(plan.getActsLegs().get(i+1))).setDuration(0);
-					((Act)(plan.getActsLegs().get(i+1))).setEndTime(now);
+					((Act)(plan.getActsLegs().get(i+1))).setDuration(this.minimumTime);
+					((Act)(plan.getActsLegs().get(i+1))).setEndTime(now+this.minimumTime);
 					}
 				}
 				else {
-					return (now-(86400+((Act)(plan.getActsLegs().get(0))).getDuration()));
+					return (now+this.minimumTime-(86400+((Act)(plan.getActsLegs().get(0))).getDuration()));
 				}
 			}
 		}
