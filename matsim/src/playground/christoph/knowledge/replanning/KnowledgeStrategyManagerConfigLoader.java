@@ -32,7 +32,6 @@ import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
@@ -54,7 +53,6 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
 
 import playground.christoph.knowledge.replanning.modules.LimitedKnowledge;
@@ -79,8 +77,6 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 		NetworkLayer network = controler.getNetwork();
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
-		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
-		LegTravelTimeEstimator legTravelTimeEstimator = controler.getLegTravelTimeEstimator();
 
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 

@@ -31,7 +31,6 @@ public class AllTests {
 
 		//$JUnit-BEGIN$
 		testSuite.addTest(org.matsim.planomat.costestimators.AllTests.suite());
-		testSuite.addTestSuite(PlanomatControlerTest.class);
 		testSuite.addTestSuite(PlanOptimizeTimesTest.class);
 		//$JUnit-END$
 

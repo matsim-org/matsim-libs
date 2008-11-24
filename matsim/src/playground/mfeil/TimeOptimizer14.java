@@ -19,17 +19,15 @@
  * *********************************************************************** */
 package playground.mfeil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.apache.log4j.Logger;
-import org.matsim.population.Plan;
-import org.matsim.scoring.PlanScorer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.Plan;
+import org.matsim.scoring.PlanScorer;
 
 
 /**

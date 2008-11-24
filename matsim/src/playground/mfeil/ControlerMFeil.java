@@ -21,6 +21,9 @@ package playground.mfeil;
 
 
 import org.matsim.config.groups.StrategyConfigGroup;
+import org.matsim.gbl.Gbl;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
@@ -36,7 +39,7 @@ import org.matsim.scoring.ScoringFunctionFactory;
  * @author Matthias Feil
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
-public class ControlerMFeil extends org.matsim.planomat.PlanomatControler {
+public class ControlerMFeil extends org.matsim.controler.Controler {
 	
 	public ControlerMFeil (String [] args){
 		super(args);
@@ -83,6 +86,14 @@ public class ControlerMFeil extends org.matsim.planomat.PlanomatControler {
 			}
 			else if (classname.equals("TimeOptimizer")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
+				DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+						super.network, 
+						super.getTraveltimeBinSize());
+				LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+						super.getTravelTimeCalculator(), 
+						super.getTravelCostCalculator(), 
+						tDepDelayCalc, 
+						super.network);
 				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, this.scoringFunctionFactory);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}

@@ -59,10 +59,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Act actOrigin, Act actDestination, Leg legIntermediate) {
 		
-		synchronized(this) {
-			double legTravelTimeEstimation = this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
-			return legTravelTimeEstimation;
-		}
+			return this.plansCalcRoute.handleLeg(legIntermediate, actOrigin, actDestination, departureTime);
 		
 	}
 

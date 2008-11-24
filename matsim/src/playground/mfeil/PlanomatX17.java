@@ -19,28 +19,33 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Activity;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
+import org.matsim.locationchoice.constrained.ManageSubchains;
+import org.matsim.locationchoice.constrained.SubChain;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
-import org.matsim.utils.charts.XYLineChart;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.io.*;
-import org.matsim.planomat.PlanOptimizeTimes;
-import org.matsim.locationchoice.constrained.*;
 
 
 
@@ -84,7 +89,15 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.factory 				= controler.getScoringFunctionFactory();
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer 				= new PlanScorer (this.factory);
-		this.timer					= new TimeOptimizer14(controler.getLegTravelTimeEstimator(), this.scorer);
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+				controler.getNetwork(), 
+				controler.getTraveltimeBinSize());
+		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				controler.getTravelCostCalculator(), 
+				tDepDelayCalc, 
+				controler.getNetwork());
+		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		//this.timer		 			= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
 		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
 		this.NEIGHBOURHOOD_SIZE 	= 10;				

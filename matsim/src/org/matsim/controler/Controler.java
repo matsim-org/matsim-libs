@@ -79,7 +79,6 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -151,7 +150,6 @@ public class Controler {
 	protected TravelCost travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
-	protected LegTravelTimeEstimator legTravelTimeEstimator = null;
 
 	/** Stores data commonly used by all router instances. */
 	private PreProcessLandmarks commonRoutingData = null;
@@ -1192,10 +1190,6 @@ public class Controler {
 			controler.run();
 		}
 		System.exit(0);
-	}
-
-	public LegTravelTimeEstimator getLegTravelTimeEstimator() {
-		return this.legTravelTimeEstimator;
 	}
 
 }

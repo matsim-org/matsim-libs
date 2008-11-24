@@ -18,9 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.planomat;
+package org.matsim.examples;
 
 import org.matsim.config.Config;
+import org.matsim.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -45,7 +46,7 @@ public class PlanomatControlerTest extends MatsimTestCase {
 
 	private void runControlerTest() {
 		config.controler().setOutputDirectory(this.getOutputDirectory());
-		PlanomatControler testee = new PlanomatControler(config);
+		Controler testee = new Controler(config);
 		testee.setCreateGraphs(false);
 		testee.setWriteEventsInterval(0);
 		testee.run();
