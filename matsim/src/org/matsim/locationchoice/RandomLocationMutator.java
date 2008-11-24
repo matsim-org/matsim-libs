@@ -55,19 +55,16 @@ public class RandomLocationMutator extends LocationMutator {
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			boolean movable = movablePrimaryActivities.contains(act);
 			
-			if (!isPrimary || movable) {	
-							
-				Object [] exchange_facilities = this.quad_trees.get(act.getType()).values().toArray();
-				
-				Facility facility = (Facility)exchange_facilities[0] ;
-				
-				if (exchange_facilities.length > 1) {
-					facility =(Facility)exchange_facilities[MatsimRandom.random.nextInt(exchange_facilities.length-1)];
-				}				
-				act.setFacility(facility);
-				act.setLink(this.network.getNearestLink(facility.getCenter()));
-				act.setCoord(facility.getCenter());
-				
+			if (!isPrimary || movable) {
+				int size = this.quad_trees.get(act.getType()).size();
+				// only one facility: do not need to do location choice
+				if (size > 1) {
+					Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
+					                       MatsimRandom.random.nextInt(size-1)];										
+					act.setFacility(facility);
+					act.setLink(this.network.getNearestLink(facility.getCenter()));
+					act.setCoord(facility.getCenter());
+				}		
 			}	
 		}
 		// loop over all <leg>s, remove route-information
