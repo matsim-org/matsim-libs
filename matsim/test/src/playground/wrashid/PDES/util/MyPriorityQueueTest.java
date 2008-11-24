@@ -5,10 +5,10 @@ import java.util.PriorityQueue;
 
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.PDES.util.ConcurrentListMPDSC;
-import playground.wrashid.PDES.util.MyPriorityQueue;
 import playground.wrashid.PDES2.Message;
 import playground.wrashid.PDES2.StartingLegMessage;
+import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
+import playground.wrashid.PDES2.util.MyPriorityQueue;
 
 public class MyPriorityQueueTest extends MatsimTestCase {
 
