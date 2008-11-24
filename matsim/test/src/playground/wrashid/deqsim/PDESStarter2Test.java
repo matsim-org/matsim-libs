@@ -20,17 +20,7 @@ import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
 public class PDESStarter2Test extends MatsimTestCase {
 
-	//public void testScenarios() {
-		//t_equilPlans1_TestHandlerDetailedEventChecker(); // das sollte laufen...
-		
-		// t_equilEvent(); // mit enable assertion flag funktioniert es nicht mehr!!!
-		// Gbl.reset();
-
-		// t_Berlin();
-		// Gbl.reset();
-		// only comment this, when test stabelized again.
-		// assertEquals(true, false);
-	//}
+	// mit enable assertion flag funktionieren einige tests nicht mehr!!! => make test cases for these assertions.
 
 	
 	public void test_equilPlans1_TestHandlerDetailedEventChecker() {

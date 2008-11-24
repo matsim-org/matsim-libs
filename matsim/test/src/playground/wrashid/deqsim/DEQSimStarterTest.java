@@ -41,28 +41,19 @@ import playground.wrashid.util.TestHandlerEventCountChecker;
 
 public class DEQSimStarterTest extends MatsimTestCase {
 
-	public void testScenarios() {
-		t_equilPlans1();
-		Gbl.reset();
-		
-		t_equilEvent();
-		Gbl.reset();
-		//TODO: continue working here...
-		//t_Berlin();
-		//Gbl.reset();
-	}
+
 	
-	private void t_equilEvent() {
+	public void test_equilEvent() {
 		TestHandlerDetailedEventChecker orderChecker = new TestHandlerDetailedEventChecker();
 		orderChecker.startTestDES("test/scenarios/equil/config.xml",false,null,null);
 	}
 	
-	private void t_equilPlans1() {
+	public void test_equilPlans1() {
 		TestHandlerDetailedEventChecker orderChecker= new TestHandlerDetailedEventChecker();
 		orderChecker.startTestDES("test/scenarios/equil/config.xml",false,"test/scenarios/equil/plans1.xml",new EquilPopulationPlans1Modified1());
 	}
 	
-	private void t_Berlin() {
+	public void test_Berlin() {
 		TestHandlerDetailedEventChecker orderChecker = new TestHandlerDetailedEventChecker();
 		orderChecker.startTestDES("test/scenarios/berlin/config.xml",false,null,null);
 	}
