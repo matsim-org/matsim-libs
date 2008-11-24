@@ -1,21 +1,23 @@
 package playground.wrashid.PDES2;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+
+
+
+import playground.wrashid.DES.EventLog;
+import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.deqsim.PDESStarter2;
+import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		// TODO: remove this class...
-		/*
-		Executor executor = Executors.newFixedThreadPool(2);
-		for (int i=0;i<1000;i++){
-			executor.execute (new MessageExecutor (i));
-		}
-		*/
+		// the config file comes as input
+		
+		String baseDir="/data/matsim/wrashid/input/input_67K/";
+		args=new String[1];
+			
+		args[0]= baseDir + "config.xml";
+		PDESStarter2.main(args);
 	}
-
 }
