@@ -24,7 +24,6 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
-import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 

@@ -31,8 +31,7 @@ import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
-import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
-import org.matsim.scoring.ScoringFunctionFactory;
+import org.matsim.scoring.*;
 
 
 /**
