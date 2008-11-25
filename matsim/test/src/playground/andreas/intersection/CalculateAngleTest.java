@@ -1,4 +1,4 @@
-package playground.andreas.intersection.test;
+package playground.andreas.intersection;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
@@ -14,7 +14,7 @@ public class CalculateAngleTest extends MatsimTestCase {
     
 	public void testCalculateAngle() {
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/angletest/config.xml");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/angletest/config.xml");
 		ScenarioData data = new ScenarioData(conf);
 		
 		assertEquals("Has to be 'null', since there is no other way back but Link 11.",

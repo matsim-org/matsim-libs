@@ -1,4 +1,4 @@
-package playground.andreas.intersection.test;
+package playground.andreas.intersection;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,7 +49,7 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/bottleneck/config.xml");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/bottleneck/config.xml");
 		
 		String newLSADef = null;
 		String newLSADefCfg = null;
@@ -90,10 +90,10 @@ public class CompareQSimQueueSim extends MatsimTestCase implements	LinkLeaveEven
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/oneways/config.xml");
 		
-		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
-		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
+		String newLSADef = "./test/input/playground/andreas/intersection/oneways/lsa.xml";
+		String newLSADefCfg = "./test/input/playground/andreas/intersection/oneways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();

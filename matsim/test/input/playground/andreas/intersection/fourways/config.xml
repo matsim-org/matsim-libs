@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./src/playground/andreas/intersection/test/data/bottleneck/">
-		<!ENTITY OUTPUTBASE   "./output/bottleneck">
+		<!ENTITY INPUTBASE    "./test/input/playground/andreas/intersection/fourways/">
+		<!ENTITY OUTPUTBASE   "./output/4ways">
 	]
 >
 
@@ -30,7 +30,7 @@
 		<param name="endTime" value="00:00:00" />
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
- 		<param name = "snapshotFormat"	value = "none"/>  
+ 		<param name = "snapshotFormat"	value = "otfvis"/>  
 		<param name = "snapshotStyle"	value = "queue"/>
 	</module>
 

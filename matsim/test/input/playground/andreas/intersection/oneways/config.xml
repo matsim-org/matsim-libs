@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./src/playground/andreas/intersection/test/data/fourways/">
-		<!ENTITY OUTPUTBASE   "./output/4ways">
+		<!ENTITY INPUTBASE    "./test/input/playground/andreas/intersection/oneways/">
+		<!ENTITY OUTPUTBASE   "./output/1ways">
 	]
 >
 
@@ -28,6 +28,8 @@
 	<module name="simulation">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
+    <param name="stuckTime" value="1000" />
+    <param name="removeStuckVehicles" value="no" />
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
  		<param name = "snapshotFormat"	value = "none"/>  

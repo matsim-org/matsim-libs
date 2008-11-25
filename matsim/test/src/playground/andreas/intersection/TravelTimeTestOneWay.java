@@ -1,4 +1,4 @@
-package playground.andreas.intersection.test;
+package playground.andreas.intersection;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,16 +47,16 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-  		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+  		Config conf = loadConfig("test/input/playground/andreas/intersection/oneways/config.xml");
 				
-		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
-		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
+		String newLSADef = "./test/input/playground/andreas/intersection/oneways/lsa.xml";
+		String newLSADefCfg = "./test/input/playground/andreas/intersection/oneways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
 		
-		String tempFile = "./src/playground/andreas/intersection/test/__tempFile__.xml";
+		String tempFile = "./test/input/playground/andreas/intersection/oneways/__tempFile__.xml";
 		
 		TreeMap<Integer, MeasurePoint> results = new TreeMap<Integer, MeasurePoint>();		
 		
@@ -129,10 +129,10 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/oneways/config.xml");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/oneways/config.xml");
 
-		String newLSADef = "./src/playground/andreas/intersection/test/data/oneways/lsa.xml";
-		String newLSADefCfg = "./src/playground/andreas/intersection/test/data/oneways/lsa_config.xml";
+		String newLSADef = "./test/input/playground/andreas/intersection/oneways/lsa.xml";
+		String newLSADefCfg = "./test/input/playground/andreas/intersection/oneways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();

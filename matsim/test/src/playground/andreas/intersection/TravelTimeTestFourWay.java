@@ -1,4 +1,4 @@
-package playground.andreas.intersection.test;
+package playground.andreas.intersection;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,10 +48,10 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/fourways/config.xml");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/fourways/config.xml");
 		
-		String newLSADef = "src/playground/andreas/intersection/test/data/fourways/lsa.xml";
-		String newLSADefCfg = "src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
+		String newLSADef = "test/input/playground/andreas/intersection/fourways/lsa.xml";
+		String newLSADefCfg = "test/input/playground/andreas/intersection/fourways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -65,7 +65,7 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 			this.writer.flush();
 			this.writer.close();
 			
-			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("src/playground/andreas/intersection/test/data/fourways/reference.txt.gz"));
+			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("test/input/playground/andreas/intersection/fourways/reference.txt.gz"));
 			
 			new File("temp.txt.gz").delete();
 
@@ -80,11 +80,11 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 		System.setProperty("line.separator", "\n"); // Unix
 //		System.setProperty("line.separator", "\r\n"); // Win
 		
-		Config conf = loadConfig("src/playground/andreas/intersection/test/data/fourways/config.xml");
-		conf.plans().setInputFile("src/playground/andreas/intersection/test/data/fourways/plans_uturn.xml.gz");
+		Config conf = loadConfig("test/input/playground/andreas/intersection/fourways/config.xml");
+		conf.plans().setInputFile("test/input/playground/andreas/intersection/fourways/plans_uturn.xml.gz");
 		
-		String newLSADef = "src/playground/andreas/intersection/test/data/fourways/lsa.xml";
-		String newLSADefCfg = "src/playground/andreas/intersection/test/data/fourways/lsa_config.xml";
+		String newLSADef = "test/input/playground/andreas/intersection/fourways/lsa.xml";
+		String newLSADefCfg = "test/input/playground/andreas/intersection/fourways/lsa_config.xml";
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
@@ -98,7 +98,7 @@ public class TravelTimeTestFourWay extends MatsimTestCase implements	LinkLeaveEv
 			this.writer.flush();
 			this.writer.close();
 			
-			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("src/playground/andreas/intersection/test/data/fourways/reference_uturn.txt.gz"));
+			assertEquals(CRCChecksum.getCRCFromFile("temp.txt.gz"),	CRCChecksum.getCRCFromFile("test/input/playground/andreas/intersection/fourways/reference_uturn.txt.gz"));
 			
 			new File("temp.txt.gz").delete();
 

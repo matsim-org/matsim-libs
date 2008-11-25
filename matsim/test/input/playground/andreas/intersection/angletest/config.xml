@@ -1,20 +1,20 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./src/playground/andreas/intersection/test/data/oneways/">
-		<!ENTITY OUTPUTBASE   "./output/1ways">
+		<!ENTITY INPUTBASE    "./test/input/playground/andreas/intersection/angletest/">
+		<!ENTITY OUTPUTBASE   "./output/angletest">
 	]
 >
 
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;network.xml.gz" />
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
 		<param name="outputNetworkFile" value="&OUTPUTBASE;/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;plans.xml.gz" />
+<!--	<param name="inputPlansFile" value="&INPUTBASE;/test/data/plans_4a_160ue.xml.gz" />-->
 		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml" />
 		<param name="outputVersion" value="v4" />
 	</module>
@@ -28,11 +28,9 @@
 	<module name="simulation">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-    <param name="stuckTime" value="1000" />
-    <param name="removeStuckVehicles" value="no" />
 
 		<param name = "snapshotperiod"	value = "00:00:01"/>
- 		<param name = "snapshotFormat"	value = "none"/>  
+ 		<param name = "snapshotFormat"	value = "otfvis"/>  
 		<param name = "snapshotStyle"	value = "queue"/>
 	</module>
 
@@ -69,7 +67,7 @@
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
-
+		
 	</module>
 
 	<module name="vis">

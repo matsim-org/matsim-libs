@@ -1,4 +1,4 @@
-package playground.andreas.intersection.test;
+package playground.andreas.intersection;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
