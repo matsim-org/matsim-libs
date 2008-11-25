@@ -160,7 +160,7 @@ public class StrategyManagerConfigLoader {
 				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcherF(network, travelCostCalc, travelTimeCalc, facilities);
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("LocationChoice")) {
-		    	strategy = new PlanStrategy(new RandomPlanSelector());
+		    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
 		    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 				final PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 				preProcessRoutingData.run(network);
