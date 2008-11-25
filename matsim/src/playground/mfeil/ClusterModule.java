@@ -54,7 +54,7 @@ public class ClusterModule implements StrategyModule {
 	
 	
 	public ClusterModule (ControlerMFeil controler){
-		this.module 				= new PlanomatX12Initialiser(controler);
+		System.out.println("ClusterModule Konstruktor!");
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
@@ -67,11 +67,11 @@ public class ClusterModule implements StrategyModule {
 				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
 				controler.getNetwork());
+		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
+		this.module 				= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.estimator, this.locator, this.timer);
 		this.minimumTime			= 1800;
 		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);
-		this.mode					= "timer";
-		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
-		
+		this.mode					= "timer";		
 	}
 	
 	public void init() {

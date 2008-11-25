@@ -98,8 +98,27 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
-		//this.timer		 			= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
+		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
 		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
+		this.NEIGHBOURHOOD_SIZE 	= 10;				
+		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
+		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
+		this.WEIGHT_INC_NUMBER 		= 0.5; 				/*Weighing whether adding or removing activities in change number method.*/
+		this.MAX_ITERATIONS 		= 20;
+		this.LC_MODE				= "reducedLC";		/* reducedLC=only modified secondary acts will be located; fullLC=all secondary acts of the plan will be located*/
+		this.LC_SET_SIZE			= 1;
+		
+	}
+	
+	public PlanomatX17 (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
+			LocationMutatorwChoiceSet locator, PlanAlgorithm timer){
+		this.preProcessRoutingData 	= preProcessRoutingData;
+		this.factory				= controler.getScoringFunctionFactory();
+		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+		this.scorer					= new PlanScorer (this.factory);
+		this.timer					= timer;
+		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
+		this.locator 				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
