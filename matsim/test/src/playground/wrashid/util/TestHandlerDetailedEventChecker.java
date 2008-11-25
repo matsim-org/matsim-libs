@@ -23,6 +23,15 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.util.testable.PopulationModifier;
@@ -32,10 +41,14 @@ import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
 import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements TestHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
+		TestHandler, ActEndEventHandler, ActStartEventHandler,
+		AgentDepartureEventHandler, AgentStuckEventHandler,
+		AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler,
+		LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
-	public LinkedList<PersonEvent> allEvents=new LinkedList<PersonEvent>();
+	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
 	private boolean printEvent = true;
 	private Population population;
@@ -63,143 +76,117 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 		}
 
 		/*
-		// checks not needed anymore, because covered by other checks
-		  
-		 
-		// compare with expected number of events per agent, per event type
-		for (LinkedList<BasicEvent> list : events.values()) {
-			int linkEnterEventCounter = 0;
-			int linkLeaveEventCounter = 0;
-			int departureEventCounter = 0;
-			int arrivalEventCounter = 0;
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i) instanceof LinkEnterEvent) {
-					linkEnterEventCounter++;
-				}
-				if (list.get(i) instanceof LinkLeaveEvent) {
-					linkLeaveEventCounter++;
-				}
-				if (list.get(i) instanceof AgentDepartureEvent) {
-					departureEventCounter++;
-				}
-				if (list.get(i) instanceof AgentArrivalEvent) {
-					arrivalEventCounter++;
-				}
-
-			}
-			ExpectedNumberOfEvents expected = expectedNumberOfMessages.get(list
-					.get(0).agentId);
-			// if (estimate.expectedLinkEnterEvents!=linkEnterEventCounter){
-			// for (int j=0;j<list.size();j++){
-			// System.out.println(list.get(j).toString());
-			// }
-			// } else {
-			// System.out.println("ok");
-			// }
-
-			assertEquals(expected.expectedLinkEnterEvents,
-					linkEnterEventCounter);
-			assertEquals(expected.expectedLinkLeaveEvents,
-					linkLeaveEventCounter);
-			assertEquals(expected.expectedDepartureEvents,
-					departureEventCounter);
-			assertEquals(expected.expectedArrivalEvents, arrivalEventCounter);
-		}
-
-		// check, that each enter event is followed by a leave event
-		// check, that the same road is left, which is entered
-		for (LinkedList<BasicEvent> list : events.values()) {
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i) instanceof LinkEnterEvent) {
-
-					try {
-						assertEquals(true,
-								list.get(i + 1) instanceof LinkLeaveEvent);
-					} catch (Exception e) {
-						for (int j = 0; j < list.size(); j++) {
-							System.out.println(list.get(j));
-						}
-						e.printStackTrace();
-						System.exit(0);
-					}
-
-					LinkEnterEvent enterEvent = (LinkEnterEvent) list.get(i);
-					LinkLeaveEvent leaveEvent = (LinkLeaveEvent) list
-							.get(i + 1);
-					// System.out.println(enterEvent);
-					if (!enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId)) {
-						for (int j = 0; j < list.size(); j++) {
-							System.out.println(list.get(j));
-						}
-						System.out.println("===========error===========");
-						System.out.println(enterEvent.toString());
-						System.out.println(leaveEvent.toString());
-					}
-
-					assertEquals(true, enterEvent.linkId
-							.equalsIgnoreCase(leaveEvent.linkId));
-				}
-			}
-		}
-
+		 * // checks not needed anymore, because covered by other checks
+		 * 
+		 *  // compare with expected number of events per agent, per event type
+		 * for (LinkedList<BasicEvent> list : events.values()) { int
+		 * linkEnterEventCounter = 0; int linkLeaveEventCounter = 0; int
+		 * departureEventCounter = 0; int arrivalEventCounter = 0; for (int i =
+		 * 0; i < list.size(); i++) { if (list.get(i) instanceof LinkEnterEvent) {
+		 * linkEnterEventCounter++; } if (list.get(i) instanceof LinkLeaveEvent) {
+		 * linkLeaveEventCounter++; } if (list.get(i) instanceof
+		 * AgentDepartureEvent) { departureEventCounter++; } if (list.get(i)
+		 * instanceof AgentArrivalEvent) { arrivalEventCounter++; }
+		 *  } ExpectedNumberOfEvents expected =
+		 * expectedNumberOfMessages.get(list .get(0).agentId); // if
+		 * (estimate.expectedLinkEnterEvents!=linkEnterEventCounter){ // for
+		 * (int j=0;j<list.size();j++){ //
+		 * System.out.println(list.get(j).toString()); // } // } else { //
+		 * System.out.println("ok"); // }
+		 * 
+		 * assertEquals(expected.expectedLinkEnterEvents,
+		 * linkEnterEventCounter);
+		 * assertEquals(expected.expectedLinkLeaveEvents,
+		 * linkLeaveEventCounter);
+		 * assertEquals(expected.expectedDepartureEvents,
+		 * departureEventCounter); assertEquals(expected.expectedArrivalEvents,
+		 * arrivalEventCounter); }
+		 *  // check, that each enter event is followed by a leave event //
+		 * check, that the same road is left, which is entered for (LinkedList<BasicEvent>
+		 * list : events.values()) { for (int i = 0; i < list.size(); i++) { if
+		 * (list.get(i) instanceof LinkEnterEvent) {
+		 * 
+		 * try { assertEquals(true, list.get(i + 1) instanceof LinkLeaveEvent); }
+		 * catch (Exception e) { for (int j = 0; j < list.size(); j++) {
+		 * System.out.println(list.get(j)); } e.printStackTrace();
+		 * System.exit(0); }
+		 * 
+		 * LinkEnterEvent enterEvent = (LinkEnterEvent) list.get(i);
+		 * LinkLeaveEvent leaveEvent = (LinkLeaveEvent) list .get(i + 1); //
+		 * System.out.println(enterEvent); if
+		 * (!enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId)) { for (int j =
+		 * 0; j < list.size(); j++) { System.out.println(list.get(j)); }
+		 * System.out.println("===========error===========");
+		 * System.out.println(enterEvent.toString());
+		 * System.out.println(leaveEvent.toString()); }
+		 * 
+		 * assertEquals(true, enterEvent.linkId
+		 * .equalsIgnoreCase(leaveEvent.linkId)); } } }
+		 * 
 		 */
-		
+
 		// compare plan and events for each agent
 		// compare: type of events, linkId
 		for (LinkedList<PersonEvent> list : events.values()) {
-			Person p = population.getPersons().get(new IdImpl(list.get(0).agentId));
-			
-			Plan plan = p.getSelectedPlan();
-			int index=0;
+			Person p = population.getPersons().get(
+					new IdImpl(list.get(0).agentId));
 
-			
+			Plan plan = p.getSelectedPlan();
+			int index = 0;
+
 			ActIterator actIter = plan.getIteratorAct();
 			LegIterator legIter = plan.getIteratorLeg();
-			
+
 			Act act = (Act) actIter.next();
 			while (legIter.hasNext()) {
-				
+
 				Leg leg = (Leg) legIter.next();
-				
+
 				// each leg starts with departure on act link
-				assertEquals(true,list.get(index) instanceof  AgentDepartureEvent); 
-				assertEquals(true,act.getLinkId().toString().equalsIgnoreCase(((AgentDepartureEvent)list.get(index)).linkId));
+				assertEquals(true,
+						list.get(index) instanceof AgentDepartureEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((AgentDepartureEvent) list.get(index)).linkId));
 				index++;
-				
+
 				// each leg must enter/leave act link
-				assertEquals(true,list.get(index) instanceof  LinkEnterEvent); 
-				assertEquals(true,act.getLinkId().toString().equalsIgnoreCase(((LinkEnterEvent)list.get(index)).linkId));
+				assertEquals(true, list.get(index) instanceof LinkEnterEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((LinkEnterEvent) list.get(index)).linkId));
 				index++;
-				
-				assertEquals(true,list.get(index) instanceof  LinkLeaveEvent); 
-				assertEquals(true,act.getLinkId().toString().equalsIgnoreCase(((LinkLeaveEvent)list.get(index)).linkId));
+
+				assertEquals(true, list.get(index) instanceof LinkLeaveEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((LinkLeaveEvent) list.get(index)).linkId));
 				index++;
-				
-				
+
 				for (Link link : leg.getRoute().getLinkRoute()) {
 					// enter link and leave each link on route
-					assertEquals(true,list.get(index) instanceof  LinkEnterEvent); 
-					assertEquals(true,link.getId().toString().equalsIgnoreCase(((LinkEnterEvent)list.get(index)).linkId));
+					assertEquals(true,
+							list.get(index) instanceof LinkEnterEvent);
+					assertEquals(true, link.getId().toString()
+							.equalsIgnoreCase(
+									((LinkEnterEvent) list.get(index)).linkId));
 					index++;
-					
-					assertEquals(true,list.get(index) instanceof  LinkLeaveEvent); 
-					assertEquals(true,link.getId().toString().equalsIgnoreCase(((LinkLeaveEvent)list.get(index)).linkId));
+
+					assertEquals(true,
+							list.get(index) instanceof LinkLeaveEvent);
+					assertEquals(true, link.getId().toString()
+							.equalsIgnoreCase(
+									((LinkLeaveEvent) list.get(index)).linkId));
 					index++;
 				}
-				
+
 				// get next act
 				act = (Act) actIter.next();
-				
+
 				// each leg ends with arrival on act link
-				assertEquals(true,list.get(index) instanceof  AgentArrivalEvent); 
-				assertEquals(true,act.getLinkId().toString().equalsIgnoreCase(((AgentArrivalEvent)list.get(index)).linkId));
+				assertEquals(true, list.get(index) instanceof AgentArrivalEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((AgentArrivalEvent) list.get(index)).linkId));
 				index++;
 			}
 		}
-		
-		
-		
-		
 
 	}
 
@@ -379,7 +366,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 			expectedNumberOfMessages.put(p.getId().toString(), expected);
 
 			if (p.getId().toString().equalsIgnoreCase("1")) {
-				//printPlan(plan);
+				// printPlan(plan);
 			}
 
 		}

@@ -18,12 +18,12 @@ import playground.wrashid.util.DEQSimEventFileComparator;
 import playground.wrashid.util.DEQSimEventFileTravelTimeComparator;
 import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
-public class PDESStarter2Test extends MatsimTestCase {
+public class TestPDESStarter2_EquilPopulationPlans1Modified1 extends MatsimTestCase {
 
 	// mit enable assertion flag funktionieren einige tests nicht mehr!!! => make test cases for these assertions.
 
 	
-	public void test_equilPlans1_TestHandlerDetailedEventChecker() {
+	public void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
 		Gbl.reset();
 		
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
@@ -33,7 +33,7 @@ public class PDESStarter2Test extends MatsimTestCase {
 	}
 	
 	
-	public void test_equilPlans1_DEQSimEventFileComparator() {
+	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileComparator() {
 		Gbl.reset();
 
 		DEQSimEventFileComparator deqSimComparator = new DEQSimEventFileComparator("test/src/playground/wrashid/input/deqsim/deq_events.txt");
@@ -42,7 +42,7 @@ public class PDESStarter2Test extends MatsimTestCase {
 				new EquilPopulationPlans1Modified1());
 	}
 	
-	public void test_equilPlans1_DEQSimEventFileTravelTimeComparator() {
+	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileTravelTimeComparator() {
 		Gbl.reset();
 
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events.txt",5);
@@ -52,38 +52,6 @@ public class PDESStarter2Test extends MatsimTestCase {
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public void test_equilEvent() {
-		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
-		detailedChecker.startTestPDES2("test/scenarios/equil/config.xml", false,
-				null, null);
-		
-		Gbl.reset();
-		
-		// This test cannot function, because DEQSim and JDEQSim can have different orders of cars at junction
-		//DEQSimEventFileComparator deqSimComparator = new DEQSimEventFileComparator("test/src/playground/wrashid/input/deqsim/deq_events100.txt");
-		//deqSimComparator.startTestPDES2("test/scenarios/equil/config.xml", false,
-		//		null, null);
-	}
-
-
-
-	public void test_Berlin() {
-		TestHandlerDetailedEventChecker orderChecker = new TestHandlerDetailedEventChecker();
-		orderChecker.startTestPDES2("test/scenarios/berlin/config.xml", false,
-				null, null);
-	}
 
 	
 

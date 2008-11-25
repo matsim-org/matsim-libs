@@ -5,7 +5,7 @@ import playground.wrashid.PDES2.util.ConcurrentListMPDSCTest;
 import playground.wrashid.PDES2.util.MyPriorityQueueTest;
 import playground.wrashid.PHEV.Utility.EnergyConsumptionSamplesTest;
 import playground.wrashid.deqsim.DEQSimStarterTest;
-import playground.wrashid.deqsim.PDESStarter2Test;
+import playground.wrashid.deqsim.TestPDESStarter2_EquilPopulationPlans1Modified1;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -15,7 +15,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.wrashid.deqsim");
 
 		suite.addTestSuite(DEQSimStarterTest.class);
-		suite.addTestSuite(PDESStarter2Test.class);
+		suite.addTestSuite(TestPDESStarter2_EquilPopulationPlans1Modified1.class);
 		
 		return suite;
 	}

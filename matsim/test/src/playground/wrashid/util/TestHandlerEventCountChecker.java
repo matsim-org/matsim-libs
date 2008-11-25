@@ -12,6 +12,15 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
+import org.matsim.events.handler.ActEndEventHandler;
+import org.matsim.events.handler.ActStartEventHandler;
+import org.matsim.events.handler.AgentArrivalEventHandler;
+import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.events.handler.EventHandler;
+import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -24,7 +33,11 @@ import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
 
-public class TestHandlerEventCountChecker extends MatsimTestCase implements TestHandler {
+public class TestHandlerEventCountChecker extends MatsimTestCase implements
+TestHandler, ActEndEventHandler, ActStartEventHandler,
+AgentDepartureEventHandler, AgentStuckEventHandler,
+AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler,
+LinkEnterEventHandler, LinkLeaveEventHandler  {
 
 	private int expectedLinkEnterEvents;
 	private int expectedLinkLeaveEvents;
