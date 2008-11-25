@@ -267,9 +267,10 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @param arrive
-	 * @return
+	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
+	 * where it was null beforehand
+	 * @param arrive Intervalls at which node is reachable
+	 * @return true iff anything was changed
 	 */
 	public boolean setTrue(ArrayList<Intervall> arrive,Link link) {
 		boolean changed = false;
@@ -283,10 +284,10 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * TODO
-	 * @param arrive
-	 * @param link
-	 * @return
+	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
+	 * where it was null beforehand
+	 * @param arrive Intervall at which node is reachable
+	 * @return true iff anything was changed
 	 */
 	public boolean setTrue(Intervall arrive,Link link){
 		boolean changed = false;
