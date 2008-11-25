@@ -156,8 +156,10 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 	protected List<Act>  defineMovablePrimaryActivities(final Plan plan) {
 
-		List<Act> movablePrimaryActivities = new Vector<Act>();
-			
+		/*
+		 * TODO: maybe better use a hash-map for both structures (speed-up?) 
+		 */
+		List<Act> movablePrimaryActivities = new Vector<Act>();		
 		TreeMap<String, List<Act>> primaryActivities = new TreeMap<String, List<Act>>();
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
