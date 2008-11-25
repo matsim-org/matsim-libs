@@ -31,11 +31,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 import org.matsim.gbl.Gbl;
 import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.DES.util.testable.PopulationModifier;
+import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.scenarios.EquilPopulationPlans1Modified1;
 import playground.wrashid.util.DummyPopulationModifier;
-import playground.wrashid.util.PopulationModifier;
-import playground.wrashid.util.TestHandler;
 import playground.wrashid.util.TestHandlerDetailedEventChecker;
 import playground.wrashid.util.TestHandlerEventCountChecker;
 

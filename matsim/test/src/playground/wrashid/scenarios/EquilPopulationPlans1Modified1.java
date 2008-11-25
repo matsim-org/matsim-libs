@@ -7,7 +7,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
-import playground.wrashid.util.PopulationModifier;
+import playground.wrashid.DES.util.testable.PopulationModifier;
 
 public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 

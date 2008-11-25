@@ -25,11 +25,14 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
 import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.DES.util.testable.PopulationModifier;
+import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
+import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends TestHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements TestHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents=new LinkedList<PersonEvent>();

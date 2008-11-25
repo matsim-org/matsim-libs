@@ -2,6 +2,8 @@ package playground.wrashid.util;
 
 import org.matsim.population.Population;
 
+import playground.wrashid.DES.util.testable.PopulationModifier;
+
 public class DummyPopulationModifier implements PopulationModifier {
 	Population population=null;
 	

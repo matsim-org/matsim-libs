@@ -16,12 +16,15 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.DES.SimulationParameters;
+import playground.wrashid.DES.util.testable.PopulationModifier;
+import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
 
-public class TestHandlerEventCountChecker extends TestHandler {
+public class TestHandlerEventCountChecker extends MatsimTestCase implements TestHandler {
 
 	private int expectedLinkEnterEvents;
 	private int expectedLinkLeaveEvents;
@@ -36,7 +39,7 @@ public class TestHandlerEventCountChecker extends TestHandler {
 
 	public boolean printEvent = true;
 
-	@Override
+	
 	public void checkAssertions() {
 		assertEquals(expectedLinkEnterEvents,linkEnterEventCounter); 
 		assertEquals(expectedLinkLeaveEvents,linkLeaveEventCounter); 
