@@ -93,8 +93,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 			TreeMap<Id, Facility> tree_of_type = tree_it.next();
 			String type = type_it.next();						
 			this.quad_trees.put(type, this.builFacQuadTree(type, tree_of_type));
-			Facility [] facility_array = (Facility [])(tree_of_type.values().toArray());
-			this.facilities_of_type.put(type, facility_array);
+			this.facilities_of_type.put(type, tree_of_type.values().toArray(new Facility[tree_of_type.size()]));
 		}
 		
 		
