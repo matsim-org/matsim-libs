@@ -52,6 +52,7 @@ import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
@@ -149,6 +150,8 @@ import playground.marcel.ptnetwork.PtNetworkLayer;
 import playground.marcel.ptnetwork.PtNode;
 
 public class MyRuns {
+
+	private final static Logger log = Logger.getLogger(MyRuns.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// createKutterPlans
@@ -279,39 +282,47 @@ public class MyRuns {
 
 	public static void readPlans(final String[] args) {
 
-		System.out.println("RUN: readPlans");
+		log.info("RUN: readPlans");
 
-		final Config config = Gbl.createConfig(args);
+		Gbl.printSystemInfo();
+
+		final Config config = Gbl.createConfig(new String[] {"../mystudies/navteq-config.xml"}); // overwrite args
 		final ScenarioData data = new ScenarioData(config);
 
-		System.out.println("  reading world, facilities and network ... ");
+		log.info("reading world, facilities and network ... ");
 		data.getWorld();
 		data.getFacilities();
 		data.getNetwork();
-		System.out.println("  done.");
+		log.info("done.");
 
-		System.out.println("  setting up plans objects...");
+//		log.info("analyzing subsequent links");
+//		Subsequent subsequent = new Subsequent(data.getNetwork());
+//		Leg.subsequentLinks = subsequent.getSubsequentLinks();
+//		log.info("done");
+
+		log.info("setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		System.out.println("  done.");
+		log.info("done.");
 
 		System.gc();System.gc();System.gc();
-		System.out.println("  memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
+		log.info("memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
+		Gbl.printMemoryUsage();
 
-		System.out.println("  reading plans...");
+		log.info("reading plans...");
 		System.out.flush();
 		final long startTime = System.currentTimeMillis();
 		plansReader.readFile(config.plans().getInputFile());
 		final long stopTime = System.currentTimeMillis();
-		System.out.println("  done.");
+		log.info("done.");
 		plans.printPlansCount();
 
 		System.gc();System.gc();System.gc();
-		System.out.println("  memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
-		System.out.println("  time used: " + (stopTime - startTime));
+		log.info("memory used: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024.0);
+		log.info("time used: " + (stopTime - startTime));
+		Gbl.printMemoryUsage();
 
-		System.out.println("RUN: readPlans finished.");
-		System.out.println();
+		log.info("RUN: readPlans finished.");
 	}
 
 
@@ -1967,9 +1978,9 @@ public class MyRuns {
 	}
 
 	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
-		
+
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
-		
+
 		final MultiGeometryType networkGeom = kmlObjectFactory.createMultiGeometryType();
 
 		for (Link link : network.getLinks().values()) {
@@ -2061,7 +2072,7 @@ public class MyRuns {
 		System.out.println("  writing the network...");
 
 		final ObjectFactory kmlObjectFactory = new ObjectFactory();
-		
+
 		final KmlType kml = kmlObjectFactory.createKmlType();
 
 		final DocumentType kmlDoc = kmlObjectFactory.createDocumentType();
@@ -2082,17 +2093,17 @@ public class MyRuns {
 		final FolderType networksFolder = kmlObjectFactory.createFolderType();
 		networksFolder.setId("networks");
 		kmlDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networksFolder));
-		
+
 		if (useVolumes) {
 			for (int hour = 4; hour < 23; hour++) {
 				System.out.println("adding network hour = " + hour);
-				
+
 				final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
 				placemark.setId("network " + hour);
 				placemark.setName("Network at " + hour);
 				placemark.setDescription("the road network at " + hour);
 				placemark.setStyleUrl(style.getId());
-				
+
 				TimeSpanType timeSpan = kmlObjectFactory.createTimeSpanType();
 				timeSpan.setBegin("1970-01-01T" + Time.writeTime(hour * 3600));
 				timeSpan.setEnd("1970-01-01T" + Time.writeTime(hour * 3600 + 59 * 60 + 59));
@@ -2104,18 +2115,18 @@ public class MyRuns {
 				}
 				placemark.setAbstractGeometryGroup(
 						kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, hourValues, new CH1903LV03toWGS84())));
-				
+
 				networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 			}
 		} else {
-			
+
 			final PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
 			placemark.setId("network");
 			placemark.setName("Network");
 			placemark.setDescription("the road network");
 			placemark.setStyleUrl(style.getId());
 			placemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, new CH1903LV03toWGS84())));
-			
+
 			networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 		}
 
@@ -2146,7 +2157,7 @@ public class MyRuns {
 		System.out.println("  writing the network...");
 
 		final ObjectFactory kmlObjectFactory = new ObjectFactory();
-		
+
 		final KmlType kml = kmlObjectFactory.createKmlType();
 
 		final DocumentType kmlDoc = kmlObjectFactory.createDocumentType();
@@ -2174,7 +2185,7 @@ public class MyRuns {
 		placemark.setDescription("the road network");
 		placemark.setStyleUrl(style.getId());
 		placemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(getNetworkAsKml(network, new GK4toWGS84())));
-		
+
 		networksFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 
 		final KMZWriter kmzWriter = new KMZWriter("test.kml");
@@ -2496,12 +2507,12 @@ public class MyRuns {
 //		fmaToTrips(args);
 
 //		convertPlans(args);
-//		readPlans(args);
+		readPlans(args);
 //		removeLinkAndRoute(args);
 
 		/* ***   DEMAND MODELING   *** */
 
-		filterSelectedPlans(args);
+//		filterSelectedPlans(args);
 //		filterPlansInArea(args, 4582000, 5939000, 4653000, 5850000);  // uckermark
 //		filterPlansInArea(args, 4580000, 5807000, 4617000, 5835000);  // berlin
 //		filterPlansWithRouteInArea(args, 683518.0, 246836.0, 30000.0); // Bellevue Zrh, 30km
