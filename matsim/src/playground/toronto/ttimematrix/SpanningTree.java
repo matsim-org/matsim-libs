@@ -69,7 +69,7 @@ public class SpanningTree {
 	// inner classes
 	//////////////////////////////////////////////////////////////////////
 
-	static class NodeData {
+	public static class NodeData {
 		private Node prev = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
