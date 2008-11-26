@@ -37,7 +37,7 @@ import org.matsim.utils.geometry.Coord;
 
 
 
-public abstract class LocationMutatorwChoiceSet extends LocationMutator {
+public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 	protected int unsuccessfullLC = 0;
@@ -99,7 +99,51 @@ public abstract class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	
-	protected abstract boolean handleSubChain(SubChain subChain, double speed, int trialNr);
+	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr){
+		if (trialNr > 50) {		
+			this.unsuccessfullLC += 1;
+					
+			Iterator<Act> act_it = subChain.getSlActs().iterator();
+			while (act_it.hasNext()) {
+				Act act = act_it.next();
+				/* 
+				 * TODO: Shoot into a growing circle instead of into the universal choice set
+				 */
+				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
+			}
+			return true;
+		}
+		
+		Coord startCoord = subChain.getStartCoord();
+		Coord endCoord = subChain.getEndCoord();
+		double ttBudget = subChain.getTtBudget();		
+		
+		Act prevAct = subChain.getFirstPrimAct();
+		
+		Iterator<Act> act_it = subChain.getSlActs().iterator();
+		while (act_it.hasNext()) {
+			Act act = act_it.next();
+			double radius = (ttBudget * speed) / 2.0;	
+			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
+				return false;
+			}
+					
+			startCoord = act.getCoord();				
+			ttBudget -= this.computeTravelTime(prevAct, act);
+			
+			if (!act_it.hasNext()) {
+				double tt2Anchor = this.computeTravelTime(act, subChain.getLastPrimAct());
+				ttBudget -= tt2Anchor;
+			}
+			
+			if (ttBudget < 0.0) {
+				return false;
+			}
+			prevAct = act;
+		}
+		return true;
+	}
+
 	
 	protected boolean modifyLocation(Act act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		

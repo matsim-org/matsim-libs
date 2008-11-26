@@ -29,6 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.utils.geometry.Coord;
 
+@Deprecated
 public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet {
 	
 	//private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSetSimultan.class);

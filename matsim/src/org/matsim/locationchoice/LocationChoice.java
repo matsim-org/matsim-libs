@@ -27,7 +27,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
@@ -85,8 +85,8 @@ public class LocationChoice extends MultithreadedModuleA {
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
-				unsuccessfull += ((LocationMutatorwChoiceSetSimultan)plan_algo).getNumberOfUnsuccessfull();
-				((LocationMutatorwChoiceSetSimultan)plan_algo).resetUnsuccsessfull();
+				unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
+				((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
 			}		
 			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);	
 				
@@ -101,7 +101,7 @@ public class LocationChoice extends MultithreadedModuleA {
 			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler));
 		}
 		else {
-			this.planAlgoInstances.add(new LocationMutatorwChoiceSetSimultan(this.network, this.controler));
+			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler));
 		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}

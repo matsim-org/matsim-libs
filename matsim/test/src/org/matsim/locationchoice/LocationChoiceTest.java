@@ -6,7 +6,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.locationchoice.LocationChoice;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -58,7 +58,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		locationchoice.setConstrained(false);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
 		locationchoice.setConstrained(true);
-		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), LocationMutatorwChoiceSetSimultan.class);
+		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), LocationMutatorwChoiceSet.class);
 	}	
 	
 	public void testFinish() {	
