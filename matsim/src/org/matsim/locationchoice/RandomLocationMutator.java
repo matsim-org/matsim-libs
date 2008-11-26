@@ -56,11 +56,13 @@ public class RandomLocationMutator extends LocationMutator {
 			boolean movable = movablePrimaryActivities.contains(act);
 			
 			if (!isPrimary || movable) {
-				int size = this.quad_trees.get(act.getType()).size();
+				int length = this.facilities_of_type.get(act.getType()).length;
 				// only one facility: do not need to do location choice
-				if (size > 1) {
-					Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
-					                       MatsimRandom.random.nextInt(size-1)];										
+				if (length > 1) {
+				//	Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
+				//	                       MatsimRandom.random.nextInt(size-1)];
+					Facility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.random.nextInt(length-1)];
+					
 					act.setFacility(facility);
 					act.setLink(this.network.getNearestLink(facility.getCenter()));
 					act.setCoord(facility.getCenter());
