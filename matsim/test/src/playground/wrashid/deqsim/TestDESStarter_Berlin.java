@@ -18,21 +18,22 @@ import playground.wrashid.util.DEQSimEventFileComparator;
 import playground.wrashid.util.DEQSimEventFileTravelTimeComparator;
 import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
-public class TestPDESStarter2_Berlin extends MatsimTestCase {
+public class TestDESStarter_Berlin extends MatsimTestCase {
 
 	
 	
-	
+
 	
 	public void test_Berlin_TestHandlerDetailedEventChecker() {
 		Gbl.reset();
 		
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
-		detailedChecker.startTestPDES2("test/scenarios/berlin/config.xml", false,
+		detailedChecker.startTestDES("test/scenarios/berlin/config.xml", false,
 				null, null);
 	}
 	
 	
+
 
 	
 
