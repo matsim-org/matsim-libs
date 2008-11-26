@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.BasicEvent;
 import org.matsim.events.PersonEvent;
 
 import playground.wrashid.DES.EventLog;
@@ -34,18 +35,27 @@ public class EventLibrary {
 		return travelTime;
 	}
 	
-	
+	/*
+	 * Get the sum of the travel time of all agents (time between each departure and arrival)
+	 */
 	public static double getSumTravelTime(LinkedList<PersonEvent> events) {
 		double travelTime = 0;
 		
 		// key=vehicleId, value=starting time of last leg
 		HashMap<String, Double> startingTime = new HashMap<String, Double>();
-		
+		PersonEvent currentEvent=null;
 		for (int i = 0; i < events.size(); i++) {
-				if (events.get(i) instanceof AgentDepartureEvent) {
-					startingTime.put(events.get(i).agentId, events.get(i).time);
-				} else if (events.get(i) instanceof AgentArrivalEvent) {
-					travelTime += events.get(i).time - startingTime.get(events.get(i).agentId);
+			currentEvent=events.get(i);
+				if (currentEvent instanceof AgentDepartureEvent) {
+					if (currentEvent.time<0){
+						// the problem is, that some agent departure events are negative.
+						// this solves this problem
+						startingTime.put(currentEvent.agentId, 0.0);
+					} else {
+						startingTime.put(currentEvent.agentId, currentEvent.time);
+					}
+				} else if (currentEvent instanceof AgentArrivalEvent) {
+					travelTime += currentEvent.time - startingTime.get(currentEvent.agentId);
 				}
 		}
 
