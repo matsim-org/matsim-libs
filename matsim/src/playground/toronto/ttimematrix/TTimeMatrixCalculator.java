@@ -80,6 +80,9 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Produces a Map that has "fromZone,toZone" as key, and leaves the values open
+	 */
 	private final void initMatrix() {
 		log.info("  init matrix...");
 		Set<Id> zids = new HashSet<Id>();
@@ -97,8 +100,15 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Initializes a place where link2link ttimes can be added into zones
+	 * (so I assume that this class will actually run the spanning tree algo
+	 * for every link.  well, actually no, see later.)
+	 */
 	private final void initTTimeMatrix() {
 		log.info("  init hourly ttimeMatrix...");
+
+		// produces one entry for every zone.  Since it is a set, repeated entries are not inserted.
 		Set<Id> zids = new HashSet<Id>();
 		for (Id zid : l2zMapping.values()) { zids.add(zid); }
 		
@@ -111,11 +121,22 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 				tmap.put(tzone,tuple);
 			}
 		}
+		// so if you say ttimeMatrix.get(fromZoneId), you get tmap<ToZoneId,Tuple>.
+		// if you say tmap.get(toZoneId), you get tuple<Double,Integer>
+		// Seems that "Double" ends up being the ttimeSum, and "Integer" ends up being the cnt
 		log.info("  done.");
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Adds a link travel time entry to the ttime matrix
+	 * (at this point, does not depend on departure time) 
+	 * 
+	 * @param fzone
+	 * @param tzone
+	 * @param ttime
+	 */
 	private final void addTTime(Id fzone, Id tzone, double ttime) {
 		Map<Id,Tuple<Double,Integer>> tmap = ttimeMatrix.get(fzone);
 		Tuple<Double,Integer> tuple = tmap.get(tzone);
@@ -124,6 +145,21 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	
 	//////////////////////////////////////////////////////////////////////
 
+	/**
+	 * For a given "hour" (given externally): 
+	 *    Goes through all fromZones
+	 *    Picks representative startNode for that zone
+	 *    (Well, no, the "zone" is a "node".  I guess these are centroids?!?!)
+	 *    Runs the spanning tree algo.  
+	 *    For every toZone:
+	 *        IF there is nothing in "tuple" then it takes the result from the spanning tree algo
+	 *        ELSE it takes the entry from "tuple" (I assume those are results of real trip times)
+	 *        It appends the ttime from the fZone to the toZone to a comma separated string
+	 *        
+	 * The method is triggered whenever an eventfile has finished a certain hour (meaning the probe particles seem
+	 * to be averages over everybody ARRIVING during a certain hour, while the spanning tree seems to start from 
+	 * a DEPARTURE time)
+	 */
 	private final void storeMatrix() {
 		log.info("  gather hourly ttimes to the matrix...");
 		System.out.println("0%       10%       20%       30%       40%       50%       60%       70%       80%       90%       100%");
