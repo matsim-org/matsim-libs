@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ClusterModule.java
+ * RecyclingModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,33 +36,42 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.scoring.PlanScorer;
-
 import java.util.ArrayList;
 
-public class ClusterModule implements StrategyModule {
+/**
+ * @author Matthias Feil
+ * This is a module that individually optimizes a number (=this.testAgentsNumber) of agents
+ * and then recycles the derived plans for all further agents to be replanned.
+ * The module is doubly parallelized meaning that
+ * the individual optimization of the agents is parallel
+ * the assigment of one of the optimized plan to all further agents is parallel.
+ */
+
+
+public class RecyclingModule implements StrategyModule {
 	
 	private  ArrayList<Plan> []				list;
-	private final MultithreadedModuleA 		module;
+	private final MultithreadedModuleA 		schedulingModule;
+	private final MultithreadedModuleA		assignmentModule;
 	private final PreProcessLandmarks		preProcessRoutingData;
 	private final LocationMutatorwChoiceSet locator;
-	private final PlansCalcRouteLandmarks 	router;
+	//private final PlansCalcRouteLandmarks 	router;
 	private final LegTravelTimeEstimator	estimator;
 	private final double					minimumTime;
 	private final ScheduleCleaner			cleaner;
-	private final String					mode;
 	private final PlanAlgorithm				timer;
-	private final int						clusterNumber, testAgentsNumber;
+	private final int						testAgentsNumber;
 	private String[]						criteria;
 	private final Controler					controler;
-	private double							distanceMeasure;
+	private OptimizedAgents 				agents;
 	
 	
 	
-	public ClusterModule (ControlerMFeil controler){
+	public RecyclingModule (ControlerMFeil controler){
 		this.controler=controler;
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
-		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
+		//this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
@@ -73,11 +82,11 @@ public class ClusterModule implements StrategyModule {
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
-		this.module 				= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.estimator, this.locator, this.timer);
+		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.estimator, this.locator, this.timer);
+		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.estimator, this.locator,
+			this.timer, this.cleaner, this, this.minimumTime);
 		this.minimumTime			= 1800;
-		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);
-		this.mode					= "timer";		
-		this.clusterNumber			= 2;
+		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);		
 		this.testAgentsNumber		= 5;
 		this.criteria				= new String [2];
 		this.criteria [0]			= "distance";
@@ -86,11 +95,12 @@ public class ClusterModule implements StrategyModule {
 	
 	public void init() {
 		
-		this.list = new ArrayList [this.clusterNumber];
-		for (int i=0;i<this.clusterNumber;i++){
+		this.list = new ArrayList [2];
+		for (int i=0;i<2;i++){
 			list[i] = new ArrayList<Plan>();
 		}
-		this.module.init();
+		this.schedulingModule.init();
+		this.assignmentModule.init();
 	}
 
 	public void handlePlan(final Plan plan) {	
@@ -101,13 +111,23 @@ public class ClusterModule implements StrategyModule {
 
 	public void finish(){
 		
-		for (int i=0;i<list[0].size();i++) module.handlePlan(list[0].get(i));
-		module.finish();
+		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
+		schedulingModule.finish();
 		
+		/*
 		double [] distancesTestAgents = new double [list[0].size()];
 		for (int i=0;i<distancesTestAgents.length;i++){
 			distancesTestAgents[i] = list[0].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[0].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 		}
+		*/
+		this.agents = new OptimizedAgents (this.list[0]);
+		
+		for (int i=0;i<list[1].size();i++){
+			this.assignmentModule.handlePlan(this.list[1].get(i));
+		}
+		
+		this.assignmentModule.finish();
+		/*
 		int [] allocations = new int [list[1].size()];
 		for (int i=0;i<list[1].size();i++){
 			double distance = Double.MAX_VALUE;
@@ -126,58 +146,15 @@ public class ClusterModule implements StrategyModule {
 			}
 			else this.cleanUpPlan(list[1].get(i));
 		}
+		*/
 	}
 	
-	private void cleanUpPlan (Plan plan){
-		double move = this.cleaner.run(((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
-		int loops=1;
-		while (move!=0.0){
-			loops++;
-			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
-			if (loops>3) {
-				for (int i=2;i< plan.getActsLegs().size()-4;i+=2){
-					((Act)(plan.getActsLegs().get(i))).setDuration(this.minimumTime);
-				}
-				move = this.cleaner.run(this.minimumTime, plan);
-				if (move!=0.0){
-					throw new IllegalArgumentException("No valid plan possible for person "+plan.getPerson().getId());
-				}
-			}
-		}
+	public OptimizedAgents getOptimizedAgents (){
+		return this.agents;
 	}
 	
 	
-	private void writePlan (Plan in, Plan out){
-		Plan bestPlan = new Plan (in.getPerson());
-		bestPlan.copyPlan(in);
-		ArrayList<Object> al = out.getActsLegs();
-		if(al.size()>bestPlan.getActsLegs().size()){ 
-			int i;
-			for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
-				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-			for (int j = i; j<al.size()-2;j=j+0){
-				al.remove(j);
-			}
-		}
-		else if(al.size()<bestPlan.getActsLegs().size()){
-			int i;
-			for (i = 2; i<al.size()-2;i++){
-				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-			for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
-				al.add(j, bestPlan.getActsLegs().get(j));
-			}
-		}
-		else {
-			for (int i = 2; i<al.size()-2;i++){
-			al.remove(i);
-			al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-		}
-	}
+	
 	
 	private double [] findDistanceMeasure (final ArrayList<Plan> list){
 		
