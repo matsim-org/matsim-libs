@@ -29,8 +29,8 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.ExeRunner;
+import org.matsim.world.Layer;
 import org.matsim.world.Location;
-
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"
@@ -47,15 +47,32 @@ import org.matsim.world.Location;
 public class Test {
 	private static final Logger log = Logger.getLogger(Test.class);
 	
-	private static final int U_CELL = 0 ;
+//	private static final int U_CELL = 0 ;
 	private static final int U_PARCEL = 1 ;
 	private static final int U_MODEL_TYPE = U_PARCEL ; // configure!! (as of nov08, does NOT work for U_CELL)
 
 	public static void main ( String[] args ) {
 		log.info("Starting the matsim run from the urbansim interface.  This looks a little rough initially since 'normal' matsim" ) ;
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
-		
-		ReadFromUrbansim readFromUrbansim ;
+
+		// parse the config arguments so we have a config.  generate scenario data from this
+		Config config = Gbl.createConfig(args);
+		ScenarioData scenarioData = new ScenarioData(config) ;
+
+		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
+		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
+		NetworkLayer network = scenarioData.getNetwork() ;
+
+		log.info("") ;
+		log.info("cleaning network ...");
+		NetworkCleaner nwCleaner = new NetworkCleaner() ;
+		nwCleaner.run( network ) ;
+		log.info("... finished cleaning network.") ;
+		log.info("") ;
+
+		// define which urbansim reader to use.  Hard-coded right now to facilitate cross-linking of code.
+//		ReadFromUrbansim readFromUrbansim ;
+		ReadFromUrbansimParcelModel readFromUrbansim ;
 		if ( U_MODEL_TYPE==U_PARCEL ) {
 			readFromUrbansim = new ReadFromUrbansimParcelModel() ;
 //		} else if ( U_MODEL_TYPE==U_CELL ) {
@@ -72,42 +89,41 @@ public class Test {
 //		facWriter.write();
 		
 		// read urbansim persons (possibly indirectly, e.g. via households).  Generates hwh acts as side effect
-		Population population = new Population(Population.NO_STREAMING);
-		readFromUrbansim.readPersons( population, facilities, 0.01 ) ;
+		Population oldPop = scenarioData.getPopulation() ;
+		Population newPop = new Population(Population.NO_STREAMING);
+		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, 0.01 ) ;
+		oldPop=null ;
+		System.gc() ;
 				
-		PopulationWriter popWriter = new PopulationWriter(population,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
+		PopulationWriter popWriter = new PopulationWriter(newPop,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
 		popWriter.write();
 		
-		// construct urbansim zones (need them for output later)
+		log.info("BEGIN constructing urbansim zones.") ;
 		Facilities zones = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readZones( zones, facilities ) ;
+		log.info("DONE with constructing urbansim zones.") ;
 
 		System.out.println("### DONE with demand generation from urbansim ###") ;
 		System.gc() ;
 		
-		Config config = Gbl.createConfig(args);
-		ScenarioData scenarioData = new ScenarioData(config) ;
-		NetworkLayer network = scenarioData.getNetwork() ;
-		
-		log.info("cleaning network ...");
-		NetworkCleaner nwCleaner = new NetworkCleaner() ;
-		nwCleaner.run( network ) ;
-		log.info("... finished cleaning network.\n") ;
-
 		config.controler().setOutputDirectory(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"output") ;
 		log.warn("matsim output path set to fixed value to make sure that it is at correct place for feedback to urbansim");
 
-		Controler controler = new Controler(config,network,population) ;
+		Controler controler = new Controler(config,network,newPop) ;
 		controler.setOverwriteFiles(true) ;
+
+		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
+		controler.addControlerListener(myControlerListener);
+
 		controler.run() ;
 
-		for ( Iterator it = zones.getFacilities().values().iterator(); it.hasNext(); ) {
-			Facility fromZone = (Facility) it.next();
-			Node fromNode = network.getNearestNode(fromZone.getCenter()) ; 
-			for ( Iterator it2 = zones.getFacilities().values().iterator(); it.hasNext(); ) {
-				Facility toZone = (Facility) it.next();
-				Node toNode = network.getNearestNode( toZone.getCenter() ) ;
-			}
-		}
+//		for ( Iterator it = zones.getFacilities().values().iterator(); it.hasNext(); ) {
+//			Facility fromZone = (Facility) it.next();
+//			Node fromNode = network.getNearestNode(fromZone.getCenter()) ; 
+//			for ( Iterator it2 = zones.getFacilities().values().iterator(); it.hasNext(); ) {
+//				Facility toZone = (Facility) it.next();
+//				Node toNode = network.getNearestNode( toZone.getCenter() ) ;
+//			}
+//		}
 	}
 }
