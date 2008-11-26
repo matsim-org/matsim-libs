@@ -20,6 +20,7 @@
 
 package org.matsim.replanning.selectors;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Person;
@@ -31,6 +32,7 @@ import org.matsim.population.Plan;
  * @author kn based on mrieser
  */
 public class ExpBetaPlanChanger implements PlanSelector {
+	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
 	static boolean betaFlag = true ;
@@ -57,8 +59,15 @@ public class ExpBetaPlanChanger implements PlanSelector {
 		double otherScore = otherPlan.getScore();
 
 		if ( betaFlag ) {
-			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08
-			System.err.println( "(This has now been done.  If you have used expBetaPlanChanger before, double the beta in your config file.)") ; // ask kai.  Jul08
+//			System.err.println( "ExpBetaPlanChanger: The following beta should be replaced by beta/2.  Not fatal.") ; // ask kai.  Jul08
+//			System.err.println( "(This has now been done.  If you have used expBetaPlanChanger before, double the beta in your config file.)") ; // ask kai.  Jul08
+			log.warn("Would make sense to revise this once more.  See comments in code.  kai, nov08") ;
+			/*** Gunnar says, rightly I think, that what is below hits the "0.01*weight > 1" threshold fairly quickly.
+			 *   An alternative might be to divide by exp(0.5*beta*oS)+exp(0.5*beta*cS), or the max of these two numbers.  But:
+			 *   (1) someone would need to go through the theory to make sure that we remain within what we have said before
+			 *       (convergence to logit and proba of jump between equal options = 0.01
+			 *   (2) someone would need to test if the "traffic" results are similar
+			 */  
 			betaFlag = false ;
 		}
 		double weight = Math.exp( 0.5 * this.beta * (otherScore - currentScore) );
