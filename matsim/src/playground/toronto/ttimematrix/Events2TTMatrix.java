@@ -39,6 +39,13 @@ import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class Events2TTMatrix {
 	
+	/**
+	 * This method, if I am seeing this right, is meant to parse a file that contains the mapping from links to zones
+	 * (assuming that linkIds are in column 0, and zones in column 1).
+	 * But it will presumably parse any two columns of a column-oriented file.
+	 * @param infile
+	 * @return the Map<Id,Id> containing the key (=linkId) value (=zoneId) pairs
+	 */
 	private static final Map<Id,Id> parseL2ZMapping(String infile) {
 		Map<Id,Id> l2zMapping = new HashMap<Id,Id>();
 		try {
@@ -111,7 +118,7 @@ public class Events2TTMatrix {
 		events.addHandler(ttmc);
 		events.addHandler(ttc);
 		
-		// reading events
+		// reading events.  Will do all the processing as side effect.
 		System.out.println("processing events file...");
 		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
 		reader.readFile(eventsfile);
