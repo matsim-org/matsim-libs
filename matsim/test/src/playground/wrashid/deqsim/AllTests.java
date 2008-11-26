@@ -16,7 +16,8 @@ public class AllTests {
 
 		suite.addTestSuite(DEQSimStarterTest.class);
 		suite.addTestSuite(TestPDESStarter2_EquilPopulationPlans1Modified1.class);
-		
+		suite.addTestSuite(TestPDESStarter2_equilPlans100.class);
+		suite.addTestSuite(TestPDESStarter2_Berlin.class);
 		return suite;
 	}
 

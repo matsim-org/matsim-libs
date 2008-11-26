@@ -45,7 +45,7 @@ public class TestPDESStarter2_EquilPopulationPlans1Modified1 extends MatsimTestC
 	public void test_EquilPopulationPlans1Modified1_DEQSimEventFileTravelTimeComparator() {
 		Gbl.reset();
 
-		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events.txt",5);
+		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events.txt",1);
 		deqSimTravelTimeComparator.startTestPDES2("test/scenarios/equil/config.xml", true,
 				"test/scenarios/equil/plans1.xml",
 				new EquilPopulationPlans1Modified1());
