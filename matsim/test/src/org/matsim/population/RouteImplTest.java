@@ -100,7 +100,7 @@ public class RouteImplTest extends MatsimTestCase {
 	}
 
 	public void testSetLinkRoute_Null() {
-		NetworkLayer network = createTestNetwork();
+		createTestNetwork();
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 		List<Node> nodes = route.getRoute();
@@ -143,7 +143,7 @@ public class RouteImplTest extends MatsimTestCase {
 	}
 
 	public void testGetDist() {
-		NetworkLayer network = createTestNetwork();
+		createTestNetwork();
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 
@@ -151,7 +151,7 @@ public class RouteImplTest extends MatsimTestCase {
 	}
 
 	public void testGetLinkIds() {
-		NetworkLayer network = createTestNetwork();
+		createTestNetwork();
 		Route route = getRouteInstance();
 		route.setRoute("2 12 13 3 4");
 
