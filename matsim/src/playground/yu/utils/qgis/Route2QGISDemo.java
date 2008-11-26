@@ -22,7 +22,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author ychen
  * 
  */
-public class SelectedPlan2QGISDemo implements X2QGIS {
+public class Route2QGISDemo implements X2QGIS {
 	public static void main(final String[] args) throws FactoryException {
 		// final String populationFilename = "./examples/equil/plans100.xml";
 		// final String populationFilename =

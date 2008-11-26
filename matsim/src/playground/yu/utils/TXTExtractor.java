@@ -87,6 +87,7 @@ public class TXTExtractor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("done.");
 	}
 
 }

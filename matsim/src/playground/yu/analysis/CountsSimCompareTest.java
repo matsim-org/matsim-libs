@@ -36,8 +36,8 @@ public class CountsSimCompareTest {
 	public static void main(String[] args) {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String countsFilename = "../schweiz-ivtch-SVN/baseCase/counts/countsIVTCH.xml";
-		String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
-		String outputPath = "../runs/run628/it.500/500.compareCountsSim.";
+		String eventsFilename = "../runs/run626/it.500/500.events.txt.gz";
+		String outputPath = "../runs/run626/it.500/compareCountsSim/";
 		double countsScaleFactor = 10.0;
 
 		Gbl.createConfig(null);

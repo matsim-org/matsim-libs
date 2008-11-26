@@ -47,10 +47,21 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class MATSimNet2QGISDemo implements X2QGIS {
 
 	public static void main(final String[] args) {
-		String netfile = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String outputFileLs = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Links.shp";
-		String outputFileP = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Polygon.shp";
-		String coordinateSys = ch1903;
+		// String netfile =
+		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
+		// String outputFileLs =
+		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Links.shp";
+		// String outputFileP =
+		// "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm_Polygon.shp";
+		// String netfile = "test/scenarios/berlin/network.xml.gz";
+		// String outputFileLs = "output/bvg/berlinLinks.shp";
+		// String outputFileP = "output/bvg/berlinPolygon.shp";
+		String netfile = "input/Toronto/toronto.xml";
+		String outputFileLs = "output/Toronto/Links.shp";
+		String outputFileP = "output/Toronto/Polygon.shp";
+
+		// String coordinateSys = ch1903;
+		String coordinateSys = "DHDN_GK4";
 
 		Gbl.createConfig(null);
 		Gbl.getConfig().global().setCoordinateSystem(coordinateSys);
