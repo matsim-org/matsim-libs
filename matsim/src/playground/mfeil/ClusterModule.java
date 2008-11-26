@@ -95,82 +95,36 @@ public class ClusterModule implements StrategyModule {
 
 	public void handlePlan(final Plan plan) {	
 		
-		if (Controler.getIteration()==1){
-			if (this.list[0].size()<this.testAgentsNumber) this.list[0].add(plan);
-			else this.list[1].add(plan);
-		}
-		else {
-	
-			if (plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter())>this.distanceMeasure){
-				this.list[0].add(plan);
-			}
-			else {
-				this.list[1].add(plan);
-			}
-		}
+		if (this.list[0].size()<this.testAgentsNumber) this.list[0].add(plan);
+		else this.list[1].add(plan);
 	}
 
 	public void finish(){
 		
-		if (Controler.getIteration()==1){
-			for (int i=0;i<list[0].size();i++) module.handlePlan(list[0].get(i));
-			module.finish();
-			double [] a = this.findDistanceMeasure(list[0]);
-			this.distanceMeasure=a[0];
-			System.out.println("distance Measure = "+this.distanceMeasure);
-			
-			for (int i=0;i<list[1].size();i++){
-				if (list[1].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[1].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter())>this.distanceMeasure){
-					this.writePlan(list[0].get((int)a[2]), list[1].get(i));
-				}
-				else this.writePlan(list[0].get((int)a[1]), list[1].get(i));
-				
-				this.locator.handlePlan(list[1].get(i));
-				this.router.run(list[1].get(i));
-				if (mode.equals("timer")){
-					this.timer.run(list[1].get(i));
-				}
-				else this.cleanUpPlan(list[1].get(i));
-			}
+		for (int i=0;i<list[0].size();i++) module.handlePlan(list[0].get(i));
+		module.finish();
+		
+		double [] distancesTestAgents = new double [list[0].size()];
+		for (int i=0;i<distancesTestAgents.length;i++){
+			distancesTestAgents[i] = list[0].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[0].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 		}
-		else {
-
-			if (!list[0].isEmpty()){
-				module.handlePlan(list[0].get(0));
-			}
-			if (!list[1].isEmpty()){
-				module.handlePlan(list[1].get(0));
-			}
-			module.finish();
-			
-			if (list[0].size()>1){
-				
-				for (int x=1;x<list[0].size();x++){
-					
-					this.writePlan(list[0].get(0), list[0].get(x));
-				
-					this.locator.handlePlan(list[0].get(x));
-					this.router.run(list[0].get(x));
-					if (mode.equals("timer")){
-						this.timer.run(list[0].get(x));
-					}
-					else this.cleanUpPlan(list[0].get(x));
+		int [] allocations = new int [list[1].size()];
+		for (int i=0;i<list[1].size();i++){
+			double distance = Double.MAX_VALUE;
+			double distanceAgent = list[1].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[1].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+			for (int j=0;j<list[0].size();j++){
+				if (java.lang.Math.abs(distanceAgent-distancesTestAgents[j])<distance){
+					allocations[i]=j;
+					distance = java.lang.Math.abs(distanceAgent-distancesTestAgents[j]);
 				}
 			}
-			if (list[1].size()>1){
-				
-				for (int x=1;x<list[1].size();x++){
-					
-					this.writePlan(list[1].get(0), list[1].get(x));
-					
-					this.locator.handlePlan(list[1].get(x));
-					this.router.run(list[1].get(x));
-					if (mode.equals("timer")){
-						this.timer.run(list[1].get(x));
-					}
-					else this.cleanUpPlan(list[1].get(x));
-				}
+			this.writePlan(list[0].get(allocations[i]), list[1].get(i));
+			this.locator.handlePlan(list[1].get(i));
+			this.router.run(list[1].get(i));
+			if (mode.equals("timer")){
+				this.timer.run(list[1].get(i));
 			}
+			else this.cleanUpPlan(list[1].get(i));
 		}
 	}
 	
