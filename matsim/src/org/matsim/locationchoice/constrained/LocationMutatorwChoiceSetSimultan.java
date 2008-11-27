@@ -39,20 +39,16 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 	}
 	
 	@Override
-	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr) {
-				
-		if (trialNr > 50) {		
-			super.unsuccessfullLC += 1;
+	protected int handleSubChain(SubChain subChain, double speed, int trialNr){
+		if (trialNr > this.max_recursions) {		
+			this.unsuccessfullLC += 1;
 					
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
 				Act act = act_it.next();
-				/* 
-				 * TODO: Shoot into a growing circle instead of into the universal choice set
-				 */
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
-			return true;
+			return 0;
 		}
 		
 		Coord startCoord = subChain.getStartCoord();
@@ -66,7 +62,7 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			Act act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;	
 			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
-				return false;
+				return 1;
 			}
 					
 			startCoord = act.getCoord();				
@@ -78,10 +74,10 @@ public class LocationMutatorwChoiceSetSimultan extends LocationMutatorwChoiceSet
 			}
 			
 			if (ttBudget < 0.0) {
-				return false;
+				return -1;
 			}
 			prevAct = act;
 		}
-		return true;
+		return 0;
 	}
 }

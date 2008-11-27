@@ -33,11 +33,16 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scalefactor";
+	private static final String RECURSIONTRAVELSPEEDCHANGE = "recursion_travelspeedchange";
+	private static final String MAX_RECURSIONS = "max_recursions";
 
 	private String constrained = null;
 	private String restraintFcnFactor = null;
 	private String restraintFcnExp = null;
 	private String scalefactor = null;
+	private String recursion_travelspeedchange = null;
+	private String max_recursions = null;
+	
 
 	public LocationChoiceConfigGroup() {
 		super(GROUP_NAME);
@@ -57,6 +62,12 @@ public class LocationChoiceConfigGroup extends Module {
 		if (SCALEFACTOR.equals(key)) {
 			return getScalefactor();
 		}
+		if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
+			return getRecursionTravelspeedChange();
+		}
+		if (MAX_RECURSIONS.equals(key)) {
+			return getMaxRecursions();
+		}
 		throw new IllegalArgumentException(key);
 	}
 
@@ -70,6 +81,10 @@ public class LocationChoiceConfigGroup extends Module {
 			setRestraintFcnExp(value);
 		} else if (SCALEFACTOR.equals(key)) {
 			setScalefactor(value);
+		} else if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
+			setRecursionTravelspeedChange(value);
+		} else if (MAX_RECURSIONS.equals(key)) {
+			setMaxRecursions(value);
 		} else		
 		{
 			throw new IllegalArgumentException(key);
@@ -83,6 +98,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RESTR_FCN_FACTOR);
 		this.addParameterToMap(map, RESTR_FCN_EXP);
 		this.addParameterToMap(map, SCALEFACTOR);
+		this.addParameterToMap(map, RECURSIONTRAVELSPEEDCHANGE);
+		this.addParameterToMap(map, MAX_RECURSIONS);
 		return map;
 	}
 
@@ -110,5 +127,17 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setScalefactor(final String scalefactor) {
 		this.scalefactor = scalefactor;
+	}
+	public String getRecursionTravelspeedChange() {
+		return recursion_travelspeedchange;
+	}
+	public void setRecursionTravelspeedChange(String recursion_travelspeedfactor) {
+		this.recursion_travelspeedchange = recursion_travelspeedfactor;
+	}
+	public String getMaxRecursions() {
+		return max_recursions;
+	}
+	public void setMaxRecursions(String max_recursions) {
+		this.max_recursions = max_recursions;
 	}
 }

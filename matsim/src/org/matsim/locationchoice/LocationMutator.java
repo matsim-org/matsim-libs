@@ -51,6 +51,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, Facility []> facilities_of_type;
+	
 			
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
@@ -58,7 +59,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	public LocationMutator(final NetworkLayer network, final Controler controler) {
 		this.quad_trees = new TreeMap<String, QuadTree<Facility>>();
 		this.facilities_of_type = new TreeMap<String, Facility []>();
-		this.initiLocal(network, controler);		
+		this.initLocal(network, controler);		
 	}
 	
 	/*
@@ -99,7 +100,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		
 	}
 
-	private void initiLocal(final NetworkLayer network, Controler controler) {		
+	private void initLocal(final NetworkLayer network, Controler controler) {		
 		//create a quadtree for every activity type
 		this.initTrees(controler.getFacilities());				
 		this.network = network;

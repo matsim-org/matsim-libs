@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.network.NetworkLayer;
@@ -41,17 +42,20 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 	protected int unsuccessfullLC = 0;
+	private double recursion_travelspeedchange = 0.2;
+	protected int max_recursions = 10;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler) {
 		super(network, controler);
+		this.recursion_travelspeedchange = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelspeedChange());
+		this.max_recursions = Integer.parseInt(Gbl.getConfig().locationchoice().getMaxRecursions());
 	}
 	
 	@Override
 	public void handlePlan(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
-		
-		
+			
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		// loop over all <leg>s, remove route-information
 		// routing is done after location choice
@@ -69,9 +73,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		this.unsuccessfullLC = 0;
 	}
 
-	public void handleSubChains(final Plan plan, List<SubChain> subChains) {
-		
-			
+	public void handleSubChains(final Plan plan, List<SubChain> subChains) {		
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
@@ -85,33 +87,35 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			}
 					
 			int nrOfTrials = 0;
-			boolean successful = false;
-			while (!successful) {
-				
-				if (nrOfTrials % 10 == 0 && nrOfTrials > 0) {
-					speed *= 0.9;
+			int change = -2;
+			boolean shrinked = false;
+			while (change != 0) {				
+				// shrinking only every second time
+				if (change == -1 && shrinked) {
+					speed *= (1.0 - this.recursion_travelspeedchange);
+					shrinked = true;
 				}
-				
-				successful = this.handleSubChain(sc, speed, nrOfTrials);
+				else if (change == 1) {
+					speed *= (1.0 + this.recursion_travelspeedchange);
+					shrinked = false;
+				}				
+				change = this.handleSubChain(sc, speed, nrOfTrials);
 				nrOfTrials++;
 			}
 		}
 	}
 	
 	
-	protected boolean handleSubChain(SubChain subChain, double speed, int trialNr){
-		if (trialNr > 50) {		
+	protected int handleSubChain(SubChain subChain, double speed, int trialNr){
+		if (trialNr > this.max_recursions) {		
 			this.unsuccessfullLC += 1;
 					
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
 				Act act = act_it.next();
-				/* 
-				 * TODO: Shoot into a growing circle instead of into the universal choice set
-				 */
 				this.modifyLocation(act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
-			return true;
+			return 0;
 		}
 		
 		Coord startCoord = subChain.getStartCoord();
@@ -125,7 +129,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			Act act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;	
 			if (!this.modifyLocation(act, startCoord, endCoord, radius, 0)) {
-				return false;
+				return 1;
 			}
 					
 			startCoord = act.getCoord();				
@@ -137,11 +141,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			}
 			
 			if (ttBudget < 0.0) {
-				return false;
+				return -1;
 			}
 			prevAct = act;
 		}
-		return true;
+		return 0;
 	}
 
 	
