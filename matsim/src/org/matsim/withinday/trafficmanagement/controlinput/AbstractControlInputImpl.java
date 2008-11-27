@@ -93,8 +93,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected Map<Double, Double> ttMeasuredAlternativeRoute = new HashMap<Double, Double>();
 
-	private ControlInputWriter writer;
-	
+	private final ControlInputWriter writer;
+
 	protected Map<String, Double> intraFlows = new HashMap<String, Double>();
 
 	protected Map<String, List<Double>> enterLinkEventTimes = new HashMap<String, List<Double>>();
@@ -103,7 +103,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected List<Link> outLinksMainRoute = new ArrayList<Link>();
 
-	
+
 	protected List<Link> inLinksAlternativeRoute = new ArrayList<Link>();
 
 	protected List<Link> outLinksAlternativeRoute = new ArrayList<Link>();
@@ -113,7 +113,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	protected Map<String, Double> extraFlowsAlternativeRoute = new HashMap<String, Double>();
 
-	
+
 
 	public AbstractControlInputImpl() {
 		this.numberOfAgents = new HashMap<String, Integer>();
@@ -332,7 +332,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public double getFreeSpeedRouteTravelTime(Route route) {
+	public double getFreeSpeedRouteTravelTime(final Route route) {
 		if (route == this.mainRoute)
 			return this.ttFreeSpeedMainRoute;
 		else if (route == this.alternativeRoute)
@@ -360,8 +360,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 		return naturalBottleNeck;
 	}
-	
-	protected void updateFlow(int flowResolution, LinkLeaveEvent event) {
+
+	protected void updateFlow(final int flowResolution, final LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.linkId);
@@ -404,8 +404,8 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
 		}
 	}
-	
-	protected double sumUpTTFreeSpeed(Node node, Route route) {
+
+	protected double sumUpTTFreeSpeed(final Node node, final Route route) {
 
 		double ttFS = 0;
 		Link[] routeLinks = route.getLinkRoute();
@@ -418,7 +418,42 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 		return ttFS;
 	}
-	
 
+	protected void updateFlow(final double flowUpdateTime, final LinkLeaveEvent event) {
+
+		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
+				.get(event.linkId);
+		// Remove times older than flowUpdateTime
+			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.time)) {
+				list.removeFirst();
+			}
+		// Add new values
+		list.addLast(event.time);
+
+		// Flow = agents / seconds:
+		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
+
+		if (this.intraFlows.containsKey(event.linkId)) {
+			this.intraFlows.put(event.linkId, flow);
+		}
+		if (this.inLinksMainRoute.contains(event.link)) {
+			double inFlow = flow;
+			this.extraFlowsMainRoute.put(event.linkId, inFlow);
+		}
+		if (this.outLinksMainRoute.contains(event.link)) {
+			double outFlow = -flow;
+			this.extraFlowsMainRoute.put(event.linkId, outFlow);
+		}
+		if (this.inLinksAlternativeRoute.contains(event.link)) {
+			double inFlow = flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
+		}
+		if (this.outLinksAlternativeRoute.contains(event.link)) {
+			double outFlow = -flow;
+			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
+		}
+	}
+
+	public void reset(final int iteration) {}
 
 }

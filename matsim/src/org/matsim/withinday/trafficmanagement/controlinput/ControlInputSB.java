@@ -92,26 +92,26 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 	private double predTTAlternativeRoute;
 
-	private Map<String, Double> ttMeasured = new HashMap<String, Double>();
+	private final Map<String, Double> ttMeasured = new HashMap<String, Double>();
 
 	// For distribution heterogenity check:
-	private Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
+	private final Map<String, Double> enterLinkEvents = new HashMap<String, Double>();
 
 
-	private Map<Id, Double> capacities = new HashMap<Id, Double>();
+	private final Map<Id, Double> capacities = new HashMap<Id, Double>();
 
 
 	private List<Node> nodesMainRoute = new ArrayList<Node>();
 
 	private List<Node> nodesAlternativeRoute = new ArrayList<Node>();
 
-	private Map<String, Double> ttFreeSpeedUpToAndIncludingLink = new HashMap<String, Double>();
+	private final Map<String, Double> ttFreeSpeedUpToAndIncludingLink = new HashMap<String, Double>();
 
-	private Map<String, Double> inFlows = new HashMap<String, Double>();
+	private final Map<String, Double> inFlows = new HashMap<String, Double>();
 
-	private Map<String, Double> outFlows = new HashMap<String, Double>();
+	private final Map<String, Double> outFlows = new HashMap<String, Double>();
 
-	private Map<String, Integer> numbersPassedOnInAndOutLinks = new HashMap<String, Integer>();
+	private final Map<String, Integer> numbersPassedOnInAndOutLinks = new HashMap<String, Integer>();
 
 	// For Accident detection:
 	private Link currentBottleNeckMainRoute;
@@ -124,9 +124,9 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 	private Collection<NetworkChangeEvent> accidents;
 
-	private SimulationConfigGroup simulationConfig;
+	private final SimulationConfigGroup simulationConfig;
 
-	public ControlInputSB(SimulationConfigGroup simulationConfigGroup) {
+	public ControlInputSB(final SimulationConfigGroup simulationConfigGroup) {
 		this.simulationConfig = simulationConfigGroup;
 	}
 
@@ -319,90 +319,8 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		super.handleEvent(event);
 	}
 
-//	private void updateFlow(int flowResolution, LinkLeaveEvent event) {
-//
-//		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-//				.get(event.linkId);
-//		if (list.size() == flowResolution) {
-//			list.removeFirst();
-//			list.addLast(event.time);
-//		}
-//		else if ((1 < list.size()) || (list.size() < flowResolution)) {
-//			list.add(event.time);
-//		}
-//		else if (list.size() == 0) {
-//			list.addLast(event.time - 1);
-//			list.addLast(event.time);
-//		}
-//		else {
-//			System.err
-//					.println("Error: number of enter event times stored exceeds numberofflowevents!");
-//		}
-//
-//		// Flow = agents / seconds:
-//		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
-//
-//		if (this.intraFlows.containsKey(event.linkId)) {
-//			this.intraFlows.put(event.linkId, flow);
-//		}
-//		if (this.inLinksMainRoute.contains(event.link)) {
-//			double inFlow = flow;
-//			this.extraFlowsMainRoute.put(event.linkId, inFlow);
-//		}
-//		if (this.outLinksMainRoute.contains(event.link)) {
-//			double outFlow = -flow;
-//			this.extraFlowsMainRoute.put(event.linkId, outFlow);
-//		}
-//		if (this.inLinksAlternativeRoute.contains(event.link)) {
-//			double inFlow = flow;
-//			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
-//		}
-//		if (this.outLinksAlternativeRoute.contains(event.link)) {
-//			double outFlow = -flow;
-//			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
-//		}
-//	}
-
-	private void updateFlow(double flowUpdateTime, LinkLeaveEvent event) {
-
-		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
-				.get(event.linkId);
-		// Remove times older than flowUpdateTime
-			while (!list.isEmpty() && ((list.getFirst() + flowUpdateTime) < event.time)) {
-				list.removeFirst();
-			}
-		// Add new values
-		list.addLast(event.time);
-
-		// Flow = agents / seconds:
-		double flow = (list.size() - 1) / (list.getLast() - list.getFirst());
-
-		if (this.intraFlows.containsKey(event.linkId)) {
-			this.intraFlows.put(event.linkId, flow);
-		}
-		if (this.inLinksMainRoute.contains(event.link)) {
-			double inFlow = flow;
-			this.extraFlowsMainRoute.put(event.linkId, inFlow);
-		}
-		if (this.outLinksMainRoute.contains(event.link)) {
-			double outFlow = -flow;
-			this.extraFlowsMainRoute.put(event.linkId, outFlow);
-		}
-		if (this.inLinksAlternativeRoute.contains(event.link)) {
-			double inFlow = flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, inFlow);
-		}
-		if (this.outLinksAlternativeRoute.contains(event.link)) {
-			double outFlow = -flow;
-			this.extraFlowsAlternativeRoute.put(event.linkId, outFlow);
-		}
-	}
-
-	public void reset(int iteration) {}
-
-
 	@Override
-	public double getPredictedNashTime(Route route) {
+	public double getPredictedNashTime(final Route route) {
 		if (route.equals(this.mainRoute)) {
 			return this.predTTMainRoute;
 		}
@@ -612,7 +530,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return (int) (totalExtraAgents);
 	}
 
-	private List<Link> getOutlinks(Route route) {
+	private List<Link> getOutlinks(final Route route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
@@ -621,7 +539,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private List<Link> getInlinks(Route route) {
+	private List<Link> getInlinks(final Route route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}
@@ -630,7 +548,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private double getInOutFlow(Link inLink, Route route) {
+	private double getInOutFlow(final Link inLink, final Route route) {
 		double flow;
 		String linkId = inLink.getId().toString();
 		if (route == this.mainRoute) {
@@ -646,12 +564,12 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return flow;
 	}
 
-	public double getFlow(Link link) {
+	public double getFlow(final Link link) {
 		double flow = this.intraFlows.get(link.getId().toString());
 		return flow;
 	}
 
-	public double getCapacity(Link link) {
+	public double getCapacity(final Link link) {
 		double capacity = this.capacities.get(link.getId());
 		return capacity;
 	}
@@ -676,7 +594,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private void setIncidentCapacity(Double currentBottleNeckCapacity, Route route) {
+	private void setIncidentCapacity(final Double currentBottleNeckCapacity, final Route route) {
 		if (route == this.mainRoute) {
 			this.currentBNCapacityMainRoute = currentBottleNeckCapacity;
 		}
@@ -685,7 +603,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private Double getIncidentCapacity(Route route) {
+	private Double getIncidentCapacity(final Route route) {
 		double cap;
 		if (route == this.mainRoute) {
 			cap = this.currentBNCapacityMainRoute;
@@ -715,22 +633,22 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		this.accidents = accidents;
 	}
 
-	public void setIgnoredQueuingTime(double time) {
+	public void setIgnoredQueuingTime(final double time) {
 		log.debug("Set ignored queing time to: " + time);
 		this.ignoredQueuingTime = time;
 	}
 
-	public void setDistributionCheckActive(boolean b) {
+	public void setDistributionCheckActive(final boolean b) {
 		log.debug("distribution check active: " + b);
 		this.distributioncheckActive = b;
 	}
 
-	public void setBackgroundnoiseCompensationActive(boolean b) {
-		log.debug("backgroun noise compensation active: " + b);
+	public void setBackgroundnoiseCompensationActive(final boolean b) {
+		log.debug("background noise compensation active: " + b);
 		this.backgroundnoiseDetectionActive = b;
 	}
 
-	public void setIncidentDetectionActive(boolean b) {
+	public void setIncidentDetectionActive(final boolean b) {
 		log.debug("Incident detection active: " + b);
 		this.incidentDetectionActive = b;
 	}
