@@ -24,6 +24,8 @@
 		<param name="restraintFcnFactor" value="0.131687242798"/>
 		<param name="restraintFcnExp" value="5.0"/>
 		<param name="scalefactor" value="1"/>
+		<param name="recursion_travelspeedchange" value="0.1"/>
+		<param name="max_recursions" value="10"/>
 	</module>
 		
 	<module name="facilities" >
