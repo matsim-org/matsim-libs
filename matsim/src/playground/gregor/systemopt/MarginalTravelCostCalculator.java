@@ -29,10 +29,10 @@ public class MarginalTravelCostCalculator implements TravelCost {
 
 	
 	
-	private final TravelTimeAndSocialCostCalculatorII timeCostCalculator;
+	private final TravelTimeAndSocialCostCalculator timeCostCalculator;
 	private final double travelCostFactor;
 
-	public MarginalTravelCostCalculator(final TravelTimeAndSocialCostCalculatorII timeCostCalculator) {
+	public MarginalTravelCostCalculator(final TravelTimeAndSocialCostCalculator timeCostCalculator) {
 		this.timeCostCalculator = timeCostCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

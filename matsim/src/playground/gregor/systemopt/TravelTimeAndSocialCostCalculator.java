@@ -42,7 +42,7 @@ import org.matsim.utils.misc.Time;
 
 
 
-public class TravelTimeAndSocialCostCalculatorII extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
+public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -56,19 +56,19 @@ public class TravelTimeAndSocialCostCalculatorII extends TravelTimeCalculator im
 	static double newCoef = 1;
 	static int iteration = 0;
 
-	public TravelTimeAndSocialCostCalculatorII(final NetworkLayer network) {
+	public TravelTimeAndSocialCostCalculator(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public TravelTimeAndSocialCostCalculatorII(final NetworkLayer network, final int timeslice) {
+	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public TravelTimeAndSocialCostCalculatorII(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice,	final int maxTime) {
 		this(network, timeslice, maxTime, new TravelTimeCalculatorFactory());
 	}
 	
-	public TravelTimeAndSocialCostCalculatorII(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeCalculatorFactory factory) {
+	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeCalculatorFactory factory) {
 		super(network,timeslice,maxTime,factory);
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
