@@ -1,3 +1,4 @@
+package playground.jhackney;
 /* *********************************************************************** *
  * project: org.matsim.*
  * Scenario.java
@@ -18,7 +19,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jhackney;
 
 import java.io.IOException;
 
@@ -53,7 +53,7 @@ import org.matsim.world.WorldWriter;
 
 import playground.jhackney.scoring.TrackEventsOverlapII;
 
-public abstract class Scenario {
+public abstract class ScenarioConfig {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -66,17 +66,27 @@ public abstract class Scenario {
 	//For TRB run analyses of 500 iterations
 //	private static final String output_directory = "D:/SocialNetsFolder/TRB/Analyses/Config1/";
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/Config1/";
+	private static String configFileName; 
+	private static String dtdFileName;
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
 //	private static final String input_directory="output/TRB6/";//AnalyzeScores
+//	private static final String output_directory="../../results/matsim/Analyses/EventsInt6_10/";//AnalyzeTimeCorrelation
+//	private static final String input_directory="output/EventsInt6_10_restart420/";//AnalyzeTimeCorrelation	
 
 //	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
-	private static final String output_directory="D:/SocialNetsFolder/HC/12_HC/timecorr/";//AnalyzeTimeCorrelation
-	private static final String input_directory="D:/SocialNetsFolder/HC/12_HC/";//AnalyzeTimeCorrelation	
-	private static final String out1 = "12_HC.out";
-	private static final String out2 = "AgentsAtActivities12_HC.out";
+	private static final String output_directory="D:/SocialNetsFolder/SNController2/6/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="D:/SocialNetsFolder/SNController2/6/";//AnalyzeTimeCorrelation	
+	private static final String out1 = "6.out";
+	private static final String out2 = "AgentsAtActivities6.out";
+	private static String eventsFileName=null;
+	private static String worldFileName=null;
+	private static String netFileName=null;
+	private static String facsFileName=null;
+	private static String matsFileName=null;
+	private static String popFileName=null;
 	
-	private static final Config config= Gbl.createConfig(null);;
+	private static final Config config= Gbl.createConfig(null);
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -85,7 +95,7 @@ public abstract class Scenario {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	private Scenario() {
+	private ScenarioConfig() {
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -95,22 +105,29 @@ public abstract class Scenario {
 	public static final void setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
 
+		configFileName = input_directory + "output_config.xml.gz";
+		dtdFileName = "D:/eclipse_workspace/matsim/dtd/config_v1.dtd";
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
 		config.world().setInputFile(input_directory + "output_world.xml.gz");
+		worldFileName=input_directory + "output_world.xml.gz";
 		config.world().setOutputFile(output_directory + "output_world.xml");
 
 		config.network().setInputFile(input_directory + "output_network.xml.gz");
+		netFileName=input_directory + "output_network.xml.gz";
 		config.network().setOutputFile(output_directory + "output_network.xml");
 
 		config.facilities().setInputFile(input_directory + "output_facilities.xml.gz");
+		facsFileName=input_directory + "output_facilities.xml.gz";
 		config.facilities().setOutputFile(output_directory + "output_facilities.xml");
 
 		config.matrices().setInputFile(input_directory + "matrices.xml");
+		matsFileName=input_directory + "matrices.xml";
 		config.matrices().setOutputFile(output_directory + "output_matrices.xml");
 
 //		config.plans().setInputFile(input_directory + "output_plans.xml.gz");
 		config.plans().setInputFile("output_plans.xml.gz");
+		popFileName="output_plans.xml.gz";
 //		config.plans().setInputFile("plans.xml.gz");//AnalyzeScores
 		config.plans().setOutputFile(output_directory + "output_plans.xml.gz");
 		config.plans().setOutputVersion("v4");
@@ -133,10 +150,10 @@ public abstract class Scenario {
 //		config.socnetmodule().setInitIter("0");
 		config.socnetmodule().setInitIter("0");
 		config.socnetmodule().setReadMentalMap("true");
-//		config.socnetmodule().setBeta1("0");
-//		config.socnetmodule().setBeta2("0");
-//		config.socnetmodule().setBeta3("0");
-//		config.socnetmodule().setBeta4("0");
+		config.socnetmodule().setBeta1("0");
+		config.socnetmodule().setBeta2("0");
+		config.socnetmodule().setBeta3("0");
+		config.socnetmodule().setBeta4("0");
 		
 		config.createModule("kml21");
 		config.getModule("kml21").addParam("outputDirectory", output_directory);
@@ -150,20 +167,21 @@ public abstract class Scenario {
 	// read input
 	//////////////////////////////////////////////////////////////////////
 
-//	public static final Config readConfig(){
-//		System.out.println("  Reading Config xml file ... ");
-//		try {
-//			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		System.out.println("  Done");
-//		return Gbl.getConfig();
-//	}
+	public static final Config readConfig(){
+		System.out.println("  Reading Config xml file ... ");
+		try {
+			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("  Done");
+		return Gbl.getConfig();
+	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
+//		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
+		new MatsimWorldReader(Gbl.getWorld()).readFile(worldFileName);
 		System.out.println("  done.");
 		return Gbl.getWorld();
 	}
@@ -171,7 +189,8 @@ public abstract class Scenario {
 	public static final Facilities readFacilities() {
 		System.out.println("  reading facilities xml file... ");
 		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+//		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		new MatsimFacilitiesReader(facilities).readFile(facsFileName);
 		System.out.println("  done.");
 		return facilities;
 	}
@@ -180,7 +199,8 @@ public abstract class Scenario {
 		System.out.println("  reading the network xml file...");
 		System.out.println(Gbl.getConfig().network().getInputFile());
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+//		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(netFileName);
 		System.out.println("  done.");
 		return network;
 	}
@@ -189,6 +209,7 @@ public abstract class Scenario {
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(Gbl.getConfig().counts().getCountsFileName());
+		
 		System.out.println("  done.");
 		return counts;
 	}
@@ -203,8 +224,10 @@ public abstract class Scenario {
 	public static final Population readPlans() {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new Population();
-		System.out.println(Gbl.getConfig().plans().getInputFile());
-		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+//		System.out.println(Gbl.getConfig().plans().getInputFile());
+//		new MatsimPopulationReader(plans).readFile(Gbl.getConfig().plans().getInputFile());
+		System.out.println(popFileName);
+		new MatsimPopulationReader(plans).readFile(popFileName);
 
 		System.out.println("  done.");
 		return plans;
@@ -213,7 +236,9 @@ public abstract class Scenario {
 		System.out.println("  reading plans xml file... ");
 		Population plans = new Population();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
-		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
+//		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
+		String filename=input_directory +popFileName;
+//		System.out.println(filename);
 		System.out.println(filename);
 		new MatsimPopulationReader(plans).readFile(filename);
 		
@@ -248,6 +273,19 @@ public abstract class Scenario {
 		return events;
 	}
 	
+	public static final Events readEvents(int i, EventsPostProcess epp, playground.jhackney.scoring.EventsToScore scoring) {
+		System.out.println("  reading plans xml file... ");
+//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
+		Events events = new Events();
+		events.addHandler(epp);
+		events.addHandler(scoring);
+		System.out.println(filename);
+		new MatsimEventsReader(events).readFile(filename);
+
+		System.out.println("  done.");
+		return events;
+	}
 	//////////////////////////////////////////////////////////////////////
 	// write output
 	//////////////////////////////////////////////////////////////////////
