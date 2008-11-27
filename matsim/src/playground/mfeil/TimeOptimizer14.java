@@ -76,7 +76,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		int loops=1;
 		while (move!=0.0){
 			loops++;
-			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
+			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), plan);
 			if (loops>3) {
 				for (int i=2;i<plan.getActsLegs().size()-4;i+=2){
 					((Act)plan.getActsLegs().get(i)).setDuration(this.minimumTime);
@@ -432,7 +432,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	public double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
 		
-		double swaptime=((Act)(actslegs.get(inner))).getDuration();
+		double swaptime= java.lang.Math.max(((Act)(actslegs.get(inner))).getDuration(), this.minimumTime);
 		return this.setTimes(plan, actslegs, ((Act)(actslegs.get(outer))).getStartTime()+swaptime, outer, inner);
 		/*
 		double now =((Act)(actslegs.get(outer))).getStartTime()+swaptime;
@@ -562,13 +562,14 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
 				((Act)(actslegs.get(i))).setEndTime(((Leg)(actslegs.get(i+1))).getDepartureTime());
 				((Act)(actslegs.get(i))).setDuration(((Leg)(actslegs.get(i+1))).getDepartureTime()-((Leg)(actslegs.get(i-1))).getArrivalTime());
-				
+				if (((Act)(actslegs.get(i))).getDuration()<this.minimumTime-2) log.warn("duration < minimumTime: "+((Act)(actslegs.get(i))).getDuration());
 			}
 			else {
 				((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
 				if (((Leg)(actslegs.get(i-1))).getArrivalTime()>86400){
 					((Act)(actslegs.get(i))).setDuration(0);
 					((Act)(actslegs.get(i))).setStartTime(((Leg)(actslegs.get(i-1))).getArrivalTime());
+					((Act)(actslegs.get(i))).setEndTime(((Act)(actslegs.get(i))).getStartTime()); // new
 				}
 				else {
 					((Act)(actslegs.get(i))).setDuration(86400-((Leg)(actslegs.get(i-1))).getArrivalTime());
@@ -617,12 +618,12 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 			
 			if (i!=inner-1){
 				now+=((Act)(actslegs.get(i+1))).getDuration();
+				if (((Act)(actslegs.get(i+1))).getDuration()<this.minimumTime-2) log.warn("Eingehende duration < minimumTime! "+((Act)(actslegs.get(i+1))).getDuration());
 			}
 			else {
 				double time1 = ((Act)(actslegs.get(i+1))).getEndTime();
 				if (inner==actslegs.size()-1) {
 					time1=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
-					//log.warn("time1 Anschlag!");
 				}
 				if (time1<now+this.minimumTime){
 					if (actslegs.size()>=i+3){
@@ -635,7 +636,6 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 						double time2 = ((Act)(actslegs.get(i+3))).getEndTime();
 						if (i+3==actslegs.size()-1) {
 							time2=((Leg)(actslegs.get(1))).getDepartureTime()+86400;
-							//log.warn("time2 Anschlag!");
 						}
 						if (time2<now+this.minimumTime){
 							return -100000;
