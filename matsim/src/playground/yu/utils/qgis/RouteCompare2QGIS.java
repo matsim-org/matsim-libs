@@ -1,16 +1,20 @@
+/**
+ * 
+ */
 package playground.yu.utils.qgis;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -31,41 +35,36 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.yu.analysis.RouteSummaryTest.RouteSummary;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * This class is a copy of main() from
- * org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape of Mr.
- * Laemmeland can convert a MATSim-population to a QGIS .shp-file (acts or legs)
- * 
- * @author ychen
+ * @author yu
  * 
  */
-public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
-	protected Map<List<Id>, Integer> routeCounters;
-	protected NetworkLayer network;
-	private FeatureType featureTypeRoute;
-	private boolean writeRoutes = true;
+public class RouteCompare2QGIS extends Route2QGIS {
+	private Map<List<Id>, Integer> routeCountersB;
 
-	public Route2QGIS(CoordinateReferenceSystem crs, String outputDir,
-			NetworkLayer network, Map<List<Id>, Integer> routeCounters) {
-		this.crs = crs;
-		this.outputDir = outputDir;
-		this.geofac = new GeometryFactory();
-		initFeatureType();
-		this.network = network;
-		this.routeCounters = routeCounters;
+	public RouteCompare2QGIS(CoordinateReferenceSystem crs, String outputDir,
+			NetworkLayer network, Map<List<Id>, Integer> routeCountersA,
+			Map<List<Id>, Integer> routeCountersB) {
+		super(crs, outputDir, network, routeCountersA);
+		this.routeCountersB = routeCountersB;
 	}
 
 	@Override
 	protected void initFeatureType() {
-		AttributeType[] attrRoute = new AttributeType[2];
+		AttributeType[] attrRoute = new AttributeType[5];
 		attrRoute[0] = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, this
 						.getCrs());
-		attrRoute[1] = AttributeTypeFactory.newAttributeType("ROUTE_FLOW",
+		attrRoute[1] = AttributeTypeFactory.newAttributeType("ROUTEFLOWA",
+				Double.class);
+		attrRoute[2] = AttributeTypeFactory.newAttributeType("ROUTEFLOWB",
+				Double.class);
+		attrRoute[3] = AttributeTypeFactory.newAttributeType("DIFF_B-A",
+				Double.class);
+		attrRoute[4] = AttributeTypeFactory.newAttributeType("DIFF_SIGN",
 				Double.class);
 		try {
 			this.setFeatureTypeRoute(FeatureTypeBuilder.newFeatureType(
@@ -77,16 +76,23 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		}
 	}
 
-	public void setFeatureTypeRoute(FeatureType featureTypeRoute) {
-		this.featureTypeRoute = featureTypeRoute;
-	}
-
+	@Override
 	protected Feature getRouteFeature(List<Id> routeLinkIds) {
-		Integer routeFlows = routeCounters.get(routeLinkIds);
-		if (routeFlows != null)
-			if (routeFlows.intValue() > 1) {
+		Integer routeFlowsA = routeCounters.get(routeLinkIds);
+		Integer routeFlowsB = routeCountersB.get(routeLinkIds);
+		if (routeFlowsA != null || routeFlowsB != null) {
+			if (routeFlowsA == null)
+				routeFlowsA = new Integer(0);
+			if (routeFlowsB == null)
+				routeFlowsB = new Integer(0);
+			if ((routeFlowsA.intValue() > 1 || routeFlowsB.intValue() > 1)
+					&& (routeFlowsA.intValue() != routeFlowsB.intValue())) {
 				Coordinate[] coordinates = new Coordinate[(routeLinkIds.size() + 1) * 2 + 1];
-				double width = 5.0 * Math.min(250.0, routeFlows.doubleValue());
+				Double diff = routeFlowsB.doubleValue()
+						- routeFlowsA.doubleValue();
+				Double absDiff = Math.abs(diff);
+				double width = 10.0 * Math.min(250.0, absDiff);
+
 				for (int i = 0; i < routeLinkIds.size(); i++) {
 					Link l = network.getLink(routeLinkIds.get(i));
 					Coord c = l.getFromNode().getCoord();
@@ -128,21 +134,26 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 																			coordinates),
 															null, getGeofac()) },
 													this.getGeofac()),
-											routeFlows.doubleValue() });
+											new Double(routeFlowsA
+													.doubleValue()),
+											new Double(routeFlowsB
+													.doubleValue()), absDiff,
+											new Double(diff / absDiff) });
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
 			}
+		}
 		return null;
 	}
 
-	protected FeatureType getFeatureTypeRoute() {
-		return featureTypeRoute;
-	}
-
+	@Override
 	protected void writeRoutes() throws IOException {
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (List<Id> routeLinkIds : routeCounters.keySet()) {
+		Set<List<Id>> totalKeys = new HashSet<List<Id>>();
+		totalKeys.addAll(routeCounters.keySet());
+		totalKeys.addAll(routeCountersB.keySet());
+		for (List<Id> routeLinkIds : totalKeys) {
 			Feature ft = getRouteFeature(routeLinkIds);
 			if (ft != null)
 				fts.add(ft);
@@ -150,17 +161,14 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		ShapeFileWriter.writeGeometries(fts, getOutputDir() + "/routes.shp");
 	}
 
-	@Override
-	public void write() throws IOException {
-		if (this.writeRoutes) {
-			writeRoutes();
-		}
-	}
-
-	public static void main(final String[] args) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 		final String networkFilename = args[0];
-		final String populationFilename = args[1];
-		final String outputDir = args[2];
+		final String populationFilenameA = args[1];
+		final String populationFilenameB = args[2];
+		final String outputDir = args[3];
 
 		Gbl.createConfig(null);
 		Gbl.createWorld();
@@ -169,27 +177,38 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Gbl.getWorld().setNetworkLayer(network);
+		// ------------------------RouteSummaryA--------------------------------
+		Population populationA = new Population();
 
-		Population population = new Population();
+		RouteSummary rsA = new RouteSummary(outputDir + "/routeCompareA.txt.gz");
+		populationA.addAlgorithm(rsA);
 
-		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
-		population.addAlgorithm(rs);
+		System.out.println("-->reading plansfile: " + populationFilenameA);
+		new MatsimPopulationReader(populationA).readFile(populationFilenameA);
 
-		System.out.println("-->reading plansfile: " + populationFilename);
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		populationA.runAlgorithms();
+		rsA.write();
+		rsA.end();
+		//------------------------RouteSummaryB---------------------------------
+		Population populationB = new Population();
 
-		population.runAlgorithms();
-		rs.write();
-		rs.end();
+		RouteSummary rsB = new RouteSummary(outputDir + "/routeCompareB.txt.gz");
+		populationB.addAlgorithm(rsB);
 
+		System.out.println("-->reading plansfile: " + populationFilenameB);
+		new MatsimPopulationReader(populationB).readFile(populationFilenameB);
+
+		populationB.runAlgorithms();
+		rsB.write();
+		rsB.end();
+		//----------------------------------------------------------------------
 		CoordinateReferenceSystem crs;
 		try {
 			crs = CRS.parseWKT(ch1903);
-			Route2QGIS r2q = new Route2QGIS(crs, outputDir, network, rs
-					.getRouteCounters());
-			r2q.setOutputSample(// 0.05
-					1);
+			RouteCompare2QGIS r2q = new RouteCompare2QGIS(crs, outputDir,
+					network, rsA.getRouteCounters(), rsB.getRouteCounters());
 			r2q.setWriteActs(false);
+			r2q.setWriteLegs(false);
 			r2q.setWriteRoutes(true);
 			r2q.write();
 		} catch (FactoryException e1) {
@@ -199,7 +218,4 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		}
 	}
 
-	protected void setWriteRoutes(boolean writeRoutes) {
-		this.writeRoutes = writeRoutes;
-	}
 }

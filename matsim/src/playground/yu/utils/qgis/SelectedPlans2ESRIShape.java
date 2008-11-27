@@ -72,18 +72,25 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SelectedPlans2ESRIShape {
 
-	private final CoordinateReferenceSystem crs;
+	protected CoordinateReferenceSystem crs;
 	private final Population population;
 	private double outputSample = 1;
 	private double actBlurFactor = 0;
 	private double legBlurFactor = 0;
-	private final String outputDir;
+	protected String outputDir;
 	private boolean writeActs = true;
 	private boolean writeLegs = true;
 	private ArrayList<Plan> outputSamplePlans;
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
-	private final GeometryFactory geofac;
+	protected GeometryFactory geofac;
+
+	public SelectedPlans2ESRIShape() {
+		crs = null;
+		population = null;
+		outputDir = null;
+		geofac = null;
+	}
 
 	public SelectedPlans2ESRIShape(final Population population,
 			final CoordinateReferenceSystem crs, final String outputDir) {
@@ -175,9 +182,9 @@ public class SelectedPlans2ESRIShape {
 		Coord cc = act.getLink().getCenter();
 		Coord c = new CoordImpl(cc.getX() + rx, cc.getY() + ry);
 		try {
-			return this.getFeatureTypeAct().create(new Object[] {
-					MGC.coord2Point(c), id, type, linkId, startTime, dur,
-					endTime });
+			return this.getFeatureTypeAct().create(
+					new Object[] { MGC.coord2Point(c), id, type, linkId,
+							startTime, dur, endTime });
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
@@ -212,8 +219,9 @@ public class SelectedPlans2ESRIShape {
 		LineString ls = this.getGeofac().createLineString(coords);
 
 		try {
-			return this.getFeatureTypeLeg().create(new Object[] { ls, id, num, mode,
-					depTime, travTime, arrTime, dist });
+			return this.getFeatureTypeLeg().create(
+					new Object[] { ls, id, num, mode, depTime, travTime,
+							arrTime, dist });
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
