@@ -158,27 +158,27 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					//test the time
 					//this is the version used in speech:	agentTwoTime = agentTwoTime + 30.0 * 60.0;
 					//this is the version used in code:
-					this.agentTwoTime = this.agentTwoTime + 1798.0; // 30.0 * 60.0 - 2.0
+					this.agentTwoTime = this.agentTwoTime + 1797.0; // 30.0 * 60.0 - 3.0
 					assertEquals(this.agentTwoTime, e.time, EPSILON);
 
 					//test the score
-					//1078 s fstt of agent 2 (non-car)
-					this.agentTwoScore = 1798.0/3600.0 * -3.0;
+					//1097s free speed travel time of agent 2 (non-car)
+					this.agentTwoScore = 1797.0/3600.0 * -3.0;
 					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
 				}
 				else {
 					//test the time
 //				this is the version used in speech:	agentTwoTime = agentTwoTime + 78.0 * 60.0;
 					//this is the version used in code:
-					this.agentTwoTime = this.agentTwoTime + 4678.0; // 78.0 * 60.0 - 2.0
+					this.agentTwoTime = this.agentTwoTime + 4677.0; // 78.0 * 60.0 - 3.0
 					assertEquals(this.agentTwoTime, e.time, EPSILON);
 
 					//test the score
 					//must be negative score for traveling to work (i.e. value of agentTwoScore)
 					//plus activity score 8 h work typical = 8h, beta_perf = 6
 					this.agentTwoScore = this.agentTwoScore + (6.0*8.0*Math.log(8.0/ (8.0*Math.exp(-10.0/8.0))));
-					//plus negative score for traveling home 4678.0 seconds by non-car mode (should be 78 min but is less!)
-					this.agentTwoScore = this.agentTwoScore + (4678.0/3600.0 * -3.0);
+					//plus negative score for traveling home 4677.0 seconds by non-car mode (should be 78 min but is less!)
+					this.agentTwoScore = this.agentTwoScore + (4677.0/3600.0 * -3.0);
 					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
 
 					EquilTwoAgentsTest.this.planScorer.finish();
