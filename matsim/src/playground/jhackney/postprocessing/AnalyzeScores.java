@@ -112,7 +112,8 @@ public class AnalyzeScores {
 
 		System.out.println(" ... Instantiation of events overlap tracking done");
 		epp=new EventsPostProcess(plans);
-		teo=new MakeTimeWindowsFromEvents(epp);
+		teo=new MakeTimeWindowsFromEvents();
+		teo.calculate(epp);
 		twm=teo.getTimeWindowMap();
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 		playground.jhackney.scoring.SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure",actStats);

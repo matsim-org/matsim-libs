@@ -101,13 +101,12 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 * to the plans.
 	 */
 	public void finish() {
-//		System.out.println("agentId\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc\tUlegt\tUlegd");
-		System.out.println("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
+
 		for (Map.Entry<String, playground.jhackney.scoring.SocScoringFunctionEvent> entry : this.agentScorers.entrySet()) {
 			String agentId = entry.getKey();
 			playground.jhackney.scoring.SocScoringFunctionEvent sf = entry.getValue();
 			sf.finish();
-//			sf.finish(act);
+
 			double score = sf.getScore();
 			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
 			double oldScore = plan.getScore();
@@ -120,31 +119,31 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			this.scoreSum += score;
 			this.scoreCount++;
 		}
-		for (Map.Entry<String, playground.jhackney.scoring.SocScoringFunctionEvent> entry : this.agentScorers.entrySet()) {
-			String agentId = entry.getKey();
-			playground.jhackney.scoring.SocScoringFunctionEvent sf = entry.getValue();
-			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
-			ActLegIterator actLegIter = plan.getIterator();
-			Act act = (Act) actLegIter.nextAct();
-
-
-			int actNumber=0;
-			int legNumber=-1;
-
-			while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-
-				Leg leg = (Leg) actLegIter.nextLeg();
-				legNumber++;
-
-				System.out.print(agentId+"\t"+sf.getUlegt(leg));
-
-				act = (Act) actLegIter.nextAct();
-				actNumber++;
-
-				double dum=sf.getUsoc(act);
-				System.out.println("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
-			}
-		}
+		
+		System.out.println("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
+//		for (Map.Entry<String, playground.jhackney.scoring.SocScoringFunctionEvent> entry : this.agentScorers.entrySet()) {
+//			String agentId = entry.getKey();
+//			playground.jhackney.scoring.SocScoringFunctionEvent sf = entry.getValue();
+//			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+//			ActLegIterator actLegIter = plan.getIterator();
+//			Act act = (Act) actLegIter.nextAct();
+//
+//
+//			int actNumber=0;
+//			int legNumber=-1;
+//
+//			while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
+//
+//				Leg leg = (Leg) actLegIter.nextLeg();
+//				legNumber++;
+//
+//				System.out.print(agentId+"\t"+sf.getUlegt(leg));
+//
+//				act = (Act) actLegIter.nextAct();
+//				actNumber++;
+//				System.out.println("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+//			}
+//		}
 	}
 
 	/**

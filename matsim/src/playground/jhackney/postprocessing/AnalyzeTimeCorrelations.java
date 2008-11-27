@@ -114,7 +114,9 @@ public class AnalyzeTimeCorrelations {
 //		new MakeTimeWindowsFromEvents(epp);
 		String out2=Scenario.getOut2();
 		String out1=Scenario.getOut1();
-		new TimeWindowCalcTimeCorrelations(new MakeTimeWindowsFromEvents(epp).getTimeWindowMap(), out2, out1);
+		MakeTimeWindowsFromEvents teo= new MakeTimeWindowsFromEvents();
+		teo.calculate(epp);
+		new TimeWindowCalcTimeCorrelations(teo.getTimeWindowMap(), out2, out1);
 		System.out.println("Type\tId");
 		new WriteActivityLocationsByType(plans);
 		System.out.println("TEST SUCCEEDED.");

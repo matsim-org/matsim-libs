@@ -175,7 +175,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.controler.getEvents().addHandler(this.epp);
 		
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring runction needs it (can null be passed?)
-		teo=new MakeTimeWindowsFromEvents(epp);
+		teo=new MakeTimeWindowsFromEvents();
+		teo.calculate(epp);
 		twm=teo.getTimeWindowMap();
 		
 		this.log.info(" ... Instantiation of events overlap tracking done");
@@ -209,7 +210,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.actStats.clear();
 		
 		Gbl.printMemoryUsage();
-		teo=new MakeTimeWindowsFromEvents(epp);
+		teo=new MakeTimeWindowsFromEvents();
+		teo.calculate(epp);
 		twm= teo.getTimeWindowMap();
 
 		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));

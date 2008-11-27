@@ -45,7 +45,7 @@ import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.scoring.EventsToScore;
+//import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
@@ -55,13 +55,13 @@ import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-
+import playground.jhackney.scoring.EventsToScore;
+import playground.jhackney.scoring.SocScoringFactoryEvent;
 
 
 
@@ -123,7 +123,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
-	private EventsToScore scoring =null;
+	private playground.jhackney.scoring.EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
 
@@ -153,18 +153,20 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		this.controler.getEvents().addHandler(this.epp);
 
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring function needs it (can null be passed?)
-		teo=new MakeTimeWindowsFromEvents(epp);
+		teo=new MakeTimeWindowsFromEvents();
+		teo.calculate(epp);
 		twm=teo.getTimeWindowMap();
 
 		this.log.info(" ... Instantiation of events overlap tracking done");
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
-		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
+//		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
+		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
 
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-		scoring = new EventsToScore(this.controler.getPopulation(), factory);
+		scoring = new playground.jhackney.scoring.EventsToScore(this.controler.getPopulation(), factory);
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 
@@ -181,7 +183,8 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			Gbl.printMemoryUsage();
 			controler.stopwatch.beginOperation("spatialencounters");
 			this.log.info(" Making time Windows and Map from Events");
-			teo=new MakeTimeWindowsFromEvents(epp);
+//			teo=new MakeTimeWindowsFromEvents(epp);
+			teo.calculate(epp);
 			this.log.info(" ... done making time windows and map");
 			twm= teo.getTimeWindowMap();
 //			execute spatial interactions (uses timewindows)
