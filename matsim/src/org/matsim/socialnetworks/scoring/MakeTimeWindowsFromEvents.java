@@ -21,8 +21,12 @@ public class MakeTimeWindowsFromEvents {
 
 	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap=new Hashtable<Facility,ArrayList<TimeWindow>>();
 	static final private Logger log = Logger.getLogger(MakeTimeWindowsFromEvents.class);
+//	EventsPostProcess epp;
 	
-	public MakeTimeWindowsFromEvents(EventsPostProcess epp){
+	public MakeTimeWindowsFromEvents(){
+//		this.epp=epp;
+	}
+	public void calculate(EventsPostProcess epp){
 		HashMap<Person, ArrayList<ActStartEvent>> startMap = epp.startMap;
 		HashMap<Person, ArrayList<ActEndEvent>> endMap = epp.endMap;
 		Object[] persons = startMap.keySet().toArray();
