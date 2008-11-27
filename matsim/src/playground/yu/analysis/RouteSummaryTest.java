@@ -26,9 +26,9 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,17 +60,19 @@ public class RouteSummaryTest {
 		 */
 		private Map<String, Set<List<Id>>> odRoutes = new HashMap<String, Set<List<Id>>>();
 		/**
-		 * @param routeCountors
-		 *            Map<List<Id linkId>,Integer number of the same routes>
+		 * @param routeCounters
+		 *            Map<List<Id routelinkId>,Integer routeFlows (car, total
+		 *            day)>
 		 */
-		private Map<List<Id>, Integer> routeCountors = new HashMap<List<Id>, Integer>();
-		public Map<List<Id>, Integer> getRouteCountors() {
-			return routeCountors;
+		private Map<List<Id>, Integer> routeCounters = new HashMap<List<Id>, Integer>();
+
+		public Map<List<Id>, Integer> getRouteCounters() {
+			return routeCounters;
 		}
 
 		/**
 		 * @param numRoutesDistribution
-		 *            Map<Integer number of used route (car), Integer number of
+		 *            Map<Integer routeFlows (car, total day), Integer number of
 		 *            occurrences of "key">
 		 */
 		private Map<Integer, Integer> numRoutesDistribution = new HashMap<Integer, Integer>();
@@ -94,20 +96,21 @@ public class RouteSummaryTest {
 					if (routes.size() > 0) {
 						writer.write("odPair :\t" + odPair + "\n");
 						for (List<Id> linkIds : routes) {
-							Integer num_of_routes = routeCountors.get(linkIds);
+							Integer routeFlows = routeCounters.get(linkIds);
 							Integer num_of_num_of_routes = numRoutesDistribution
-									.get(num_of_routes);
+									.get(routeFlows);
 							numRoutesDistribution
 									.put(
-											num_of_routes,
+											routeFlows,
 											(num_of_num_of_routes == null) ? new Integer(
 													1)
 													: new Integer(
 															num_of_num_of_routes
 																	.intValue() + 1));
-							writer.write(linkIds.toString()
-									+ "\tnum_of_routes :\t" + num_of_routes
-									+ "\n");
+							writer
+									.write(linkIds.toString()
+											+ "\tnum_of_routes :\t"
+											+ routeFlows + "\n");
 						}
 						writer.write("-----------------------\n");
 						writer.flush();
@@ -144,32 +147,42 @@ public class RouteSummaryTest {
 						Id previousActLinkId = p.getPreviousActivity(l)
 								.getLinkId();
 						Id nextActLinkId = p.getNextActivity(l).getLinkId();
+
 						String odPair = previousActLinkId.toString() + "->"
 								+ nextActLinkId.toString();
-						Set<List<Id>> routes = odRoutes.get(odPair);
-						if (routes == null)
-							routes = new HashSet<List<Id>>();
 
-						List<Id> linkIds = new ArrayList<Id>();
+						Set<List<Id>> aOdRouteSet = odRoutes.get(odPair);
+						if (aOdRouteSet == null)
+							aOdRouteSet = new HashSet<List<Id>>();
+
+						List<Id> routeLinkIds = new LinkedList<Id>();
 						Route r = l.getRoute();
+						// boolean illegalRoute = false;
 
-						boolean illegalRoute = false;
-						if (r.getRoute().size() > 0)
-							linkIds = r.getLinkIds();
-						else if (r.getRoute().size() == 0
+						if (r.getRoute().size() > 0) {
+							LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
+							tmpRouteLinkList.addFirst(previousActLinkId);
+							List<Id> origRouteLinkIds = r.getLinkIds();
+							for (int i = 0; i < origRouteLinkIds.size(); i++) {
+								tmpRouteLinkList.add(origRouteLinkIds.get(i));
+							}
+							tmpRouteLinkList.addLast(nextActLinkId);
+							routeLinkIds = tmpRouteLinkList;
+						} else if (r.getRoute().size() == 0
 								&& previousActLinkId.equals(nextActLinkId))
-							linkIds.add(previousActLinkId);
-						else
-							illegalRoute = true;
-						if (!routes.contains(linkIds))
-							routes.add(linkIds);
-						if (!illegalRoute) {
-							Integer itg = routeCountors.get(linkIds);
-							routeCountors.put(linkIds,
-									(itg == null) ? new Integer(1)
-											: new Integer(itg.intValue() + 1));
-						}
-						odRoutes.put(odPair, routes);
+							routeLinkIds.add(previousActLinkId);
+						// else
+						// illegalRoute = true;
+
+						if (!aOdRouteSet.contains(routeLinkIds))
+							aOdRouteSet.add(routeLinkIds);
+						// if (!illegalRoute) {
+						Integer itg = routeCounters.get(routeLinkIds);
+						routeCounters.put(routeLinkIds,
+								(itg == null) ? new Integer(1) : new Integer(
+										itg.intValue() + 1));
+						// }
+						odRoutes.put(odPair, aOdRouteSet);
 					}
 		}
 	}
