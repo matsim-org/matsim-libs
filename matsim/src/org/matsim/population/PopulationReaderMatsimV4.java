@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
@@ -107,9 +108,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (LOCATION.equals(name)) {
 			startLocation(atts);
 		} else if (CAPACITY.equals(name)) {
-			startCapacity(atts);
+			startCapacity();
 		} else if (OPENTIME.equals(name)) {
-			startOpenTime(atts);
+			startOpenTime();
 		} else if (PLAN.equals(name)) {
 			startPlan(atts);
 		} else if (ACT.equals(name)) {
@@ -126,12 +127,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			try {
-				this.plans.addPerson(this.currperson);
-			}
-			catch (Exception e) {
-				Gbl.errorMsg(e);
-			}
+			this.plans.addPerson(this.currperson);
 			this.currperson = null;
 		} else if (DESIRES.equals(name)) {
 			this.currdesires = null;
@@ -248,11 +244,11 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.currknowledge.addActivity(this.curractivity,isPrimary);
 	}
 
-	private void startCapacity(final Attributes atts) {
+	private void startCapacity() {
 		log.warn("<capcity> will be ignored!");
 	}
 
-	private void startOpenTime(final Attributes atts) {
+	private void startOpenTime() {
 		log.warn("<opentime> will be ignored!");
 	}
 
@@ -306,25 +302,18 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startAct(final Attributes atts) {
-		try {
-			this.curract = this.currplan.createAct(atts.getValue("type"), atts.getValue("x"), atts.getValue("y"), atts.getValue("link"),
-																						 atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"),null);
-			if (atts.getValue("facility") != null) {
-				this.curract.setFacility(atts.getValue("facility"));
-			}
-		} catch (Exception e) {
-			Gbl.errorMsg(e);
+		this.curract = this.currplan.createAct(atts.getValue("type"), atts.getValue("x"), atts.getValue("y"), atts.getValue("link"),
+				atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"),null);
+		if (atts.getValue("facility") != null) {
+			this.curract.setFacility(atts.getValue("facility"));
 		}
 	}
 
 	private void startLeg(final Attributes atts) {
-		try {
-			this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"),
-																						 atts.getValue("trav_time"), atts.getValue("arr_time"));
-		}
-		catch (Exception e) {
-			Gbl.errorMsg(e);
-		}
+		this.currleg = this.currplan.createLeg(BasicLeg.Mode.valueOf(atts.getValue("mode").toLowerCase()));
+		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
+		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
 	}
 
 	private void startRoute(final Attributes atts) {

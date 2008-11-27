@@ -26,9 +26,11 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -74,16 +76,10 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		} else if (LEG.equals(name)) {
 			startLeg(atts);
 		} else if (ROUTE.equals(name)) {
-			startRoute(atts);
+			startRoute();
 		} else if (DEMAND.equals(name)) {
 			log.info("The tag <demand> is not supported");
-		} else if (SEGMENT.equals(name) || MODEL.equals(name) || (PARAM.equals(name) || PLANS.equals(name))) {
-			/* segment, model, param:
-			 * 		these are all inside <demand>, as we ignore that one, these are of no relevance
-			 * plans:
-			 * 		nothing to do for that one
-			 */
-		} else {
+		} else if (!SEGMENT.equals(name) && !MODEL.equals(name) && !PARAM.equals(name) && !PLANS.equals(name)) {
 			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
@@ -156,12 +152,13 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg =
-				 this.currplan.createLeg(atts.getValue("mode"),atts.getValue("dep_time"),atts.getValue("trav_time"),
-																 atts.getValue("arr_time"));
+		this.currleg = this.currplan.createLeg(BasicLeg.Mode.valueOf(atts.getValue("mode").toLowerCase()));
+		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
+		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
 	}
 
-	private void startRoute(final Attributes atts) {
+	private void startRoute() {
 		this.currroute = this.currleg.createRoute();
 	}
 

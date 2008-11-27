@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
@@ -176,8 +177,10 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createLeg(atts.getValue("mode"), atts.getValue("dep_time"), atts.getValue("trav_time"),
-					atts.getValue("arr_time"));
+		this.currleg = this.currplan.createLeg(BasicLeg.Mode.valueOf(atts.getValue("mode").toLowerCase()));
+		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
+		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
 	}
 
 	private void startRoute(final Attributes atts) {
