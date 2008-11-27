@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
@@ -38,6 +37,8 @@ import org.matsim.utils.misc.Time;
 public class Plan extends BasicPlanImpl {
 
 	private final static Logger log = Logger.getLogger(Plan.class);
+	
+	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -57,7 +58,7 @@ public class Plan extends BasicPlanImpl {
 
 	public final Act createAct(final String type, final Coord coord) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException(ACT_ERROR);
 		}
 		Act a = new Act(type, coord);
 		this.actsLegs.add(a);
@@ -66,7 +67,7 @@ public class Plan extends BasicPlanImpl {
 
 	public final Act createAct(final String type, final Facility fac) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException(ACT_ERROR);
 		}
 		Act a = new Act(type, fac);
 		this.actsLegs.add(a);
@@ -76,7 +77,7 @@ public class Plan extends BasicPlanImpl {
 
 	public final Act createAct(final String type, final Link link) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException(ACT_ERROR);
 		}
 		Act a = new Act(type, link);
 		this.actsLegs.add(a);
@@ -120,40 +121,6 @@ public class Plan extends BasicPlanImpl {
 		return a;
 	}
 
-  /**
-   * @deprecated use method with less arguments and make use of the appropriate setters afterwards
-   */
-	@Deprecated
-	public final Leg createLeg(final String modestring, final String depTime, final String travTime,
-			 final String arrTime) throws IllegalStateException {
-		BasicLeg.Mode mode;
-		if ("miv".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.miv;
-		else if ("car".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.car;
-		else if ("ride".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.ride;
-		else if ("motorbike".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.motorbike;
-		else if ("pt".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.pt;
-		else if ("train".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.train;
-		else if ("bike".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.bike;
-		else if ("walk".equalsIgnoreCase(modestring))
-			mode = BasicLeg.Mode.walk;
-		else {
-			Logger.getLogger(BasicLegImpl.class).warn("Unknown Leg mode: " + modestring);
-			mode = BasicLeg.Mode.undefined;
-		}
-		Leg leg = createLeg(mode);
-		leg.setDepartureTime(Time.parseTime(depTime));
-		leg.setTravelTime(Time.parseTime(travTime));
-		leg.setArrivalTime(Time.parseTime(arrTime));
-		return leg;
-	}
-
 	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException {
 		verifyCreateLeg();
 		Leg leg = new Leg(mode);
@@ -172,7 +139,7 @@ public class Plan extends BasicPlanImpl {
 
 	private final void verifyCreateAct(final String end_time) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.");
+			throw new IllegalStateException(ACT_ERROR);
 		}
 		if ((this.actsLegs.size() == 0) && (end_time == null)) {
 			throw new IllegalStateException("The first 'act' has to have an end time.");
