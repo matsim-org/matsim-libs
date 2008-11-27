@@ -34,6 +34,7 @@ public class AllTests {
 		suite.addTestSuite(RandomLocationMutatorTest.class);
 		suite.addTestSuite(SubChainTest.class);
 		suite.addTestSuite(ManageSubchainsTest.class);
+		suite.addTestSuite(LocationMutatorwChoiceSetTest.class);
 
 		//$JUnit-END$
 		return suite;

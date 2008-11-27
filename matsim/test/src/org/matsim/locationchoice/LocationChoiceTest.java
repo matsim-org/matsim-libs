@@ -54,7 +54,8 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		assertNotNull("network not initialized", this.locationchoice.getNetwork());
 	}
 	
-	public void testGetPlanAlgoInstance() {	
+	public void testGetPlanAlgoInstance() {
+		this.initialize();
 		locationchoice.setConstrained(false);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
 		locationchoice.setConstrained(true);
@@ -62,6 +63,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	}	
 	
 	public void testFinish() {	
+		this.initialize();
 		locationchoice.getPlanAlgoInstance();
 		assertEquals(false, locationchoice.getPlanAlgoInstances().isEmpty());
 		locationchoice.init();
