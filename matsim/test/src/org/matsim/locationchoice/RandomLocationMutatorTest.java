@@ -7,8 +7,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class RandomLocationMutatorTest  extends MatsimTestCase {
 	
-	RandomLocationMutator randomlocationmutator = null;
-	Controler controler = null;
+	private RandomLocationMutator randomlocationmutator = null;
+	private Controler controler = null;
 	
 	public RandomLocationMutatorTest() {
 		initialize();

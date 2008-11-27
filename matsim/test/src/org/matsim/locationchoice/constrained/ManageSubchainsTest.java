@@ -10,8 +10,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class ManageSubchainsTest extends MatsimTestCase {
 	
-	ManageSubchains manager = null;
-	Controler controler = null;
+	private ManageSubchains manager = null;
+	private Controler controler = null;
 	
 	public ManageSubchainsTest() {
 		manager = new ManageSubchains();

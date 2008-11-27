@@ -12,8 +12,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class LocationChoiceTest  extends MatsimTestCase {
 	
-	LocationChoice locationchoice = null;
-	Controler controler = null;
+	private LocationChoice locationchoice = null;
+	private Controler controler = null;
 	
 	public LocationChoiceTest() {
 		this.initialize();

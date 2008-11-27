@@ -6,7 +6,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class SubChainTest extends MatsimTestCase {
 	
-	SubChain subchain = null;
+	private SubChain subchain = null;
 	
 	public SubChainTest() {	
 		subchain = new SubChain();
