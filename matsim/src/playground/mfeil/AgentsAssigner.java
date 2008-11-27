@@ -47,6 +47,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	private final RecyclingModule			module;
 	private final ScheduleCleaner			cleaner;
 	private final double					minimumTime;
+	private final String					distance, homeLocation;
 	
 	
 	//////////////////////////////////////////////////////////////////////
@@ -65,6 +66,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.cleaner				= cleaner;
 		this.module					= recyclingModule;
 		this.minimumTime			= minimumTime;
+		this.distance				= "distance";
+		this.homeLocation			= "homelocation";
 	}
 	
 		
@@ -77,14 +80,30 @@ public class AgentsAssigner implements PlanAlgorithm{
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
 		double distance = Double.MAX_VALUE;
+		double distanceAgent = 0;
 		int assignedAgent = -1;
-		double distanceAgent = plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+		
 		for (int j=0;j<agents.getNumberOfAgents();j++){
-			if (java.lang.Math.abs(distanceAgent-agents.getAgentDistance(j))<distance){
+			if (this.distance=="distance"){
+				distanceAgent += plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+			}
+	
+			if (this.homeLocation=="homelocation"){
+			
+				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX();
+				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY();
+			
+				distanceAgent += java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
+						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
+			}
+			if (distanceAgent<distance){
 				assignedAgent=j;
-				distance = java.lang.Math.abs(distanceAgent-agents.getAgentDistance(j));
+				distance = distanceAgent;
 			}
 		}
+		
+		
+		
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.router.run(plan);
@@ -124,6 +143,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		}
 	}
 	
+	@Deprecated
 	private void cleanUpPlan (Plan plan){
 		double move = this.cleaner.run(((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
 		int loops=1;
