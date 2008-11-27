@@ -36,6 +36,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -109,7 +110,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 	}
 
 	protected double getLinkWidth(Link link) {
-		return link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)
+		return link.getCapacity(Time.UNDEFINED_TIME)
 				/ network.getCapacityPeriod() * 3600.0 / 50.0;
 	}// TODO override
 
