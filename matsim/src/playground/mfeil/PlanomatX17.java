@@ -99,7 +99,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
-		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
+		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;
