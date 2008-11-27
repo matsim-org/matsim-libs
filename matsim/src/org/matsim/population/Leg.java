@@ -54,26 +54,6 @@ public class Leg extends BasicLegImpl {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @param dist
-	 * @param time
-	 * @return newly created route
-	 * @deprecated please use the method without arguments
-	 */
-	@Deprecated
-	public final Route createRoute(final String dist, final String time) {
-		this.route = new RouteImpl();
-		if (dist != null) {
-			this.route.setDist(Double.parseDouble(dist));
-		}
-		if (time != null) {
-			this.route.setTravTime(Time.parseTime(time));
-		}
-		return getRoute();
-		// TODO [MR] delete method
-		// set to deprecated on 2008/11/18, mrieser
-	}
-
 	public final Route createRoute() {
 		this.route = new RouteImpl();
 		return (Route) this.route;
