@@ -194,7 +194,8 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			boolean movable = movablePrimaryActivities.contains(act);
 			
 			// found secondary activity
-			if (!isPrimary || movable) {			
+			// test for home if by accident home is not declared as primary
+			if ((!isPrimary || movable) && !act.getType().startsWith("h")) {			
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}		
 			// found primary activity
