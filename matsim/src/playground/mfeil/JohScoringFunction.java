@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -47,6 +48,7 @@ public class JohScoringFunction implements ScoringFunction {
 
 	protected final Person person;
 	protected final Plan plan;
+	protected final Id id;
 
 	protected double score;
 	private double lastTime;
@@ -72,13 +74,13 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6/3600;
-	private static double marginalUtilityOfLateArrival = -18/3600;
-	private static double marginalUtilityOfEarlyDeparture = -6/3600;
-	private static double marginalUtilityOfTraveling = -12/3600;
-	private static double marginalUtilityOfTravelingPT = -12/3600; // public transport
-	private static double marginalUtilityOfTravelingWalk = -12/3600;
-	private static double marginalUtilityOfDistance = 0/3600;
+	private static double marginalUtilityOfWaiting = -6;
+	private static double marginalUtilityOfLateArrival = -40; 
+	private static double marginalUtilityOfEarlyDeparture = -6;
+	private static double marginalUtilityOfTraveling = -12;
+	private static double marginalUtilityOfTravelingPT = -12; // public transport
+	private static double marginalUtilityOfTravelingWalk = -12;
+	private static double marginalUtilityOfDistance = 0;
 	
 	private static final double uMin_home = 0;
 	private static final double uMin_work = 0;
@@ -109,6 +111,7 @@ public class JohScoringFunction implements ScoringFunction {
 		this.plan = plan;
 		this.person = this.plan.getPerson();
 		this.lastActIndex = this.plan.getActsLegs().size() - 1;
+		this.id = plan.getPerson().getId();
 	}
 
 	public void reset() {
@@ -230,37 +233,38 @@ public class JohScoringFunction implements ScoringFunction {
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
+			tmpScore += marginalUtilityOfWaiting / 3600 * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 		double latestStartTime = params.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
-			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
+			tmpScore += marginalUtilityOfLateArrival / 3600 * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action
 		if (duration > 0) {
 			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
 			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
-			double utilWait = marginalUtilityOfWaiting * duration;
+			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else if (duration<0){
-			//tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
-			tmpScore += -100000; // Negative durations results in refusal of plan
+			tmpScore += 2*marginalUtilityOfLateArrival / 3600 *Math.abs(duration);
+			//tmpScore += -100000; // Negative durations results in refusal of plan
+
 		}
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
-			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
+			tmpScore += marginalUtilityOfEarlyDeparture / 3600 * (earliestEndTime - activityEnd);
 		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
-			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
+			tmpScore += marginalUtilityOfWaiting / 3600 * (departureTime - activityEnd);
 		}
-
+		//if (this.id.toString().equals("10")) System.out.println (tmpScore);
 		return tmpScore;
 	}
 
@@ -288,14 +292,14 @@ public class JohScoringFunction implements ScoringFunction {
 		double dist = 0.0; // distance in meters
 
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling / 3600 + marginalUtilityOfDistance / 3600 * dist;
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingPT / 3600 + marginalUtilityOfDistance / 3600 * dist;
 		} else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
-			tmpScore += travelTime * marginalUtilityOfTravelingWalk + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTravelingWalk / 3600 + marginalUtilityOfDistance / 3600 * dist;
 		} else {
 			// use the same values as for "car"
-			tmpScore += travelTime * marginalUtilityOfTraveling + marginalUtilityOfDistance * dist;
+			tmpScore += travelTime * marginalUtilityOfTraveling / 3600 + marginalUtilityOfDistance / 3600 * dist;
 		}
 
 		return tmpScore;
@@ -361,6 +365,7 @@ public class JohScoringFunction implements ScoringFunction {
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION
+					
 				}
 			}
 		} else {
