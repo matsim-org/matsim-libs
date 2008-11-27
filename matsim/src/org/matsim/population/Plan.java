@@ -218,7 +218,7 @@ public class Plan extends BasicPlanImpl {
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
 				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
-				prev_leg.removeRoute();
+				prev_leg.setRoute(null);
 
 				this.actsLegs.remove(index+1); // following leg
 				this.actsLegs.remove(index); // act
@@ -244,7 +244,7 @@ public class Plan extends BasicPlanImpl {
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
 				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
-				next_leg.removeRoute();
+				next_leg.setRoute(null);
 			}
 			this.actsLegs.remove(index+1); // following act
 			this.actsLegs.remove(index); // leg
@@ -320,14 +320,14 @@ public class Plan extends BasicPlanImpl {
 		return this.person.getSelectedPlan() == this;
 	}
 
-	
+
 	@Override
-	public void setSelected(boolean selected) {
+	public void setSelected(final boolean selected) {
 		this.getPerson().setSelectedPlan(this);
 		super.setSelected(selected);
 	}
-	
-	
+
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
