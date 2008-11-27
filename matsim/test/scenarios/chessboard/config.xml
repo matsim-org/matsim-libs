@@ -93,8 +93,20 @@
 		
 		<param name="ModuleProbability_4" value="0.0" />
 		<param name="Module_4" value="Planomat" />
+		
+		<param name="ModuleProbability_5" value="0.0" />
+		<param name="Module_5" value="Clustering" />
 
 	
+	</module>
+	
+	<module name="locationchoice">
+		<param name="constrained" value="true" />
+		<param name="restraintFcnFactor" value="0.131687242798" />
+		<param name="restraintFcnExp" value="5.0" />
+		<param name="scalefactor" value="1" />
+		<param name="recursion_travelspeedchange" value="0.1" />
+		<param name="max_recursions" value="20" />
 	</module>
 
 </config>
