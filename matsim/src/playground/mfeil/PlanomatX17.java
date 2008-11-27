@@ -32,11 +32,11 @@ import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.PlanOptimizeTimes;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
@@ -98,7 +98,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
-		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
+		//this.timer		 			= new PlanOptimizeTimes (legTravelTimeEstimator, this.factory);
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -117,7 +117,6 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer					= new PlanScorer (this.factory);
 		this.timer					= timer;
-		//this.timer		 		= new PlanOptimizeTimes (controler.getLegTravelTimeEstimator(), this.factory);
 		this.locator 				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -164,8 +163,8 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 	//	double [] xs;
 	//	double [] ys 									= new double [MAX_ITERATIONS+1];		
-		
-	/*	String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
+	/*	
+		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		Counter.counter++;
 		PrintStream stream;
 		try {
