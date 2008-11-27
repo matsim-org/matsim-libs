@@ -41,7 +41,7 @@ import org.matsim.scoring.ScoringFunction;
  */
 public class SocScoringFunctionEvent implements ScoringFunction{
 
-	static final private Logger log = Logger.getLogger(SocScoringFunctionPlan.class);
+	static final private Logger log = Logger.getLogger(SocScoringFunctionEvent.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
