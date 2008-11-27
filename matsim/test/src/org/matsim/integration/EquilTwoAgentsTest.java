@@ -43,7 +43,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
 
-	/*package*/ EventsToScore planScorer;
+	/*package*/ EventsToScore planScorer = null;
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");
@@ -180,6 +180,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 					//must be negative score for traveling to work (i.e. value of agentTwoScore)
 					//plus activity score 8 h work typical = 8h, beta_perf = 6
 					this.agentTwoScore = this.agentTwoScore + (6.0*8.0*Math.log(8.0 / (8.0*Math.exp(-10.0/8.0))));
+					// plus negative score for being late at work in the morning
+					this.agentTwoScore = this.agentTwoScore + (this.agent2LeaveHomeTime + 1797.0 - 7.0*3600) * (-18.0 / 3600.0);
 					//plus negative score for traveling home 4677.0 seconds by non-car mode (should be 78 min but is less!)
 					this.agentTwoScore = this.agentTwoScore + (4677.0/3600.0 * -3.0);
 					assertEquals(this.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(e.agent.getId()), EPSILON);
