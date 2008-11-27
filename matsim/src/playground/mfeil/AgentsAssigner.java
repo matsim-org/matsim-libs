@@ -34,7 +34,8 @@ import org.matsim.router.util.PreProcessLandmarks;
 
 /**
  * @author Matthias Feil
- * Parallel PlanAlgorithm to assign the non-optimized agents to an optimized agent.
+ * Parallel PlanAlgorithm to assign the non-optimized agents to an optimized agent
+ * (= non-optimized agent copies the plan of the most similar optimized agent).
  */
 
 public class AgentsAssigner implements PlanAlgorithm{ 
@@ -43,7 +44,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 	private final PlanAlgorithm				timer;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRouteLandmarks 	router;
-	private final String					mode;
 	private final RecyclingModule			module;
 	private final ScheduleCleaner			cleaner;
 	private final double					minimumTime;
@@ -64,7 +64,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.locator 				= locator;
 		this.cleaner				= cleaner;
 		this.module					= recyclingModule;
-		this.mode					= "timer";	
 		this.minimumTime			= minimumTime;
 	}
 	
@@ -89,10 +88,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.router.run(plan);
-		if (this.mode.equals("timer")){
-			this.timer.run(plan);
-		}
-		else this.cleanUpPlan(plan);
+		this.timer.run(plan);
 		
 	}	
 	
