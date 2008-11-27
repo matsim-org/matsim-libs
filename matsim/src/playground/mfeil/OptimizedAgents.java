@@ -22,6 +22,7 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import org.matsim.population.Plan;
+import org.matsim.population.Person;
 
 /**
  * @author Matthias Feil
@@ -57,5 +58,9 @@ public class OptimizedAgents {
 	
 	public Plan getAgentPlan (int agent){
 		return this.list.get(agent);
+	}
+	
+	public Person getAgentPerson (int agent){
+		return this.list.get(agent).getPerson();
 	}
 }
