@@ -22,7 +22,13 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import org.matsim.population.Plan;
-import org.matsim.basic.v01.Id;;
+
+/**
+ * @author Matthias Feil
+ * This class provides access to all agents that have been optimized during an iteration.
+ * Attributes (such as number or type of primary activities, distance between primary activities
+ * and others) may be calculated and provided to other classes, mainly the AgentsAssigner.
+ */
 
 public class OptimizedAgents {
 	
@@ -39,10 +45,6 @@ public class OptimizedAgents {
 		for (int i=0;i<this.distancesTestAgents.length;i++){
 			this.distancesTestAgents[i] = this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 		}
-	}
-	
-	public Id getAgent (int agent){
-		return this.list.get(agent).getPerson().getId();
 	}
 	
 	public double getAgentDistance (int agent){
