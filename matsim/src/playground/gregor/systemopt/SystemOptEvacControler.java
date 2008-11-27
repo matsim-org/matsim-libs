@@ -44,7 +44,7 @@ public class SystemOptEvacControler extends EvacuationQSimControler{
 		factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
-		TravelTimeAndSocialCostCalculator t = new TravelTimeAndSocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize(),(int)endTime,factory);
+		TravelTimeAndSocialCostCalculatorII t = new TravelTimeAndSocialCostCalculatorII(this.network,this.config.controler().getTraveltimeBinSize(),(int)endTime,factory);
 		this.travelTimeCalculator = t;
 		this.travelCostCalculator = new MarginalTravelCostCalculator(t);
 		this.events.removeHandler(this.travelTimeCalculator);
