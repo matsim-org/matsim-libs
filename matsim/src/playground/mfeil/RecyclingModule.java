@@ -23,7 +23,6 @@ package playground.mfeil;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetSimultan;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.controler.Controler;
@@ -31,7 +30,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Plan;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -72,7 +70,7 @@ public class RecyclingModule implements StrategyModule {
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
 		//this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
-		this.locator 				= new LocationMutatorwChoiceSetSimultan(controler.getNetwork(), controler);
+		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
 				controler.getTraveltimeBinSize());
@@ -114,12 +112,6 @@ public class RecyclingModule implements StrategyModule {
 		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
 		schedulingModule.finish();
 		
-		/*
-		double [] distancesTestAgents = new double [list[0].size()];
-		for (int i=0;i<distancesTestAgents.length;i++){
-			distancesTestAgents[i] = list[0].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[0].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
-		}
-		*/
 		this.agents = new OptimizedAgents (this.list[0]);
 		
 		for (int i=0;i<list[1].size();i++){
@@ -127,26 +119,6 @@ public class RecyclingModule implements StrategyModule {
 		}
 		
 		this.assignmentModule.finish();
-		/*
-		int [] allocations = new int [list[1].size()];
-		for (int i=0;i<list[1].size();i++){
-			double distance = Double.MAX_VALUE;
-			double distanceAgent = list[1].get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(list[1].get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
-			for (int j=0;j<list[0].size();j++){
-				if (java.lang.Math.abs(distanceAgent-distancesTestAgents[j])<distance){
-					allocations[i]=j;
-					distance = java.lang.Math.abs(distanceAgent-distancesTestAgents[j]);
-				}
-			}
-			this.writePlan(list[0].get(allocations[i]), list[1].get(i));
-			this.locator.handlePlan(list[1].get(i));
-			this.router.run(list[1].get(i));
-			if (mode.equals("timer")){
-				this.timer.run(list[1].get(i));
-			}
-			else this.cleanUpPlan(list[1].get(i));
-		}
-		*/
 	}
 	
 	public OptimizedAgents getOptimizedAgents (){
@@ -155,7 +127,7 @@ public class RecyclingModule implements StrategyModule {
 	
 	
 	
-	
+	@Deprecated
 	private double [] findDistanceMeasure (final ArrayList<Plan> list){
 		
 		int [][] distanceMatrix = new int [this.testAgentsNumber][this.testAgentsNumber];
