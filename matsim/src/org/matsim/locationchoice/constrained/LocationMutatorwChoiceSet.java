@@ -217,4 +217,21 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
 		return (ArrayList<Facility>) this.quad_trees.get(type).get(midPointX, midPointY, radius);
 	}
+	
+	// for test cases:
+	public double getRecursion_travelspeedchange() {
+		return recursion_travelspeedchange;
+	}
+
+	public void setRecursion_travelspeedchange(double recursion_travelspeedchange) {
+		this.recursion_travelspeedchange = recursion_travelspeedchange;
+	}
+
+	public int getMax_recursions() {
+		return max_recursions;
+	}
+
+	public void setMax_recursions(int max_recursions) {
+		this.max_recursions = max_recursions;
+	}
 }
