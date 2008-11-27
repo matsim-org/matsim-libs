@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.locationchoice;
 
+import org.matsim.locationchoice.constrained.ManageSubchainsTest;
+import org.matsim.locationchoice.constrained.SubChainTest;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -30,7 +34,6 @@ public class AllTests {
 		//$JUnit-BEGIN$
 
 		suite.addTestSuite(LocationChoiceTest.class);
-		suite.addTestSuite(LocationMutatorwChoiceSetTest.class);
 		suite.addTestSuite(RandomLocationMutatorTest.class);
 		suite.addTestSuite(SubChainTest.class);
 		suite.addTestSuite(ManageSubchainsTest.class);
