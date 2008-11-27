@@ -22,6 +22,8 @@ package org.matsim.locationchoice;
 import org.matsim.locationchoice.constrained.ManageSubchainsTest;
 import org.matsim.locationchoice.constrained.SubChainTest;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSetTest;
+import org.matsim.locationchoice.facilityload.FacilityPenaltyTest;
+import org.matsim.locationchoice.facilityload.ScoringPenaltyTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -38,6 +40,8 @@ public class AllTests {
 		suite.addTestSuite(SubChainTest.class);
 		suite.addTestSuite(ManageSubchainsTest.class);
 		suite.addTestSuite(LocationMutatorwChoiceSetTest.class);
+		suite.addTestSuite(FacilityPenaltyTest.class);
+		suite.addTestSuite(ScoringPenaltyTest.class);
 
 		//$JUnit-END$
 		return suite;
