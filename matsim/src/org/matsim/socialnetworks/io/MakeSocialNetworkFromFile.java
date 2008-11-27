@@ -26,6 +26,8 @@ public class MakeSocialNetworkFromFile {
 	public void read(String fileName, int iterToLoad){
 		log.info("Reading social network for iteration "+iterToLoad);
 		BufferedReader br = null;
+		long i = 0;
+		long nextMsg = 1;
 
 		try // If an error occurs, go to the "catch" block
 		{   // FileInputStream fis = new FileInputStream (fileName);
@@ -40,7 +42,6 @@ public class MakeSocialNetworkFromFile {
 
 			// Continue to read lines while there are still some left to read
 			String thisLineOfData=null;
-			int i=0; // counter for the number of lines
 			while ((thisLineOfData=br.readLine()) != null)
 			{
 				if(i>0){ // first line is the header with the variable names
@@ -68,7 +69,10 @@ public class MakeSocialNetworkFromFile {
 					}
 				}
 				i++;
-				if(i%1000==0){log.info("   Edge "+i);}
+				if (i % nextMsg == 0) {
+					nextMsg *= 2;
+					log.info("   Edge "+i);
+				}
 			}
 
 			// Close the input stream
@@ -79,5 +83,7 @@ public class MakeSocialNetworkFromFile {
 		catch (Exception e)
 		{   System.err.println(" File input error: "+fileName);
 		}
+		this.log.info("Number of Edges: "+snet.getLinks().size());
+		this.log.info("Average Degree: "+2*snet.getLinks().size()/snet.getNodes().size());
 	}
 }
