@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicRoute.java
+ * BasicRouteImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -30,7 +30,10 @@ public class BasicRouteImpl implements BasicRoute {
 
 	private double travTime = Time.UNDEFINED_TIME;
 
-	private List<Id> linkIds;
+	private List<Id> linkIds = null;
+	
+	private Id startLinkId = null;
+	private Id endLinkId = null;
 
 	public double getDist() {
 		return dist;
@@ -54,6 +57,22 @@ public class BasicRouteImpl implements BasicRoute {
 	
 	public List<Id> getLinkIds() {
 		return this.linkIds;
+	}
+
+	public void setStartLinkId(final Id linkId) {
+		this.startLinkId = linkId;
+	}
+	
+	public Id getStartLinkId() {
+		return this.startLinkId;
+	}
+	
+	public void setEndLinkId(final Id linkId) {
+		this.endLinkId = linkId;
+	}
+	
+	public Id getEndLinkId() {
+		return this.endLinkId;
 	}
 
 }

@@ -37,4 +37,12 @@ public interface BasicRoute {
 	
 	public List<Id> getLinkIds();
 	
+	public void setStartLinkId(final Id linkId);
+	
+	public Id getStartLinkId();
+
+	public void setEndLinkId(final Id linkId);
+	
+	public Id getEndLinkId();
+	
 }
