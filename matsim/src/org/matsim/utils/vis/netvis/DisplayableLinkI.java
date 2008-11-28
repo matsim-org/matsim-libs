@@ -2,7 +2,7 @@ package org.matsim.utils.vis.netvis;
 
 import java.awt.geom.AffineTransform;
 
-import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableLinkI;
 
 public interface DisplayableLinkI extends DrawableLinkI, BasicLink {

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.population.routes.NodeCarRouteFactory;
 import org.matsim.population.routes.Route;
 import org.matsim.population.routes.RouteFactory;

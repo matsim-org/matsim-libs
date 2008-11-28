@@ -25,7 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNet;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.config.ConfigModuleI;
 import org.matsim.utils.vis.netvis.config.GeneralConfig;

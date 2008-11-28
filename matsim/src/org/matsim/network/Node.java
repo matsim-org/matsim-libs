@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicNodeImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
-import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.utils.geometry.Coord;
 
 public class Node extends BasicNodeImpl implements Comparable<Node> {

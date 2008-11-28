@@ -23,7 +23,7 @@ package org.matsim.network;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLinkImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.utils.geometry.Coord;
 
 public class LinkImpl extends BasicLinkImpl implements Link {

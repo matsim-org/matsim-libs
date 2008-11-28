@@ -26,8 +26,8 @@ package playground.johannes.eut;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNet;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.router.util.TravelTime;

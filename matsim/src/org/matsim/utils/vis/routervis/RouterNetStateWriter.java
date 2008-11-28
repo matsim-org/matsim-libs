@@ -23,8 +23,8 @@ package org.matsim.utils.vis.routervis;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNet;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 

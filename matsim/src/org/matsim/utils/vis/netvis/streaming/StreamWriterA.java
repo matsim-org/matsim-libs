@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
-import org.matsim.interfaces.networks.basicNet.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNet;
 import org.matsim.utils.vis.netvis.config.ConfigModuleI;
 import org.matsim.utils.vis.netvis.config.GeneralConfig;
 import org.matsim.utils.vis.netvis.config.IndexationConfig;

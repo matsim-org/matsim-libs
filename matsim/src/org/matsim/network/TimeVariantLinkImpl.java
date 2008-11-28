@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
 
 /**

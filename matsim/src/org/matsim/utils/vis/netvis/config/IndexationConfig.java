@@ -31,9 +31,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.interfaces.networks.basicNet.BasicNet;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNet;
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 

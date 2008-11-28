@@ -1,6 +1,6 @@
 package org.matsim.network;
 
-import org.matsim.interfaces.networks.basicNet.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 

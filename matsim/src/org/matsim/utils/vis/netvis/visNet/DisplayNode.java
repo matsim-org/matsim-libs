@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.interfaces.networks.basicNet.BasicLink;
-import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.interfaces.basic.v01.BasicLink;
+import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.vis.netvis.drawableNet.DrawableNodeI;
 

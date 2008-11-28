@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.interfaces.networks.basicNet;
+package org.matsim.interfaces.basic.v01;
 
 import org.matsim.basic.v01.Id;
 
