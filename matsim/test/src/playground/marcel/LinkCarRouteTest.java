@@ -29,7 +29,7 @@ import org.matsim.population.RouteImplTest;
 public class LinkCarRouteTest extends RouteImplTest {
 
 	@Override
-	public Route getRouteInstance() {
+	public Route getCarRouteInstance() {
 		return new LinkCarRoute();
 	}
 
