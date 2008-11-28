@@ -192,7 +192,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		super();
 		this.network = network;
 		this.timeslice = timeslice;
-		this.linkData = new HashMap(network.getLinks().size());
+		this.linkData = new HashMap<Link, LinearInterpolatingTravelTimeData>(network.getLinks().size());
 		resetTravelTimes();
 	}
 
