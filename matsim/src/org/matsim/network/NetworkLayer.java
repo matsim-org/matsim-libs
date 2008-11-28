@@ -421,6 +421,10 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 		return this.networkChangeEvents;
 	}
 
+	public NetworkFactory getFactory() {
+		return this.factory;
+	}
+	
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////
