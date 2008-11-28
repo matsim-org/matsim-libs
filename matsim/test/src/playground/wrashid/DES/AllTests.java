@@ -9,6 +9,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for playground.wrashid.DES");
 
 		suite.addTestSuite(TestEventLog.class);
+		suite.addTestSuite(TestMessageQueue.class);
 		
 		return suite;
 	}
