@@ -96,7 +96,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
-		Node n = this.factory.newNode(id, coord, nodeType);
+		Node n = this.factory.createNode(id, coord, nodeType);
 		this.nodes.put(id, n);
 		if (this.nodeQuadTree != null) {
 			// we changed the nodes, invalidate the quadTree
@@ -133,7 +133,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 			throw new IllegalArgumentException("Link id=" + id + " already exists in 'locations'!");
 		}
 
-		Link link = this.factory.newLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
+		Link link = this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 		link.setType(type);
 		link.setOrigId(origId);
 		fromNode.addOutLink(link);
