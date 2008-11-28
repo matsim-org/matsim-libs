@@ -26,10 +26,12 @@ package playground.johannes.itsc08;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.withinday.routeprovider.RouteProvider;
 
 /**
@@ -58,8 +60,13 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	public synchronized CarRoute requestRoute(Link departureLink, Link destinationLink,
 			double time) {
-		return this.algorithm.calcLeastCostPath(departureLink.getToNode(),
+		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);
+		CarRoute route = new NodeCarRoute();
+		route.setStartLink(departureLink);
+		route.setEndLink(destinationLink);
+		route.setNodes(path.nodes);
+		return route;
 	}
 
 	public void setPriority(int p) {

@@ -25,17 +25,14 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
-import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
 import playground.christoph.router.util.KnowledgeTravelCost;
 import playground.christoph.router.util.KnowledgeTravelTime;
+import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 /*
  * This is a Wrapper-Class that is needed to forward the currently replanned Person
@@ -71,7 +68,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		this.timeFunction = timeFunction;
 	}
 	
-	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 /*		log.info(this);
 		log.info(fromNode);

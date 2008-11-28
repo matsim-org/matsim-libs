@@ -32,8 +32,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.TravelCost;
@@ -122,18 +120,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	protected ComparatorDijkstraCost comparator;
 
-	boolean doGatherInformation = false;
-
-	private double avgRouteLength = 0;
-
-	private double avgTravelTime = 0;
-
-	private int routeCnt = 0;
-
-	private int revisitNodeCount = 0;
-
-	private int visitNodeCount = 0;
-
 	private final PreProcessDijkstra preProcessData;
 
 	/**
@@ -199,7 +185,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
 		double arrivalTime = 0;
 		boolean stillSearching = true;
@@ -234,30 +220,22 @@ public class Dijkstra implements LeastCostPathCalculator {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 
-		Node tmpNode = toNode;
-		while (tmpNode.getId() != fromNode.getId()) {
-			nodes.add(0, tmpNode);
-			DijkstraNodeData tmpData = getData(tmpNode);
-			tmpNode = tmpData.getPrevNode();
+		nodes.add(0, toNode);
+		Link tmpLink = getData(toNode).getPrevLink();
+		if (tmpLink != null) {
+			while (tmpLink.getFromNode().getId() != fromNode.getId()) {
+				links.add(0, tmpLink);
+				nodes.add(0, tmpLink.getFromNode());
+				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
+			}
+			links.add(0, tmpLink);
+			nodes.add(0, tmpLink.getFromNode());
 		}
-		nodes.add(0, tmpNode); // add the fromNode at the beginning of the list
-
-		// FIXME [MR] also collect links!
-		Path path = new Path(nodes, links, arrivalTime - startTime);
 
 		DijkstraNodeData toNodeData = getData(toNode);
-		CarRoute route = new NodeCarRoute();
-		route.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, toNodeData.cost); // FIXME [MR] remove cast
+		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.cost);
 
-		if (this.doGatherInformation) {
-			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route
-					.getTravelTime()) / (this.routeCnt + 1);
-			this.avgRouteLength = (this.routeCnt * this.avgRouteLength + route
-					.getDist()) / (this.routeCnt + 1);
-			this.routeCnt++;
-		}
-
-		return route;
+		return path;
 	}
 
 	/**
@@ -309,12 +287,12 @@ public class Dijkstra implements LeastCostPathCalculator {
 						|| (ddOutData.getDeadEndEntryNode() != null)
 						|| ((this.deadEndEntryNode != null)
 								&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
-					addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
+					addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
 				}
 			}
 		} else { // this.pruneDeadEnds == false
 			for (Link l : outNode.getOutLinks().values()) {
-				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, outNode, toNode);
+				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
 			}
 		}
 	}
@@ -333,8 +311,6 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The time at which we started to traverse l.
 	 * @param currCost
 	 *            The cost at the time we started to traverse l.
-	 * @param outNode
-	 *            The Node from which we came to n.
 	 * @param toNode
 	 *            The target Node of the route.
 	 * @return true if the node was added to the pending nodes, false otherwise
@@ -342,18 +318,18 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PriorityQueue<Node> pendingNodes, final double currTime,
-			final double currCost, final Node outNode, final Node toNode) {
+			final double currCost, final Node toNode) {
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();
 		if (!data.isVisited(getIterationID())) {
 			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, outNode);
+					+ travelCost, l);
 			return true;
 		} else if (currCost + travelCost < nCost) {
 			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, outNode);
+					+ travelCost, l);
 			return true;
 		}
 
@@ -374,17 +350,16 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The time of the visit of n.
 	 * @param cost
 	 *            The accumulated cost at the time of the visit of n.
-	 * @param outNode
-	 *            The node from which we came visiting n.
+	 * @param outLink
+	 *            The link from which we came visiting n.
 	 */
 	void revisitNode(final Node n, final DijkstraNodeData data,
 			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Node outNode) {
+			final Link outLink) {
 		pendingNodes.remove(n);
 
-		data.visit(outNode, cost, time, getIterationID());
+		data.visit(outLink, cost, time, getIterationID());
 		pendingNodes.add(n);
-		this.revisitNodeCount++;
 	}
 
 	/**
@@ -401,15 +376,14 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The time of the visit of n.
 	 * @param cost
 	 *            The accumulated cost at the time of the visit of n.
-	 * @param outNode
+	 * @param outLink
 	 *            The node from which we came visiting n.
 	 */
 	void visitNode(final Node n, final DijkstraNodeData data,
 			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Node outNode) {
-		data.visit(outNode, cost, time, getIterationID());
+			final Link outLink) {
+		data.visit(outLink, cost, time, getIterationID());
 		pendingNodes.add(n);
-		this.visitNodeCount++;
 	}
 
 	/**
@@ -479,28 +453,12 @@ public class Dijkstra implements LeastCostPathCalculator {
 	}
 
 	/**
-	 * Prints out some very simple statistical values calculated during routing.
-	 */
-	public void printInformation() {
-		if (this.doGatherInformation) {
-			log.info("Avg revisited count per route: "
-					+ (double) this.revisitNodeCount / this.routeCnt);
-			log.info("Avg visited count per route: "
-					+ (double) this.visitNodeCount / this.routeCnt);
-			log.info("Number of routes: " + this.routeCnt);
-			log.info("Average route length: " + this.avgRouteLength);
-			log.info("Average travel time per route: "
-					+ this.avgTravelTime);
-		}
-	}
-
-	/**
 	 * A data structure to store temporarily information used
 	 * by the Dijkstra-algorithm.
 	 */
 	static class DijkstraNodeData {
 
-		private Node prev = null;
+		private Link prev = null;
 
 		/*default */ double cost = 0;
 
@@ -513,7 +471,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 			this.iterationID = Integer.MIN_VALUE;
 		}
 
-		public void visit(final Node comingFrom, final double cost, final double time,
+		public void visit(final Link comingFrom, final double cost, final double time,
 				final int iterID) {
 			this.prev = comingFrom;
 			this.cost = cost;
@@ -533,7 +491,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 			return this.time;
 		}
 
-		public Node getPrevNode() {
+		public Link getPrevLink() {
 			return this.prev;
 		}
 	}

@@ -32,10 +32,10 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 public class RoadSignAgentsGenerator {
 
@@ -52,8 +52,8 @@ public class RoadSignAgentsGenerator {
 			}
 			Id id = new IdImpl("guide" + count++);
 			Person p = new PersonImpl(id);
-			CarRoute route = dijkstra.calcLeastCostPath(node, network.getNode("en2"), 3*3600);
-			Link shortest = route.getLinks().get(0);
+			Path path = dijkstra.calcLeastCostPath(node, network.getNode("en2"), 3*3600);
+			Link shortest = path.links.get(0);
 			
 			
 			for (Link dest : node.getOutLinks().values()){

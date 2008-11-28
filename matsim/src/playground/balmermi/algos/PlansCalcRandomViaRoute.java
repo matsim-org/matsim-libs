@@ -40,6 +40,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
@@ -190,35 +191,30 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 
 		// calc first part of the route
-		CarRoute route1 = null;
-		if (startNode == viaNode) {
-			route1 = new NodeCarRoute();
-			route1.setTravelTime(0.0);
-			travTime = 0.0;
-		}
-		else {
-			route1 = this.routeAlgo.calcLeastCostPath(startNode,viaNode,depTime);
-			if (route1 == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + viaNode.getId() + ".");
-			travTime = route1.getTravelTime();
+		Path path1 = null;
+		if (startNode != viaNode) {
+			path1 = this.routeAlgo.calcLeastCostPath(startNode,viaNode,depTime);
+			if (path1 == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + viaNode.getId() + ".");
+			travTime = path1.travelTime;
 		}
 
 		// calc second part of the route
-		CarRoute route2 = null;
-		if (viaNode == endNode) {
-			route2 = new NodeCarRoute();
-			route2.setTravelTime(0.0);
-			travTime += 0.0;
-		}
-		else {
-			route2 = this.routeAlgo.calcLeastCostPath(viaNode,endNode,depTime+travTime);
-			if (route2 == null) throw new RuntimeException("No route found from node " + viaNode.getId() + " to node " + endNode.getId() + ".");
-			travTime += route2.getTravelTime();
+		Path path2 = null;
+		if (viaNode != endNode) {
+			path2 = this.routeAlgo.calcLeastCostPath(viaNode,endNode,depTime+travTime);
+			if (path2 == null) throw new RuntimeException("No route found from node " + viaNode.getId() + " to node " + endNode.getId() + ".");
+			travTime += path2.travelTime;
 		}
 		
-		List<Node> nodes = route1.getNodes();
+		
+		List<Node> nodes = (path1 != null ? path1.nodes : new ArrayList<Node>());
 		if (!nodes.isEmpty()) { nodes.remove(nodes.size()-1); } // remove the via node
-		nodes.addAll(route2.getNodes());
+		if (path2 != null) {
+			nodes.addAll(path2.nodes);
+		}
 		CarRoute route = new NodeCarRoute();
+		route.setStartLink(fromLink);
+		route.setEndLink(toLink);
 		route.setNodes(nodes);
 		leg.setRoute(route);
 		

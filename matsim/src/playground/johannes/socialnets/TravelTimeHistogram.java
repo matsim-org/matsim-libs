@@ -42,10 +42,10 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -214,8 +214,8 @@ public class TravelTimeHistogram {
 			for(Coord coord : ego.alters) {
 				Relation r = new Relation();
 				Link alterlink = network.getNearestLink(coord);
-				CarRoute fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
-				CarRoute shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
+				Path fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
+				Path shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				
 //				double sumOpportunities = 0;
 //				int sumCells = 0;
@@ -261,9 +261,9 @@ public class TravelTimeHistogram {
 						System.err.println("pAlter = 0");
 				} else {
 				
-				r.ttFastesPath = fastestRoute.getTravelTime();
+				r.ttFastesPath = fastestRoute.travelTime;
 				r.distFastestPath = getPathLength(fastestRoute);
-				r.ttShortestPath = shortesRoute.getTravelTime();
+				r.ttShortestPath = shortesRoute.travelTime;
 				r.distShortestPath = getPathLength(shortesRoute);
 				r.geodesicDistance = coord.calcDistance(ego.homeloc);
 				if(r.geodesicDistance > 0 ) {
@@ -341,9 +341,9 @@ public class TravelTimeHistogram {
 			e.printStackTrace();
 		}
 	}
-	private static double getPathLength(CarRoute route) {
+	private static double getPathLength(Path path) {
 		double sum = 0;
-		for(Link link : route.getLinks())
+		for(Link link : path.links)
 			sum += link.getLength();
 		return sum;
 	}

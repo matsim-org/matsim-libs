@@ -38,6 +38,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.misc.Time;
 
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -151,7 +152,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		} else if (legmode == BasicLeg.Mode.bike) {
 			return handleBikeLeg(leg, fromAct, toAct, depTime);
 		} else if (legmode == BasicLeg.Mode.undefined) {
-			/* TODO balmermi: No clue how to handle legs with 'undef' mode
+			/* balmermi: No clue how to handle legs with 'undef' mode
 			 *                Therefore, handle it similar like bike mode with 50 km/h
 			 *                and no route assigned  */
 			return handleUndefLeg(leg, fromAct, toAct, depTime);
@@ -170,16 +171,23 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-		CarRoute route = null;
+//		CarRoute route = null;
+		Path path = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
-			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			CarRoute route = new NodeCarRoute();
+			route.setStartLink(fromLink);
+			route.setEndLink(toLink);
+			route.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost);//FIXME [MR] remove cast
 			leg.setRoute(route);
-			travTime = route.getTravelTime();
+			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new NodeCarRoute();
+			CarRoute route = new NodeCarRoute();
+			route.setStartLink(fromLink);
+			route.setEndLink(toLink);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -207,23 +215,28 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-
-		CarRoute route = null;
+		Path path = null;
+//		CarRoute route = null;
 		if (toLink != fromLink) {
 			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			route = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
-			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			path = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
+			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
-			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + route.getTravelTime());
-			travTime = (int) ((route.getTravelTime() + travelTimeLastLink) * 2.0);
-			route.setTravelTime(travTime);
+			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + path.travelTime);
+			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * 2.0);
+			CarRoute route = new NodeCarRoute(); // TODO [MR] change to PtRoute once available
+			route.setStartLink(fromLink);
+			route.setEndLink(toLink);
+			route.setNodes((ArrayList<Node>) path.nodes, travTime, path.travelCost);//FIXME [MR] remove cast 
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new NodeCarRoute();
+			CarRoute route = new NodeCarRoute();
+			route.setStartLink(fromLink);
+			route.setEndLink(toLink);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

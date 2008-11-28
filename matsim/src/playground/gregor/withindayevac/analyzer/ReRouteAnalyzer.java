@@ -26,9 +26,9 @@ import java.util.HashSet;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.gregor.withindayevac.Beliefs;
 import playground.gregor.withindayevac.Intentions;
@@ -72,14 +72,12 @@ public class ReRouteAnalyzer implements Analyzer {
 
 
 		final Dijkstra router = new Dijkstra(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost());
-		final CarRoute route = router.calcLeastCostPath(this.beliefs.getCurrentLink().getToNode(), this.intentions.getDestination(), now);
-		this.linkRoute = route.getLinks().toArray(new Link[route.getLinks().size()]);
+		final Path path = router.calcLeastCostPath(this.beliefs.getCurrentLink().getToNode(), this.intentions.getDestination(), now);
+		this.linkRoute = path.links.toArray(new Link[path.links.size()]);
 		this.linkCount = 0;
 		this.lastCurrent = this.beliefs.getCurrentLink();
 		this.lastNext = this.linkRoute[this.linkCount++];
 		return new NextLinkOption(this.lastNext,1*this.coef);
-
-
 	}
 
 	private boolean blocked(final Link link) {

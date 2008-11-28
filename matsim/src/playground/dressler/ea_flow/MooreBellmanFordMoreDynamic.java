@@ -34,6 +34,7 @@ import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.utils.misc.Time;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
@@ -168,7 +169,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode,
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime) {
 
 		// run the algorithm
@@ -220,10 +221,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(routeNodes);
-
-		return route;
+		// FIXME [MR] collect links
+		return new Path(routeNodes, null, Time.UNDEFINED_TIME, 0);
 	}
 
 	/**

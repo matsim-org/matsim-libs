@@ -26,7 +26,6 @@ import java.util.PriorityQueue;
 
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -113,14 +112,13 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	@Override
-	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime) {
 		if (this.landmarks.length >= 2) {
 			initializeActiveLandmarks(fromNode, toNode, 2);
 		} else {
 			initializeActiveLandmarks(fromNode, toNode, this.landmarks.length);
 		}
-		CarRoute route = super.calcLeastCostPath(fromNode, toNode, startTime);
-		return route;
+		return super.calcLeastCostPath(fromNode, toNode, startTime);
 	}
 
 	@Override
@@ -313,15 +311,6 @@ public class AStarLandmarks extends AStarEuclidean {
 			return 0;
 		}
 		return tmpTravTime * this.overdoFactor;
-	}
-
-	/**
-	 * @see org.matsim.router.AStarEuclidean#printInformation()
-	 */
-	@Override
-	public void printInformation() {
-		super.printInformation();
-		System.out.println("Used " + this.landmarks.length + " landmarks in total");
 	}
 
 }

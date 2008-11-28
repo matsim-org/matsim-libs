@@ -20,16 +20,19 @@
 
 package org.matsim.router;
 
-import org.matsim.testcases.TestDepth;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.matsim.testcases.TestDepth;
 
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.router");
+		TestSuite suite = new TestSuite("Tests for org.matsim.router");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(DijkstraTest.class);
+		suite.addTestSuite(AStarEuclideanTest.class);
+		suite.addTestSuite(AStarLandmarksTest.class);
 		if (TestDepth.getDepth() == TestDepth.extended) {
 			suite.addTestSuite(RoutingTest.class);
 		}

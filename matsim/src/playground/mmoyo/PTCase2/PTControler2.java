@@ -1,10 +1,11 @@
 package playground.mmoyo.PTCase2;
 
-import org.matsim.network.Node;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
+
 import org.matsim.network.Link;
-import org.matsim.population.routes.CarRoute;
+import org.matsim.network.Node;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -41,9 +42,9 @@ public class PTControler2 {
 	    	case 1:
     			Coord coord1= new CoordImpl(680291,248300);
     			Coord coord2= new CoordImpl(684573,246805);
-	    		CarRoute route = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
+	    		Path path = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
-	    		pt.getPtRouter2().PrintRoute(route);
+	    		pt.getPtRouter2().PrintRoute(path);
 	    		break;
 	    	case 2:
 	    		PTActWriter ptActWriter = new PTActWriter(pt);

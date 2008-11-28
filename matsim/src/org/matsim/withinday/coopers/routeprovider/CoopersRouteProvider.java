@@ -109,19 +109,6 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 		throw new RuntimeException("requestRoute should never be called, if the sign doesn't provide a route!");
 	}
 
-	/**
-	 * This method is not implemented in this class. It is only overwritten to use
-	 * the already implemented methods of AbstractRouteProvider.
-	 *
-	 * @see org.matsim.withinday.routeprovider.AbstractRouteProvider#requestRoute(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
-	 */
-	@Override
-	protected CarRoute requestRoute(final Node departureNode,
-			final Node destinationNode, final double time) {
-		throw new UnsupportedOperationException();
-	}
-
 	private static class CurrentSignRouteProvider implements RouteProvider {
 
 		private CarRoute route;

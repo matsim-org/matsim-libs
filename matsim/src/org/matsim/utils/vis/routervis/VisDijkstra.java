@@ -20,26 +20,20 @@
 
 package org.matsim.utils.vis.routervis;
 
-
-
-
 import java.io.IOException;
 import java.util.PriorityQueue;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
-import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
 /**
  * @author laemmel
- *
  */
-public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, VisLeastCostPathCalculator {
+public class VisDijkstra extends Dijkstra implements VisLeastCostPathCalculator {
 
 	private final RouterNetStateWriter writer;
 
@@ -54,57 +48,26 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 		this.explCounter = 0;
 		this.dumpCounter = 0;
 	}
-	/**
-	 * Calculates the cheapest route from Node 'fromNode' to Node 'toNode' at
-	 * starting time 'startTime'.
-	 *
-	 * @param fromNode
-	 *            The Node at which the route should start.
-	 * @param toNode
-	 *            The Node at which the route should end.
-	 * @param startTime
-	 *            The time at which the route should start.
-	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
-	 *      org.matsim.network.Node, double)
-	 */
+	
 	@Override
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		doSnapshot();
-		final CarRoute route = super.calcLeastCostPath(fromNode, toNode, startTime);
+		final Path path = super.calcLeastCostPath(fromNode, toNode, startTime);
 
 		this.writer.reset();
-		for (Link link : route.getLinks()) {
+		for (Link link : path.links) {
 			this.writer.setLinkColor(link.getId(), 0.1);
 			doSnapshot();
 		}
 
-		return route;
+		return path;
 	}
 
-	/**
-	 * Adds some parameters to the given Node then adds it to the set of pending
-	 * nodes.
-	 *
-	 * @param l
-	 *            The link from which we came to this Node.
-	 * @param n
-	 *            The Node to add to the pending nodes.
-	 * @param pendingNodes
-	 *            The set of pending nodes.
-	 * @param currTime
-	 *            The time at which we started to traverse l.
-	 * @param currCost
-	 *            The cost at the time we started to traverse l.
-	 * @param outNode
-	 *            The Node from which we came to n.
-	 * @param toNode
-	 *            The target Node of the route.
-	 */
 	@Override
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PriorityQueue<Node> pendingNodes, final double currTime,
-			final double currCost, final Node outNode, final Node toNode) {
-		final boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, outNode, toNode);
+			final double currCost, final Node toNode) {
+		final boolean succ = super.addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
 
 		if (succ) {
 			/* test if the node was revisited - if so the former shortest

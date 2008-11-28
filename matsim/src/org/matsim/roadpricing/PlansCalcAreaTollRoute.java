@@ -37,6 +37,7 @@ import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -112,21 +113,25 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				}
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
-				CarRoute tollRoute = null;
+
+				CarRoute tollRoute = new NodeCarRoute();
+				tollRoute.setStartLink(fromLink);
+				tollRoute.setEndLink(toLink);
 				CarRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
 				if (toLink != fromLink) {
-					tollRoute = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					if (tollRoute == null) {
+					Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					if (path == null) {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
-					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, tollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
+					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
+					tollRoute.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost); // FIXME [MR] remove cast 
 				} else {
 					// do not drive/walk around, if we stay on the same link
-					tollRoute = new NodeCarRoute();
-					tollRoute.setNodes(null, 0, 0.0);
+					tollRoute.setDist(0.0);
+					tollRoute.setTravelTime(0.0);
 					// if we don't drive around, it doesn't matter  if we're in or out the toll area, so use "false"
 				}
 
@@ -140,9 +145,14 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					 * it is possible for the agent to drive around, it will, otherwise there
 					 * will still be a route returned.
 					 */
-					noTollRoute = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
+					noTollRoute = new NodeCarRoute();
+					noTollRoute.setStartLink(fromLink);
+					noTollRoute.setEndLink(toLink);
+					noTollRoute.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost);// FIXME [MR] remove cast
+//					noTollRoute.setTravelTime(path.travelTime);
 
-					if (routeOverlapsTollLinks(fromLink, noTollRoute, toLink, depTimes[TOLL_INDEX][routeIndex])) {
+					if (routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex])) {
 						/* the no-toll route leads also through the tolling area, so it seems the agent
 						 * can not avoid paying the toll. */
 						agentPaysToll = true;
@@ -248,7 +258,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final CarRoute route, final Link endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final Path route, final Link endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link
@@ -261,7 +271,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 		 */
 
 		// handle following links
-		for (Link link : route.getLinks()) {
+		for (Link link : route.links) {
 			if (isLinkTolled(link, time)) {
 				return true;
 			}

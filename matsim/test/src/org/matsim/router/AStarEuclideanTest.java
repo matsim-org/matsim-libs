@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractRouteProvider.java
+ * AStarEuclideanTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.routeprovider;
+package org.matsim.router;
 
-import org.matsim.network.Link;
-import org.matsim.population.routes.CarRoute;
+import org.matsim.network.NetworkLayer;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.LeastCostPathCalculator;
+import org.matsim.router.util.PreProcessEuclidean;
 
+public class AStarEuclideanTest extends AbstractLeastCostPathCalculatorTest {
 
-/**
- * @author dgrether
- *
- */
-public abstract class AbstractRouteProvider implements RouteProvider {
-
-	private int priority;
-
-	/**
-	 * Throws an IllegalArgumentException if the value is not in 0..10
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#setPriority(int)
-	 */
-	public void setPriority(int p) {
-		if ((0 <= p) && (p <= 10)) {
-			this.priority = p;
-		}
-		else {
-			throw new IllegalArgumentException("The priority must be a value in 0..10!");
-		}
+	@Override
+	protected LeastCostPathCalculator getLeastCostPathCalculator(NetworkLayer network) {
+		FreespeedTravelTimeCost travelTimeCostCalculator = new FreespeedTravelTimeCost();
+		PreProcessEuclidean preProcessData = new PreProcessEuclidean(travelTimeCostCalculator);
+		preProcessData.run(network);
+		return new AStarEuclidean(network, preProcessData, travelTimeCostCalculator);
 	}
-
-	public int getPriority() {
-		return this.priority;
-	}
-
-	public abstract CarRoute requestRoute(Link departureLink, Link destinationLink, double time);
 
 }

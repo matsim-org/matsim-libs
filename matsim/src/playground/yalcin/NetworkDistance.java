@@ -39,12 +39,12 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkTransform;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.StringUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -152,15 +152,15 @@ public class NetworkDistance {
 				Node fromNode = network.getNearestNode(fromCoord);
 				Node toNode = network.getNearestNode(toCoord);
 
-				CarRoute route = router.calcLeastCostPath(fromNode, toNode, 0);
+				Path path = router.calcLeastCostPath(fromNode, toNode, 0);
 
 				double crowflyDistance = ct.transform(fromCoord).calcDistance(ct.transform(toCoord));
 
-				writer.write(parts[0] + "\t" + parts[1] + "\t" + crowflyDistance + "\t" + route.getDist());
+				writer.write(parts[0] + "\t" + parts[1] + "\t" + crowflyDistance + "\t" + getPathDistance(path));
 
 				writer.write("\t" + fromNode.getId().toString());
 				writer.write("\t" + toNode.getId().toString());
-				for (Link link : route.getLinks()) {
+				for (Link link : path.links) {
 					writer.write("\t" + link.getId().toString());
 				}
 
@@ -179,6 +179,14 @@ public class NetworkDistance {
 
 	}
 
+	private static double getPathDistance(final Path path) {
+		double dist = 0;
+		for (Link link : path.links) {
+			dist += link.getLength();
+		}
+		return dist;
+	}
+	
 	public static void main(String[] args) {
 //		exportNetwork(); // exports the network as GoogleEarth KMZ. NOTE: This can be quite big for GoogleEarth!
 		convertNetwork();

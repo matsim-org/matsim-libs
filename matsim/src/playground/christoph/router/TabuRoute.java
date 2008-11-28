@@ -28,8 +28,6 @@ import org.matsim.basic.v01.Id;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -56,12 +54,12 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	}
 
 	
-	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected CarRoute findRoute(Node fromNode, Node toNode)
+	protected Path findRoute(Node fromNode, Node toNode)
 	{
 		Node currentNode = fromNode;
 		Link currentLink;
@@ -119,13 +117,11 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(nodes);
-		route.setDist(routeLength);
+		Path path = new Path(nodes, null, 0, 0); // FIXME [MR] collect links
 		
-		if (removeLoops) LoopRemover.removeLoops(route);
-		
-		return route;
+		if (removeLoops) LoopRemover.removeLoops(path);
+				
+		return path;
 	}
 	
 	@Override

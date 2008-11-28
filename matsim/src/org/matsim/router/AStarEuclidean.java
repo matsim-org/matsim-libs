@@ -154,13 +154,10 @@ public class AStarEuclidean extends Dijkstra {
 		data.setExpectedRemainingCost(estimateRemainingTravelCost(fromNode, toNode));
 	}
 
-	/**
-	 * @see org.matsim.router.Dijkstra#addToPendingNodes(org.matsim.network.LinkImpl, org.matsim.network.Node, org.matsim.router.util.PriorityQueue, double, double, org.matsim.network.Node, org.matsim.network.Node)
-	 */
 	@Override
 	protected
 	boolean addToPendingNodes(final Link l, final Node n, final PriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost, final Node outNode, final Node toNode) {
+			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
 		double travelCost = this.costFunction.getLinkTravelCost(l, currTime);
@@ -169,11 +166,11 @@ public class AStarEuclidean extends Dijkstra {
 		if (!data.isVisited(getIterationID())) {
 			double remainingTravelCost = estimateRemainingTravelCost(n, toNode);
 			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, remainingTravelCost, outNode);
+					+ travelCost, remainingTravelCost, l);
 			return true;
 		} else if (currCost + travelCost < nCost) {
 			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, outNode);
+					+ travelCost, l);
 			return true;
 		}
 		return false;
@@ -189,13 +186,13 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param cost The accumulated cost at the time of the visit of n.
 	 * @param expectedRemainingCost The expected remaining travel cost when
 	 * traveling from n to the target node of the route.
-	 * @param outNode The node from which we came visiting n.
+	 * @param outLink The link from which we came visiting n.
 	 */
 	private void visitNode(final Node n, final AStarNodeData data,
 			final PriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final double expectedRemainingCost, final Node outNode) {
+			final double expectedRemainingCost, final Link outLink) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
-		visitNode(n, data, pendingNodes, time, cost, outNode);
+		visitNode(n, data, pendingNodes, time, cost, outLink);
 	}
 
 	/**
@@ -255,15 +252,6 @@ public class AStarEuclidean extends Dijkstra {
 	}
 
 	/**
-	 * @see org.matsim.router.Dijkstra#printInformation()
-	 */
-	@Override
-	public void printInformation() {
-		System.out.println("Used an overdo factor of " + this.overdoFactor);
-		super.printInformation();
-	}
-
-	/**
 	 * Holds AStarEuclidean specific information used during routing
 	 * associated with each node in the network.
 	 */
@@ -297,7 +285,7 @@ public class AStarEuclidean extends Dijkstra {
 		public double getExpectedRemainingCost() {
 			return this.expectedRemainingCost;
 		}
-	};
+	}
 
 	/**
 	 * The comparator used to sort the pending nodes during routing.

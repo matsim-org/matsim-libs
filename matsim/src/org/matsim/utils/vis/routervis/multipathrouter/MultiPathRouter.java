@@ -30,20 +30,13 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
-import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.vis.routervis.RouterNetStateWriter;
 import org.matsim.utils.vis.routervis.VisLeastCostPathCalculator;
 import org.matsim.utils.vis.routervis.multipathrouter.NodeData.ComparatorNodeData;
 
-
-
-
-abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCostPathCalculator{
-	
+abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	
 	private static final Logger log = Logger.getLogger(MultiPathRouter.class);
 	
@@ -86,31 +79,14 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	
 	private int shadowID;
 
-	boolean doGatherInformation = true;
-
-	double avgRouteLength = 0;
-
-	double avgTravelTime = 0;
-
-	int routeCnt = 0;
-
-	int revisitNodeCount = 0;
-
-	int visitNodeCount = 0;
-
 	private BeelineDifferenceTracer tracer;
 	
 	protected LogitSelector selector;	
-	//TODO DEBUGGING STUFF
+	//TODO [gl] DEBUGGING STUFF
 	private final  boolean debug = true;
 	protected RouterNetStateWriter netStateWriter = null;
-//	final private int slowDown = 100000;
 
 	private int dumpCounter;
-
-	
-
-
 
 	public MultiPathRouter(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction, final RouterNetStateWriter writer){
 		this.network = network;
@@ -122,7 +98,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 
 		initSelector();
 		
-		//TODO DEBUGGING STUFF
+		//TODO [gl] DEBUGGING STUFF
 		if (this.debug){
 			this.netStateWriter = writer;
 			this.dumpCounter = 0;
@@ -133,7 +109,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	
 	abstract void initSelector();
 
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		final PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		double minCost = Double.MAX_VALUE;
@@ -206,10 +182,10 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 
 	
 		this.selector.run(toNodes,getData(fromNode));
-		//TODO DEBUG
+		//TODO [gl] DEBUG
 		colorizePaths(toNodes,fromNode);
 		
-		if (true)
+		if (true)    // that's a joke, isn't it? // marcel,2008nov28
 		return null;
 		
 		final ArrayList<Node> routeNodes = new ArrayList<Node>();
@@ -222,27 +198,11 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
 
-		final CarRoute route = new NodeCarRoute();
-		route.setNodes(routeNodes, (int) (arrivalTime - startTime), cost);
+		final Path path = new Path(routeNodes, null, (int) (arrivalTime - startTime), cost); // FIXME [MR] collect links
 
-		if (this.doGatherInformation) {
-			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route
-					.getTravelTime()) / (this.routeCnt + 1);
-			this.avgRouteLength = (this.routeCnt * this.avgRouteLength + route
-					.getDist()) / (this.routeCnt + 1);
-			this.routeCnt++;
-		}
-		return route;
+		return path;
 	}
 	
-	
-	
-
-
-
-
-
-
 	//////////////////////////////////////////////////////////////////////
 	// the network exploration stuff starts here
 	//////////////////////////////////////////////////////////////////////
@@ -280,7 +240,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	 * Expands the given Node in the routing algorithm as an shadow node; may be overridden in
 	 * sub-classes.
 	 *
-	 * @param outNode
+	 * @param outNodeD
 	 *            The NodeData to be expanded.
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
@@ -430,7 +390,6 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	private void visitNode(final NodeData toNodeData, final PriorityQueue<NodeData> pendingNodes, final double time, final double cost, final NodeData fromNodeData, final double trace) {
 		toNodeData.visit(fromNodeData, cost, time, getIterationID(), trace);
 		pendingNodes.add(toNodeData);
-		this.visitNodeCount++;
 	}
 
 	/**
@@ -466,8 +425,6 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		pendingNodes.remove(toNodeData);
 		this.comparator.setCheckIDs(false);
 		pendingNodes.add(toNodeData);
-		this.revisitNodeCount++;
-
 	}
 
 	/**
@@ -553,7 +510,6 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		data.reset();
 		data.visitInitNode(startTime,this.iterationID);
 		pendingNodes.add(data);
-		this.visitNodeCount++;
 	}
 
 
@@ -597,12 +553,6 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		}
 		return r;
 	}
-	
-	
-	/**
-	 * 
-	 * 
-	 */
 	
 	
 	//RouterVis - stuff

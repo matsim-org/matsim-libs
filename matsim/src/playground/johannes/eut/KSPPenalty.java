@@ -13,11 +13,11 @@ import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 /**
  * @author illenberger
@@ -142,7 +142,7 @@ public class KSPPenalty {
 	 * @return a link of different paths. Can be empty if no paths have been
 	 *         identified. The first path in the list is always the best path!
 	 */
-	public List<CarRoute> getPaths(Node departure, Node destination, double time,
+	public List<Path> getPaths(Node departure, Node destination, double time,
 			int count, TravelTime travelTimes) {
 		/*
 		 * (1) Set the plain linkcost object and set the extended linkcost
@@ -156,11 +156,11 @@ public class KSPPenalty {
 		 * (2) Iterate until we found the required number of different paths or
 		 * we exceeded the maxruns number.
 		 */
-		List<CarRoute> paths = new ArrayList<CarRoute>(count);
+		List<Path> paths = new ArrayList<Path>(count);
 		int maxruns = count * 2;
 		int runcount = 0;
 		do {
-			CarRoute path = this.algorithm.calcLeastCostPath(departure, destination, time);
+			Path path = this.algorithm.calcLeastCostPath(departure, destination, time);
 			if (path != null) {
 				/*
 				 * (2a) Increase the impedance on the links in the identified
@@ -175,8 +175,8 @@ public class KSPPenalty {
 				if (paths.isEmpty())
 					paths.add(path);
 				else {
-					for (CarRoute foundpaths : paths) {
-						if (foundpaths.getNodes().equals(path.getNodes()))
+					for (Path foundpaths : paths) {
+						if (foundpaths.nodes.equals(path.nodes))
 							found = true;
 					}
 					if (!found)
@@ -218,11 +218,11 @@ public class KSPPenalty {
 //		return plainPath;
 //	}
 
-	private void penalizeLinks(CarRoute path) {
+	private void penalizeLinks(Path path) {
 		/*
 		 * (1) Convert the path to a list of links.
 		 */
-		List<Link> links = path.getLinks();
+		List<Link> links = path.links;
 		/*
 		 * (2) Get the total length of the route.
 		 */

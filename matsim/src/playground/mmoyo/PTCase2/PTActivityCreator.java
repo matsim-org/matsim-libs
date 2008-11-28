@@ -17,6 +17,7 @@ import org.matsim.population.PopulationReaderMatsimV4;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -68,9 +69,9 @@ public class PTActivityCreator {
 
 		    		int distToWalk= distToWalk(person.getAge());
 		    		//Route legRoute = this.ptRouter2.findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-		    		CarRoute legRoute = this.ptRouter2.forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+		    		Path legRoute = this.ptRouter2.forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 		    		if(legRoute!=null){
-		    			if (legRoute.getNodes().size()>2){
+		    			if (legRoute.nodes.size()>2){
 			    			List<Object> listLegAct = new ArrayList<Object>();
 			    	    	
 			    			listLegAct=this.ptRouter2.findLegActs(legRoute, lastAct.getEndTime());

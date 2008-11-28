@@ -118,6 +118,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -126,6 +127,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -1033,7 +1035,9 @@ public class MyRuns {
 				final Coord arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
 				final double depTime = leg.getDepartureTime();
 				try {
-					final CarRoute route = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
+					final Path path = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
+					CarRoute route = new NodeCarRoute();
+					route.setNodes(path.nodes);
 					leg.setRoute(route);
 				} catch (final RuntimeException e) {
 					System.err.println("error while handling plan " + 0 + " of person " + person.getId());

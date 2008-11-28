@@ -28,7 +28,6 @@ import java.util.List;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelTime;
 
@@ -62,20 +61,20 @@ public class EUTRouter implements LeastCostPathCalculator {
 		this.analyzer = analyzer;
 	}
 	
-	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
 		return selectChoice(generateChoiceSet(fromNode, toNode, starttime),
 				starttime);
 	}
 
-	protected List<CarRoute> generateChoiceSet(Node departure, Node destination,
+	protected List<Path> generateChoiceSet(Node departure, Node destination,
 			double time) {
 		return kspPenalty.getPaths(departure, destination, time, searchPaths,
 				ttKnowledge.getMeanTravelTimes());
 	}
 
-	protected CarRoute selectChoice(List<CarRoute> routes, double starttime) {
-		CarRoute bestRoute = null;
-		CarRoute indiffRoute = null;
+	protected Path selectChoice(List<Path> routes, double starttime) {
+		Path bestRoute = null;
+		Path indiffRoute = null;
 		double leastcost = Double.MAX_VALUE;
 		double leastIndiffCost = Double.MAX_VALUE;
 		
@@ -83,7 +82,7 @@ public class EUTRouter implements LeastCostPathCalculator {
 //		 * We can expect the first route in the list to be the real best path.
 //		 */
 //		indiffRoute = routes.get(0);
-		for (CarRoute route : routes) {
+		for (Path route : routes) {
 			double totaltravelcosts = 0;
 			double totalIndiffCosts = 0;
 			
@@ -116,10 +115,10 @@ public class EUTRouter implements LeastCostPathCalculator {
 		return bestRoute;
 	}
 
-	private double calcTravTime(TravelTime traveltimes, CarRoute route,
+	private double calcTravTime(TravelTime traveltimes, Path path,
 			double starttime) {
 		double totaltt = 0;
-		for (Link link : route.getLinks()) {
+		for (Link link : path.links) {
 			totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt);
 		}
 		return totaltt;

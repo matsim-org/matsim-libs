@@ -244,12 +244,11 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		return handled;
 	}
 
-	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double starttime){
-		CarRoute route = dijkstraGetCheapestRoute(fromNode.getCoord(), toNode.getCoord(), starttime, 0);
-		return route;
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double starttime){
+		return dijkstraGetCheapestRoute(fromNode.getCoord(), toNode.getCoord(), starttime, 0);
 	}
 
-	public CarRoute dijkstraGetCheapestRoute(final Coord fromCoord, final Coord toCoord, final double depTime, final int searchRadius) {
+	public Path dijkstraGetCheapestRoute(final Coord fromCoord, final Coord toCoord, final double depTime, final int searchRadius) {
 
 		ArrayList<PtNode> depNodes = this.getPedNodesWithin(searchRadius, fromCoord);
 		ArrayList<PtNode> arrNodes = this.getPedNodesWithin(searchRadius, toCoord);
@@ -365,20 +364,18 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		int arrTime = (arrNode.actTime + (int) (arrNode.getCoord().calcDistance(toCoord) / PEDESTRIAN_SPEED));
 
 		// create path
-		ArrayList<Node> path = new ArrayList<Node>();
+		ArrayList<Node> nodes = new ArrayList<Node>();
 
 		// walk path backwards, starting at arrival node arrNode
 		PtNode actNode = arrNode;
 		while (actNode.shortestPath != null) {
-			path.add(0, actNode);
+			nodes.add(0, actNode);
 			actNode = (PtNode) actNode.shortestPath.getFromNode();
 		}
 
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(path);
-		route.setTravelTime(arrTime - depTime);
+		Path path = new Path(nodes, null, arrTime - depTime, 0); // FIXME [MR] collect links
 
-		return route;
+		return path;
 	}
 
 	public CarRoute dijkstraGetCheapestRouteLogger (final CoordImpl fromCoord, final CoordImpl toCoord, final int depTime,final int searchRadius,final BufferedWriter out){

@@ -30,10 +30,12 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
 public class RouteSetGenerator {
@@ -105,8 +107,13 @@ public class RouteSetGenerator {
 			for (int i=0; i<ls.length; i++) { this.removeLinkFromNetwork(ls[i]); }
 //			System.out.println("    ---");
 //			System.out.println("    removed " + ls.length + " links from the net");
-			CarRoute route = this.router.calcLeastCostPath(o,d,time);
-
+			Path path = this.router.calcLeastCostPath(o,d,time);
+			CarRoute route = null;
+			if (path != null) {
+				route = new NodeCarRoute();
+				route.setNodes(path.nodes);
+			}
+			
 			// add it to the resulting list of routes if exists. Also, create the link sets for
 			// the next level (d+1) of the tree for the current link set
 			// TODO: add the route only if not already exists!!!
@@ -146,11 +153,11 @@ public class RouteSetGenerator {
 
 		LinkedList<CarRoute> routes = new LinkedList<CarRoute>(); // resulting k least cost routes
 		LinkedList<Link[]> links = new LinkedList<Link[]>(); // removed links
-		CarRoute route = this.router.calcLeastCostPath(o,d,time);
-		if (route == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
+		Path path = this.router.calcLeastCostPath(o,d,time);
+		if (path == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
 //		routes.add(route);
 
-		for (Link link : route.getLinks()) {
+		for (Link link : path.links) {
 			Link[] lls = new Link[1];
 			lls[0] = link;
 			links.add(lls);
@@ -165,6 +172,8 @@ public class RouteSetGenerator {
 //		while (k-1 < routes.size()) { routes.remove((int)Math.random()*routes.size()); }
 		while (k-1 < routes.size()) { routes.remove(MatsimRandom.random.nextInt(routes.size())); }
 		// add the least cost path at the beginning of the route
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(path.nodes);
 		routes.addFirst(route);
 		System.out.println("--- done. ---");
 

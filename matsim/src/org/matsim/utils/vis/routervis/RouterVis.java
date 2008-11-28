@@ -32,10 +32,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;
@@ -118,15 +118,15 @@ public class RouterVis {
  *
  * @return route
  */
-	public CarRoute runRouter(final Node fromNode, final Node toNode, final double time){
-		final CarRoute route = this.router.calcLeastCostPath(fromNode, toNode, time);
+	public Path runRouter(final Node fromNode, final Node toNode, final double time){
+		final Path path = this.router.calcLeastCostPath(fromNode, toNode, time);
 
 		try {
 			this.writer.close();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		return route;
+		return path;
 	}
 
 	private RouterNetStateWriter getNetStateWriter(final NetworkLayer network) {

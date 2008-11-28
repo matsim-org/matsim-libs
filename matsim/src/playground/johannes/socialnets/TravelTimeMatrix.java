@@ -26,8 +26,8 @@ package playground.johannes.socialnets;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -80,8 +80,8 @@ public class TravelTimeMatrix {
 					for(int col2 = 0; col2 < numCols; col2++) {
 						Node target = grid.getValue(row2, col2);
 						int targetCellIdx = row2 * col2;
-						CarRoute route = router.calcLeastCostPath(source, target, 0);
-						ttmatrix.setValue(souceCellIdx, targetCellIdx, (int)route.getTravelTime());
+						Path path = router.calcLeastCostPath(source, target, 0);
+						ttmatrix.setValue(souceCellIdx, targetCellIdx, (int)path.travelTime);
 					}
 				}
 				System.out.println(String.format("Processed %1$s of %2$s cells.", ((row+1) * col), (numRows * numCols)));

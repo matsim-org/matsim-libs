@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -54,12 +52,12 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	}
 
 	
-	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected CarRoute findRoute(Node fromNode, Node toNode)
+	protected Path findRoute(Node fromNode, Node toNode)
 	{
 		Node previousNode = null;
 		Node currentNode = fromNode;
@@ -139,18 +137,16 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(nodes);
-		route.setDist(routeLength);
+		Path path = new Path(nodes, null, 0, 0); // FIXME [MR] collect links
 		
-		if (maxLinks == route.getLinks().size())
+		if (maxLinks == path.links.size())
 		{
-			log.info("LinkCount " + route.getLinks().size() + " distance " + route.getDist());
+			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
 		}
 		
-		if (removeLoops) LoopRemover.removeLoops(route);
+		if (removeLoops) LoopRemover.removeLoops(path);
 				
-		return route;
+		return path;
 	}
 	
 	protected double calcAngle(Node currentNode, Node toNode, Node nextLinkNode)

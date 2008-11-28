@@ -15,6 +15,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 /**
  * A AbstractPersonAlgorithm that calculates and sets the routes of a person's activities using {@link Dijkstra}.
@@ -56,16 +57,16 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		Node startNode = this.network.getNode(fromLink.getId().toString());	// start at the end of the "current" link
 		Node endNode = this.network.getNode(toLink.getId().toString()); // the target is the start of the link
 
-		CarRoute route = null;
+		Path path = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
-			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
+			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			
 			NetworkLayer realNetwork = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
 			
-			for (Node node : route.getNodes()) {
+			for (Node node : path.nodes) {
 				realRouteNodeList.add(realNetwork.getLink(node.getId().toString()).getToNode());
 			}
 			
@@ -73,14 +74,13 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			
 			CarRoute wrappedRoute = new NodeCarRoute();
 			wrappedRoute.setNodes(realRouteNodeList);
-			wrappedRoute.setDist(route.getDist());
-			wrappedRoute.setTravelTime(route.getTravelTime());
+			wrappedRoute.setTravelTime(path.travelTime);
 			
 			leg.setRoute(wrappedRoute);
-			travTime = route.getTravelTime();
+			travTime = path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new NodeCarRoute();
+			CarRoute route = new NodeCarRoute();
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;

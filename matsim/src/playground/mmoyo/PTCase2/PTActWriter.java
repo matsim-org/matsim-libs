@@ -18,6 +18,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -72,11 +73,11 @@ public class PTActWriter {
 		    		Coord actCoord = thisAct.getCoord();
 
 		    		int distToWalk= distToWalk(person.getAge());
-		    		CarRoute route = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-		    		if(route!=null){
-		    			if (route.getNodes().size()>2){
-		    				createWlinks(lastActCoord, route, actCoord);
-		    				legNum= insertLegActs(route, lastAct.getEndTime(), legNum, newPlan);
+		    		Path path = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+		    		if(path!=null){
+		    			if (path.nodes.size()>2){
+		    				createWlinks(lastActCoord, path, actCoord);
+		    				legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
 		    				removeWlinks();
 		    			}else{     // if router didn't find a PT connection then walk
 		    				newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
@@ -110,13 +111,13 @@ public class PTActWriter {
 	}//createPTActs
 
 	
-	private void createWlinks(Coord coord1, CarRoute route, Coord coord2){
+	private void createWlinks(Coord coord1, Path path, Coord coord2){
 		ptNode1= this.pt.getPtNetworkFactory().CreateWalkingNode(pt.getPtNetworkLayer(), new IdImpl("w1"), coord1);
 		ptNode2= this.pt.getPtNetworkFactory().CreateWalkingNode(pt.getPtNetworkLayer(), new IdImpl("w2"), coord2);
-		route.getNodes().add(0, ptNode1);
-		route.getNodes().add(ptNode2);
-		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW1", ptNode1 , (PTNode)route.getNodes().get(1), "Walking");
-		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW2", (PTNode)route.getNodes().get(route.getNodes().size()-2) , ptNode2, "Walking");
+		path.nodes.add(0, ptNode1);
+		path.nodes.add(ptNode2);
+		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW1", ptNode1 , (PTNode)path.nodes.get(1), "Walking");
+		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW2", (PTNode)path.nodes.get(path.nodes.size()-2) , ptNode2, "Walking");
 	}
 	
 	private void removeWlinks(){
@@ -136,17 +137,17 @@ public class PTActWriter {
 		return distance;
 	}	
 
-	public CarRoute forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-		CarRoute route=null;
-		while (route==null && distToWalk<1300){
-			route= findRoute(coord1, coord2, time, distToWalk);
+	public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+		Path path=null;
+		while (path==null && distToWalk<1300){
+			path= findRoute(coord1, coord2, time, distToWalk);
 			distToWalk= distToWalk+50;
 		}
-		return route;
+		return path;
 	}
 		
 	//TODO  use  this.pt.getPtNetworkLayer().getNearestNodes(coord, distance) and get ride of proximity object		
-	public CarRoute findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+	public Path findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
 		
 		PTNode[] NearStops1=  ptnProximity.getNearestBusStops(coord1, distToWalk);
 		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk);
@@ -155,7 +156,7 @@ public class PTActWriter {
 		List <IdImpl> walkingLinkList1 = this.pt.getPtNetworkFactory().CreateWalkingLinks(this.pt.getPtNetworkLayer(), ptNode1, NearStops1, true);
 		List <IdImpl> walkingLinkList2 = this.pt.getPtNetworkFactory().CreateWalkingLinks(this.pt.getPtNetworkLayer(), ptNode2, NearStops2, false);
 		
-		CarRoute route = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
+		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 
 		this.pt.getPtNetworkFactory().removeWalkinkLinks(this.pt.getPtNetworkLayer(), walkingLinkList1);
 		this.pt.getPtNetworkFactory().removeWalkinkLinks(this.pt.getPtNetworkLayer(), walkingLinkList2);
@@ -164,7 +165,7 @@ public class PTActWriter {
 		this.pt.getPtNetworkLayer().removeNode(ptNode1);
 		this.pt.getPtNetworkLayer().removeNode(ptNode2);
 	
-		return route;
+		return path;
 	}
 	
 	private Leg walkLeg(int legNum, Act act1, Act act2){
@@ -190,8 +191,8 @@ public class PTActWriter {
 		return distance * WALKING_SPEED;
 	}
 	
-	public int insertLegActs(CarRoute route, double depTime, int legNum, Plan newPlan){
-		List<Link> routeLinks = route.getLinks();
+	public int insertLegActs(Path path, double depTime, int legNum, Plan newPlan){
+		List<Link> routeLinks = path.links;
 		List<Link> legRouteLinks = new ArrayList<Link>();
 		double accumulatedTime=depTime;
 		double arrTime;

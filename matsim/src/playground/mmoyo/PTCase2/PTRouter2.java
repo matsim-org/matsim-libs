@@ -13,6 +13,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
 
 import playground.mmoyo.PTRouter.PTNProximity;
@@ -47,7 +48,7 @@ public class PTRouter2 {
 		this.dijkstra = new Dijkstra(ptNetworkLayer, ptTravelCost, ptTravelTime);	
 	}
 		
-	public CarRoute findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+	public Path findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
 		PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk);
 		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk);
 		PTNode ptNode1=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W1"), coord1);
@@ -55,7 +56,7 @@ public class PTRouter2 {
 		List <IdImpl> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
 		List <IdImpl> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
 		
-		CarRoute route = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
+		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
 		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList1);
 		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList2);
@@ -64,35 +65,35 @@ public class PTRouter2 {
 		this.ptNetworkLayer.removeNode(ptNode1);
 		this.ptNetworkLayer.removeNode(ptNode2);
 
-		if (route!=null){
-			route.getNodes().remove(ptNode1);
-			route.getNodes().remove(ptNode2);
+		if (path!=null){
+			path.nodes.remove(ptNode1);
+			path.nodes.remove(ptNode2);
 		}
-		return route;
+		return path;
 	}
 
-	public CarRoute findRoute(Coord coord1, Coord coord2, double time){
+	public Path findRoute(Coord coord1, Coord coord2, double time){
 		PTNode node1= ptnProximity.getNearestNode(coord1.getX(), coord1.getY());
 		PTNode node2= ptnProximity.getNearestNode(coord2.getX(), coord2.getY());
 		return findRoute(node1, node2,time);
 	}
 	
-	public CarRoute findRoute(Node ptNode1, Node ptNode2, double time){
+	public Path findRoute(Node ptNode1, Node ptNode2, double time){
 		return dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
-	public CarRoute forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-		CarRoute route=null;
-		while (route==null && distToWalk<1300){
-			route= findRoute(coord1, coord2, time, distToWalk);
+	public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+		Path path=null;
+		while (path==null && distToWalk<1300){
+			path= findRoute(coord1, coord2, time, distToWalk);
 			distToWalk= distToWalk+50;
 		}
-		return route;
+		return path;
 	}
 	
-	public List<Object> findLegActs(CarRoute route, double depTime){
+	public List<Object> findLegActs(Path path, double depTime){
 		List<Object> actLegList = new ArrayList<Object>();
-		if (route!=null){
+		if (path!=null){
 			double legTravTime =0;
 			double accumulatedTime=depTime;
 			//double legArrTime=depTime;
@@ -101,7 +102,7 @@ public class PTRouter2 {
 		
 			List<Link> linkList = new ArrayList<Link>();
 			boolean first=true;
-			List<Link> linkRoute = route.getLinks();
+			List<Link> linkRoute = path.links;
 			for(int x=0; x< linkRoute.size();x++){
 				Link link = linkRoute.get(x);
 				double linkTravelTime=ptTravelTime.getLinkTravelTime(link,accumulatedTime);
@@ -195,15 +196,15 @@ public class PTRouter2 {
 		return  link;
 	}
 	
-	public void PrintRoute(CarRoute route){
-		if (route!=null){
+	public void PrintRoute(Path path){
+		if (path!=null){
 			System.out.print("\nLinks: ");
 			//for (Link l L route.getLinks()) {
 				//System.out.println("link: "l.getId() + " cost: " + link.);
 			//}
 		
 			IdImpl idPTLine = new IdImpl("");
-			for (Iterator<Node> iter = route.getNodes().iterator(); iter.hasNext();){
+			for (Iterator<Node> iter = path.nodes.iterator(); iter.hasNext();){
 				PTNode ptNode= (PTNode)iter.next();
 				if(ptNode.getIdPTLine()==idPTLine){
 					System.out.print(ptNode.getId().toString() + " ");
@@ -213,7 +214,7 @@ public class PTRouter2 {
 				}
 				idPTLine= ptNode.getIdPTLine();	
 			}
-			System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravelTime());
+			System.out.println("\nTravel cost of route=" + path.travelCost + "  time of route:" + path.travelTime);
 		}else{
 			System.out.println("The route is null");
 		}//if null
