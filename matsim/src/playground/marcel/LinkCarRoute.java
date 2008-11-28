@@ -183,7 +183,7 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 
 	public void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
 		setNodes(route);
-		this.setTravTime(travelTime);
+		this.setTravelTime(travelTime);
 		this.travelCost = travelCost;
 	}
 }

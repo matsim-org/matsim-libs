@@ -176,11 +176,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			leg.setRoute(route);
-			travTime = route.getTravTime();
+			travTime = route.getTravelTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new NodeCarRoute();
-			route.setTravTime(0);
+			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
 		}
@@ -217,14 +217,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			if (route == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
-			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + route.getTravTime());
-			travTime = (int) ((route.getTravTime() + travelTimeLastLink) * 2.0);
-			route.setTravTime(travTime);
+			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + route.getTravelTime());
+			travTime = (int) ((route.getTravelTime() + travelTimeLastLink) * 2.0);
+			route.setTravelTime(travTime);
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new NodeCarRoute();
-			route.setTravTime(0);
+			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
 		}
@@ -242,7 +242,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -257,7 +257,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -272,7 +272,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);

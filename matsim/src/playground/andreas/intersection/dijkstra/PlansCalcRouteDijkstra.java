@@ -74,14 +74,14 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			CarRoute wrappedRoute = new NodeCarRoute();
 			wrappedRoute.setNodes(realRouteNodeList);
 			wrappedRoute.setDist(route.getDist());
-			wrappedRoute.setTravTime(route.getTravTime());
+			wrappedRoute.setTravelTime(route.getTravelTime());
 			
 			leg.setRoute(wrappedRoute);
-			travTime = route.getTravTime();
+			travTime = route.getTravelTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route = new NodeCarRoute();
-			route.setTravTime(0);
+			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
 		}

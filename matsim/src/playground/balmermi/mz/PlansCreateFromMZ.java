@@ -224,7 +224,7 @@ public class PlansCreateFromMZ {
 					leg.setArrivalTime(arrival);
 					CarRoute route = leg.createRoute();
 					route.setDist(distance);
-					route.setTravTime(leg.getTravelTime());
+					route.setTravelTime(leg.getTravelTime());
 					Act act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 
@@ -243,7 +243,7 @@ public class PlansCreateFromMZ {
 					leg.setArrivalTime(arrival);
 					CarRoute route = leg.createRoute();
 					route.setDist(distance);
-					route.setTravTime(leg.getTravelTime());
+					route.setTravelTime(leg.getTravelTime());
 					Act act = plan.createAct(acttype,to);
 					act.setStartTime(arrival);
 				}

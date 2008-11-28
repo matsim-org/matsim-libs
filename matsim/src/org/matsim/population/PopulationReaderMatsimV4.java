@@ -331,7 +331,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
-			this.currroute.setTravTime(Time.parseTime(atts.getValue("trav_time")));
+			this.currroute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		}
 		this.currroute.setStartLink(this.prevAct.getLink());
 	}

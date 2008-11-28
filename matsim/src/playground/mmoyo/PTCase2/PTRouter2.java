@@ -124,7 +124,7 @@ public class PTRouter2 {
 					linkList.add(link);
 				}else{
 					CarRoute legRoute = new NodeCarRoute();
-					legRoute.setTravTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
+					legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
 					if (linkList.size()>0) {legRoute.setLinks(linkList);}
 					
 					//insert leg 
@@ -213,7 +213,7 @@ public class PTRouter2 {
 				}
 				idPTLine= ptNode.getIdPTLine();	
 			}
-			System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravTime());
+			System.out.println("\nTravel cost of route=" + route.getTravelCost() + "  time of route:" + route.getTravelTime());
 		}else{
 			System.out.println("The route is null");
 		}//if null

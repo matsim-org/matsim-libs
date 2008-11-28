@@ -258,7 +258,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// correctly set route object
 				// restore original routes, because planomat must not alter routes at all
 				leg.setRoute(originalRoutes.get(leg));
-				leg.getRoute().setTravTime(travelTimeEstimation);
+				leg.getRoute().setTravelTime(travelTimeEstimation);
 
 				now += leg.getTravelTime();
 				// set planned arrival time accordingly

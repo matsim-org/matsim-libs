@@ -43,11 +43,11 @@ public class BasicRouteImpl implements BasicRoute {
 		this.dist = dist;
 	}
 
-	public final double getTravTime() {
+	public final double getTravelTime() {
 		return this.travTime;
 	}
 	
-	public final void setTravTime(final double travTime) {
+	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
 

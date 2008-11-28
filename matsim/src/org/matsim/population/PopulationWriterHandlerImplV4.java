@@ -335,8 +335,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write("\t\t\t\t<route");
 		if (!Double.isNaN(route.getDist()))
 			out.write(" dist=\"" + route.getDist() + "\"");
-		if (route.getTravTime() != Time.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Time.writeTime(route.getTravTime()) + "\"");
+		if (route.getTravelTime() != Time.UNDEFINED_TIME)
+			out.write(" trav_time=\"" + Time.writeTime(route.getTravelTime()) + "\"");
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");

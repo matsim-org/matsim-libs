@@ -42,20 +42,12 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 		return this.startLink;
 	}
 
-	public double getTravelTime() {
-		return super.getTravTime(); // FIXME [MR] remove indirection
-	}
-
 	public void setEndLink(final Link link) {
 		this.endLink = link;
 	}
 
 	public void setStartLink(final Link link) {
 		this.startLink = link;
-	}
-
-	public void setTravelTime(final double travelTime) {
-		super.setTravTime(travelTime); // FIXME [MR] remove indirection
 	}
 
 	@Override

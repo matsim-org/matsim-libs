@@ -81,7 +81,7 @@ public class TravelTimeMatrix {
 						Node target = grid.getValue(row2, col2);
 						int targetCellIdx = row2 * col2;
 						CarRoute route = router.calcLeastCostPath(source, target, 0);
-						ttmatrix.setValue(souceCellIdx, targetCellIdx, (int)route.getTravTime());
+						ttmatrix.setValue(souceCellIdx, targetCellIdx, (int)route.getTravelTime());
 					}
 				}
 				System.out.println(String.format("Processed %1$s of %2$s cells.", ((row+1) * col), (numRows * numCols)));

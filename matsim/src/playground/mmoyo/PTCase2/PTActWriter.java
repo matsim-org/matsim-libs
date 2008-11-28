@@ -281,7 +281,7 @@ public class PTActWriter {
 		if (mode!=Leg.Mode.walk){
 			legRoute.setLinks(routeLinks);
 		}
-		legRoute.setTravTime(travTime);
+		legRoute.setTravelTime(travTime);
 		legRoute.setDist(distance);  
 	
 		Leg leg = new Leg(mode);

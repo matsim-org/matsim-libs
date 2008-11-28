@@ -307,7 +307,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 				assertNotNull(leg.getRoute());
 				route = leg.getRoute();
 				assertEquals(45.5d, route.getDist(), EPSILON);
-				assertEquals(23.0d * 60.0d + 23.0d, route.getTravTime(), EPSILON);
+				assertEquals(23.0d * 60.0d + 23.0d, route.getTravelTime(), EPSILON);
 				assertEquals(2, route.getLinkIds().size());
 				assertEquals(id23, route.getLinkIds().get(0));
 				assertEquals(id24, route.getLinkIds().get(1));

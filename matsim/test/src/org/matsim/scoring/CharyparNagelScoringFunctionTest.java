@@ -97,12 +97,12 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 			Leg leg = this.plan.createLeg(Mode.car);
 			CarRoute route = leg.createRoute();
 			route.setDist(25000.0);
-			route.setTravTime(0.5*3600);
+			route.setTravelTime(0.5*3600);
 			this.plan.createAct("w", link3);
 			leg = this.plan.createLeg(Mode.pt);
 			route = leg.createRoute();
 			route.setDist(20000.0);
-			route.setTravTime(0.25*3600);
+			route.setTravelTime(0.25*3600);
 			this.plan.createAct("h", link5);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

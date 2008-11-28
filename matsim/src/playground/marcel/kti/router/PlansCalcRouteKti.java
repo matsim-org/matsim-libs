@@ -95,13 +95,13 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		CarRoute newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
 			newRoute = leg.createRoute();
-			newRoute.setTravTime(beeLineWalkTime);
+			newRoute.setTravelTime(beeLineWalkTime);
 		} else {
 			newRoute = leg.createRoute();
-			newRoute.setTravTime(timeInVehicle + walkTime);
+			newRoute.setTravelTime(timeInVehicle + walkTime);
 		}
 //		System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
-		return newRoute.getTravTime();
+		return newRoute.getTravelTime();
 	}
 
 }

@@ -164,8 +164,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				if (nextIndex < routes[0].length) {
 					// update time
 					// first, add travel time
-					depTimes[TOLL_INDEX][nextIndex] = depTimes[TOLL_INDEX][routeIndex] + routes[TOLL_INDEX][routeIndex].getTravTime();
-					depTimes[NOTOLL_INDEX][nextIndex] = depTimes[NOTOLL_INDEX][routeIndex] + routes[NOTOLL_INDEX][routeIndex].getTravTime();
+					depTimes[TOLL_INDEX][nextIndex] = depTimes[TOLL_INDEX][routeIndex] + routes[TOLL_INDEX][routeIndex].getTravelTime();
+					depTimes[NOTOLL_INDEX][nextIndex] = depTimes[NOTOLL_INDEX][routeIndex] + routes[NOTOLL_INDEX][routeIndex].getTravelTime();
 					// next, add activity duration or set endtime
 					double endTime = toAct.getEndTime();
 					double dur = toAct.getDuration();

@@ -211,8 +211,8 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 
 	private void writeRoute(final BasicRoute route) throws IOException {
 		this.atts.clear();
-		if (route.getTravTime() != Time.UNDEFINED_TIME) {
-			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, route.getTravTime()));
+		if (route.getTravelTime() != Time.UNDEFINED_TIME) {
+			this.atts.add(this.createTimeTuple(PopulationSchemaV5Names.TRAVELTIME, route.getTravelTime()));
 		}
 		if (!Double.isNaN(route.getDist())) {
 			this.atts.add(this.createTuple(PopulationSchemaV5Names.DISTANCE, route.getDist()));

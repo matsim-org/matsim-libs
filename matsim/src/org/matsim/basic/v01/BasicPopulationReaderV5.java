@@ -150,7 +150,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 				this.currentRoute.setDist(this.currentDistance);
 			}
 			if (null != this.currentTravelTime) {
-				this.currentRoute.setTravTime(this.currentTravelTime);
+				this.currentRoute.setTravelTime(this.currentTravelTime);
 			}
 			this.currentRouteLinkIds.clear();
 			this.currentDistance = null;

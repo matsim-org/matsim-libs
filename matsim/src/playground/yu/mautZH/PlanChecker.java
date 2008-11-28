@@ -113,7 +113,7 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
 				Leg l = it.next();
 				CarRoute r = l.getRoute();
-				text.append(r.getDist() + "\t" + r.getTravTime() + "\t");
+				text.append(r.getDist() + "\t" + r.getTravelTime() + "\t");
 			}
 			try {
 				out.writeBytes(person.getId().toString() + "\t"

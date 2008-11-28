@@ -376,7 +376,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(path);
-		route.setTravTime(arrTime - depTime);
+		route.setTravelTime(arrTime - depTime);
 
 		return route;
 	}
@@ -465,7 +465,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			if(path.size()>0){
 				route = new NodeCarRoute();
 				route.setNodes(path);
-				route.setTravTime(arrTime-depTime);
+				route.setTravelTime(arrTime-depTime);
 				out.write(path.get(0).getId()+";"+arrNode.getId()+";"+path.get(0).getCoord().calcDistance(fromCoord)+";"+arrNode.getCoord().calcDistance(toCoord)+";"+path.size()+";"+touchedNodes+";"+pending.size()+";"+(arrTime-depTime)+";"+(int)((arrNode.actCost+(arrNode.getCoord().calcDistance(toCoord)/PEDESTRIAN_SPEED))-depTime)+";");
 			} else {
 				out.write(";;;;0;"+touchedNodes+";"+pending.size()+";"+arrTime+";;");

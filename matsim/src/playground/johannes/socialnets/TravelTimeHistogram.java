@@ -261,9 +261,9 @@ public class TravelTimeHistogram {
 						System.err.println("pAlter = 0");
 				} else {
 				
-				r.ttFastesPath = fastestRoute.getTravTime();
+				r.ttFastesPath = fastestRoute.getTravelTime();
 				r.distFastestPath = getPathLength(fastestRoute);
-				r.ttShortestPath = shortesRoute.getTravTime();
+				r.ttShortestPath = shortesRoute.getTravelTime();
 				r.distShortestPath = getPathLength(shortesRoute);
 				r.geodesicDistance = coord.calcDistance(ego.homeloc);
 				if(r.geodesicDistance > 0 ) {

@@ -251,7 +251,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 		if (this.doGatherInformation) {
 			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route
-					.getTravTime()) / (this.routeCnt + 1);
+					.getTravelTime()) / (this.routeCnt + 1);
 			this.avgRouteLength = (this.routeCnt * this.avgRouteLength + route
 					.getDist()) / (this.routeCnt + 1);
 			this.routeCnt++;

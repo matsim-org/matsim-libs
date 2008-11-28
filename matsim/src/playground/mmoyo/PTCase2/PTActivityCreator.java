@@ -172,7 +172,7 @@ public class PTActivityCreator {
 		//Set walkRoute
 		CarRoute walkRoute= new NodeCarRoute();
 		walkRoute.setDist(walkDistance);
-		walkRoute.setTravTime(walkTravelTime);
+		walkRoute.setTravelTime(walkTravelTime);
 
 		Leg walkLeg1= new Leg(Leg.Mode.walk);
 		walkLeg1.setNum(legNum);

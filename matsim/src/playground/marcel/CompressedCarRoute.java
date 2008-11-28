@@ -285,7 +285,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	public void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
 		setNodes(route);
-		setTravTime(travelTime);
+		setTravelTime(travelTime);
 		this.travelCost = travelCost;
 	}
 

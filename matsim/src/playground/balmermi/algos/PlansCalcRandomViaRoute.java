@@ -193,26 +193,26 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		CarRoute route1 = null;
 		if (startNode == viaNode) {
 			route1 = new NodeCarRoute();
-			route1.setTravTime(0.0);
+			route1.setTravelTime(0.0);
 			travTime = 0.0;
 		}
 		else {
 			route1 = this.routeAlgo.calcLeastCostPath(startNode,viaNode,depTime);
 			if (route1 == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + viaNode.getId() + ".");
-			travTime = route1.getTravTime();
+			travTime = route1.getTravelTime();
 		}
 
 		// calc second part of the route
 		CarRoute route2 = null;
 		if (viaNode == endNode) {
 			route2 = new NodeCarRoute();
-			route2.setTravTime(0.0);
+			route2.setTravelTime(0.0);
 			travTime += 0.0;
 		}
 		else {
 			route2 = this.routeAlgo.calcLeastCostPath(viaNode,endNode,depTime+travTime);
 			if (route2 == null) throw new RuntimeException("No route found from node " + viaNode.getId() + " to node " + endNode.getId() + ".");
-			travTime += route2.getTravTime();
+			travTime += route2.getTravelTime();
 		}
 		
 		List<Node> nodes = route1.getNodes();
@@ -246,7 +246,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 //	 create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -261,7 +261,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 //	 create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
@@ -276,7 +276,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 //	 create an empty route, but with realistic traveltime
 		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
-		route.setTravTime(travTime);
+		route.setTravelTime(travTime);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);

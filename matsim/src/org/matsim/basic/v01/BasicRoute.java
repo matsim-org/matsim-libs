@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -31,18 +31,18 @@ public interface BasicRoute {
 
 	public void setDist(final double dist);
 
-	public double getTravTime();
-	
-	public void setTravTime(final double travTime);
-	
+	public double getTravelTime();
+
+	public void setTravelTime(final double travelTime);
+
 	public List<Id> getLinkIds();
-	
+
 	public void setStartLinkId(final Id linkId);
-	
+
 	public Id getStartLinkId();
 
 	public void setEndLinkId(final Id linkId);
-	
+
 	public Id getEndLinkId();
-	
+
 }
