@@ -21,6 +21,7 @@
 package org.matsim.examples;
 
 import org.matsim.config.Config;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
@@ -40,7 +41,7 @@ public class PlanomatControlerTest extends MatsimTestCase {
 
 	public void testMainCarPt() {
 		this.config.charyparNagelScoring().setTravelingPt(-6);
-		this.config.planomat().setPossibleModes("car pt");
+		this.config.planomat().setPossibleModes(PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT);
 		this.runControlerTest();
 	}
 

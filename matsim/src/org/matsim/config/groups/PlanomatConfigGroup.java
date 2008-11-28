@@ -1,7 +1,5 @@
 package org.matsim.config.groups;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.Module;
@@ -31,10 +29,10 @@ public class PlanomatConfigGroup extends Module {
 	private int jgapMaxGenerations;
 
 	public static final String POSSIBLE_MODES = "possibleModes";
-	public static final String POSSIBLE_MODES_CAR = BasicLeg.Mode.car.toString();
-	public static final String POSSIBLE_MODES_CAR_PT = BasicLeg.Mode.car.toString() + " " + BasicLeg.Mode.pt.toString();
-	public static final String DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
-	private String possibleModes;
+	public static final BasicLeg.Mode[] POSSIBLE_MODES_CAR = new BasicLeg.Mode[]{BasicLeg.Mode.car};
+	public static final BasicLeg.Mode[] POSSIBLE_MODES_CAR_PT = new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt};
+	public static final BasicLeg.Mode[] DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
+	private BasicLeg.Mode[] possibleModes;
 
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR_NAME = "legTravelTimeEstimator";
 	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
@@ -70,7 +68,11 @@ public class PlanomatConfigGroup extends Module {
 	public void addParam(final String param_name, final String value) {
 
 		if (PlanomatConfigGroup.POSSIBLE_MODES.equals(param_name)) {
-			this.possibleModes = value;
+			String[] possibleModesStringArray = value.split(" ");
+			this.possibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+			for (int ii=0; ii < possibleModesStringArray.length; ii++) {
+				this.possibleModes[ii] = BasicLeg.Mode.valueOf(possibleModesStringArray[ii]);
+			}
 		} else if (PlanomatConfigGroup.LEG_TRAVEL_TIME_ESTIMATOR_NAME.equals(param_name)) {
 			this.legTravelTimeEstimatorName = value;
 		}
@@ -133,15 +135,12 @@ public class PlanomatConfigGroup extends Module {
 		return this.popSize;
 	}
 
-	public ArrayList<BasicLeg.Mode> getPossibleModes() {
+	public BasicLeg.Mode[] getPossibleModes() {
+		return possibleModes;
+	}
 
-		ArrayList<BasicLeg.Mode> possibleModesArrayList = new ArrayList<BasicLeg.Mode>();
-
-		for (String possibleMode : this.possibleModes.split(" ")) {
-			possibleModesArrayList.add(BasicLeg.Mode.valueOf(possibleMode));
-		}
-
-		return possibleModesArrayList;
+	public void setPossibleModes(BasicLeg.Mode[] possibleModes) {
+		this.possibleModes = possibleModes;
 	}
 
 	public void setPopSize(int popSize) {
@@ -150,10 +149,6 @@ public class PlanomatConfigGroup extends Module {
 
 	public String getLegTravelTimeEstimatorName() {
 		return legTravelTimeEstimatorName;
-	}
-
-	public void setPossibleModes(String possibleModes) {
-		this.possibleModes = possibleModes;
 	}
 
 	public void setJgapMaxGenerations(int jgapMaxGenerations) {

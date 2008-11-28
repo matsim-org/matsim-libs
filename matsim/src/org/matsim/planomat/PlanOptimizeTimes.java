@@ -159,7 +159,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 			}
 
 			for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
-				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().size() - 1));
+				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
 			} 
 
 		} catch (InvalidConfigurationException e) {
@@ -238,7 +238,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// set mode to result from optimization
 				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 				int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-				Mode mode = Gbl.getConfig().planomat().getPossibleModes().get(modeIndex);
+				Mode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
 //				System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
 				leg.setMode(mode);
 
