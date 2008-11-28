@@ -33,9 +33,9 @@ import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentReplanEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
-import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.BasicEventHandler;
 import org.matsim.events.handler.EventHandler;
@@ -61,24 +61,24 @@ public class Events {
 
 	static private class HandlerData {
 
-		public Class<?> eventklass;
-		public ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
-		public Method method;
-		public HandlerData(final Class<?> eventklass, final Method method) {
+		protected Class<?> eventklass;
+		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
+		protected Method method;
+		protected HandlerData(final Class<?> eventklass, final Method method) {
 			this.eventklass = eventklass;
 			this.method = method;
 		}
-		public void removeHandler(final EventHandler handler) {
+		protected void removeHandler(final EventHandler handler) {
 			this.handlerList.remove(handler);
 		}
 	}
 
 	static private class HandlerInfo {
-		public final Class<?> eventClass;
-		public final EventHandler eventHandler;
-		public final Method method;
+		protected final Class<?> eventClass;
+		protected final EventHandler eventHandler;
+		protected final Method method;
 
-		public HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
+		protected HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
 			this.eventClass = eventClass;
 			this.eventHandler = eventHandler;
 			this.method = method;
@@ -91,12 +91,6 @@ public class Events {
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
-
-	/**
-	 * creates new Events-data structure
-	 */
-	public Events() {
-	}
 
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
