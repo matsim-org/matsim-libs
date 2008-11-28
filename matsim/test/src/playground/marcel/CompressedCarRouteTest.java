@@ -30,14 +30,14 @@ import playground.yu.compressRoute.Subsequent;
 /**
  * @author mrieser
  */
-public class CompressedRouteTest extends RouteImplTest {
+public class CompressedCarRouteTest extends RouteImplTest {
 
 	@Override
-	public Route getRouteInstance() {
+	public Route getCarRouteInstance() {
 
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		Subsequent subsequent = new Subsequent(network);
-		return new CompressedRoute(subsequent.getSubsequentLinks());
+		return new CompressedCarRoute(subsequent.getSubsequentLinks());
 	}
 
 }

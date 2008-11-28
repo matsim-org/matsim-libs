@@ -25,15 +25,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.routes.AbstractRoute;
 
-public class CompressedRoute extends BasicRouteImpl implements Route {
+public class CompressedCarRoute extends AbstractRoute implements Route {
 
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
@@ -41,7 +41,7 @@ public class CompressedRoute extends BasicRouteImpl implements Route {
 	/** number of links in uncompressed route */
 	private int uncompressedLength = 0;
 
-	public CompressedRoute(final Map<Link, Link> subsequentLinks) {
+	public CompressedCarRoute(final Map<Link, Link> subsequentLinks) {
 		this.subsequentLinks = subsequentLinks;
 	}
 
@@ -93,30 +93,36 @@ public class CompressedRoute extends BasicRouteImpl implements Route {
 	public List<Node> getRoute() {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
 
-		Link previousLink = null;
-		for (Link link : this.route) {
-			if (previousLink == null) {
-				nodes.add(link.getFromNode());
-				nodes.add(link.getToNode());
-				previousLink = link;
-			} else {
-				boolean found = false;
-				do {
-					Node node = previousLink.getToNode();
-					for (Link outLink : node.getOutLinks().values()) {
-						if (link.getId().equals(outLink.getId())) {
-							found = true;
-							nodes.add(link.getToNode());
-							previousLink = link;
+		if (this.route.size() == 0) {
+			if (getStartLink() != getEndLink()) {
+				nodes.add(getStartLink().getToNode());
+			}
+		} else {
+			Link previousLink = null;
+			for (Link link : this.route) {
+				if (previousLink == null) {
+					nodes.add(link.getFromNode());
+					nodes.add(link.getToNode());
+					previousLink = link;
+				} else {
+					boolean found = false;
+					do {
+						Node node = previousLink.getToNode();
+						for (Link outLink : node.getOutLinks().values()) {
+							if (link.getId().equals(outLink.getId())) {
+								found = true;
+								nodes.add(link.getToNode());
+								previousLink = link;
+							}
 						}
-					}
-					if (!found) {
-						// the link in the route was not part of the current outgoing links, so follow the subsequent Links
-						Link tmpLink = this.subsequentLinks.get(previousLink);
-						nodes.add(tmpLink.getToNode());
-						previousLink = tmpLink;
-					}
-				} while (!found);
+						if (!found) {
+							// the link in the route was not part of the current outgoing links, so follow the subsequent Links
+							Link tmpLink = this.subsequentLinks.get(previousLink);
+							nodes.add(tmpLink.getToNode());
+							previousLink = tmpLink;
+						}
+					} while (!found);
+				}
 			}
 		}
 
@@ -144,7 +150,7 @@ public class CompressedRoute extends BasicRouteImpl implements Route {
 		if (!foundFromNode || !foundToNode) {
 			throw new IllegalArgumentException("fromNode or toNode are not part of this route.");
 		}
-		Route subRoute = new CompressedRoute(this.subsequentLinks);
+		Route subRoute = new CompressedCarRoute(this.subsequentLinks);
 		subRoute.setRoute(nodes);
 		return subRoute;
 	}
@@ -155,7 +161,8 @@ public class CompressedRoute extends BasicRouteImpl implements Route {
 
 	public void setLinkRoute(final List<Link> srcRoute) {
 		this.route.clear();
-		if (srcRoute == null) {
+		if (srcRoute == null || srcRoute.size() == 0) {
+			this.uncompressedLength = 0;
 			return;
 		}
 		Link previousLink = null;
@@ -181,8 +188,12 @@ public class CompressedRoute extends BasicRouteImpl implements Route {
 	public void setRoute(final String route) {
 		this.route.clear();
 		String[] parts = route.trim().split("[ \t\n]+");
+		if (parts.length == 1) {
+			// exactly one node, so the route must be defined by the start and end leg
+			this.uncompressedLength = 0;
+			return;
+		}
 
-		this.route.clear();
 		Node previousNode = null;
 		Link previousLink = null;
 		for (String id : parts) {

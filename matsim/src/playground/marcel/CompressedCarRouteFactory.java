@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkRouteTest.java
+ * CompressedCarRouteFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,19 +20,22 @@
 
 package playground.marcel;
 
+import java.util.Map;
+
+import org.matsim.network.Link;
 import org.matsim.population.Route;
-import org.matsim.population.RouteImplTest;
+import org.matsim.population.routes.RouteFactory;
 
-import playground.marcel.LinkRoute;
+public class CompressedCarRouteFactory implements RouteFactory {
 
-/**
- * @author mrieser
- */
-public class LinkRouteTest extends RouteImplTest {
-
-	@Override
-	public Route getRouteInstance() {
-		return new LinkRoute();
+	private final Map<Link, Link> subsequentLinks;
+	
+	public CompressedCarRouteFactory(final Map<Link, Link> subsequentLinks) {
+		this.subsequentLinks = subsequentLinks;
+	}
+	
+	public Route createRoute() {
+		return new CompressedCarRoute(this.subsequentLinks);
 	}
 
 }

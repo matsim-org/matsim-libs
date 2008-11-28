@@ -23,15 +23,20 @@ package playground.marcel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Route;
+import org.matsim.population.routes.AbstractRoute;
 
-public class LinkRoute extends BasicRouteImpl implements Route {
+/**
+ * Implementation of {@link Route} which internally stores the route as a series of {@link Link}s.
+ *
+ * @author mrieser
+ */
+public class LinkCarRoute extends AbstractRoute implements Route {
 
 	private final ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
@@ -81,9 +86,11 @@ public class LinkRoute extends BasicRouteImpl implements Route {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.route.size() + 1);
 		if (this.route.size() > 0) {
 			nodes.add(this.route.get(0).getFromNode());
-		}
-		for (Link link : this.route) {
-			nodes.add(link.getToNode());
+			for (Link link : this.route) {
+				nodes.add(link.getToNode());
+			}
+		} else if (this.getStartLink() != this.getEndLink()) {
+			nodes.add(getStartLink().getToNode());
 		}
 		nodes.trimToSize();
 		return nodes;
@@ -113,7 +120,7 @@ public class LinkRoute extends BasicRouteImpl implements Route {
 		if (toIndex == -1) {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
-		LinkRoute ret = new LinkRoute();
+		LinkCarRoute ret = new LinkCarRoute();
 		ret.setLinkRoute(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
