@@ -41,6 +41,8 @@ public abstract class Message implements Comparable {
 			// ATTENTION: try to remove this in some intelligent manner, because
 			// at the moment if you just return 0 here, we have a problem (find out why).
 			// => DES scenarios do not run anymore.
+			// find out, why this happens and perhaps replace it by
+			// priorities as in PDES????
 			return (int) (messageId-otherMessage.messageId);
 		}
 	}
