@@ -64,6 +64,9 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private Route currroute = null;
 
+	private Act prevAct = null;
+	private Route prevRoute = null;
+
 	public PopulationReaderMatsimV1(final Population plans) {
 		this.plans = plans;
 	}
@@ -110,6 +113,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		}
 		else if (ROUTE.equals(name)) {
 			this.currroute.setRoute(content);
+			this.prevRoute = this.currroute;
 			this.currroute = null;
 		}
 	}
@@ -170,10 +174,13 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
+		this.prevAct = this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
 					atts.getValue("y100"), atts.getValue("link"), atts
 							.getValue("start_time"), atts.getValue("end_time"), atts
 							.getValue("dur"), null);
+		if (this.prevRoute != null) {
+			this.prevRoute.setEndLink(this.prevAct.getLink());
+		}
 	}
 
 	private void startLeg(final Attributes atts) {
@@ -191,6 +198,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		if (atts.getValue("trav_time") != null) {
 			this.currroute.setTravTime(Time.parseTime(atts.getValue("trav_time")));
 		}
+		this.currroute.setStartLink(this.prevAct.getLink());
 	}
 
 }

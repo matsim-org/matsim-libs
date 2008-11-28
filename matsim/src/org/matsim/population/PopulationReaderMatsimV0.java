@@ -59,6 +59,9 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private Leg currleg = null;
 	private Route currroute = null;
 
+	private Act prevAct = null;
+	private Route prevRoute = null;
+
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
 	public PopulationReaderMatsimV0(final Population plans) {
@@ -95,6 +98,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 			this.currleg = null;
 		} else if (ROUTE.equals(name)) {
 			this.currroute.setRoute(content);
+			this.prevRoute = this.currroute;
 			this.currroute = null;
 		}
 	}
@@ -147,8 +151,11 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		if (atts.getValue("zone") != null) {
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
-		this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
+		this.prevAct = this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
 				atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
+		if (this.prevRoute != null) {
+			this.prevRoute.setEndLink(this.prevAct.getLink());
+		}
 	}
 
 	private void startLeg(final Attributes atts) {
@@ -160,6 +167,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 
 	private void startRoute() {
 		this.currroute = this.currleg.createRoute();
+		this.currroute.setStartLink(this.prevAct.getLink());
 	}
 
 }

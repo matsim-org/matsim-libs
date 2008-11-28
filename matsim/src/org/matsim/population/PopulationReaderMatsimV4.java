@@ -76,6 +76,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Leg currleg = null;
 	private Route currroute = null;
 
+	private Act prevAct = null;
+	private Route prevRoute = null;
+
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
 	private int warnPlanTypeCount = 0;
@@ -147,11 +150,13 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			this.currplan.getActsLegs().trimToSize();
 			this.currplan = null;
 		} else if (ACT.equals(name)) {
+			this.prevAct = this.curract;
 			this.curract = null;
 		} else if (LEG.equals(name)) {
 			this.currleg = null;
 		} else if (ROUTE.equals(name)) {
 			this.currroute.setRoute(content);
+			this.prevRoute = this.currroute;
 			this.currroute = null;
 		}
 	}
@@ -307,6 +312,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (atts.getValue("facility") != null) {
 			this.curract.setFacility(atts.getValue("facility"));
 		}
+		if (this.prevRoute != null) {
+			this.prevRoute.setEndLink(this.curract.getLink());
+		}
 	}
 
 	private void startLeg(final Attributes atts) {
@@ -324,6 +332,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (atts.getValue("trav_time") != null) {
 			this.currroute.setTravTime(Time.parseTime(atts.getValue("trav_time")));
 		}
+		this.currroute.setStartLink(this.prevAct.getLink());
 	}
 
 }
