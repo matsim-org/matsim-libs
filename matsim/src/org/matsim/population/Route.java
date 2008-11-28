@@ -23,11 +23,10 @@ package org.matsim.population;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicRoute;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
-public interface Route extends BasicRoute {
+public interface Route extends org.matsim.population.routes.Route {
 
 	public abstract void setRoute(final String route);
 

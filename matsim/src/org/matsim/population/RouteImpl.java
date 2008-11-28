@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.basic.v01.BasicRouteImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.routes.AbstractRoute;
 import org.matsim.utils.misc.Time;
 
-public class RouteImpl extends BasicRouteImpl implements Route {
+public class RouteImpl extends AbstractRoute implements Route {
 
 	protected final ArrayList<Node> route = new ArrayList<Node>();
 
@@ -48,9 +48,9 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 		this.route.addAll(route.getRoute());
 		this.route.trimToSize();
 	}
-	
+
 	@Override
-	public void setLinkIds(List<Id> linkids) {
+	public void setLinkIds(final List<Id> linkids) {
 		throw new UnsupportedOperationException("Setting only the link ids is not possible at this " +
 				"level in the inheritance hierachy! If the Interfaces Link/Node/Route are used you " +
 				"have to set the route by object references not by Ids.");
@@ -94,11 +94,19 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 	public void setLinkRoute(final List<Link> srcRoute) {
 		this.route.clear();
 		if (srcRoute != null) {
-			Link l = srcRoute.get(0);
-			this.route.add(l.getFromNode());
-			for (int i = 0; i < srcRoute.size(); i++) {
-				l = srcRoute.get(i);
-				this.route.add(l.getToNode());
+			if (srcRoute.size() == 0) {
+				if (getStartLink() != getEndLink()) {
+					// we do not check that start link and end link are really connected with the same node
+					this.route.add(getStartLink().getToNode());
+					// TODO [MR] what to do if setEndLink is set after the linkRoute, than this doesn't work
+				}
+			} else {
+				Link l = srcRoute.get(0);
+				this.route.add(l.getFromNode());
+				for (int i = 0; i < srcRoute.size(); i++) {
+					l = srcRoute.get(i);
+					this.route.add(l.getToNode());
+				}
 			}
 		}
 		this.route.trimToSize();
@@ -136,7 +144,7 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 
 	@Override
 	public List<Id> getLinkIds() {
-		List<Id> ret = new ArrayList<Id>(this.route.size()-1);
+		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
 		for (Link l : getLinkRoute()) {
 			ret.add(l.getId());
 		}
@@ -239,4 +247,5 @@ public class RouteImpl extends BasicRouteImpl implements Route {
 				"[trav_time=" + Time.writeTime(this.getTravTime()) + "]" +
 				"[nof_nodes=" + this.route.size() + "]";
 	}
+
 }
