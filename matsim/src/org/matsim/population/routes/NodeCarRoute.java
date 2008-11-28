@@ -122,7 +122,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 
-	public final void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
+	public final void setNodes(final List<Node> route, final double travelTime, final double travelCost) {
 		setNodes(route);
 		super.setTravelTime(travelTime);
 		this.cost = travelCost;

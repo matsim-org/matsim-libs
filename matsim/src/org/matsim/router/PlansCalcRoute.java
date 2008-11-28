@@ -180,7 +180,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			CarRoute route = new NodeCarRoute();
 			route.setStartLink(fromLink);
 			route.setEndLink(toLink);
-			route.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost);//FIXME [MR] remove cast
+			route.setNodes(path.nodes, (int) path.travelTime, path.travelCost);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {
@@ -230,7 +230,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			CarRoute route = new NodeCarRoute(); // TODO [MR] change to PtRoute once available
 			route.setStartLink(fromLink);
 			route.setEndLink(toLink);
-			route.setNodes((ArrayList<Node>) path.nodes, travTime, path.travelCost);//FIXME [MR] remove cast 
+			route.setNodes(path.nodes, travTime, path.travelCost); 
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink

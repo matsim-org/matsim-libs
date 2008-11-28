@@ -127,7 +127,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
-					tollRoute.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost); // FIXME [MR] remove cast 
+					tollRoute.setNodes(path.nodes, (int) path.travelTime, path.travelCost); 
 				} else {
 					// do not drive/walk around, if we stay on the same link
 					tollRoute.setDist(0.0);
@@ -149,7 +149,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					noTollRoute = new NodeCarRoute();
 					noTollRoute.setStartLink(fromLink);
 					noTollRoute.setEndLink(toLink);
-					noTollRoute.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, path.travelCost);// FIXME [MR] remove cast
+					noTollRoute.setNodes(path.nodes, (int) path.travelTime, path.travelCost);
 //					noTollRoute.setTravelTime(path.travelTime);
 
 					if (routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex])) {

@@ -20,7 +20,6 @@
 
 package org.matsim.population.routes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.network.Link;
@@ -36,7 +35,7 @@ public interface CarRoute extends Route {
 
 	public abstract void setNodes(List<Node> srcRoute);
 
-	public abstract void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost);
+	public abstract void setNodes(final List<Node> route, final double travelTime, final double travelCost);
 
 	public abstract double getTravelCost();
 
