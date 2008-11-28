@@ -81,7 +81,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 			Person pers = this.population.getPerson(e.getKey());
 			Plan plan = pers.getSelectedPlan();
 		
-			Link[] links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinks();
+			Link[] links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
 			ArrayList<String> strLinks = e.getValue();
 			if (strLinks.size() < links.length) {
 				if (addNewPlan(pers,strLinks)) count++;

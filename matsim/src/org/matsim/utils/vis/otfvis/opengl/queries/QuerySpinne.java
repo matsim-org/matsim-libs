@@ -42,6 +42,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -87,7 +88,7 @@ public class QuerySpinne implements OTFQuery {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					Link[] route = leg.getRoute().getLinks();
+					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 					for (int j = 0; j < route.length; j++) {
 						Id id2 = route[j].getId();
 						if(id2.equals(this.linkId) ) {
@@ -119,7 +120,7 @@ public class QuerySpinne implements OTFQuery {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					Link[] route = leg.getRoute().getLinks();
+					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 					for (int j = 0; j < route.length; j++) {
 							addLink(route[j]);
 					}

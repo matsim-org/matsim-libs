@@ -207,7 +207,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		CarRoute route = testLeg.getRoute();
+		CarRoute route = (CarRoute) testLeg.getRoute();
 		log.info(route.toString());
 
 		// generate some travel times
@@ -276,7 +276,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.linkTravelCostEstimator, 
 				this.tDepDelayCalc, 
 				this.network);
-		Id linkId = testLeg.getRoute().getLinks()[0].getId();
+		Id linkId = ((CarRoute) testLeg.getRoute()).getLinks()[0].getId();
 
 		Events events = new Events();
 		events.addHandler(linkTravelTimeEstimator);

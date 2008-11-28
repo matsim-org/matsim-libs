@@ -1,7 +1,6 @@
 package playground.wrashid.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.events.ActEndEvent;
@@ -25,6 +24,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.DES.SimulationParameters;
@@ -83,7 +83,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			LegIterator iter=plan.getIteratorLeg();
 			while (iter.hasNext()){
 				Leg leg=(Leg)iter.next();
-				expectedLinkEnterEvents+=leg.getRoute().getLinks().length+1;
+				expectedLinkEnterEvents+=((CarRoute) leg.getRoute()).getLinks().length+1;
 			}
 		}
 		

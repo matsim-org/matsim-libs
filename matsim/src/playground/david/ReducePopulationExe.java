@@ -41,6 +41,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.world.World;
 
 class EventHH implements LinkEnterEventHandler {
@@ -52,8 +53,6 @@ class EventHH implements LinkEnterEventHandler {
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }
@@ -86,7 +85,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					// Leg
 					Leg l = (Leg) actl.get(i);
 					List<Link> ll = new LinkedList<Link>();
-					for(Link link : l.getRoute().getLinks()) {
+					for(Link link : ((CarRoute) l.getRoute()).getLinks()) {
 						usedlinkList.add(link);
 					}
 				}

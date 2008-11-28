@@ -30,6 +30,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
 
@@ -85,7 +86,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						return true;
 					}
 				} else {
-					Link[] links = leg.getRoute().getLinks();
+					Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 					if (links.length == 0) {
 						if (judgeByBeeline((Act) plan.getActsLegs().get(i-1), (Act) plan.getActsLegs().get(i+1))) {
 							return true;

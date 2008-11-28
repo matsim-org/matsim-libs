@@ -16,12 +16,13 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.mobsim.queuesim.QueueVehicleDepartureTimeComparator;
+import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
@@ -341,7 +342,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 							this.realLink.getLink(), veh.getCurrentLeg()));
 			Leg actLeg = veh.getCurrentLeg();
 			if (actLeg.getRoute() != null) {
-				if(actLeg.getRoute().getNodes() != null){
+				if (((CarRoute) actLeg.getRoute()).getNodes() != null){
 					this.parkToLinkQueue.add(veh);
 				}
 			} else {

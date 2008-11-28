@@ -118,7 +118,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	}
 
 	private Leg getELeg(final Leg leg) {
-		List<Node> nodeRoute = leg.getRoute().getNodes();
+		List<Node> nodeRoute = ((CarRoute) leg.getRoute()).getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
 		Leg l = new Leg(BasicLeg.Mode.car);
 		CarRoute route = new NodeCarRoute();
@@ -128,7 +128,7 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	}
 
 	private Link getEvacLink(final Leg leg) {
-		Link [] lr = leg.getRoute().getLinks();
+		Link [] lr = ((CarRoute) leg.getRoute()).getLinks();
 		
 		
 		return lr[lr.length-1];

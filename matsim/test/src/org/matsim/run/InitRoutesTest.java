@@ -99,7 +99,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
 		Leg leg2 = (Leg) plan2.getActsLegs().get(1);
-		CarRoute route2 = leg2.getRoute();
+		CarRoute route2 = (CarRoute) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
 		assertEquals("wrong route", 3, route2.getNodes().size());
 	}

@@ -190,7 +190,7 @@ public class DEQSim extends ExternalMobsim {
 			// departuretime, double, 64bit
 			out.writeDouble(time);
 
-			CarRoute route = leg.getRoute();
+			CarRoute route = (CarRoute) leg.getRoute();
 			// in the binary format, we write the link-ids instead of the node-ids
 			Link[] linkRoute = route.getLinks();
 

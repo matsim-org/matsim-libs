@@ -51,6 +51,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.collections.QuadTree;
@@ -175,7 +176,7 @@ public class EgressAnalysis {
 			log.info("handle plans");
 			for (Person person : this.population) {
 				Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
-				List<Node> route = leg.getRoute().getNodes();
+				List<Node> route = ((CarRoute) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				Plan plan = new Plan(person);
@@ -189,7 +190,7 @@ public class EgressAnalysis {
 				plan.addAct(person.getSelectedPlan().getNextActivity(leg));
 				router.run(plan);
 				Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
-				List<Node> route2 = leg2.getRoute().getNodes();
+				List<Node> route2 = ((CarRoute) leg2.getRoute()).getNodes();
 				Node node2 = route2.get(route2.size()-2);
 				this.egressNodes.get(node2.getId()).num_shortest++;
 

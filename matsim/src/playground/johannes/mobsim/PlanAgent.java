@@ -29,6 +29,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -263,8 +264,8 @@ public class PlanAgent implements MobsimAgent {
 	public void enterLink(Link link, double time) {
 		currentLink = link;
 		currentRouteIndex++;
-		Link desiredLink = ((Leg) person.getSelectedPlan().getActsLegs().get(
-				currentPlanIndex)).getRoute().getLinks()[currentRouteIndex];
+		Link desiredLink = ((CarRoute) ((Leg) person.getSelectedPlan().getActsLegs().get(
+				currentPlanIndex)).getRoute()).getLinks()[currentRouteIndex];
 		if (currentLink != desiredLink)
 			currentRouteIndex--;
 	}

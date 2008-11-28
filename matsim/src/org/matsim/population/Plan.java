@@ -331,7 +331,7 @@ public class Plan extends BasicPlanImpl {
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
 					if (l.getRoute() != null) {
-						CarRoute r = new NodeCarRoute(l.getRoute());
+						CarRoute r = new NodeCarRoute((CarRoute) l.getRoute());
 						l2.setRoute(r);
 					}
 				}

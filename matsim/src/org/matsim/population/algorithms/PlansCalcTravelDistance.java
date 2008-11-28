@@ -94,7 +94,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			nodes.add(startnode);
 
-			CarRoute route = leg.getRoute();
+			CarRoute route = (CarRoute) leg.getRoute();
 			if (route == null) throw new Exception("route missing");
 			nodes.addAll(route.getNodes());
 

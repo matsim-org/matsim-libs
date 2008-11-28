@@ -31,6 +31,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -75,7 +76,8 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	}
 
 	private int intersectAOI(final Leg leg) {
-		for (Link link : leg.getRoute().getLinks()) {
+		CarRoute route = (CarRoute) leg.getRoute();
+		for (Link link : route.getLinks()) {
 			if (this.aOI.contains(link.getId()))
 				return 1;
 		}

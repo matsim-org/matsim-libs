@@ -229,7 +229,7 @@ public class LinkSetRendererRoutes extends RendererA {
 			List<?> actslegs = plan.getActsLegs();
 			for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 				Leg leg = (Leg)actslegs.get(i);
-				run(leg.getRoute());
+				run((CarRoute) leg.getRoute());
 			}
 		}
 

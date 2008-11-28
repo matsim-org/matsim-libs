@@ -117,7 +117,7 @@ public class WithindayAgent extends PersonAgent {
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-					CarRoute subRoute = this.getCurrentLeg().getRoute().getSubRoute(currentToNode, currentDestinationNode);
+					CarRoute subRoute = ((CarRoute) this.getCurrentLeg().getRoute()).getSubRoute(currentToNode, currentDestinationNode);
 					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
 						this.reroute();
 					}
@@ -152,7 +152,7 @@ public class WithindayAgent extends PersonAgent {
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
-		List<Node> oldRouteNodes = currentLeg.getRoute().getNodes();
+		List<Node> oldRouteNodes = ((CarRoute) currentLeg.getRoute()).getNodes();
 		CarRoute alreadyPassedNodes = new NodeCarRoute();
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setRoute(..) doesn't use the List interface and

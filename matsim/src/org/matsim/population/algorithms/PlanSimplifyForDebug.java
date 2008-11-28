@@ -31,7 +31,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -148,12 +147,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 			return;
 
 		Act act = (Act) plan.getActsLegs().get(0);
-		int time = 6 * 3600 + (int) (MatsimRandom.random.nextDouble() * 3600 * 3); // random
-																			// time
-																			// between
-																			// 6am
-																			// and
-																			// 9am
+		int time = 6 * 3600 + (int) (MatsimRandom.random.nextDouble() * 3600 * 3);
 		act.setStartTime(0);
 		act.setEndTime(time);
 		act.setDuration(time);
@@ -187,8 +181,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		List<?> actsLegs = plan.getActsLegs();
 		for (int i = 1, max = actsLegs.size(); i < max; i += 2) {
 			Leg leg = (Leg) actsLegs.get(i);
-			CarRoute route = leg.getRoute();
-			if (route == null) {
+			if (leg.getRoute() == null) {
 				needsRouter = true;
 			}
 		}

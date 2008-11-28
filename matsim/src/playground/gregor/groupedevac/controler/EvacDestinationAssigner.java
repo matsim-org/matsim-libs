@@ -88,7 +88,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
 			Link link = group.getBestLink();
 			Plan plan = getBestLinkPlan(link);
-			ArrayList<Node> evacRoute = new ArrayList<Node>(((Leg)plan.getActsLegs().get(1)).getRoute().getNodes());
+			ArrayList<Node> evacRoute = new ArrayList<Node>(((CarRoute) ((Leg) plan.getActsLegs().get(1)).getRoute()).getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
 			}

@@ -29,6 +29,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
 
@@ -48,7 +49,7 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg)iter.next();
-			Link[] links = leg.getRoute().getLinks();
+			Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 			for (Link link : links) {
 				if (this.linkIds.contains(link.getId())) {
 					return true;

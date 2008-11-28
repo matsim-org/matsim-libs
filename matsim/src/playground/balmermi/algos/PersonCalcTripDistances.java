@@ -28,6 +28,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -63,13 +64,13 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 			Act next = (Act)plan.getActsLegs().get(i+1);
 
 			if (prev.getLinkId().equals(next.getLinkId())) {
-				if (!leg.getRoute().getNodes().isEmpty()) { Gbl.errorMsg("Person id=" + person.getId() + ", leg nr=" + leg.getNum() + ": route should be empty!"); }
+				if (!((CarRoute) leg.getRoute()).getNodes().isEmpty()) { Gbl.errorMsg("Person id=" + person.getId() + ", leg nr=" + leg.getNum() + ": route should be empty!"); }
 				else { leg.getRoute().setDist(0.0); }
 			}
 			else {
-				if (leg.getRoute().getNodes().isEmpty()) { leg.getRoute().setDist(next.getCoord().calcDistance(prev.getCoord())); }
+				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDist(next.getCoord().calcDistance(prev.getCoord())); }
 				else {
-					Link [] links = leg.getRoute().getLinks();
+					Link [] links = ((CarRoute) leg.getRoute()).getLinks();
 					double dist = prev.getLink().getLength();
 					for (int j=0; j<links.length; j++) { dist += links[j].getLength(); }
 					leg.getRoute().setDist(dist);

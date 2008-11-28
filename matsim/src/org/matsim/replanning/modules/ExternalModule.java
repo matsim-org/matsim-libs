@@ -116,7 +116,7 @@ public class ExternalModule implements StrategyModule {
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {
-						CarRoute r = leg.getRoute();
+						CarRoute r = (CarRoute) leg.getRoute();
 						this.handler.startRoute(r, this.writer);
 						this.handler.endRoute(this.writer);
 					}

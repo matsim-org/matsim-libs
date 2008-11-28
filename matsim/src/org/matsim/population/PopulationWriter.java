@@ -229,7 +229,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 						this.handler.startLeg(leg, this.out);
 						// route
 						if (leg.getRoute() != null) {
-							CarRoute r = leg.getRoute();
+							CarRoute r = (CarRoute) leg.getRoute();
 							this.handler.startRoute(r, this.out);
 							this.handler.endRoute(this.out);
 						}

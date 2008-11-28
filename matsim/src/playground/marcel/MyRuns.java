@@ -552,7 +552,7 @@ public class MyRuns {
 			for (final Plan plan : person.getPlans()) {
 				for (int i = 1, max = plan.getActsLegs().size(); i < max; i +=2) {
 					final Leg leg = (Leg)plan.getActsLegs().get(i);
-					final CarRoute route = leg.getRoute();
+					final CarRoute route = (CarRoute) leg.getRoute();
 					final List<Node> nodes = route.getNodes();
 					final int fromNodeIdx = nodes.indexOf(fromNode);
 					final int toNodeIdx = nodes.indexOf(toNode);
@@ -2039,7 +2039,7 @@ public class MyRuns {
 							final List actslegs = plan.getActsLegs();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final Leg leg = (Leg)actslegs.get(i);
-								run(leg.getRoute(), leg.getDepartureTime());
+								run((CarRoute) leg.getRoute(), leg.getDepartureTime());
 							}
 						}
 

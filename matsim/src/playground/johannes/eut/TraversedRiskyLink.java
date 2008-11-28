@@ -46,6 +46,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -136,7 +137,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			Plan plan = (Plan)arg0;
 			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
 				Leg leg = (Leg)it.next();
-				for(Link link : leg.getRoute().getLinks()) {
+				for(Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 					if(link.equals(predicateLink))
 						return true;
 				}

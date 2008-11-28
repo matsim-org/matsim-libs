@@ -37,6 +37,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.world.World;
 
 class FilterPersons extends AbstractPersonAlgorithm{
@@ -71,7 +72,7 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				Leg leg = (Leg)plan.getActsLegs().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					List<Node> nodes = leg.getRoute().getNodes();
+					List<Node> nodes = ((CarRoute) leg.getRoute()).getNodes();
 					int count = 0;
 					for (Node node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;

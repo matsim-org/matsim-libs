@@ -40,6 +40,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -245,7 +246,7 @@ public class QueueLink {
 			if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
-				if (leg.getRoute().getNodes().size() != 0) {
+				if (((CarRoute) leg.getRoute()).getNodes().size() != 0) {
 					this.waitingList.add(veh);
 				} else {
 					// this is the case where (hopefully) the next act happens at the same location as this act

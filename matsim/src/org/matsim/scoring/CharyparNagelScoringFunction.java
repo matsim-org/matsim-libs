@@ -32,7 +32,7 @@ import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -344,7 +344,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
 			 */
-			CarRoute route = leg.getRoute();
+			Route route = leg.getRoute();
 			dist = route.getDist();
 			/* TODO the route-distance does not contain the length of the first or
 			 * last link of the route, because the route doesn't know those. Should

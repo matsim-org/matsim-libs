@@ -56,6 +56,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.statistics.WeightedStatistics;
@@ -311,7 +312,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			events.remove(event.agent);
 			double triptime = event.time - e.time;
 			traveltimes.put(event.agent, triptime);
-			if(((Leg)event.agent.getSelectedPlan().getActsLegs().get(1)).getRoute().getNodes().get(1).getId().toString().equals("3")) {
+			if (((CarRoute) ((Leg)event.agent.getSelectedPlan().getActsLegs().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 					// bad day

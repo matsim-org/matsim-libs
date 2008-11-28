@@ -46,7 +46,7 @@ public class ItsumoSim extends ExternalMobsim {
 		super(population, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +
-		"#              according to the itsumo scenario description file." +
+				"#              according to the itsumo scenario description file." +
 		"\n##################################################################################################\n");
 	}
 
@@ -135,7 +135,7 @@ public class ItsumoSim extends ExternalMobsim {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;
 							continue ;
 						}
-						CarRoute rr = leg.getRoute();
+						CarRoute rr = (CarRoute) leg.getRoute();
 						Link[] links = rr.getLinks() ;
 						for ( int ii=0 ; ii<links.length ; ii++ ) {
 							out.write("    <route>"); out.newLine();

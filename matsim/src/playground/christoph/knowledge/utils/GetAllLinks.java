@@ -41,7 +41,6 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -124,7 +123,7 @@ public class GetAllLinks {
 		{
 			Leg leg = (Leg)legIterator.next();
 
-			CarRoute route = leg.getRoute();
+			CarRoute route = (CarRoute) leg.getRoute();
 				
 			Link[] linkArray = route.getLinks(); 
 			

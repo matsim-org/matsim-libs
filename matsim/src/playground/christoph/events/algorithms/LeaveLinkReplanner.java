@@ -141,7 +141,7 @@ public class LeaveLinkReplanner {
 		 * Entries with a lower index have already been visited!
 		 */ 
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		CarRoute route = this.leg.getRoute();
+		CarRoute route = (CarRoute) this.leg.getRoute();
 
 		
 		// create dummy data for the "new" activities
@@ -213,7 +213,7 @@ public class LeaveLinkReplanner {
 		replanner.run(newPlan);			
 		
 		// get new calculated Route
-		CarRoute newRoute = newLeg.getRoute();
+		CarRoute newRoute = (CarRoute) newLeg.getRoute();
 			
 		// Merge already driven parts of the Route with the new routed parts.
 		nodeBuffer.addAll(newRoute.getNodes());
@@ -223,8 +223,8 @@ public class LeaveLinkReplanner {
 				
 		// replace Route
 //		leg.setRoute(mergedRoute);
-		leg.getRoute().getNodes().clear();
-		leg.getRoute().getNodes().addAll(mergedRoute.getNodes());
+		((CarRoute) leg.getRoute()).getNodes().clear();
+		((CarRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
 		
 		// check new created Route
 //		checkRoute(mergedRoute);

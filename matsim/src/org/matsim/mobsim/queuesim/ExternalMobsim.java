@@ -149,7 +149,7 @@ public class ExternalMobsim {
 						handler.startLeg(leg, writer);
 						// route
 						if (leg.getRoute() != null) {
-							CarRoute r = leg.getRoute();
+							CarRoute r = (CarRoute) leg.getRoute();
 							handler.startRoute(r, writer);
 							handler.endRoute(writer);
 						}

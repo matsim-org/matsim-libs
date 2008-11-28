@@ -55,7 +55,7 @@ public class CetinCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTrav
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		CarRoute route = testLeg.getRoute();
+		CarRoute route = (CarRoute) testLeg.getRoute();
 		Link[] links = route.getLinks();
 
 		// let's test a route without events first

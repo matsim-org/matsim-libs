@@ -61,7 +61,7 @@ public class PersonRouteFilter extends PersonFilterA {
 				for (Object obj : acts_Legs) {
 					if (even) {
 						Leg leg = (Leg) obj;
-						CarRoute route = leg.getRoute();
+						CarRoute route = (CarRoute) leg.getRoute();
 						if (route != null) {
 							Link[] links = route.getLinks();
 							if (links != null)

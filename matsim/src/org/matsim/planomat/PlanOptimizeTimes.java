@@ -279,7 +279,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		LegIterator legIterator = plan.getIteratorLeg();
 		while (legIterator.hasNext()) {
 			Leg curLeg = (Leg) legIterator.next();
-			routes.put(curLeg, new NodeCarRoute(curLeg.getRoute()));
+			routes.put(curLeg, new NodeCarRoute((CarRoute) curLeg.getRoute()));
 		}
 		
 		return routes;

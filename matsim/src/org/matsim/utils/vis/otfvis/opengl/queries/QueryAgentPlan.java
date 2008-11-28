@@ -40,6 +40,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
@@ -96,7 +97,7 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 
 				if (leg.getMode().equals(Mode.car)) {
-					Link[] route = leg.getRoute().getLinks();
+					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 					count += route.length;
 					if(route.length != 0) count++; //add last position if there is a path
 				}
@@ -144,7 +145,7 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 
 				if (leg.getMode().equals(Mode.car)) {
-					Link[] route = leg.getRoute().getLinks();
+					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 					Node last = null;
 					for (Link driven : route) {
 						Node node = driven.getFromNode();

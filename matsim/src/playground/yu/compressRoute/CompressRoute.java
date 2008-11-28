@@ -36,6 +36,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * this Class counts and writes the amount of "new" filtered links as well as
@@ -87,7 +88,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				Leg leg = (Leg) actsLegs.get(legId);
-				Link[] links = leg.getRoute().getLinks();
+				Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 				int linksLength = links.length;
 				this.oldLinksNr += linksLength;
 				try {

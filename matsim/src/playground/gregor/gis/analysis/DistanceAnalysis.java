@@ -51,6 +51,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -194,7 +195,7 @@ public class DistanceAnalysis {
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDist();
-			Link [] ls = leg.getRoute().getLinks();
+			Link [] ls = ((CarRoute) leg.getRoute()).getLinks();
 			Link l = ls[ls.length-1];
 			String destS  = l.getId().toString().replace("el", "");
 			int dest = Integer.parseInt(destS);

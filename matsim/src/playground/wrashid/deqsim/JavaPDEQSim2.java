@@ -21,11 +21,8 @@
 package playground.wrashid.deqsim;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -37,12 +34,13 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
+import org.matsim.population.routes.CarRoute;
 
+import playground.wrashid.DES.util.Timer;
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.PDES2.Scheduler;
 import playground.wrashid.PDES2.SimulationParameters;
 import playground.wrashid.PDES2.Vehicle;
-import playground.wrashid.DES.util.Timer;
 
 public class JavaPDEQSim2 {
 
@@ -154,7 +152,7 @@ public class JavaPDEQSim2 {
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
 				} else {
 					leg = (Leg) actsLegs.get(i);
-					Link[] links=leg.getRoute().getLinks();
+					Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 					
 					
 					

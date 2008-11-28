@@ -31,6 +31,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -106,7 +107,7 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 			for (int i=1; i<plan.getActsLegs().size(); i=i+2) {
 				Leg l = (Leg)plan.getActsLegs().get(i);
 				Act a = (Act)plan.getActsLegs().get(i+1);
-				Link[] links = l.getRoute().getLinks();
+				Link[] links = ((CarRoute) l.getRoute()).getLinks();
 				Link arr_link = a.getLink();
 
 				out_routes.write(person.getId() + "\t" + l.getNum() + "\t" + l.getMode() + "\t");

@@ -26,6 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
@@ -130,7 +131,7 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		Link [] route = leg.getRoute().getLinks();
+		Link [] route = ((CarRoute) leg.getRoute()).getLinks();
 		int posInRoute = 0;
 		//determine the actual position in the route
 		for (int j = 0; j < route.length; j++) {
@@ -162,8 +163,6 @@ public class PlanScore implements AgentContentment {
 			}
 			planIdx++;
 		}
-		if (log.isTraceEnabled())
-			log.trace("getNextActivity: " + leg + " route: " + leg.getRoute().getNodes());
 		Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 

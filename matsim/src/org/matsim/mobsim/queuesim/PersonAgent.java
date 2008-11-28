@@ -30,6 +30,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -218,7 +219,7 @@ public class PersonAgent {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
-		List<Node> route = this.currentLeg.getRoute().getNodes();
+		List<Node> route = ((CarRoute) this.currentLeg.getRoute()).getNodes();
 
 		if (this.currentNodeIndex >= route.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link

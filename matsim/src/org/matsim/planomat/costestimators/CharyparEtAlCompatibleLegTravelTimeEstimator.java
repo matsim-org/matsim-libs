@@ -24,6 +24,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 
@@ -63,7 +64,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimator extends FixedRouteLegT
 
 		now = this.processDeparture(actOrigin.getLink(), now);
 		now = this.processLink(actOrigin.getLink(), now);
-		now = this.processRouteTravelTime(legIntermediate.getRoute(), now);
+		now = this.processRouteTravelTime((CarRoute) legIntermediate.getRoute(), now);
 		
 		double legTravelTimeEstimation = now - departureTime;
 

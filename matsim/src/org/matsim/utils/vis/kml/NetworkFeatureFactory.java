@@ -32,6 +32,7 @@ import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
@@ -129,7 +130,7 @@ public class NetworkFeatureFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(String.valueOf(leg.getNum()));
 
-		for (Link l : leg.getRoute().getLinks()) {
+		for (Link l : ((CarRoute) leg.getRoute()).getLinks()) {
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
 			if (abstractFeature.getClass().equals(FolderType.class)) {
@@ -138,7 +139,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (Node n : leg.getRoute().getNodes()) {
+		for (Node n : ((CarRoute) leg.getRoute()).getNodes()) {
 			
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {

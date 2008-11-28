@@ -95,7 +95,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
 				tripcounts++;
 				Leg leg = ((Leg)it.next());
-				CarRoute route = leg.getRoute();
+				CarRoute route = (CarRoute) leg.getRoute();
 				double totaltravelcosts = 0;
 				double totaltraveltime = 0;
 				

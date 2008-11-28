@@ -156,7 +156,7 @@ public class RouteSummaryTest {
 							aOdRouteSet = new HashSet<List<Id>>();
 
 						List<Id> routeLinkIds = new LinkedList<Id>();
-						CarRoute r = l.getRoute();
+						CarRoute r = (CarRoute) l.getRoute();
 						// boolean illegalRoute = false;
 
 						if (r.getNodes().size() > 0) {

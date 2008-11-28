@@ -31,6 +31,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 
 public class JavaDEQSim {
 
@@ -62,7 +63,7 @@ public class JavaDEQSim {
 					Leg leg = (Leg)actsLegs.get(i);
 					// the leg the agent performs
 					if (BasicLeg.Mode.car.equals(leg.getMode())) { // we only simulate car traffic
-						Link[] route = leg.getRoute().getLinks(); // these are the links the agent will drive along one after the other.
+						Link[] route = ((CarRoute) leg.getRoute()).getLinks(); // these are the links the agent will drive along one after the other.
 					}
 				}
 			}

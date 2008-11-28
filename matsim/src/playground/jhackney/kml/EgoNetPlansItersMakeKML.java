@@ -61,6 +61,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
@@ -406,7 +407,7 @@ public class EgoNetPlansItersMakeKML {
 
 			Leg leg = (Leg) actLegIter.nextLeg();
 
-			Link[] routeLinks = (leg).getRoute().getLinks();
+			Link[] routeLinks = ((CarRoute) leg.getRoute()).getLinks();
 			for (Link routeLink : routeLinks) {
 				PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo, iter);
 				

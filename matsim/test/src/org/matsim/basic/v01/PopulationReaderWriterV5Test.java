@@ -46,6 +46,7 @@ import org.matsim.population.PopulationReaderMatsimV5;
 import org.matsim.population.PopulationWriterV5;
 import org.matsim.population.Vehicle;
 import org.matsim.population.VehicleReaderV1;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -126,14 +127,15 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNull(a.getLink());
 		assertNull(a.getLinkId());
 		Leg l = p.getNextLeg(a);
-		assertNotNull(l.getRoute());
-		assertNotNull(l.getRoute().getNodes());
-		assertNotNull(l.getRoute().getLinkIds());
-		assertNotNull(l.getRoute().getLinks());
-		for (Node n : l.getRoute().getNodes()) {
+		CarRoute route = (CarRoute) l.getRoute();
+		assertNotNull(route);
+		assertNotNull(route.getNodes());
+		assertNotNull(route.getLinkIds());
+		assertNotNull(route.getLinks());
+		for (Node n : route.getNodes()) {
 			assertNotNull(n);
 		}
-		for (Link ll : l.getRoute().getLinks()){
+		for (Link ll : route.getLinks()){
 			assertNotNull(ll);
 			assertTrue((ll.equals(net.getLink(id23))) || ll.equals(net.getLink(id24)));
 		}

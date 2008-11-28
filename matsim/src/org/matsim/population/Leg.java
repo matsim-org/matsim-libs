@@ -24,6 +24,7 @@ import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.utils.misc.Time;
 
 public class Leg extends BasicLegImpl {
@@ -47,7 +48,7 @@ public class Leg extends BasicLegImpl {
 			this.route = new NodeCarRoute((NodeCarRoute) leg.route);
 		} else {
 			this.route = new NodeCarRoute();
-			((CarRoute)this.route).setNodes(leg.getRoute().getNodes());
+			((CarRoute)this.route).setNodes(((CarRoute) (leg.getRoute())).getNodes());
 		}
 	}
 
@@ -57,8 +58,8 @@ public class Leg extends BasicLegImpl {
 	}
 
 	@Override
-	public CarRoute getRoute() {
-		return (CarRoute) this.route;
+	public Route getRoute() {
+		return (Route) this.route;
 	}
 
 	@Override

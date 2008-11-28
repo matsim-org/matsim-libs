@@ -17,12 +17,6 @@ import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.PersonEvent;
-import org.matsim.network.Link;
-import org.matsim.population.Act;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
-import org.matsim.population.Population;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.AgentArrivalEventHandler;
@@ -32,6 +26,14 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.network.Link;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
+import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.util.testable.PopulationModifier;
@@ -39,7 +41,6 @@ import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.deqsim.DEQSimStarter;
 import playground.wrashid.deqsim.PDESStarter2;
-import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		TestHandler, ActEndEventHandler, ActStartEventHandler,
@@ -160,7 +161,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 						((LinkLeaveEvent) list.get(index)).linkId));
 				index++;
 
-				for (Link link : leg.getRoute().getLinks()) {
+				for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 					// enter link and leave each link on route
 					assertEquals(true,
 							list.get(index) instanceof LinkEnterEvent);
@@ -355,8 +356,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				Leg leg = (Leg) iter.next();
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
-					expected.expectedLinkEnterEvents += leg.getRoute()
-							.getLinks().length + 1;
+					expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().length + 1;
 				}
 			}
 
@@ -383,7 +383,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg) iter.next();
-			for (Link link : leg.getRoute().getLinks()) {
+			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 				System.out.print(link.getId()
 						+ "("
 						+ Road.allRoads.get(link.getId().toString())

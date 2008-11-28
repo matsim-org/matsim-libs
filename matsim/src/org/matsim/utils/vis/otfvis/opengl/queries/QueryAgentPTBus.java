@@ -37,6 +37,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
@@ -93,7 +94,7 @@ public class QueryAgentPTBus implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 				
 				//if (!leg.getMode().equals("car")) continue;
-				Link[] route = leg.getRoute().getLinks();
+				Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 				for (Link driven : route) {
 					drivenLinks.add(driven);
 				}

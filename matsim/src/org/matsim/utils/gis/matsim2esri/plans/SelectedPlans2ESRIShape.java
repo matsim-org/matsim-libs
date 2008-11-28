@@ -38,6 +38,7 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
@@ -46,6 +47,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -185,7 +187,7 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDist();
 
-		org.matsim.network.Link[] links = leg.getRoute().getLinks();
+		Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 		Coordinate [] coords = new Coordinate[links.length + 1];
 		for (int i = 0; i < links.length; i++) {
 			Coord c = links[i].getFromNode().getCoord();

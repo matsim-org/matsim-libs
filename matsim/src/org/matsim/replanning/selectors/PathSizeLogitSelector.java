@@ -105,7 +105,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while (it.hasNext()){
 					Leg leg = ((Leg)it.next());
 					currentEndTime = leg.getDepartureTime();
-					CarRoute r = leg.getRoute();
+					CarRoute r = (CarRoute) leg.getRoute();
 					pathSize += r.getDist();
 					Link[] links = r.getLinks();
 					for (Link link : links){
@@ -129,7 +129,8 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while(it.hasNext()){
 				Leg leg = (Leg) it.next();
 				double currentTime = leg.getDepartureTime();
-				for (Link link : leg.getRoute().getLinks()){
+				CarRoute route = (CarRoute) leg.getRoute();
+				for (Link link : route.getLinks()){
 					double denominator = 0;
 					for (double dbl : linksInTime.get(link.getId())){
 						//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a

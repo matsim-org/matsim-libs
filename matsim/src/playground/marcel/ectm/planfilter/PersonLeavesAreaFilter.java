@@ -31,6 +31,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.filters.AbstractPersonFilter;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * @author mrieser
@@ -53,7 +54,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 				if (leg.getRoute() == null) {
 					return false;
 				}
-				Link[] links = leg.getRoute().getLinks();
+				Link[] links = ((CarRoute) leg.getRoute()).getLinks();
 				for (Link link : links) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}

@@ -29,6 +29,7 @@ import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * @author illenberger
@@ -80,8 +81,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 				/*
 				 * Compare sequence of nodes.
 				 */
-				if (leg2.getRoute().getNodes().equals(
-						leg1.getRoute().getNodes())) {
+				if (((CarRoute) leg2.getRoute()).getNodes().equals(
+						((CarRoute) leg1.getRoute()).getNodes())) {
 					/*
 					 * Compare departure times.
 					 */

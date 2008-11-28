@@ -47,6 +47,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.routes.CarRoute;
 
 public class BasicSimulation {
 	
@@ -112,7 +113,7 @@ public class BasicSimulation {
 			// solange wir das Ziel nicht erreicht habenMap		
 			while(!currentLink.equals(destinationLink))
 			{				
-				// gew�hlten Link speichern, um ihn sp�ter im Plan hinterlegen zu k�nnen
+				// gewaehlten Link speichern, um ihn spaeter im Plan hinterlegen zu koennen
 				routeNodes.add(currentLink.getToNode());
 
 				log.info("Current Link: " + currentLink.getId() + " Destination Link: " + destinationLink.getId());
@@ -126,18 +127,18 @@ public class BasicSimulation {
 					break;
 				}
 				
-				/* Hier nicht n�tig - alle Links sind gleich wahscheinlich. Die Verteilung
-				 * erfolgt �ber die Random Funktion - diese sollte gleichverteile Zufallswerte
+				/* Hier nicht noetig - alle Links sind gleich wahscheinlich. Die Verteilung
+				 * erfolgt ueber die Random Funktion - diese sollte gleichverteile Zufallswerte
 				 * generieren.
 				 * 
-				// Wahrscheinlichkeit f�r die ausgehenden Links berechnen
+				// Wahrscheinlichkeit fuer die ausgehenden Links berechnen
 				double probabilty = 1/linkCount;
 				*/
 				
-				// Link w�hlen
+				// Link waehlen
 				int nextLink = random.nextInt(linkCount);
 				
-				// den gew�hlten Link zum neuen CurrentLink machen
+				// den gewaehlten Link zum neuen CurrentLink machen
 				if(links[nextLink] instanceof Link)
 				{
 					currentLink = (Link)links[nextLink];
@@ -153,7 +154,7 @@ public class BasicSimulation {
 			}	// while(!currentLink.equals(destinationLink))
 			
 			// gefahrene Route im aktuellen Leg des Agenten hinterlegen
-			leg.getRoute().setNodes(routeNodes);
+			((CarRoute) leg.getRoute()).setNodes(routeNodes);
 			//Route newRoute = new Route();
 			//newRoute.setRoute(routeNodes);
 			//leg.setRoute(newRoute);

@@ -54,7 +54,7 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 		while (leg_it.hasNext()) {
 			Leg leg = (Leg)leg_it.next();
 			System.out.println("Person id=" + person.getId() + "; Leg nr=" + leg.getNum());
-			CarRoute route = leg.getRoute();
+			CarRoute route = (CarRoute) leg.getRoute();
 			Link[] links = route.getLinks();
 			for (int i=0; i<links.length; i++) {
 				System.out.println(links[i].getOrigId());
