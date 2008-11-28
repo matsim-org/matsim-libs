@@ -32,6 +32,7 @@ public class AllTests {
 		suite.addTestSuite(KmlNetworkWriterTest.class);
 		suite.addTestSuite(LinkImplTest.class);
 		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
+		suite.addTestSuite(NetworkFactoryTest.class);
 		suite.addTestSuite(NetworkParserWriterTest.class);
 		suite.addTestSuite(TimeVariantLinkImplTest.class);
 		suite.addTest(org.matsim.network.algorithms.AllTests.suite());

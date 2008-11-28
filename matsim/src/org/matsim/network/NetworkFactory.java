@@ -22,9 +22,15 @@ package org.matsim.network;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.networks.basicNet.BasicNode;
+import org.matsim.population.routes.NodeCarRouteFactory;
+import org.matsim.population.routes.Route;
+import org.matsim.population.routes.RouteFactory;
 import org.matsim.utils.geometry.Coord;
 
 /**
@@ -38,6 +44,8 @@ public class NetworkFactory {
 			BasicNode.class, BasicNode.class, NetworkLayer.class, double.class,
 			double.class, double.class, double.class};
 
+	private Map<BasicLeg.Mode, RouteFactory> routeFactories = new HashMap<BasicLeg.Mode, RouteFactory>();
+	
 	public NetworkFactory() {
 		try {
 			this.prototypeContructor = LinkImpl.class
@@ -47,6 +55,8 @@ public class NetworkFactory {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
+		
+		routeFactories.put(BasicLeg.Mode.car, new NodeCarRouteFactory());
 	}
 
 	protected Node newNode(final Id id, final Coord coord, final String type) {
@@ -79,7 +89,37 @@ public class NetworkFactory {
 				"Cannot instantiate link from prototype, this should never happen, but never say never!",
 				ex);
 	}
+	
+	/**
+	 * @param mode the transport mode the route should be for
+	 * @return a new Route for the specified mode
+	 * @throws IllegalArgumentException if no {@link RouteFactory} is registered that creates routes for the specified mode.
+	 * 
+	 * @see #setRouteFactory(org.matsim.basic.v01.BasicLeg.Mode, RouteFactory)
+	 */
+	public Route createRoute(final BasicLeg.Mode mode) {
+		final RouteFactory factory = this.routeFactories.get(mode);
+		if (factory == null) {
+			throw new IllegalArgumentException("There is no factory known to create routes for leg-mode " + mode.toString());
+		}
+		return factory.createRoute();
+	}
 
+	/**
+	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
+	 * the existing entry for this <code>mode</code> will be deleted.
+	 * 
+	 * @param mode
+	 * @param factory
+	 */
+	public void setRouteFactory(final BasicLeg.Mode mode, final RouteFactory factory) {
+		if (factory == null) {
+			this.routeFactories.remove(mode);
+		} else {
+			this.routeFactories.put(mode, factory);
+		}
+	}
+	
 	public void setLinkPrototype(Class<? extends Link> prototype) {
 		try {
 			Constructor<? extends Link> c = prototype.getConstructor(PROTOTYPECONSTRUCTOR);
