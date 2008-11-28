@@ -23,15 +23,13 @@ package playground.marcel;
 import org.matsim.population.Route;
 import org.matsim.population.RouteImplTest;
 
-import playground.marcel.LinkCarRoute;
-
 /**
  * @author mrieser
  */
 public class LinkCarRouteTest extends RouteImplTest {
 
 	@Override
-	public Route getCarRouteInstance() {
+	public Route getRouteInstance() {
 		return new LinkCarRoute();
 	}
 

@@ -20,7 +20,7 @@
 
 package playground.marcel;
 
-import org.matsim.population.Route;
+import org.matsim.population.routes.Route;
 import org.matsim.population.routes.RouteFactory;
 
 /**

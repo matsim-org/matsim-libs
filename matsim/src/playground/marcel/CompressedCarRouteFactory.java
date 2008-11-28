@@ -23,17 +23,17 @@ package playground.marcel;
 import java.util.Map;
 
 import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.population.routes.Route;
 import org.matsim.population.routes.RouteFactory;
 
 public class CompressedCarRouteFactory implements RouteFactory {
 
 	private final Map<Link, Link> subsequentLinks;
-	
+
 	public CompressedCarRouteFactory(final Map<Link, Link> subsequentLinks) {
 		this.subsequentLinks = subsequentLinks;
 	}
-	
+
 	public Route createRoute() {
 		return new CompressedCarRoute(this.subsequentLinks);
 	}
