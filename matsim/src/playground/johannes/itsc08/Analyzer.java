@@ -376,6 +376,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		TDoubleArrayList pi_safe_list_plus = new TDoubleArrayList();
 		TDoubleArrayList pi_safe_list_minus = new TDoubleArrayList();
 		TDoubleArrayList pi_safe_list_avr = new TDoubleArrayList();
+		
+		TDoubleArrayList willingness = new TDoubleArrayList();
+		
 		TIntObjectHashMap<TDoubleArrayList> pi_avr_map = new TIntObjectHashMap<TDoubleArrayList>();
 		TIntObjectHashMap<TDoubleArrayList> pi_guided_map = new TIntObjectHashMap<TDoubleArrayList>();
 		
@@ -401,6 +404,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			double utilBad =  calcUtil(starttime, (int) (starttime + t_bad), t_act_start, beta_travel, beta_late);
 //			double utilActStart =  calcUtil(starttime, t_act_start, t_act_start, beta_travel, beta_late);
 			double avrUtil = (utilGood + utilBad)/2.0;
+			
+			double utilGuided = calcUtil(starttime, (int) (starttime + t_guided), t_act_start, beta_travel, beta_late);
+			willingness.add(avrUtil - utilGuided);
 			
 			double t_ce = (avrUtil - (t_act_start - starttime)*beta_travel)/(beta_travel + beta_late) + t_act_start;
 			if(t_ce <= t_act_start) { // agent is in time or early
@@ -440,7 +446,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 		try {
 			BufferedWriter w = IOUtils.getBufferedWriter(controler.getOutputFilename("ce_analysis.txt"));
-			w.write("tt_risky_good\ttt_risky_bad\ttt_guided\tpi_avr\tpi_guided\tn_pi_avr\tn_pi_guided\tpi_avr2\tpi_guided2\tt_ce\tpi_safe_plus\tn_pi_safe_plus\tpi_safe_minus\tn_pi_safe_minus\tpi_safe_avr");
+			w.write("tt_risky_good\ttt_risky_bad\ttt_guided\tpi_avr\tpi_guided\tn_pi_avr\tn_pi_guided\tpi_avr2\tpi_guided2\tt_ce\tpi_safe_plus\tn_pi_safe_plus\tpi_safe_minus\tn_pi_safe_minus\tpi_safe_avr\twillingness");
 			w.newLine();
 			w.write(String.valueOf(StatUtils.mean(avrRiskyGoodTriptimes.getValues())));
 			w.write("\t");
@@ -471,6 +477,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			w.write(String.valueOf(pi_safe_list_minus.size()));
 			w.write("\t");
 			w.write(String.valueOf(StatUtils.mean(pi_safe_list_avr.toNativeArray())));
+			w.write("\t");
+			w.write(Double.toString(StatUtils.mean(willingness.toNativeArray())));
 			w.close();
 			
 			WeightedStatistics.writeHistogram(avrRiskyGoodTriptimes, controler.getOutputFilename("riskyGood.txt"));
