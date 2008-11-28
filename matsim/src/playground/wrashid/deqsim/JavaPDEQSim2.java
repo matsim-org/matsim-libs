@@ -154,7 +154,7 @@ public class JavaPDEQSim2 {
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
 				} else {
 					leg = (Leg) actsLegs.get(i);
-					Link[] links=leg.getRoute().getLinkRoute();
+					Link[] links=leg.getRoute().getLinks();
 					
 					
 					

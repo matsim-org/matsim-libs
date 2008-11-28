@@ -25,7 +25,7 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -71,7 +71,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		this.timeFunction = timeFunction;
 	}
 	
-	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 /*		log.info(this);
 		log.info(fromNode);

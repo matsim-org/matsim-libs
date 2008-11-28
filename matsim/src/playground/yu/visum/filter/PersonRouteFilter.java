@@ -9,7 +9,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
@@ -61,16 +61,16 @@ public class PersonRouteFilter extends PersonFilterA {
 				for (Object obj : acts_Legs) {
 					if (even) {
 						Leg leg = (Leg) obj;
-						Route route = leg.getRoute();
+						CarRoute route = leg.getRoute();
 						if (route != null) {
-							Link[] links = route.getLinkRoute();
+							Link[] links = route.getLinks();
 							if (links != null)
 								for (Link link : links) {
 									if (this.criterionLinkIds.contains(link
 											.getId()))
 										return false;
 								}
-							List<Node> nodes = route.getRoute();
+							List<Node> nodes = route.getNodes();
 							if (nodes != null)
 								for (Node node : nodes) {
 									if (this.criterionNodeIds.contains(node

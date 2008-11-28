@@ -29,7 +29,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -94,9 +94,9 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			nodes.add(startnode);
 
-			Route route = leg.getRoute();
+			CarRoute route = leg.getRoute();
 			if (route == null) throw new Exception("route missing");
-			nodes.addAll(route.getRoute());
+			nodes.addAll(route.getNodes());
 
 			double dist = calcDistance(nodes);
 

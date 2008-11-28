@@ -45,8 +45,8 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
@@ -204,8 +204,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
 			leg1.setDepartureTime(depTime);
 			leg1.setTravelTime(10);
-			Route route = new RouteImpl();
-			route.setRoute("2 3");
+			CarRoute route = new NodeCarRoute();
+			route.setNodes("2 3");
 			leg1.setRoute(route);
 			plan1.createAct("w", destLink);
 

@@ -28,7 +28,7 @@ import org.matsim.matrices.Matrix;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -92,7 +92,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 //		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
 
 //		Route oldRoute = leg.getRoute();
-		Route newRoute;
+		CarRoute newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
 			newRoute = leg.createRoute();
 			newRoute.setTravTime(beeLineWalkTime);

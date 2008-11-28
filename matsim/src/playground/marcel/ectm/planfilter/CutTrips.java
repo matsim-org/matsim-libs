@@ -31,8 +31,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 public class CutTrips implements PersonAlgorithm {
@@ -90,7 +90,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// test links of route
-			Link[] links = leg.getRoute().getLinkRoute();
+			Link[] links = leg.getRoute().getLinks();
 			for (Link link : links) {
 				if (this.aoi.containsKey(link.getId())) {
 					if (firstInsideLink == null) {
@@ -155,8 +155,8 @@ public class CutTrips implements PersonAlgorithm {
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
 			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
-			Route route = leg.getRoute();
-			Link[] links = route.getLinkRoute();
+			CarRoute route = leg.getRoute();
+			Link[] links = route.getLinks();
 			double traveltime = 0.0;
 			for (Link link : links) {
 				traveltime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
@@ -176,7 +176,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// adapt route of the leg that leads into the AOI
-			List<Node> nodes = route.getRoute();
+			List<Node> nodes = route.getNodes();
 			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
 				Node node = iter.next();
@@ -203,8 +203,8 @@ public class CutTrips implements PersonAlgorithm {
 			// adapt route of leg that leads out of the AOI
 			boolean removing = false;
 			Leg leg = (Leg) plan.getActsLegs().get(firstOutsideLeg);
-			Route route = leg.getRoute();
-			List<Node> nodes = route.getRoute();
+			CarRoute route = leg.getRoute();
+			List<Node> nodes = route.getNodes();
 			Iterator<Node> iter = nodes.iterator();
 			while (iter.hasNext()) {
 				Node node = iter.next();

@@ -42,7 +42,7 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ShutdownListener;
 import org.matsim.controler.listener.StartupListener;
 import org.matsim.population.Person;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -78,10 +78,10 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		riskAversePersons = new HashSet<Person>();
 	}
 	
-	public void appendSnapshot(Route bestRoute, double bestRouteCosts, Route indiffRoute) {
+	public void appendSnapshot(CarRoute bestRoute, double bestRouteCosts, CarRoute indiffRoute) {
 		Snapshot s = new Snapshot();
 		s.ce = utilFunction.getTravelTime(bestRouteCosts);
-		if(!bestRoute.getRoute().equals(indiffRoute.getRoute())) {
+		if(!bestRoute.getNodes().equals(indiffRoute.getNodes())) {
 			s.routesDiffer = true;
 			riskAversePersons.add(person);
 		}

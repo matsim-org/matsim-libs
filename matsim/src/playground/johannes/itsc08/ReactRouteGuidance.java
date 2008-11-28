@@ -25,7 +25,7 @@ package playground.johannes.itsc08;
 
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
@@ -52,11 +52,11 @@ public class ReactRouteGuidance implements RouteProvider {
 		return 10;
 	}
 
-	public boolean providesRoute(Link currentLink, Route subRoute) {
+	public boolean providesRoute(Link currentLink, CarRoute subRoute) {
 		return true;
 	}
 
-	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
+	public synchronized CarRoute requestRoute(Link departureLink, Link destinationLink,
 			double time) {
 		return this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 					destinationLink.getFromNode(), time);

@@ -34,8 +34,8 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
@@ -117,7 +117,7 @@ public class WithindayAgent extends PersonAgent {
 				//as replanning is rerouting agents will only replan if they are on the road and not on the link of the next activity
 				if (isEnRoute()) {
 					//only reroute if the RouteProvider provides a route
-					Route subRoute = this.getCurrentLeg().getRoute().getSubRoute(currentToNode, currentDestinationNode);
+					CarRoute subRoute = this.getCurrentLeg().getRoute().getSubRoute(currentToNode, currentDestinationNode);
 					if (this.desireGenerationFunction.providesRoute(currentLink, subRoute)) {
 						this.reroute();
 					}
@@ -145,24 +145,24 @@ public class WithindayAgent extends PersonAgent {
 		Link currentLink = this.getCurrentLink();
 		Act nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
 		Link destinationLink = nextAct.getLink();
-		Route alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
+		CarRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		Leg currentLeg = this.getCurrentLeg();
 
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
-		List<Node> oldRouteNodes = currentLeg.getRoute().getRoute();
-		Route alreadyPassedNodes = new RouteImpl();
+		List<Node> oldRouteNodes = currentLeg.getRoute().getNodes();
+		CarRoute alreadyPassedNodes = new NodeCarRoute();
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setRoute(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
 		ArrayList<Node> passedNodesList = new ArrayList<Node>();
 		if (lastPassedNodeIndex != -1) {
 			passedNodesList.addAll(oldRouteNodes.subList(0, lastPassedNodeIndex+1));
-			alreadyPassedNodes.setRoute(passedNodesList);
+			alreadyPassedNodes.setNodes(passedNodesList);
 		}
-		alreadyPassedNodes.setRoute(passedNodesList);
+		alreadyPassedNodes.setNodes(passedNodesList);
 		//create new plan
 		Plan newPlan = new Plan(this.getPerson());
 		newPlan.copyPlan(oldPlan);
@@ -179,11 +179,11 @@ public class WithindayAgent extends PersonAgent {
     Leg oldLeg = (Leg) newPlan.getActsLegs().remove(currentLegIndex);
     Leg newLeg = new Leg(oldLeg);
     //concat the Route of already passed nodes with the new route
-    ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(alreadyPassedNodes.getRoute().size() + alternativeRoute.getRoute().size());
-    newRouteConcatedList.addAll(alreadyPassedNodes.getRoute());
-    newRouteConcatedList.addAll(alternativeRoute.getRoute());
-    Route newRoute = new RouteImpl();
-    newRoute.setRoute(newRouteConcatedList);
+    ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(alreadyPassedNodes.getNodes().size() + alternativeRoute.getNodes().size());
+    newRouteConcatedList.addAll(alreadyPassedNodes.getNodes());
+    newRouteConcatedList.addAll(alternativeRoute.getNodes());
+    CarRoute newRoute = new NodeCarRoute();
+    newRoute.setNodes(newRouteConcatedList);
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
     newPlan.getActsLegs().add(currentLegIndex, newLeg);
@@ -202,7 +202,7 @@ public class WithindayAgent extends PersonAgent {
     	if (log.isTraceEnabled()) {
 				log.trace("rerouting agent " + this.getPerson().getId() + " with ...");
 				StringBuffer buffer = new StringBuffer();
-				for (Node n : alternativeRoute.getRoute()) {
+				for (Node n : alternativeRoute.getNodes()) {
 					buffer.append(n.getId().toString());
 					buffer.append(" ");
 				}

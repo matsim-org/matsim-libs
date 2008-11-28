@@ -22,7 +22,7 @@ package org.matsim.withinday.routeprovider;
 
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 
 /**
@@ -55,7 +55,7 @@ public abstract class AbstractRouteProvider implements RouteProvider {
 	/**
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.LinkImpl, org.matsim.network.LinkImpl, double)
 	 */
-	public Route requestRoute(Link departureLink, Link destinationLink, double time) {
+	public CarRoute requestRoute(Link departureLink, Link destinationLink, double time) {
 		return requestRoute(departureLink.getToNode(), destinationLink.getFromNode(), time);
 	}
 
@@ -65,6 +65,6 @@ public abstract class AbstractRouteProvider implements RouteProvider {
 	 * @param destinationNode
 	 * @param time
 	 */
-	protected abstract Route requestRoute(Node departureNode, Node destinationNode, double time);
+	protected abstract CarRoute requestRoute(Node departureNode, Node destinationNode, double time);
 
 }

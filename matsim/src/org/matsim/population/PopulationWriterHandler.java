@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.writer.WriterHandler;
 
 public interface PopulationWriterHandler extends WriterHandler {
@@ -161,7 +162,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final Route route, final BufferedWriter out) throws IOException;
+	public void startRoute(final CarRoute route, final BufferedWriter out) throws IOException;
 
 	public void endRoute(final BufferedWriter out) throws IOException;
 

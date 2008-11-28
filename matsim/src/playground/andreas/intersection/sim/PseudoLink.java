@@ -341,7 +341,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 							this.realLink.getLink(), veh.getCurrentLeg()));
 			Leg actLeg = veh.getCurrentLeg();
 			if (actLeg.getRoute() != null) {
-				if(actLeg.getRoute().getRoute() != null){
+				if(actLeg.getRoute().getNodes() != null){
 					this.parkToLinkQueue.add(veh);
 				}
 			} else {

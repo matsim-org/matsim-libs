@@ -43,7 +43,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.util.TravelTime;
 import org.matsim.utils.io.IOUtils;
 
@@ -95,7 +95,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
 				tripcounts++;
 				Leg leg = ((Leg)it.next());
-				Route route = leg.getRoute();
+				CarRoute route = leg.getRoute();
 				double totaltravelcosts = 0;
 				double totaltraveltime = 0;
 				
@@ -182,10 +182,10 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 
 	}
 
-	private double calcTravTime(TravelTime traveltimes, Route route,
+	private double calcTravTime(TravelTime traveltimes, CarRoute route,
 			double starttime) {
 		double totaltt = 0;
-		for (Link link : route.getLinkRoute()) {
+		for (Link link : route.getLinks()) {
 			totaltt += traveltimes.getLinkTravelTime(link, starttime + totaltt);
 		}
 		return totaltt;

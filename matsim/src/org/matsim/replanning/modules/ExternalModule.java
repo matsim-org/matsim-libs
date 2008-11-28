@@ -41,9 +41,9 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandler;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.ExeRunner;
 
 /**
@@ -116,7 +116,7 @@ public class ExternalModule implements StrategyModule {
 					this.handler.startLeg(leg, this.writer);
 					// route
 					if (leg.getRoute() != null) {
-						Route r = leg.getRoute();
+						CarRoute r = leg.getRoute();
 						this.handler.startRoute(r, this.writer);
 						this.handler.endRoute(this.writer);
 					}

@@ -41,7 +41,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.testcases.MatsimTestCase;
@@ -207,13 +207,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		Route route = testLeg.getRoute();
+		CarRoute route = testLeg.getRoute();
 		log.info(route.toString());
 
 		// generate some travel times
 		BasicEvent event = null;
 
-		Link[] links = route.getLinkRoute();
+		Link[] links = route.getLinks();
 		System.out.println(links.length);
 
 		String[][] eventTimes = new String[][]{
@@ -276,7 +276,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.linkTravelCostEstimator, 
 				this.tDepDelayCalc, 
 				this.network);
-		Id linkId = testLeg.getRoute().getLinkRoute()[0].getId();
+		Id linkId = testLeg.getRoute().getLinks()[0].getId();
 
 		Events events = new Events();
 		events.addHandler(linkTravelTimeEstimator);

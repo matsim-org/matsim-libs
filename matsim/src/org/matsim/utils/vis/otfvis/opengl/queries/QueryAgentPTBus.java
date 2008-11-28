@@ -93,7 +93,7 @@ public class QueryAgentPTBus implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 				
 				//if (!leg.getMode().equals("car")) continue;
-				Link[] route = leg.getRoute().getLinkRoute();
+				Link[] route = leg.getRoute().getLinks();
 				for (Link driven : route) {
 					drivenLinks.add(driven);
 				}

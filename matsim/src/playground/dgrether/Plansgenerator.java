@@ -35,8 +35,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -83,8 +83,8 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			Leg leg = plan.createLeg(Mode.car);
-			Route route = new RouteImpl();
-			route.setRoute("2 4 5");
+			CarRoute route = new NodeCarRoute();
+			route.setNodes("2 4 5");
 			leg.setRoute(route);
 			//work
 			a = plan.createAct("w", workCoord);
@@ -92,8 +92,8 @@ public class Plansgenerator {
 			a.setDuration(2.5 * 3600);
 			//leg to work
 			leg = plan.createLeg(Mode.car);
-			route = new RouteImpl();
-			route.setRoute("13 14 15 1");
+			route = new NodeCarRoute();
+			route.setNodes("13 14 15 1");
 			leg.setRoute(route);
 			a = plan.createAct("h", homeCoord);
 			a.setLink(link1);

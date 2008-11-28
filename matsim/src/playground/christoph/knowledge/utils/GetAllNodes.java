@@ -22,9 +22,9 @@
  * @author Christoph Dobler
  * 
  * Liefert eine ArrayList von Nodes.
- * Übergabeparameter muss ein Netzwerk, eine Person oder ein Plan sein.
- * Wird eine Person übergeben, so wird der jeweils aktuelle Plan verwendet.
- * Wird zusätzlich noch eine ArrayList Nodes mit übergeben, so wird diese
+ * ï¿½bergabeparameter muss ein Netzwerk, eine Person oder ein Plan sein.
+ * Wird eine Person ï¿½bergeben, so wird der jeweils aktuelle Plan verwendet.
+ * Wird zusï¿½tzlich noch eine ArrayList Nodes mit ï¿½bergeben, so wird diese
  * mit den neu gefundenen Nodes erweitert. Andernfalls wird eine neue erstellt.
  *
  */
@@ -47,7 +47,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 public class GetAllNodes {
 
@@ -83,8 +83,8 @@ public class GetAllNodes {
 	
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
-	// Da keine ArrayList mit bereits selektieren Nodes übergeben wurde, wird diese neu erstellt. 
+	// Liefert eine ArrayList aller Nodes, welche Teil der ï¿½bergebenen Links sind.
+	// Da keine ArrayList mit bereits selektieren Nodes ï¿½bergeben wurde, wird diese neu erstellt. 
 	protected Map<Id, Node> getNodes(ArrayList<Link> links)
 	{
 		Map <Id, Node> nodesMap = new TreeMap<Id, Node>();
@@ -95,7 +95,7 @@ public class GetAllNodes {
 	} // getNodes(ArrayList<Link>)
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
+	// Liefert eine ArrayList aller Nodes, welche Teil der ï¿½bergebenen Links sind.
 	protected void getNodes(ArrayList<Link> links, Map<Id, Node> nodesMap)
 	{
 		Iterator<Link> linksIterator = links.iterator();

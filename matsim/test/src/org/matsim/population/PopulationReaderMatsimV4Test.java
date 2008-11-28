@@ -28,6 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -52,15 +53,15 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		Person person1 = population.getPerson(new IdImpl("1"));
 		Plan plan1 = person1.getPlans().get(0);
 		Leg leg1a = (Leg) plan1.getActsLegs().get(1);
-		Route route1a = leg1a.getRoute();
+		CarRoute route1a = leg1a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("1")), route1a.getStartLink());
 		assertEquals("different endLink for first leg.", network.getLink(new IdImpl("20")), route1a.getEndLink());
 		Leg leg2a = (Leg) plan1.getActsLegs().get(3);
-		Route route2a = leg2a.getRoute();
+		CarRoute route2a = leg2a.getRoute();
 		assertEquals("different startLink for second leg.", network.getLink(new IdImpl("20")), route2a.getStartLink());
 		assertEquals("different endLink for second leg.", network.getLink(new IdImpl("20")), route2a.getEndLink());
 		Leg leg3a = (Leg) plan1.getActsLegs().get(5);
-		Route route3a = leg3a.getRoute();
+		CarRoute route3a = leg3a.getRoute();
 		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route3a.getStartLink());
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route3a.getEndLink());
 	}

@@ -87,7 +87,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				Leg leg = (Leg) actsLegs.get(legId);
-				Link[] links = leg.getRoute().getLinkRoute();
+				Link[] links = leg.getRoute().getLinks();
 				int linksLength = links.length;
 				this.oldLinksNr += linksLength;
 				try {

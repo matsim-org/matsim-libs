@@ -35,7 +35,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 
 public class ItsumoSim extends ExternalMobsim {
@@ -135,8 +135,8 @@ public class ItsumoSim extends ExternalMobsim {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;
 							continue ;
 						}
-						Route rr = leg.getRoute();
-						Link[] links = rr.getLinkRoute() ;
+						CarRoute rr = leg.getRoute();
+						Link[] links = rr.getLinks() ;
 						for ( int ii=0 ; ii<links.length ; ii++ ) {
 							out.write("    <route>"); out.newLine();
 							out.write("     <laneset>" + links[ii].getId() + "</laneset>"); out.newLine();

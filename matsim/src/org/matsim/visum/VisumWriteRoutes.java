@@ -70,7 +70,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 		for (int i = 1; i < plan.getActsLegs().size(); i += 2) {
 			Leg leg = (Leg)plan.getActsLegs().get(i);
 			StringBuilder visum = new StringBuilder();
-			List<Node> route = leg.getRoute().getRoute();
+			List<Node> route = leg.getRoute().getNodes();
 
 			if (route.size() > 0) {
 				ArrayList<Location> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);

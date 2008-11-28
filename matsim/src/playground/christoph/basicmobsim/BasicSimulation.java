@@ -20,11 +20,11 @@
 
 /**
  * Basisimplementierung einer Verkehrssimulation.
- * Die Simulation ist zeitunabhängig, die Agenten haben keinen Einfluss auf das 
+ * Die Simulation ist zeitunabhï¿½ngig, die Agenten haben keinen Einfluss auf das 
  * Verkehrsnetz und somit auch nicht aufeinander.
  * 
- * Die Datenstrukturen bzw. Klassen (Personen, Netzwerk, Pläne, usw.) werden von
- * MATSim übernommen.
+ * Die Datenstrukturen bzw. Klassen (Personen, Netzwerk, Plï¿½ne, usw.) werden von
+ * MATSim ï¿½bernommen.
  */
 
 package playground.christoph.basicmobsim;
@@ -112,7 +112,7 @@ public class BasicSimulation {
 			// solange wir das Ziel nicht erreicht habenMap		
 			while(!currentLink.equals(destinationLink))
 			{				
-				// gewählten Link speichern, um ihn später im Plan hinterlegen zu können
+				// gewï¿½hlten Link speichern, um ihn spï¿½ter im Plan hinterlegen zu kï¿½nnen
 				routeNodes.add(currentLink.getToNode());
 
 				log.info("Current Link: " + currentLink.getId() + " Destination Link: " + destinationLink.getId());
@@ -126,18 +126,18 @@ public class BasicSimulation {
 					break;
 				}
 				
-				/* Hier nicht nötig - alle Links sind gleich wahscheinlich. Die Verteilung
-				 * erfolgt über die Random Funktion - diese sollte gleichverteile Zufallswerte
+				/* Hier nicht nï¿½tig - alle Links sind gleich wahscheinlich. Die Verteilung
+				 * erfolgt ï¿½ber die Random Funktion - diese sollte gleichverteile Zufallswerte
 				 * generieren.
 				 * 
-				// Wahrscheinlichkeit für die ausgehenden Links berechnen
+				// Wahrscheinlichkeit fï¿½r die ausgehenden Links berechnen
 				double probabilty = 1/linkCount;
 				*/
 				
-				// Link wählen
+				// Link wï¿½hlen
 				int nextLink = random.nextInt(linkCount);
 				
-				// den gewählten Link zum neuen CurrentLink machen
+				// den gewï¿½hlten Link zum neuen CurrentLink machen
 				if(links[nextLink] instanceof Link)
 				{
 					currentLink = (Link)links[nextLink];
@@ -153,7 +153,7 @@ public class BasicSimulation {
 			}	// while(!currentLink.equals(destinationLink))
 			
 			// gefahrene Route im aktuellen Leg des Agenten hinterlegen
-			leg.getRoute().setRoute(routeNodes);
+			leg.getRoute().setNodes(routeNodes);
 			//Route newRoute = new Route();
 			//newRoute.setRoute(routeNodes);
 			//leg.setRoute(newRoute);

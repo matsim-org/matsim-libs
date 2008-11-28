@@ -31,10 +31,10 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -190,9 +190,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 
 		// calc first part of the route
-		Route route1 = null;
+		CarRoute route1 = null;
 		if (startNode == viaNode) {
-			route1 = new RouteImpl();
+			route1 = new NodeCarRoute();
 			route1.setTravTime(0.0);
 			travTime = 0.0;
 		}
@@ -203,9 +203,9 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		}
 
 		// calc second part of the route
-		Route route2 = null;
+		CarRoute route2 = null;
 		if (viaNode == endNode) {
-			route2 = new RouteImpl();
+			route2 = new NodeCarRoute();
 			route2.setTravTime(0.0);
 			travTime += 0.0;
 		}
@@ -215,11 +215,11 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 			travTime += route2.getTravTime();
 		}
 		
-		List<Node> nodes = route1.getRoute();
+		List<Node> nodes = route1.getNodes();
 		if (!nodes.isEmpty()) { nodes.remove(nodes.size()-1); } // remove the via node
-		nodes.addAll(route2.getRoute());
-		Route route = new RouteImpl();
-		route.setRoute(nodes);
+		nodes.addAll(route2.getNodes());
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(nodes);
 		leg.setRoute(route);
 		
 		leg.setDepartureTime(depTime);
@@ -244,7 +244,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -259,7 +259,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -274,7 +274,7 @@ public class PlansCalcRandomViaRoute extends AbstractPersonAlgorithm implements 
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 //	 create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);

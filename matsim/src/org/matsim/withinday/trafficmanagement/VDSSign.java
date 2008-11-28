@@ -30,8 +30,8 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -67,13 +67,13 @@ public class VDSSign {
 
 	private Link directionLink;
 
-	private Route currentRoute;
+	private CarRoute currentRoute;
 
-	private List<Route> currentRouteSet;
+	private List<CarRoute> currentRouteSet;
 
-	private Route mainRoute;
+	private CarRoute mainRoute;
 
-	private Route alternativeRoute;
+	private CarRoute alternativeRoute;
 
 	private double complianceRate;
 
@@ -87,7 +87,7 @@ public class VDSSign {
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
-		this.currentRouteSet = new ArrayList<Route>(this.controlEvents);
+		this.currentRouteSet = new ArrayList<CarRoute>(this.controlEvents);
 		if (this.signOutput != null) {
 			try {
 				this.signOutput.init();
@@ -250,7 +250,7 @@ public class VDSSign {
 	 * Returns the guidance message as a <code>Route</code>
 	 * @return current route
 	 */
-	public Route requestRoute() {
+	public CarRoute requestRoute() {
 		double time = SimulationTimer.getTime();
 		double trust = MatsimRandom.random.nextDouble();
 		if (time > this.nextUpdate) {
@@ -280,9 +280,9 @@ public class VDSSign {
 		}
 	}
 
-	private Route completeRoute(final Route r) {
-		Route ret = new RouteImpl();
-		ArrayList<Node> rNodes = new ArrayList<Node>(r.getRoute());
+	private CarRoute completeRoute(final CarRoute r) {
+		CarRoute ret = new NodeCarRoute();
+		ArrayList<Node> rNodes = new ArrayList<Node>(r.getNodes());
 		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
 			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {
 				rNodes.add(0, n);
@@ -292,7 +292,7 @@ public class VDSSign {
 			rNodes.addAll(calculateOutLinks(this.directionLink, rNodes.get(rNodes
 					.size() - 1)));
 		}
-		ret.setRoute(rNodes);
+		ret.setNodes(rNodes);
 		return ret;
 	}
 

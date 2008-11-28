@@ -32,7 +32,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -118,8 +118,8 @@ public class RouterVis {
  *
  * @return route
  */
-	public Route runRouter(final Node fromNode, final Node toNode, final double time){
-		final Route route = this.router.calcLeastCostPath(fromNode, toNode, time);
+	public CarRoute runRouter(final Node fromNode, final Node toNode, final double time){
+		final CarRoute route = this.router.calcLeastCostPath(fromNode, toNode, time);
 
 		try {
 			this.writer.close();

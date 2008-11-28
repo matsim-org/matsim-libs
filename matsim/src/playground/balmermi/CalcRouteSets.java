@@ -34,7 +34,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 import playground.balmermi.algos.RouteSetGenerator;
 
@@ -64,7 +64,7 @@ public class CalcRouteSets {
 		if (o.getId().equals(d.getId())) { return; }
 
 		System.out.println("  create route set...");
-		LinkedList<Route> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor);
+		LinkedList<CarRoute> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor);
 		System.out.println("  done.");
 
 		System.out.println("  write route set file...");
@@ -122,11 +122,11 @@ public class CalcRouteSets {
 		}
 	}
 
-	public static void printRoutes(Node o, Node d, LinkedList<Route> routes) {
-		Iterator<Route> r_it = routes.iterator();
+	public static void printRoutes(Node o, Node d, LinkedList<CarRoute> routes) {
+		Iterator<CarRoute> r_it = routes.iterator();
 		while (r_it.hasNext()) {
-			Route r = r_it.next();
-			Link[] links = r.getLinkRoute();
+			CarRoute r = r_it.next();
+			Link[] links = r.getLinks();
 			for (int i=0; i<links.length; i++) {
 				Link l = links[i];
 				System.out.print(l.getId() + "\t");
@@ -135,17 +135,17 @@ public class CalcRouteSets {
 		}
 	}
 
-	public static void writeRouteSetFile(Integer id, Node o, Node d, LinkedList<Route> routes) {
+	public static void writeRouteSetFile(Integer id, Node o, Node d, LinkedList<CarRoute> routes) {
 		try {
 			out.flush();
 			boolean is_first = true;
-			Iterator<Route> r_it = routes.iterator();
+			Iterator<CarRoute> r_it = routes.iterator();
 			while (r_it.hasNext()) {
-				Route r = r_it.next();
+				CarRoute r = r_it.next();
 				out.write(id.toString());
 				out.write("\t" + o.getId());
 				out.write("\t" + d.getId());
-				Link[] links = r.getLinkRoute();
+				Link[] links = r.getLinks();
 				for (int i=0; i<links.length; i++) { out.write("\t" + links[i].getId()); }
 				out.write("\t" + "-1");
 				if (is_first) { out.write("\t" + "1"); is_first = false; }

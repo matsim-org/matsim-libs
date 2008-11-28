@@ -36,8 +36,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordImpl;
@@ -118,17 +118,17 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	}
 
 	private Leg getELeg(final Leg leg) {
-		List<Node> nodeRoute = leg.getRoute().getRoute();
+		List<Node> nodeRoute = leg.getRoute().getNodes();
 		nodeRoute.remove(nodeRoute.size()-1);
 		Leg l = new Leg(BasicLeg.Mode.car);
-		Route route = new RouteImpl();
-		route.setRoute(nodeRoute);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(nodeRoute);
 		l.setRoute(route);
 		return l;
 	}
 
 	private Link getEvacLink(final Leg leg) {
-		Link [] lr = leg.getRoute().getLinkRoute();
+		Link [] lr = leg.getRoute().getLinks();
 		
 		
 		return lr[lr.length-1];

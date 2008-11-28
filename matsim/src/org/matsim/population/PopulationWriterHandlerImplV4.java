@@ -27,6 +27,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Node;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
@@ -330,7 +331,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	public void startRoute(final CarRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
 		if (!Double.isNaN(route.getDist()))
 			out.write(" dist=\"" + route.getDist() + "\"");
@@ -339,7 +340,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		for (Node n : route.getRoute()) {
+		for (Node n : route.getNodes()) {
 			out.write(n.getId() + " ");
 		}
 		out.write("\n");

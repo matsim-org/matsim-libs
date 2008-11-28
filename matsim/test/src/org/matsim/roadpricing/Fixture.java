@@ -34,8 +34,8 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.geometry.CoordImpl;
@@ -175,8 +175,8 @@ public class Fixture {
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		Route route = new RouteImpl();
-		route.setRoute(routeNodes);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(routeNodes);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
 		return person;
@@ -209,9 +209,9 @@ public class Fixture {
 		return referencePopulation;
 	}
 
-	public static void compareRoutes(final String expectedRoute, final Route realRoute) {
+	public static void compareRoutes(final String expectedRoute, final CarRoute realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
-		for (Node node : realRoute.getRoute()) {
+		for (Node node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());
 			strBuilder.append(' ');
 		}

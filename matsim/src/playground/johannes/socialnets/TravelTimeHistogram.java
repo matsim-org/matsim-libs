@@ -42,7 +42,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -214,8 +214,8 @@ public class TravelTimeHistogram {
 			for(Coord coord : ego.alters) {
 				Relation r = new Relation();
 				Link alterlink = network.getNearestLink(coord);
-				Route fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
-				Route shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
+				CarRoute fastestRoute = fastestPathRouter.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
+				CarRoute shortesRoute = shortestPathRouer.calcLeastCostPath(homelink.getToNode(), alterlink.getFromNode(), 0);
 				
 //				double sumOpportunities = 0;
 //				int sumCells = 0;
@@ -341,9 +341,9 @@ public class TravelTimeHistogram {
 			e.printStackTrace();
 		}
 	}
-	private static double getPathLength(Route route) {
+	private static double getPathLength(CarRoute route) {
 		double sum = 0;
-		for(Link link : route.getLinkRoute())
+		for(Link link : route.getLinks())
 			sum += link.getLength();
 		return sum;
 	}

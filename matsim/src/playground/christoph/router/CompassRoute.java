@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -54,12 +54,12 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 	}
 
 	
-	public Route calcLeastCostPath(Node fromNode, Node toNode, double startTime)
+	public CarRoute calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Route findRoute(Node fromNode, Node toNode)
+	protected CarRoute findRoute(Node fromNode, Node toNode)
 	{
 		Node previousNode = null;
 		Node currentNode = fromNode;
@@ -139,13 +139,13 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			nodes.add(currentNode);
 		}	// while(!currentNode.equals(toNode))
 		
-		Route route = new RouteImpl();
-		route.setRoute(nodes);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(nodes);
 		route.setDist(routeLength);
 		
-		if (maxLinks == route.getLinkRoute().length)
+		if (maxLinks == route.getLinks().length)
 		{
-			log.info("LinkCount " + route.getLinkRoute().length + " distance " + route.getDist());
+			log.info("LinkCount " + route.getLinks().length + " distance " + route.getDist());
 		}
 		
 		if (removeLoops) LoopRemover.removeLoops(route);

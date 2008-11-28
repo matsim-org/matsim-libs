@@ -26,7 +26,7 @@ package playground.johannes.eut;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
@@ -53,19 +53,19 @@ public class ReactRouteGuidance implements RouteProvider {
 		return 10;
 	}
 
-	public boolean providesRoute(Link currentLink, Route subRoute) {
+	public boolean providesRoute(Link currentLink, CarRoute subRoute) {
 		if(currentLink.getId().toString().equals("1"))
 			return true;
 		else
 			return false;
 	}
 
-	public synchronized Route requestRoute(Link departureLink, Link destinationLink,
+	public synchronized CarRoute requestRoute(Link departureLink, Link destinationLink,
 			double time) {
 		if(linkcost.traveltimes instanceof EventBasedTTProvider) {
 			((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
 		}
-		Route route = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
+		CarRoute route = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 				destinationLink.getFromNode(), time);
 		
 //		boolean isRisky = false;

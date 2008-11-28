@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Route.java
+ * CarRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.population.routes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +26,17 @@ import java.util.List;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
-public interface Route extends org.matsim.population.routes.Route {
+public interface CarRoute extends Route {
 
-	public abstract void setRoute(final String route);
+	public abstract void setNodes(final String route);
 
-	public abstract List<Node> getRoute();
+	public abstract List<Node> getNodes();
 
-	public abstract void setLinkRoute(List<Link> srcRoute);
+	public abstract void setLinks(List<Link> srcRoute);
 
-	public abstract void setRoute(List<Node> srcRoute);
+	public abstract void setNodes(List<Node> srcRoute);
 
-	public abstract void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost);
+	public abstract void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost);
 
 	public abstract double getTravelCost();
 
@@ -46,7 +46,7 @@ public interface Route extends org.matsim.population.routes.Route {
 	 * included in the list.
 	 * @return an array containing the links the agents plans to travel along
 	 */
-	public abstract Link[] getLinkRoute();
+	public abstract Link[] getLinks();
 
 	/**
 	 * This method returns a new Route object with the subroute of this beginning at fromNode
@@ -55,6 +55,6 @@ public interface Route extends org.matsim.population.routes.Route {
 	 * @param toNode
 	 * @return A flat copy of the original Route
 	 */
-	public abstract Route getSubRoute(final Node fromNode, final Node toNode);
+	public abstract CarRoute getSubRoute(final Node fromNode, final Node toNode);
 
 }

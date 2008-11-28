@@ -75,7 +75,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 	}
 
 	private int intersectAOI(final Leg leg) {
-		for (Link link : leg.getRoute().getLinkRoute()) {
+		for (Link link : leg.getRoute().getLinks()) {
 			if (this.aOI.contains(link.getId()))
 				return 1;
 		}

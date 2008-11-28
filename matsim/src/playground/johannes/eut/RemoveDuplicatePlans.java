@@ -80,8 +80,8 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 				/*
 				 * Compare sequence of nodes.
 				 */
-				if (leg2.getRoute().getRoute().equals(
-						leg1.getRoute().getRoute())) {
+				if (leg2.getRoute().getNodes().equals(
+						leg1.getRoute().getNodes())) {
 					/*
 					 * Compare departure times.
 					 */

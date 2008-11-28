@@ -39,7 +39,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -222,7 +222,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					Route route = leg.createRoute();
+					CarRoute route = leg.createRoute();
 					route.setDist(distance);
 					route.setTravTime(leg.getTravelTime());
 					Act act = plan.createAct(acttype,to);
@@ -241,7 +241,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					Route route = leg.createRoute();
+					CarRoute route = leg.createRoute();
 					route.setDist(distance);
 					route.setTravTime(leg.getTravelTime());
 					Act act = plan.createAct(acttype,to);

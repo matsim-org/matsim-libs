@@ -41,7 +41,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandler;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.ExeRunner;
 
 public class ExternalMobsim {
@@ -149,7 +149,7 @@ public class ExternalMobsim {
 						handler.startLeg(leg, writer);
 						// route
 						if (leg.getRoute() != null) {
-							Route r = leg.getRoute();
+							CarRoute r = leg.getRoute();
 							handler.startRoute(r, writer);
 							handler.endRoute(writer);
 						}

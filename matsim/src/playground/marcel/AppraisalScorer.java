@@ -30,7 +30,7 @@ import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.scoring.ScoringFunction;
@@ -272,7 +272,7 @@ public class AppraisalScorer implements ScoringFunction {
 			 * because route.getDist() may calculate the distance if not yet
 			 * available, which is quite an expensive operation
 			 */
-			Route route = leg.getRoute();
+			CarRoute route = leg.getRoute();
 			dist = route.getDist();
 			/* TODO the route-distance does not contain the length of the first or
 			 * last link of the route, because the route doesn't know those. Should

@@ -129,7 +129,7 @@ public class NetworkFeatureFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(String.valueOf(leg.getNum()));
 
-		for (Link l : leg.getRoute().getLinkRoute()) {
+		for (Link l : leg.getRoute().getLinks()) {
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);
 			if (abstractFeature.getClass().equals(FolderType.class)) {
@@ -138,7 +138,7 @@ public class NetworkFeatureFactory {
 				log.warn("Not yet implemented: Adding link KML features of type" + abstractFeature.getClass());
 			}
 		}
-		for (Node n : leg.getRoute().getRoute()) {
+		for (Node n : leg.getRoute().getNodes()) {
 			
 			AbstractFeatureType abstractFeature = this.createNodeFeature(n, style);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {

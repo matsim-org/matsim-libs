@@ -29,6 +29,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.*;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.router.PlansCalcRouteLandmarks;
@@ -143,8 +144,8 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
 		
-		RouteImpl route = new RouteImpl();
-		route.setRoute("1 2 3");
+		NodeCarRoute route = new NodeCarRoute();
+		route.setNodes("1 2 3");
 		
 		// but flat copy of leg routes so that change in plan does also affect newPlan
 		((Leg)(plan.getActsLegs().get(1))).setRoute(route);
@@ -157,7 +158,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		((Act)(newPlanActsLegs.get(0))).setEndTime(0.0);
 		
 		// but flat copy of leg routes so that change in plan does also affect newPlan
-		route.setRoute("3 2 1");
+		route.setNodes("3 2 1");
 		
 		assertEquals(((Act)plan.getActsLegs().get(0)).getEndTime(), planActTime);
 		assertEquals(((Act)(newPlanActsLegs.get(0))).getEndTime(), 0.0);

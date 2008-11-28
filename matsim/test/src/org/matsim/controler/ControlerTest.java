@@ -37,7 +37,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.scoring.CharyparNagelScoringFunction;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
@@ -85,8 +85,8 @@ public class ControlerTest extends MatsimTestCase {
 		Act a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
 		Leg leg1 = plan1.createLeg(Mode.car);
-		Route route1 = leg1.createRoute();
-		route1.setRoute("2 3");
+		CarRoute route1 = leg1.createRoute();
+		route1.setNodes("2 3");
 		plan1.createAct("h", link3);
 		population.addPerson(person1);
 
@@ -95,8 +95,8 @@ public class ControlerTest extends MatsimTestCase {
 		Act a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
 		Leg leg2 = plan2.createLeg(Mode.car);
-		Route route2 = leg2.createRoute();
-		route2.setRoute("2 3");
+		CarRoute route2 = leg2.createRoute();
+		route2.setNodes("2 3");
 		plan2.createAct("h", link3);
 		population.addPerson(person2);
 

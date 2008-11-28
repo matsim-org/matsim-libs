@@ -29,7 +29,7 @@ import java.util.PriorityQueue;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
@@ -68,12 +68,12 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 	 *      org.matsim.network.Node, double)
 	 */
 	@Override
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		doSnapshot();
-		final Route route = super.calcLeastCostPath(fromNode, toNode, startTime);
+		final CarRoute route = super.calcLeastCostPath(fromNode, toNode, startTime);
 
 		this.writer.reset();
-		final Link [] links = route.getLinkRoute();
+		final Link [] links = route.getLinks();
 		for (int i =0; i < links.length; i++){
 			this.writer.setLinkColor(links[i].getId(), 0.1);
 			doSnapshot();

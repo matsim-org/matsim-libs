@@ -35,8 +35,8 @@ import java.util.Iterator;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -112,7 +112,7 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			StringBuilder text = new StringBuilder("\t");
 			for (Iterator<Leg> it = pl.getIteratorLeg(); it.hasNext();) {
 				Leg l = it.next();
-				Route r = l.getRoute();
+				CarRoute r = l.getRoute();
 				text.append(r.getDist() + "\t" + r.getTravTime() + "\t");
 			}
 			try {

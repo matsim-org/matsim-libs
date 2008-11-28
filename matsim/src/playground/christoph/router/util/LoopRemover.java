@@ -23,7 +23,7 @@ package playground.christoph.router.util;
 import java.util.List;
 
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 public class LoopRemover {
 
@@ -31,14 +31,14 @@ public class LoopRemover {
 	 * Removes loops within a route. This is done by searching duplicated 
 	 * nodes / links and removing the route between them.
 	 */
-	public static void removeLoops(Route route)
+	public static void removeLoops(CarRoute route)
 	{
 		/*
 		 * Compare nodes and not links. 
 		 * Maybe a Problem: two nodes could be connected with more than one link.
 		 * It's a question of the definition of a "loop" if comparing links would be better...
 		 */ 		 	
-		List<Node> newNodes = route.getRoute();
+		List<Node> newNodes = route.getNodes();
 				
 		for(int i = 0; i < newNodes.size(); i++)
 		{		

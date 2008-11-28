@@ -32,8 +32,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
 import org.matsim.router.util.TravelCost;
@@ -199,7 +199,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 
 		double arrivalTime = 0;
 		boolean stillSearching = true;
@@ -230,19 +230,24 @@ public class Dijkstra implements LeastCostPathCalculator {
 			}
 		}
 
-		// now construct the route
-		ArrayList<Node> routeNodes = new ArrayList<Node>();
+		// now construct the path
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Link> links = new ArrayList<Link>();
+
 		Node tmpNode = toNode;
 		while (tmpNode.getId() != fromNode.getId()) {
-			routeNodes.add(0, tmpNode);
+			nodes.add(0, tmpNode);
 			DijkstraNodeData tmpData = getData(tmpNode);
 			tmpNode = tmpData.getPrevNode();
 		}
-		routeNodes.add(0, tmpNode); // add the fromNode at the beginning of the list
+		nodes.add(0, tmpNode); // add the fromNode at the beginning of the list
+
+		// FIXME [MR] also collect links!
+		Path path = new Path(nodes, links, arrivalTime - startTime);
 
 		DijkstraNodeData toNodeData = getData(toNode);
-		Route route = new RouteImpl();
-		route.setRoute(routeNodes, (int) (arrivalTime - startTime), toNodeData.cost);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes((ArrayList<Node>) path.nodes, (int) path.travelTime, toNodeData.cost); // FIXME [MR] remove cast
 
 		if (this.doGatherInformation) {
 			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route

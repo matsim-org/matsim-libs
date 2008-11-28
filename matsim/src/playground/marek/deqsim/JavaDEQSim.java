@@ -62,7 +62,7 @@ public class JavaDEQSim {
 					Leg leg = (Leg)actsLegs.get(i);
 					// the leg the agent performs
 					if (BasicLeg.Mode.car.equals(leg.getMode())) { // we only simulate car traffic
-						Link[] route = leg.getRoute().getLinkRoute(); // these are the links the agent will drive along one after the other.
+						Link[] route = leg.getRoute().getLinks(); // these are the links the agent will drive along one after the other.
 					}
 				}
 			}

@@ -39,7 +39,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkTransform;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -152,7 +152,7 @@ public class NetworkDistance {
 				Node fromNode = network.getNearestNode(fromCoord);
 				Node toNode = network.getNearestNode(toCoord);
 
-				Route route = router.calcLeastCostPath(fromNode, toNode, 0);
+				CarRoute route = router.calcLeastCostPath(fromNode, toNode, 0);
 
 				double crowflyDistance = ct.transform(fromCoord).calcDistance(ct.transform(toCoord));
 
@@ -160,7 +160,7 @@ public class NetworkDistance {
 
 				writer.write("\t" + fromNode.getId().toString());
 				writer.write("\t" + toNode.getId().toString());
-				for (Link link : route.getLinkRoute()) {
+				for (Link link : route.getLinks()) {
 					writer.write("\t" + link.getId().toString());
 				}
 

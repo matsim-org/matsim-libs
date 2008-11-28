@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement;
 
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputImpl;
 
 
@@ -60,7 +60,7 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getPredictedNashTime(Route route) {
+	public double getPredictedNashTime(CarRoute route) {
 		return this.nashTime;
 	}
 

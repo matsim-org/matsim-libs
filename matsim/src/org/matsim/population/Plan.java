@@ -29,6 +29,8 @@ import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -329,7 +331,7 @@ public class Plan extends BasicPlanImpl {
 					l2.setTravelTime(l.getTravelTime());
 					l2.setArrivalTime(l.getArrivalTime());
 					if (l.getRoute() != null) {
-						Route r = new RouteImpl(l.getRoute());
+						CarRoute r = new NodeCarRoute(l.getRoute());
 						l2.setRoute(r);
 					}
 				}

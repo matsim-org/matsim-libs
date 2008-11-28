@@ -33,8 +33,8 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.scoring.ScoringFunction;
 
 /**
@@ -77,7 +77,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		BasicLeg.Mode modeName;
 		Act origin = null, destination = null;
 		Leg legIntermediate = null;
-		HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
+		HashMap<Leg, CarRoute> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
 
 		sf.reset();
 		double now = 0.0;

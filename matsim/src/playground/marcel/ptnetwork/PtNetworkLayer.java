@@ -35,8 +35,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.Coord;
@@ -244,12 +244,12 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 		return handled;
 	}
 
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode, final double starttime){
-		Route route = dijkstraGetCheapestRoute(fromNode.getCoord(), toNode.getCoord(), starttime, 0);
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double starttime){
+		CarRoute route = dijkstraGetCheapestRoute(fromNode.getCoord(), toNode.getCoord(), starttime, 0);
 		return route;
 	}
 
-	public Route dijkstraGetCheapestRoute(final Coord fromCoord, final Coord toCoord, final double depTime, final int searchRadius) {
+	public CarRoute dijkstraGetCheapestRoute(final Coord fromCoord, final Coord toCoord, final double depTime, final int searchRadius) {
 
 		ArrayList<PtNode> depNodes = this.getPedNodesWithin(searchRadius, fromCoord);
 		ArrayList<PtNode> arrNodes = this.getPedNodesWithin(searchRadius, toCoord);
@@ -374,15 +374,15 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			actNode = (PtNode) actNode.shortestPath.getFromNode();
 		}
 
-		Route route = new RouteImpl();
-		route.setRoute(path);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(path);
 		route.setTravTime(arrTime - depTime);
 
 		return route;
 	}
 
-	public Route dijkstraGetCheapestRouteLogger (final CoordImpl fromCoord, final CoordImpl toCoord, final int depTime,final int searchRadius,final BufferedWriter out){
-		Route route = null;
+	public CarRoute dijkstraGetCheapestRouteLogger (final CoordImpl fromCoord, final CoordImpl toCoord, final int depTime,final int searchRadius,final BufferedWriter out){
+		CarRoute route = null;
 		int touchedNodes = 0;
 		try {
 			ArrayList<Node> path = new ArrayList<Node>();
@@ -463,8 +463,8 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 //				RUN;FROM_X;FROM_Y;TO_X;TO_Y;ABSCOORDDIST;NUM_FROMNODES;NUM_TONODES;FROMNODE_ID;TO_NODEID;DEPWALKDIST;ARRWALKDIST;ROUTELEMENTS;TOUCHEDNODES;PENDINGNODES;TRAVELTIME;TRAVELCOST;CALCTIME\n");
 
 			if(path.size()>0){
-				route = new RouteImpl();
-				route.setRoute(path);
+				route = new NodeCarRoute();
+				route.setNodes(path);
 				route.setTravTime(arrTime-depTime);
 				out.write(path.get(0).getId()+";"+arrNode.getId()+";"+path.get(0).getCoord().calcDistance(fromCoord)+";"+arrNode.getCoord().calcDistance(toCoord)+";"+path.size()+";"+touchedNodes+";"+pending.size()+";"+(arrTime-depTime)+";"+(int)((arrNode.actCost+(arrNode.getCoord().calcDistance(toCoord)/PEDESTRIAN_SPEED))-depTime)+";");
 			} else {
@@ -482,9 +482,9 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 	 *
 	 * @param route
 	 */
-	public void markRoute(final Route route) {
-		if(route.getRoute()!=null){
-			List<Node> routeNodes = route.getRoute();
+	public void markRoute(final CarRoute route) {
+		if(route.getNodes()!=null){
+			List<Node> routeNodes = route.getNodes();
 			for(int i=0; i<(routeNodes.size()-1);i++){
 				for(Iterator<? extends Link> it = routeNodes.get(i).getOutLinks().values().iterator();it.hasNext();){
 					Link link = it.next();

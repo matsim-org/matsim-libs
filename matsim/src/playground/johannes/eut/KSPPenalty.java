@@ -13,7 +13,7 @@ import org.matsim.interfaces.networks.basicNet.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
@@ -142,7 +142,7 @@ public class KSPPenalty {
 	 * @return a link of different paths. Can be empty if no paths have been
 	 *         identified. The first path in the list is always the best path!
 	 */
-	public List<Route> getPaths(Node departure, Node destination, double time,
+	public List<CarRoute> getPaths(Node departure, Node destination, double time,
 			int count, TravelTime travelTimes) {
 		/*
 		 * (1) Set the plain linkcost object and set the extended linkcost
@@ -156,11 +156,11 @@ public class KSPPenalty {
 		 * (2) Iterate until we found the required number of different paths or
 		 * we exceeded the maxruns number.
 		 */
-		List<Route> paths = new ArrayList<Route>(count);
+		List<CarRoute> paths = new ArrayList<CarRoute>(count);
 		int maxruns = count * 2;
 		int runcount = 0;
 		do {
-			Route path = this.algorithm.calcLeastCostPath(departure, destination, time);
+			CarRoute path = this.algorithm.calcLeastCostPath(departure, destination, time);
 			if (path != null) {
 				/*
 				 * (2a) Increase the impedance on the links in the identified
@@ -175,8 +175,8 @@ public class KSPPenalty {
 				if (paths.isEmpty())
 					paths.add(path);
 				else {
-					for (Route foundpaths : paths) {
-						if (foundpaths.getRoute().equals(path.getRoute()))
+					for (CarRoute foundpaths : paths) {
+						if (foundpaths.getNodes().equals(path.getNodes()))
 							found = true;
 					}
 					if (!found)
@@ -218,11 +218,11 @@ public class KSPPenalty {
 //		return plainPath;
 //	}
 
-	private void penalizeLinks(Route path) {
+	private void penalizeLinks(CarRoute path) {
 		/*
 		 * (1) Convert the path to a list of links.
 		 */
-		Link[] links = path.getLinkRoute();
+		Link[] links = path.getLinks();
 		/*
 		 * (2) Get the total length of the route.
 		 */

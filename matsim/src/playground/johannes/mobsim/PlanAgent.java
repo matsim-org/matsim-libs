@@ -264,7 +264,7 @@ public class PlanAgent implements MobsimAgent {
 		currentLink = link;
 		currentRouteIndex++;
 		Link desiredLink = ((Leg) person.getSelectedPlan().getActsLegs().get(
-				currentPlanIndex)).getRoute().getLinkRoute()[currentRouteIndex];
+				currentPlanIndex)).getRoute().getLinks()[currentRouteIndex];
 		if (currentLink != desiredLink)
 			currentRouteIndex--;
 	}

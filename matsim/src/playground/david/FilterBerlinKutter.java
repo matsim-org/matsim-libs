@@ -71,7 +71,7 @@ class FilterPersons extends AbstractPersonAlgorithm{
 				Leg leg = (Leg)plan.getActsLegs().get(jj);
 				// route
 				if (leg.getRoute() != null) {
-					List<Node> nodes = leg.getRoute().getRoute();
+					List<Node> nodes = leg.getRoute().getNodes();
 					int count = 0;
 					for (Node node : nodes) {
 						if (relevantFromNodes.contains(node)) count++;

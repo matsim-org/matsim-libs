@@ -22,8 +22,8 @@ package playground.marcel;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Route;
 import org.matsim.population.RouteImplTest;
+import org.matsim.population.routes.CarRoute;
 
 import playground.yu.compressRoute.Subsequent;
 
@@ -33,7 +33,7 @@ import playground.yu.compressRoute.Subsequent;
 public class CompressedCarRouteTest extends RouteImplTest {
 
 	@Override
-	public Route getCarRouteInstance() {
+	public CarRoute getCarRouteInstance() {
 
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		Subsequent subsequent = new Subsequent(network);

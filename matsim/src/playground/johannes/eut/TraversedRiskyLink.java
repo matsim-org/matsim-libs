@@ -136,7 +136,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 			Plan plan = (Plan)arg0;
 			for(Iterator it = plan.getIteratorLeg(); it.hasNext();) {
 				Leg leg = (Leg)it.next();
-				for(Link link : leg.getRoute().getLinkRoute()) {
+				for(Link link : leg.getRoute().getLinks()) {
 					if(link.equals(predicateLink))
 						return true;
 				}

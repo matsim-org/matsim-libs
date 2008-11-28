@@ -28,15 +28,15 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
 import org.matsim.population.routes.AbstractRoute;
+import org.matsim.population.routes.CarRoute;
 
 /**
- * Implementation of {@link Route} which internally stores the route as a series of {@link Link}s.
+ * Implementation of {@link CarRoute} which internally stores the route as a series of {@link Link}s.
  *
  * @author mrieser
  */
-public class LinkCarRoute extends AbstractRoute implements Route {
+public class LinkCarRoute extends AbstractRoute implements CarRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
@@ -78,11 +78,11 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		return ids;
 	}
 
-	public Link[] getLinkRoute() {
+	public Link[] getLinks() {
 		return this.route.toArray(new Link[this.route.size()]);
 	}
 
-	public List<Node> getRoute() {
+	public List<Node> getNodes() {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.route.size() + 1);
 		if (this.route.size() > 0) {
 			nodes.add(this.route.get(0).getFromNode());
@@ -96,7 +96,7 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		return nodes;
 	}
 
-	public Route getSubRoute(final Node fromNode, final Node toNode) {
+	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
@@ -121,7 +121,7 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
 		LinkCarRoute ret = new LinkCarRoute();
-		ret.setLinkRoute(this.route.subList(fromIndex, toIndex + 1));
+		ret.setLinks(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
 
@@ -129,7 +129,7 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		return this.travelCost;
 	}
 
-	public void setLinkRoute(final List<Link> srcRoute) {
+	public void setLinks(final List<Link> srcRoute) {
 		this.route.clear();
 		if (srcRoute != null) {
 			this.route.addAll(srcRoute);
@@ -137,7 +137,7 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		this.route.trimToSize();
 	}
 
-	public void setRoute(final String route) {
+	public void setNodes(final String route) {
 		this.route.clear();
 		String[] parts = route.trim().split("[ \t\n]+");
 
@@ -163,7 +163,7 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		this.route.trimToSize();
 	}
 
-	public void setRoute(final List<Node> srcRoute) {
+	public void setNodes(final List<Node> srcRoute) {
 		this.route.clear();
 		Node prevNode = null;
 		for (Node node : srcRoute) {
@@ -181,8 +181,8 @@ public class LinkCarRoute extends AbstractRoute implements Route {
 		this.route.trimToSize();
 	}
 
-	public void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
-		setRoute(route);
+	public void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
+		setNodes(route);
 		this.setTravTime(travelTime);
 		this.travelCost = travelCost;
 	}

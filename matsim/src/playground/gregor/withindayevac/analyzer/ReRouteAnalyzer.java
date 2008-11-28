@@ -26,7 +26,7 @@ import java.util.HashSet;
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 
@@ -72,8 +72,8 @@ public class ReRouteAnalyzer implements Analyzer {
 
 
 		final Dijkstra router = new Dijkstra(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost());
-		final Route route = router.calcLeastCostPath(this.beliefs.getCurrentLink().getToNode(), this.intentions.getDestination(), now);
-		this.linkRoute = route.getLinkRoute();
+		final CarRoute route = router.calcLeastCostPath(this.beliefs.getCurrentLink().getToNode(), this.intentions.getDestination(), now);
+		this.linkRoute = route.getLinks();
 		this.linkCount = 0;
 		this.lastCurrent = this.beliefs.getCurrentLink();
 		this.lastNext = this.linkRoute[this.linkCount++];

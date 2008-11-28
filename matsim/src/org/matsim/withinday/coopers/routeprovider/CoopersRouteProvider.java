@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.routeprovider.AbstractRouteProvider;
 import org.matsim.withinday.routeprovider.HierarchicalRouteProvider;
@@ -43,7 +43,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 //	private VDSSign currentSign;
 
-	private Route currentRoute;
+	private CarRoute currentRoute;
 
 	private HierarchicalRouteProvider hierarchicalProvider;
 
@@ -56,9 +56,9 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	/**
 	 *
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.Link,
-	 *      org.matsim.population.Route)
+	 *      org.matsim.population.routes.CarRoute)
 	 */
-	public boolean providesRoute(final Link currentLink, final Route subRoute) {
+	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
 		for (VDSSign s : this.signs) {
 			log.trace("signLink: " + s.getSignLink().getId() + " currentLInk: " + currentLink.getId());
 			if (s.getSignLink().equals(currentLink) && containsLink(subRoute, s.getDirectionLinks())) {
@@ -75,9 +75,9 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 
 	}
 
-	private boolean containsLink(final Route subRoute, final Link directionLink) {
+	private boolean containsLink(final CarRoute subRoute, final Link directionLink) {
 		// this should be the natural way of testing if a route contains a link
-		for (Link l : subRoute.getLinkRoute()) {
+		for (Link l : subRoute.getLinks()) {
 			if (l.equals(directionLink)) {
 				return true;
 			}
@@ -86,7 +86,7 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 		// Route.getLinkRoute() method
 		// we have to check if the last node of the subRoute has an outgoing link
 		// which is equal to the direction link
-		List<Node> route = subRoute.getRoute();
+		List<Node> route = subRoute.getNodes();
 		for (Link link : route.get(route.size() - 1).getOutLinks().values()) {
 			if (link.equals(directionLink)) {
 				return true;
@@ -96,12 +96,12 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	}
 
 	@Override
-	public Route requestRoute(final Link departureLink, final Link destinationLink, final double time) {
+	public CarRoute requestRoute(final Link departureLink, final Link destinationLink, final double time) {
 		if (this.currentRoute != null) {
 			CurrentSignRouteProvider current = new CurrentSignRouteProvider(
 					this.currentRoute);
 			this.hierarchicalProvider.addRouteProvider(current);
-			Route ret = this.hierarchicalProvider.requestRoute(departureLink,
+			CarRoute ret = this.hierarchicalProvider.requestRoute(departureLink,
 					destinationLink, time);
 			this.hierarchicalProvider.removeRouteProvider(current);
 			return ret;
@@ -117,16 +117,16 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 	 *      org.matsim.network.Node, double)
 	 */
 	@Override
-	protected Route requestRoute(final Node departureNode,
+	protected CarRoute requestRoute(final Node departureNode,
 			final Node destinationNode, final double time) {
 		throw new UnsupportedOperationException();
 	}
 
 	private static class CurrentSignRouteProvider implements RouteProvider {
 
-		private Route route;
+		private CarRoute route;
 
-		CurrentSignRouteProvider(final Route route) {
+		CurrentSignRouteProvider(final CarRoute route) {
 			this.route = route;
 		}
 
@@ -134,11 +134,11 @@ public class CoopersRouteProvider extends AbstractRouteProvider {
 			return 10;
 		}
 
-		public boolean providesRoute(final Link currentLink, final Route subRoute) {
+		public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
 			return true;
 		}
 
-		public Route requestRoute(final Link departureLink,
+		public CarRoute requestRoute(final Link departureLink,
 				final Link destinationLink, final double time) {
 			return this.route;
 		}

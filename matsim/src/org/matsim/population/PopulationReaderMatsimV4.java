@@ -33,6 +33,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -74,10 +75,10 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Plan currplan = null;
 	private Act curract = null;
 	private Leg currleg = null;
-	private Route currroute = null;
+	private CarRoute currroute = null;
 
 	private Act prevAct = null;
-	private Route prevRoute = null;
+	private CarRoute prevRoute = null;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
@@ -155,7 +156,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (LEG.equals(name)) {
 			this.currleg = null;
 		} else if (ROUTE.equals(name)) {
-			this.currroute.setRoute(content);
+			this.currroute.setNodes(content);
 			this.prevRoute = this.currroute;
 			this.currroute = null;
 		}

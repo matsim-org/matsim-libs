@@ -30,10 +30,10 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
@@ -170,7 +170,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-		Route route = null;
+		CarRoute route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
 			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
@@ -179,7 +179,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = route.getTravTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new RouteImpl();
+			route = new NodeCarRoute();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -208,7 +208,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
 
-		Route route = null;
+		CarRoute route = null;
 		if (toLink != fromLink) {
 			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
@@ -223,7 +223,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new RouteImpl();
+			route = new NodeCarRoute();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -240,7 +240,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -255,7 +255,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);
@@ -270,7 +270,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		int travTime = (int)(dist / speed);
 		route.setTravTime(travTime);
 		leg.setRoute(route);

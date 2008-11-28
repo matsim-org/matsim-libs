@@ -34,7 +34,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
@@ -95,7 +95,7 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		try {
 			this.plan.createAct("h", link1);
 			Leg leg = this.plan.createLeg(Mode.car);
-			Route route = leg.createRoute();
+			CarRoute route = leg.createRoute();
 			route.setDist(25000.0);
 			route.setTravTime(0.5*3600);
 			this.plan.createAct("w", link3);

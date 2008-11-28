@@ -48,7 +48,7 @@ public class RouteLinkFilter extends AbstractPlanFilter {
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg)iter.next();
-			Link[] links = leg.getRoute().getLinkRoute();
+			Link[] links = leg.getRoute().getLinks();
 			for (Link link : links) {
 				if (this.linkIds.contains(link.getId())) {
 					return true;

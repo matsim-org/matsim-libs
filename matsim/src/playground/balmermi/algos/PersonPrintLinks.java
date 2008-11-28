@@ -26,8 +26,8 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {
 
@@ -54,8 +54,8 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 		while (leg_it.hasNext()) {
 			Leg leg = (Leg)leg_it.next();
 			System.out.println("Person id=" + person.getId() + "; Leg nr=" + leg.getNum());
-			Route route = leg.getRoute();
-			Link[] links = route.getLinkRoute();
+			CarRoute route = leg.getRoute();
+			Link[] links = route.getLinks();
 			for (int i=0; i<links.length; i++) {
 				System.out.println(links[i].getOrigId());
 			}

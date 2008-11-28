@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.population.routes;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,23 +29,22 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.AbstractRoute;
 import org.matsim.utils.misc.Time;
 
-public class RouteImpl extends AbstractRoute implements Route {
+public class NodeCarRoute extends AbstractRoute implements CarRoute {
 
 	protected final ArrayList<Node> route = new ArrayList<Node>();
 
 	private double cost = Double.NaN;
 
-	public RouteImpl() {
+	public NodeCarRoute() {
 		// default constructor
 	}
 
-	public RouteImpl(final Route route) {
+	public NodeCarRoute(final CarRoute route) {
 		super.setDist(route.getDist());
 		super.setTravTime(route.getTravTime());
-		this.route.addAll(route.getRoute());
+		this.route.addAll(route.getNodes());
 		this.route.trimToSize();
 	}
 
@@ -56,7 +55,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 				"have to set the route by object references not by Ids.");
 	}
 
-	public final void setRoute(final String route) {
+	public final void setNodes(final String route) {
 		NetworkLayer layer = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		if (layer == null) {
 			throw new RuntimeException("NetworkLayer does not exist in world.");
@@ -87,11 +86,11 @@ public class RouteImpl extends AbstractRoute implements Route {
 	}
 
 
-	public List<Node> getRoute() {
+	public List<Node> getNodes() {
 		return this.route;
 	}
 
-	public void setLinkRoute(final List<Link> srcRoute) {
+	public void setLinks(final List<Link> srcRoute) {
 		this.route.clear();
 		if (srcRoute != null) {
 			if (srcRoute.size() == 0) {
@@ -112,7 +111,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 		this.route.trimToSize();
 	}
 
-	public void setRoute(final List<Node> srcRoute) {
+	public void setNodes(final List<Node> srcRoute) {
 		if (srcRoute == null) {
 			this.route.clear();
 		} else {
@@ -123,8 +122,8 @@ public class RouteImpl extends AbstractRoute implements Route {
 	}
 
 
-	public final void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
-		setRoute(route);
+	public final void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
+		setNodes(route);
 		super.setTravTime(travelTime);
 		this.cost = travelCost;
 	}
@@ -145,7 +144,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 	@Override
 	public List<Id> getLinkIds() {
 		List<Id> ret = new ArrayList<Id>(Math.max(0, this.route.size() - 1));
-		for (Link l : getLinkRoute()) {
+		for (Link l : getLinks()) {
 			ret.add(l.getId());
 		}
 		return ret;
@@ -157,7 +156,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 	 * included in the list.
 	 * @return an array containing the links the agents plans to travel along
 	 */
-	public final Link[] getLinkRoute() {
+	public final Link[] getLinks() {
 		// marcel, 2006-09-05: added getLinkRoute
 		/* Nodes have proved to not be the best solution to store routes.
 		 * Thus it should be changed sooner or later to links instead of nodes
@@ -196,7 +195,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 		 * very first or the very last link of the route, only the links in between.
 		 * fix this somehow, but how?? MR, jan07
 		 */
-		Link[] links = getLinkRoute();
+		Link[] links = getLinks();
 		double distance = 0;
 		for (Link link : links) {
 			distance += link.getLength();
@@ -212,7 +211,7 @@ public class RouteImpl extends AbstractRoute implements Route {
 	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route!
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
-	public Route getSubRoute(final Node fromNode, final Node toNode) {
+	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
@@ -236,8 +235,8 @@ public class RouteImpl extends AbstractRoute implements Route {
 		if (toIndex == -1) {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
-		RouteImpl ret = new RouteImpl();
-		ret.setRoute(this.route.subList(fromIndex, toIndex + 1));
+		NodeCarRoute ret = new NodeCarRoute();
+		ret.setNodes(this.route.subList(fromIndex, toIndex + 1));
 		return ret;
 	}
 

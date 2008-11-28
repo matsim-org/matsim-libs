@@ -28,8 +28,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 
 
 /**
@@ -54,9 +54,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.LinkImpl, org.matsim.network.LinkImpl, double)
 	 */
 	@Override
-	public Route requestRoute(Link departureLink, final Link destinationLink, final double time) {
-		Route subRoute;
-		Route returnRoute = new RouteImpl();
+	public CarRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
+		CarRoute subRoute;
+		CarRoute returnRoute = new NodeCarRoute();
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {
@@ -65,24 +65,24 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 			subRoute = rp.requestRoute(departureLink, destinationLink, time);
 			//in the first iteration of the loop we have to add all nodes
 			if (routeNodes.isEmpty()) {
-				routeNodes.addAll(subRoute.getRoute());
+				routeNodes.addAll(subRoute.getNodes());
 			}
 			//next time we don't have to add the first node
 			else {
-				routeNodes.addAll(subRoute.getRoute().subList(1, subRoute.getRoute().size()));
+				routeNodes.addAll(subRoute.getNodes().subList(1, subRoute.getNodes().size()));
 			}
-			returnRoute.setRoute(routeNodes);
+			returnRoute.setNodes(routeNodes);
 			if (isCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			Link [] returnRouteLinks = returnRoute.getLinkRoute();
+			Link [] returnRouteLinks = returnRoute.getLinks();
 			departureLink = returnRouteLinks[returnRouteLinks.length-1];
 		}
 		return null;
 	}
 
-	private boolean isCompleteRoute(final Route subRoute, final Link destinationLink) {
-		Node endNode = subRoute.getRoute().get(subRoute.getRoute().size() - 1);
+	private boolean isCompleteRoute(final CarRoute subRoute, final Link destinationLink) {
+		Node endNode = subRoute.getNodes().get(subRoute.getNodes().size() - 1);
 		if (endNode.getOutLinks().containsKey(destinationLink.getId())) {
 			return true;
 		}
@@ -94,7 +94,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 	 * @see org.matsim.withinday.routeprovider.AbstractRouteProvider#requestRoute(org.matsim.network.Node, org.matsim.network.Node, double)
 	 */
 	@Override
-	protected Route requestRoute(final Node departureNode, final Node destinationNode,
+	protected CarRoute requestRoute(final Node departureNode, final Node destinationNode,
 			final double time) {
 		throw new UnsupportedOperationException("This method is not supported by this class.");
 	}
@@ -115,9 +115,9 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 
 	/**
 	 * As this implementation is backed by a AStarRouter the class provides Routes from everywhere to everywhere
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.population.Route)
+	 * @see org.matsim.withinday.routeprovider.RouteProvider#providesRoute(org.matsim.network.LinkImpl, org.matsim.population.routes.CarRoute)
 	 */
-	public boolean providesRoute(final Link currentLink, final Route subRoute) {
+	public boolean providesRoute(final Link currentLink, final CarRoute subRoute) {
 		return true;
 	}
 

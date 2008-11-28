@@ -38,7 +38,7 @@ import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -135,7 +135,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		super.init();
 		// Initialize ttMeasured with ttFreeSpeeds and linkFlows with zero.
 		// Main route
-		Link[] linksMainRoute = this.mainRoute.getLinkRoute();
+		Link[] linksMainRoute = this.mainRoute.getLinks();
 		for (Link l : linksMainRoute) {
 			String linkId = l.getId().toString();
 			if (!this.intraFlows.containsKey(l.getId().toString())) {
@@ -167,7 +167,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		this.currentBottleNeckMainRoute = this.mainRouteNaturalBottleNeck;
 		this.currentBNCapacityMainRoute = getCapacity(this.mainRouteNaturalBottleNeck);
 		List<Link> linksMainRouteList = Arrays.asList(linksMainRoute);
-		this.nodesMainRoute = this.mainRoute.getRoute();
+		this.nodesMainRoute = this.mainRoute.getNodes();
 		for (int i = 1; i < this.nodesMainRoute.size() - 1; i++) {
 			Node n = this.nodesMainRoute.get(i);
 			for (Link inLink : n.getInLinks().values()) {
@@ -199,7 +199,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 
 		// Alt Route
-		Link[] linksAlternativeRoute = this.alternativeRoute.getLinkRoute();
+		Link[] linksAlternativeRoute = this.alternativeRoute.getLinks();
 		for (Link l : linksAlternativeRoute) {
 			String linkId = l.getId().toString();
 			if (!this.intraFlows.containsKey(l.getId().toString())) {
@@ -230,7 +230,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		this.currentBottleNeckAlternativeRoute = this.altRouteNaturalBottleNeck;
 		this.currentBNCapacityAlternativeRoute = getCapacity(this.altRouteNaturalBottleNeck);
 
-		this.nodesAlternativeRoute = this.alternativeRoute.getRoute();
+		this.nodesAlternativeRoute = this.alternativeRoute.getNodes();
 		List<Link> linksAlternativeRouteList = Arrays.asList(linksAlternativeRoute);
 		for (int i = 1; i < this.nodesAlternativeRoute.size() - 1; i++) {
 			Node n = this.nodesAlternativeRoute.get(i);
@@ -320,7 +320,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getPredictedNashTime(final Route route) {
+	public double getPredictedNashTime(final CarRoute route) {
 		if (route.equals(this.mainRoute)) {
 			return this.predTTMainRoute;
 		}
@@ -356,10 +356,10 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return this.predTTMainRoute - this.predTTAlternativeRoute;
 	}
 
-	private double getPredictedTravelTime(final Route route, final Link bottleNeck) {
+	private double getPredictedTravelTime(final CarRoute route, final Link bottleNeck) {
 
 		double predictedTT;
-		Link[] routeLinks = route.getLinkRoute();
+		Link[] routeLinks = route.getLinks();
 		double ttFreeSpeedPart = 0.0;
 		int agentsToQueueAtBottleNeck = 0;
 		boolean guidanceObjectWillQueue = false;
@@ -498,11 +498,11 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return predictedTT;
 	}
 
-	private int getAdditionalAgents(final Route route, final int linkIndex) {
+	private int getAdditionalAgents(final CarRoute route, final int linkIndex) {
 		double totalExtraAgents = 0.0;
 
 		// check distance and free speed travel time from start node to bottleneck
-		Link[] routeLinks = route.getLinkRoute();
+		Link[] routeLinks = route.getLinks();
 		String linkId1 = routeLinks[linkIndex].getId().toString();
 		double ttToLink = this.ttFreeSpeedUpToAndIncludingLink.get(linkId1);
 
@@ -530,7 +530,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return (int) (totalExtraAgents);
 	}
 
-	private List<Link> getOutlinks(final Route route) {
+	private List<Link> getOutlinks(final CarRoute route) {
 		if (route == this.mainRoute) {
 			return this.outLinksMainRoute;
 		}
@@ -539,7 +539,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private List<Link> getInlinks(final Route route) {
+	private List<Link> getInlinks(final CarRoute route) {
 		if (route == this.mainRoute) {
 			return this.inLinksMainRoute;
 		}
@@ -548,7 +548,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private double getInOutFlow(final Link inLink, final Route route) {
+	private double getInOutFlow(final Link inLink, final CarRoute route) {
 		double flow;
 		String linkId = inLink.getId().toString();
 		if (route == this.mainRoute) {
@@ -574,7 +574,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return capacity;
 	}
 
-	public Link getDetectedBottleNeck(final Route route) {
+	public Link getDetectedBottleNeck(final CarRoute route) {
 		Link l;
 		if (route == this.mainRoute) {
 			l = this.currentBottleNeckMainRoute;
@@ -585,7 +585,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return l;
 	}
 
-	public void setIncidentLink(final Link link, final Route route) {
+	public void setIncidentLink(final Link link, final CarRoute route) {
 		if (route == this.mainRoute) {
 			this.currentBottleNeckMainRoute = link;
 		}
@@ -594,7 +594,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private void setIncidentCapacity(final Double currentBottleNeckCapacity, final Route route) {
+	private void setIncidentCapacity(final Double currentBottleNeckCapacity, final CarRoute route) {
 		if (route == this.mainRoute) {
 			this.currentBNCapacityMainRoute = currentBottleNeckCapacity;
 		}
@@ -603,7 +603,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private Double getIncidentCapacity(final Route route) {
+	private Double getIncidentCapacity(final CarRoute route) {
 		double cap;
 		if (route == this.mainRoute) {
 			cap = this.currentBNCapacityMainRoute;
@@ -615,9 +615,9 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	}
 
 	private Link searchAccidentsOnRoutes(final String accidentLinkId) {
-		Route r = this.mainRoute;
+		CarRoute r = this.mainRoute;
 		for (int j = 0; j < 2; j++) {
-			Link[] links = r.getLinkRoute();
+			Link[] links = r.getLinks();
 			for (int i = 0; i < links.length; i++) {
 				if (links[i].getId().toString().equalsIgnoreCase(accidentLinkId)) {
 					return links[i];

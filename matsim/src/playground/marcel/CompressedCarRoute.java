@@ -30,10 +30,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
 import org.matsim.population.routes.AbstractRoute;
+import org.matsim.population.routes.CarRoute;
 
-public class CompressedCarRoute extends AbstractRoute implements Route {
+public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
@@ -45,7 +45,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		this.subsequentLinks = subsequentLinks;
 	}
 
-	public Link[] getLinkRoute() {
+	public Link[] getLinks() {
 		Link[] links = new Link[this.uncompressedLength];
 		int counter = 0;
 		Link previousLink = null;
@@ -82,7 +82,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 
 	@Override
 	public List<Id> getLinkIds() {
-		Link[] links = getLinkRoute();
+		Link[] links = getLinks();
 		List<Id> ids = new ArrayList<Id>(links.length);
 		for (Link link : links) {
 			ids.add(link.getId());
@@ -90,7 +90,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		return ids;
 	}
 
-	public List<Node> getRoute() {
+	public List<Node> getNodes() {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
 
 		if (this.route.size() == 0) {
@@ -129,8 +129,8 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		return nodes;
 	}
 
-	public Route getSubRoute(final Node fromNode, final Node toNode) {
-		List<Node> nodes = getRoute();
+	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+		List<Node> nodes = getNodes();
 		boolean foundFromNode = false;
 		boolean foundToNode = false;
 		for (Iterator<Node> iter = nodes.iterator(); iter.hasNext(); ) {
@@ -150,8 +150,8 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		if (!foundFromNode || !foundToNode) {
 			throw new IllegalArgumentException("fromNode or toNode are not part of this route.");
 		}
-		Route subRoute = new CompressedCarRoute(this.subsequentLinks);
-		subRoute.setRoute(nodes);
+		CarRoute subRoute = new CompressedCarRoute(this.subsequentLinks);
+		subRoute.setNodes(nodes);
 		return subRoute;
 	}
 
@@ -159,7 +159,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		return this.travelCost;
 	}
 
-	public void setLinkRoute(final List<Link> srcRoute) {
+	public void setLinks(final List<Link> srcRoute) {
 		this.route.clear();
 		if (srcRoute == null || srcRoute.size() == 0) {
 			this.uncompressedLength = 0;
@@ -185,7 +185,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
 	}
 
-	public void setRoute(final String route) {
+	public void setNodes(final String route) {
 		this.route.clear();
 		String[] parts = route.trim().split("[ \t\n]+");
 		if (parts.length == 1) {
@@ -229,7 +229,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
 	}
 
-	public void setRoute(final List<Node> srcRoute) {
+	public void setNodes(final List<Node> srcRoute) {
 		this.route.clear();
 		Node previousNode = null;
 		Link previousLink = null;
@@ -275,7 +275,7 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 
 	private double calcDistance() {
 		double dist = 0;
-		Link[] links = getLinkRoute();
+		Link[] links = getLinks();
 		for (Link link : links) {
 			dist += link.getLength();
 		}
@@ -283,8 +283,8 @@ public class CompressedCarRoute extends AbstractRoute implements Route {
 		return dist;
 	}
 
-	public void setRoute(final ArrayList<Node> route, final double travelTime, final double travelCost) {
-		setRoute(route);
+	public void setNodes(final ArrayList<Node> route, final double travelTime, final double travelCost) {
+		setNodes(route);
 		setTravTime(travelTime);
 		this.travelCost = travelCost;
 	}

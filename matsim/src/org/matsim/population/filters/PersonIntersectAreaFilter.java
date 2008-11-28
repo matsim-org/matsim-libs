@@ -85,7 +85,7 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						return true;
 					}
 				} else {
-					Link[] links = leg.getRoute().getLinkRoute();
+					Link[] links = leg.getRoute().getLinks();
 					if (links.length == 0) {
 						if (judgeByBeeline((Act) plan.getActsLegs().get(i-1), (Act) plan.getActsLegs().get(i+1))) {
 							return true;

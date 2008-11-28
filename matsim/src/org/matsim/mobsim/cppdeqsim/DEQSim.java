@@ -42,7 +42,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 /**
@@ -190,9 +190,9 @@ public class DEQSim extends ExternalMobsim {
 			// departuretime, double, 64bit
 			out.writeDouble(time);
 
-			Route route = leg.getRoute();
+			CarRoute route = leg.getRoute();
 			// in the binary format, we write the link-ids instead of the node-ids
-			Link[] linkRoute = route.getLinkRoute();
+			Link[] linkRoute = route.getLinks();
 
 			// # links, int, 32bit
 			out.writeInt(linkRoute.length + 2);

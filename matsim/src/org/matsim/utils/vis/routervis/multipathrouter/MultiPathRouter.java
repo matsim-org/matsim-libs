@@ -30,8 +30,8 @@ import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -133,7 +133,7 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 	
 	abstract void initSelector();
 
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
 		final PriorityQueue<NodeData> pendingNodes = new PriorityQueue<NodeData>(500, this.comparator);
 
 		double minCost = Double.MAX_VALUE;
@@ -222,8 +222,8 @@ abstract class MultiPathRouter  implements LeastCostPathCalculator, VisLeastCost
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
 
-		final Route route = new RouteImpl();
-		route.setRoute(routeNodes, (int) (arrivalTime - startTime), cost);
+		final CarRoute route = new NodeCarRoute();
+		route.setNodes(routeNodes, (int) (arrivalTime - startTime), cost);
 
 		if (this.doGatherInformation) {
 			this.avgTravelTime = (this.routeCnt * this.avgTravelTime + route

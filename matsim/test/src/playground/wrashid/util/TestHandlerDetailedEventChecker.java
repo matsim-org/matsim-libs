@@ -160,7 +160,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 						((LinkLeaveEvent) list.get(index)).linkId));
 				index++;
 
-				for (Link link : leg.getRoute().getLinkRoute()) {
+				for (Link link : leg.getRoute().getLinks()) {
 					// enter link and leave each link on route
 					assertEquals(true,
 							list.get(index) instanceof LinkEnterEvent);
@@ -356,7 +356,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
 					expected.expectedLinkEnterEvents += leg.getRoute()
-							.getLinkRoute().length + 1;
+							.getLinks().length + 1;
 				}
 			}
 
@@ -383,7 +383,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		LegIterator iter = plan.getIteratorLeg();
 		while (iter.hasNext()) {
 			Leg leg = (Leg) iter.next();
-			for (Link link : leg.getRoute().getLinkRoute()) {
+			for (Link link : leg.getRoute().getLinks()) {
 				System.out.print(link.getId()
 						+ "("
 						+ Road.allRoads.get(link.getId().toString())

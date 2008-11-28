@@ -29,8 +29,8 @@ import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -78,7 +78,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
 		final int nofLegs = (actslegs.size() - 1) / 2;
-		Route[][] routes = new Route[2][nofLegs];
+		CarRoute[][] routes = new CarRoute[2][nofLegs];
 		double[][] depTimes = new double[2][nofLegs];
 		boolean[] isCarLeg = new boolean[nofLegs];
 
@@ -112,8 +112,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				}
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
-				Route tollRoute = null;
-				Route noTollRoute = null;
+				CarRoute tollRoute = null;
+				CarRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
@@ -125,8 +125,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, tollRoute, toLink, depTimes[TOLL_INDEX][routeIndex]);
 				} else {
 					// do not drive/walk around, if we stay on the same link
-					tollRoute = new RouteImpl();
-					tollRoute.setRoute(null, 0, 0.0);
+					tollRoute = new NodeCarRoute();
+					tollRoute.setNodes(null, 0, 0.0);
 					// if we don't drive around, it doesn't matter  if we're in or out the toll area, so use "false"
 				}
 
@@ -248,7 +248,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final Route route, final Link endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final CarRoute route, final Link endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link
@@ -261,7 +261,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 		 */
 
 		// handle following links
-		for (Link link : route.getLinkRoute()) {
+		for (Link link : route.getLinks()) {
 			if (isLinkTolled(link, time)) {
 				return true;
 			}

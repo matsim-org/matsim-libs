@@ -22,9 +22,9 @@
  * @author Christoph Dobler
  * 
  * Liefert eine ArrayList von Links.
- * Übergabeparameter muss ein Netzwerk, eine Person oder ein Plan sein.
- * Wird eine Person übergeben, so wird der jeweils aktuelle Plan verwendet.
- * Wird zusätzlich noch eine ArrayList Links mit übergeben, so wird diese
+ * ï¿½bergabeparameter muss ein Netzwerk, eine Person oder ein Plan sein.
+ * Wird eine Person ï¿½bergeben, so wird der jeweils aktuelle Plan verwendet.
+ * Wird zusï¿½tzlich noch eine ArrayList Links mit ï¿½bergeben, so wird diese
  * mit den neu gefundenen Links erweitert. Andernfalls wird eine neue erstellt.
  *
  */
@@ -46,7 +46,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 public class GetAllLinks {
 	
@@ -87,7 +87,7 @@ public class GetAllLinks {
 		getLinks(plan, links);
 	}
 	
-	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der übergebenen Person sind.
+	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der ï¿½bergebenen Person sind.
 	protected ArrayList<Link> getLinks(Person person)
 	{
 		Plan plan = person.getSelectedPlan();
@@ -96,7 +96,7 @@ public class GetAllLinks {
 	} //getLinks(Person)
 	
 	
-	// Liefert eine ArrayList aller Links, die Teil übergebenen Plans sind.
+	// Liefert eine ArrayList aller Links, die Teil ï¿½bergebenen Plans sind.
 	protected ArrayList<Link> getLinks(Plan plan)
 	{	
 		ArrayList<Link> links = new ArrayList<Link>();
@@ -113,7 +113,7 @@ public class GetAllLinks {
 		{
 			Act act = (Act)actIterator.next();
 			
-			// Hinzufügen, falls neues Element
+			// Hinzufï¿½gen, falls neues Element
 			if(!links.contains(act.getLink())) links.add(act.getLink());
 			
 		}	// while actIterator.hasNext()
@@ -124,15 +124,15 @@ public class GetAllLinks {
 		{
 			Leg leg = (Leg)legIterator.next();
 
-			Route route = leg.getRoute();
+			CarRoute route = leg.getRoute();
 				
-			Link[] linkArray = route.getLinkRoute(); 
+			Link[] linkArray = route.getLinks(); 
 			
 			for(int i = 0; i < linkArray.length; i++)
 			{
 				Link link = linkArray[i];
 			
-				// Hinzufügen, falls neues Element
+				// Hinzufï¿½gen, falls neues Element
 				if(!links.contains(link)) links.add(link);
 				
 			}
@@ -158,12 +158,12 @@ public class GetAllLinks {
 		
 		while(linkIterator.hasNext())
 		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
+			// Wir wissen ja, was fï¿½r Elemente zurï¿½ckgegeben werden :)
 			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
 
 			Link link = nextLink.getValue();
 						
-			// Prüfen, ob der Link bereits in der Liste enthalten ist
+			// Prï¿½fen, ob der Link bereits in der Liste enthalten ist
 			if(!links.contains(link)) links.add(link);	
 		}	// while linkIterator.hasNext()
 		

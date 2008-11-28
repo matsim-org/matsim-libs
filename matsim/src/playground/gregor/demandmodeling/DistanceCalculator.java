@@ -30,7 +30,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.utils.geometry.CoordImpl;
@@ -85,7 +85,7 @@ public class DistanceCalculator {
 			
 			Node home = this.network.getNearestNode(hh.home);
 			Node act = this.network.getNearestNode(actCoord);
-			Route route = router.calcLeastCostPath(home, act, 0);
+			CarRoute route = router.calcLeastCostPath(home, act, 0);
 			double dist = route.getDist();
 			writer.writeLine(new String [] {excId,id,Double.toString(dist)});
 			

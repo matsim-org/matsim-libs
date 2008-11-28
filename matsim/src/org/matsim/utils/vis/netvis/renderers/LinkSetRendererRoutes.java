@@ -44,9 +44,9 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.netvis.gui.ControlToolbar;
@@ -233,10 +233,10 @@ public class LinkSetRendererRoutes extends RendererA {
 			}
 		}
 
-		public void run(final Route route) {
+		public void run(final CarRoute route) {
 			if (route == null) return;
 
-			Link[] links = route.getLinkRoute();
+			Link[] links = route.getLinks();
 			for (Link link : links) {
 				Id id = link.getId();
 				Integer counter = this.linkValues.get(id);

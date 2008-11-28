@@ -43,7 +43,7 @@ public class FollowPlanAnalyzer implements Analyzer {
 	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan, final InformationExchanger informationExchanger) {
 		this.beliefs = beliefs;
 		this.informationExchanger = informationExchanger;
-		this.links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
+		this.links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinks();
 		this.startLink = plan.getFirstActivity().getLink();
 		if (plan.getScore() == Plan.UNDEF_SCORE){
 			this.isScored = false;

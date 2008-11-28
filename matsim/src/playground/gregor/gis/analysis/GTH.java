@@ -21,7 +21,7 @@
 package playground.gregor.gis.analysis;
 
 import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.spatialschema.geometry.geometry.Circle;
 
@@ -59,9 +59,9 @@ public class GTH {
 		return this.geofac.createPolygon(lr,null);
 	}
 	
-	public Polygon getPolygonFromRoute(Route r) {
+	public Polygon getPolygonFromRoute(CarRoute r) {
 		
-		Link [] linkRoute = r.getLinkRoute();
+		Link [] linkRoute = r.getLinks();
 		Coordinate [] edges = new Coordinate [linkRoute.length * 4] ;
 		
 		int pos = 0;

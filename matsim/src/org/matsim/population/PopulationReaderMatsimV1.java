@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -62,10 +63,10 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private Leg currleg = null;
 
-	private Route currroute = null;
+	private CarRoute currroute = null;
 
 	private Act prevAct = null;
-	private Route prevRoute = null;
+	private CarRoute prevRoute = null;
 
 	public PopulationReaderMatsimV1(final Population plans) {
 		this.plans = plans;
@@ -112,7 +113,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			this.currleg = null;
 		}
 		else if (ROUTE.equals(name)) {
-			this.currroute.setRoute(content);
+			this.currroute.setNodes(content);
 			this.prevRoute = this.currroute;
 			this.currroute = null;
 		}

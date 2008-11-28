@@ -43,10 +43,10 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.misc.Time;
@@ -191,7 +191,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		Act activity = null;
 		Leg leg = null;
 
-		HashMap<Leg, Route> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
+		HashMap<Leg, CarRoute> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
 
 		Gene[] fittestGenes = individual.getGenes();
 //		for (Gene gene: fittestGenes) {
@@ -272,14 +272,14 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	}
 
-	public static HashMap<Leg, Route> getLegsRoutes(final Plan plan) {
+	public static HashMap<Leg, CarRoute> getLegsRoutes(final Plan plan) {
 		
-		HashMap<Leg, Route> routes = new HashMap<Leg, Route>();
+		HashMap<Leg, CarRoute> routes = new HashMap<Leg, CarRoute>();
 		
 		LegIterator legIterator = plan.getIteratorLeg();
 		while (legIterator.hasNext()) {
 			Leg curLeg = (Leg) legIterator.next();
-			routes.put(curLeg, new RouteImpl(curLeg.getRoute()));
+			routes.put(curLeg, new NodeCarRoute(curLeg.getRoute()));
 		}
 		
 		return routes;

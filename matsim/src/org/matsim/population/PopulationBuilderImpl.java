@@ -39,6 +39,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 
 /**
  * @author dgrether
@@ -96,12 +98,12 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	}
 
 	public BasicRoute createRoute(List<Id> currentRouteLinkIds) {
-		Route route = new RouteImpl();
+		CarRoute route = new NodeCarRoute();
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : currentRouteLinkIds) {
 			links.add(this.network.getLink(id));
 		}
-		route.setLinkRoute(links);
+		route.setLinks(links);
 		return route;
 	}
 

@@ -48,7 +48,7 @@ import org.matsim.network.Node;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.vis.kml.KMZWriter;
@@ -68,7 +68,7 @@ public class KMLPersonWriter {
 	protected ArrayList<Node> routeNodes;
 	protected NetworkLayer network;
 	protected Map<Id, Node> nodes;
-	protected Route route;
+	protected CarRoute route;
 	
 	protected boolean writeKnownNodes = true;
 	protected boolean writeActivityLinks = true;
@@ -301,10 +301,10 @@ public class KMLPersonWriter {
 				{
 					BasicLeg leg = iterator.next();
 					
-					if (leg.getRoute() instanceof Route)
+					if (leg.getRoute() instanceof CarRoute)
 					{
-						Route route = (Route)leg.getRoute();
-						for(Node node : route.getRoute())
+						CarRoute route = (CarRoute)leg.getRoute();
+						for(Node node : route.getNodes())
 						{
 							routeNodes.add(node);
 						}

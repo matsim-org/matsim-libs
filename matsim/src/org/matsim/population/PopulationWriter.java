@@ -28,6 +28,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.writer.Writer;
 
@@ -228,7 +229,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 						this.handler.startLeg(leg, this.out);
 						// route
 						if (leg.getRoute() != null) {
-							Route r = leg.getRoute();
+							CarRoute r = leg.getRoute();
 							this.handler.startRoute(r, this.out);
 							this.handler.endRoute(this.out);
 						}

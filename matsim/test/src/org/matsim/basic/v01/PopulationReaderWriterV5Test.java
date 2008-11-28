@@ -127,13 +127,13 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNull(a.getLinkId());
 		Leg l = p.getNextLeg(a);
 		assertNotNull(l.getRoute());
-		assertNotNull(l.getRoute().getRoute());
+		assertNotNull(l.getRoute().getNodes());
 		assertNotNull(l.getRoute().getLinkIds());
-		assertNotNull(l.getRoute().getLinkRoute());
-		for (Node n : l.getRoute().getRoute()) {
+		assertNotNull(l.getRoute().getLinks());
+		for (Node n : l.getRoute().getNodes()) {
 			assertNotNull(n);
 		}
-		for (Link ll : l.getRoute().getLinkRoute()){
+		for (Link ll : l.getRoute().getLinks()){
 			assertNotNull(ll);
 			assertTrue((ll.equals(net.getLink(id23))) || ll.equals(net.getLink(id24)));
 		}

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.network.Node;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 import org.matsim.writer.MatsimXmlWriter;
 
@@ -253,12 +254,12 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	public void startRoute(final CarRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		Iterator<Node> it = route.getRoute().iterator();
+		Iterator<Node> it = route.getNodes().iterator();
 		while (it.hasNext()) {
 			Node n = it.next();
 			out.write(n.getId() + " ");

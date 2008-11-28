@@ -35,7 +35,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.world.World;
 
 /**
@@ -66,9 +66,9 @@ public class AvoidOldNodes extends NewPlan {
 		for (Plan p : person.getPlans()) {
 			for (LegIterator i = p.getIteratorLeg(); i.hasNext();) {
 				BasicLeg bl = i.next();
-				Route br = (Route) bl.getRoute();
+				CarRoute br = (CarRoute) bl.getRoute();
 				if (br != null) {
-					tag: for (final Node n : br.getRoute()) {
+					tag: for (final Node n : br.getNodes()) {
 						final String nId = n.getId().toString();
 						for (String nodeId : nodeIds) {
 							if (nId.equals(nodeId)) {

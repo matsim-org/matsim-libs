@@ -218,7 +218,7 @@ public class PersonAgent {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
-		List<Node> route = this.currentLeg.getRoute().getRoute();
+		List<Node> route = this.currentLeg.getRoute().getNodes();
 
 		if (this.currentNodeIndex >= route.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link

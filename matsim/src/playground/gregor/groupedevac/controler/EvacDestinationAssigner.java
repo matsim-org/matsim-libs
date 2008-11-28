@@ -38,8 +38,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRouteDijkstra;
 import org.matsim.router.util.TravelCost;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
@@ -88,7 +88,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
 			Link link = group.getBestLink();
 			Plan plan = getBestLinkPlan(link);
-			ArrayList<Node> evacRoute = new ArrayList<Node>(((Leg)plan.getActsLegs().get(1)).getRoute().getRoute());
+			ArrayList<Node> evacRoute = new ArrayList<Node>(((Leg)plan.getActsLegs().get(1)).getRoute().getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
 			}
@@ -144,13 +144,13 @@ public class EvacDestinationAssigner implements ScoringListener {
 		
 		for (Plan plan : plans) {
 			Leg leg = new Leg(Mode.car);
-			Route route = new RouteImpl();
-			route.setRoute(evacRoute);
+			CarRoute route = new NodeCarRoute();
+			route.setNodes(evacRoute);
 			leg.setRoute(route);
 			leg.setNum(1);
 			Act act = new Act("h",dest);
 			try {
-				route.getLinkRoute();
+				route.getLinks();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;

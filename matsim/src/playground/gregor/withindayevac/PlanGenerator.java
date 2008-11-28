@@ -44,8 +44,8 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 
 import playground.gregor.withindayevac.debug.DebugDecisionTree;
 import playground.gregor.withindayevac.debug.DebugFollowFastestAgent;
@@ -81,7 +81,7 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 			Person pers = this.population.getPerson(e.getKey());
 			Plan plan = pers.getSelectedPlan();
 		
-			Link[] links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinkRoute();
+			Link[] links = plan.getNextLeg(plan.getFirstActivity()).getRoute().getLinks();
 			ArrayList<String> strLinks = e.getValue();
 			if (strLinks.size() < links.length) {
 				if (addNewPlan(pers,strLinks)) count++;
@@ -133,8 +133,8 @@ System.out.println(count);
 		Act oldB = pers.getSelectedPlan().getNextActivity(oldLeg);
 		Act b = new Act(oldB);
 		plan.addAct(a);
-		Route route = new RouteImpl();
-		route.setRoute(nodes);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(nodes);
 		route.getDist();
 		l.setRoute(route);
 		plan.addLeg(l);

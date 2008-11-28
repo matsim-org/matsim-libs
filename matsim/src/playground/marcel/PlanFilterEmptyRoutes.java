@@ -66,7 +66,7 @@ public class PlanFilterEmptyRoutes extends AbstractPersonAlgorithm implements Pl
 		ArrayList<Object> actslegs = plan.getActsLegs();
 		for (int i = 1; i < actslegs.size(); i = i + 2) {
 			Leg leg = (Leg)actslegs.get(i);
-			if (leg.getRoute().getRoute().size() == 0) {
+			if (leg.getRoute().getNodes().size() == 0) {
 				Act act1 = (Act)actslegs.get(i-1);
 				Act act2 = (Act)actslegs.get(i+1);
 				

@@ -29,7 +29,7 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
@@ -73,11 +73,11 @@ public class RouteSetGenerator {
 		link.getToNode().removeInLink(link);
 	}
 
-	private boolean containsRoute(Route route, LinkedList<Route> routes) {
-		List<Node> nodes = route.getRoute();
-		Iterator<Route> r_it = routes.iterator();
+	private boolean containsRoute(CarRoute route, LinkedList<CarRoute> routes) {
+		List<Node> nodes = route.getNodes();
+		Iterator<CarRoute> r_it = routes.iterator();
 		while (r_it.hasNext()) {
-			List<Node> ns = r_it.next().getRoute();
+			List<Node> ns = r_it.next().getNodes();
 			if (ns.size() == nodes.size()) {
 				boolean is_equal = true;
 				for (int i=0; i<ns.size(); i++) {
@@ -89,7 +89,7 @@ public class RouteSetGenerator {
 		return false;
 	}
 
-	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int time, final LinkedList<Link[]> links, final LinkedList<Route> routes) {
+	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int time, final LinkedList<Link[]> links, final LinkedList<CarRoute> routes) {
 
 		// the list to handle for the next level (level d+1) of the tree
 		LinkedList<Link[]> new_links = new LinkedList<Link[]>();
@@ -105,7 +105,7 @@ public class RouteSetGenerator {
 			for (int i=0; i<ls.length; i++) { this.removeLinkFromNetwork(ls[i]); }
 //			System.out.println("    ---");
 //			System.out.println("    removed " + ls.length + " links from the net");
-			Route route = this.router.calcLeastCostPath(o,d,time);
+			CarRoute route = this.router.calcLeastCostPath(o,d,time);
 
 			// add it to the resulting list of routes if exists. Also, create the link sets for
 			// the next level (d+1) of the tree for the current link set
@@ -116,7 +116,7 @@ public class RouteSetGenerator {
 
 				// for each link of the calc route create a new link set with the
 				// other links of the current link set
-				Link[] route_links = route.getLinkRoute();
+				Link[] route_links = route.getLinks();
 				for (int j=0; j<route_links.length; j++) {
 					Link[] new_ls = new Link[ls.length+1];
 					for (int jj=0; jj<ls.length; jj++) { new_ls[jj] = ls[jj]; }
@@ -141,17 +141,17 @@ public class RouteSetGenerator {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final LinkedList<Route> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor) {
+	public final LinkedList<CarRoute> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor) {
 		if (o.getId().toString().equals(d.getId().toString())) { Gbl.errorMsg("O == D not alloed!"); }
 		if (k < 1) { Gbl.errorMsg("k < 1 not allowed!"); }
 
-		LinkedList<Route> routes = new LinkedList<Route>(); // resulting k least cost routes
+		LinkedList<CarRoute> routes = new LinkedList<CarRoute>(); // resulting k least cost routes
 		LinkedList<Link[]> links = new LinkedList<Link[]>(); // removed links
-		Route route = this.router.calcLeastCostPath(o,d,time);
+		CarRoute route = this.router.calcLeastCostPath(o,d,time);
 		if (route == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
 //		routes.add(route);
 
-		Link[] ls = route.getLinkRoute();
+		Link[] ls = route.getLinks();
 		for (int i=0; i<ls.length; i++) {
 			Link[] lls = new Link[1];
 			lls[0] = ls[i];

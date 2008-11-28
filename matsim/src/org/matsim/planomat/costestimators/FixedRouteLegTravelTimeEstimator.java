@@ -25,7 +25,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -70,10 +70,10 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
-	protected double processRouteTravelTime(final Route route, final double start) {
+	protected double processRouteTravelTime(final CarRoute route, final double start) {
 
 		double now = start;
-		Link[] links = route.getLinkRoute();
+		Link[] links = route.getLinks();
 		for (Link link : links) {
 			now = this.processLink(link, now);
 		}

@@ -35,8 +35,8 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -180,12 +180,12 @@ public class CMCFScenarioGenerator {
 			act1.setEndTime(homeEndTime);
 			//leg to home
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = new RouteImpl();
+			CarRoute route = new NodeCarRoute();
 			if (isAlternativeRouteEnabled) {
-				route.setRoute("2 3 4 5 6");
+				route.setNodes("2 3 4 5 6");
 			}
 			else {
-				route.setRoute("2 3 5 6");
+				route.setNodes("2 3 5 6");
 			}
 			leg.setRoute(route);				
 			Act act2 = plan.createAct("h", l6.getCenter());

@@ -27,7 +27,7 @@ import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.misc.Time;
 
 public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRouteLegTravelTimeEstimatorTest {
@@ -56,8 +56,8 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		events.addHandler(super.linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		Route route = testLeg.getRoute();
-		Link[] links = route.getLinkRoute();
+		CarRoute route = testLeg.getRoute();
+		Link[] links = route.getLinks();
 
 		// let's test a route without events first
 		// should result in free speed travel time, without departure delay

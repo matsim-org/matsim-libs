@@ -245,7 +245,7 @@ public class QueueLink {
 			if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 				QueueSimulation.handleUnknownLegMode(veh);
 			} else {
-				if (leg.getRoute().getRoute().size() != 0) {
+				if (leg.getRoute().getNodes().size() != 0) {
 					this.waitingList.add(veh);
 				} else {
 					// this is the case where (hopefully) the next act happens at the same location as this act

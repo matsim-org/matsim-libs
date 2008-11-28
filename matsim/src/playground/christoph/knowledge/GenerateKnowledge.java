@@ -37,7 +37,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 
 import playground.christoph.knowledge.utils.GetAllLinks;
@@ -58,8 +58,8 @@ public class GenerateKnowledge {
 	}
 	
 	
-	// Führt alle Schritte durch, um das Wissen (in diesem Fall die Kenntnis der Umgegung)
-	// der Personen des aktuellen Objekts zu beschränken.
+	// Fï¿½hrt alle Schritte durch, um das Wissen (in diesem Fall die Kenntnis der Umgegung)
+	// der Personen des aktuellen Objekts zu beschrï¿½nken.
 	protected void getPersons()
 	{
 		Iterator<Person> PersonIterator = population.iterator();
@@ -71,14 +71,14 @@ public class GenerateKnowledge {
 			
 			setKnowledge(person, links);
 			
-			// alte Version - Berechnung über Abstand Node zu Node und nicht Node zu Link
+			// alte Version - Berechnung ï¿½ber Abstand Node zu Node und nicht Node zu Link
 			//ArrayList<Node> nodes = getNodes(links);
 			//setKnowledge(person, nodes);
 		}
 	}
 	
 	
-	// Liefert eine ArrayList aller Nodes, welche Teil der übergebenen Links sind.
+	// Liefert eine ArrayList aller Nodes, welche Teil der ï¿½bergebenen Links sind.
 	protected ArrayList<Node> getNodes(ArrayList<Link> links)
 	{
 		ArrayList<Node> nodes = new ArrayList<Node>();
@@ -103,7 +103,7 @@ public class GenerateKnowledge {
 	} //getNodes(ArrayList<Link>)
 	
 	
-	// Beschränkt die Kenntnis der Umgebung der übergebenen Person.
+	// Beschrï¿½nkt die Kenntnis der Umgebung der ï¿½bergebenen Person.
 	protected void setKnowledge(Person person, ArrayList<Link> links)
 	{		
 		Knowledge knowledge = person.getKnowledge();
@@ -116,7 +116,7 @@ public class GenerateKnowledge {
 		// ... und daraus die Links innerhalb der vorgegebenen Distanz generieren.
 		ArrayList<Link> includedLinks = getIncludedLinks(includedNodes);
 		
-		// Links zum Knowledge der Person hinzufügen
+		// Links zum Knowledge der Person hinzufï¿½gen
 		for(int i = 0; i < includedLinks.size(); i++)
 		{
 			Id id = includedLinks.get(i).getId();
@@ -126,7 +126,7 @@ public class GenerateKnowledge {
 	} //setKnowledge(ArrayList<Node>)
 
 	
-	// Gibt eine ArrayList mit Knoten zurück, die innerhalb eines vorgegebenen
+	// Gibt eine ArrayList mit Knoten zurï¿½ck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
 	protected ArrayList<Node> getIncludedNodes(ArrayList<Link> links)
 	{
@@ -139,14 +139,14 @@ public class GenerateKnowledge {
 		
 		while(nodeIterator.hasNext())
 		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
+			// Wir wissen ja, was fï¿½r Elemente zurï¿½ckgegeben werden :)
 			Map.Entry<Id, Node> nextLink = (Map.Entry<Id, Node>)nodeIterator.next();
 			//Id id = nextLink.getKey();
 			Node node = nextLink.getValue();
 			
 			Coord coord = node.getCoord();
 			
-			// Abstand zu allen Links der übergebenen Person untersuchen
+			// Abstand zu allen Links der ï¿½bergebenen Person untersuchen
 			for (int i = 0; i < links.size(); i++)
 			{
 				double dist = links.get(i).calcDistance(coord);
@@ -167,7 +167,7 @@ public class GenerateKnowledge {
 	}
 	
 	
-	// Gibt eine ArrayList mit Links zurück, die innerhalb eines vorgegebenen
+	// Gibt eine ArrayList mit Links zurï¿½ck, die innerhalb eines vorgegebenen
 	// Abstands zu einer vorgeggebenen Route liegen.
 	protected ArrayList<Link> getIncludedLinks(ArrayList<Node> includedNodes)
 	{
@@ -180,7 +180,7 @@ public class GenerateKnowledge {
 		
 		while(linkIterator.hasNext())
 		{
-			// Wir wissen ja, was für Elemente zurückgegeben werden :)
+			// Wir wissen ja, was fï¿½r Elemente zurï¿½ckgegeben werden :)
 			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
 			//Id id = nextLink.getKey();
 			Link link = nextLink.getValue();
@@ -188,7 +188,7 @@ public class GenerateKnowledge {
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			// Prüfen, ob der Node in der übergebenen Liste enthalten ist
+			// Prï¿½fen, ob der Node in der ï¿½bergebenen Liste enthalten ist
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))
 			{
 				//... also beide Nodes enthalten -> Link enthalten

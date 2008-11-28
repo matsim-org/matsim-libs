@@ -86,7 +86,7 @@ public class Vehicle extends SimUnit {
 
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
-		currentLinkRoute=currentLeg.getRoute().getLinkRoute();
+		currentLinkRoute=currentLeg.getRoute().getLinks();
 	}
 	
 	public Link[] getCurrentLinkRoute(){

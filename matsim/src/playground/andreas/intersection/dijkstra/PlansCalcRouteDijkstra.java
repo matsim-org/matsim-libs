@@ -8,8 +8,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
@@ -56,7 +56,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		Node startNode = this.network.getNode(fromLink.getId().toString());	// start at the end of the "current" link
 		Node endNode = this.network.getNode(toLink.getId().toString()); // the target is the start of the link
 
-		Route route = null;
+		CarRoute route = null;
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
 			route = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
@@ -65,14 +65,14 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			NetworkLayer realNetwork = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 			ArrayList<Node> realRouteNodeList = new ArrayList<Node>();
 			
-			for (Node node : route.getRoute()) {
+			for (Node node : route.getNodes()) {
 				realRouteNodeList.add(realNetwork.getLink(node.getId().toString()).getToNode());
 			}
 			
 			realRouteNodeList.remove(realRouteNodeList.size() - 1);
 			
-			Route wrappedRoute = new RouteImpl();
-			wrappedRoute.setRoute(realRouteNodeList);
+			CarRoute wrappedRoute = new NodeCarRoute();
+			wrappedRoute.setNodes(realRouteNodeList);
 			wrappedRoute.setDist(route.getDist());
 			wrappedRoute.setTravTime(route.getTravTime());
 			
@@ -80,7 +80,7 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 			travTime = route.getTravTime();
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			route = new RouteImpl();
+			route = new NodeCarRoute();
 			route.setTravTime(0);
 			leg.setRoute(route);
 			travTime = 0;

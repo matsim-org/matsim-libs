@@ -20,17 +20,16 @@
 
 package org.matsim.population.routes;
 
-import org.matsim.population.RouteImpl;
 
 /**
- * Creates new instances of {@link RouteImpl}.
+ * Creates new instances of {@link NodeCarRoute}.
  * 
  * @author mrieser
  */
 public class NodeCarRouteFactory implements RouteFactory {
 
 	public Route createRoute() {
-		return new RouteImpl();
+		return new NodeCarRoute();
 	}
 
 }

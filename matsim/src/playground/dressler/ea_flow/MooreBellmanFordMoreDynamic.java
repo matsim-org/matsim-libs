@@ -29,8 +29,8 @@ import java.util.Queue;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -168,7 +168,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode,
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime) {
 
 		// run the algorithm
@@ -220,8 +220,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		Route route = new RouteImpl();
-		route.setRoute(routeNodes);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(routeNodes);
 
 		return route;
 	}
@@ -239,7 +239,7 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 	 * @see org.matsim.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.network.Node,
 	 *      org.matsim.network.Node, double)
 	 */
-	public Route calcLeastCostPath(final Node fromNode, final Node toNode,
+	public CarRoute calcLeastCostPath(final Node fromNode, final Node toNode,
 			final double startTime, HashMap<Link, EdgeIntervalls> flow) {
 
 		this.flow = flow;
@@ -293,8 +293,8 @@ public class MooreBellmanFordMoreDynamic implements LeastCostPathCalculator {
 				routeNodes.add(tmpNode);
 			}
 		}
-		Route route = new RouteImpl();
-		route.setRoute(routeNodes);
+		CarRoute route = new NodeCarRoute();
+		route.setNodes(routeNodes);
 
 		return route;
 	}

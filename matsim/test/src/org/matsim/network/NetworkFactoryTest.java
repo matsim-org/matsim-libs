@@ -22,8 +22,8 @@ package org.matsim.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.population.RouteImpl;
 import org.matsim.population.routes.AbstractRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.population.routes.Route;
 import org.matsim.population.routes.RouteFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,7 +40,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test default
 		Route carRoute = factory.createRoute(BasicLeg.Mode.car);
-		assertTrue(carRoute instanceof RouteImpl);
+		assertTrue(carRoute instanceof NodeCarRoute);
 
 		try {
 			Route route = factory.createRoute(BasicLeg.Mode.pt);

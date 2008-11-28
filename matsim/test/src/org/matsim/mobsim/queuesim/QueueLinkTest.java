@@ -29,7 +29,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -125,8 +125,8 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAct("h", link1);
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			Route route = leg.createRoute();
-			route.setRoute("2");
+			CarRoute route = leg.createRoute();
+			route.setNodes("2");
 			leg.setRoute(route);
 			plan.createAct("w", link2);
 		} catch (Exception e) {

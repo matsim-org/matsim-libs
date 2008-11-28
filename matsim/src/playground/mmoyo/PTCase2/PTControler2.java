@@ -4,7 +4,7 @@ import org.matsim.network.Node;
 import java.util.Map;
 import java.util.Iterator;
 import org.matsim.network.Link;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -41,7 +41,7 @@ public class PTControler2 {
 	    	case 1:
     			Coord coord1= new CoordImpl(680291,248300);
     			Coord coord2= new CoordImpl(684573,246805);
-	    		Route route = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
+	    		CarRoute route = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
 	    		pt.getPtRouter2().PrintRoute(route);
 	    		break;

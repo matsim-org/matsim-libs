@@ -185,7 +185,7 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDist();
 
-		org.matsim.network.Link[] links = leg.getRoute().getLinkRoute();
+		org.matsim.network.Link[] links = leg.getRoute().getLinks();
 		Coordinate [] coords = new Coordinate[links.length + 1];
 		for (int i = 0; i < links.length; i++) {
 			Coord c = links[i].getFromNode().getCoord();

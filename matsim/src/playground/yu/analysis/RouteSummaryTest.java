@@ -43,8 +43,8 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
 
@@ -156,10 +156,10 @@ public class RouteSummaryTest {
 							aOdRouteSet = new HashSet<List<Id>>();
 
 						List<Id> routeLinkIds = new LinkedList<Id>();
-						Route r = l.getRoute();
+						CarRoute r = l.getRoute();
 						// boolean illegalRoute = false;
 
-						if (r.getRoute().size() > 0) {
+						if (r.getNodes().size() > 0) {
 							LinkedList<Id> tmpRouteLinkList = new LinkedList<Id>();
 							tmpRouteLinkList.addFirst(previousActLinkId);
 							List<Id> origRouteLinkIds = r.getLinkIds();
@@ -168,7 +168,7 @@ public class RouteSummaryTest {
 							}
 							tmpRouteLinkList.addLast(nextActLinkId);
 							routeLinkIds = tmpRouteLinkList;
-						} else if (r.getRoute().size() == 0
+						} else if (r.getNodes().size() == 0
 								&& previousActLinkId.equals(nextActLinkId))
 							routeLinkIds.add(previousActLinkId);
 						// else

@@ -130,7 +130,7 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		Link [] route = leg.getRoute().getLinkRoute();
+		Link [] route = leg.getRoute().getLinks();
 		int posInRoute = 0;
 		//determine the actual position in the route
 		for (int j = 0; j < route.length; j++) {
@@ -163,7 +163,7 @@ public class PlanScore implements AgentContentment {
 			planIdx++;
 		}
 		if (log.isTraceEnabled())
-			log.trace("getNextActivity: " + leg + " route: " + leg.getRoute().getRoute());
+			log.trace("getNextActivity: " + leg + " route: " + leg.getRoute().getNodes());
 		Act nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 

@@ -334,7 +334,7 @@ public class EgoNetPlansMakeKML {
 
 			Leg leg = (Leg) actLegIter.nextLeg();
 
-			Link[] routeLinks = (leg).getRoute().getLinkRoute();
+			Link[] routeLinks = (leg).getRoute().getLinks();
 			for (Link routeLink : routeLinks) {
 				PlacemarkType agentLinkL = generateLinkPlacemark(routeLink, agentLinkStyle, trafo);
 

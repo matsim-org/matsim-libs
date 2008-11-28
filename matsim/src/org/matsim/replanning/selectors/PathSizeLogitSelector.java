@@ -32,7 +32,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Route;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -105,9 +105,9 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while (it.hasNext()){
 					Leg leg = ((Leg)it.next());
 					currentEndTime = leg.getDepartureTime();
-					Route r = leg.getRoute();
+					CarRoute r = leg.getRoute();
 					pathSize += r.getDist();
-					Link[] links = r.getLinkRoute();
+					Link[] links = r.getLinks();
 					for (Link link : links){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
 						if (lit == null){
@@ -129,7 +129,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 			while(it.hasNext()){
 				Leg leg = (Leg) it.next();
 				double currentTime = leg.getDepartureTime();
-				for (Link link : leg.getRoute().getLinkRoute()){
+				for (Link link : leg.getRoute().getLinks()){
 					double denominator = 0;
 					for (double dbl : linksInTime.get(link.getId())){
 						//TODO this is just for testing (those legs where the depature time differs more then 3600 seconds will not compared to each other) - need a

@@ -194,7 +194,7 @@ public class DistanceAnalysis {
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDist();
-			Link [] ls = leg.getRoute().getLinkRoute();
+			Link [] ls = leg.getRoute().getLinks();
 			Link l = ls[ls.length-1];
 			String destS  = l.getId().toString().replace("el", "");
 			int dest = Integer.parseInt(destS);

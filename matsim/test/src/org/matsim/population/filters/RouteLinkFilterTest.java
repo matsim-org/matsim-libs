@@ -32,9 +32,9 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.Route;
-import org.matsim.population.RouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.World;
 
@@ -69,15 +69,15 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Person person;
 		Plan plan;
 		Leg leg;
-		Route route;
+		CarRoute route;
 
 		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createPlan(true);
 		Act a = plan.createAct("h", link1);
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createLeg(Mode.car);
-		route = new RouteImpl();
-		route.setRoute("2 7 12");
+		route = new NodeCarRoute();
+		route.setNodes("2 7 12");
 		leg.setRoute(route);
 		plan.createAct("w", link20);
 		population.addPerson(person);
@@ -87,8 +87,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Act a2 = plan.createAct("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createLeg(Mode.car);
-		route = new RouteImpl();
-		route.setRoute("2 7 12");
+		route = new NodeCarRoute();
+		route.setNodes("2 7 12");
 		leg.setRoute(route);
 		plan.createAct("w", link20);
 		population.addPerson(person);
@@ -98,8 +98,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Act a3 = plan.createAct("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createLeg(Mode.car);
-		route = new RouteImpl();
-		route.setRoute("2 6 12");
+		route = new NodeCarRoute();
+		route.setNodes("2 6 12");
 		leg.setRoute(route);
 		plan.createAct("w", link20);
 		population.addPerson(person);

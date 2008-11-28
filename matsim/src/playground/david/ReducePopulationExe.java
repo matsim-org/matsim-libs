@@ -86,7 +86,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					// Leg
 					Leg l = (Leg) actl.get(i);
 					List<Link> ll = new LinkedList<Link>();
-					for(Link link : l.getRoute().getLinkRoute()) {
+					for(Link link : l.getRoute().getLinks()) {
 						usedlinkList.add(link);
 					}
 				}

@@ -101,7 +101,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationReaderKutter;
 import org.matsim.population.PopulationWriter;
-import org.matsim.population.Route;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
 import org.matsim.population.algorithms.PersonFilterSelectedPlan;
@@ -118,6 +117,7 @@ import org.matsim.population.algorithms.PlansFilterArea;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.population.routes.CarRoute;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -552,8 +552,8 @@ public class MyRuns {
 			for (final Plan plan : person.getPlans()) {
 				for (int i = 1, max = plan.getActsLegs().size(); i < max; i +=2) {
 					final Leg leg = (Leg)plan.getActsLegs().get(i);
-					final Route route = leg.getRoute();
-					final List<Node> nodes = route.getRoute();
+					final CarRoute route = leg.getRoute();
+					final List<Node> nodes = route.getNodes();
 					final int fromNodeIdx = nodes.indexOf(fromNode);
 					final int toNodeIdx = nodes.indexOf(toNode);
 					if (toNodeIdx == fromNodeIdx + 1) {
@@ -1033,7 +1033,7 @@ public class MyRuns {
 				final Coord arrCoord = ((Act)plan.getActsLegs().get(i)).getCoord();
 				final double depTime = leg.getDepartureTime();
 				try {
-					final Route route = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
+					final CarRoute route = ptNetwork.dijkstraGetCheapestRoute(depCoord, arrCoord, depTime, radius);
 					leg.setRoute(route);
 				} catch (final RuntimeException e) {
 					System.err.println("error while handling plan " + 0 + " of person " + person.getId());
@@ -2043,13 +2043,13 @@ public class MyRuns {
 							}
 						}
 
-						public void run(final Route route, final double time) {
+						public void run(final CarRoute route, final double time) {
 							if (route == null) return;
 
 							final int hour = (int)time / 3600;
 							if ((hour > 30) || (hour < 0)) return;
 
-							for (final Link link : route.getLinkRoute()) {
+							for (final Link link : route.getLinks()) {
 								final Id id = link.getId();
 								TreeMap<Id, Integer> hourValues = linkValues.get(hour);
 								if (hourValues == null) {
