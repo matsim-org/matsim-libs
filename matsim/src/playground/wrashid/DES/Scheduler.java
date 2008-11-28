@@ -37,7 +37,7 @@ public class Scheduler {
 		
 		Message m;
 		
-		while(queue.hasElement() && simTime<SimulationParameters.maxSimulationLength){
+		while(!queue.isEmpty() && simTime<SimulationParameters.maxSimulationLength){
 			m=queue.getNextMessage();
 			simTime=m.getMessageArrivalTime();
 			m.printMessageLogString();

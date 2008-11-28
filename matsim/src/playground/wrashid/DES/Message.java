@@ -2,19 +2,16 @@ package playground.wrashid.DES;
 
 public abstract class Message implements Comparable {
 	
-	private static long messageCounter=0;
+	//private static long messageCounter=0;
 	public double messageArrivalTime=0;
 	public SimUnit sendingUnit;
 	public SimUnit receivingUnit;
 	public long messageType;
-	public long messageId;
-	public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
+	//public long messageId;
+	//public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
 	
-	// all inheriting or extending modules must
-	// invoke this Constructer first
+	
 	public Message() {
-		messageId=messageCounter;
-		messageCounter++;
 	}
 	
 	public double getMessageArrivalTime() {
@@ -27,7 +24,10 @@ public abstract class Message implements Comparable {
 	
 	public abstract void printMessageLogString();
 
-	// two messages can not be equal!!!
+	/*
+	 * The comparison is done according to the message arrival Time.
+	 * If the time is equal of two messages, one is bigger then the other randomly.
+	 */
 	public int compareTo(Object obj){
 		Message otherMessage= (Message) obj;
 		if (messageArrivalTime>otherMessage.messageArrivalTime){
@@ -35,7 +35,7 @@ public abstract class Message implements Comparable {
 		} else if (messageArrivalTime<otherMessage.messageArrivalTime) {
 			return -1;
 		} else {
-			return (int)(messageId-otherMessage.messageId);
+			return -1;
 		}
 	}
 
