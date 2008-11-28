@@ -33,6 +33,7 @@ public class AllTests {
 		suite.addTestSuite(KnowledgeTest.class);
 		suite.addTestSuite(PersonTest.class);
 		suite.addTestSuite(PlanTest.class);
+		suite.addTestSuite(PopulationReaderMatsimV4Test.class);
 		suite.addTestSuite(RouteImplTest.class);
 		suite.addTest(org.matsim.population.algorithms.AllTests.suite());
 		suite.addTest(org.matsim.population.filters.AllTests.suite());
