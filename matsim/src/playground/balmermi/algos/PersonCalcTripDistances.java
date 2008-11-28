@@ -70,9 +70,10 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 			else {
 				if (((CarRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDist(next.getCoord().calcDistance(prev.getCoord())); }
 				else {
-					Link [] links = ((CarRoute) leg.getRoute()).getLinks();
 					double dist = prev.getLink().getLength();
-					for (int j=0; j<links.length; j++) { dist += links[j].getLength(); }
+					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+						dist += link.getLength();
+					}
 					leg.getRoute().setDist(dist);
 				}
 			}

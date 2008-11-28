@@ -136,10 +136,9 @@ public class ItsumoSim extends ExternalMobsim {
 							continue ;
 						}
 						CarRoute rr = (CarRoute) leg.getRoute();
-						Link[] links = rr.getLinks() ;
-						for ( int ii=0 ; ii<links.length ; ii++ ) {
+						for (Link link : rr.getLinks()) {
 							out.write("    <route>"); out.newLine();
-							out.write("     <laneset>" + links[ii].getId() + "</laneset>"); out.newLine();
+							out.write("     <laneset>" + link.getId() + "</laneset>"); out.newLine();
 							out.write("    </route>"); out.newLine();
 						}
 					}

@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.config.Config;
@@ -192,10 +193,10 @@ public class DEQSim extends ExternalMobsim {
 
 			CarRoute route = (CarRoute) leg.getRoute();
 			// in the binary format, we write the link-ids instead of the node-ids
-			Link[] linkRoute = route.getLinks();
+			List<Link> linkRoute = route.getLinks();
 
 			// # links, int, 32bit
-			out.writeInt(linkRoute.length + 2);
+			out.writeInt(linkRoute.size() + 2);
 			// the first link where the departure happens
 			out.writeInt(Integer.parseInt(act.getLink().getId().toString()));
 			for (Link link : linkRoute) {

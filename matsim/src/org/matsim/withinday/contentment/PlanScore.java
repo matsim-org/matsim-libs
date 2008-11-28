@@ -20,6 +20,8 @@
 
 package org.matsim.withinday.contentment;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
@@ -131,21 +133,21 @@ public class PlanScore implements AgentContentment {
 		double totalDistance = 0;
 		double length = 0;
 
-		Link [] route = ((CarRoute) leg.getRoute()).getLinks();
+		List<Link> route = ((CarRoute) leg.getRoute()).getLinks();
 		int posInRoute = 0;
 		//determine the actual position in the route
-		for (int j = 0; j < route.length; j++) {
-			if (route[j].equals(currentLink)) {
+		for (int j = 0; j < route.size(); j++) {
+			if (route.get(j).equals(currentLink)) {
 				posInRoute = j;
 			}
 		}
 		//determine remaining time
-		for (int i = 0; i < route.length; i++) {
-			length = route[i].getLength();
+		for (int i = 0; i < route.size(); i++) {
+			length = route.get(i).getLength();
 			totalDistance += length;
 			//do this only for links on which we are or will be in the future
 			if (i >= posInRoute) {
-				duration += travelTime.getLinkTravelTime(route[i], time);
+				duration += travelTime.getLinkTravelTime(route.get(i), time);
 				distance += length;
 			}
 		}

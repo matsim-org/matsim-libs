@@ -60,11 +60,11 @@ public class RouteImplTest extends MatsimTestCase {
 		nodes.add(network.getNode(new IdImpl("4")));
 		route.setNodes(nodes);
 
-		Link[] links = route.getLinks();
-		assertEquals("number of links in route.", 3, links.length);
-		assertEquals(network.getLink(new IdImpl("12")), links[0]);
-		assertEquals(network.getLink(new IdImpl("-23")), links[1]);
-		assertEquals(network.getLink(new IdImpl("3")), links[2]);
+		List<Link> links = route.getLinks();
+		assertEquals("number of links in route.", 3, links.size());
+		assertEquals(network.getLink(new IdImpl("12")), links.get(0));
+		assertEquals(network.getLink(new IdImpl("-23")), links.get(1));
+		assertEquals(network.getLink(new IdImpl("3")), links.get(2));
 	}
 
 	public void testSetRoute_asString() {
@@ -72,12 +72,12 @@ public class RouteImplTest extends MatsimTestCase {
 		CarRoute route = getCarRouteInstance();
 		route.setNodes("2 12 13 3 4");
 
-		Link[] links = route.getLinks();
-		assertEquals("number of links in route.", 4, links.length);
-		assertEquals(network.getLink(new IdImpl("22")), links[0]);
-		assertEquals(network.getLink(new IdImpl("12")), links[1]);
-		assertEquals(network.getLink(new IdImpl("-23")), links[2]);
-		assertEquals(network.getLink(new IdImpl("3")), links[3]);
+		List<Link> links = route.getLinks();
+		assertEquals("number of links in route.", 4, links.size());
+		assertEquals(network.getLink(new IdImpl("22")), links.get(0));
+		assertEquals(network.getLink(new IdImpl("12")), links.get(1));
+		assertEquals(network.getLink(new IdImpl("-23")), links.get(2));
+		assertEquals(network.getLink(new IdImpl("3")), links.get(3));
 	}
 
 	public void testSetRoute_asString_empty() {
@@ -86,7 +86,7 @@ public class RouteImplTest extends MatsimTestCase {
 		route.setNodes("");
 
 		assertEquals("number of nodes in route.", 0, route.getNodes().size());
-		assertEquals("number of links in route.", 0, route.getLinks().length);
+		assertEquals("number of links in route.", 0, route.getLinks().size());
 		assertEquals("number of link ids in route.", 0, route.getLinkIds().size());
 	}
 
@@ -187,11 +187,11 @@ public class RouteImplTest extends MatsimTestCase {
 		assertEquals(network.getNode(new IdImpl("13")), nodes.get(1));
 		assertEquals(network.getNode(new IdImpl("3")), nodes.get(2));
 		assertEquals(network.getNode(new IdImpl("4")), nodes.get(3));
-		Link[] links = subRoute.getLinks();
-		assertEquals("number of links in subRoute.", 3, links.length);
-		assertEquals(network.getLink(new IdImpl("12")), links[0]);
-		assertEquals(network.getLink(new IdImpl("-23")), links[1]);
-		assertEquals(network.getLink(new IdImpl("3")), links[2]);
+		List<Link> links = subRoute.getLinks();
+		assertEquals("number of links in subRoute.", 3, links.size());
+		assertEquals(network.getLink(new IdImpl("12")), links.get(0));
+		assertEquals(network.getLink(new IdImpl("-23")), links.get(1));
+		assertEquals(network.getLink(new IdImpl("3")), links.get(2));
 	}
 
 	public void testGetSubRoute_fromStart() {
@@ -207,12 +207,12 @@ public class RouteImplTest extends MatsimTestCase {
 		assertEquals(network.getNode(new IdImpl("12")), nodes.get(2));
 		assertEquals(network.getNode(new IdImpl("13")), nodes.get(3));
 		assertEquals(network.getNode(new IdImpl("3")), nodes.get(4));
-		Link[] links = subRoute.getLinks();
-		assertEquals("number of links in subRoute.", 4, links.length);
-		assertEquals(network.getLink(new IdImpl("1")), links[0]);
-		assertEquals(network.getLink(new IdImpl("22")), links[1]);
-		assertEquals(network.getLink(new IdImpl("12")), links[2]);
-		assertEquals(network.getLink(new IdImpl("-23")), links[3]);
+		List<Link> links = subRoute.getLinks();
+		assertEquals("number of links in subRoute.", 4, links.size());
+		assertEquals(network.getLink(new IdImpl("1")), links.get(0));
+		assertEquals(network.getLink(new IdImpl("22")), links.get(1));
+		assertEquals(network.getLink(new IdImpl("12")), links.get(2));
+		assertEquals(network.getLink(new IdImpl("-23")), links.get(3));
 	}
 
 	public void testGetSubRoute_toEnd() {
@@ -226,10 +226,10 @@ public class RouteImplTest extends MatsimTestCase {
 		assertEquals(network.getNode(new IdImpl("4")), nodes.get(0));
 		assertEquals(network.getNode(new IdImpl("14")), nodes.get(1));
 		assertEquals(network.getNode(new IdImpl("15")), nodes.get(2));
-		Link[] links = subRoute.getLinks();
-		assertEquals("number of links in subRoute.", 2, links.length);
-		assertEquals(network.getLink(new IdImpl("24")), links[0]);
-		assertEquals(network.getLink(new IdImpl("14")), links[1]);
+		List<Link> links = subRoute.getLinks();
+		assertEquals("number of links in subRoute.", 2, links.size());
+		assertEquals(network.getLink(new IdImpl("24")), links.get(0));
+		assertEquals(network.getLink(new IdImpl("14")), links.get(1));
 	}
 
 	public void testGetSubRoute_wrongStart() {
@@ -269,7 +269,7 @@ public class RouteImplTest extends MatsimTestCase {
 		route.setStartLink(network.getLink(new IdImpl("2")));
 		route.setEndLink(network.getLink(new IdImpl("2")));
 		assertEquals(0, route.getNodes().size());
-		assertEquals(0, route.getLinks().length);
+		assertEquals(0, route.getLinks().size());
 	}
 
 	public void testStartAndEndOnSameLinks_setLinks() {
@@ -279,7 +279,7 @@ public class RouteImplTest extends MatsimTestCase {
 		route.setStartLink(network.getLink(new IdImpl("3")));
 		route.setEndLink(network.getLink(new IdImpl("3")));
 		assertEquals(0, route.getNodes().size());
-		assertEquals(0, route.getLinks().length);
+		assertEquals(0, route.getLinks().size());
 	}
 
 	public void testStartAndEndOnSubsequentLinks_setNodes() {
@@ -289,7 +289,7 @@ public class RouteImplTest extends MatsimTestCase {
 		route.setStartLink(network.getLink(new IdImpl("12")));
 		route.setEndLink(network.getLink(new IdImpl("13")));
 		assertEquals(1, route.getNodes().size());
-		assertEquals(0, route.getLinks().length);
+		assertEquals(0, route.getLinks().size());
 	}
 
 	public void testStartAndEndOnSubsequentLinks_setLinks() {
@@ -299,7 +299,7 @@ public class RouteImplTest extends MatsimTestCase {
 		route.setEndLink(network.getLink(new IdImpl("14")));
 		route.setLinks(new ArrayList<Link>(0));
 		assertEquals(1, route.getNodes().size());
-		assertEquals(0, route.getLinks().length);
+		assertEquals(0, route.getLinks().size());
 		assertEquals(network.getNode(new IdImpl(14)), route.getNodes().get(0));
 	}
 

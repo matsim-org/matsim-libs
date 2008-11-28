@@ -20,6 +20,8 @@
 
 package org.matsim.planomat.costestimators;
 
+import java.util.List;
+
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
@@ -57,7 +59,7 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 		events.printEventHandlers();
 
 		CarRoute route = (CarRoute) testLeg.getRoute();
-		Link[] links = route.getLinks();
+		List<Link> links = route.getLinks();
 
 		// let's test a route without events first
 		// should result in free speed travel time, without departure delay
@@ -109,17 +111,17 @@ public class CharyparEtAlCompatibleLegTravelTimeEstimatorTest extends FixedRoute
 
 		BasicEvent event = null;
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
-			for (int linkCnt = 0; linkCnt < links.length; linkCnt++) {
+			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						TEST_PERSON_ID,
-						links[linkCnt].getId().toString(),
+						links.get(linkCnt).getId().toString(),
 						TEST_LEG_NR);
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						TEST_PERSON_ID,
-						links[linkCnt].getId().toString(),
+						links.get(linkCnt).getId().toString(),
 						TEST_LEG_NR);
 				events.processEvent(event);
 			}

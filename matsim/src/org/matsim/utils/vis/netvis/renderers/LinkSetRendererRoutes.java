@@ -236,8 +236,7 @@ public class LinkSetRendererRoutes extends RendererA {
 		public void run(final CarRoute route) {
 			if (route == null) return;
 
-			Link[] links = route.getLinks();
-			for (Link link : links) {
+			for (Link link : route.getLinks()) {
 				Id id = link.getId();
 				Integer counter = this.linkValues.get(id);
 				if (counter == null) counter = 0;

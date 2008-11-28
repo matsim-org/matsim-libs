@@ -73,8 +73,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected double processRouteTravelTime(final CarRoute route, final double start) {
 
 		double now = start;
-		Link[] links = route.getLinks();
-		for (Link link : links) {
+		for (Link link : route.getLinks()) {
 			now = this.processLink(link, now);
 		}
 		return now;

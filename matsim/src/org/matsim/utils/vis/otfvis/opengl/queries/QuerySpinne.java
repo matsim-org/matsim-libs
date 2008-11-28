@@ -88,9 +88,8 @@ public class QuerySpinne implements OTFQuery {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
-					for (int j = 0; j < route.length; j++) {
-						Id id2 = route[j].getId();
+					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
 							break;
@@ -120,9 +119,8 @@ public class QuerySpinne implements OTFQuery {
 				} else {
 					// handle leg
 					Leg leg = (Leg)actslegs.get(i);
-					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
-					for (int j = 0; j < route.length; j++) {
-							addLink(route[j]);
+					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
+							addLink(link);
 					}
 				}
 

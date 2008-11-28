@@ -21,6 +21,7 @@
 package playground.gregor.withindayevac.analyzer;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.population.Plan;
@@ -44,7 +45,8 @@ public class FollowPlanAnalyzer implements Analyzer {
 	public FollowPlanAnalyzer(final Beliefs beliefs, final Plan plan, final InformationExchanger informationExchanger) {
 		this.beliefs = beliefs;
 		this.informationExchanger = informationExchanger;
-		this.links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
+		List<Link> linklist = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
+		this.links = linklist.toArray(new Link[linklist.size()]);
 		this.startLink = plan.getFirstActivity().getLink();
 		if (plan.getScore() == Plan.UNDEF_SCORE){
 			this.isScored = false;
@@ -68,9 +70,8 @@ public class FollowPlanAnalyzer implements Analyzer {
 		if (link == this.startLink) {
 			if (this.isScored) {
 				return new NextLinkWithEstimatedTravelTimeOption(this.links[0],1 * this.coef,this.estArivalTime-now);
-			} else {
-				return new NextLinkOption(this.links[0],1 * this.coef);
 			}
+			return new NextLinkOption(this.links[0],1 * this.coef);
 		}
 		
 		

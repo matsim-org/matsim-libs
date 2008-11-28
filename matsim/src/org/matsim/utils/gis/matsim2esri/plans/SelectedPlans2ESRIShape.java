@@ -22,6 +22,7 @@ package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -187,21 +188,21 @@ public class SelectedPlans2ESRIShape {
 		Double arrTime = leg.getArrivalTime();
 		Double dist = leg.getRoute().getDist();
 
-		Link[] links = ((CarRoute) leg.getRoute()).getLinks();
-		Coordinate [] coords = new Coordinate[links.length + 1];
-		for (int i = 0; i < links.length; i++) {
-			Coord c = links[i].getFromNode().getCoord();
+		List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
+		Coordinate [] coords = new Coordinate[links.size() + 1];
+		for (int i = 0; i < links.size(); i++) {
+			Coord c = links.get(i).getFromNode().getCoord();
 			double rx = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 			double ry = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 			Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
 			coords[i] = cc;
 		}
 
-		Coord c = links[links.length -1 ].getToNode().getCoord();
+		Coord c = links.get(links.size()-1).getToNode().getCoord();
 		double rx = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 		double ry = MatsimRandom.random.nextDouble() * this.legBlurFactor;
 		Coordinate cc = new Coordinate(c.getX()+rx,c.getY()+ry);
-		coords[links.length] = cc;
+		coords[links.size()] = cc;
 
 		LineString ls = this.geofac.createLineString(coords);
 

@@ -83,7 +83,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			LegIterator iter=plan.getIteratorLeg();
 			while (iter.hasNext()){
 				Leg leg=(Leg)iter.next();
-				expectedLinkEnterEvents+=((CarRoute) leg.getRoute()).getLinks().length+1;
+				expectedLinkEnterEvents+=((CarRoute) leg.getRoute()).getLinks().size()+1;
 			}
 		}
 		

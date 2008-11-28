@@ -22,6 +22,7 @@ package playground.wrashid.deqsim;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -152,17 +153,17 @@ public class JavaPDEQSim2 {
 					bucketCount[getZone(act.getLink().getFromNode().getCoord().getX(),bucketBoundries)]++;
 				} else {
 					leg = (Leg) actsLegs.get(i);
-					Link[] links = ((CarRoute) leg.getRoute()).getLinks();
+					List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
 					
 					
 					
 					double lookahead=leg.getDepartureTime();
 					Link link=null;
-					for (int j=0;j<links.length;j++){
-						link=links[j];
+					for (int j=0;j<links.size();j++){
+						link=links.get(j);
 						Road r=Road.allRoads.get(link.getId().toString());
 						// init buckedCount
-						if (j==0 || j==links.length-1){
+						if (j==0 || j==links.size()-1){
 							// if start leg or end leg, increment by two bucket counter
 							bucketCount[getZone(r.getXCoordinate(),bucketBoundries)]++;
 							bucketCount[getZone(r.getXCoordinate(),bucketBoundries)]++;

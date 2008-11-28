@@ -164,9 +164,9 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		route.setNodes(nodes);
 		route.setDist(routeLength);
 		
-		if (maxLinks == route.getLinks().length)
+		if (maxLinks == route.getLinks().size())
 		{
-			log.info("LinkCount " + route.getLinks().length + " distance " + route.getDist());
+			log.info("LinkCount " + route.getLinks().size() + " distance " + route.getDist());
 		}
 	
 		if (removeLoops) LoopRemover.removeLoops(route);

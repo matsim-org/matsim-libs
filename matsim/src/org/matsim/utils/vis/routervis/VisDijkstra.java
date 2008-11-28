@@ -73,9 +73,8 @@ public class VisDijkstra extends Dijkstra implements LeastCostPathCalculator, Vi
 		final CarRoute route = super.calcLeastCostPath(fromNode, toNode, startTime);
 
 		this.writer.reset();
-		final Link [] links = route.getLinks();
-		for (int i =0; i < links.length; i++){
-			this.writer.setLinkColor(links[i].getId(), 0.1);
+		for (Link link : route.getLinks()) {
+			this.writer.setLinkColor(link.getId(), 0.1);
 			doSnapshot();
 		}
 

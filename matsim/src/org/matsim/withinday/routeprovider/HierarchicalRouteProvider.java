@@ -75,8 +75,8 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 			if (isCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}
-			Link [] returnRouteLinks = returnRoute.getLinks();
-			departureLink = returnRouteLinks[returnRouteLinks.length-1];
+			List<Link> returnRouteLinks = returnRoute.getLinks();
+			departureLink = returnRouteLinks.get(returnRouteLinks.size()-1);
 		}
 		return null;
 	}

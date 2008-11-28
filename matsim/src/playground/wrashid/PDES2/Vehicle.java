@@ -1,6 +1,7 @@
 package playground.wrashid.PDES2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.network.Link;
 import org.matsim.population.Act;
@@ -83,7 +84,8 @@ public class Vehicle extends SimUnit {
 
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
-		currentLinkRoute= ((CarRoute) currentLeg.getRoute()).getLinks();
+		List<Link> links = ((CarRoute) currentLeg.getRoute()).getLinks();
+		currentLinkRoute= links.toArray(new Link[links.size()]);
 	}
 	
 	public Link[] getCurrentLinkRoute(){

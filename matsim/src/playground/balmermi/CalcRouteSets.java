@@ -126,9 +126,7 @@ public class CalcRouteSets {
 		Iterator<CarRoute> r_it = routes.iterator();
 		while (r_it.hasNext()) {
 			CarRoute r = r_it.next();
-			Link[] links = r.getLinks();
-			for (int i=0; i<links.length; i++) {
-				Link l = links[i];
+			for (Link l : r.getLinks()) {
 				System.out.print(l.getId() + "\t");
 			}
 			System.out.print("\n");
@@ -145,8 +143,9 @@ public class CalcRouteSets {
 				out.write(id.toString());
 				out.write("\t" + o.getId());
 				out.write("\t" + d.getId());
-				Link[] links = r.getLinks();
-				for (int i=0; i<links.length; i++) { out.write("\t" + links[i].getId()); }
+				for (Link link : r.getLinks()) {
+					out.write("\t" + link.getId());
+				}
 				out.write("\t" + "-1");
 				if (is_first) { out.write("\t" + "1"); is_first = false; }
 				else { out.write("\t" + "0"); }

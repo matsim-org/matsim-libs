@@ -116,11 +116,10 @@ public class RouteSetGenerator {
 
 				// for each link of the calc route create a new link set with the
 				// other links of the current link set
-				Link[] route_links = route.getLinks();
-				for (int j=0; j<route_links.length; j++) {
+				for (Link link : route.getLinks()) {
 					Link[] new_ls = new Link[ls.length+1];
 					for (int jj=0; jj<ls.length; jj++) { new_ls[jj] = ls[jj]; }
-					new_ls[new_ls.length-1] = route_links[j];
+					new_ls[new_ls.length-1] = link;
 					new_links.addLast(new_ls);
 				}
 //				System.out.println("    -> links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
@@ -151,10 +150,9 @@ public class RouteSetGenerator {
 		if (route == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
 //		routes.add(route);
 
-		Link[] ls = route.getLinks();
-		for (int i=0; i<ls.length; i++) {
+		for (Link link : route.getLinks()) {
 			Link[] lls = new Link[1];
-			lls[0] = ls[i];
+			lls[0] = link;
 			links.add(lls);
 		}
 		// creating a route set with the minimum of k*var_factor routes

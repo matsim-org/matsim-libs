@@ -21,6 +21,7 @@
 package playground.marcel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.basic.v01.Id;
@@ -78,8 +79,8 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		return ids;
 	}
 
-	public Link[] getLinks() {
-		return this.route.toArray(new Link[this.route.size()]);
+	public List<Link> getLinks() {
+		return Collections.unmodifiableList(this.route);
 	}
 
 	public List<Node> getNodes() {

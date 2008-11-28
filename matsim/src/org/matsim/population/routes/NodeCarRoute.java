@@ -150,25 +150,18 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		return ret;
 	}
 
-	/**
-	 * Returns the list of links that build the route. The links where the route
-	 * starts and ends (the links where the activities are on) are <b>not</b>
-	 * included in the list.
-	 * @return an array containing the links the agents plans to travel along
-	 */
-	public final Link[] getLinks() {
+	public final List<Link> getLinks() {
 		// marcel, 2006-09-05: added getLinkRoute
 		/* Nodes have proved to not be the best solution to store routes.
 		 * Thus it should be changed sooner or later to links instead of nodes
 		 * This function is a first step for this as it helps to create the
 		 * list of links the route leads through */
 		if (this.route.size() == 0) {
-			return new Link[0];
+			return new ArrayList<Link>(0);
 		}
 
 		Node prevNode = null;
-		Link[] links = new Link[this.route.size() - 1];
-		int idx = 0;
+		ArrayList<Link> links = new ArrayList<Link>(this.route.size() - 1);
 		for (Node node : this.route) {
 			if (prevNode != null) {
 				// search link from prevNode to node
@@ -176,8 +169,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 				for (Iterator<? extends Link> iter = prevNode.getOutLinks().values().iterator(); iter.hasNext() && !linkFound; ) {
 					Link link = iter.next();
 					if (link.getToNode() == node) {
-						links[idx] = link;
-						idx++;
+						links.add(link);
 						linkFound = true;
 					}
 				}
@@ -195,9 +187,8 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		 * very first or the very last link of the route, only the links in between.
 		 * fix this somehow, but how?? MR, jan07
 		 */
-		Link[] links = getLinks();
 		double distance = 0;
-		for (Link link : links) {
+		for (Link link : getLinks()) {
 			distance += link.getLength();
 		}
 		return distance;

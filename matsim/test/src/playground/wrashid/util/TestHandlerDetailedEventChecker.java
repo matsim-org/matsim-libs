@@ -356,7 +356,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				Leg leg = (Leg) iter.next();
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
-					expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().length + 1;
+					expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().size() + 1;
 				}
 			}
 

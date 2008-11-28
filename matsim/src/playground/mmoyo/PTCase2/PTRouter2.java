@@ -101,8 +101,9 @@ public class PTRouter2 {
 		
 			List<Link> linkList = new ArrayList<Link>();
 			boolean first=true;
-			for(int x=0; x< route.getLinks().length;x++){
-				Link link = route.getLinks()[x];
+			List<Link> linkRoute = route.getLinks();
+			for(int x=0; x< linkRoute.size();x++){
+				Link link = linkRoute.get(x);
 				double linkTravelTime=ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 				accumulatedTime =accumulatedTime + linkTravelTime;
 				routeTravelTime =routeTravelTime+linkTravelTime;
@@ -197,10 +198,9 @@ public class PTRouter2 {
 	public void PrintRoute(CarRoute route){
 		if (route!=null){
 			System.out.print("\nLinks: ");
-			for(int x=0; x< route.getLinks().length;x++){
-				Link l =route.getLinks()[x];
+			//for (Link l L route.getLinks()) {
 				//System.out.println("link: "l.getId() + " cost: " + link.);
-			}
+			//}
 		
 			IdImpl idPTLine = new IdImpl("");
 			for (Iterator<Node> iter = route.getNodes().iterator(); iter.hasNext();){

@@ -73,7 +73,7 @@ public class ReRouteAnalyzer implements Analyzer {
 
 		final Dijkstra router = new Dijkstra(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost());
 		final CarRoute route = router.calcLeastCostPath(this.beliefs.getCurrentLink().getToNode(), this.intentions.getDestination(), now);
-		this.linkRoute = route.getLinks();
+		this.linkRoute = route.getLinks().toArray(new Link[route.getLinks().size()]);
 		this.linkCount = 0;
 		this.lastCurrent = this.beliefs.getCurrentLink();
 		this.lastNext = this.linkRoute[this.linkCount++];

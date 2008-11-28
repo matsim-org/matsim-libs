@@ -20,10 +20,11 @@
 
 package playground.gregor.gis.analysis;
 
+import java.util.List;
+
 import org.matsim.network.Link;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.geometry.geotools.MGC;
-import org.opengis.spatialschema.geometry.geometry.Circle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -61,17 +62,17 @@ public class GTH {
 	
 	public Polygon getPolygonFromRoute(CarRoute r) {
 		
-		Link [] linkRoute = r.getLinks();
-		Coordinate [] edges = new Coordinate [linkRoute.length * 4] ;
+		List<Link> linkRoute = r.getLinks();
+		Coordinate [] edges = new Coordinate [linkRoute.size() * 4] ;
 		
 		int pos = 0;
-		for (int i = 0; i < linkRoute.length; i++) {
-			edges[pos++] = MGC.coord2Coordinate(linkRoute[i].getFromNode().getCoord());
-			edges[pos++] = MGC.coord2Coordinate(linkRoute[i].getToNode().getCoord());
+		for (int i = 0; i < linkRoute.size(); i++) {
+			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getFromNode().getCoord());
+			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getToNode().getCoord());
 		}
-		for (int i = linkRoute.length -1 ; i >= 0; i--) {
-			edges[pos++] = MGC.coord2Coordinate(linkRoute[i].getToNode().getCoord());
-			edges[pos++] = MGC.coord2Coordinate(linkRoute[i].getFromNode().getCoord());
+		for (int i = linkRoute.size() -1 ; i >= 0; i--) {
+			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getToNode().getCoord());
+			edges[pos++] = MGC.coord2Coordinate(linkRoute.get(i).getFromNode().getCoord());
 		}		
 		
 		LinearRing lr = this.geofac.createLinearRing(edges);

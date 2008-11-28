@@ -3,11 +3,11 @@ package playground.mmoyo.PTCase2;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -17,11 +17,12 @@ import org.matsim.population.PopulationReaderMatsimV4;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.router.Dijkstra;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.router.Dijkstra;
-import playground.mmoyo.PTRouter.PTNode;
+
 import playground.mmoyo.PTRouter.PTNProximity;
+import playground.mmoyo.PTRouter.PTNode;
 
 public class PTActWriter {
 	private final Population population;
@@ -190,7 +191,7 @@ public class PTActWriter {
 	}
 	
 	public int insertLegActs(CarRoute route, double depTime, int legNum, Plan newPlan){
-		Link[] routeLinks = route.getLinks();
+		List<Link> routeLinks = route.getLinks();
 		List<Link> legRouteLinks = new ArrayList<Link>();
 		double accumulatedTime=depTime;
 		double arrTime;
@@ -220,7 +221,7 @@ public class PTActWriter {
 				}
 				legTravelTime=legTravelTime+(linkTravelTime); 
 				legRouteLinks.add(link);
-				if(linkCounter == (routeLinks.length-1)){ //Last PTAct: getting off
+				if(linkCounter == (routeLinks.size()-1)){ //Last PTAct: getting off
 					arrTime= depTime+ legTravelTime;
 					legDistance=legDistance + linkDistance;  
 					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.pt, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));	

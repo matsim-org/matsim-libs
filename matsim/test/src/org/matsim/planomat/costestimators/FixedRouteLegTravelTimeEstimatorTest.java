@@ -21,6 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
@@ -213,8 +214,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// generate some travel times
 		BasicEvent event = null;
 
-		Link[] links = route.getLinks();
-		System.out.println(links.length);
+		List<Link> links = route.getLinks();
+		System.out.println(links.size());
 
 		String[][] eventTimes = new String[][]{
 			new String[]{"06:05:00", "06:07:00", "06:09:00"},
@@ -222,17 +223,17 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		};
 
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
-			for (int linkCnt = 0; linkCnt < links.length; linkCnt++) {
+			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						testPerson.getId().toString(),
-						links[linkCnt].getId().toString(),
+						links.get(linkCnt).getId().toString(),
 						testLeg.getNum());
 				events.processEvent(event);
 				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						testPerson.getId().toString(),
-						links[linkCnt].getId().toString(),
+						links.get(linkCnt).getId().toString(),
 						testLeg.getNum());
 				events.processEvent(event);
 			}
@@ -257,14 +258,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		startTime = Time.parseTime("05:59:00");
 		routeEndTime = testee.processRouteTravelTime(route, startTime);
 		assertEquals(
-				testee.processLink(links[1], startTime + network.getLink(links[0].getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
+				testee.processLink(links.get(1), startTime + network.getLink(links.get(0).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
 				routeEndTime, EPSILON);
 
 		// test a start time in the second bin, having second departure in the free speed bin
 		startTime = Time.parseTime("06:28:00");
 		routeEndTime = testee.processRouteTravelTime(route, startTime);
 		assertEquals(
-				testee.processLink(links[0], startTime) + network.getLink(links[1].getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME),
+				testee.processLink(links.get(0), startTime) + network.getLink(links.get(1).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME),
 				routeEndTime, EPSILON);
 
 	}
@@ -276,7 +277,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.linkTravelCostEstimator, 
 				this.tDepDelayCalc, 
 				this.network);
-		Id linkId = ((CarRoute) testLeg.getRoute()).getLinks()[0].getId();
+		Id linkId = ((CarRoute) testLeg.getRoute()).getLinks().get(0).getId();
 
 		Events events = new Events();
 		events.addHandler(linkTravelTimeEstimator);

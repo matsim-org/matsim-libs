@@ -107,16 +107,15 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 			for (int i=1; i<plan.getActsLegs().size(); i=i+2) {
 				Leg l = (Leg)plan.getActsLegs().get(i);
 				Act a = (Act)plan.getActsLegs().get(i+1);
-				Link[] links = ((CarRoute) l.getRoute()).getLinks();
 				Link arr_link = a.getLink();
 
 				out_routes.write(person.getId() + "\t" + l.getNum() + "\t" + l.getMode() + "\t");
 				out_types.write(person.getId() + "\t" + l.getNum() + "\t" + l.getMode() + "\t");
 				out_length.write(person.getId() + "\t" + l.getNum() + "\t" + l.getMode() + "\t");
-				for (int j=0; j<links.length; j++) {
-					out_routes.write(links[j].getId() + "\t");
-					out_types.write(links[j].getType() + "\t");
-					out_length.write(links[j].getLength() + "\t");
+				for (Link link : ((CarRoute) l.getRoute()).getLinks()) {
+					out_routes.write(link.getId() + "\t");
+					out_types.write(link.getType() + "\t");
+					out_length.write(link.getLength() + "\t");
 				}
 				out_routes.write(arr_link.getId() + "\n");
 				out_types.write(arr_link.getType() + "\n");

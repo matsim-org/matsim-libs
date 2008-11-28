@@ -16,7 +16,7 @@ import org.matsim.population.routes.CarRoute;
  * don't move on false links and nodes, which should not exist in network(file).
  * 
  * beurteilen, ob Personen auf nicht existierende Links oder durch nicht
- * existierende Nodes fahren oder andere Aktivit�ten durchf�hren. Die
+ * existierende Nodes fahren oder andere Aktivitaeten durchfuehren. Die
  * richtigen Personen wurden hier zur NewPlansWriter übertragen.
  * 
  * @author yu chen
@@ -63,7 +63,7 @@ public class PersonRouteFilter extends PersonFilterA {
 						Leg leg = (Leg) obj;
 						CarRoute route = (CarRoute) leg.getRoute();
 						if (route != null) {
-							Link[] links = route.getLinks();
+							List<Link> links = route.getLinks();
 							if (links != null)
 								for (Link link : links) {
 									if (this.criterionLinkIds.contains(link

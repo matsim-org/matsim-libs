@@ -54,8 +54,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 				if (leg.getRoute() == null) {
 					return false;
 				}
-				Link[] links = ((CarRoute) leg.getRoute()).getLinks();
-				for (Link link : links) {
+				for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link

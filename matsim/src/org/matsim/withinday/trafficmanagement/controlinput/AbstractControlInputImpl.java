@@ -173,10 +173,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	}
 
 	public int getNumberOfVehiclesOnRoute(final CarRoute route) {
-		Link[] links = route.getLinks();
 		int ret = 0;
-		for (int i = 0; i < links.length; i++) {
-			ret += this.numberOfAgents.get(links[i].getId().toString());
+		for (Link link : route.getLinks()) {
+			ret += this.numberOfAgents.get(link.getId().toString());
 		}
 		return ret;
 	}
@@ -188,10 +187,9 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	public void init() {
 		this.writer.open();
 
-		Link[] routeLinks;
-		routeLinks = this.getAlternativeRoute().getLinks();
-		this.firstLinkOnAlternativeRoute = routeLinks[0].getId().toString();
-		this.lastLinkOnAlternativeRoute = routeLinks[routeLinks.length - 1].getId()
+		List<Link> routeLinks = this.getAlternativeRoute().getLinks();
+		this.firstLinkOnAlternativeRoute = routeLinks.get(0).getId().toString();
+		this.lastLinkOnAlternativeRoute = routeLinks.get(routeLinks.size() - 1).getId()
 				.toString();
 		for (Link l : routeLinks) {
 			if (!this.numberOfAgents.containsKey(l.getId().toString())) {
@@ -204,17 +202,17 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.lastTimeAlternativeRoute = this.ttFreeSpeedAltRoute;
 
 		// find the natural bottleneck on the alternative route
-		Link[] altRouteLinks = this.getAlternativeRoute().getLinks();
-		this.altRouteNaturalBottleNeck = altRouteLinks[0];
-		for (int i = 1; i < altRouteLinks.length; i++) {
-			if (altRouteLinks[i].getCapacity(Time.UNDEFINED_TIME) <= this.altRouteNaturalBottleNeck
+		List<Link> altRouteLinks = this.getAlternativeRoute().getLinks();
+		this.altRouteNaturalBottleNeck = altRouteLinks.get(0);
+		for (int i = 1; i < altRouteLinks.size(); i++) {
+			if (altRouteLinks.get(i).getCapacity(Time.UNDEFINED_TIME) <= this.altRouteNaturalBottleNeck
 					.getCapacity(Time.UNDEFINED_TIME))
-				this.altRouteNaturalBottleNeck = altRouteLinks[i];
+				this.altRouteNaturalBottleNeck = altRouteLinks.get(i);
 		}
 
 		routeLinks = this.getMainRoute().getLinks();
-		this.firstLinkOnMainRoute = routeLinks[0].getId().toString();
-		this.lastLinkOnMainRoute = routeLinks[routeLinks.length - 1].getId()
+		this.firstLinkOnMainRoute = routeLinks.get(0).getId().toString();
+		this.lastLinkOnMainRoute = routeLinks.get(routeLinks.size() - 1).getId()
 				.toString();
 		double tt;
 		for (Link l : routeLinks) {
@@ -228,12 +226,12 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		this.lastTimeMainRoute = this.ttFreeSpeedMainRoute;
 
 		// find the natural bottleneck on the main route
-		Link[] mainRouteLinks = this.getMainRoute().getLinks();
-		this.mainRouteNaturalBottleNeck = mainRouteLinks[0];
-		for (int i = 1; i < mainRouteLinks.length; i++) {
-			if (mainRouteLinks[i].getCapacity(Time.UNDEFINED_TIME) < this.mainRouteNaturalBottleNeck
+		List<Link> mainRouteLinks = this.getMainRoute().getLinks();
+		this.mainRouteNaturalBottleNeck = mainRouteLinks.get(0);
+		for (int i = 1; i < mainRouteLinks.size(); i++) {
+			if (mainRouteLinks.get(i).getCapacity(Time.UNDEFINED_TIME) < this.mainRouteNaturalBottleNeck
 					.getCapacity(Time.UNDEFINED_TIME))
-				this.mainRouteNaturalBottleNeck = mainRouteLinks[i];
+				this.mainRouteNaturalBottleNeck = mainRouteLinks.get(i);
 		}
 	}
 
@@ -408,9 +406,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	protected double sumUpTTFreeSpeed(final Node node, final CarRoute route) {
 
 		double ttFS = 0;
-		Link[] routeLinks = route.getLinks();
-		for (int i = 0; i < routeLinks.length; i++) {
-			Link l = routeLinks[i];
+		for (Link l : route.getLinks()) {
 			ttFS += this.ttFreeSpeeds.get(l.getId());
 			if (l.getToNode() == node) {
 				break;
@@ -455,5 +451,19 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	}
 
 	public void reset(final int iteration) {}
+	
+	protected List<Link> getOutlinks(final CarRoute route) {
+		if (route == this.mainRoute) {
+			return this.outLinksMainRoute;
+		}
+		return this.outLinksAlternativeRoute;
+	}
+
+	protected List<Link> getInlinks(final CarRoute route) {
+		if (route == this.mainRoute) {
+			return this.inLinksMainRoute;
+		}
+		return this.inLinksAlternativeRoute;
+	}
 
 }

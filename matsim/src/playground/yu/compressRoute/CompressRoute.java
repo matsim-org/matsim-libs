@@ -88,8 +88,8 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				Leg leg = (Leg) actsLegs.get(legId);
-				Link[] links = ((CarRoute) leg.getRoute()).getLinks();
-				int linksLength = links.length;
+				List<Link> links = ((CarRoute) leg.getRoute()).getLinks();
+				int linksLength = links.size();
 				this.oldLinksNr += linksLength;
 				try {
 					this.out.writeBytes("[");
@@ -98,7 +98,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				}
 				for (int i = 0; i < linksLength; i++)
 					try {
-						this.out.writeBytes(links[i].getId().toString());
+						this.out.writeBytes(links.get(i).getId().toString());
 						if (i < linksLength - 1)
 							this.out.writeBytes("-");
 					} catch (IOException e) {
@@ -111,10 +111,10 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 				}
 				newLinks.clear();
 				for (int i = linksLength - 1; i > 0; i--) {
-					Link ssl = links[i];
+					Link ssl = links.get(i);
 					String sslId = ssl.getId().toString();
 					if (this.ssLinks.containsKey(sslId)) {
-						if (!links[i - 1].getId().toString().equals(
+						if (!links.get(i - 1).getId().toString().equals(
 								this.ssLinks.get(sslId))) {
 							newLinks.push(ssl);
 						}

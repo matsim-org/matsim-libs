@@ -107,8 +107,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 					currentEndTime = leg.getDepartureTime();
 					CarRoute r = (CarRoute) leg.getRoute();
 					pathSize += r.getDist();
-					Link[] links = r.getLinks();
-					for (Link link : links){
+					for (Link link : r.getLinks()){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
 						if (lit == null){
 							lit = new ArrayList<Double>();

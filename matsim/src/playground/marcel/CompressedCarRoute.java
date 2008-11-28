@@ -45,14 +45,12 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 		this.subsequentLinks = subsequentLinks;
 	}
 
-	public Link[] getLinks() {
-		Link[] links = new Link[this.uncompressedLength];
-		int counter = 0;
+	public List<Link> getLinks() {
+		ArrayList<Link> links = new ArrayList<Link>(this.uncompressedLength);
 		Link previousLink = null;
 		for (Link link : this.route) {
 			if (previousLink == null) {
-				links[counter] = link;
-				counter++;
+				links.add(link);
 				previousLink = link;
 			} else {
 				boolean found = false;
@@ -61,16 +59,14 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 					for (Link outLink : node.getOutLinks().values()) {
 						if (link.getId().equals(outLink.getId())) {
 							found = true;
-							links[counter] = link;
-							counter++;
+							links.add(link);
 							previousLink = link;
 						}
 					}
 					if (!found) {
 						// the link in the route was not part of the current outgoing links, so follow the subsequent Links
 						Link tmpLink = this.subsequentLinks.get(previousLink);
-						links[counter] = tmpLink;
-						counter++;
+						links.add(tmpLink);
 						previousLink = tmpLink;
 					}
 				} while (!found);
@@ -82,8 +78,8 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	@Override
 	public List<Id> getLinkIds() {
-		Link[] links = getLinks();
-		List<Id> ids = new ArrayList<Id>(links.length);
+		List<Link> links = getLinks();
+		List<Id> ids = new ArrayList<Id>(links.size());
 		for (Link link : links) {
 			ids.add(link.getId());
 		}
@@ -275,8 +271,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	private double calcDistance() {
 		double dist = 0;
-		Link[] links = getLinks();
-		for (Link link : links) {
+		for (Link link : getLinks()) {
 			dist += link.getLength();
 		}
 		setDist(dist);

@@ -90,8 +90,7 @@ public class CutTrips implements PersonAlgorithm {
 			}
 
 			// test links of route
-			Link[] links = ((CarRoute) leg.getRoute()).getLinks();
-			for (Link link : links) {
+			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 				if (this.aoi.containsKey(link.getId())) {
 					if (firstInsideLink == null) {
 						firstInsideLink = link;
@@ -156,9 +155,8 @@ public class CutTrips implements PersonAlgorithm {
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
 			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
 			CarRoute route = (CarRoute) leg.getRoute();
-			Link[] links = route.getLinks();
 			double traveltime = 0.0;
-			for (Link link : links) {
+			for (Link link : route.getLinks()) {
 				traveltime += link.getFreespeedTravelTime(Time.UNDEFINED_TIME);
 				if (link.equals(firstInsideLink)) {
 					break;

@@ -222,7 +222,7 @@ public class KSPPenalty {
 		/*
 		 * (1) Convert the path to a list of links.
 		 */
-		Link[] links = path.getLinks();
+		List<Link> links = path.getLinks();
 		/*
 		 * (2) Get the total length of the route.
 		 */

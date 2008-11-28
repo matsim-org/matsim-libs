@@ -128,10 +128,10 @@ public class GroupedEvacuationPlansGeneratorAndNetworkTrimmer extends Evacuation
 	}
 
 	private Link getEvacLink(final Leg leg) {
-		Link [] lr = ((CarRoute) leg.getRoute()).getLinks();
+		List<Link> lr = ((CarRoute) leg.getRoute()).getLinks();
 		
 		
-		return lr[lr.length-1];
+		return lr.get(lr.size()-1);
 	}
 
 	

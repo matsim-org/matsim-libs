@@ -23,6 +23,7 @@ package playground.gregor.withindayevac;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.matsim.controler.events.AfterMobsimEvent;
@@ -81,15 +82,15 @@ AgentStuckEventHandler, LinkEnterEventHandler{
 			Person pers = this.population.getPerson(e.getKey());
 			Plan plan = pers.getSelectedPlan();
 		
-			Link[] links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
+			List<Link> links = ((CarRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinks();
 			ArrayList<String> strLinks = e.getValue();
-			if (strLinks.size() < links.length) {
+			if (strLinks.size() < links.size()) {
 				if (addNewPlan(pers,strLinks)) count++;
 				continue;
 			}
 			
-			for (int i = 0; i < links.length; i++) {
-				if (!links[i].getId().toString().equals(strLinks.get(i))) {
+			for (int i = 0; i < links.size(); i++) {
+				if (!links.get(i).getId().toString().equals(strLinks.get(i))) {
 					if (addNewPlan(pers,strLinks)) count++;
 					break;
 				}

@@ -189,14 +189,14 @@ public class CoopersRouteProviderTest extends TestCase {
 	  provider.providesRoute(linkNo1, agentRoute);
 	  //check routing
 	  CarRoute r = provider.requestRoute(linkNo1, this.network.getLink("7"), SimulationTimer.getTime());
-//	  log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
+//	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < r.getNodes().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));
 		}
 
 	  r = provider.requestRoute(linkNo1, this.network.getLink("8"), SimulationTimer.getTime());
 	  providerRouteNodes.add(this.network.getNode("5"));
-//	  log.debug("Route is: " + LogRouteUtils.getNodeRoute(r));
+//	  System.out.println("Route is: " + LogRouteUtils.getNodeRoute(r));
 		for (int i = 0; i < r.getNodes().size(); i++) {
 			assertEquals(providerRouteNodes.get(i), r.getNodes().get(i));
 		}

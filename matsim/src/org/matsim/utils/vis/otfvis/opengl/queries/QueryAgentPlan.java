@@ -97,9 +97,9 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 
 				if (leg.getMode().equals(Mode.car)) {
-					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
-					count += route.length;
-					if(route.length != 0) count++; //add last position if there is a path
+					List<Link> route = ((CarRoute) leg.getRoute()).getLinks();
+					count += route.size();
+					if(route.size() != 0) count++; //add last position if there is a path
 				}
 			}
 		}
@@ -145,9 +145,8 @@ public class QueryAgentPlan implements OTFQuery {
 				Leg leg = (Leg)actslegs.get(i);
 
 				if (leg.getMode().equals(Mode.car)) {
-					Link[] route = ((CarRoute) leg.getRoute()).getLinks();
 					Node last = null;
-					for (Link driven : route) {
+					for (Link driven : ((CarRoute) leg.getRoute()).getLinks()) {
 						Node node = driven.getFromNode();
 						last = driven.getToNode();
 						setCoord(pos++, node.getCoord(), carColor);

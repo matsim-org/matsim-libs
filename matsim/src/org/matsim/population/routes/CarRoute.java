@@ -44,9 +44,9 @@ public interface CarRoute extends Route {
 	 * Returns the list of links that build the route. The links where the route
 	 * starts and ends (the links where the activities are on) are <b>not</b>
 	 * included in the list.
-	 * @return an array containing the links the agents plans to travel along
+	 * @return a list containing the links the agents plans to travel along
 	 */
-	public abstract Link[] getLinks();
+	public abstract List<Link> getLinks();
 
 	/**
 	 * This method returns a new Route object with the subroute of this beginning at fromNode

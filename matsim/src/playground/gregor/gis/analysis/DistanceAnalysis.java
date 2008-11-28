@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
@@ -195,8 +196,8 @@ public class DistanceAnalysis {
 		for (Person person : persons) {
 			Leg leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
 			double l1 = leg.getRoute().getDist();
-			Link [] ls = ((CarRoute) leg.getRoute()).getLinks();
-			Link l = ls[ls.length-1];
+			List<Link> ls = ((CarRoute) leg.getRoute()).getLinks();
+			Link l = ls.get(ls.size()-1);
 			String destS  = l.getId().toString().replace("el", "");
 			int dest = Integer.parseInt(destS);
 			dests[dest]++;

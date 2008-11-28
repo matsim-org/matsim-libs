@@ -53,7 +53,7 @@ public class RoadSignAgentsGenerator {
 			Id id = new IdImpl("guide" + count++);
 			Person p = new PersonImpl(id);
 			CarRoute route = dijkstra.calcLeastCostPath(node, network.getNode("en2"), 3*3600);
-			Link shortest = route.getLinks()[0];
+			Link shortest = route.getLinks().get(0);
 			
 			
 			for (Link dest : node.getOutLinks().values()){

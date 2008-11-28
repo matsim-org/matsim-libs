@@ -86,7 +86,7 @@ public class GetAllLinks {
 		getLinks(plan, links);
 	}
 	
-	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der �bergebenen Person sind.
+	// Liefert eine ArryList aller Links, die Teil des selektierten Plans der uebergebenen Person sind.
 	protected ArrayList<Link> getLinks(Person person)
 	{
 		Plan plan = person.getSelectedPlan();
@@ -95,7 +95,7 @@ public class GetAllLinks {
 	} //getLinks(Person)
 	
 	
-	// Liefert eine ArrayList aller Links, die Teil �bergebenen Plans sind.
+	// Liefert eine ArrayList aller Links, die Teil uebergebenen Plans sind.
 	protected ArrayList<Link> getLinks(Plan plan)
 	{	
 		ArrayList<Link> links = new ArrayList<Link>();
@@ -112,7 +112,7 @@ public class GetAllLinks {
 		{
 			Act act = (Act)actIterator.next();
 			
-			// Hinzuf�gen, falls neues Element
+			// Hinzufuegen, falls neues Element
 			if(!links.contains(act.getLink())) links.add(act.getLink());
 			
 		}	// while actIterator.hasNext()
@@ -124,14 +124,9 @@ public class GetAllLinks {
 			Leg leg = (Leg)legIterator.next();
 
 			CarRoute route = (CarRoute) leg.getRoute();
-				
-			Link[] linkArray = route.getLinks(); 
-			
-			for(int i = 0; i < linkArray.length; i++)
-			{
-				Link link = linkArray[i];
-			
-				// Hinzuf�gen, falls neues Element
+
+			for (Link link : route.getLinks()) {
+				// Hinzufuegen, falls neues Element
 				if(!links.contains(link)) links.add(link);
 				
 			}
@@ -157,12 +152,12 @@ public class GetAllLinks {
 		
 		while(linkIterator.hasNext())
 		{
-			// Wir wissen ja, was f�r Elemente zur�ckgegeben werden :)
+			// Wir wissen ja, was fuer Elemente zurueckgegeben werden :)
 			Map.Entry<Id, Link> nextLink = (Map.Entry<Id, Link>)linkIterator.next();
 
 			Link link = nextLink.getValue();
 						
-			// Pr�fen, ob der Link bereits in der Liste enthalten ist
+			// Pruefen, ob der Link bereits in der Liste enthalten ist
 			if(!links.contains(link)) links.add(link);	
 		}	// while linkIterator.hasNext()
 		
