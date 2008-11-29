@@ -185,7 +185,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		//TODO [gl] DEBUG
 		colorizePaths(toNodes,fromNode);
 		
-		if (true)    // that's a joke, isn't it? // marcel,2008nov28
+		if (true)    // that's a joke, isn't it? // marcel,2008nov28, please also read the note/todo below
 		return null;
 		
 		final ArrayList<Node> routeNodes = new ArrayList<Node>();
@@ -198,7 +198,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		}
 		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
 
-		final Path path = new Path(routeNodes, null, (int) (arrivalTime - startTime), cost); // FIXME [MR] collect links
+		final Path path = new Path(routeNodes, null, (int) (arrivalTime - startTime), cost); // TODO [MR] collect links; I will fix that once that "if (true)" above is fixed.
 
 		return path;
 	}

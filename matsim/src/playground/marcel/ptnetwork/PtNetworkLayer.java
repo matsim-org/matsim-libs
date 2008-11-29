@@ -373,7 +373,7 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 			actNode = (PtNode) actNode.shortestPath.getFromNode();
 		}
 
-		Path path = new Path(nodes, null, arrTime - depTime, 0); // FIXME [MR] collect links
+		Path path = new Path(nodes, null, arrTime - depTime, 0); // TODO collect links for compatibility reasons
 
 		return path;
 	}

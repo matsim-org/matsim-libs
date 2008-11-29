@@ -40,7 +40,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	
 	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final NetworkLayer network);
 	
-	public void testCalcLeastCostPath() throws SAXException, ParserConfigurationException, IOException {
+	public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
 		loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
@@ -59,5 +59,19 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		assertEquals(network.getLink(new IdImpl("20")), path.links.get(0));
 		assertEquals(network.getLink(new IdImpl("21")), path.links.get(1));
 		assertEquals(network.getLink(new IdImpl("22")), path.links.get(2));
+	}
+
+	public void testCalcLeastCostPath_SubsequentLinks() throws SAXException, ParserConfigurationException, IOException {
+		loadConfig(null);
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
+		Node node12 = network.getNode(new IdImpl("12"));
+		
+		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
+		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600);
+		
+		assertEquals("number of nodes wrong.", 1, path.nodes.size());
+		assertEquals("number of links wrong.", 0, path.links.size());
+		assertEquals(network.getNode(new IdImpl("12")), path.nodes.get(0));
 	}
 }
