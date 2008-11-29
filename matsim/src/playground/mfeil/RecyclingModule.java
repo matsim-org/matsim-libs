@@ -48,20 +48,20 @@ import java.util.ArrayList;
 
 public class RecyclingModule implements StrategyModule {
 	
-	private  ArrayList<Plan> []				list;
-	private final MultithreadedModuleA 		schedulingModule;
-	private final MultithreadedModuleA		assignmentModule;
-	private final PreProcessLandmarks		preProcessRoutingData;
-	private final LocationMutatorwChoiceSet locator;
+	protected  ArrayList<Plan> []				list;
+	protected final MultithreadedModuleA 		schedulingModule;
+	protected final MultithreadedModuleA		assignmentModule;
+	protected final PreProcessLandmarks			preProcessRoutingData;
+	protected final LocationMutatorwChoiceSet 	locator;
 	//private final PlansCalcRouteLandmarks 	router;
-	private final LegTravelTimeEstimator	estimator;
-	private final double					minimumTime;
-	private final ScheduleCleaner			cleaner;
-	private final PlanAlgorithm				timer;
-	private final int						testAgentsNumber;
-	private String[]						criteria;
-	private final Controler					controler;
-	private OptimizedAgents 				agents;
+	protected final LegTravelTimeEstimator		estimator;
+	protected final double						minimumTime;
+	protected final ScheduleCleaner				cleaner;
+	protected final PlanAlgorithm				timer;
+	protected final int							testAgentsNumber;
+	protected String[]							criteria;
+	protected final Controler					controler;
+	protected OptimizedAgents 					agents;
 	
 	
 	
@@ -98,7 +98,6 @@ public class RecyclingModule implements StrategyModule {
 			list[i] = new ArrayList<Plan>();
 		}
 		this.schedulingModule.init();
-		this.assignmentModule.init();
 	}
 
 	public void handlePlan(final Plan plan) {	
@@ -114,6 +113,8 @@ public class RecyclingModule implements StrategyModule {
 		
 		this.agents = new OptimizedAgents (this.list[0]);
 		
+		this.assignmentModule.init();
+		
 		for (int i=0;i<list[1].size();i++){
 			this.assignmentModule.handlePlan(this.list[1].get(i));
 		}
@@ -124,7 +125,7 @@ public class RecyclingModule implements StrategyModule {
 	public OptimizedAgents getOptimizedAgents (){
 		return this.agents;
 	}
-	
+		
 	
 	
 	@Deprecated

@@ -38,35 +38,24 @@ import org.matsim.router.util.PreProcessLandmarks;
  * (= non-optimized agent copies the plan of the most similar optimized agent).
  */
 
-public class AgentsAssigner implements PlanAlgorithm{ 
+public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{ 
 	
-	protected final PlanAlgorithm				timer;
-	protected final LocationMutatorwChoiceSet 	locator;
-	protected final PlansCalcRouteLandmarks 	router;
-	protected final RecyclingModule				module;
-	protected final ScheduleCleaner				cleaner;
-	protected final double						minimumTime;
-	protected final String						distance, homeLocation;
-		
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
+	private final DistanceCoefficients coefficients;
 	
-	
-	public AgentsAssigner (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
+	public AgentsAssigner1 (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
 			LocationMutatorwChoiceSet locator, PlanAlgorithm timer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
-			double minimumTime){
-		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
-		this.timer					= timer;
-		this.locator 				= locator;
-		this.cleaner				= cleaner;
-		this.module					= recyclingModule;
-		this.minimumTime			= minimumTime;
-		this.distance				= "distance";
-		this.homeLocation			= "homelocation";
+			double minimumTime, DistanceCoefficients coefficients){
+		
+		super(controler, preProcessRoutingData, legTravelTimeEstimator, locator, timer,
+				cleaner, recyclingModule, minimumTime);
+		this.coefficients = coefficients;
 	}
+	
 	
 		
 	//////////////////////////////////////////////////////////////////////
@@ -83,7 +72,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 		for (int j=0;j<agents.getNumberOfAgents();j++){
 			if (this.distance=="distance"){
-				distanceAgent += plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+				distanceAgent += this.coefficients.getPrimActsDistance()*plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 			}
 	
 			if (this.homeLocation=="homelocation"){
@@ -91,7 +80,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX();
 				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY();
 			
-				distanceAgent += java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
+				distanceAgent += this.coefficients.gethomeLocationDistance()*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
 						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
 			}
 			if (distanceAgent<distance){
@@ -109,55 +98,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 	}	
 	
-	protected void writePlan (Plan in, Plan out){
-		Plan bestPlan = new Plan (in.getPerson());
-		bestPlan.copyPlan(in);
-		ArrayList<Object> al = out.getActsLegs();
-		if(al.size()>bestPlan.getActsLegs().size()){ 
-			int i;
-			for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){
-				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-			for (int j = i; j<al.size()-2;j=j+0){
-				al.remove(j);
-			}
-		}
-		else if(al.size()<bestPlan.getActsLegs().size()){
-			int i;
-			for (i = 2; i<al.size()-2;i++){
-				al.remove(i);
-				al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-			for (int j = i; j<bestPlan.getActsLegs().size()-2;j++){			
-				al.add(j, bestPlan.getActsLegs().get(j));
-			}
-		}
-		else {
-			for (int i = 2; i<al.size()-2;i++){
-			al.remove(i);
-			al.add(i, bestPlan.getActsLegs().get(i));	
-			}
-		}
-	}
 	
-	@Deprecated
-	private void cleanUpPlan (Plan plan){
-		double move = this.cleaner.run(((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
-		int loops=1;
-		while (move!=0.0){
-			loops++;
-			move = this.cleaner.run(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,0), plan);
-			if (loops>3) {
-				for (int i=2;i< plan.getActsLegs().size()-4;i+=2){
-					((Act)(plan.getActsLegs().get(i))).setDuration(this.minimumTime);
-				}
-				move = this.cleaner.run(this.minimumTime, plan);
-				if (move!=0.0){
-					throw new IllegalArgumentException("No valid plan possible for person "+plan.getPerson().getId());
-				}
-			}
-		}
-	}
 }
 	

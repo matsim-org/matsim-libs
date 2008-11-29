@@ -34,52 +34,35 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
  * Initializes the agentsAssigner.
  */
 
-public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
+public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
 	
-	
-	protected final NetworkLayer 				network;
-	protected final Controler					controler;
-	protected final LegTravelTimeEstimator 	estimator;
-	protected final PreProcessLandmarks		preProcessRoutingData;
-	protected final LocationMutatorwChoiceSet locator;
-	protected final PlanAlgorithm				timer;
-	protected final ScheduleCleaner				cleaner;
-	protected final RecyclingModule			module;
-	protected final double					minimumTime;
+	private final DistanceCoefficients distanceCoefficients;
 
 		
-	public AgentsAssignmentInitialiser (final Controler controler, 
+	public AgentsAssignmentInitialiser1 (final Controler controler, 
 			final PreProcessLandmarks preProcessRoutingData,
 			final LegTravelTimeEstimator estimator,
 			final LocationMutatorwChoiceSet locator,
 			final PlanAlgorithm timer,
 			final ScheduleCleaner cleaner,
 			final RecyclingModule module, 
-			final double minimumTime) {
+			final double minimumTime,
+			final DistanceCoefficients distanceCoefficients) {
 		
-		this.network = controler.getNetwork();
-		this.controler = controler;
-		this.init(network);
-		this.estimator = estimator;
-		this.preProcessRoutingData = preProcessRoutingData;	
-		this.locator = locator;
-		this.timer = timer;
-		this.cleaner = cleaner;
-		this.module = module;
-		this.minimumTime = minimumTime;
+		super (controler, preProcessRoutingData, estimator, locator, timer,
+				cleaner, module, minimumTime);
+		this.distanceCoefficients = distanceCoefficients;
 	}
 	
-	private void init(final NetworkLayer network) {
-		this.network.connect();
-	}
+
 
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm agentsAssigner;
 		
-		agentsAssigner = new AgentsAssigner (this.controler, this.preProcessRoutingData, this.estimator,
-					this.locator, this.timer, this.cleaner, this.module, this.minimumTime);
+		agentsAssigner = new AgentsAssigner1 (this.controler, this.preProcessRoutingData, this.estimator,
+					this.locator, this.timer, this.cleaner, this.module, this.minimumTime, this.distanceCoefficients);
 		
 		return agentsAssigner;
 	}
