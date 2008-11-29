@@ -45,9 +45,12 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimCellModel.class);
 
 	public void readFacilities(Facilities facilities) {
+		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
+		System.exit(-1) ;
+		
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/gridcells.tab" ) ;
+			BufferedReader reader = IOUtils.getBufferedReader(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/gridcells.tab" ) ;
 
 			String header = reader.readLine() ;
 			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header ) ;
@@ -89,7 +92,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	public long personCnt = 0 ;
 	void readPersonsFromHouseholds ( Population population, Facilities facilities, double fraction ) {
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/households.tab");
+			BufferedReader reader = IOUtils.getBufferedReader(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/households.tab");
 
 			String header = reader.readLine();
 			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header ) ;

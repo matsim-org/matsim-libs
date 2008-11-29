@@ -51,8 +51,8 @@ public class NetworkEmme2Matsim {
 			boolean weAreReadingNodes = true ;
 			long linkCnt = 0 ;
 
-			String line = reader.readLine() ;
-			while ( line != null ) {
+			String line ;
+			while ( (line = reader.readLine()) != null ) {
 				String[] parts = line.split("[ \t\n]+");
 
 				if ( parts[0].equals("c") ) {
@@ -61,7 +61,7 @@ public class NetworkEmme2Matsim {
 					if ( parts[1].equals("links") ) {
 						weAreReadingNodes = false ;
 					} 
-				} else if ( parts[0].equals("a") || parts[0].equals("a*") ) {
+				} else if ( parts[0].equals("a") ) { // || parts[0].equals("a*") ) { // a* seem to be centroid connectors
 					if ( weAreReadingNodes ) {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
@@ -74,6 +74,14 @@ public class NetworkEmme2Matsim {
 					} else {
 						Node fromNode = network.getNode(parts[1]) ;
 						Node   toNode = network.getNode(parts[2]);
+						if ( fromNode==null || toNode==null ) {
+//							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
+							continue ;
+						}
+						if ( parts[4].equals("r") || parts[4].equals("b") ) {
+							log.info("rail only or bus only link; skipping it ...") ;
+							continue;
+						}
 						double length = 1600 * Double.parseDouble( parts[3] ) ; // probably miles
 //						String type = parts[5] ;
 
@@ -108,8 +116,6 @@ public class NetworkEmme2Matsim {
 				} else {
 					// something else; do nothing
 				}
-
-				line = reader.readLine();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

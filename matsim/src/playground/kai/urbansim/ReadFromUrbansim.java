@@ -17,12 +17,6 @@ import org.matsim.world.Layer;
 public interface ReadFromUrbansim {
 	
 
-	/**
-	 * This path has this weird level of indirection (../opus) so that the package can also be called from within
-	 * matsim if it is checked out at the same hierarchy.  Very useful for debugging. 
-	 */
-	public static final String PATH_TO_OPUS_MATSIM = "../opus/opus_matsim/" ;
-
 	public void readFacilities ( Facilities facilities ) ;
 
 	public void readPersons( Population population, Facilities facilities, double fraction ) ;

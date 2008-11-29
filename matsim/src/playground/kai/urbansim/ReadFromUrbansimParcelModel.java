@@ -52,7 +52,7 @@ import playground.kai.urbansim.ids.ZoneIdFactory;
 public class ReadFromUrbansimParcelModel {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimParcelModel.class);
 	
-	private final String PATH_TO_OPUS_MATSIM = ReadFromUrbansim.PATH_TO_OPUS_MATSIM ;
+	private final String PATH_TO_OPUS_MATSIM = Matsim4Urbansim.PATH_TO_OPUS_MATSIM ;
 	
 	private final String parcelfile = "tmp/parcels-cleaned.tab" ;
 	
@@ -151,9 +151,7 @@ public class ReadFromUrbansimParcelModel {
 		Utils.readKV( buildingFromJob, "job_id:i4", new JobIdFactory(), "building_id:i4", new BldIdFactory(), 
 				PATH_TO_OPUS_MATSIM+"tmp/jobs.tab" ) ;
 		
-		MatsimRandom.random.setSeed(4711) ; // fix seed so that the persons are always the same
-//		log.error("a single person added or removed in the urbansim persons file will screw up the people matching algo.  fix!") ;
-		// FIXME [kn] (see previous line)
+//		MatsimRandom.random.setSeed(4711) ; // fix seed so that the persons are always the same (not really needed any more)
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(PATH_TO_OPUS_MATSIM+"tmp/persons.tab");
@@ -165,16 +163,17 @@ public class ReadFromUrbansimParcelModel {
 			// (1) We have an old population.  Then we look for those people who have the same id.  We assume that the old pop 
 			//     has the correct size.
 			// (2) We do not have an old population.  Then we draw randomly.
-			log.warn("As of now, will ignore additions to the population.") ;
-			log.warn("oldPop==null not tried out");
 
 			long homeParcelIdNullCnt = 0 ;
+			long jobBuildingIdNullCnt = 0 ;
+			boolean flag = false ;
 			while ( (line=reader.readLine()) != null ) {
 
 				// if there is no pre-existing population, check for the fraction:
-				if ( oldPop==null && MatsimRandom.random.nextDouble() > fraction ) {
+				if ( oldPop==null && MatsimRandom.random.nextDouble() > fraction && !flag ) {
 					continue ;
 				}
+				flag = false ;
 
 				// construct the person id
 				String[] parts = line.split("[\t\n]+");
@@ -186,12 +185,12 @@ public class ReadFromUrbansimParcelModel {
 				Person oldPerson = null ;
 				if ( oldPop!=null && (oldPerson=oldPop.getPerson(personId))==null ) {
 					if ( notFoundCnt == 0 ) {
-						notFoundCnt++ ; log.info("person from urbansim NOT found in pre-exising pop file.  This info only shown once.") ;
+						notFoundCnt++ ; log.info("person from urbansim NOT found in pre-exising pop file." + Gbl.ONLYONCE ) ;
 					}
 					continue ;
 				}
-				if ( foundCnt == 0 ) {
-					foundCnt++ ; log.info("found person from urbansim in pre-existing pop file.  This info only shown once.") ;
+				if ( oldPop==null && foundCnt == 0 ) {
+					foundCnt++ ; log.info("found person from urbansim in pre-existing pop file." + Gbl.ONLYONCE ) ;
 				}
 
 				// continue constructing the new person.  If there is a pre-existing pop, we need it to look for changes
@@ -235,8 +234,13 @@ public class ReadFromUrbansimParcelModel {
 					JobId jobId = new JobId( parts[idx] ) ;
 					buildingId = (BldId) buildingFromJob.get( jobId ) ;
 					if ( buildingId == null ) {
-						System.err.println ( " person_id: " + personId.toString() + " job_id: " + jobId.toString() ) ;
-						continue ;
+						if ( jobBuildingIdNullCnt < 1 ) {
+							jobBuildingIdNullCnt++ ;
+							log.warn( "jobBuildingId==null, probably out of area. person_id: " + personId.toString() 
+									+ " job_id: " + jobId.toString() + Gbl.ONLYONCE ) ;
+							log.info("(Will re-try until I find someone whoose job is in the area.)") ;
+						}
+						flag = true ; continue ;
 					}
 					assert( buildingId != null ) ;
 					LocationId jobParcelId = (LocationId) locationFromBuilding.get( buildingId ) ;
@@ -256,13 +260,13 @@ public class ReadFromUrbansimParcelModel {
 					// otherwise, compare if something has changed:
 					while ( true ) { // loop from which we can "break"
 						if ( !oldPerson.getEmployed().equals( person.getEmployed() ) ) {
-							log.info("employment status changed") ;
+//							log.info("employment status changed") ;
 							break ;
 						}
 						Act oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();  // FIXME: awkward
 						Act newHomeAct =    person.getSelectedPlan().getFirstActivity() ; // FIXME: awkward
 						if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) {
-							log.info( "something has changed with home act" ) ;
+//							log.info( "something has changed with home act" ) ;
 							break ;
 						}
 						if ( oldPerson.getEmployed().equals("no") ) {
@@ -274,7 +278,7 @@ public class ReadFromUrbansimParcelModel {
 						Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getActsLegs().get(2) ; // FIXME: awkward
 						Act newWorkAct = (Act)    person.getSelectedPlan().getActsLegs().get(2) ; // FIXME: awkward
 						if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
-							log.info( "something has changed with work act" ) ;
+//							log.info( "something has changed with work act" ) ;
 							break ;
 						}
 
@@ -283,6 +287,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// add person:
+//					log.info("adding person") ;
 					newPop.addPerson(person) ;
 				}
 			}
@@ -297,11 +302,11 @@ public class ReadFromUrbansimParcelModel {
 	
 	private boolean actHasChanged ( Act oldAct, Act newAct, NetworkLayer network ) {
 		if ( !oldAct.getCoord().equals( newAct.getCoord() ) ) {
-			log.info( "act location changed" ) ;
+//			log.info( "act location changed" ) ;
 			return true ;
 		}
-		if ( network.getLink( oldAct.getLinkId() ) == null ) { // careful: only the old activity has a link
-			log.info( "act link does not exist any more" ) ;
+		if ( oldAct.getLinkId()==null || network.getLink( oldAct.getLinkId() ) == null ) { // careful: only the old activity has a link
+//			log.info( "act link does not exist any more" ) ;
 			return true ;
 		}
 		return false ;

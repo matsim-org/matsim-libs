@@ -41,20 +41,32 @@ import org.matsim.world.Location;
  * psrc_parcel, and care was not taken to make sure that the JobIds in the persons still point to something.
  * Or maybe I made a mistake on my side.
  * 
+ * Pathnames: One could use OPUS_HOME.  However, the matsim config system does not know anything about that. 
+ * Instead, I assume that matsim is called from OPUS_HOME/opus_matsim
+ * 
+ *   cd ${OPUS_HOME}/opus_matsim ; java -cp jar/matsim.jar ...
+ *   
+ * If you want to debug inside eclipse, it makes sense to have OPUS_HOME/opus_matsim also at the root of the eclipse workspace 
+ * (e.g. via a symbolic link),
+ * so that, from the normal matsim root directory, ../opus_matsim points to OPUS_HOME.  (This is better than having
+ * OPUS_HOME itself at the root, since OPUS_HOME may have different names for different people.)
+ * 
  * @author nagel
  *
  */
-public class Test {
-	private static final Logger log = Logger.getLogger(Test.class);
+public class Matsim4Urbansim {
+	private static final Logger log = Logger.getLogger(Matsim4Urbansim.class);
 	
-//	private static final int U_CELL = 0 ;
-	private static final int U_PARCEL = 1 ;
-	private static final int U_MODEL_TYPE = U_PARCEL ; // configure!! (as of nov08, does NOT work for U_CELL)
-
+	/**
+	 * This path has this weird level of indirection (../opus_matsim) so that the package can also be called from within
+	 * matsim if it is linked to the same hierarchy.  Useful for debugging. 
+	 */
+	public static final String PATH_TO_OPUS_MATSIM = "../opus_matsim/" ;
+	
 	public static void main ( String[] args ) {
 		log.info("Starting the matsim run from the urbansim interface.  This looks a little rough initially since 'normal' matsim" ) ;
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
-
+		
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
 		ScenarioData scenarioData = new ScenarioData(config) ;
@@ -70,33 +82,36 @@ public class Test {
 		log.info("... finished cleaning network.") ;
 		log.info("") ;
 
-		// define which urbansim reader to use.  Hard-coded right now to facilitate cross-linking of code.
-//		ReadFromUrbansim readFromUrbansim ;
-		ReadFromUrbansimParcelModel readFromUrbansim ;
-		if ( U_MODEL_TYPE==U_PARCEL ) {
-			readFromUrbansim = new ReadFromUrbansimParcelModel() ;
-//		} else if ( U_MODEL_TYPE==U_CELL ) {
-//			readFromUrbansim = new ReadFromUrbansimCellModel() ;
-		} else {
-			log.fatal("not implemented" ) ;	System.exit(-1);
-		}
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel() ;
 		
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		Facilities facilities = new Facilities("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readFacilities( facilities ) ;
 
-//		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
+//		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
 //		facWriter.write();
 		
-		// read urbansim persons (possibly indirectly, e.g. via households).  Generates hwh acts as side effect
-		Population oldPop = scenarioData.getPopulation() ;
+		Population oldPop ;
+		if ( config.plans().getInputFile() != null ) {
+			log.warn("Population specified in matsim config file; assuming WARM start.");
+			log.info("(I.e. keep only those agents from urbansim files that exist in pre-existing pop file.)");
+			oldPop = scenarioData.getPopulation() ;
+			log.warn("In spite of 'warm' start this will NOT 'continue' the iterations from one urbansim call to the next. :-(") ;
+			log.warn("As of now, will ignore additions to the population (e.g. in-migration).") ;
+		} else {
+			log.warn("No population specified in matsim config file; assuming COLD start.");
+			log.info("(I.e. generate new pop from urbansim files.)" );
+			oldPop=null ;
+		}
+		
 		Population newPop = new Population(Population.NO_STREAMING);
+		// read urbansim persons (possibly indirectly, e.g. via households).  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, 0.01 ) ;
 		oldPop=null ;
 		System.gc() ;
 				
-		PopulationWriter popWriter = new PopulationWriter(newPop,ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
-		popWriter.write();
+//		PopulationWriter popWriter = new PopulationWriter(newPop,PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
+//		popWriter.write();
 		
 		log.info("BEGIN constructing urbansim zones.") ;
 		Facilities zones = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
@@ -106,24 +121,18 @@ public class Test {
 		System.out.println("### DONE with demand generation from urbansim ###") ;
 		System.gc() ;
 		
-		config.controler().setOutputDirectory(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"output") ;
+		config.controler().setOutputDirectory(PATH_TO_OPUS_MATSIM+"output") ;
 		log.warn("matsim output path set to fixed value to make sure that it is at correct place for feedback to urbansim");
 
 		Controler controler = new Controler(config,network,newPop) ;
 		controler.setOverwriteFiles(true) ;
 
+		// The following lines register what should be done _after_ the iterations were run:
 		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
 		controler.addControlerListener(myControlerListener);
 
+		// run the iterations, including the postprocessing:
 		controler.run() ;
 
-//		for ( Iterator it = zones.getFacilities().values().iterator(); it.hasNext(); ) {
-//			Facility fromZone = (Facility) it.next();
-//			Node fromNode = network.getNearestNode(fromZone.getCenter()) ; 
-//			for ( Iterator it2 = zones.getFacilities().values().iterator(); it.hasNext(); ) {
-//				Facility toZone = (Facility) it.next();
-//				Node toNode = network.getNearestNode( toZone.getCenter() ) ;
-//			}
-//		}
 	}
 }

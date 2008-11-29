@@ -61,15 +61,23 @@ public class MyControlerListener implements ShutdownListener {
 		st.setDepartureTime(dpTime);
 
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(ReadFromUrbansim.PATH_TO_OPUS_MATSIM+"tmp/travel_data.tab");
+			BufferedWriter writer = IOUtils.getBufferedWriter(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/travel_data_from_matsim.csv");
 
-			System.out.println("Computing and writing travel_data.tab" ) ;
+			log.info("Computing and writing travel_data" ) ;
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
-			long cnt = 0 ;
+			
+			writer.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4" ) ; writer.newLine();
+			
+			long cnt = 0 ; long percentDone = 0 ;
 			for ( Location fromZone : zones.getLocations().values() ) {
-				if ( cnt % ( zones.getLocations().size()/100 ) == 0 ) System.out.print('.') ;
+				if ( (int) (100.*cnt/zones.getLocations().size()) > percentDone ) { 
+					percentDone++ ; System.out.print('.') ; 
+				}  
+				cnt++ ;
 				Coord coord = fromZone.getCenter() ;
+				assert( coord != null ) ;
 				Node fromNode = network.getNearestNode( coord ) ;
+				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
 				for ( Location toZone : zones.getLocations().values() ) {
@@ -77,13 +85,14 @@ public class MyControlerListener implements ShutdownListener {
 					Node toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();
 					double ttime = arrTime - dpTime ;
-					writer.write ( " fromZone: " + fromZone.getId().toString()
-							+ " toZone: " + toZone.getId().toString()
-							+ " tTime: " + ttime ) ;
+					writer.write ( fromZone.getId().toString()
+							+ "," + toZone.getId().toString()
+							+ "," + ttime ) ;
 					writer.newLine();
 				}
 			}
-			System.out.println("DONE with writing travel_data.tab" ) ;
+			System.out.println(" done") ;
+			log.info("DONE with writing travel_data.tab" ) ;
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
