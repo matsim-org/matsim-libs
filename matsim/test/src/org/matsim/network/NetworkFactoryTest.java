@@ -75,15 +75,15 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	}
 	
-	/*package*/ class CarRouteMock extends AbstractRoute { }
-	/*package*/ class PtRouteMock extends AbstractRoute { }
+	/*package*/ static class CarRouteMock extends AbstractRoute { }
+	/*package*/ static class PtRouteMock extends AbstractRoute { }
 	
-	/*package*/ class CarRouteMockFactory implements RouteFactory {
+	/*package*/ static class CarRouteMockFactory implements RouteFactory {
 		public Route createRoute() {
 			return new CarRouteMock();
 		}
 	}
-	/*package*/ class PtRouteMockFactory implements RouteFactory {
+	/*package*/ static class PtRouteMockFactory implements RouteFactory {
 		public Route createRoute() {
 			return new PtRouteMock();
 		}
