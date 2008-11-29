@@ -34,6 +34,11 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.scoring.PlanScorer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 /**
@@ -63,6 +68,8 @@ public class RecyclingModule implements StrategyModule {
 	protected final Controler					controler;
 	protected OptimizedAgents 					agents;
 	
+	public static PrintStream 					assignment;
+	
 	
 	
 	public RecyclingModule (ControlerMFeil controler){
@@ -89,6 +96,18 @@ public class RecyclingModule implements StrategyModule {
 		this.criteria				= new String [2];
 		this.criteria [0]			= "distance";
 		this.criteria [1]			= "primacts";
+		
+		new Statistics();		
+		String outputfileOverview = Controler.getOutputFilename("assignment_log.xls");
+		FileOutputStream fileOverview;
+		try {
+			fileOverview = new FileOutputStream(new File(outputfileOverview), true);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		RecyclingModule.assignment = new PrintStream (fileOverview);
+		assignment.println("Agent\tScore\tPlan\n");
 	}
 	
 	public void init() {
@@ -111,15 +130,26 @@ public class RecyclingModule implements StrategyModule {
 		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
 		schedulingModule.finish();
 		
-		this.agents = new OptimizedAgents (this.list[0]);
+		for (int i=0;i<list[0].size();i++){
+			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScore()+"\t");
+			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
+				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
+			}
+			assignment.println();
+		}
+		assignment.println();
 		
-		this.assignmentModule.init();
-		
+		this.agents = new OptimizedAgents (this.list[0]);		
+		this.assignmentModule.init();		
 		for (int i=0;i<list[1].size();i++){
 			this.assignmentModule.handlePlan(this.list[1].get(i));
-		}
-		
+		}		
 		this.assignmentModule.finish();
+		
+		for (int i=0;i<Statistics.list.size();i++){
+			assignment.println(Statistics.list.get(i)[0]+"\t"+Statistics.list.get(i)[1]+"\t"+Statistics.list.get(i)[2]);
+		}
+		Statistics.list.clear();
 	}
 	
 	public OptimizedAgents getOptimizedAgents (){

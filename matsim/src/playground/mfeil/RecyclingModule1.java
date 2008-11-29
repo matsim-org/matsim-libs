@@ -21,10 +21,15 @@
 package playground.mfeil;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
+import org.matsim.controler.Controler;
+import org.matsim.population.Act;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
-import org.matsim.population.Plan;
-import java.util.ArrayList;
 
 
 /**
@@ -56,17 +61,31 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
 		schedulingModule.finish();
 		
+		for (int i=0;i<list[0].size();i++){
+			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScore()+"\t");
+			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
+				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
+			}
+			assignment.println();
+		}
+		assignment.println();
+		
 		agents = new OptimizedAgents (list[0]);
 		
+		Statistics.prt=false;
 		this.detectCoefficients();
+		Statistics.prt=true;
 		
 		assignmentModule.init();
 		
 		for (int i=0;i<list[1].size();i++){
 			assignmentModule.handlePlan(list[1].get(i));
 		}
-		
 		assignmentModule.finish();
+		for (int i=0;i<Statistics.list.size();i++){
+			assignment.println(Statistics.list.get(i)[0]+"\t"+Statistics.list.get(i)[1]+"\t"+Statistics.list.get(i)[2]);
+		}
+		Statistics.list.clear();
 	}
 	
 	private void detectCoefficients (){

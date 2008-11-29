@@ -21,14 +21,11 @@ package playground.mfeil;
 
 
 
-import java.util.ArrayList;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
-import org.matsim.population.Act;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 
 
@@ -67,10 +64,11 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
 		double distance = Double.MAX_VALUE;
-		double distanceAgent = 0;
+		double distanceAgent;
 		int assignedAgent = -1;
 		
 		for (int j=0;j<agents.getNumberOfAgents();j++){
+			distanceAgent=0;
 			if (this.distance=="distance"){
 				distanceAgent += this.coefficients.getPrimActsDistance()*plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 			}
@@ -89,13 +87,12 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		
-		
-		
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.router.run(plan);
 		this.timer.run(plan);
 		
+		if (Statistics.prt==true) Statistics.list.add(new String []{plan.getPerson().getId().toString(),agents.getAgentPerson(assignedAgent).getId().toString(),""+plan.getScore()});	
 	}	
 	
 	

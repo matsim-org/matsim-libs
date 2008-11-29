@@ -78,10 +78,11 @@ public class AgentsAssigner implements PlanAlgorithm{
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
 		double distance = Double.MAX_VALUE;
-		double distanceAgent = 0;
+		double distanceAgent;
 		int assignedAgent = -1;
 		
 		for (int j=0;j<agents.getNumberOfAgents();j++){
+			distanceAgent=0;
 			if (this.distance=="distance"){
 				distanceAgent += plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
 			}
@@ -107,6 +108,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.router.run(plan);
 		this.timer.run(plan);
 		
+		Statistics.list.add(new String []{plan.getPerson().getId().toString(),agents.getAgentPerson(assignedAgent).getId().toString(),""+plan.getScore()});	
+				
 	}	
 	
 	protected void writePlan (Plan in, Plan out){

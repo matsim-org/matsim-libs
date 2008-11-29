@@ -94,7 +94,7 @@ public class ControlerMFeil extends org.matsim.controler.Controler {
 			}
 			else if (classname.equals("Clustering")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule module = new RecyclingModule1(this);
+				StrategyModule module = new RecyclingModule(this);
 				strategy.addStrategyModule(module);
 			}
 		
