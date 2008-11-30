@@ -48,7 +48,6 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.misc.Time;
 
 // "GeneratePlansFromEvents" would be more appropriate as class name...
@@ -263,7 +262,7 @@ public class GenerateRealPlans implements ActStartEventHandler,
 
 	private void finishLeg(final String agentId, final Leg leg) {
 		ArrayList<Node> routeNodes = this.routes.remove(agentId);
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		route.setNodes(routeNodes);
 		leg.setRoute(route);
 	}

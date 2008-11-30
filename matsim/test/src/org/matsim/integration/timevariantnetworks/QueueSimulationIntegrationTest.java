@@ -46,7 +46,6 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
@@ -75,8 +74,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 		// create a population
 		Population plans = new Population(Population.NO_STREAMING);
-		Person person1 = createPersons(7*3600, link1, link3, 1).get(0);
-		Person person2 = createPersons(9*3600, link1, link3, 1).get(0);
+		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
+		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
 		plans.addPerson(person2);
 
@@ -127,12 +126,12 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population plans = new Population(Population.NO_STREAMING);
-		List<Person> persons1 = createPersons(0, link1, link3, personsPerWave);
+		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(Person p : persons1)
 			plans.addPerson(p);
 		Person person1 = persons1.get(personsPerWave - 1);
 
-		List<Person> persons2 = createPersons(3600, link1, link3, personsPerWave);
+		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
 		for(Person p : persons2)
 			plans.addPerson(p);
 		Person person2 = persons2.get(personsPerWave - 1);
@@ -193,7 +192,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink,
+	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
 			final int count) {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
@@ -204,7 +203,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
 			leg1.setDepartureTime(depTime);
 			leg1.setTravelTime(10);
-			CarRoute route = new NodeCarRoute();
+			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
 			route.setNodes("2 3");
 			leg1.setRoute(route);
 			plan1.createAct("w", destLink);

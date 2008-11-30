@@ -27,6 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
@@ -44,7 +45,6 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
@@ -93,9 +93,9 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private void createRoutes() {
-		this.route1 = new NodeCarRoute();
-		this.route2 = new NodeCarRoute();
-		this.agentRoute = new NodeCarRoute();
+		this.route1 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.route2 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.agentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));

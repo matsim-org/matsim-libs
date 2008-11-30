@@ -31,6 +31,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -54,7 +55,6 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -116,6 +116,14 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.network = null;
+		this.facilities = null;
+		this.population = null;
+		super.tearDown();
+	}
+	
 	public void testRun() {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
@@ -302,7 +310,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 		
-		CarRoute expectedRoute = new NodeCarRoute();
+		CarRoute expectedRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		expectedRoute.setNodes("2 7 12");
 		
 		HashMap<Leg, CarRoute> legsRoutes = PlanOptimizeTimes.getLegsRoutes(testPlan);
@@ -310,7 +318,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		// this code should changes to the route of the plan leg object, 
 		// but should not affect the previously saved routes 
 		Leg modifyMe = testPlan.getNextLeg(testPlan.getFirstActivity());
-		CarRoute differentRoute = new NodeCarRoute();
+		CarRoute differentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		differentRoute.setNodes("2 10 12");
 		modifyMe.setRoute(differentRoute);
 		

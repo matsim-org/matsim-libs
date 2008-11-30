@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
@@ -229,11 +229,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	public void endTag(final String name, String content, final Stack<String> context) {
 		content = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			CarRoute route = new NodeCarRoute();
+			CarRoute route = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 			route.setNodes(this.currentRouteNodes);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			CarRoute route = new NodeCarRoute();
+			CarRoute route = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 			route.setNodes(this.currentRouteNodes);
 			this.controlInput.setAlternativeRoute(route);
 		}

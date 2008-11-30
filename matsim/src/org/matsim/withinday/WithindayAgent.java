@@ -24,18 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.AgentReplanEvent;
 import org.matsim.mobsim.queuesim.PersonAgent;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
@@ -153,7 +154,7 @@ public class WithindayAgent extends PersonAgent {
 		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
 		List<Node> oldRouteNodes = ((CarRoute) currentLeg.getRoute()).getNodes();
-		CarRoute alreadyPassedNodes = new NodeCarRoute();
+		CarRoute alreadyPassedNodes = (CarRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
 		//this in fact a bit sophisticated construction is needed because Route.setRoute(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
@@ -182,7 +183,7 @@ public class WithindayAgent extends PersonAgent {
     ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(alreadyPassedNodes.getNodes().size() + alternativeRoute.getNodes().size());
     newRouteConcatedList.addAll(alreadyPassedNodes.getNodes());
     newRouteConcatedList.addAll(alternativeRoute.getNodes());
-    CarRoute newRoute = new NodeCarRoute();
+    CarRoute newRoute = (CarRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
     newRoute.setNodes(newRouteConcatedList);
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);

@@ -20,10 +20,10 @@
 
 package org.matsim.withinday.routeprovider;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
@@ -61,7 +61,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 	public CarRoute requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = (CarRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
 		route.setStartLink(departureLink);
 		route.setEndLink(destinationLink);
 		route.setNodes(path.nodes);

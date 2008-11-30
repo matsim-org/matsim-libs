@@ -30,7 +30,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.AStarLandmarks;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.LeastCostPathCalculator;
@@ -114,7 +113,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				CarRoute tollRoute = new NodeCarRoute();
+				CarRoute tollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
 				tollRoute.setStartLink(fromLink);
 				tollRoute.setEndLink(toLink);
 				CarRoute noTollRoute = null;
@@ -148,9 +147,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = new NodeCarRoute();
-					noTollRoute.setStartLink(fromLink);
-					noTollRoute.setEndLink(toLink);
+					noTollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
