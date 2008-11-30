@@ -33,13 +33,17 @@ public interface CarRoute extends Route {
 
 	public abstract void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
 
+	/**
+	 * @param srcRoute
+	 * @deprecated please use method {@link #setNodes(Link, List, Link)} which also specifies start and end Link
+	 */
 	@Deprecated
 	public abstract void setNodes(final List<Node> srcRoute);
 	
 	public abstract void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink);
 
-	public abstract void setNodes(final List<Node> route, final double travelTime, final double travelCost);
-
+	public abstract void setTravelCost(final double travelCost);
+	
 	public abstract double getTravelCost();
 
 	/**

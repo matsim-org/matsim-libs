@@ -154,6 +154,10 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	public double getTravelCost() {
 		return this.travelCost;
 	}
+	
+	public void setTravelCost(final double travelCost) {
+		this.travelCost = travelCost;
+	}
 
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
@@ -284,12 +288,6 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 		}
 		setDist(dist);
 		return dist;
-	}
-
-	public void setNodes(final List<Node> route, final double travelTime, final double travelCost) {
-		setNodes(route);
-		setTravelTime(travelTime);
-		this.travelCost = travelCost;
 	}
 
 }

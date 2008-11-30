@@ -178,9 +178,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			CarRoute route = new NodeCarRoute();
-			route.setStartLink(fromLink);
-			route.setEndLink(toLink);
-			route.setNodes(path.nodes, (int) path.travelTime, path.travelCost);
+			route.setNodes(fromLink, path.nodes, toLink);
+			route.setTravelTime((int) path.travelTime);
+			route.setTravelCost(path.travelCost);
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {
@@ -228,9 +228,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * 2.0);
 			CarRoute route = new NodeCarRoute(); // TODO [MR] change to PtRoute once available
-			route.setStartLink(fromLink);
-			route.setEndLink(toLink);
-			route.setNodes(path.nodes, travTime, path.travelCost); 
+			route.setNodes(fromLink, path.nodes, toLink);
+			route.setTravelTime(travTime);
+			route.setTravelCost(path.travelCost); 
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink

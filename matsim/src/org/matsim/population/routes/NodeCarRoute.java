@@ -129,13 +129,6 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		this.route.trimToSize();
 	}
 
-
-	public final void setNodes(final List<Node> route, final double travelTime, final double travelCost) {
-		setNodes(route);
-		super.setTravelTime(travelTime);
-		this.cost = travelCost;
-	}
-
 	@Override
 	public final double getDist() {
 		if (Double.isNaN(super.getDist())) {
@@ -144,6 +137,9 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		return super.getDist();
 	}
 
+	public final void setTravelCost(final double travelCost) {
+		this.cost = travelCost;
+	}
 
 	public final double getTravelCost() {
 		return this.cost;

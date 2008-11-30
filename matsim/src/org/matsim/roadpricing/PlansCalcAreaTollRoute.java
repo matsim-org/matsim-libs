@@ -127,7 +127,9 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
 					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
-					tollRoute.setNodes(path.nodes, (int) path.travelTime, path.travelCost); 
+					tollRoute.setNodes(fromLink, path.nodes, toLink);
+					tollRoute.setTravelTime((int) path.travelTime);
+					tollRoute.setTravelCost(path.travelCost); 
 				} else {
 					// do not drive/walk around, if we stay on the same link
 					tollRoute.setDist(0.0);
@@ -149,8 +151,9 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					noTollRoute = new NodeCarRoute();
 					noTollRoute.setStartLink(fromLink);
 					noTollRoute.setEndLink(toLink);
-					noTollRoute.setNodes(path.nodes, (int) path.travelTime, path.travelCost);
-//					noTollRoute.setTravelTime(path.travelTime);
+					noTollRoute.setNodes(fromLink, path.nodes, toLink);
+					noTollRoute.setTravelTime((int) path.travelTime);
+					noTollRoute.setTravelCost(path.travelCost);
 
 					if (routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex])) {
 						/* the no-toll route leads also through the tolling area, so it seems the agent
