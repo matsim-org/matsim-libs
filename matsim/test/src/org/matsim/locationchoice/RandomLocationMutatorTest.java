@@ -27,7 +27,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	/* 
 	 * TODO: Construct scenario with knowledge to compare plans before and after loc. choice
 	 */
-	public void testhandlePlan() {
+	public void testHandlePlan() {
 		this.randomlocationmutator.handlePlan(controler.getPopulation().getPerson("1").getSelectedPlan());	
 	}	
 }
