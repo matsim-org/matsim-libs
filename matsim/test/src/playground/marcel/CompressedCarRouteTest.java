@@ -22,15 +22,15 @@ package playground.marcel;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.RouteImplTest;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.AbstractCarRouteTest;
 
 import playground.yu.compressRoute.Subsequent;
 
 /**
  * @author mrieser
  */
-public class CompressedCarRouteTest extends RouteImplTest {
+public class CompressedCarRouteTest extends AbstractCarRouteTest {
 
 	@Override
 	public CarRoute getCarRouteInstance() {

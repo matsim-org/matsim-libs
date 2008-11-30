@@ -97,13 +97,13 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return createPlan(currentPerson, false);
 	}
 
-	public BasicRoute createRoute(List<Id> currentRouteLinkIds) {
+	public BasicRoute createRoute(final List<Id> currentRouteLinkIds) {
 		CarRoute route = new NodeCarRoute();
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : currentRouteLinkIds) {
 			links.add(this.network.getLink(id));
 		}
-		route.setLinks(links);
+		route.setLinks(null, links, null); // TODO [dg] pass start and endLink instead of null
 		return route;
 	}
 

@@ -127,7 +127,7 @@ public class PTRouter2 {
 				}else{
 					CarRoute legRoute = new NodeCarRoute();
 					legRoute.setTravelTime(routeTravelTime); //legRoute.setTravTime(routeTravelTime*3600);
-					if (linkList.size()>0) {legRoute.setLinks(linkList);}
+					if (linkList.size()>0) {legRoute.setLinks(null, linkList, null);}
 					
 					//insert leg 
 					Leg leg = new Leg(Leg.Mode.pt);

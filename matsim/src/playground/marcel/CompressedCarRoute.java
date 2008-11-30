@@ -155,8 +155,10 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 		return this.travelCost;
 	}
 
-	public void setLinks(final List<Link> srcRoute) {
+	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
+		setStartLink(startLink);
+		setEndLink(endLink);
 		if (srcRoute == null || srcRoute.size() == 0) {
 			this.uncompressedLength = 0;
 			return;
@@ -226,7 +228,13 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	public void setNodes(final List<Node> srcRoute) {
+		setNodes(null, srcRoute, null);
+	}
+	
+	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		this.route.clear();
+		setStartLink(startLink);
+		setEndLink(endLink);
 		Node previousNode = null;
 		Link previousLink = null;
 		for (Node node : srcRoute) {

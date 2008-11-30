@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * NodeCarRouteTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,27 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population;
+package org.matsim.population.routes;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * @author mrieser
+ */
+public class NodeCarRouteTest extends AbstractCarRouteTest {
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.population");
-
-		suite.addTestSuite(ActTest.class);
-		suite.addTestSuite(DesiresTest.class);
-		suite.addTestSuite(KnowledgeTest.class);
-		suite.addTestSuite(PersonTest.class);
-		suite.addTestSuite(PlanTest.class);
-		suite.addTestSuite(PopulationReaderMatsimV4Test.class);
-		suite.addTest(org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(org.matsim.population.filters.AllTests.suite());
-		suite.addTest(org.matsim.population.routes.AllTests.suite());
-
-		return suite;
+	public CarRoute getCarRouteInstance() {
+		return new NodeCarRoute();
 	}
-
+	
 }

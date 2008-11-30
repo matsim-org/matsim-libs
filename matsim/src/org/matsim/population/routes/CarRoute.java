@@ -31,9 +31,12 @@ public interface CarRoute extends Route {
 
 	public abstract List<Node> getNodes();
 
-	public abstract void setLinks(List<Link> srcRoute);
+	public abstract void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink);
 
-	public abstract void setNodes(List<Node> srcRoute);
+	@Deprecated
+	public abstract void setNodes(final List<Node> srcRoute);
+	
+	public abstract void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink);
 
 	public abstract void setNodes(final List<Node> route, final double travelTime, final double travelCost);
 

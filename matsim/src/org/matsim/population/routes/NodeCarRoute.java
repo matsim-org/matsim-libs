@@ -90,14 +90,15 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		return this.route;
 	}
 
-	public void setLinks(final List<Link> srcRoute) {
+	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
+		setStartLink(startLink);
+		setEndLink(endLink);
 		if (srcRoute != null) {
 			if (srcRoute.size() == 0) {
-				if (getStartLink() != getEndLink()) {
+				if (startLink != endLink) {
 					// we do not check that start link and end link are really connected with the same node
-					this.route.add(getStartLink().getToNode());
-					// TODO [MR] what to do if setEndLink is set after the linkRoute, than this doesn't work
+					this.route.add(startLink.getToNode());
 				}
 			} else {
 				Link l = srcRoute.get(0);
@@ -111,7 +112,14 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 		this.route.trimToSize();
 	}
 
+	@Deprecated
 	public void setNodes(final List<Node> srcRoute) {
+		setNodes(null, srcRoute, null);
+	}
+	
+	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
+		setStartLink(startLink);
+		setEndLink(endLink);
 		if (srcRoute == null) {
 			this.route.clear();
 		} else {
@@ -203,31 +211,76 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
 	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+		Link fromLink = getStartLink();
+		Link toLink = getEndLink();
 		int fromIndex = -1;
 		int toIndex = -1;
-		int max = this.route.size();
-		for (int i = 0; i < max; i++) {
-			Node node = this.route.get(i);
-			if (node.equals(fromNode)) {
-				fromIndex = i;
-				break;
+		List<Link> links = getLinks();
+		int max = links.size();
+		if (fromNode == toNode) {
+			if (this.route.size() > 1) {
+				for (int i = 0; i < max; i++) {
+					Link link = links.get(i);
+					if (toIndex >= 0) {
+						toLink = link;
+						break;
+					}
+					Node node = link.getFromNode();
+					if (node.equals(fromNode)) {
+						fromIndex = i;
+						toIndex = i;
+					}
+					fromLink = link;
+				}
+				if (fromIndex == -1) {
+					// not yet found, maybe it's the last node in the route?
+					if (fromNode.equals(fromLink.getToNode())) {
+						fromIndex = max;
+						toIndex = max;
+					} else {
+						throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+					}
+				}
+			} else if (this.route.size() == 1) {
+				if (this.route.get(0) == fromNode) {
+					fromIndex = 0;
+					toIndex = 0;
+				} else {
+					throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+				}
+			} else {
+				throw new IllegalArgumentException("Can't create subroute because route does not contain any nodes.");
 			}
-		}
-		if (fromIndex == -1) {
-			throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
-		}
-		for (int i = fromIndex; i < max; i++) {
-			Node node = this.route.get(i);
-			if (node.equals(toNode)) {
-				toIndex = i;
-				break;
+		} else { // --> fromNode != toNode
+			for (int i = 0; i < max; i++) {
+				Link link = links.get(i);
+				Node node = link.getFromNode();
+				if (node.equals(fromNode)) {
+					fromIndex = i;
+					break;
+				}
+				fromLink = link;
 			}
-		}
-		if (toIndex == -1) {
-			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
+			if (fromIndex == -1) {
+				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+			}
+			for (int i = fromIndex; i < max; i++) {
+				Link link = links.get(i);
+				if (toIndex >= 0) {
+					toLink = link;
+					break;
+				}
+				Node node = link.getToNode();
+				if (node.equals(toNode)) {
+					toIndex = i + 1;
+				}
+			}
+			if (toIndex == -1) {
+				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
+			}		
 		}
 		NodeCarRoute ret = new NodeCarRoute();
-		ret.setNodes(this.route.subList(fromIndex, toIndex + 1));
+		ret.setNodes(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
 		return ret;
 	}
 

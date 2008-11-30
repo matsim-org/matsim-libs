@@ -98,31 +98,39 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+		Link fromLink = getStartLink();
+		Link toLink = getEndLink();
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
 		for (int i = 0; i < max; i++) {
-			Node node = this.route.get(i).getFromNode();
+			Link link = this.route.get(i);
+			Node node = link.getFromNode();
 			if (node.equals(fromNode)) {
 				fromIndex = i;
 				break;
 			}
+			fromLink = link;
 		}
 		if (fromIndex == -1) {
 			throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
 		}
 		for (int i = fromIndex; i < max; i++) {
-			Node node = this.route.get(i).getToNode();
+			Link link = this.route.get(i);
+			if (toIndex >= 0) {
+				toLink = link;
+				break;
+			}
+			Node node = link.getToNode();
 			if (node.equals(toNode)) {
 				toIndex = i;
-				break;
 			}
 		}
 		if (toIndex == -1) {
 			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 		}
 		LinkCarRoute ret = new LinkCarRoute();
-		ret.setLinks(this.route.subList(fromIndex, toIndex + 1));
+		ret.setLinks(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
 		return ret;
 	}
 
@@ -130,8 +138,10 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		return this.travelCost;
 	}
 
-	public void setLinks(final List<Link> srcRoute) {
+	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
+		setStartLink(startLink);
+		setEndLink(endLink);
 		if (srcRoute != null) {
 			this.route.addAll(srcRoute);
 		}
@@ -163,7 +173,13 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		}
 		this.route.trimToSize();
 	}
-
+	
+	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
+		setStartLink(startLink);
+		setEndLink(endLink);
+		setNodes(srcRoute);
+	}
+	
 	public void setNodes(final List<Node> srcRoute) {
 		this.route.clear();
 		Node prevNode = null;
