@@ -29,6 +29,7 @@ import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -38,7 +39,7 @@ import playground.christoph.router.util.TabuSelector;
 
 public class CompassRoute extends PersonLeastCostPathCalculator {
 
-	protected boolean removeLoops = true;
+	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
@@ -67,6 +68,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Link> links = new ArrayList<Link>();
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
@@ -77,17 +79,21 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks) break;
+			if (nodes.size() > maxLinks)
+			{
+				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+				break;
+			}
 			
-			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 			
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
+			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 	
 			// if a route should not return to the previous node from the step before
-			if (tabuSearch) links = TabuSelector.getLinks(links, previousNode);
+			if (tabuSearch) linksArray = TabuSelector.getLinks(linksArray, previousNode);
 			
-			if (links.length == 0)
+			if (linksArray.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
@@ -97,17 +103,17 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			double angle = Math.PI;	// worst possible start value
 			
 			// get the Link with the nearest direction to the destination node
-			for(int i = 0; i < links.length; i++)
+			for(int i = 0; i < linksArray.length; i++)
 			{
-				if(links[i] instanceof Link)
+				if(linksArray[i] instanceof Link)
 				{
-					double newAngle = calcAngle (fromNode, toNode, links[i].getToNode());
+					double newAngle = calcAngle (fromNode, toNode, linksArray[i].getToNode());
 					
 					//if the new direction is better than the existing one
 					if (newAngle <= angle)
 					{
 						angle = newAngle;
-						nextLink = links[i];
+						nextLink = linksArray[i];
 					}
 /*					else
 					{
@@ -117,7 +123,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 				}
 				else
 				{
-					log.error("Return object was not from type Link! Class " + links[i] + " was returned!");
+					log.error("Return object was not from type Link! Class " + linksArray[i] + " was returned!");
 				}	
 			}
 				
@@ -132,16 +138,20 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			}
 			else
 			{
-				log.error("Number of Links " + links.length);
+				log.error("Number of Links " + linksArray.length);
 				log.error("Return object was not from type Link! Class " + nextLink + " was returned!");
 				break;
 			}
 			nodes.add(currentNode);
+			links.add(currentLink);
 		}	// while(!currentNode.equals(toNode))
-		
+
+		Path path = new Path(nodes, links, 0, 0);
+/*		
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodes);
 		Path path = new Path(nodes, route.getLinks(), 0, 0); // TODO [MR] make collecting the links more efficient
+*/
 		
 		if (maxLinks == path.links.size())
 		{

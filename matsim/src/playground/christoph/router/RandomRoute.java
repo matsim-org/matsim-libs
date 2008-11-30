@@ -21,6 +21,7 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -40,7 +41,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
 	
-	protected boolean removeLoops = true;
+	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	/**
@@ -67,6 +68,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		double routeLength = 0.0;
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Link> links = new ArrayList<Link>();
 		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
@@ -77,41 +79,48 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks) break;
+			if (nodes.size() > maxLinks)
+			{
+				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+				break;
+			}
 			
-			Link[] links = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
+			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
 		
 			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			links = KnowledgeTools.getKnownLinks(links, knownNodesMap);
+			linksArray = KnowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 
-			if (links.length == 0)
+			if (linksArray.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
 			
 			// choose node
-			int nextLink = MatsimRandom.random.nextInt(links.length);
+			int nextLink = MatsimRandom.random.nextInt(linksArray.length);
 			
 			// make the chosen link to the new current link
-			if(links[nextLink] instanceof Link)
+			if(linksArray[nextLink] instanceof Link)
 			{
-				currentLink = links[nextLink];
+				currentLink = linksArray[nextLink];
 				currentNode = currentLink.getToNode();
 				routeLength = routeLength + currentLink.getLength();
 			}
 			else
 			{
-				log.error("Return object was not from type Link! Class " + links[nextLink] + " was returned!");
+				log.error("Return object was not from type Link! Class " + linksArray[nextLink] + " was returned!");
 				break;
 			}
 			nodes.add(currentNode);
+			links.add(currentLink);
 		}	// while(!currentNode.equals(toNode))
 		
+		Path path = new Path(nodes, links, 0, 0);
+/*		
 		CarRoute route = new NodeCarRoute();
 		route.setNodes(nodes);
 		Path path = new Path(nodes, route.getLinks(), 0, 0); // TODO [MR] make collecting the links more efficient
-	
+*/	
 		if (removeLoops) LoopRemover.removeLoops(path);
 				
 		return path;
