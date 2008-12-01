@@ -18,18 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.compressRoute;
+package org.matsim.network.algorithms;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
+import org.matsim.network.LinkIdComparator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.geometry.Coord;
@@ -42,24 +42,21 @@ import org.matsim.utils.misc.Time;
  * is more likely to continue straight on instead of making a U-turn), the
  * capacity of links (likely to continue on links with the same or larger
  * capacity instead of using small bumpy roads), the speed limit, other
- * attributes or combinations there of.
+ * attributes or combinations there of. This code only looks at geometry.
  *
  * @author ychen
  * @author mrieser
  */
-public class Subsequent {
+public class SubsequentLinksAnalyzer {
 
 	private final NetworkLayer network;
 
-	/** Criterion to judge Capacity */
-	private static double BETA = 0.0;
-
-	private final static LinkComparator linkComparator = new LinkComparator();
+	private final static LinkIdComparator linkComparator = new LinkIdComparator();
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
 	private final TreeMap<Link, Link> subsequentLinks = new TreeMap<Link, Link>(linkComparator);
 
-	public Subsequent(final NetworkLayer network) {
+	public SubsequentLinksAnalyzer(final NetworkLayer network) {
 		this.network = network;
 		compute();
 	}
@@ -109,9 +106,9 @@ public class Subsequent {
 	}
 
 	private Link computeSubsequentLink(final Link l, final Map<Link, Double> thetas) {
-		Link finalOutLink = null;
+		Link outLink = null;
 		List<Link> minThetaOutLinks = new ArrayList<Link>();
-		while (finalOutLink == null) {
+		while (outLink == null) {
 			minThetaOutLinks.clear();
 			double absMin = Collections.min(thetas.values()).doubleValue();
 			for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
@@ -119,31 +116,20 @@ public class Subsequent {
 					minThetaOutLinks.add(entry.getKey());
 			}
 			if (minThetaOutLinks.size() == 1) {
-				Link outLink = minThetaOutLinks.get(0);
-				if (outLink.getCapacity(Time.UNDEFINED_TIME) >= BETA * l.getCapacity(Time.UNDEFINED_TIME))
-					finalOutLink = outLink;
-				else {
-					thetas.remove(outLink);
-				}
+				outLink = minThetaOutLinks.get(0);
 			} else if (minThetaOutLinks.size() == 2) {
 				Link outLinkA = minThetaOutLinks.get(0);
 				Link outLinkB = minThetaOutLinks.get(1);
 				double capA = outLinkA.getCapacity(Time.UNDEFINED_TIME);
 				double capB = outLinkB.getCapacity(Time.UNDEFINED_TIME);
 				if (l.getCapacity(Time.UNDEFINED_TIME) > Math.min(capA, capB)) {
-					finalOutLink = (capA >= capB) ? outLinkA : outLinkB;
+					outLink = (capA >= capB) ? outLinkA : outLinkB;
 				} else {
-					finalOutLink = (MatsimRandom.random.nextDouble() < 0.5) ? outLinkA : outLinkB;
+					outLink = (MatsimRandom.random.nextDouble() < 0.5) ? outLinkA : outLinkB;
 				}
 			}
 		}
-		return finalOutLink;
-	}
-
-	/*package*/ static class LinkComparator implements Comparator<Link> {
-		public int compare(final Link o1, final Link o2) {
-			return o1.getId().compareTo(o2.getId());
-		}
+		return outLink;
 	}
 
 }
