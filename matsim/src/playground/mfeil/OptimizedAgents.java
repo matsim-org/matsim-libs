@@ -53,7 +53,7 @@ public class OptimizedAgents {
 	}
 	
 	public int getNumberOfAgents (){
-		return this.list.size()-1;
+		return this.list.size();
 	}
 	
 	public Plan getAgentPlan (int agent){
