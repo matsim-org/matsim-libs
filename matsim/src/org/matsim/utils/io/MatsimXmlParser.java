@@ -42,6 +42,8 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import playground.kai.urbansim.MyControlerListener;
+
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
  * functionality required to parse xml-files. Extending classes have only to implement {@link #startTag} and {@link #endTag}
@@ -51,6 +53,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mrieser
  */
 public abstract class MatsimXmlParser extends DefaultHandler {
+	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<StringBuffer>();
 	private final Stack<String> context = new Stack<String>();
@@ -188,6 +191,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		}
 
 		// try to get the dtd from the web
+		log.info("Trying to get some info (e.g. dtd) from www.matsim.org.  In some cases (e.g. network interface up but no connection),");
+		log.info(" this may take a bit ..." ) ;
 		try {
 			InputStream is = new URL(systemId).openStream();
 			/* If there was no exception until here, than the path is valid.
