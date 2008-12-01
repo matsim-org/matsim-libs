@@ -72,18 +72,18 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class DistanceAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
-	private FeatureSource featureSourcePolygon;
+	private final FeatureSource featureSourcePolygon;
 	private ArrayList<Polygon> polygons;
 
-	private Population population;
+	private final Population population;
 	private Envelope envelope = null;
 	private QuadTree<Person> personTree;
-	private NetworkLayer network;
-	private PlansCalcRoute router;
+	private final NetworkLayer network;
+	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
 	private ArrayList<Feature> features;
-	private GeometryFactory geofac;
-	private HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
+	private final GeometryFactory geofac;
+	private final HashMap<Polygon,Double> catchRadi = new HashMap<Polygon,Double>();
 	private static double CATCH_RADIUS;
 	playground.gregor.collections.gnuclasspath.TreeMap<Double, Feature> ft_tree;
 
@@ -92,7 +92,7 @@ public class DistanceAnalysis {
 
 
 
-	public DistanceAnalysis(FeatureSource features, Population population, NetworkLayer network) throws Exception {
+	public DistanceAnalysis(final FeatureSource features, final Population population, final NetworkLayer network) throws Exception {
 		this.featureSourcePolygon = features;
 		this.population = population;
 		this.network = network;
@@ -102,7 +102,7 @@ public class DistanceAnalysis {
 		this.geofac = new GeometryFactory();
 
 		initFeatureCollection();
-		parsePolygons();
+//		parsePolygons();
 		createPolygons();
 		handlePlans();
 		iteratePolygons();
@@ -184,7 +184,7 @@ public class DistanceAnalysis {
 
 	}
 
-	private double[] handlePersons(Collection<Person> persons) {
+	private double[] handlePersons(final Collection<Person> persons) {
 
 		double [] dist = {0., 0.,0., 0., 0.};
 		double diff = 0;
@@ -213,7 +213,7 @@ public class DistanceAnalysis {
 			ll.setTravelTime(0.0);
 			plan.addLeg(ll);
 			plan.addAct(person.getSelectedPlan().getNextActivity(leg));
-			router.run(plan);
+			this.router.run(plan);
 			Leg leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDist();
 			dist[1] = l2;
@@ -244,7 +244,7 @@ public class DistanceAnalysis {
 		return dist;
 
 	}
-	private Collection<Person>  rmAliens(Collection<Person> persons, Polygon polygon) {
+	private Collection<Person>  rmAliens(final Collection<Person> persons, final Polygon polygon) {
 
 		ArrayList<Person> ret = new ArrayList<Person>();
 		for (Person person : persons) {
@@ -294,8 +294,8 @@ public class DistanceAnalysis {
 
 	}
 
-	private Feature getFeature(Polygon polygon, double meanDeviance,
-			double length_shortest, double length_selected, int num_pers, int id, double evac_time, double varK, int dest ) throws IllegalAttributeException {
+	private Feature getFeature(final Polygon polygon, final double meanDeviance,
+			final double length_shortest, final double length_selected, final int num_pers, final int id, final double evac_time, final double varK, final int dest ) throws IllegalAttributeException {
 
 		return this.ftDistrictShape.create(new Object [] {new MultiPolygon(new Polygon []{polygon },this.geofac),id,num_pers, length_shortest, length_selected, meanDeviance, meanDeviance*meanDeviance,evac_time, varK, dest},"network");
 
@@ -319,7 +319,7 @@ public class DistanceAnalysis {
 
 	}
 
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 
 
 		String district_shape_file;
