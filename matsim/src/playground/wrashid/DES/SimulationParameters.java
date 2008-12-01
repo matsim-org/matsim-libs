@@ -43,6 +43,15 @@ public class SimulationParameters {
 														   //   entering next road, it will enter the next 
 
 	
+	// a higher priority comes first in the message queue (when same time)
+	// a person has a enter road message at the same time as leaving the previous road
+	// for events with same time stamp: leave < arrival < departure < enter
+	// especially for testing this is important
+	// only important for messages of same person
+	public static final int PRIORITY_LEAVE_ROAD_MESSAGE=200;
+	public static final int PRIORITY_ARRIVAL_MESSAGE=150;
+	public static final int PRIORITY_DEPARTUARE_MESSAGE=125;
+	public static final int PRIORITY_ENTER_ROAD_MESSAGE=100;
 	
 	// simulation internal parameters
 	

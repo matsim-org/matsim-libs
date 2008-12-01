@@ -15,6 +15,7 @@ public class LeaveRoadMessage extends EventMessage {
 	public LeaveRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
 		eventType=SimulationParameters.LEAVE_LINK;
+		priority=SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
 	
 	public void printMessageLogString() {
@@ -29,6 +30,7 @@ public class LeaveRoadMessage extends EventMessage {
 		}
 		logEvent();
 	}
+	
 
 	@Override
 	public void logEvent() {

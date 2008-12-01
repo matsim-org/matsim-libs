@@ -15,6 +15,7 @@ public class EndLegMessage extends EventMessage {
 	public EndLegMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
 		eventType=SimulationParameters.END_LEG;
+		priority=SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
 	}
 	
 

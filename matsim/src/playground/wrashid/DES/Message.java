@@ -8,12 +8,14 @@ public abstract class Message implements Comparable {
 	public SimUnit receivingUnit;
 	public long messageType;
 	public long messageId;
+	protected int priority=0;
 	//public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
 	
 	
 	public Message() {
-		messageId=messageCounter;
-		messageCounter++;
+		//messageId=messageCounter;
+		//messageCounter++;
+		messageId=0;
 	}
 	
 	public double getMessageArrivalTime() {
@@ -28,23 +30,27 @@ public abstract class Message implements Comparable {
 
 	/*
 	 * The comparison is done according to the message arrival Time.
-	 * If the time is equal of two messages, one is bigger then the other randomly.
-	 * => WRONG, this is not possible at the moment.
+	 * If the time is equal of two messages, then the priority of the messages is compared
 	 */
 	public int compareTo(Object obj){
+		if (messageArrivalTime>3272){
+			System.out.println();
+		}
+		
+		
 		Message otherMessage= (Message) obj;
 		if (messageArrivalTime>otherMessage.messageArrivalTime){
 			return 1;
 		} else if (messageArrivalTime<otherMessage.messageArrivalTime) {
 			return -1;
 		} else {
-			// ATTENTION: try to remove this in some intelligent manner, because
-			// at the moment if you just return 0 here, we have a problem (find out why).
-			// => DES scenarios do not run anymore.
-			// find out, why this happens and perhaps replace it by
-			// priorities as in PDES????
-			return (int) (messageId-otherMessage.messageId);
+			// higher priority means for a queue, that it comes first
+			return otherMessage.getPriority() - priority;
 		}
+	}
+
+	public int getPriority() {
+		return priority;
 	}
 
 }

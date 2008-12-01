@@ -14,6 +14,7 @@ public class StartingLegMessage extends EventMessage {
 	public StartingLegMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
 		eventType=SimulationParameters.START_LEG;
+		priority=SimulationParameters.PRIORITY_DEPARTUARE_MESSAGE;
 	}
 
 	@Override
