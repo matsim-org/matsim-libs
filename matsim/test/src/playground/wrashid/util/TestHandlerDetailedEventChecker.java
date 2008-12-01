@@ -70,61 +70,15 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 					}
 					System.out.println(lastTimeStamp);
 					System.out.println(list.get(i).time);
+					
+					
+					assertEquals(true, false); // in this case, something is wrong (messages are not arriving in a consistent manner)
 				}
 				assertEquals(true, lastTimeStamp <= list.get(i).time);
 				lastTimeStamp = list.get(i).time;
 			}
 		}
 
-		/*
-		 * // checks not needed anymore, because covered by other checks
-		 * 
-		 *  // compare with expected number of events per agent, per event type
-		 * for (LinkedList<BasicEvent> list : events.values()) { int
-		 * linkEnterEventCounter = 0; int linkLeaveEventCounter = 0; int
-		 * departureEventCounter = 0; int arrivalEventCounter = 0; for (int i =
-		 * 0; i < list.size(); i++) { if (list.get(i) instanceof LinkEnterEvent) {
-		 * linkEnterEventCounter++; } if (list.get(i) instanceof LinkLeaveEvent) {
-		 * linkLeaveEventCounter++; } if (list.get(i) instanceof
-		 * AgentDepartureEvent) { departureEventCounter++; } if (list.get(i)
-		 * instanceof AgentArrivalEvent) { arrivalEventCounter++; }
-		 *  } ExpectedNumberOfEvents expected =
-		 * expectedNumberOfMessages.get(list .get(0).agentId); // if
-		 * (estimate.expectedLinkEnterEvents!=linkEnterEventCounter){ // for
-		 * (int j=0;j<list.size();j++){ //
-		 * System.out.println(list.get(j).toString()); // } // } else { //
-		 * System.out.println("ok"); // }
-		 * 
-		 * assertEquals(expected.expectedLinkEnterEvents,
-		 * linkEnterEventCounter);
-		 * assertEquals(expected.expectedLinkLeaveEvents,
-		 * linkLeaveEventCounter);
-		 * assertEquals(expected.expectedDepartureEvents,
-		 * departureEventCounter); assertEquals(expected.expectedArrivalEvents,
-		 * arrivalEventCounter); }
-		 *  // check, that each enter event is followed by a leave event //
-		 * check, that the same road is left, which is entered for (LinkedList<BasicEvent>
-		 * list : events.values()) { for (int i = 0; i < list.size(); i++) { if
-		 * (list.get(i) instanceof LinkEnterEvent) {
-		 * 
-		 * try { assertEquals(true, list.get(i + 1) instanceof LinkLeaveEvent); }
-		 * catch (Exception e) { for (int j = 0; j < list.size(); j++) {
-		 * System.out.println(list.get(j)); } e.printStackTrace();
-		 * System.exit(0); }
-		 * 
-		 * LinkEnterEvent enterEvent = (LinkEnterEvent) list.get(i);
-		 * LinkLeaveEvent leaveEvent = (LinkLeaveEvent) list .get(i + 1); //
-		 * System.out.println(enterEvent); if
-		 * (!enterEvent.linkId.equalsIgnoreCase(leaveEvent.linkId)) { for (int j =
-		 * 0; j < list.size(); j++) { System.out.println(list.get(j)); }
-		 * System.out.println("===========error===========");
-		 * System.out.println(enterEvent.toString());
-		 * System.out.println(leaveEvent.toString()); }
-		 * 
-		 * assertEquals(true, enterEvent.linkId
-		 * .equalsIgnoreCase(leaveEvent.linkId)); } } }
-		 * 
-		 */
 
 		// compare plan and events for each agent
 		// compare: type of events, linkId
@@ -140,7 +94,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 
 			Act act = (Act) actIter.next();
 			while (legIter.hasNext()) {
-
+				
 				Leg leg = (Leg) legIter.next();
 
 				// each leg starts with departure on act link

@@ -24,7 +24,7 @@ public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 		Gbl.reset();
 		
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
-		detailedChecker.startTestDES("test/scenarios/equil/config.xml", true,
+		detailedChecker.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans100.xml",
 				null);
 	}
@@ -49,7 +49,7 @@ public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 		Gbl.reset();
 
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events100.txt",1);
-		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", true,
+		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans100.xml",
 				null);
 	}
