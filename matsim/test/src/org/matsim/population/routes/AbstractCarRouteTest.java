@@ -79,8 +79,11 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 	}
 
 	public void testSetNodes_asString_empty() {
-		createTestNetwork();
+		NetworkLayer network = createTestNetwork();
 		CarRoute route = getCarRouteInstance();
+		Link link = network.getLink(new IdImpl("3"));
+		route.setStartLink(link);
+		route.setEndLink(link);
 		route.setNodes("");
 
 		assertEquals("number of nodes in route.", 0, route.getNodes().size());
@@ -360,9 +363,9 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 	public void testStartAndEndOnSameLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
 		CarRoute route = getCarRouteInstance();
-		route.setNodes("");
 		route.setStartLink(network.getLink(new IdImpl("2")));
 		route.setEndLink(network.getLink(new IdImpl("2")));
+		route.setNodes("");
 		assertEquals(0, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
 	}
@@ -379,9 +382,9 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 	public void testStartAndEndOnSubsequentLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
 		CarRoute route = getCarRouteInstance();
-		route.setNodes("13");
 		route.setStartLink(network.getLink(new IdImpl("12")));
 		route.setEndLink(network.getLink(new IdImpl("13")));
+		route.setNodes("13");
 		assertEquals(1, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
 	}
