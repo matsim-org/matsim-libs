@@ -70,6 +70,7 @@ public class EndLegMessage extends EventMessage {
 				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
 				.getId().toString(), vehicle.getLegIndex() - 1);
 
+		SimulationParameters.events.processEvent(event);
 	}
 
 }
