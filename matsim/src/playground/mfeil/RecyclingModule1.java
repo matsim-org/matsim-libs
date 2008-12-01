@@ -98,43 +98,27 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		for (int i=0;i<this.iterations;i++){
 			score[0][1]=basis+(i+1)*offset;
 			this.coefficients.setPrimActsDistance(score[0][1]);
-			//score[0][2]=this.coefficients.gethomeLocationDistance();
 			score[0][0] = this.calculate();
 			
 			score[1][1]=basis-(i+1)*offset;
 			this.coefficients.setPrimActsDistance(score[1][1]);
-			//score[1][2]=this.coefficients.gethomeLocationDistance();
 			score[1][0] = this.calculate();
-			/*
-			this.coefficients.sethomeLocationDistance(this.coefficients.gethomeLocationDistance()-offset);
-			score[2][1]=this.coefficients.getPrimActsDistance();
-			score[2][2]=this.coefficients.gethomeLocationDistance();
-			score[2][0] = this.calculate();
-			this.coefficients.sethomeLocationDistance(this.coefficients.gethomeLocationDistance()+2*offset);
-			score[3][1]=this.coefficients.getPrimActsDistance();
-			score[3][2]=this.coefficients.gethomeLocationDistance();
-			score[3][0] = this.calculate();
-			*/
-			double tmpScore = Double.MIN_VALUE;
+				double tmpScore = Double.MIN_VALUE;
 			double x=0;
-			//double y=0;
 			for (int j=0;j<score.length;j++){
 				if (score[j][0]>tmpScore){
 					tmpScore = score[j][0];
 					x = score[j][1];
-					//y = score[j][2];
 				}
 			}
 			tmp[i][0]=tmpScore;
 			tmp[i][1]= x;
-			//tmp[i][2]= y;			
 		}
 		double tmpScoreFinal = Double.MIN_VALUE;
 		for (int i=0;i<this.iterations;i++){
 			if (tmp[i][0]>tmpScoreFinal){
 				tmpScoreFinal = tmp[i][0];
 				this.coefficients.setPrimActsDistance(tmp[i][1]);
-				//this.coefficients.sethomeLocationDistance(tmp[i][2]);
 				System.out.println("PrimActsDistance = "+tmp[i][1]);
 				System.out.println("HomeLocationDistance = "+this.coefficients.gethomeLocationDistance());
 				System.out.println("Score = "+tmpScoreFinal);
