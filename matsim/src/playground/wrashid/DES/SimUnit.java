@@ -2,7 +2,7 @@ package playground.wrashid.DES;
 
 public abstract class SimUnit {
 
-	Scheduler scheduler = null;
+	protected Scheduler scheduler = null;
 
 	public SimUnit(Scheduler scheduler) {
 		this.scheduler = scheduler;
@@ -15,10 +15,11 @@ public abstract class SimUnit {
 		m.setMessageArrivalTime(messageArrivalTime);
 		scheduler.schedule(m);
 	}
+
 	// this procedure is invoked at the end of the simulation
 	public abstract void finalize();
 
-	public void setScheduler(Scheduler scheduler) {
-		this.scheduler = scheduler;
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 }

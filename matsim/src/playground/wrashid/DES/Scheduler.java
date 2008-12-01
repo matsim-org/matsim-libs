@@ -7,6 +7,7 @@ import org.matsim.gbl.Gbl;
 public class Scheduler {
 	private double simTime = 0;
 	private MessageQueue queue = new MessageQueue();
+	private double simulationStartTime = System.currentTimeMillis();
 
 	public void schedule(Message m) {
 		queue.putMessage(m);
@@ -17,8 +18,6 @@ public class Scheduler {
 	}
 
 	public void startSimulation() {
-		long simulationStart = System.currentTimeMillis();
-		double hourlyLogTime = 3600;
 
 		Message m;
 
@@ -28,23 +27,27 @@ public class Scheduler {
 			simTime = m.getMessageArrivalTime();
 			m.processEvent();
 			m.handleMessage();
-
-			// print output each hour
-			if (simTime / hourlyLogTime > 1) {
-				hourlyLogTime = simTime + 3600;
-				System.out.print("Simulation at " + simTime / 3600 + "[h]; ");
-				System.out
-						.println("s/r:"
-								+ simTime
-								/ (System.currentTimeMillis() - simulationStart)
-								* 1000);
-				Gbl.printMemoryUsage();
-			}
+			printLog();
 		}
 	}
 
 	public double getSimTime() {
 		return simTime;
+	}
+
+	private void printLog() {
+		double hourlyLogTime = 3600;
+		// print output each hour
+		if (simTime / hourlyLogTime > 1) {
+			hourlyLogTime = simTime + 3600;
+			System.out.print("Simulation at " + simTime / 3600 + "[h]; ");
+			System.out
+					.println("s/r:"
+							+ simTime
+							/ (System.currentTimeMillis() - simulationStartTime)
+							* 1000);
+			Gbl.printMemoryUsage();
+		}
 	}
 
 }

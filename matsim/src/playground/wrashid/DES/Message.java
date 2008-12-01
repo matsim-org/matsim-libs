@@ -57,4 +57,8 @@ public abstract class Message implements Comparable<Message> {
 	
 	public abstract void handleMessage();
 
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
 }
