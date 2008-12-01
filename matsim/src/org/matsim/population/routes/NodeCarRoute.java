@@ -116,7 +116,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
 	}
-	
+
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
@@ -203,7 +203,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	 * ending at toNode.
 	 * @param fromNode
 	 * @param toNode
-	 * @return A flat copy of the original Route  // FIXME reading the doc above, this clearly does NOT return a flat copy of the original Route!
+	 * @return a route leading from <code>fromNode</code> to <code>toNode</code> along this route
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
 	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
@@ -217,14 +217,12 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 			if (this.route.size() > 1) {
 				for (int i = 0; i < max; i++) {
 					Link link = links.get(i);
-					if (toIndex >= 0) {
-						toLink = link;
-						break;
-					}
 					Node node = link.getFromNode();
 					if (node.equals(fromNode)) {
 						fromIndex = i;
 						toIndex = i;
+						toLink = link;
+						break;
 					}
 					fromLink = link;
 				}
@@ -273,7 +271,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 			}
 			if (toIndex == -1) {
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
-			}		
+			}
 		}
 		NodeCarRoute ret = new NodeCarRoute();
 		ret.setNodes(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
