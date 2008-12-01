@@ -18,7 +18,7 @@ public abstract class Message implements Comparable<Message> {
 		this.messageArrivalTime = messageArrivalTime;
 	}
 
-	public abstract void printMessageLogString();
+	public abstract void processEvent();
 
 	/*
 	 * The comparison is done according to the message arrival Time. If the time
@@ -54,5 +54,7 @@ public abstract class Message implements Comparable<Message> {
 	public void setReceivingUnit(SimUnit receivingUnit) {
 		this.receivingUnit = receivingUnit;
 	}
+	
+	public abstract void handleMessage();
 
 }

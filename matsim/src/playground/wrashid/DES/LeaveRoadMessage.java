@@ -7,8 +7,8 @@ import org.matsim.events.LinkLeaveEvent;
 public class LeaveRoadMessage extends EventMessage {
 
 	@Override
-	public void selfhandleMessage() {
-		Road road=(Road)scheduler.getSimUnit(this.getReceivingUnit().unitNo);
+	public void handleMessage() {
+		Road road=(Road)this.getReceivingUnit();
 		road.leaveRoad(vehicle);
 	}
 
@@ -18,23 +18,12 @@ public class LeaveRoadMessage extends EventMessage {
 		priority=SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
 	
-	public void printMessageLogString() {
-		Road road=(Road)scheduler.getSimUnit(this.getReceivingUnit().unitNo);
-		
-		if (logMessage){
-			EventLog ev=new EventLog(this.getMessageArrivalTime(),Integer.parseInt(vehicle.getOwnerPerson().getId().toString()),vehicle.getLegIndex()-1,Integer.parseInt(road.getLink().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getFromNode().getId().toString()),Integer.parseInt(vehicle.getCurrentLink().getToNode().getId().toString()),eventType);
-			//SimulationParameters.eventOutputLog.add(ev);
-			if (SimulationParameters.debugMode){
-				ev.print();
-			}
-		}
-		logEvent();
-	}
+
 	
 
 	@Override
-	public void logEvent() {
-		Road road=(Road)scheduler.getSimUnit(this.getReceivingUnit().unitNo);
+	public void processEvent() {
+		Road road=(Road)this.getReceivingUnit();
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){

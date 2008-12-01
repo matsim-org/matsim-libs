@@ -20,7 +20,7 @@ public class EndLegMessage extends EventMessage {
 	
 
 	@Override
-	public void selfhandleMessage() {
+	public void handleMessage() {
 		//vehicle.leavePreviousRoad();
 		
 		
@@ -60,7 +60,7 @@ public class EndLegMessage extends EventMessage {
 		
 	}
 	
-	public void logEvent() {
+	public void processEvent() {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.END_LEG)){

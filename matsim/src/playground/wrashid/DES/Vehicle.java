@@ -22,6 +22,7 @@ public class Vehicle extends SimUnit {
 	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
+		initialize();
 	}
 
 	@Override
@@ -30,26 +31,6 @@ public class Vehicle extends SimUnit {
 
 	}
 
-	@Override
-	public void handleMessage(Message m) {
-		/*
-		 * m.printMessageLogString(); if (m instanceof StartingLegMessage){
-		 * StartingLegMessage startingLegMessage=(StartingLegMessage) m; Plan
-		 * plan = ownerPerson.getSelectedPlan(); // that's the plan the person
-		 * will execute ArrayList<Object> actsLegs = plan.getActsLegs(); Leg
-		 * leg = (Leg)actsLegs.get(startingLegMessage.getLegIndex()); // if
-		 * current lag has more links if
-		 * (leg.getRoute().getLinkRoute().length>startingLegMessage.getLinkIndex()+1){ //
-		 * get the next leg if ("car".equals(leg.getMode())) { // we only
-		 * simulate car traffic Link nextLink =
-		 * leg.getRoute().getLinkRoute()[startingLegMessage.getLinkIndex()+1]; //
-		 * these are the links the agent will drive along one after the other. } //
-		 * when nicht car, was dann????????????????????????????? } } => delete
-		 * this 'comment', as soon tests are written and run
-		 */
-	}
-
-	@Override
 	// put the first event of each person is action completed.
 	// this is put into the MessageQueue
 	public void initialize() {
@@ -172,7 +153,7 @@ public class Vehicle extends SimUnit {
 			scheduleEndLegMessage(scheduleTime, road);
 		} else {
 			sendMessage(MessageFactory.getEnterRoadMessage(road.scheduler, this), road
-					.getUnitNo(), scheduleTime);
+					, scheduleTime);
 		}
 	}
 
@@ -205,28 +186,28 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void scheduleEndRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndRoadMessage(road.scheduler, this), road.getUnitNo(),
+		sendMessage(MessageFactory.getEndRoadMessage(road.scheduler, this), road,
 				scheduleTime);
 	}
 
 	public void scheduleLeaveRoadMessage(double scheduleTime, Road road) {
 		sendMessage(MessageFactory.getLeaveRoadMessage(road.scheduler, this), road
-				.getUnitNo(), scheduleTime);
+				, scheduleTime);
 	}
 
 	public void scheduleEndLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road.getUnitNo(),
+		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road,
 				scheduleTime);
 	}
 	
 	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getStartingLegMessage(road.scheduler, this), road.getUnitNo(),
+		sendMessage(MessageFactory.getStartingLegMessage(road.scheduler, this), road,
 				scheduleTime);
 	}
 
 	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {
 		DeadlockPreventionMessage dpMessage= MessageFactory.getDeadlockPreventionMessage(road.scheduler, this);
-		sendMessage(dpMessage, road.getUnitNo(),scheduleTime);
+		sendMessage(dpMessage, road,scheduleTime);
 		return dpMessage;
 	}
 	

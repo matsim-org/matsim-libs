@@ -11,7 +11,7 @@ public class EnterRoadMessage extends EventMessage {
 
 
 	@Override
-	public void selfhandleMessage() {
+	public void handleMessage() {
 		//Ask road to really enter the road
 		// => Road will then let us enter the road and tell us, when we can leave the road.
 
@@ -27,7 +27,7 @@ public class EnterRoadMessage extends EventMessage {
 		priority=SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
-	public void logEvent() {
+	public void processEvent() {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){

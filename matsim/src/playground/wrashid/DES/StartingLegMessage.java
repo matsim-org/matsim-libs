@@ -18,7 +18,7 @@ public class StartingLegMessage extends EventMessage {
 	}
 
 	@Override
-	public void selfhandleMessage() {
+	public void handleMessage() {
 		
 		// attempt to enter street.
 		
@@ -30,11 +30,11 @@ public class StartingLegMessage extends EventMessage {
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
-			vehicle.scheduleEndLegMessage(scheduler.simTime+vehicle.getCurrentLeg().getTravelTime(), road);
+			vehicle.scheduleEndLegMessage(scheduler.getSimTime()+vehicle.getCurrentLeg().getTravelTime(), road);
 		}
 	}
 	
-	public void logEvent() {
+	public void processEvent() {
 		BasicEvent event=null;
 		
 		if (eventType.equalsIgnoreCase(SimulationParameters.START_LEG)){

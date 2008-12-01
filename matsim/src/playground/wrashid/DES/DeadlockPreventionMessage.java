@@ -4,24 +4,20 @@ public class DeadlockPreventionMessage extends EventMessage {
 
 	@Override
 	// let enter the car into the road immediatly
-	public void selfhandleMessage() {
+	public void handleMessage() {
 		
-		Road road=(Road)scheduler.getSimUnit(this.getReceivingUnit().unitNo);
+		Road road=(Road)this.getReceivingUnit();
 		
 		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
-		road.setTimeOfLastEnteringVehicle(scheduler.simTime);
+		road.setTimeOfLastEnteringVehicle(scheduler.getSimTime());
 		road.removeFirstDeadlockPreventionMessage(this);
 		road.removeFromInterestedInEnteringRoad();
 		
-		vehicle.scheduleEnterRoadMessage(scheduler.simTime, road);
+		vehicle.scheduleEnterRoadMessage(scheduler.getSimTime(), road);
 		//System.out.println("Deadlock prevention happend");
 	}
 
-	@Override
-	public void printMessageLogString() {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 	public DeadlockPreventionMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
@@ -29,7 +25,7 @@ public class DeadlockPreventionMessage extends EventMessage {
 		logMessage=false;
 	}
 	
-	public void logEvent() {
+	public void processEvent() {
 		// don't do anything
 	}
 

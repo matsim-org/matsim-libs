@@ -94,24 +94,14 @@ public class Road extends SimUnit {
 
 	}
 
-	@Override
-	public void handleMessage(Message m) {
-		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void initialize() {
-		// TODO Auto-generated method stub
-
-	}
 
 	public void leaveRoad(Vehicle vehicle) {
 		//System.out.println("vehicleId:"+vehicle.getOwnerPerson().getId().toString() + ";linkId:"+this.getLink().getId().toString());
 		assert(carsOnTheRoad.getFirst()==vehicle); // TODO: uncomment this, and find out, why it produces a problem with test6
 		carsOnTheRoad.removeFirst();
 		earliestDepartureTimeOfCar.removeFirst();
-		timeOfLastLeavingVehicle = scheduler.simTime;
+		timeOfLastLeavingVehicle = scheduler.getSimTime();
 
 		if (link.getId().toString().equalsIgnoreCase("110915")) {
 			//System.out.println("leave road: " + Scheduler.simTime);
@@ -127,7 +117,7 @@ public class Road extends SimUnit {
 			
 			double nextAvailableTimeForEnteringStreet = Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
-					scheduler.simTime + gapTravelTime);
+					scheduler.getSimTime() + gapTravelTime);
 
 			noOfCarsPromisedToEnterRoad++;
 
@@ -137,7 +127,7 @@ public class Road extends SimUnit {
 			if (gap != null) {
 				// as long as the road is not full once, there is no need to
 				// keep track of the gaps
-				gap.add(scheduler.simTime + gapTravelTime);
+				gap.add(scheduler.getSimTime() + gapTravelTime);
 
 				// if no one is interested in entering this road (precondition)
 				// and there are no cars on the road, then reset gap
@@ -173,7 +163,7 @@ public class Road extends SimUnit {
 		}
 
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
-		nextAvailableTimeForLeavingStreet = scheduler.simTime
+		nextAvailableTimeForLeavingStreet = scheduler.getSimTime()
 				+ link.getLength()
 				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
 
@@ -245,7 +235,7 @@ public class Road extends SimUnit {
 			noOfCarsPromisedToEnterRoad++;
 			nextAvailableTimeForEnteringStreet = Math.max(Math.max(
 					timeOfLastEnteringVehicle + inverseInFlowCapacity,
-					scheduler.simTime), arrivalTimeOfGap);
+					scheduler.getSimTime()), arrivalTimeOfGap);
 
 			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
 			vehicle.scheduleEnterRoadMessage(
@@ -289,13 +279,13 @@ public class Road extends SimUnit {
 			// the first car interested in entering a road has to wait 'stuckTime'
 			// the car behind has to wait an additional stuckTime (this logic was introduced to adhere the C++ implementation)
 			if (deadlockPreventionMessages.size()>0){
-				if (deadlockPreventionMessages.getLast().getMessageArrivalTime() +SimulationParameters.stuckTime<scheduler.simTime){
+				if (deadlockPreventionMessages.getLast().getMessageArrivalTime() +SimulationParameters.stuckTime<scheduler.getSimTime()){
 					System.out.println();	
 				}
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(deadlockPreventionMessages.getLast().getMessageArrivalTime() +SimulationParameters.stuckTime, this));
 				
 			} else {
-				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.simTime+SimulationParameters.stuckTime, this));
+				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(scheduler.getSimTime()+SimulationParameters.stuckTime, this));
 			}
 			
 		}

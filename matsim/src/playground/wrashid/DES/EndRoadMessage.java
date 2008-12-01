@@ -14,7 +14,7 @@ public class EndRoadMessage extends EventMessage {
 	// in the class hierarchy
 
 	@Override
-	public void selfhandleMessage() {
+	public void handleMessage() {
 		// Find out, when this vehicle can enter the next road
 		
 		
@@ -58,7 +58,7 @@ public class EndRoadMessage extends EventMessage {
 		logMessage=false;
 	}
 	
-	public void logEvent() {
+	public void processEvent() {
 		// don't do anything
 	}
 
