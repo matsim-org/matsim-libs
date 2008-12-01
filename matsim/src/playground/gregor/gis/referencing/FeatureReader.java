@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TextFileReader.java
+ * FeatureReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,49 +20,31 @@
 
 package playground.gregor.gis.referencing;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 
-public class TextFileReader {
-
-	private final char delimiter;
-	private final int size;
+public class FeatureReader {
 	
-	private BufferedReader infile = null;
-	public TextFileReader(final String filename, final char delimiter, final int size){
+	public Collection<Feature> getFeatures(final FeatureSource n) {
+		final Collection<Feature> features = new ArrayList<Feature>();
+		FeatureIterator it = null;
 		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-		} catch (FileNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}	
-		this.delimiter = delimiter;
-		this.size = size;
-	}
-	
-	public String [] readLine() {
-		String [] tokline = null;
-		try {
-			String line = this.infile.readLine();
-			if (line == null){
-				this.infile.close();
-			} else {
-				tokline = StringUtils.explode(line, this.delimiter, this.size);
-			}
-			
-		} catch (IOException e) {
+			it = n.getFeatures().features();
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return tokline;
+		while (it.hasNext()) {
+			final Feature feature = it.next();
+			features.add(feature);
+		}
+
+		return features;
 	}
-	
+
 }

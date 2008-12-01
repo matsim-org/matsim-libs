@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 
 import org.geotools.feature.Feature;
 
@@ -42,6 +43,9 @@ public class CRN {
 	private final Map<String,String> nT4 = new HashMap<String,String>();
 	private final HashSet<String> expr = new HashSet<String>();
 	private final HashMap<Integer,SimilarityLink> simLinks = new HashMap<Integer,SimilarityLink>();
+	
+	public Random rnd = new Random();
+	
 	
 	public CRN(final Collection<Feature> ft) {
 		this.caseNodes = new ArrayList<CaseNode>();
@@ -111,7 +115,8 @@ public class CRN {
 				continue;
 			}
 			this.expr.add(expression.toLowerCase());
-			this.caseNodes.add(new CaseNode(expression,ft.getDefaultGeometry().getCentroid().getCoordinate()));
+//			this.caseNodes.add(new CaseNode(expression,ft.getDefaultGeometry().getCentroid().getCoordinate()));
+			this.caseNodes.add(new CaseNode(expression,ft));
 		}
 		
 		
@@ -273,10 +278,12 @@ public class CRN {
 		private double [] weights;
 		private double activation;
 		private double sW = 0;
-		private final Coordinate coord;
+//		private final Coordinate coord;
+		private final Feature ft;
 
-		public CaseNode(final String input, final Coordinate coordinate) {
-			this.coord = coordinate;
+		public CaseNode(final String input, final Feature ft) {
+//			this.coord = ft;
+			this.ft = ft;
 			this.expression = input.toLowerCase();
 			linkCaseNode();			
 			if (!checkIt()) {
@@ -301,7 +308,9 @@ public class CRN {
 		}
 
 		public Coordinate getCoordinate() {
-			return this.coord;
+			Coordinate [] coords = this.ft.getDefaultGeometry().getCoordinates();
+			int idx = (int) (CRN.this.rnd.nextDouble() * (coords.length - 1) + 0.5);
+			return coords[idx];
 		}
 		
 		public String getExpression() {
