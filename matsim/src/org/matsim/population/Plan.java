@@ -94,7 +94,7 @@ public class Plan extends BasicPlanImpl {
 	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
 	 */
   @Deprecated
-	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
+	public final Act createAct(final String type, final String x, final String y, String link, final String startTime,
 			 final String endTime, final String dur, final String isPrimary) throws IllegalStateException {
 		verifyCreateAct(endTime);
 		Coord coord = null;
@@ -103,7 +103,13 @@ public class Plan extends BasicPlanImpl {
 		}
 		Act a = new Act(type, coord);
 		if (link != null) {
-			a.setLinkFromString(link);
+			try {
+				a.setLinkFromString(link);
+			} catch ( Exception ee ) {
+				log.info( ee.getMessage() ) ;
+				log.warn("the link has a problem.  Not setting it and hoping for the best ..." ) ;
+				link = null ;
+			}
 		} else if (coord == null) {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
@@ -139,12 +145,17 @@ public class Plan extends BasicPlanImpl {
 		}
 	}
 
+	private static long noEndTimeCnt = 0 ;
 	private final void verifyCreateAct(final String end_time) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
 			throw new IllegalStateException(ACT_ERROR);
 		}
 		if ((this.actsLegs.size() == 0) && (end_time == null)) {
-			throw new IllegalStateException("The first 'act' has to have an end time.");
+			if ( noEndTimeCnt < 1 ) {
+				noEndTimeCnt++ ;
+			log.warn( "First 'act' has no end time.  Some people think that the first 'act' should have an end time.  This is, however, not true, since someone can stay at the first act all day.  Future occurences of this warning will be suppressed." ) ;
+//			throw new IllegalStateException("The first 'act' has to have an end time.");
+			}
 		}
 	}
 
