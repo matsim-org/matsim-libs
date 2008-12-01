@@ -103,34 +103,66 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		int fromIndex = -1;
 		int toIndex = -1;
 		int max = this.route.size();
-		for (int i = 0; i < max; i++) {
-			Link link = this.route.get(i);
-			Node node = link.getFromNode();
-			if (node.equals(fromNode)) {
-				fromIndex = i;
-				break;
+		if (fromNode == toNode) {
+			boolean found = false;
+			for (int i = 0; i < max; i++) {
+				Link link = this.route.get(i);
+				if (found) {
+					toLink = link;
+					break;
+				}
+				Node node = link.getToNode();
+				if (node.equals(fromNode)) {
+					found = true;
+					fromIndex = 0; // value doesn't really matter, just >= 0
+					fromLink = link;
+				}
 			}
-			fromLink = link;
-		}
-		if (fromIndex == -1) {
-			throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
-		}
-		for (int i = fromIndex; i < max; i++) {
-			Link link = this.route.get(i);
-			if (toIndex >= 0) {
-				toLink = link;
-				break;
+			if (fromIndex == -1) {
+				if (fromNode.equals(getStartLink().getToNode())) {
+					fromIndex = 0;
+					fromLink = getStartLink();
+					if (this.route.size() > 0) {
+						toLink = this.route.get(0);
+					}
+				} else {
+					throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+				}
 			}
-			Node node = link.getToNode();
-			if (node.equals(toNode)) {
-				toIndex = i;
+		} else {
+			for (int i = 0; i < max; i++) {
+				Link link = this.route.get(i);
+				Node node = link.getFromNode();
+				if (node.equals(fromNode)) {
+					fromIndex = i;
+					break;
+				}
+				fromLink = link;
 			}
-		}
-		if (toIndex == -1) {
-			throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
+			if (fromIndex == -1) {
+				throw new IllegalArgumentException("Can't create subroute because fromNode is not in the original Route");
+			}
+			for (int i = fromIndex; i < max; i++) {
+				Link link = this.route.get(i);
+				if (toIndex >= 0) {
+					toLink = link;
+					break;
+				}
+				Node node = link.getToNode();
+				if (node.equals(toNode)) {
+					toIndex = i;
+				}
+			}
+			if (toIndex == -1) {
+				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
+			}
 		}
 		LinkCarRoute ret = new LinkCarRoute();
-		ret.setLinks(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
+		if (toIndex >= fromIndex) {
+			ret.setLinks(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
+		} else {
+			ret.setLinks(fromLink, null, toLink);
+		}
 		return ret;
 	}
 
@@ -141,7 +173,7 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 	public void setTravelCost(final double travelCost) {
 		this.travelCost = travelCost;
 	}
-	
+
 	public void setLinks(final Link startLink, final List<Link> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
@@ -177,13 +209,13 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 		}
 		this.route.trimToSize();
 	}
-	
+
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		setStartLink(startLink);
 		setEndLink(endLink);
 		setNodes(srcRoute);
 	}
-	
+
 	public void setNodes(final List<Node> srcRoute) {
 		this.route.clear();
 		Node prevNode = null;

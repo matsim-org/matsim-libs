@@ -20,8 +20,15 @@
 
 package playground.marcel;
 
-import org.matsim.population.routes.CarRoute;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.routes.AbstractCarRouteTest;
+import org.matsim.population.routes.CarRoute;
 
 /**
  * @author mrieser
@@ -31,6 +38,34 @@ public class LinkCarRouteTest extends AbstractCarRouteTest {
 	@Override
 	public CarRoute getCarRouteInstance() {
 		return new LinkCarRoute();
+	}
+
+	public void testGetNodes_subsequentLinks_setLinks() {
+		NetworkLayer network = createTestNetwork();
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Node node2 = network.getNode(new IdImpl("2"));
+
+		CarRoute route = new LinkCarRoute();
+		route.setLinks(link1, null, link2);
+		assertEquals("number of links.", 0, route.getLinks().size());
+		assertEquals("number of nodes.", 1, route.getNodes().size());
+		assertEquals("wrong node.", node2, route.getNodes().get(0));
+	}
+
+	public void testGetNodes_subsequentLinks_setNodes() {
+		NetworkLayer network = createTestNetwork();
+		Link link1 = network.getLink(new IdImpl("1"));
+		Link link2 = network.getLink(new IdImpl("2"));
+		Node node2 = network.getNode(new IdImpl("2"));
+		List<Node> nodes = new ArrayList<Node>();
+		nodes.add(node2);
+
+		CarRoute route = new LinkCarRoute();
+		route.setNodes(link1, nodes, link2);
+		assertEquals("number of links.", 0, route.getLinks().size());
+		assertEquals("number of nodes.", 1, route.getNodes().size());
+		assertEquals("wrong node.", node2, route.getNodes().get(0));
 	}
 
 }
