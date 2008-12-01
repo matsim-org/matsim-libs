@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.population.routes;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,13 +26,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.AbstractRoute;
-import org.matsim.population.routes.CarRoute;
 
+/**
+ * Implementation of {@link CarRoute} that tries to minimize the amount of
+ * data needed to be stored for each route. This will give some memory savings,
+ * allowing for larger scenarios (=more agents), especially on detailed
+ * networks, but is likely a bit slower due to the more complex access of the
+ * route information internally.
+ *
+ * @author mrieser
+ */
 public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
@@ -47,33 +52,32 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	public List<Link> getLinks() {
 		ArrayList<Link> links = new ArrayList<Link>(this.uncompressedLength);
-		Link previousLink = null;
-		for (Link link : this.route) {
-			if (previousLink == null) {
-				links.add(link);
-				previousLink = link;
-			} else {
-				boolean found = false;
-				do {
-					Node node = previousLink.getToNode();
-					for (Link outLink : node.getOutLinks().values()) {
-						if (link.getId().equals(outLink.getId())) {
-							found = true;
-							links.add(link);
-							previousLink = link;
-						}
-					}
-					if (!found) {
-						// the link in the route was not part of the current outgoing links, so follow the subsequent Links
-						Link tmpLink = this.subsequentLinks.get(previousLink);
-						links.add(tmpLink);
-						previousLink = tmpLink;
-					}
-				} while (!found);
-			}
+		Link previousLink = getStartLink();
+		Link endLink = getEndLink();
+		if (previousLink == endLink) {
+			return links;
 		}
+		for (Link link : this.route) {
+			getLinksTillLink(links, link, previousLink);
+			links.add(link);
+			previousLink = link;
+		}
+		getLinksTillLink(links, endLink, previousLink);
 
 		return links;
+	}
+
+	private void getLinksTillLink(final List<Link> links, final Link nextLink, final Link startLink) {
+		Link link = startLink;
+		for (;;) { // loop until we hit "return;"
+			for (Link outLink : link.getToNode().getOutLinks().values()) {
+				if (outLink == nextLink) {
+					return;
+				}
+			}
+			link = this.subsequentLinks.get(link);
+			links.add(link);
+		}
 	}
 
 	@Override
@@ -89,72 +93,80 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	public List<Node> getNodes() {
 		ArrayList<Node> nodes = new ArrayList<Node>(this.uncompressedLength + 1);
 
-		if (this.route.size() == 0) {
-			if (getStartLink() != getEndLink()) {
-				nodes.add(getStartLink().getToNode());
-			}
-		} else {
-			Link previousLink = null;
-			for (Link link : this.route) {
-				if (previousLink == null) {
-					nodes.add(link.getFromNode());
-					nodes.add(link.getToNode());
-					previousLink = link;
-				} else {
-					boolean found = false;
-					do {
-						Node node = previousLink.getToNode();
-						for (Link outLink : node.getOutLinks().values()) {
-							if (link.getId().equals(outLink.getId())) {
-								found = true;
-								nodes.add(link.getToNode());
-								previousLink = link;
-							}
-						}
-						if (!found) {
-							// the link in the route was not part of the current outgoing links, so follow the subsequent Links
-							Link tmpLink = this.subsequentLinks.get(previousLink);
-							nodes.add(tmpLink.getToNode());
-							previousLink = tmpLink;
-						}
-					} while (!found);
-				}
-			}
+		Link startLink = getStartLink();
+		Link endLink = getEndLink();
+
+		if (startLink == endLink) {
+			return nodes;
 		}
+
+		Link previousLink = startLink;
+		for (Link link : this.route) {
+			getNodesTillLink(nodes, link, previousLink);
+			previousLink = link;
+		}
+		getNodesTillLink(nodes, endLink, previousLink);
 
 		return nodes;
 	}
 
-	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
-		List<Node> nodes = getNodes();
-		boolean foundFromNode = false;
-		boolean foundToNode = false;
-		for (Iterator<Node> iter = nodes.iterator(); iter.hasNext(); ) {
-			Node node = iter.next();
-			if (!foundFromNode) {
-				if (fromNode.equals(node)) {
-					foundFromNode = true;
-				} else {
-					iter.remove();
+	private void getNodesTillLink(final List<Node> nodes, final Link nextLink, final Link startLink) {
+		Link link = startLink;
+		do {
+			Node node = link.getToNode();
+			nodes.add(node);
+			for (Link outLink : node.getOutLinks().values()) {
+				if (nextLink == outLink) {
+					return;
 				}
-			} else if (foundToNode) {
-				iter.remove();
-			} else if (toNode.equals(node)) {
-				foundToNode = true;
+			}
+			// nextLink is not an outgoing link, so continue with the subsequent link
+			link = this.subsequentLinks.get(link);
+		} while (true);
+
+	}
+
+	public CarRoute getSubRoute(final Node fromNode, final Node toNode) {
+		Link newStartLink = null;
+		Link newEndLink = null;
+		List<Link> newLinks = new ArrayList<Link>(10);
+
+		Link startLink = getStartLink();
+		if (startLink.getToNode() == fromNode) {
+			newStartLink = startLink;
+		}
+		for (Link link : getLinks()) {
+			if (link.getFromNode() == toNode) {
+				newEndLink = link;
+				break;
+			}
+			if (newStartLink != null) {
+				newLinks.add(link);
+			}
+			if (link.getToNode() == fromNode) {
+				newStartLink = link;
 			}
 		}
-		if (!foundFromNode || !foundToNode) {
-			throw new IllegalArgumentException("fromNode or toNode are not part of this route.");
+		if (newStartLink == null) {
+			throw new IllegalArgumentException("fromNode is not part of this route.");
 		}
+		if (newEndLink == null) {
+			if (getEndLink().getFromNode() == toNode) {
+				newEndLink = getEndLink();
+			} else {
+				throw new IllegalArgumentException("toNode is not part of this route.");
+			}
+		}
+
 		CarRoute subRoute = new CompressedCarRoute(this.subsequentLinks);
-		subRoute.setNodes(nodes);
+		subRoute.setLinks(newStartLink, newLinks, newEndLink);
 		return subRoute;
 	}
 
 	public double getTravelCost() {
 		return this.travelCost;
 	}
-	
+
 	public void setTravelCost(final double travelCost) {
 		this.travelCost = travelCost;
 	}
@@ -167,20 +179,12 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 			this.uncompressedLength = 0;
 			return;
 		}
-		Link previousLink = null;
+		Link previousLink = startLink;
 		for (Link link : srcRoute) {
-			if (previousLink != null) {
-				if (!this.subsequentLinks.get(previousLink).equals(link)) {
-					this.route.add(link);
-				}
-			} else {
+			if (!this.subsequentLinks.get(previousLink).equals(link)) {
 				this.route.add(link);
 			}
 			previousLink = link;
-		}
-		if (this.route.get(this.route.size()-1) != previousLink) {
-			// add the last link to mark end of route
-			this.route.add(previousLink);
 		}
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
@@ -196,77 +200,69 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 			return;
 		}
 
-		Node previousNode = null;
-		Link previousLink = null;
-		for (String id : parts) {
-			if (previousNode != null) {
-				// find link from prevNode to node
-				Link link = null;
-				for (Link tmpLink : previousNode.getOutLinks().values()) {
-					if (id.equals(tmpLink.getToNode().getId().toString())) {
-						link = tmpLink;
-						break;
-					}
+		Link previousLink = getStartLink();
+		Node previousNode = previousLink.getToNode();
+		for (int i = 1, n = parts.length; i < n; i++) { // skip the first id, as it should be equal to previousNode
+			String id = parts[i];
+			// find link from prevNode to node
+			Link link = null;
+			for (Link tmpLink : previousNode.getOutLinks().values()) {
+				if (id.equals(tmpLink.getToNode().getId().toString())) {
+					link = tmpLink;
+					break;
 				}
-
-				if (previousLink != null) {
-					if (!this.subsequentLinks.get(previousLink).equals(link)) {
-						this.route.add(link);
-					}
-				} else {
-					this.route.add(link);
-				}
-				previousLink = link;
-				previousNode = link.getToNode();
-			} else {
-				previousNode = ((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE)).getNode(id);
 			}
+
+			if (this.subsequentLinks.get(previousLink) != link) {
+				this.route.add(link);
+			}
+			previousLink = link;
+			previousNode = link.getToNode();
 		}
-		if (this.route.size() == 0 || this.route.get(this.route.size()-1) != previousLink) {
-			// add the last link to mark end of route
-			this.route.add(previousLink);
-		}
+
 		this.route.trimToSize();
 		this.uncompressedLength = parts.length - 1;
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
 	}
 
+	@Deprecated
 	public void setNodes(final List<Node> srcRoute) {
 		setNodes(null, srcRoute, null);
 	}
-	
+
 	public void setNodes(final Link startLink, final List<Node> srcRoute, final Link endLink) {
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
-		Node previousNode = null;
-		Link previousLink = null;
-		for (Node node : srcRoute) {
-			if (previousNode != null) {
-				// find link from prevNode to node
-				Link link = null;
-				for (Link tmpLink : previousNode.getOutLinks().values()) {
-					if (tmpLink.getToNode().equals(node)) {
-						link = tmpLink;
-						break;
-					}
-				}
 
-				if (previousLink != null) {
-					if (!this.subsequentLinks.get(previousLink).equals(link)) {
-						this.route.add(link);
-					}
-				} else {
-					this.route.add(link);
+		Link previousLink = getStartLink();
+		Node previousNode = previousLink.getToNode();
+		Iterator<Node> iter = srcRoute.iterator();
+		if (iter.hasNext()) {
+			iter.next(); // ignore the first part, it should be the same as previousNode
+		} else {
+			// empty srcRoute, nothing else to do
+			this.uncompressedLength = 0;
+			return;
+		}
+		for (; iter.hasNext(); ) {
+			Node node = iter.next();
+			// find link from prevNode to node
+			Link link = null;
+			for (Link tmpLink : previousNode.getOutLinks().values()) {
+				if (node == tmpLink.getToNode()) {
+					link = tmpLink;
+					break;
 				}
-				previousLink = link;
 			}
-			previousNode = node;
+
+			if (this.subsequentLinks.get(previousLink) != link) {
+				this.route.add(link);
+			}
+			previousLink = link;
+			previousNode = link.getToNode();
 		}
-		if (this.route.get(this.route.size()-1) != previousLink) {
-			// add the last link to mark end of route
-			this.route.add(previousLink);
-		}
+
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size() - 1;
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());

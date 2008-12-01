@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CompressedRouteTest.java
+ * CompressedCarRouteFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.population.routes;
 
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.AbstractCarRouteTest;
+import java.util.Map;
 
-import playground.yu.compressRoute.Subsequent;
+import org.matsim.network.Link;
 
-/**
- * @author mrieser
- */
-public class CompressedCarRouteTest extends AbstractCarRouteTest {
+public class CompressedCarRouteFactory implements RouteFactory {
 
-	@Override
-	public CarRoute getCarRouteInstance() {
+	private final Map<Link, Link> subsequentLinks;
 
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		Subsequent subsequent = new Subsequent(network);
-		return new CompressedCarRoute(subsequent.getSubsequentLinks());
+	public CompressedCarRouteFactory(final Map<Link, Link> subsequentLinks) {
+		this.subsequentLinks = subsequentLinks;
+	}
+
+	public Route createRoute() {
+		return new CompressedCarRoute(this.subsequentLinks);
 	}
 
 }

@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.population.routes");
 
+		suite.addTestSuite(CompressedCarRouteTest.class);
 		suite.addTestSuite(LinkCarRouteTest.class);
 		suite.addTestSuite(NodeCarRouteTest.class);
 
