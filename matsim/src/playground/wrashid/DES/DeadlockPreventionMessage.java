@@ -21,8 +21,6 @@ public class DeadlockPreventionMessage extends EventMessage {
 
 	public DeadlockPreventionMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
-		eventType="";
-		logMessage=false;
 	}
 	
 	public void processEvent() {

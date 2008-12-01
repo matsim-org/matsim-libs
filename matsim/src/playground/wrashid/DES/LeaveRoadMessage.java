@@ -14,7 +14,6 @@ public class LeaveRoadMessage extends EventMessage {
 
 	public LeaveRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
-		eventType=SimulationParameters.LEAVE_LINK;
 		priority=SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
 	
@@ -26,9 +25,9 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road=(Road)this.getReceivingUnit();
 		BasicEvent event=null;
 		
-		if (eventType.equalsIgnoreCase(SimulationParameters.LEAVE_LINK)){
+
 			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),road.getLink().getId().toString(),vehicle.getLegIndex()-1);
-		}
+
 		
 		SimulationParameters.events.processEvent(event);
 	}

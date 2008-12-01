@@ -23,16 +23,15 @@ public class EnterRoadMessage extends EventMessage {
 	
 	public EnterRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
-		eventType=SimulationParameters.ENTER_LINK;
+
 		priority=SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
 	public void processEvent() {
 		BasicEvent event=null;
-		
-		if (eventType.equalsIgnoreCase(SimulationParameters.ENTER_LINK)){
+
 			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
-		}
+
 		
 		SimulationParameters.events.processEvent(event);
 	}

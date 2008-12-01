@@ -54,8 +54,6 @@ public class EndRoadMessage extends EventMessage {
 
 	public EndRoadMessage(Scheduler scheduler,Vehicle vehicle) {
 		super(scheduler,vehicle);
-		eventType="";
-		logMessage=false;
 	}
 	
 	public void processEvent() {
