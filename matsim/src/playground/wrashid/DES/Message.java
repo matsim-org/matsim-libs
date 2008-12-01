@@ -33,11 +33,6 @@ public abstract class Message implements Comparable {
 	 * If the time is equal of two messages, then the priority of the messages is compared
 	 */
 	public int compareTo(Object obj){
-		if (messageArrivalTime>3272){
-			System.out.println();
-		}
-		
-		
 		Message otherMessage= (Message) obj;
 		if (messageArrivalTime>otherMessage.messageArrivalTime){
 			return 1;
