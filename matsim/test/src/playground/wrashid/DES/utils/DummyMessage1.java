@@ -2,17 +2,18 @@ package playground.wrashid.DES.utils;
 
 import playground.wrashid.DES.Message;
 
-public class DummyMessage extends Message {
+public class DummyMessage1 extends Message {
 
-	public DummyMessage(){
+	public Message messageToUnschedule=null;
+	
+	public DummyMessage1(){
 		super();
 	}
 	
 
 	@Override
 	public void handleMessage() {
-		// TODO Auto-generated method stub
-		
+		this.getSendingUnit().getScheduler().unschedule(messageToUnschedule);
 	}
 
 	@Override

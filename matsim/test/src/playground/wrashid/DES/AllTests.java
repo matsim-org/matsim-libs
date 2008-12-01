@@ -10,6 +10,7 @@ public class AllTests {
 
 		suite.addTestSuite(TestEventLog.class);
 		suite.addTestSuite(TestMessageQueue.class);
+		suite.addTestSuite(TestScheduler.class);
 		
 		return suite;
 	}

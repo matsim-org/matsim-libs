@@ -1,10 +1,15 @@
 Classes covered with Unit Tests 100% (tidied up?)
 ======================================
 - playground.wrashid.DES.MessageQueue (yes)
+- playground.wrashid.DES.Scheduler (yes)
+- playground.wrashid.DES.SimUnit (yes)
 
-
+Code coverage 100% (only getters and setters not included) (tidied up?)
+======================================
+- playground.wrashid.DES.Message (yes)
 
 
 next:
-- playground.wrashid.DES.Message
-- playground.wrashid.DES.Scheduler
+- 
+- 
+- 
