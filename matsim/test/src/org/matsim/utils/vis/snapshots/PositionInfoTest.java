@@ -47,8 +47,9 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 250, 0, 10, PositionInfo.VehicleState.Driving, null);
-		assertEquals(250.0, posInfo.getEasting(), epsilon);
-		assertEquals(250.0, posInfo.getNorthing(), epsilon);
+		assertEquals(260.6066017177982, posInfo.getEasting(), epsilon);
+		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
+		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
 	}
 
 	/**
@@ -67,8 +68,9 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 500, 0, 10, PositionInfo.VehicleState.Driving, null);
-		assertEquals(250.0, posInfo.getEasting(), epsilon);
-		assertEquals(250.0, posInfo.getNorthing(), epsilon);
+		assertEquals(260.6066017177982, posInfo.getEasting(), epsilon);
+		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
+		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
 	}
 
 }
