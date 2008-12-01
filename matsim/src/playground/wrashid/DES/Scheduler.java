@@ -8,6 +8,7 @@ public class Scheduler {
 	private double simTime = 0;
 	private MessageQueue queue = new MessageQueue();
 	private double simulationStartTime = System.currentTimeMillis();
+	private double hourlyLogTime = 3600;
 
 	public void schedule(Message m) {
 		queue.putMessage(m);
@@ -36,7 +37,7 @@ public class Scheduler {
 	}
 
 	private void printLog() {
-		double hourlyLogTime = 3600;
+		
 		// print output each hour
 		if (simTime / hourlyLogTime > 1) {
 			hourlyLogTime = simTime + 3600;

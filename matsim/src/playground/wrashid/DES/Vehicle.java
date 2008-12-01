@@ -54,7 +54,7 @@ public class Vehicle extends SimUnit {
 		// this is the link, where the first activity took place
 		currentLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
 
-		Road road=Road.allRoads.get(getCurrentLink().getId().toString());
+		Road road=Road.getRoad(getCurrentLink().getId().toString());
 		scheduleStartingLegMessage(departureTime, road);
 		
 		//TODO: Das hier noch einbauchen
@@ -166,11 +166,11 @@ public class Vehicle extends SimUnit {
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			previousLink = ((Act) actsLegs.get(legIndex - 1)).getLink();
 			//System.out.println("AscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
-			previousRoad=Road.allRoads.get(previousLink.getId().toString());
+			previousRoad=Road.getRoad(previousLink.getId().toString());
 		} else if (this.getLinkIndex()>=1){
 			previousLink=this.getCurrentLinkRoute()[this.getLinkIndex()-1];
 			//System.out.println("BscheduleLeavePreviousRoadMessage:"+previousLink.getId().toString());
-			previousRoad=Road.allRoads.get(previousLink.getId().toString());
+			previousRoad=Road.getRoad(previousLink.getId().toString());
 		}
 		
 		scheduleLeaveRoadMessage(scheduleTime, previousRoad);

@@ -12,7 +12,7 @@ import org.matsim.population.Plan;
 
 public class Road extends SimUnit {
 
-	public static HashMap<String, Road> allRoads;
+	
 	private Link link;
 	private LinkedList<Double> gap; // see enterRequest for a detailed
 	// description of variable 'gap'
@@ -327,6 +327,10 @@ public class Road extends SimUnit {
 	
 	public void removeFromInterestedInEnteringRoad(){
 		interestedInEnteringRoad.removeFirst();
+	}
+	
+	public static Road getRoad(String linkId){
+		return SimulationParameters.allRoads.get(linkId);
 	}
 
 }

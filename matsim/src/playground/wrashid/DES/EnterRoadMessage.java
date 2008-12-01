@@ -17,7 +17,7 @@ public class EnterRoadMessage extends EventMessage {
 
 		// enter the road and find out the time for leaving the street
 		
-		Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+		Road road=Road.getRoad(vehicle.getCurrentLink().getId().toString());
 		road.enterRoad(vehicle);
 	}
 	

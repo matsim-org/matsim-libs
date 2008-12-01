@@ -1,6 +1,7 @@
 package playground.wrashid.DES;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
@@ -66,6 +67,7 @@ public class SimulationParameters {
 	public static String testPlanPath=null;
 	public static PopulationModifier testPopulationModifier=null;
 	
-	
+	// this must be initialized before starting the simulation!
+	public static HashMap<String, Road> allRoads=null;
 	
 }

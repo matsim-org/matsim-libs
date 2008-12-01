@@ -37,14 +37,14 @@ public class EndRoadMessage extends EventMessage {
 			
 			//System.out.println(vehicle.getCurrentLink().getId().toString());
 			
-			Road road=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
+			Road road=Road.getRoad(vehicle.getCurrentLink().getId().toString());
 			road.enterRequest(vehicle);	
 		} else if (vehicle.getCurrentLinkRoute().length>vehicle.getLinkIndex()+1){
 			// if leg is not finished yet
 			vehicle.setLinkIndex(vehicle.getLinkIndex()+1);
 			Link nextLink=vehicle.getCurrentLinkRoute()[vehicle.getLinkIndex()];
 			
-			Road nextRoad=Road.allRoads.get(nextLink.getId().toString());
+			Road nextRoad=Road.getRoad(nextLink.getId().toString());
 			vehicle.setCurrentLink(nextLink);
 			nextRoad.enterRequest(vehicle);
 		} else {

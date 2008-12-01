@@ -97,14 +97,14 @@ public class JavaDEQSim {
 		
 		
 		Scheduler scheduler=new Scheduler();
-		Road.allRoads=new HashMap<String,Road>();
+		SimulationParameters.allRoads=new HashMap<String,Road>();
 
 		
 		// initialize network
 		Road road=null;
 		for (Link link: network.getLinks().values()){
 			road= new Road(scheduler,link);
-			Road.allRoads.put(link.getId().toString(), road);
+			SimulationParameters.allRoads.put(link.getId().toString(), road);
 		}
 		
 		// initialize vehicles
