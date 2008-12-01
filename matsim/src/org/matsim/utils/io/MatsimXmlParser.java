@@ -42,8 +42,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import playground.kai.urbansim.MyControlerListener;
-
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
  * functionality required to parse xml-files. Extending classes have only to implement {@link #startTag} and {@link #endTag}
