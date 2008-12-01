@@ -20,7 +20,6 @@
 
 package org.matsim.config.groups;
 
-import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -37,13 +36,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		String actualPossibleModesString = "";
-		for (BasicLeg.Mode expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
-			actualPossibleModesString += expectedPossibleMode.toString();
-			actualPossibleModesString += " ";
-		}
-		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
-		assertEquals( PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES, actualPossibleModesString );
+		assertEquals( PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES, Gbl.getConfig().planomat().getPossibleModes() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 	}
 
@@ -51,14 +44,15 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 		super.loadConfig(this.getInputDirectory() + "config.xml");
 
-		String actualPossibleModesString = "";
-		for (BasicLeg.Mode expectedPossibleMode : Gbl.getConfig().planomat().getPossibleModes()) {
-			actualPossibleModesString += expectedPossibleMode.toString();
-			actualPossibleModesString += " ";
-		}
-		actualPossibleModesString = actualPossibleModesString.substring(0, actualPossibleModesString.length() - 1);
-		assertEquals( PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT, actualPossibleModesString );
-		
+//		for (BasicLeg.Mode mode : Gbl.getConfig().planomat().getPossibleModes()) {
+//			System.out.println(mode);
+//		}
+//		System.out.println("ende");
+//		System.out.println(Gbl.getConfig().planomat().getPossibleModes().length);
+//		System.out.println(BasicLeg.Mode.car.equals(Gbl.getConfig().planomat().getPossibleModes()[0]));
+//		System.out.println(BasicLeg.Mode.pt.equals(Gbl.getConfig().planomat().getPossibleModes()[1]));
+		// [TODO] don't know why the first test fails...
+		assertEquals( PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT, Gbl.getConfig().planomat().getPossibleModes());
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		
 	}
