@@ -56,11 +56,9 @@ public class SimulationParameters {
 	
 	// simulation internal parameters
 	
-	// specifies the minimal queue length for using in all message static constructers
-    // this parameter needs to be set to avoid race conditions
-	public static final int minQueueLength=Runtime.getRuntime().availableProcessors()*10;
-	// if a lot of messages are not needed any more, then GC should be allowed
-	public static final int maxQueueLength=10000;
+	private static boolean GC_MESSAGES = false;
+	
+	
 	
 	// test injection variables
 	public static TestHandler testEventHandler=null;
@@ -69,5 +67,13 @@ public class SimulationParameters {
 	
 	// this must be initialized before starting the simulation!
 	public static HashMap<String, Road> allRoads=null;
+
+	public static boolean isGC_MESSAGES() {
+		return GC_MESSAGES;
+	}
+
+	public static void setGC_MESSAGES(boolean gc_messages) {
+		GC_MESSAGES = gc_messages;
+	}
 	
 }

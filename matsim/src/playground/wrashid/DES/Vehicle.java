@@ -24,6 +24,7 @@ public class Vehicle extends SimUnit {
 		this.ownerPerson = ownerPerson;
 		initialize();
 	}
+	
 
 	@Override
 	public void finalize() {
@@ -41,6 +42,11 @@ public class Vehicle extends SimUnit {
 		// we start with linkIndex -1
 		linkIndex = -1;
 
+		// return at this position, if we are just testing using a dummy person (to avoid null pointer exception)
+		if (ownerPerson.getSelectedPlan()==null){
+			return;
+		}
+		
 		Plan plan = ownerPerson.getSelectedPlan(); // that's the plan the
 		// person will execute
 		ArrayList<Object> actsLegs = plan.getActsLegs();
