@@ -24,9 +24,9 @@ public abstract class SimUnit {
 	public abstract void handleMessage(Message m);
 	
 	public void sendMessage(Message m, long targetUnitId, double messageArrivalTime){
-		m.sendingUnit=this;
+		m.setSendingUnit(this);
 		
-		m.receivingUnit=(SimUnit) scheduler.getSimUnit(targetUnitId);
+		m.setReceivingUnit((SimUnit) scheduler.getSimUnit(targetUnitId));
 		
 		m.setMessageArrivalTime(messageArrivalTime);
 		scheduler.schedule(m);
@@ -38,8 +38,8 @@ public abstract class SimUnit {
 	public void setTimer(double timeOut, Message m){
 		
 		m.setMessageArrivalTime(scheduler.simTime+timeOut);
-		m.sendingUnit=this;
-		m.receivingUnit=this;
+		m.setSendingUnit(this);
+		m.setReceivingUnit(this);
 		scheduler.schedule(m);
 	}
 	

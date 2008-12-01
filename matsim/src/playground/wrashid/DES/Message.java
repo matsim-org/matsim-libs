@@ -1,36 +1,33 @@
 package playground.wrashid.DES;
 
-public abstract class Message implements Comparable {
-	
-	public double messageArrivalTime=0;
-	public SimUnit sendingUnit;
-	public SimUnit receivingUnit;
-	protected int priority=0;
-	//public String queueKey=""; // only used because of implementation convenience (might be removed in future, if not needed)
-	
-	
+public abstract class Message implements Comparable<Message> {
+
+	private double messageArrivalTime = 0;
+	private SimUnit sendingUnit;
+	private SimUnit receivingUnit;
+	protected int priority = 0;
+
 	public Message() {
 	}
-	
+
 	public double getMessageArrivalTime() {
 		return messageArrivalTime;
 	}
-	
+
 	public void setMessageArrivalTime(double messageArrivalTime) {
 		this.messageArrivalTime = messageArrivalTime;
 	}
-	
+
 	public abstract void printMessageLogString();
 
 	/*
-	 * The comparison is done according to the message arrival Time.
-	 * If the time is equal of two messages, then the priority of the messages is compared
+	 * The comparison is done according to the message arrival Time. If the time
+	 * is equal of two messages, then the priority of the messages is compared
 	 */
-	public int compareTo(Object obj){
-		Message otherMessage= (Message) obj;
-		if (messageArrivalTime>otherMessage.messageArrivalTime){
+	public int compareTo(Message otherMessage) {
+		if (messageArrivalTime > otherMessage.messageArrivalTime) {
 			return 1;
-		} else if (messageArrivalTime<otherMessage.messageArrivalTime) {
+		} else if (messageArrivalTime < otherMessage.messageArrivalTime) {
 			return -1;
 		} else {
 			// higher priority means for a queue, that it comes first
@@ -40,6 +37,22 @@ public abstract class Message implements Comparable {
 
 	public int getPriority() {
 		return priority;
+	}
+
+	public SimUnit getSendingUnit() {
+		return sendingUnit;
+	}
+
+	public void setSendingUnit(SimUnit sendingUnit) {
+		this.sendingUnit = sendingUnit;
+	}
+
+	public SimUnit getReceivingUnit() {
+		return receivingUnit;
+	}
+
+	public void setReceivingUnit(SimUnit receivingUnit) {
+		this.receivingUnit = receivingUnit;
 	}
 
 }

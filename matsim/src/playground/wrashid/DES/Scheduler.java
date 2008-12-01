@@ -44,7 +44,7 @@ public class Scheduler {
 			if (m instanceof SelfhandleMessage){
 				((SelfhandleMessage) m).selfhandleMessage();
 			} else {
-				m.receivingUnit.handleMessage(m);
+				m.getReceivingUnit().handleMessage(m);
 			}
 			
 			

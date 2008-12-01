@@ -6,7 +6,7 @@ public class DeadlockPreventionMessage extends EventMessage {
 	// let enter the car into the road immediatly
 	public void selfhandleMessage() {
 		
-		Road road=(Road)scheduler.getSimUnit(this.receivingUnit.unitNo);
+		Road road=(Road)scheduler.getSimUnit(this.getReceivingUnit().unitNo);
 		
 		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
 		road.setTimeOfLastEnteringVehicle(scheduler.simTime);
