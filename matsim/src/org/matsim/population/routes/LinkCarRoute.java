@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.population.routes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +29,6 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.AbstractRoute;
-import org.matsim.population.routes.CarRoute;
 
 /**
  * Implementation of {@link CarRoute} which internally stores the route as a series of {@link Link}s.

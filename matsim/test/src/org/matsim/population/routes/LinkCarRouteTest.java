@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.population.routes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.AbstractCarRouteTest;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.LinkCarRoute;
 
 /**
  * @author mrieser

@@ -18,10 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel;
+package org.matsim.population.routes;
 
-import org.matsim.population.routes.Route;
-import org.matsim.population.routes.RouteFactory;
 
 /**
  * @author mrieser
