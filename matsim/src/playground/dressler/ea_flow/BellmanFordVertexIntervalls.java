@@ -59,7 +59,7 @@ public class BellmanFordVertexIntervalls {
 	private HashMap<Link, EdgeIntervalls> _flowlabels;
 	
 	/**
-	 * data structure to keep distance labels on nodes during and after one Iteration of the shortest Path Algorithm
+	 * data structure to keep distance labels on nodes during and after one Iteration of the shortest TimeExpandedPath Algorithm
 	 */
 	private HashMap<Node, VertexIntervalls> _labels;
 	
@@ -74,7 +74,7 @@ public class BellmanFordVertexIntervalls {
 	private final int _timehorizon;
 	
 	/**
-	 * sink node to which paths are searched
+	 * sink node to which TimeExpandedPaths are searched
 	 */
 	private final Node _sink;
 
@@ -154,14 +154,14 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * Constructs  a Path based on the labels set by the algorithm 
-	 * @return shortest Path from one active source to the sink if it exists
+	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
+	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private Path constructRoute()throws BFException{
+	private TimeExpandedPath constructRoute()throws BFException{
 		Node to = _sink;
 		VertexIntervalls tolabels = this._labels.get(to);
 		int totime = tolabels.firstPossibleTime();
-		//check if path can be constructed
+		//check if TimeExpandedPath can be constructed
 		if(Integer.MAX_VALUE==totime){
 			throw new BFException("sink can not be reached!");
 		}
@@ -169,9 +169,9 @@ public class BellmanFordVertexIntervalls {
 			throw new BFException("sink can not be reached within timehorizon!");
 		}
 			
-		//start constructing the path
-		Path path = new Path();
-		path.setArrival(totime);
+		//start constructing the TimeExpandedPath
+		TimeExpandedPath TimeExpandedPath = new TimeExpandedPath();
+		TimeExpandedPath.setArrival(totime);
 		VertexIntervall tolabel = tolabels.getIntervallAt(totime);
 		while(tolabel.getPredecessor()!=null){
 			Link edge = tolabel.getPredecessor();
@@ -190,11 +190,11 @@ public class BellmanFordVertexIntervalls {
 			int fromtime;
 			if(forward){
 				fromtime = (totime-_flowlabels.get(edge).getTravelTime());
-				path.push(edge, fromtime, forward);
+				TimeExpandedPath.push(edge, fromtime, forward);
 				to= edge.getFromNode();
 			}else{
 				fromtime = (totime+_flowlabels.get(edge).getTravelTime());
-				path.push(edge, fromtime, forward);
+				TimeExpandedPath.push(edge, fromtime, forward);
 				to =edge.getToNode();
 			}
 			tolabels = this._labels.get(to);
@@ -203,7 +203,7 @@ public class BellmanFordVertexIntervalls {
 		}
 		
 		
-		return path;
+		return TimeExpandedPath;
 	}
 	
 	
@@ -251,10 +251,10 @@ public class BellmanFordVertexIntervalls {
 	}
 	
 	/**
-	 * main bellman ford algorithm calculating a shortest path
-	 * @return shortest Path from one active source to the sink if it exists
+	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
+	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	public Path doCalculations() {
+	public TimeExpandedPath doCalculations() {
 		// queue to save nodes we have to scan
 		Queue<Node> queue = new LinkedList<Node>();
 		//set the startLabels and add active sources to to the queue
@@ -295,13 +295,13 @@ public class BellmanFordVertexIntervalls {
 		}
 		System.out.println("finale labels: \n");
 		printStatus();
-		Path path = null;
+		TimeExpandedPath TimeExpandedPath = null;
 		try{ 
-			path = constructRoute();
+			TimeExpandedPath = constructRoute();
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
-		return path;
+		return TimeExpandedPath;
 		
 	}
 

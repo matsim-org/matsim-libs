@@ -35,7 +35,7 @@ import org.matsim.network.Node;
  * @author Manuel Schneider
  *
  */
-public class Path {
+public class TimeExpandedPath {
 	
 	/**
 	 * amount of flow on the path
@@ -131,7 +131,7 @@ public class Path {
 	/**
 	 * Default Constructor creating a Path with flow value 0 and no edges
 	 */
-	public Path(){
+	public TimeExpandedPath(){
 		this._flow = 0;
 		this._edges = new LinkedList<PathEdge>();
 	}
@@ -298,7 +298,7 @@ public class Path {
 	 * @param debug debug mode true is on
 	 */
 	public static void debug(boolean debug){
-		Path._debug=debug;
+		TimeExpandedPath._debug=debug;
 	}
 	
 

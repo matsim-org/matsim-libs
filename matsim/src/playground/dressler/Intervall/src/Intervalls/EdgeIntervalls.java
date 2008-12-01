@@ -243,7 +243,7 @@ public class EdgeIntervalls {
 		if (u<=0){
 			throw new IllegalArgumentException("capacity shold be positive");
 		}
-		//TODO check wether this was the problem of negation in for
+		//TODO check whether this was the problem of negation in for
 		for(_tree.goToNodeAt(t);!_tree.isAtEnd() ;_tree.increment()){
 			if(_debug){
 				System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow()+" on: "+((EdgeIntervall)_tree._curr.obj));
@@ -280,7 +280,7 @@ public class EdgeIntervalls {
 	}
 	
 	/**
-	 * TODO
+	 * TODO comment
 	 * @param i
 	 * @param u
 	 * @param forward

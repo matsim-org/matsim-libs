@@ -29,7 +29,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
-import playground.dressler.ea_flow.Path.PathEdge;
+import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink 
  * @author Manuel Schneider
@@ -57,9 +57,9 @@ public class Flow {
 	private HashMap<Link, EdgeIntervalls> _flow;
 	
 	/**
-	 * Path representation of flow on the network
+	 * TimeExpandedTimeExpandedPath representation of flow on the network
 	 */
-	private LinkedList<Path> _paths;
+	private LinkedList<TimeExpandedPath> _TimeExpandedPaths;
 	
 	/**
 	 * list of all sources
@@ -115,7 +115,7 @@ public class Flow {
 			int l = (int) _lengths.getLinkTravelCost(link, 1.);
 			this._flow.put(link, new EdgeIntervalls(l));
 		}
-		this._paths = new LinkedList<Path>();
+		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = demands;
 		this._sources = new LinkedList<Node>();
 		this._sources.addAll(demands.keySet());
@@ -139,7 +139,7 @@ public class Flow {
 		this._network = network;
 		this._lengths = lengths;
 		this._flow = flow;
-		this._paths = new LinkedList<Path>();
+		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = demands;
 		this._sources = new LinkedList<Node>();
 		this._sources.addAll(demands.keySet());
@@ -190,19 +190,19 @@ public class Flow {
 	
 	/**
 	 * Method for finding the minimum of the demand at the start node
-	 * and the minimal capacity along the Path
-	 * @param path
+	 * and the minimal capacity along the TimeExpandedPath
+	 * @param TimeExpandedPath
 	 * @return minimum over all unused capacities and the demand in the first node
 	 */
-	private int bottleNeckCapacity(final Path path){
+	private int bottleNeckCapacity(final TimeExpandedPath TimeExpandedPath){
 		//check if first node is a source
-		Node source = path.getSource();
+		Node source = TimeExpandedPath.getSource();
 		if(!this._demands.containsKey(source)){
-			throw new IllegalArgumentException("Startnode is no source " + path);
+			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
 		int result = this._demands.get(source);
 		//go through the pat edges
-		for(PathEdge edge : path.getPathEdges()){
+		for(PathEdge edge : TimeExpandedPath.getPathEdges()){
 			Link link = edge.getEdge();
 			int cap =(int) link.getCapacity(1.);
 			int time = edge.getTime();
@@ -229,12 +229,12 @@ public class Flow {
 	}
 	
 	/**
-	 * Method to add another path to the flow. The Path will be added with flow equal to its bottleneck capacity
-	 * @param path the path on which the maximal flow possible is augmented 
+	 * Method to add another TimeExpandedPath to the flow. The TimeExpandedPath will be added with flow equal to its bottleneck capacity
+	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal flow possible is augmented 
 	 */
-	public void augment(Path path){
-		int gamma = bottleNeckCapacity(path);
-		for(PathEdge edge : path.getPathEdges()){
+	public void augment(TimeExpandedPath TimeExpandedPath){
+		int gamma = bottleNeckCapacity(TimeExpandedPath);
+		for(PathEdge edge : TimeExpandedPath.getPathEdges()){
 			Link link = edge.getEdge();
 			int time = edge.getTime();
 			EdgeIntervalls flow = _flow.get(link);
@@ -244,24 +244,24 @@ public class Flow {
 				flow.augmentreverse((time-this._flow.get(link).getTravelTime()), gamma);
 			}
 		}
-		path.setFlow(gamma);
-		reduceDemand(path);
-		this._paths.add(path);
+		TimeExpandedPath.setFlow(gamma);
+		reduceDemand(TimeExpandedPath);
+		this._TimeExpandedPaths.add(TimeExpandedPath);
 	}
 	
 	/**
-	 * Reduces the demand of the first node in the path by the flow value of the Path
-	 * @param path path used to determine flow and Source Node
+	 * Reduces the demand of the first node in the TimeExpandedPath by the flow value of the TimeExpandedPath
+	 * @param TimeExpandedPath TimeExpandedPath used to determine flow and Source Node
 	 */
-	private void reduceDemand(final Path path) {
-		Node source = path.getSource();
+	private void reduceDemand(final TimeExpandedPath TimeExpandedPath) {
+		Node source = TimeExpandedPath.getSource();
 		if(!this._demands.containsKey(source)){
-			throw new IllegalArgumentException("Startnode is no source" + path);
+			throw new IllegalArgumentException("Startnode is no source" + TimeExpandedPath);
 		}
-		int flow = path.getFlow();
+		int flow = TimeExpandedPath.getFlow();
 		int demand = this._demands.get(source)-flow;
 		if(demand<0){
-			throw new IllegalArgumentException("too much flow on path" + path);
+			throw new IllegalArgumentException("too much flow on TimeExpandedPath" + TimeExpandedPath);
 		}
 		this._demands.put(source, demand);
 		if (demand==0){
@@ -288,9 +288,9 @@ public class Flow {
 	public int[] arrivals(){
 		int maxtime = 0;
 		int[] temp = new int[this._timeHorizon+1];
-		for (Path path : _paths){
-			int flow = path.getFlow();
-			int time = path.getArrival();
+		for (TimeExpandedPath TimeExpandedPath : _TimeExpandedPaths){
+			int flow = TimeExpandedPath.getFlow();
+			int time = TimeExpandedPath.getArrival();
 			if (maxtime < time){
 				maxtime = time; 
 			}
@@ -357,7 +357,7 @@ public class Flow {
 	
 	
 	/**
-	 * returns a String representation of a Path
+	 * returns a String representation of a TimeExpandedPath
 	 */
 	public String toString(){
 		StringBuilder strb = new StringBuilder();

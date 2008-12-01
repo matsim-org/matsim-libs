@@ -134,7 +134,7 @@ public class MultiSourceEAF {
 		//set parameters
 		int timeHorizon = 90;
 		Node sink = network.getNode("5");
-		Path result = null;
+		TimeExpandedPath result = null;
 		int rounds = 2000;
 		
 		//check if demands and sink are set 
@@ -153,7 +153,7 @@ public class MultiSourceEAF {
 				if (result==null){
 					break;
 				}
-				System.out.println("path: " +  result);
+				System.out.println("TimeExpandedPath: " +  result);
 				fluss.augment(result);
 				System.out.println(fluss);
 			}
