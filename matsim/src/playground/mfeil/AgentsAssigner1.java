@@ -21,12 +21,15 @@ package playground.mfeil;
 
 
 
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.population.Act;
+import java.util.LinkedList;
 
 
 /**
@@ -46,10 +49,10 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	
 	public AgentsAssigner1 (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
 			LocationMutatorwChoiceSet locator, PlanAlgorithm timer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
-			double minimumTime, DistanceCoefficients coefficients){
+			double minimumTime, DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 		
 		super(controler, preProcessRoutingData, legTravelTimeEstimator, locator, timer,
-				cleaner, recyclingModule, minimumTime);
+				cleaner, recyclingModule, minimumTime, nonassignedAgents);
 		this.coefficients = coefficients;
 	}
 	
@@ -67,7 +70,25 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		double distanceAgent;
 		int assignedAgent = -1;
 		
+		optimizedAgentsLoop:
 		for (int j=0;j<agents.getNumberOfAgents();j++){
+/*
+			// hard constraints
+			for (int i=0;i<plan.getPerson().getKnowledge().getActivities(true).size();i++){
+				boolean in = false;
+				for (int x=0;x<agents.getAgentPlan(j).getActsLegs().size()-2;x+=2){
+					if (((Act)(agents.getAgentPlan(j).getActsLegs().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
+						in = true;
+						break;
+					}
+				}
+				if (!in) {
+					log.warn("Anschlag optimizedAgentsLoop! Person "+plan.getPerson().getId()+" bei OptimizedAgent "+agents.getAgentPerson(j).getId());
+					continue optimizedAgentsLoop;
+				}
+			}
+			*/
+			// distance (=soft) fitness
 			distanceAgent=0;
 			if (this.distance=="distance"){
 				distanceAgent += this.coefficients.getPrimActsDistance()*plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
@@ -86,7 +107,10 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 				distance = distanceAgent;
 			}
 		}
-		
+		if (distance==Double.MAX_VALUE){
+			this.nonassignedAgents.add(plan.getPerson().getId().toString());
+			return;
+		}
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.router.run(plan);

@@ -22,6 +22,9 @@ package playground.mfeil;
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+
+import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -30,6 +33,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
+import org.matsim.facilities.Activity;
+import org.matsim.facilities.Facility;
 
 
 /**
@@ -39,7 +44,7 @@ import org.matsim.router.util.PreProcessLandmarks;
  */
 
 public class AgentsAssigner implements PlanAlgorithm{ 
-	
+	protected final Controler					controler;
 	protected final PlanAlgorithm				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
 	protected final PlansCalcRouteLandmarks 	router;
@@ -47,6 +52,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
 	protected final String						distance, homeLocation;
+	protected LinkedList<String>					nonassignedAgents;
+	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
 	
 	//////////////////////////////////////////////////////////////////////
@@ -57,7 +64,8 @@ public class AgentsAssigner implements PlanAlgorithm{
 	
 	public AgentsAssigner (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
 			LocationMutatorwChoiceSet locator, PlanAlgorithm timer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
-			double minimumTime){
+			double minimumTime, LinkedList<String> nonassignedAgents){
+		this.controler				= controler;
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.timer					= timer;
 		this.locator 				= locator;
@@ -66,6 +74,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.minimumTime			= minimumTime;
 		this.distance				= "distance";
 		this.homeLocation			= "homelocation";
+		this.nonassignedAgents		= nonassignedAgents;
 	}
 	
 		
@@ -116,6 +125,30 @@ public class AgentsAssigner implements PlanAlgorithm{
 		Plan bestPlan = new Plan (in.getPerson());
 		bestPlan.copyPlan(in);
 		ArrayList<Object> al = out.getActsLegs();
+		
+		// NEW NEW NEW NEW NEW NEW NEW
+		ArrayList<Activity> primActs = new ArrayList<Activity>(out.getPerson().getKnowledge().getActivities(true));
+		
+		// Condition that home activity is always first and last activity in day plan
+		for (int i=0;i<primActs.size();i++){
+			if (primActs.get(i).getType().equals(((Act)(bestPlan.getActsLegs().get(0))).getType())) primActs.remove(i);
+		}
+		
+		for (int i=2;i<bestPlan.getActsLegs().size()-2;i+=2){
+			if (!primActs.isEmpty()){
+				for (int j=0;j<primActs.size();j++){
+					if (((Act)(bestPlan.getActsLegs().get(i))).getType().equals(primActs.get(j).getType())){
+						Facility fac = (Facility) this.controler.getFacilities().getLocation(primActs.get(j).getFacility().getId());
+						((Act)(bestPlan.getActsLegs().get(i))).setFacility(fac);
+						//log.info("Für type "+primActs.get(j).getType()+", set Facility = "+primActs.get(j).getFacility().getId()+" für Person "+out.getPerson().getId());
+						primActs.remove(j);
+						break;
+					}
+				}
+				//log.info("Für type "+((Act)(bestPlan.getActsLegs().get(i))).getType()+", Facility = "+((Act)(bestPlan.getActsLegs().get(i))).getFacility().getId()+" für Person "+out.getPerson().getId());
+			}
+		}
+		
 		if(al.size()>bestPlan.getActsLegs().size()){ 
 			int i;
 			for (i = 2; i<bestPlan.getActsLegs().size()-2;i++){

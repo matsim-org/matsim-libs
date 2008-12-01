@@ -26,6 +26,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import java.util.LinkedList;
 
 
 
@@ -46,6 +47,7 @@ public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
 	protected final ScheduleCleaner				cleaner;
 	protected final RecyclingModule			module;
 	protected final double					minimumTime;
+	protected LinkedList<String>				nonassignedAgents;
 
 		
 	public AgentsAssignmentInitialiser (final Controler controler, 
@@ -55,7 +57,8 @@ public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
 			final PlanAlgorithm timer,
 			final ScheduleCleaner cleaner,
 			final RecyclingModule module, 
-			final double minimumTime) {
+			final double minimumTime,
+			LinkedList<String> nonassignedAgents) {
 		
 		this.network = controler.getNetwork();
 		this.controler = controler;
@@ -67,6 +70,7 @@ public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
 		this.cleaner = cleaner;
 		this.module = module;
 		this.minimumTime = minimumTime;
+		this.nonassignedAgents = nonassignedAgents;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -79,7 +83,7 @@ public class AgentsAssignmentInitialiser extends MultithreadedModuleA{
 		PlanAlgorithm agentsAssigner;
 		
 		agentsAssigner = new AgentsAssigner (this.controler, this.preProcessRoutingData, this.estimator,
-					this.locator, this.timer, this.cleaner, this.module, this.minimumTime);
+					this.locator, this.timer, this.cleaner, this.module, this.minimumTime, this.nonassignedAgents);
 		
 		return agentsAssigner;
 	}

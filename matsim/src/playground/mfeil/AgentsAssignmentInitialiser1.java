@@ -24,6 +24,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import java.util.LinkedList;
 
 
 
@@ -45,10 +46,11 @@ public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
 			final ScheduleCleaner cleaner,
 			final RecyclingModule module, 
 			final double minimumTime,
-			final DistanceCoefficients distanceCoefficients) {
+			final DistanceCoefficients distanceCoefficients,
+			LinkedList<String> nonassignedAgents) {
 		
 		super (controler, preProcessRoutingData, estimator, locator, timer,
-				cleaner, module, minimumTime);
+				cleaner, module, minimumTime, nonassignedAgents);
 		this.distanceCoefficients = distanceCoefficients;
 	}
 	
@@ -60,7 +62,8 @@ public class AgentsAssignmentInitialiser1 extends AgentsAssignmentInitialiser {
 		PlanAlgorithm agentsAssigner;
 		
 		agentsAssigner = new AgentsAssigner1 (this.controler, this.preProcessRoutingData, this.estimator,
-					this.locator, this.timer, this.cleaner, this.module, this.minimumTime, this.distanceCoefficients);
+					this.locator, this.timer, this.cleaner, this.module, this.minimumTime, this.distanceCoefficients,
+					this.nonassignedAgents);
 		
 		return agentsAssigner;
 	}

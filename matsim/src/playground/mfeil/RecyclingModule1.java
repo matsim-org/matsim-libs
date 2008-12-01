@@ -21,12 +21,6 @@
 package playground.mfeil;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-
-import org.matsim.controler.Controler;
 import org.matsim.population.Act;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
@@ -46,12 +40,12 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	public RecyclingModule1 (ControlerMFeil controler) {
 		super(controler);
-		this.iterations 	= 20;
-		this.noOfAgents		= 10;
-		this.coefficients = new DistanceCoefficients (1, 1);
-		this.assignmentModule		= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
-				this.estimator, this.locator, this.timer, 
-				this.cleaner, this, this.minimumTime, this.coefficients);
+		this.iterations 		= 20;
+		this.noOfAgents			= 10;
+		this.coefficients 		= new DistanceCoefficients (1, 1);		
+		this.assignmentModule	= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
+				this.estimator, this.locator, this.timer, this.cleaner, this, 
+				this.minimumTime, this.coefficients, this.nonassignedAgents);
 	}
 	
 	
@@ -130,11 +124,11 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	private double calculate (){
 		double score = 0;
 		this.assignmentModule.init();
-		for (int j=0;j<this.noOfAgents;j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
 			assignmentModule.handlePlan(list[1].get(j));
 		}
 		assignmentModule.finish();
-		for (int j=0;j<this.noOfAgents;j++){
+		for (int j=0;j<java.lang.Math.min(this.noOfAgents, list[1].size());j++){
 			score += this.list[1].get(j).getScore(); 
 		}
 		return score;

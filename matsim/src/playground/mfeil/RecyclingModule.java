@@ -40,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * @author Matthias Feil
@@ -67,6 +68,7 @@ public class RecyclingModule implements StrategyModule {
 	protected String[]							criteria;
 	protected final Controler					controler;
 	protected OptimizedAgents 					agents;
+	protected LinkedList<String>				nonassignedAgents;
 	
 	public static PrintStream 					assignment;
 	
@@ -86,10 +88,11 @@ public class RecyclingModule implements StrategyModule {
 				controler.getTravelCostCalculator(), 
 				tDepDelayCalc, 
 				controler.getNetwork());
+		this.nonassignedAgents = new LinkedList<String>();
 		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
 		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.estimator, this.locator, this.timer);
 		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.estimator, this.locator,
-			this.timer, this.cleaner, this, this.minimumTime);
+			this.timer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
 		this.minimumTime			= 1800;
 		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);		
 		this.testAgentsNumber		= 5;
@@ -110,9 +113,10 @@ public class RecyclingModule implements StrategyModule {
 		assignment.println("Agent\tScore\tPlan\n");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void init() {
 		
-		this.list = new ArrayList [2];
+		this.list = new ArrayList[2];
 		for (int i=0;i<2;i++){
 			list[i] = new ArrayList<Plan>();
 		}
