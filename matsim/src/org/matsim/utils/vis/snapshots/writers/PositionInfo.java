@@ -34,9 +34,23 @@ public class PositionInfo {
 	public enum VehicleState {Driving, Parking};
 
 	private static final double LANE_WIDTH = 3.75;//TODO lane width is no longer static but it is defined in network. The question is,
-																						//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
-																						//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
-																						//(without a static Gbl)? [GL] - april 08 
+	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
+	//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
+	//(without a static Gbl)? [GL] - april 08
+	//
+	// Could put this as a subclass into "Network".  That's probably where it belongs: convert "position on graph" to
+	// "x/y-positions". Kai
+
+	/**
+	 * Distance (in m) between the two innermost opposing lanes. Setting this to a larger number (e.g. 30) lets you see the direction
+	 * in which cars are going.  (Setting this to a negative number probably gives you "driving on the left", but lanes will be wrong
+	 * (could be fixed), and, more importantly, the simulation still assumes "driving on the right" when coordinates are connected
+	 * to links.
+	 * 
+	 * TODO should be configurable
+	 */
+	private static final double WIDTH_OF_MEDIAN = 30. ; 	
+	
 	private static final double PI_HALF = Math.PI / 2.0;
 	private static final double TWO_PI = 2.0 * Math.PI;
 
@@ -91,8 +105,10 @@ public class PositionInfo {
 		}
 		if (theta < 0.0) theta += TWO_PI;
 		double correction = link.getEuklideanDistance() / link.getLength();
-		this.easting  = fromCoord.getX() + Math.cos(theta) * distanceOnLink * correction + Math.sin(theta) * LANE_WIDTH * lane;
-		this.northing = fromCoord.getY() + Math.sin(theta) * distanceOnLink * correction - Math.cos(theta) * LANE_WIDTH * lane;
+		this.easting  = fromCoord.getX() + Math.cos(theta) * distanceOnLink * correction 
+		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
+		this.northing = fromCoord.getY() + Math.sin(theta) * distanceOnLink * correction 
+		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
 		this.elevation = 0.0;
 		this.azimuth = theta / (TWO_PI) * 360;
 		this.vehicleState = vehicleState;
