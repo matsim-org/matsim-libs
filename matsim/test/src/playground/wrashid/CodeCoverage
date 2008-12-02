@@ -11,8 +11,8 @@ Code coverage 100% (only getters and setters not included) (tidied up?)
 - playground.wrashid.DES.MessageFactory (yes)
 
 next:
-- look, which is almost 100%
-- Other messages
-- Road
+- we have a person: 225055, which wakes. This causes the test
+Berlin to fail. Look into this phenomena. Probably the test needs to be adapted
+to cope with this.
 - 
 - 
