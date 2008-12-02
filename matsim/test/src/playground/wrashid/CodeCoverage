@@ -1,28 +1,4 @@
-Classes covered with Unit Tests 100% (tidied up?)
-======================================
-- playground.wrashid.DES.MessageQueue (yes)
-- playground.wrashid.DES.Scheduler (yes)
-- playground.wrashid.DES.SimUnit (yes)
-- playground.wrashid.DES.EventMessage (yes)
+Package coverage
+=================
+- playground.wrashid.DES.*
 
-Code coverage 100% (only getters and setters not included) (tidied up?)
-======================================
-- playground.wrashid.DES.Message (yes)
-- playground.wrashid.DES.MessageFactory (yes)
-
-
-Tidied up / Candidates
-=========
-- playground.wrashid.DES.Vehicle
-- playground.wrashid.DES.EndLegMessage
-- playground.wrashid.DES.EndRoadMessage
-- playground.wrashid.DES.StartingLegMessage
-- playground.wrashid.DES.EnterRoadMessage
-- playground.wrashid.DES.LeaveRoadMessage
-
-next:
-- we have a person: 225055, which wakes. This causes the test
-Berlin to fail. Look into this phenomena. Probably the test needs to be adapted
-to cope with this.
-- 
-- 
