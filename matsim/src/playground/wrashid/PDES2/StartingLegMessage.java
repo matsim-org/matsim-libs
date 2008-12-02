@@ -39,7 +39,7 @@ public class StartingLegMessage extends EventMessage {
 			ArrayList<Object> actsLegs = plan.getActsLegs();
 			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1)).getLink();
 			Road road=Road.allRoads.get(nextLink.getId().toString());
-			//System.out.println(".");
+			//vehicle.setCurrentLink(nextLink); //perhaps this line of code is needed (it helped in the single cpu variant)
 			vehicle.scheduleEndLegMessage(messageArrivalTime+vehicle.getCurrentLeg().getTravelTime(), road);
 		}
 	}
