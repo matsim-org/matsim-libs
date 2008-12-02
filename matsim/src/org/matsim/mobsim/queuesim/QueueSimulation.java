@@ -145,6 +145,10 @@ public class QueueSimulation {
 	//TODO remove this method when agent representation is completely implemented
 	protected void addVehicleToLink(final QueueVehicle veh) {
 		Link link = veh.getCurrentLink();
+		if ( link==null ) {
+			log.error( "vehicle has no link; will not be inserted into the simulation." + this ) ;
+			return ;
+		}
 		QueueLink qlink = this.network.getQueueLink(link.getId());
 		qlink.addParking(veh);
 	}
