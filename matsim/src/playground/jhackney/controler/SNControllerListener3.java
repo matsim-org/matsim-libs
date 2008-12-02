@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SNControlerListener2.java
+ * SNControllerListener3.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,13 +26,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
@@ -40,12 +44,24 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 //import org.matsim.scoring.EventsToScore;
+import org.matsim.replanning.PlanStrategy;
+import org.matsim.replanning.StrategyManager;
+import org.matsim.replanning.StrategyManagerConfigLoader;
+import org.matsim.replanning.modules.ReRouteLandmarks;
+import org.matsim.replanning.modules.StrategyModule;
+import org.matsim.replanning.modules.TimeAllocationMutator;
+import org.matsim.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.replanning.selectors.RandomPlanSelector;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsPostProcess;
@@ -55,6 +71,8 @@ import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
+import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
+import org.matsim.socialnetworks.replanning.SNCoordinateArrivalTimes;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -96,10 +114,7 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * @author jhackney
  *
  */
-public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
-//	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
-//	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
-
+public class SNControllerListener3 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
 
 	private static final boolean CALCSTATS = true;
 	private static final String DIRECTORY_SN = "socialnets/";
@@ -124,13 +139,13 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
 
-	private final Logger log = Logger.getLogger(SNControllerListener2.class);
-
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
 	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
 //	New variables for replanning
 	int replan_interval;
+	
+	private final Logger log = Logger.getLogger(SNControllerListener3.class);
 
 	private Controler controler = null;
 
@@ -171,6 +186,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		this.log.info(" ... Instantiation of social network scoring done");
 
 		snsetup();
+
 	}
 
 	public void notifyScoring(final ScoringEvent event){
@@ -314,8 +330,11 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 	}
 
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+/**
+ * Clears the spatial social interaction tables (time overlap, or time windows) AFTER
+ * the replanning step but before the new assignment
+ */
 		this.epp.reset(snIter);// I think this doesn't need to be called
 		this.teo.clearTimeWindowMap();// needs to be called because it's not an eventhandler
 		this.actStats.clear();// needs to be called because it's not an eventhandler
