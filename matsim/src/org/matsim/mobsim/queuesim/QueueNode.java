@@ -93,6 +93,8 @@ public class QueueNode {
 		if (nextLink != null) {
 
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
+			// FIXME: Ich hätte gerne die alte Konstruktion wieder, dass explizit über den Knoten nach den outgoing links
+			// gesucht wird.  Ansonsten kann man hier nämlich teleportieren.  kai, nov08
 
 			if (nextQueueLink.hasSpace()) {
 				currentQueueLink.popFirstFromBuffer();
