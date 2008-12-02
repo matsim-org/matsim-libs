@@ -19,7 +19,7 @@ public class TestDESStarter_LocalCVS_Test6 extends MatsimTestCase {
 							false, null, null);
 		} catch (Exception e) {
 			System.out.println("THIS TEST WILL ONLY RUN LOCALLY");
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
