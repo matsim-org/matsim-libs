@@ -20,6 +20,10 @@ public class StartingLegMessage extends EventMessage {
 	public void handleMessage() {
 
 		// attempt to enter street.
+		
+		//if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("225055")){
+		//	System.out.println();
+		//}
 
 		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
@@ -33,6 +37,7 @@ public class StartingLegMessage extends EventMessage {
 			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1))
 					.getLink();
 			Road road = Road.getRoad(nextLink.getId().toString());
+			vehicle.setCurrentLink(nextLink);
 			vehicle.scheduleEndLegMessage(scheduler.getSimTime()
 					+ vehicle.getCurrentLeg().getTravelTime(), road);
 		}

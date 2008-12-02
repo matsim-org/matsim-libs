@@ -20,6 +20,10 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void handleMessage() {
+		//if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("225055")){
+		//	System.out.println();
+		//}
+		
 		// vehicle.leavePreviousRoad();
 
 		// schedule next leg, if there are more legs, else end trip (TODO)

@@ -1,16 +1,17 @@
 package playground.wrashid.DES;
 
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MessageFactory {
 
-	protected static ConcurrentLinkedQueue<EndLegMessage> endLegMessageQueue = new ConcurrentLinkedQueue<EndLegMessage>();
-	protected static ConcurrentLinkedQueue<EnterRoadMessage> enterRoadMessageQueue = new ConcurrentLinkedQueue<EnterRoadMessage>();
-	protected static ConcurrentLinkedQueue<StartingLegMessage> startingLegMessageQueue = new ConcurrentLinkedQueue<StartingLegMessage>();
-	protected static ConcurrentLinkedQueue<LeaveRoadMessage> leaveRoadMessageQueue = new ConcurrentLinkedQueue<LeaveRoadMessage>();
-	protected static ConcurrentLinkedQueue<EndRoadMessage> endRoadMessageQueue = new ConcurrentLinkedQueue<EndRoadMessage>();
+	protected static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
+	protected static LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
+	protected static LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
+	protected static LinkedList<LeaveRoadMessage> leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
+	protected static LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
-	private static ConcurrentLinkedQueue<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new ConcurrentLinkedQueue<DeadlockPreventionMessage>();
+	private static LinkedList<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
 
 	public static void disposeEndLegMessage(EndLegMessage message) {
 		if (!SimulationParameters.isGC_MESSAGES()) {
@@ -117,13 +118,13 @@ public class MessageFactory {
 	}
 
 	public static void GC_ALL_MESSAGES() {
-		endLegMessageQueue = new ConcurrentLinkedQueue<EndLegMessage>();
-		enterRoadMessageQueue = new ConcurrentLinkedQueue<EnterRoadMessage>();
-		startingLegMessageQueue = new ConcurrentLinkedQueue<StartingLegMessage>();
-		leaveRoadMessageQueue = new ConcurrentLinkedQueue<LeaveRoadMessage>();
-		endRoadMessageQueue = new ConcurrentLinkedQueue<EndRoadMessage>();
+		endLegMessageQueue = new LinkedList<EndLegMessage>();
+		enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
+		startingLegMessageQueue = new LinkedList<StartingLegMessage>();
+		leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
+		endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
-		deadlockPreventionMessageQueue = new ConcurrentLinkedQueue<DeadlockPreventionMessage>();
+		deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
 	}
 
 }
