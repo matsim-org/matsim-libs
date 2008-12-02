@@ -1,35 +1,31 @@
 package playground.wrashid.DES;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkLeaveEvent;
 
 public class LeaveRoadMessage extends EventMessage {
 
 	@Override
 	public void handleMessage() {
-		Road road=(Road)this.getReceivingUnit();
+		Road road = (Road) this.getReceivingUnit();
 		road.leaveRoad(vehicle);
 	}
 
-	public LeaveRoadMessage(Scheduler scheduler,Vehicle vehicle) {
-		super(scheduler,vehicle);
-		priority=SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
+	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
+		super(scheduler, vehicle);
+		priority = SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
-	
-
-	
 
 	@Override
 	public void processEvent() {
-		Road road=(Road)this.getReceivingUnit();
-		BasicEvent event=null;
-		
+		Road road = (Road) this.getReceivingUnit();
+		BasicEvent event = null;
 
-			event=new LinkLeaveEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),road.getLink().getId().toString(),vehicle.getLegIndex()-1);
+		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle
+				.getOwnerPerson().getId().toString(), road.getLink().getId()
+				.toString(), vehicle.getLegIndex() - 1);
 
-		
 		SimulationParameters.events.processEvent(event);
 	}
-	
+
 }

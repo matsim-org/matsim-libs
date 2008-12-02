@@ -1,13 +1,8 @@
 package playground.wrashid.DES;
 
-import java.util.ArrayList;
-
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
-import org.matsim.network.Link;
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
 
 public class StartingLegMessage extends EventMessage {
 
@@ -18,26 +13,17 @@ public class StartingLegMessage extends EventMessage {
 
 	@Override
 	public void handleMessage() {
-
-		// attempt to enter street.
-		
-		//if (vehicle.getOwnerPerson().getId().toString().equalsIgnoreCase("225055")){
-		//	System.out.println();
-		//}
-
+		// if current leg is in car mode, then enter request in first road
 		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
 			road.enterRequest(vehicle);
 		} else {
-			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's
-																	// the plan
-																	// the
-			ArrayList<Object> actsLegs = plan.getActsLegs();
-			Link nextLink = ((Act) actsLegs.get(vehicle.getLegIndex() + 1))
-					.getLink();
-			Road road = Road.getRoad(nextLink.getId().toString());
-			vehicle.setCurrentLink(nextLink);
+			// move to first link in next leg and schedule an end leg message
+			vehicle.moveToFirstLinkInNextLeg();
+			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
+					.toString());
+
 			vehicle.scheduleEndLegMessage(scheduler.getSimTime()
 					+ vehicle.getCurrentLeg().getTravelTime(), road);
 		}

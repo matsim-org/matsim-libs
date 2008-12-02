@@ -1,39 +1,30 @@
 package playground.wrashid.DES;
 
 import org.matsim.events.BasicEvent;
-import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.LinkEnterEvent;
-import org.matsim.network.Link;
-import org.matsim.population.Leg;
 
 public class EnterRoadMessage extends EventMessage {
 
-
-
 	@Override
 	public void handleMessage() {
-		//Ask road to really enter the road
-		// => Road will then let us enter the road and tell us, when we can leave the road.
-
-		// enter the road and find out the time for leaving the street
-		
-		Road road=Road.getRoad(vehicle.getCurrentLink().getId().toString());
+		// enter the next road
+		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
 		road.enterRoad(vehicle);
 	}
-	
-	public EnterRoadMessage(Scheduler scheduler,Vehicle vehicle) {
-		super(scheduler,vehicle);
 
-		priority=SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
+	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
+		super(scheduler, vehicle);
+		priority = SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
 	public void processEvent() {
-		BasicEvent event=null;
+		BasicEvent event = null;
 
-			event=new LinkEnterEvent(this.getMessageArrivalTime(),vehicle.getOwnerPerson().getId().toString(),vehicle.getCurrentLink().getId().toString(),vehicle.getLegIndex()-1);
+		event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
+				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
+				.getId().toString(), vehicle.getLegIndex() - 1);
 
-		
 		SimulationParameters.events.processEvent(event);
 	}
-	
+
 }

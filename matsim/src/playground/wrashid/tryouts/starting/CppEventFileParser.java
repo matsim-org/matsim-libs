@@ -56,7 +56,7 @@ public class CppEventFileParser {
 			while (line != null) {
 				counter++;
 				
-				if (SimulationParameters.debugMode && counter % 1000000==0){
+				if (counter % 1000000==0){
 					System.out.println("noOfLines Read:" + counter);
 				}
 				

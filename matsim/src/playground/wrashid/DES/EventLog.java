@@ -109,11 +109,9 @@ public class EventLog {
 			}
 		}
 
-		if (SimulationParameters.debugMode) {
 			System.out.println("# Events Java: " + eventLog1.size());
 			System.out.println("# Events C++: " + eventLog2.size());
 			System.out.println("NoOfNotEqualEvents: " + NoOfNotEqualEvents);
-		}
 
 		return true;
 	}

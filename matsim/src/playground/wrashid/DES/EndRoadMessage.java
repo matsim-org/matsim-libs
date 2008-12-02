@@ -2,62 +2,43 @@ package playground.wrashid.DES;
 
 import java.util.ArrayList;
 
-import org.matsim.events.BasicEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.network.Link;
 import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 
 public class EndRoadMessage extends EventMessage {
-// TODO: This is not a normal Event message, perhaps I should redesign it and put it somewhere else
-	// in the class hierarchy
 
 	@Override
 	public void handleMessage() {
-		// Find out, when this vehicle can enter the next road
-		
-		
-		// leave previous road
-		//Road previousRoad=Road.allRoads.get(vehicle.getCurrentLink().getId().toString());
-		//previousRoad.leaveRoad(vehicle);
-		
-		
-		
-		if (vehicle.getCurrentLinkRoute().length==vehicle.getLinkIndex()+1){
-			// the leg is completed, try to enter the last link but do not enter it 
-			// (just wait, until you have clearance for enter and then leave the road)
-			
+		if (vehicle.isCurrentLegFinished()) {
+			// the leg is completed, try to enter the last link but do not enter
+			// it
+			// (just wait, until you have clearance for enter and then leave the
+			// road)
+
 			vehicle.initiateEndingLegMode();
+
+			Plan plan = vehicle.getOwnerPerson().getSelectedPlan();
 			
-			Plan plan = vehicle.getOwnerPerson().getSelectedPlan(); // that's the plan the
-			// person will execute
-			ArrayList<Object> actsLegs = plan.getActsLegs();
-			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex()+1)).getLink());
-			
-			//System.out.println(vehicle.getCurrentLink().getId().toString());
-			
-			Road road=Road.getRoad(vehicle.getCurrentLink().getId().toString());
-			road.enterRequest(vehicle);	
-		} else if (vehicle.getCurrentLinkRoute().length>vehicle.getLinkIndex()+1){
+			vehicle.moveToFirstLinkInNextLeg();
+			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
+					.toString());
+			road.enterRequest(vehicle);
+		} else if (!vehicle.isCurrentLegFinished()) {
 			// if leg is not finished yet
-			vehicle.setLinkIndex(vehicle.getLinkIndex()+1);
-			Link nextLink=vehicle.getCurrentLinkRoute()[vehicle.getLinkIndex()];
-			
-			Road nextRoad=Road.getRoad(nextLink.getId().toString());
-			vehicle.setCurrentLink(nextLink);
+			vehicle.moveToNextLinkInLeg();
+
+			Road nextRoad = Road.getRoad(vehicle.getCurrentLink().getId()
+					.toString());
 			nextRoad.enterRequest(vehicle);
-		} else {
-			
 		}
 	}
 
-	public EndRoadMessage(Scheduler scheduler,Vehicle vehicle) {
-		super(scheduler,vehicle);
+	public EndRoadMessage(Scheduler scheduler, Vehicle vehicle) {
+		super(scheduler, vehicle);
 	}
-	
+
 	public void processEvent() {
-		// don't do anything
+		// don't need to output any event
 	}
 
 }
