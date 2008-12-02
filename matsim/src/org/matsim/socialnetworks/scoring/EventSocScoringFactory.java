@@ -10,14 +10,13 @@ import org.matsim.scoring.ScoringFunctionFactory;
 
 
 
-public class SocScoringFactoryEvent implements ScoringFunctionFactory {
+public class EventSocScoringFactory implements ScoringFunctionFactory {
 
 	private String factype;
-//	private TrackEventsOverlap teo;
 	private Hashtable<Act,ArrayList<Double>> actStats;
 	private ScoringFunctionFactory factory;
 
-	public SocScoringFactoryEvent(String factype, ScoringFunctionFactory sf, Hashtable<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFactory(String factype, ScoringFunctionFactory sf, Hashtable<Act,ArrayList<Double>> actStats) {
 		this.factype=factype;
 		this.actStats=actStats;
 		this.factory=sf;
@@ -26,7 +25,7 @@ public class SocScoringFactoryEvent implements ScoringFunctionFactory {
 
 	public ScoringFunction getNewScoringFunction(final Plan plan) {
 //		return new SNScoringMaxFriendFoeRatio(plan, this.factype, this.scorer);
-		return new SocScoringFunctionEvent(plan, this.factory.getNewScoringFunction(plan), factype, actStats);
+		return new EventSocScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, actStats);
 	}
 
 

@@ -10,7 +10,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.SocScoringFunctionPlan;
+import org.matsim.socialnetworks.scoring.PlanSocScoringFunction;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 
 

@@ -37,9 +37,9 @@ import org.matsim.scoring.ScoringFunction;
  *
  * @author jhackney
  */
-public class SocScoringFunctionPlan implements ScoringFunction{
+public class PlanSocScoringFunction implements ScoringFunction{
 
-	static final private Logger log = Logger.getLogger(SocScoringFunctionPlan.class);
+	static final private Logger log = Logger.getLogger(PlanSocScoringFunction.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 	private final TrackActsOverlap spatialScorer;
@@ -56,7 +56,7 @@ public class SocScoringFunctionPlan implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public SocScoringFunctionPlan(final Plan plan, final ScoringFunction scoringFunction, String factype, TrackActsOverlap spatialScorer) {
+	public PlanSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, TrackActsOverlap spatialScorer) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;

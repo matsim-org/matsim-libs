@@ -39,9 +39,9 @@ import org.matsim.scoring.ScoringFunction;
  *
  * @author jhackney
  */
-public class SocScoringFunctionEvent implements ScoringFunction{
+public class EventSocScoringFunction implements ScoringFunction{
 
-	static final private Logger log = Logger.getLogger(SocScoringFunctionEvent.class);
+	static final private Logger log = Logger.getLogger(EventSocScoringFunction.class);
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
@@ -59,7 +59,7 @@ public class SocScoringFunctionEvent implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public SocScoringFunctionEvent(final Plan plan, final ScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;
@@ -82,21 +82,14 @@ public class SocScoringFunctionEvent implements ScoringFunction{
 
 		ActIterator ait = this.plan.getIteratorAct();
 
-//		Hashtable<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
-//		Hashtable<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
-//		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();
 			if(act.getType().equals(factype)){
-//				this.friendFoeRatio+=stats.get(0);
-//				this.nFriends+=stats.get(1);
-//				this.timeWithFriends+=stats.get(2);
 				this.friendFoeRatio+=actStats.get(act).get(0);
 				this.nFriends+=actStats.get(act).get(1);
 				this.timeWithFriends+=actStats.get(act).get(2);
 			}
 		}
-//		log.info("SSTEST Person "+plan.getPerson().getId()+" meets nFriends "+this.nFriends+" for "+this.timeWithFriends+" at activity "+ factype);
 	}
 
 	public void agentStuck(final double time) {
