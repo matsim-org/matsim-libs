@@ -212,6 +212,9 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 					break;
 				}
 			}
+			if (link == null) {
+				throw new IllegalArgumentException("Could not find any link from node " + previousNode.getId() + " to " + id);
+			}
 
 			if (this.subsequentLinks.get(previousLink) != link) {
 				this.route.add(link);
@@ -254,6 +257,9 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 					link = tmpLink;
 					break;
 				}
+			}
+			if (link == null) {
+				throw new IllegalArgumentException("Could not find any link from node " + previousNode.getId() + " to " + node.getId());
 			}
 
 			if (this.subsequentLinks.get(previousLink) != link) {
