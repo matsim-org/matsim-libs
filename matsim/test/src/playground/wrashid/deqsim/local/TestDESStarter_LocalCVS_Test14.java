@@ -7,7 +7,7 @@ import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
 public class TestDESStarter_LocalCVS_Test14 extends MatsimTestCase {
 	// enable assertion flag allowed
-	public void test_Berlin_TestHandlerDetailedEventChecker() {
+	public void test_LocalCVS_Test14_TestHandlerDetailedEventChecker() {
 		Gbl.reset();
 
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
