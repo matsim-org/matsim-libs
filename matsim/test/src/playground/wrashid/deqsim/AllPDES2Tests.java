@@ -1,4 +1,4 @@
-package playground.wrashid;
+package playground.wrashid.deqsim;
 
 import playground.wrashid.PDES2.ZoneMessageQueueTest;
 import playground.wrashid.PDES2.util.ConcurrentListMPDSCTest;
@@ -8,17 +8,18 @@ import playground.wrashid.deqsim.TestPDESStarter2_EquilPopulationPlans1Modified1
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
+public class AllPDES2Tests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				"Test for playground.wrashid");
-		suite.addTest(playground.wrashid.deqsim.AllDESTests.suite());
-		suite.addTest(playground.wrashid.deqsim.AllPDES2Tests.suite());
-		suite.addTest(playground.wrashid.PDES2.util.AllTests.suite());
-		suite.addTest(playground.wrashid.PDES2.AllTests.suite());
-		suite.addTest(playground.wrashid.PHEV.Utility.AllTests.suite());
+		TestSuite suite = new TestSuite("Tests for playground.wrashid.deqsim (PDES2)");
 		
+		// PDES Tests
+		suite.addTestSuite(TestPDESStarter2_EquilPopulationPlans1Modified1.class);
+		suite.addTestSuite(TestPDESStarter2_equilPlans100.class);
+		suite.addTestSuite(TestPDESStarter2_Berlin.class);
 		return suite;
 	}
+
+	
+
 }
