@@ -56,7 +56,7 @@ import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.scoring.SocScoringFactoryEvent;
+import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
@@ -182,7 +182,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info(" ... Instantiation of events overlap tracking done");
 //		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
-		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
+		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 		
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");

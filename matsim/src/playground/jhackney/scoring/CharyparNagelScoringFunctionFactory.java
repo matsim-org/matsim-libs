@@ -25,7 +25,7 @@ import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 
 /**
- * A factory to create {@link CharyparNagelScoringFunction}s.
+ * A factory to create {@link CharyparNagelReportingScoringFunction}s.
  *
  * @author mrieser
  */
@@ -34,8 +34,8 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	/* (non-Javadoc)
 	 * @see org.matsim.demandmodeling.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.demandmodeling.plans.Plan)
 	 */
-	public playground.jhackney.scoring.CharyparNagelScoringFunction getNewScoringFunction(final Plan plan) {
-		return new playground.jhackney.scoring.CharyparNagelScoringFunction(plan);
+	public playground.jhackney.scoring.CharyparNagelReportingScoringFunction getNewScoringFunction(final Plan plan) {
+		return new playground.jhackney.scoring.CharyparNagelReportingScoringFunction(plan);
 	}
 
 }

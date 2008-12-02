@@ -46,6 +46,7 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 //import org.matsim.scoring.EventsToScore;
+import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsPostProcess;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
@@ -55,14 +56,12 @@ import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
+import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.scoring.EventsToScore;
-import playground.jhackney.scoring.SocScoringFactoryEvent;
-
 
 
 /**
@@ -123,7 +122,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
-	private playground.jhackney.scoring.EventsToScore scoring =null;
+	private EventsToScore scoring = null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
 
@@ -159,14 +158,15 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		this.log.info(" ... Instantiation of events overlap tracking done");
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
-//		SocScoringFactoryEvent factory = new SocScoringFactoryEvent("leisure", controler.getScoringFunctionFactory(),actStats);
-		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
+		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
+//		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
 
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
 		this.log.info("  Instantiating social network EventsToScore for scoring the plans");
-		scoring = new playground.jhackney.scoring.EventsToScore(this.controler.getPopulation(), factory);
+//		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(this.controler.getPopulation(), factory);
+		scoring = new EventsToScore(this.controler.getPopulation(),factory);
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
 

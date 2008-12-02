@@ -40,9 +40,9 @@ import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
  *
  * @author jhackney
  */
-public class SocScoringFunctionEvent extends playground.jhackney.scoring.CharyparNagelScoringFunction {
+public class EventSocScoringFunction extends playground.jhackney.scoring.CharyparNagelReportingScoringFunction {
 
-	static final private Logger log = Logger.getLogger(SocScoringFunctionEvent.class);
+	static final private Logger log = Logger.getLogger(EventSocScoringFunction.class);
 //	private final playground.jhackney.scoring.CharyparNagelScoringFunctiosuperon;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
@@ -60,9 +60,10 @@ public class SocScoringFunctionEvent extends playground.jhackney.scoring.Charypa
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 	Hashtable<Act,Double> usoc=new Hashtable<Act,Double>();
+	Hashtable<Act,Double> dusoc=new Hashtable<Act,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
-	public SocScoringFunctionEvent(final Plan plan, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		super(plan);
 		this.plan = plan;
@@ -105,6 +106,34 @@ public class SocScoringFunctionEvent extends playground.jhackney.scoring.Charypa
 		return super.getUlegd(l);
 	}
 
+	public double getDusoc(Act a){
+		return dusoc.get(a);
+	}
+	public double getDudur(Act a){
+		return super.getDudur(a);
+	}
+	public double getDuw(Act a){
+		return super.getDuw(a);
+	}
+	public double getDus(Act a){
+		return super.getDus(a);
+	}
+	public double getDula(Act a){
+		return super.getDula(a);
+	}
+	public double getDued(Act a){
+		return super.getDued(a);
+	}
+	public double getDuld(Act a){
+		return super.getDuld(a);
+	}
+	public double getDulegt(Leg l){
+		return super.getDulegt(l);
+	}
+	public double getDulegd(Leg l){
+		return super.getDulegd(l);
+	}
+	
 	/**
 	 * Totals the act scores, including socializing during acts, for the entire plan
 	 *
@@ -135,6 +164,7 @@ public class SocScoringFunctionEvent extends playground.jhackney.scoring.Charypa
 			}
 				this.score+=temp;
 				usoc.put(act,temp);
+				dusoc.put(act,dtemp);
 			}
 		
 		

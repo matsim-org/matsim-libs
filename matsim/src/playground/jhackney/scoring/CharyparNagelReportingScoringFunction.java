@@ -84,7 +84,7 @@ import org.matsim.utils.misc.Time;
  * @author mrieser
  */
 
-public class CharyparNagelScoringFunction implements ScoringFunction {
+public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 	/* TODO [MR] this class should take a ScoringFunctionConfigModule on
 	 * initialization once the new config-modules are available, instead
@@ -115,9 +115,9 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	/** True if one at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	private static boolean scoreActs = true;
 
-	private static final Logger log = Logger.getLogger(CharyparNagelScoringFunction.class);
+	private static final Logger log = Logger.getLogger(CharyparNagelReportingScoringFunction.class);
 
-	public CharyparNagelScoringFunction(final Plan plan) {
+	public CharyparNagelReportingScoringFunction(final Plan plan) {
 		init();
 		this.reset();
 
@@ -171,6 +171,63 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	public double getScore() {
 		return this.score;
 	}
+	public double getDudur(Act a){
+		if(dudur.size()>0&&dudur.keySet().contains(a)){
+			return dudur.get(a);
+			}else{
+				return -999;
+			}
+	}
+	public double getDuw(Act a){
+		if(duw.size()>0&&duw.keySet().contains(a)){
+			return duw.get(a);
+			}else{
+				return 0;
+			}
+	}
+	public double getDus(Act a){
+		if(dus.size()>0&&dus.keySet().contains(a)){
+			return dus.get(a);
+			}else{
+				return 0;
+			}
+	}
+	public double getDula(Act a){
+		if(dula.size()>0&&dula.keySet().contains(a)){
+		return dula.get(a);
+		}else
+			return 0;
+	}
+	public double getDued(Act a){
+		if(dued.size()>0&&dued.keySet().contains(a)){
+		return dued.get(a);
+		}else{
+			return 0;
+		}
+		
+	}
+	public double getDuld(Act a){
+		if(duld.size()>0&&duld.keySet().contains(a)){
+			return duld.get(a);
+			}else{
+				return 0;
+			}
+	}
+	public double getDulegt(Leg l){
+		if(dulegt.size()>0&&dulegt.keySet().contains(l)){
+			return dulegt.get(l);
+			}else{
+				return 0;
+			}
+	}
+	public double getDulegd(Leg l){
+		if(dulegd.size()>0&&dulegd.keySet().contains(l)){
+			return dulegd.get(l);
+			}else{
+				return 0;
+			}
+	}
+	
 	public double getUdur(Act a){
 		if(udur.size()>0&&udur.keySet().contains(a)){
 			return udur.get(a);
@@ -227,7 +284,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 				return 0;
 			}
 	}
-	
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
@@ -250,7 +306,15 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private Hashtable<Act,Double> uld=new Hashtable<Act,Double>();
 	private Hashtable<Leg,Double> ulegt=new Hashtable<Leg,Double>();
 	private Hashtable<Leg,Double> ulegd = new Hashtable<Leg,Double>();
-
+	private Hashtable<Act,Double> dudur=new Hashtable<Act,Double>();
+	private Hashtable<Act,Double> duw=new Hashtable<Act,Double>();
+	private Hashtable<Act,Double> dus=new Hashtable<Act,Double>();
+	private Hashtable<Act,Double> dula=new Hashtable<Act,Double>();
+	private Hashtable<Act,Double> dued=new Hashtable<Act,Double>();
+	private Hashtable<Act,Double> duld=new Hashtable<Act,Double>();
+	private Hashtable<Leg,Double> dulegt=new Hashtable<Leg,Double>();
+	private Hashtable<Leg,Double> dulegd = new Hashtable<Leg,Double>();
+	
 	private static void init() {
 		if (initialized) return;
 
@@ -343,18 +407,18 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			// agent arrives to early, has to wait
 			tmpScore += marginalUtilityOfWaiting * (activityStart - arrivalTime);
 			uw.put(act,marginalUtilityOfWaiting * (activityStart - arrivalTime));
-//			uw.put(act, marginalUtilityOfWaiting);
 		}else uw.put(act,0.);
-
+		duw.put(act, marginalUtilityOfWaiting);
+		
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
 		if (latestStartTime >= 0 && activityStart > latestStartTime) {
 			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 			ula.put(act,marginalUtilityOfLateArrival * (activityStart - latestStartTime));
-//			ula.put(act,marginalUtilityOfLateArrival);
 		}else ula.put(act,0.);
-
+		dula.put(act,marginalUtilityOfLateArrival);
+		
 		// utility of performing an action, duration is >= 1, thus log is no problem
 		double typicalDuration = params.getTypicalDuration();
 
@@ -362,40 +426,41 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
 					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
 			double utilWait = marginalUtilityOfWaiting * duration;
-			double dutilPerf =marginalUtilityOfPerforming * typicalDuration
-			/ Math.log((duration));
+			double dutilPerf =marginalUtilityOfPerforming * typicalDuration/duration;
 			double dutilWait =marginalUtilityOfWaiting;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 			udur.put(act,Math.max(0, Math.max(utilPerf, utilWait)));			
-//			udur.put(act,Math.max(0, Math.max(dutilPerf, dutilWait)));
+			dudur.put(act,Math.max(0, Math.max(dutilPerf, dutilWait)));
 		} else {
 			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
 			udur.put(act,2*marginalUtilityOfLateArrival*Math.abs(duration));
-//			udur.put(act,2*marginalUtilityOfLateArrival);
+			dudur.put(act,2*marginalUtilityOfLateArrival);
 		}
-
+				
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
 		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
 			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 			ued.put(act,marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd));
-//			ued.put(act,marginalUtilityOfEarlyDeparture);
 		}else ued.put(act,0.);
-
+		dued.put(act,marginalUtilityOfEarlyDeparture);
+		
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
 			tmpScore += marginalUtilityOfWaiting * (departureTime - activityEnd);
 			uld.put(act,marginalUtilityOfWaiting * (departureTime - activityEnd));
-//			uld.put(act,marginalUtilityOfWaiting);
 		}else uld.put(act, 0.);
-
+		duld.put(act,marginalUtilityOfWaiting);
+		
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
 		if (minimalDuration >= 0 && duration < minimalDuration) {
 			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 			us.put(act,marginalUtilityOfEarlyDeparture * (minimalDuration - duration));
-//			us.put(act,marginalUtilityOfEarlyDeparture);
-		}else us.put(act, 0.);
+		}else {
+			us.put(act, 0.);
+		}
+		dus.put(act,marginalUtilityOfEarlyDeparture);
 		return tmpScore;
 	}
 
@@ -419,6 +484,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
+		double dtmpScore=0.;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
 		
@@ -437,7 +503,6 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			 * distance in the leg is the actual distance driven by the agent.
 			 */
 		}
-
 		if (BasicLeg.Mode.car.equals(leg.getMode())) {
 			tmpScore=travelTime * marginalUtilityOfTraveling - marginalUtilityOfDistance * dist; 
 		} else if (BasicLeg.Mode.pt.equals(leg.getMode())) {
@@ -448,6 +513,8 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 			// use the same values as for "car"
 			tmpScore= travelTime * marginalUtilityOfTraveling - marginalUtilityOfDistance * dist;
 		}
+		dulegd.put(leg,dtmpScore);
+		ulegd.put(leg,tmpScore);
 		return tmpScore;
 	}
 
@@ -523,7 +590,7 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 		double temp=calcLegScore(this.lastTime, time, leg);
 		this.score += temp;
 		double dtemp=marginalUtilityOfTraveling+marginalUtilityOfDistance;
-//		ulegt.put(leg,dtemp);
+		dulegt.put(leg,dtemp);
 		ulegt.put(leg, temp);
 //		System.out.print("\n|1|"+plan.getPerson().getId()+"\t"+uleg+"\t|2|");
 		this.index++;

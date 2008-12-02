@@ -20,6 +20,9 @@
 
 package playground.jhackney.scoring;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -56,20 +59,20 @@ import org.matsim.scoring.ScoringFunctionFactory;
  *
  * @author mrieser
  */
-public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
+public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
 	private Population population = null;
-	private playground.jhackney.scoring.SocScoringFactoryEvent sfFactory = null;
-	private final TreeMap<String, playground.jhackney.scoring.SocScoringFunctionEvent> agentScorers = new TreeMap<String, playground.jhackney.scoring.SocScoringFunctionEvent>();
+	private playground.jhackney.scoring.EventSocScoringFactory sfFactory = null;
+	private final TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction> agentScorers = new TreeMap<String, playground.jhackney.scoring.EventSocScoringFunction>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
 
-	public EventsToScore(final Population population, final playground.jhackney.scoring.SocScoringFactoryEvent factory) {
+	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
 	}
 
-	public EventsToScore(final Population population, final playground.jhackney.scoring.SocScoringFactoryEvent factory, final double learningRate) {
+	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;
@@ -77,22 +80,22 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		playground.jhackney.scoring.SocScoringFunctionEvent sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.startLeg(event.time, event.leg);
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		playground.jhackney.scoring.SocScoringFunctionEvent sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.endLeg(event.time);
 	}
 
 	public void handleEvent(final AgentStuckEvent event) {
-		playground.jhackney.scoring.SocScoringFunctionEvent sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.agentStuck(event.time);
 	}
 
 	public void handleEvent(final AgentMoneyEvent event) {
-		playground.jhackney.scoring.SocScoringFunctionEvent sf = getScoringFunctionForAgent(event.agentId);
+		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.agentId);
 		sf.addMoney(event.amount);
 	}
 
@@ -102,9 +105,9 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 */
 	public void finish() {
 
-		for (Map.Entry<String, playground.jhackney.scoring.SocScoringFunctionEvent> entry : this.agentScorers.entrySet()) {
+		for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 			String agentId = entry.getKey();
-			playground.jhackney.scoring.SocScoringFunctionEvent sf = entry.getValue();
+			playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
 			sf.finish();
 
 			double score = sf.getScore();
@@ -119,31 +122,63 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 			this.scoreSum += score;
 			this.scoreCount++;
 		}
-		
-		System.out.println("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
-//		for (Map.Entry<String, playground.jhackney.scoring.SocScoringFunctionEvent> entry : this.agentScorers.entrySet()) {
-//			String agentId = entry.getKey();
-//			playground.jhackney.scoring.SocScoringFunctionEvent sf = entry.getValue();
-//			Plan plan = this.population.getPerson(agentId).getSelectedPlan();
-//			ActLegIterator actLegIter = plan.getIterator();
-//			Act act = (Act) actLegIter.nextAct();
-//
-//
-//			int actNumber=0;
-//			int legNumber=-1;
-//
-//			while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
-//
-//				Leg leg = (Leg) actLegIter.nextLeg();
-//				legNumber++;
-//
-//				System.out.print(agentId+"\t"+sf.getUlegt(leg));
-//
-//				act = (Act) actLegIter.nextAct();
-//				actNumber++;
-//				System.out.println("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
-//			}
-//		}
+
+		boolean report=true;
+		if(report){
+			//open marginal utility outfile
+			//open utility outfile
+			String ufname=Gbl.getConfig().socnetmodule().getInDirName()+"_UtilityComponents.txt";
+			BufferedWriter uout = null;
+
+			String mufname=Gbl.getConfig().socnetmodule().getInDirName()+"_MarginalUtilityComponents.txt";
+			BufferedWriter muout = null;
+			try {
+				uout = new BufferedWriter(new FileWriter(ufname));
+				muout = new BufferedWriter(new FileWriter(mufname));
+				uout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
+				muout.write("agentId\tUlegt\tactNumber\tactType\tUdur\tUed\tUla\tUld\tUs\tUw\tUsoc");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
+				String agentId = entry.getKey();
+				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
+				Plan plan = this.population.getPerson(agentId).getSelectedPlan();
+				ActLegIterator actLegIter = plan.getIterator();
+				Act act = (Act) actLegIter.nextAct();
+
+
+				int actNumber=0;
+				int legNumber=-1;
+
+				while(actLegIter.hasNextLeg()){//alternates Act-Leg-Act-Leg and ends with Act
+
+					Leg leg = (Leg) actLegIter.nextLeg();
+					legNumber++;
+
+					try {
+						muout.write(agentId+"\t"+sf.getDulegt(leg));
+						uout.write(agentId+"\t"+sf.getDulegt(leg));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					act = (Act) actLegIter.nextAct();
+					actNumber++;
+
+					try {
+						muout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));
+						uout.write("\t"+actNumber+"\t\""+act.getType()+"\"\t"+sf.getUdur(act)+"\t"+sf.getUed(act)+"\t"+sf.getUla(act)+"\t"+sf.getUld(act)+"\t"+sf.getUs(act)+"\t"+sf.getUw(act)+"\t"+sf.getUsoc(act));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -186,8 +221,8 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	 * @param agentId The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
-	private playground.jhackney.scoring.SocScoringFunctionEvent getScoringFunctionForAgent(final String agentId) {
-		playground.jhackney.scoring.SocScoringFunctionEvent sf = this.agentScorers.get(agentId);
+	private playground.jhackney.scoring.EventSocScoringFunction getScoringFunctionForAgent(final String agentId) {
+		playground.jhackney.scoring.EventSocScoringFunction sf = this.agentScorers.get(agentId);
 		if (sf == null) {
 			sf = this.sfFactory.getNewScoringFunction(this.population.getPerson(agentId).getSelectedPlan());
 			this.agentScorers.put(agentId, sf);

@@ -101,7 +101,7 @@ public class AnalyzeScores {
 		MakeTimeWindowsFromEvents teo=null;
 		Hashtable<Act,ArrayList<Double>> actStats=null;
 		Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
-		playground.jhackney.scoring.EventsToScore scoring =null;
+		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 		
 		//Register scoring function and other events handlers
 //		playground.jhackney.scoring.CharyparNagelScoringFunctionFactory scoringFf=new playground.jhackney.scoring.CharyparNagelScoringFunctionFactory();
@@ -116,8 +116,8 @@ public class AnalyzeScores {
 		teo.calculate(epp);
 		twm=teo.getTimeWindowMap();
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
-		playground.jhackney.scoring.SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure",actStats);
-		scoring = new playground.jhackney.scoring.EventsToScore(plans, factory);
+		playground.jhackney.scoring.EventSocScoringFactory factory = new playground.jhackney.scoring.EventSocScoringFactory("leisure",actStats);
+		scoring = new playground.jhackney.scoring.EventsToScoreAndReport(plans, factory);
 		System.out.println("  Instantiating social network EventsToScore for scoring the plans");
 //		scoring = new EventsToScore(plans, factory);
 
