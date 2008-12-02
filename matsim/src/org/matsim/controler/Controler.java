@@ -77,8 +77,10 @@ import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -131,10 +133,8 @@ public class Controler {
 	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
 	 * always running in a predefined order to ensure correctness.
 	 * The second list manages the other listeners, which can be added by calling addControlerListener(...).
-	 * A normal ControlerListener must not [["must not" = "darf nicht".  Ist das gemeint?  Dann vielleicht besser 
-	 * "is not allowed to".  Deutschsprachler machen das so oft falsch, dass es nie klar ist.
-     * Kai]] depend on the execution of other ControlerListeners.
-	 * */
+	 * A normal ControlerListener is not allowed to depend on the execution of other ControlerListeners.
+	 */
 	private final EventListenerList coreListenerList = new EventListenerList();
 	private final EventListenerList listenerList = new EventListenerList();
 
@@ -147,6 +147,7 @@ public class Controler {
 	protected NetworkLayer network = null;
 	protected Population population = null;
 	private Counts counts = null;
+	private final NetworkFactory networkFactory = new NetworkFactory();
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
@@ -410,6 +411,11 @@ public class Controler {
 		configwriter.write();
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
+		
+		if (this.config.network().isTimeVariantNetwork()) {
+			log.info("setting TimeVariantLinkImpl as link prototype in NetworkFactory.");
+			this.networkFactory.setLinkPrototype(TimeVariantLinkImpl.class);
+		}
 	}
 
 	private final void setupOutputDir() {
@@ -460,7 +466,7 @@ public class Controler {
 	 */
 	protected void loadData() {
 		if (this.network == null) {
-			this.scenarioData = new ScenarioData(this.config);
+			this.scenarioData = new ScenarioData(this.config, this.networkFactory);
 			this.network = loadNetwork();
 			this.population = loadPopulation();
 		}
@@ -1015,6 +1021,10 @@ public class Controler {
 	 */
 	public final Counts getCounts() {
 		return this.counts;
+	}
+
+	protected NetworkFactory getNetworkFactory() {
+		return this.networkFactory;
 	}
 
 	public final CalcLinkStats getLinkStats() {
