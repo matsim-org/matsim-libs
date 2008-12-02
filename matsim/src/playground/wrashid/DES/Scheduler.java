@@ -1,7 +1,5 @@
 package playground.wrashid.DES;
 
-import java.util.HashMap;
-
 import org.matsim.gbl.Gbl;
 
 public class Scheduler {
@@ -37,7 +35,7 @@ public class Scheduler {
 	}
 
 	private void printLog() {
-		
+
 		// print output each hour
 		if (simTime / hourlyLogTime > 1) {
 			hourlyLogTime = simTime + 3600;

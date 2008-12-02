@@ -1,10 +1,5 @@
 package playground.wrashid.DES;
 
-import java.util.ArrayList;
-
-import org.matsim.population.Act;
-import org.matsim.population.Plan;
-
 public class EndRoadMessage extends EventMessage {
 
 	@Override
@@ -16,9 +11,6 @@ public class EndRoadMessage extends EventMessage {
 			// road)
 
 			vehicle.initiateEndingLegMode();
-
-			Plan plan = vehicle.getOwnerPerson().getSelectedPlan();
-			
 			vehicle.moveToFirstLinkInNextLeg();
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
