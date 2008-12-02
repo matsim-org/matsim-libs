@@ -26,7 +26,7 @@ import org.matsim.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
-public class PlanomatControlerTest extends MatsimTestCase {
+public class PlanomatTest extends MatsimTestCase {
 
 	private Config config;
 	
