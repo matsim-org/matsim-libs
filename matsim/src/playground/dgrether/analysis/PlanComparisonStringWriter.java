@@ -54,30 +54,41 @@ public class PlanComparisonStringWriter implements PlanComparisonWriter {
 		_buffer.append("Score second plan");
 		_buffer.append("\t");
 		_buffer.append("Improvement");
+		_buffer.append("\t");
+		_buffer.append("Delta") ;
 		_buffer.append(linesep);
 
 		for (Id i : pc.getPersonIds()) {
 			score1 = pc.getFirstScore(i);
 			score2 = pc.getSecondScore(i);
-			coordinates = pc.getHomeLocation(i).getCoord();
-			_buffer.append(i.toString());
-			_buffer.append("\t");
-			_buffer.append(coordinates.getX());
-			_buffer.append("\t");
-			_buffer.append(coordinates.getY());
-			_buffer.append("\t");
-			_buffer.append(score1);
-			_buffer.append("\t");
-			_buffer.append(score2);
-			_buffer.append("\t");
-			if (score1 < score2)
-				_buffer.append("1");
-			else if (score1 == score2)
-				_buffer.append("0");
-			else
-				_buffer.append("-1");
-			_buffer.append(" ");
-			_buffer.append(linesep);
+			if ( !Double.isNaN(score1) && !Double.isNaN(score2) ) {
+				coordinates = pc.getHomeLocation(i).getCoord();
+				_buffer.append(i.toString());
+				_buffer.append("\t");
+				_buffer.append(coordinates.getX());
+				_buffer.append("\t");
+				_buffer.append(coordinates.getY());
+				_buffer.append("\t");
+				_buffer.append(score1);
+				_buffer.append("\t");
+				_buffer.append(score2);
+				_buffer.append("\t");
+				if (score1 < score2)
+					_buffer.append("1");
+				else if (score1 == score2)
+					_buffer.append("0");
+				else if ( Double.isNaN(score1) || Double.isNaN(score2) ) // NaN return false to all comparisons
+					_buffer.append("0") ;
+				else
+					_buffer.append("-1");
+				_buffer.append("\t") ;
+				if ( Double.isNaN(score1) || Double.isNaN(score2) ) 
+					_buffer.append("0") ;
+				else
+					_buffer.append(score2-score1) ;
+				_buffer.append(" ");
+				_buffer.append(linesep);
+			}
 		}
 
 	}
