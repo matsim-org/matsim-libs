@@ -70,6 +70,36 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
+/**
+ * - man braucht eine shape file mit einem Raster  
+ *   DistanceAnalysis.createPolygons() kreiert eins
+ *   
+ * - dann werden alle Personen mit den Koordinaten der home location in einen 
+ *   QuadTree gepackt. (DistanceAnalysis.handlePlans())
+ *   
+ * - nun kann man über die Polygons des Rasters iterieren 
+ *   (DistanceAnalysis.iteratePolygons()). Die Personen werden in zwei Schritten 
+ *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer über alle 
+ *   Personen zu iterieren):
+ *   
+ * - Aus dem QuadTree holt man sich zunächst alle Personen im Umkreis von  min 
+ *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons - 
+ *   Zeile 158)
+ *   
+ * - Dannach werden alle die Personen, deren home location sich ausserhalb des 
+ *   Polygons befindet mit der Methode DistanceAnalysis.rmAliens(...,...) 
+ *   entfernt.
+ *   
+ * - zum Schluss wird basierend auf der Analyse dieser Personen noch ein neues 
+ *   Feature mit den entsprechenden Attributen angelegt 
+ *   (DistanceAnalysis.iteratePolygons - Zeile 174)
+ *   
+ * - am Ende werden noch alle Features in einen neuen Shapefile geschrieben 
+ *   (DistanceAnalysis.writePolygons())
+ *
+ * @author laemmel
+ *
+ */
 public class DistanceAnalysis {
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
 	private final FeatureSource featureSourcePolygon;
