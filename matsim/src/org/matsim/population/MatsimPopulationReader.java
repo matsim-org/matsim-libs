@@ -26,6 +26,8 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -44,17 +46,29 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V4 = "plans_v4.dtd";
 
 	private final Population plans;
+	private final NetworkLayer network;
 	private MatsimXmlParser delegate = null;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
 
 	/**
 	 * Creates a new reader for MATSim plans (population) files.
+	 * Uses the network available in Gbl.getWorld().
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
 	 */
 	public MatsimPopulationReader(final Population plans) {
+		this(plans, (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE));
+	}
+
+	/**
+	 * Creates a new reader for MATSim plans (population) files.
+	 *
+	 * @param plans The data structure where to store the persons with their plans.
+	 */
+	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
+		this.network = network;
 	}
 
 	@Override
@@ -89,13 +103,13 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 		if (PLANS_V4.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV4(this.plans);
+			this.delegate = new PopulationReaderMatsimV4(this.plans, this.network);
 			log.info("using plans_v4-reader.");
 		} else if (PLANS_V1.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV1(this.plans);
+			this.delegate = new PopulationReaderMatsimV1(this.plans, this.network);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV0(this.plans);
+			this.delegate = new PopulationReaderMatsimV0(this.plans, this.network);
 			log.info("using plans_v0-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

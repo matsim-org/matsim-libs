@@ -33,6 +33,7 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -65,6 +66,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String ROUTE = "route";
 
 	private final BasicPopulation plans;
+	private final NetworkLayer network;
+
 	private Person currperson = null;
 	private Desires currdesires = null;
 	private Knowledge currknowledge = null;
@@ -84,8 +87,9 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private int warnPlanTypeCount = 0;
 
-	public PopulationReaderMatsimV4(final BasicPopulation pop) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network) {
 		this.plans = pop;
+		this.network = network;
 	}
 
 	@Override
@@ -326,7 +330,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute();
+		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
 		}

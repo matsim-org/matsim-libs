@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -43,18 +44,19 @@ import org.xml.sax.SAXException;
  */
 public class PopulationReaderMatsimV0 extends MatsimXmlParser implements PopulationReader {
 
-	protected final static String PLANS = "plans";
-	protected final static String DEMAND = "demand";
-	protected final static String SEGMENT = "segment";
-	protected final static String MODEL = "model";
-	protected final static String PARAM = "param";
-	protected final static String PERSON = "person";
-	protected final static String PLAN = "plan";
-	protected final static String ACT = "act";
-	protected final static String LEG = "leg";
-	protected final static String ROUTE = "route";
+	private final static String PLANS = "plans";
+	private final static String DEMAND = "demand";
+	private final static String SEGMENT = "segment";
+	private final static String MODEL = "model";
+	private final static String PARAM = "param";
+	private final static String PERSON = "person";
+	private final static String PLAN = "plan";
+	private final static String ACT = "act";
+	private final static String LEG = "leg";
+	private final static String ROUTE = "route";
 
 	private final Population plans;
+	private final NetworkLayer network;
 	private Person currperson = null;
 	private Plan currplan = null;
 	private Leg currleg = null;
@@ -65,8 +67,9 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
-	public PopulationReaderMatsimV0(final Population plans) {
+	public PopulationReaderMatsimV0(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
+		this.network = network;
 	}
 
 	@Override
@@ -167,7 +170,8 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute() {
-		this.currroute = this.currleg.createRoute();
+		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.currleg.setRoute(this.currroute);
 		this.currroute.setStartLink(this.prevAct.getLink());
 	}
 

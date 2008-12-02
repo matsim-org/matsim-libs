@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -44,18 +45,14 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		PopulationReader {
 
 	private final static String PLANS = "plans";
-
 	private final static String PERSON = "person";
-
 	private final static String PLAN = "plan";
-
 	private final static String ACT = "act";
-
 	private final static String LEG = "leg";
-
 	private final static String ROUTE = "route";
 
 	private final Population plans;
+	private final NetworkLayer network;
 
 	private Person currperson = null;
 
@@ -68,8 +65,9 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private Act prevAct = null;
 	private CarRoute prevRoute = null;
 
-	public PopulationReaderMatsimV1(final Population plans) {
+	public PopulationReaderMatsimV1(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
+		this.network = network;
 	}
 
 	@Override
@@ -192,7 +190,8 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = this.currleg.createRoute();
+		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDist(Double.parseDouble(atts.getValue("dist")));
 		}
