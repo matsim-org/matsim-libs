@@ -131,7 +131,9 @@ public class Controler {
 	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
 	 * always running in a predefined order to ensure correctness.
 	 * The second list manages the other listeners, which can be added by calling addControlerListener(...).
-	 * A normal ControlerListener must not depend on the execution of other ControlerListeners.
+	 * A normal ControlerListener must not [["must not" = "darf nicht".  Ist das gemeint?  Dann vielleicht besser 
+	 * "is not allowed to".  Deutschsprachler machen das so oft falsch, dass es nie klar ist.
+     * Kai]] depend on the execution of other ControlerListeners.
 	 * */
 	private final EventListenerList coreListenerList = new EventListenerList();
 	private final EventListenerList listenerList = new EventListenerList();
@@ -285,9 +287,12 @@ public class Controler {
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
+		String divider = "###################################################" ;
+		String marker = "### " ;
 
 		for (iteration = firstIteration; (iteration <= lastIteration) && (this.state == ControlerState.Running); iteration++) {
-			log.info("ITERATION " + iteration + " BEGINS");
+			log.info(divider);
+			log.info(marker + "ITERATION " + iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(Controler.iteration);
 			this.stopwatch.beginOperation("iteration");
 			makeIterationPath(iteration);
@@ -309,6 +314,8 @@ public class Controler {
 			fireControlerIterationEndsEvent(iteration);
 			this.stopwatch.endOperation("iteration");
 			this.stopwatch.write(getOutputFilename("stopwatch.txt"));
+			log.info(marker + "ITERATION " + iteration + " ENDS") ;
+			log.info(divider) ;
 		}
 
 	}
@@ -595,6 +602,7 @@ public class Controler {
 	private void resetRandomNumbers() {
 		MatsimRandom.reset(this.config.global().getRandomSeed() + iteration);
 		MatsimRandom.random.nextDouble(); // draw one because of strange "not-randomness" is the first draw...
+		// Fixme [kn] this should really be ten thousand draws instead of just one
 	}
 
 	/* ===================================================================
