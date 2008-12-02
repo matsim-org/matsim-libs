@@ -7,6 +7,7 @@ import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
 public class TestDESStarter_LocalCVS_Test6 extends MatsimTestCase {
 	// enable assertion flag allowed
+	// contains 67K plans
 	public void test_LocalCVS_Test6_TestHandlerDetailedEventChecker() {
 		Gbl.reset();
 
