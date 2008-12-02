@@ -26,9 +26,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.opengis.kml._2.AbstractFeatureType;
-import net.opengis.kml._2.PlacemarkType;
-
 import org.matsim.basic.v01.BasicPlan;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActLegIterator;
@@ -41,23 +38,26 @@ import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentMoneyEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.scoring.ScoringFunctionFactory;
 
 /**
- * Calculates continuously the score of the selected plans of a given population
- * based on events.<br>
+ * Continuously calculates the score of the selected plans of a given population
+ * based on events, tracks the score components, and if "report" is set,
+ * writes two tab-delimited output files to the output directory containing (1)
+ * the marginal utility components and (2) the utility components of each activity
+ * and leg. It is recommended to analyze only the final iteration this way,
+ * due to the large output file.<br>
  * Departure- and Arrival-Events *must* be provided to calculate the score,
  * AgentStuck-Events are used if available to add a penalty to the score.
  * The final score are written to the selected plans of each person in the
  * population.
  *
  * @author mrieser
+ * @author jhackney
  */
 public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
@@ -67,6 +67,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
+	boolean report=true;
 
 	public EventsToScoreAndReport(final Population population, final playground.jhackney.scoring.EventSocScoringFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
@@ -123,7 +124,6 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			this.scoreCount++;
 		}
 
-		boolean report=true;
 		if(report){
 			//open marginal utility outfile
 			//open utility outfile
