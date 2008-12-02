@@ -50,10 +50,10 @@ public class CompareTimeWindows {
 			Facility myFacility=(Facility) fit.next();
 			ArrayList<TimeWindow> visits=timeWindowMap.get(myFacility);
 			if(!timeWindowMap.keySet().contains(myFacility)){
-				log.info(" activityMap does not contain myActivity");
+				log.error(" activityMap does not contain myActivity");
 			}
 			if(!(visits.size()>0)){
-				log.info(" number of visitors not >0");
+				log.error(" number of visitors not >0");
 			}
 			// Go through the visits
 			for(int i=0; i<visits.size();i++){
