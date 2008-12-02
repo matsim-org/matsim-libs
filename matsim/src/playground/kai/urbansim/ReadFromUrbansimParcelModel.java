@@ -66,9 +66,12 @@ public class ReadFromUrbansimParcelModel {
 			log.error("My example of parcels.tab contains ^M characters, which screws up the java readline().") ;
 			log.error("The following attempts to run a hack to solve this problem.  But it has many hard-coded pathnames in it,");
 			log.error("and it probably only works on unix.") ;
-			ExeRunner.run("sh "+PATH_TO_OPUS_MATSIM+"bin/remove_weird_characters.sh", PATH_TO_OPUS_MATSIM+"tmp/remove_weird_characters.log", 3600) ;
+			ExeRunner.run("sh -e "+PATH_TO_OPUS_MATSIM+"bin/remove_weird_characters.sh", PATH_TO_OPUS_MATSIM+"tmp/remove_weird_characters.log", 3600) ;
 
-			BufferedReader reader = IOUtils.getBufferedReader(PATH_TO_OPUS_MATSIM+parcelfile ) ;
+			String filename = PATH_TO_OPUS_MATSIM+parcelfile ;
+			log.info( "Starting to read urbansim parcels from " + filename ) ;
+			
+			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
 
 			String line = reader.readLine() ;
 			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line ) ;
@@ -89,7 +92,9 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info( "DONE with reading urbansim parcels" ) ;
 	}
+
 	class PseudoZone {
 		double sumx = 0. ;
 		double sumy = 0. ;
@@ -154,7 +159,9 @@ public class ReadFromUrbansimParcelModel {
 //		MatsimRandom.random.setSeed(4711) ; // fix seed so that the persons are always the same (not really needed any more)
 
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader(PATH_TO_OPUS_MATSIM+"tmp/persons.tab");
+			String filename = PATH_TO_OPUS_MATSIM+"tmp/persons.tab" ;
+			log.info( "Starting to read persons from " + filename ) ;
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
 			String line = reader.readLine();
 			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line ) ;
@@ -185,12 +192,13 @@ public class ReadFromUrbansimParcelModel {
 				Person oldPerson = null ;
 				if ( oldPop!=null && (oldPerson=oldPop.getPerson(personId))==null ) {
 					if ( notFoundCnt == 0 ) {
-						notFoundCnt++ ; log.info("person from urbansim NOT found in pre-exising pop file." + Gbl.ONLYONCE ) ;
+						notFoundCnt++ ; log.info("Person from urbansim NOT found in pre-exising pop file." 
+								+ " This is normal if you are running matsim on a sample. " + Gbl.ONLYONCE ) ;
 					}
 					continue ;
 				}
-				if ( oldPop==null && foundCnt == 0 ) {
-					foundCnt++ ; log.info("found person from urbansim in pre-existing pop file." + Gbl.ONLYONCE ) ;
+				if ( oldPop!=null && foundCnt == 0 ) {
+					foundCnt++ ; log.info("Found person from urbansim in pre-existing pop file." + Gbl.ONLYONCE ) ;
 				}
 
 				// continue constructing the new person.  If there is a pre-existing pop, we need it to look for changes
@@ -204,15 +212,16 @@ public class ReadFromUrbansimParcelModel {
 				LocationId homeParcelId = (LocationId) locationFromBuilding.get( buildingId ) ;
 				if ( homeParcelId==null ) {
 					if ( homeParcelIdNullCnt < 1 ) {
-						homeParcelIdNullCnt++ ; log.warn( "homeParcelId==null; personId: " + personId.toString() + " hhId: " + hhId.toString() 
+						homeParcelIdNullCnt++ ; 
+						log.warn( "homeParcelId==null; personId: " + personId.toString() + " hhId: " + hhId.toString() 
 								+ " buildingId: " + buildingId.toString() + ' ' + this ) ; log.info(Gbl.ONLYONCE) ;
 					}
 					continue ;
 				}
 				Location homeLocation = facilities.getLocation( homeParcelId ) ;
 				if ( homeLocation==null ) {
-					log.warn( "homeLocation==null; personId: " + personId.toString() + " hhId: " + hhId.toString() 
-							+ " buildingId: " + buildingId.toString() + ' ' + this ) ;
+					log.warn( "homeLocation==null; personId: " + personId + " hhId: " + hhId 
+							+ " buildingId: " + buildingId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
 				Coord homeCoord = homeLocation.getCenter() ;
@@ -298,6 +307,7 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info( "Done with reading persons." ) ;
 	}
 	
 	private boolean actHasChanged ( Act oldAct, Act newAct, NetworkLayer network ) {

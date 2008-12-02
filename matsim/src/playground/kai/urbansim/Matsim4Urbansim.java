@@ -67,10 +67,28 @@ public class Matsim4Urbansim {
 		log.info("Starting the matsim run from the urbansim interface.  This looks a little rough initially since 'normal' matsim" ) ;
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
 		
+		try { 
+			Integer.parseInt( args[1] ) ;
+		} catch ( Exception ee ) {
+			log.fatal("Something wrong with second argument; should be a year; is: " + args[1] + " Aborting ..." ) ;
+		}
+		
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
 		ScenarioData scenarioData = new ScenarioData(config) ;
-
+		
+		log.warn("TODO: The following is a hack so that matsim calls at different urbansim years go into different iteration directories.");
+		log.warn("      This will almost certainly mess up the `ModuleDisableAfterIteration' settings, so best do not use them.") ;
+		log.warn("      (They don't make sense in that context anyways.  If you want to do detailed policy analysis, run matsim separate from urbansim.)") ;
+		// (Still, would be better to do something like "ITERS" -> "ITERS.year".)
+		int frstIt = config.controler().getFirstIteration();
+		int lastIt = config.controler().getLastIteration() ;
+		
+		int year = Integer.parseInt( args[1] ) ;
+		
+		config.controler().setFirstIteration( year*1000 + frstIt ) ;  
+		config.controler().setLastIteration( year*1000 + lastIt ) ;
+		
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkLayer network = scenarioData.getNetwork() ;

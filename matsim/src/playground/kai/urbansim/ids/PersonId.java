@@ -9,9 +9,12 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 
 /**
+ * See comment under IdFactory
+ * 
  * @author nagel
  *
  */
+@Deprecated
 public class PersonId extends IdImpl {
 	private static final Logger log = Logger.getLogger(PersonId.class);
 

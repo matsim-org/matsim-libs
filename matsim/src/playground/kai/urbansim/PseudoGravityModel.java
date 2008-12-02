@@ -20,9 +20,26 @@ import org.matsim.world.Location;
 import playground.kai.urbansim.ids.LocationId;
 
 /**
+ * This is meant to generate hwh trips if only home locations and work locations are given, but not their relation (2nd step of
+ * four step process, also called destination choice or trip distribution).  It should work, but the only time I tried to use it
+ * was with the urbansim eugene data set, and I am reasonably sure that there were coordinate system issues (the coordinate system 
+ * of the network had nothing to do with the coordinate system of the urbansim gridcells ... then it can't possibly work).
+ * 
+ * So it is (ab)using the "Deprecated" marker for "not fully developed".
+ * 
+ * The approach here is completely independent from any spatial system given in the original data set: It only uses point coordinates
+ * for home locations and work locations.   These are aggregated into a grid that is hardcoded below as 33x33 (this could be made
+ * configurable without problems, but runtimes go up quite a lot if this is made much bigger).
+ * 
+ * There is also, as of now, absolutely no distance-dependent impedance, so jobs are selected randomly in the area.  This is clearly 
+ * not very realistic, but in order to get small-scale scenarios off the ground, it should actually be enough.  It is also in principle
+ * easy to fix, although it would mean that the coordinate system that is used conveys some meaning of "distance" or "trave time",
+ * which is not necessary with the current approach.  
+ * 
  * @author nagel
  *
  */
+@Deprecated
 public class PseudoGravityModel {
 	private static final Logger log = Logger.getLogger(PseudoGravityModel.class);
 

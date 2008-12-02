@@ -3,6 +3,14 @@ package playground.kai.urbansim;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
+/**
+ * Helper class for PseudoGravityModel; has never been really tested since the PseudoGravityModel has never been really tested;
+ * remains here since PseudoGravityModel remains in the package for the time being.
+ * 
+ * @author nagel
+ *
+ */
+@Deprecated
 public class PseudoCell {
 	
 	double xSum = 0. ; double xCnt = 0 ;

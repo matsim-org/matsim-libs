@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
@@ -21,7 +20,6 @@ import org.matsim.population.Population;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.utils.misc.ExeRunner;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
@@ -38,9 +36,14 @@ import playground.kai.urbansim.ids.LocationIdFactory;
  * Unfortunately, it does not work with the eugene example.  This may, however, be a problem with the difference in coordinate
  * systems between the (visum->emme derived) network file and the urbansim files rather than with the approach or the code.
  * 
+ * It is left here because it _should_ work. :--)
+ * 
+ * @date dec 2008
+ * 
  * @author nagel
  *
  */
+@Deprecated
 public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	private static final Logger log = Logger.getLogger(ReadFromUrbansimCellModel.class);
 
@@ -81,6 +84,8 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	}
 
 	public void readPersons( Population population, Facilities facilities, double fraction) {
+		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
+		System.exit(-1) ;
 		Map<Id,Id> gridcellFromJob = new HashMap<Id,Id>() ;
 		Utils.readKV( gridcellFromJob, "job_id:i4", new JobIdFactory(), "grid_id:i4", new LocationIdFactory(), 
 				"../opus/opus_matsim/tmp/jobs.tab" ) ;
@@ -91,6 +96,8 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 	public long personCnt = 0 ;
 	void readPersonsFromHouseholds ( Population population, Facilities facilities, double fraction ) {
+		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
+		System.exit(-1) ;
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/households.tab");
 
