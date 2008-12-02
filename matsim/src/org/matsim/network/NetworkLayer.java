@@ -107,6 +107,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	}
 
 	/** Usage of this method is discouraged, as the method will soon be deprecated. */
+	@Deprecated
 	public final Link createLink(final String id, final String fromTo, final String toNode, final String length,
 	                             final String freespeed, final String capacity, final String permlanes,
 	                             final String origid, String type) {
@@ -271,6 +272,14 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 		Node nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
+		if ( nearestNode == null ) {
+			log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + this ) ;
+			return null ;
+		}
+		
+		if ( nearestNode.getIncidentLinks().isEmpty() ) {
+			log.warn(this + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
+		}
 
 		// now find nearest link from the nearest node
 		// [balmermi] it checks now ALL incident links, not only the outgoing ones.
@@ -284,6 +293,9 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 				shortestDistance = dist;
 				nearestLink = link;
 			}
+		}
+		if ( nearestLink == null ) {
+			log.warn(this + "[nearestLink not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
 		}
 		return nearestLink;
 	}
@@ -402,6 +414,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @return the closest node found, null if none
 	 */
 	public Node getNearestNode(final Coord coord) {
+		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY());
 	}
 
