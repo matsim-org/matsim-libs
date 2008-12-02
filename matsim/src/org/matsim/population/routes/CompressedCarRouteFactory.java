@@ -23,10 +23,22 @@ package org.matsim.population.routes;
 import java.util.Map;
 
 import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
 
 public class CompressedCarRouteFactory implements RouteFactory {
 
 	private final Map<Link, Link> subsequentLinks;
+
+	/**
+	 * Uses {@link SubsequentLinksAnalyzer} to get the map of subsequent links,
+	 * used to compress the route information stored.
+	 *
+	 * @param network
+	 */
+	public CompressedCarRouteFactory(final NetworkLayer network) {
+		this(new SubsequentLinksAnalyzer(network).getSubsequentLinks());
+	}
 
 	public CompressedCarRouteFactory(final Map<Link, Link> subsequentLinks) {
 		this.subsequentLinks = subsequentLinks;
