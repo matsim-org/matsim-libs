@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration;
+package org.matsim.integration.population;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,15 +27,10 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Integration Tests for MATSim");
-
-		suite.addTestSuite(EquilTwoAgentsTest.class);
-		suite.addTest(org.matsim.integration.events.AllTests.suite());
-		suite.addTest(org.matsim.integration.population.AllTests.suite());
-		suite.addTest(org.matsim.integration.withinday.AllTests.suite());
-		suite.addTest(org.matsim.integration.replanning.AllTests.suite());
-		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
-
+		TestSuite suite = new TestSuite("Integration Tests for org.matsim.population");
+		//$JUnit-BEGIN$
+		suite.addTest(org.matsim.integration.population.routes.AllTests.suite());
+		//$JUnit-END$
 		return suite;
 	}
 
