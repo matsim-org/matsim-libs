@@ -25,6 +25,7 @@ import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
@@ -46,10 +47,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		super.setUp();
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "1", "0", null);
-		this.link = network.createLink("1", "1", "2", "1", "1",
-				"1", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "1", "0", null);
+		this.link = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		super.loadConfig(null);
 		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
@@ -108,11 +108,11 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testBuffer() {
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "1", "0", null);
-		network.createNode("3", "2", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "1", "1", "1", "1", null, null);
-		Link link2 = network.createLink("2", "2", "3", "1", "1", "1", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "1", "0", null);
+		Node node3 = network.createNode("3", "2", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		Gbl.createWorld().setNetworkLayer(network);
 		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
@@ -125,7 +125,8 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAct("h", link1);
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			CarRoute route = leg.createRoute();
+			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			leg.setRoute(route);
 			route.setNodes("2");
 			leg.setRoute(route);
 			plan.createAct("w", link2);

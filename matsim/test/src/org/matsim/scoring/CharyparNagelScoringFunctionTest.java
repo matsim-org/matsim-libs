@@ -20,6 +20,7 @@
 
 package org.matsim.scoring;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
@@ -28,6 +29,7 @@ import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.ActUtilityParameters;
 import org.matsim.population.Leg;
@@ -77,17 +79,17 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		scoring.addActivityParams(params);
 
 		this.network = new NetworkLayer();
-		this.network.createNode("1",    "0.0", "0.0", null);
-		this.network.createNode("2",   "500.0", "0.0", null);
-		this.network.createNode("3",  "5500.0", "0.0", null);
-		this.network.createNode("4",  "6000.0", "0.0", null);
-		this.network.createNode("5", "11000.0", "0.0", null);
-		this.network.createNode("6", "11500.0", "0.0", null);
-		Link link1 = this.network.createLink("1", "1", "2", "500", "25", "3600", "1", null, null);
-		this.network.createLink("2", "2", "3", "5000", "50", "3600", "1", null, null);
-		Link link3 = this.network.createLink("3", "3", "4", "500", "25", "3600", "1", null, null);
-		this.network.createLink("4", "4", "5", "5000", "50", "3600", "1", null, null);
-		Link link5 = this.network.createLink("5", "5", "6", "500", "25", "3600", "1", null, null);
+		Node node1 = this.network.createNode("1",    "0.0", "0.0", null);
+		Node node2 = this.network.createNode("2",   "500.0", "0.0", null);
+		Node node3 = this.network.createNode("3",  "5500.0", "0.0", null);
+		Node node4 = this.network.createNode("4",  "6000.0", "0.0", null);
+		Node node5 = this.network.createNode("5", "11000.0", "0.0", null);
+		Node node6 = this.network.createNode("6", "11500.0", "0.0", null);
+		Link link1 = this.network.createLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
+		this.network.createLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
+		Link link3 = this.network.createLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
+		this.network.createLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
+		Link link5 = this.network.createLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
 		Gbl.createWorld().setNetworkLayer(this.network);
 
 		this.person = new PersonImpl(new IdImpl(1));
@@ -95,12 +97,14 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		try {
 			this.plan.createAct("h", link1);
 			Leg leg = this.plan.createLeg(Mode.car);
-			CarRoute route = leg.createRoute();
+			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			leg.setRoute(route);
 			route.setDist(25000.0);
 			route.setTravelTime(0.5*3600);
 			this.plan.createAct("w", link3);
 			leg = this.plan.createLeg(Mode.pt);
-			route = leg.createRoute();
+			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			leg.setRoute(route);
 			route.setDist(20000.0);
 			route.setTravelTime(0.25*3600);
 			this.plan.createAct("h", link5);

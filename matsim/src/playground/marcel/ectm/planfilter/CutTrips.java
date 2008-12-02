@@ -150,7 +150,7 @@ public class CutTrips implements PersonAlgorithm {
 			// remove all routes from legs before firstInsideLeg, as they are now all at the same location
 			for (int legNr = 1; legNr < firstInsideLeg; legNr += 2) {
 				Leg leg = (Leg) plan.getActsLegs().get(legNr);
-				leg.createRoute();
+				leg.setRoute(null);
 			}
 			// find the time the agent is entering the AOI, and use that time as from-act endtime
 			Leg leg = (Leg) plan.getActsLegs().get(firstInsideLeg);
@@ -195,7 +195,7 @@ public class CutTrips implements PersonAlgorithm {
 			// remove all routes from legs after firstOutsideLeg, as they are now all at the same location
 			for (int legNr = firstOutsideLeg + 2; legNr < plan.getActsLegs().size(); legNr += 2) {
 				Leg leg = (Leg) plan.getActsLegs().get(legNr);
-				leg.createRoute();
+				leg.setRoute(null);
 			}
 
 			// adapt route of leg that leads out of the AOI

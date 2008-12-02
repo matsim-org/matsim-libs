@@ -43,6 +43,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 
 	private final static double WALK_SPEED = 3.0/3.6; // 3.0km/h --> m/s = speed of people walking to the next station from home (bee-line!)
 
+	private final NetworkLayer network;
 	private final Matrix ptTravelTimes;
 	private final SwissHaltestellen haltestellen;
 	private final Layer municipalities;
@@ -59,6 +60,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final Matrix ptTravelTimes, final SwissHaltestellen haltestellen, final Layer municipalities) {
 		super(new AStarLandmarks(network, preProcessData, costCalculator, timeCalculator),
 				new AStarLandmarks(network, preProcessData, timeCostCalc, timeCostCalc));
+		this.network = network;
 		this.ptTravelTimes = ptTravelTimes;
 		this.haltestellen = haltestellen;
 		this.municipalities = municipalities;
@@ -94,10 +96,12 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 //		Route oldRoute = leg.getRoute();
 		CarRoute newRoute;
 		if (beeLineWalkTime < (timeInVehicle + walkTime)) {
-			newRoute = leg.createRoute();
+			newRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			leg.setRoute(newRoute);
 			newRoute.setTravelTime(beeLineWalkTime);
 		} else {
-			newRoute = leg.createRoute();
+			newRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+			leg.setRoute(newRoute);
 			newRoute.setTravelTime(timeInVehicle + walkTime);
 		}
 //		System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);

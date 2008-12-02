@@ -46,7 +46,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
 		Population population = new Population(Population.NO_STREAMING);
-		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population);
+		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
 		reader.parse("test/scenarios/equil/plans2.xml");
 
 		assertEquals("population size.", 2, population.size());

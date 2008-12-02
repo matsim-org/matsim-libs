@@ -70,13 +70,13 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  writing population file...");
 		new PopulationWriter(pop,super.getOutputDirectory()+"plans.xml","v4").write();
 		log.info("  done.");
-		
+
 		log.info("  clean up population...");
 		pop.clearPersons();
 		log.info("  done.");
-		
+
 		log.info("  reading in created population file...");
-		new PopulationReaderMatsimV4(pop).readFile(super.getOutputDirectory()+"plans.xml");
+		new PopulationReaderMatsimV4(pop, null).readFile(super.getOutputDirectory()+"plans.xml");
 		log.info("  done.");
 
 		log.info("  writing population file again...");
@@ -88,7 +88,7 @@ public class DesiresTest extends MatsimTestCase {
 		long checksum_run = CRCChecksum.getCRCFromFile(super.getOutputDirectory()+"plans.equal.xml");
 		assertEquals("different population files",checksum_ref,checksum_run);
 		log.info("  done.");
-		
+
 		log.info("done.");
 	}
 }
