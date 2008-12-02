@@ -38,7 +38,7 @@ public class DEQSimStarter {
 			return;
 		}
 		
-		// read, prepare configuratiaon
+		// read, prepare configuration
 		Config config = Gbl.createConfig(null);
 		if (args.length > 1 && args[1].toLowerCase().endsWith(".dtd")) {
 			try {

@@ -125,7 +125,7 @@ public class JavaPDEQSim2 {
 		
 		
 		
-		// only create equidistant buckets in the area of the map, where really roads are
+		// only create equi-distant buckets in the area of the map, where really roads are
 		double bucketDistance=(SimulationParameters.maxXCoodrinate-SimulationParameters.minXCoodrinate)/SimulationParameters.numberOfZoneBuckets;
 		for (int i=0;i<SimulationParameters.numberOfZoneBuckets-1;i++){
 			bucketBoundries[i]=SimulationParameters.minXCoodrinate+(i+1)*bucketDistance;
@@ -133,6 +133,7 @@ public class JavaPDEQSim2 {
 		
 		
 		// initialize vehicles
+		// the vehicle has registered itself to the scheduler
 		Vehicle vehicle=null;
 		for (Person person : this.population.getPersons().values()) {
 			vehicle =new Vehicle(scheduler,person);
