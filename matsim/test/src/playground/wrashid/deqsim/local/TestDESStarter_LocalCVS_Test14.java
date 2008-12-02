@@ -15,7 +15,7 @@ public class TestDESStarter_LocalCVS_Test14 extends MatsimTestCase {
 		try {
 			detailedChecker
 					.startTestDES(
-							"C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\test\\test14\\config.xml",
+							"C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\test\\test14\\config.xml_",
 							false, null, null);
 		} catch (Exception e) {
 			System.out.println("THIS TEST WILL ONLY RUN LOCALLY");
