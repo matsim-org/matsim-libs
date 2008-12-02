@@ -52,9 +52,9 @@ public class ScenarioData {
 	private final String networkFileName;
 	private final String facilitiesFileName;
 	private final String populationFileName;
-	private boolean isTimeVariantNetwork;
+	private boolean isTimeVariantNetwork = false;
 	private String changEventsInputFile;
-	
+
 	private boolean worldLoaded = false;
 	private boolean networkLoaded = false;
 	private boolean facilitiesLoaded = false;
@@ -64,8 +64,8 @@ public class ScenarioData {
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Population population = null;
-	
-	
+
+	private final NetworkFactory networkFactory;
 
 	private static final Logger log = Logger.getLogger(ScenarioData.class);
 
@@ -76,12 +76,24 @@ public class ScenarioData {
 	 * @param config
 	 */
 	public ScenarioData(final Config config) {
+		this(config, null);
+	}
+
+	public ScenarioData(final Config config, final NetworkFactory factory) {
 		this.worldFileName = config.world().getInputFile();
 		this.networkFileName = config.network().getInputFile();
 		this.isTimeVariantNetwork = config.network().isTimeVariantNetwork();
 		this.changEventsInputFile = config.network().getChangeEventsInputFile();
 		this.facilitiesFileName = config.facilities().getInputFile();
 		this.populationFileName = config.plans().getInputFile();
+		if (factory == null) {
+			this.networkFactory = new NetworkFactory();
+			if (this.isTimeVariantNetwork){
+				this.networkFactory.setLinkPrototype(TimeVariantLinkImpl.class);
+			}
+		} else {
+			this.networkFactory = factory;
+		}
 	}
 
 	public ScenarioData(final String worldFileName, final String networkFileName,
@@ -90,6 +102,7 @@ public class ScenarioData {
 		this.networkFileName = networkFileName;
 		this.facilitiesFileName = facilitiesFileName;
 		this.populationFileName = populationFileName;
+		this.networkFactory = new NetworkFactory();
 	}
 
 	public World getWorld() throws RuntimeException {
@@ -114,12 +127,8 @@ public class ScenarioData {
 		if (!this.networkLoaded) {
 			getWorld(); // make sure the world is loaded
 			log.info("loading network from " + this.networkFileName);
-			NetworkFactory nf = new NetworkFactory();			
-			if (this.isTimeVariantNetwork){
-				nf.setLinkPrototype(TimeVariantLinkImpl.class);
-			}
-			this.network = new NetworkLayer(nf);	
-			
+			this.network = new NetworkLayer(this.networkFactory);
+
 			try {
 				new MatsimNetworkReader(this.network).parse(this.networkFileName);
 			} catch (Exception e) {
@@ -127,9 +136,9 @@ public class ScenarioData {
 			}
 			this.world.setNetworkLayer(this.network);
 			this.world.complete();
-			
+
 			if (this.changEventsInputFile != null && this.isTimeVariantNetwork){
-				log.info("loading change events from " + this.changEventsInputFile);
+				log.info("loading network change events from " + this.changEventsInputFile);
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(this.network);
 				try {
 					parser.parse(this.changEventsInputFile);
@@ -140,14 +149,14 @@ public class ScenarioData {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				this.network.setNetworkChangeEvents(parser.getEvents()); 
+				this.network.setNetworkChangeEvents(parser.getEvents());
 			}
-			
+
 			this.networkLoaded = true;
 		}
 		return this.network;
 	}
-	
+
 	public Facilities getFacilities() throws RuntimeException {
 		if (!this.facilitiesLoaded) {
 			if (this.facilitiesFileName != null) {
