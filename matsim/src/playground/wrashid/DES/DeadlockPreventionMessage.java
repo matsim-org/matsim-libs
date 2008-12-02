@@ -14,7 +14,6 @@ public class DeadlockPreventionMessage extends EventMessage {
 		road.removeFromInterestedInEnteringRoad();
 		
 		vehicle.scheduleEnterRoadMessage(scheduler.getSimTime(), road);
-		//System.out.println("Deadlock prevention happend");
 	}
 
 
