@@ -10,10 +10,10 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationReaderMatsimV4;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
@@ -47,7 +47,7 @@ public class PTActWriter {
 		this.ptnProximity= new PTNProximity(this.pt.getPtNetworkLayer()); 
 		this.dijkstra = new Dijkstra(this.pt.getPtNetworkLayer(), ptTravelCost, ptTravelTime);
 		this.population = new org.matsim.population.Population(false);
-		PopulationReaderMatsimV4 plansReader = new org.matsim.population.PopulationReaderMatsimV4(this.population);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population);
 		plansReader.readFile(pt.getPlansFile());
 	}
 	
