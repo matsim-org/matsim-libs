@@ -47,7 +47,10 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
-
+	static private double fsWarnCnt = 0 ;
+	static private double cpWarnCnt = 0 ;
+	static private double plWarnCnt = 0 ;
+	
 	public LinkImpl(final Id id, final BasicNode from, final BasicNode to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id, from, to);
@@ -68,9 +71,18 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
 		 */
-		if (this.freespeed <= 0.0) { log.warn("[freespeed="+this.freespeed+" not allowed]"); }
-		if (this.capacity <= 0.0) { log.warn("[capacity="+this.capacity+" not allowed]"); }
-		if (this.permlanes < 1) { log.warn("[permlanes="+this.permlanes+" not allowed]"); }
+		if (this.freespeed <= 0.0 && fsWarnCnt <= 0 ) { 
+			fsWarnCnt++ ;
+			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]"); 
+		}
+		if (this.capacity <= 0.0 && cpWarnCnt <= 0 ) { 
+			cpWarnCnt++ ;
+			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]"); 
+		}
+		if (this.permlanes < 1 && plWarnCnt <= 0 ) { 
+			plWarnCnt++ ;
+			log.warn("[permlanes="+this.permlanes+" may cause problems. Future occurences of this warning are suppressed.]"); 
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
