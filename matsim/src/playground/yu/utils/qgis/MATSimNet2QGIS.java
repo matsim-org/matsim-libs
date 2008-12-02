@@ -160,6 +160,10 @@ public class MATSimNet2QGIS {
 		population.runAlgorithms();
 	}
 
+	public CoordinateReferenceSystem getCrs() {
+		return crs;
+	}
+
 	/**
 	 * @param n2g
 	 *            the n2g to set

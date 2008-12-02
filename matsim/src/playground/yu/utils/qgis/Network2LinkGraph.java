@@ -55,7 +55,7 @@ public class Network2LinkGraph {
 	protected CoordinateReferenceSystem crs;
 	protected GeometryFactory geofac;
 	protected Collection<Feature> features;
-	protected DefaultFeatureTypeFactory dftf;
+	protected DefaultFeatureTypeFactory defaultFeatureTypeFactory;
 	protected List<Map<Id, ?>> parameters = new ArrayList<Map<Id, ?>>();
 	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
 
@@ -84,9 +84,9 @@ public class Network2LinkGraph {
 				Integer.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
-		dftf = new DefaultFeatureTypeFactory();
-		dftf.setName("link");
-		dftf.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
+		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
+		defaultFeatureTypeFactory.setName("link");
+		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
 				cap, type, freespeed });
 	}
 
@@ -106,8 +106,8 @@ public class Network2LinkGraph {
 	public Collection<Feature> getFeatures() throws SchemaException,
 			NumberFormatException, IllegalAttributeException {
 		for (int i = 0; i < attrTypes.size(); i++)
-			dftf.addType(attrTypes.get(i));
-		FeatureType ftRoad = dftf.getFeatureType();
+			defaultFeatureTypeFactory.addType(attrTypes.get(i));
+		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Link link : this.network.getLinks().values()) {
 			LineString ls = new LineString(
 					new CoordinateArraySequence(

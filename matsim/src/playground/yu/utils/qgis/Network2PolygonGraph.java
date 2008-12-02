@@ -34,6 +34,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.misc.Time;
@@ -80,13 +81,13 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 				Integer.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
-		dftf = new DefaultFeatureTypeFactory();
-		dftf.setName("link");
-		dftf.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
+		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
+		defaultFeatureTypeFactory.setName("link");
+		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
 				cap, type, freespeed });
 	}
 
-	protected LinearRing getLinearRing(Link link) {
+	protected LinearRing getLinearRing(BasicLink link) {
 		// //////////////////////////////////////////////////////////////
 		double width = getLinkWidth(link);
 		// //////////////////////////////////////////////////////////////
@@ -109,7 +110,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 				from, to, toB, fromB, from }), this.geofac);
 	}
 
-	protected double getLinkWidth(Link link) {
+	protected double getLinkWidth(BasicLink link) {
 		return link.getCapacity(Time.UNDEFINED_TIME)
 				/ network.getCapacityPeriod() * 3600.0 / 50.0;
 	}// TODO override
@@ -118,8 +119,8 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 	public Collection<Feature> getFeatures() throws SchemaException,
 			NumberFormatException, IllegalAttributeException {
 		for (int i = 0; i < attrTypes.size(); i++)
-			dftf.addType(attrTypes.get(i));
-		FeatureType ftRoad = dftf.getFeatureType();
+			defaultFeatureTypeFactory.addType(attrTypes.get(i));
+		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Link link : this.network.getLinks().values()) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);

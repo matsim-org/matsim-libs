@@ -34,6 +34,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -59,13 +60,13 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 				"MultiPolygon", MultiPolygon.class, true, null, null, crs);
 		AttributeType id = AttributeTypeFactory.newAttributeType("ID",
 				String.class);
-		dftf = new DefaultFeatureTypeFactory();
-		dftf.setName("link");
-		dftf.addTypes(new AttributeType[] { geom, id });
+		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
+		defaultFeatureTypeFactory.setName("link");
+		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id });
 	}
 
 	@Override
-	protected double getLinkWidth(Link link) {
+	protected double getLinkWidth(BasicLink link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
 		return ((double) i.intValue()) / 5.0;
 	}
@@ -74,8 +75,8 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	public Collection<Feature> getFeatures() throws SchemaException,
 			NumberFormatException, IllegalAttributeException {
 		for (int i = 0; i < attrTypes.size(); i++)
-			dftf.addType(attrTypes.get(i));
-		FeatureType ftRoad = dftf.getFeatureType();
+			defaultFeatureTypeFactory.addType(attrTypes.get(i));
+		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 		for (Link link : network.getLinks().values()) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
