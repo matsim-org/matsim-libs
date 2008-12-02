@@ -19,15 +19,9 @@ public class CMCFNetworkConverter {
 	
 	
 	
-	//@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public static NetworkLayer readCMCFNetwork(String filename) throws JDOMException, IOException{
 		NetworkLayer result = new NetworkLayer();
-		
-		/*Gbl.createWorld();
-		Config config = new Config();
-		config.addCoreModules();
-		Gbl.setConfig(config);*/
-		
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfGraph = builder.build(filename);
 		Element basegraph = cmcfGraph.getRootElement();
@@ -53,12 +47,15 @@ public class CMCFNetworkConverter {
 			 String from = edge.getChildText("from");
 			 String to	= edge.getChildText("to");
 			 String length = edge.getChildText("length");
-			 String capacity = edge.getChildText("capacyty");
+			 String capacity = edge.getChildText("capacity");
 			 //build a new edge in 
 			 Id matsimid  = new IdImpl(id);
 			 //TODO freespeed is set to 1.3 find something better
 			 result.createLink(matsimid, result.getNode(from), result.getNode(to),
-					 Double.parseDouble(length), 1.3 ,Double.parseDouble(capacity), 1.);
+					 Double.parseDouble(length),
+					  1.3 ,
+					 Double.parseDouble(capacity),
+					 1.);
 		 }
 			
 		return result;
@@ -67,11 +64,21 @@ public class CMCFNetworkConverter {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		String filename = "/Users/manuel/Documents/playground/net.xml";
+	public static void main(String[] args) { 
+		if(args.length == 0 && args.length > 2){
+			System.out.println("usage: 1. argument inputfile 2. argument outfile (optional)");
+			return;
+		}
+		String inputfile = args[0].trim();
+		String outfile = inputfile.substring(0, inputfile.length()-4)+"_msimNW.xml";
+		if(args.length == 2){
+			outfile = args[1];
+		}
 		try {
-			NetworkLayer network = readCMCFNetwork(filename);
-			//TODO find out how to write networks
+			NetworkLayer network = readCMCFNetwork(inputfile);
+			NetworkWriter writer = new NetworkWriter( network, outfile);
+			writer.write();
+			System.out.println(inputfile+"  conveted successfully \n"+"output written in: "+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();
 			
