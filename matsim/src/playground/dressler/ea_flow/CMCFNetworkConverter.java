@@ -16,7 +16,13 @@ import org.matsim.utils.geometry.CoordImpl;
 public class CMCFNetworkConverter {
 	
 	
-	
+	/**
+	 * reads a cmcf graph file in xml format from filename 
+	 * @param filename
+	 * @return a NetworkLayer that is the graph represented in the cmcf file
+	 * @throws JDOMException
+	 * @throws IOException
+	 */
 	@SuppressWarnings("unchecked")
 	public static NetworkLayer readCMCFNetwork(String filename) throws JDOMException, IOException{
 		NetworkLayer result = new NetworkLayer();
@@ -60,7 +66,7 @@ public class CMCFNetworkConverter {
 	}
 
 	/**
-	 * @param args
+	 * @param usage: 1. argument inputfile 2. argument outfile (optional)
 	 */
 	public static void main(String[] args) { 
 		if(args.length == 0 && args.length > 2){

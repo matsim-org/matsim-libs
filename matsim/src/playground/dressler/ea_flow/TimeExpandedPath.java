@@ -222,6 +222,19 @@ public class TimeExpandedPath {
 	}
 	
 	/**
+	 * checks whether all edges in the path are forward edges
+	 * @return true iff all edges are forward
+	 */
+	public boolean isforward() {
+		for(PathEdge edge : this._edges){
+			if (!edge.isForward()){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Method to find the First node in a path
 	 * @return first Node 
 	 */
@@ -300,6 +313,7 @@ public class TimeExpandedPath {
 	public static void debug(boolean debug){
 		TimeExpandedPath._debug=debug;
 	}
+
 	
 
 }
