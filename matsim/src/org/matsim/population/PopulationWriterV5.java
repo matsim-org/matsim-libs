@@ -243,13 +243,15 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 	}
 
 	private void writeTravelCards(final TreeSet<String> travelcards) throws IOException {
-		this.writeStartTag(PopulationSchemaV5Names.TRAVELCARD, null);
-		for (String tc : travelcards) {
-			this.writeStartTag(PopulationSchemaV5Names.SWISSTRAVELCARD, null);
-			this.writeContent(tc.trim(), false);
-			this.writeEndTag(PopulationSchemaV5Names.SWISSTRAVELCARD);
+		if (travelcards != null) {
+			this.writeStartTag(PopulationSchemaV5Names.TRAVELCARD, null);
+			for (String tc : travelcards) {
+				this.writeStartTag(PopulationSchemaV5Names.SWISSTRAVELCARD, null);
+				this.writeContent(tc.trim(), false);
+				this.writeEndTag(PopulationSchemaV5Names.SWISSTRAVELCARD);
+			}
+			this.writeEndTag(PopulationSchemaV5Names.TRAVELCARD);
 		}
-		this.writeEndTag(PopulationSchemaV5Names.TRAVELCARD);
 	}
 
 }
