@@ -2,7 +2,6 @@ package org.matsim.socialnetworks.replanning;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -15,8 +14,6 @@ import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 
-import playground.jhackney.controler.SNControllerListener3;
-
 public class SNAdjustTimes implements PlanAlgorithm {
 
 	Hashtable<Facility,ArrayList<TimeWindow>> twm = null;
@@ -26,12 +23,10 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		this.twm=timeWindowMap;
 	}
 	public void run(Plan plan) {
-		// TODO Auto-generated method stub
 		adjustDepartureTimes(plan);
 	}
 
 	private void adjustDepartureTimes(Plan plan) {
-		// TODO Auto-generated method stub
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
@@ -60,7 +55,6 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		person.setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(Act act) {
-		// TODO Auto-generated method stub
 		int count=0;
 		double avgStartTime=0;
 		TimeWindow tw1 = null;
