@@ -72,7 +72,6 @@ import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
-import org.matsim.socialnetworks.replanning.SNCoordinateArrivalTimes;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
@@ -80,6 +79,7 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
+import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 
 
 /**
@@ -136,7 +136,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	private EventsPostProcess epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
-	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+//	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
 
 //	Variables for allocating the spatial meetings among different types of activities
@@ -169,10 +169,11 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring function needs it (can null be passed?)
 		teo=new MakeTimeWindowsFromEvents();
 		teo.calculate(epp);
-		twm=teo.getTimeWindowMap();
+		controler.setTwm(teo.getTimeWindowMap());
+//		twm=teo.getTimeWindowMap();
 
 		this.log.info(" ... Instantiation of events overlap tracking done");
-		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
+		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm());
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 //		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
 
@@ -202,11 +203,12 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 //			teo=new MakeTimeWindowsFromEvents(epp);
 			teo.calculate(epp);
 			this.log.info(" ... done making time windows and map");
-			twm= teo.getTimeWindowMap();
+//			twm= teo.getTimeWindowMap();
+			controler.setTwm(teo.getTimeWindowMap());
 //			execute spatial interactions (uses timewindows)
 
 			if (total_spatial_fraction(this.fractionS) > 0) {
-				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
+				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, controler.getTwm());
 			} else {
 				this.log.info("     (none)");
 			}
@@ -261,7 +263,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 //			make new actstats (uses new twm AND new socialnet)
 			this.log.info(" Remaking actStats from events");
-			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
+			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(controler.getTwm()));
 
 			Gbl.printMemoryUsage();
 

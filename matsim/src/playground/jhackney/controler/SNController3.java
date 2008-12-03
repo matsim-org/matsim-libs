@@ -19,33 +19,26 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.replanning.SNCoordinateArrivalTimes;
+
+import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 
 public class SNController3 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController3.class);
-	protected Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+//	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
 
 	public SNController3(String args[]){
 		super(args);
-		twm=new Hashtable<Facility,ArrayList<TimeWindow>>();
 	}
-//	@Override
-	protected void setup(){
-		super.setup();
 
-		this.log.info("  Setting up the replanning strategies");
-		this.strategyManager = loadStrategyManager();
-		this.log.info(" ... done.");
-	}
-	
 	public static void main(final String[] args) {
-		final Controler controler = new SNController(args);
+		final Controler controler = new SNController3(args);
 		controler.addControlerListener(new SNControllerListener3());
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
 	}
+
 
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
@@ -53,28 +46,35 @@ public class SNController3 extends Controler {
 	protected StrategyManager loadStrategyManager() {
 
 		StrategyManager manager = new StrategyManager();
-//		StrategyManagerConfigLoader.load(this, this.config, manager);
 
 		// Adjust activity start times by social network and time windows
-		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
-		StrategyModule socialNetStrategyModule= new SNCoordinateArrivalTimes(this.twm);
-		strategy.addStrategyModule(socialNetStrategyModule);
-		manager.addStrategy(strategy, 0.15);
+		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());
+		StrategyModule socialNetStrategyModule= new SNCoordinateArrivalTimes(this);
+		strategy1.addStrategyModule(socialNetStrategyModule);
+		manager.addStrategy(strategy1, 0.15);
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");
 
 		// Adjust activity route
 		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		preProcessRoutingData.run(this.getNetwork());
-		strategy.addStrategyModule(new ReRouteLandmarks(this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
-		manager.addStrategy(strategy,0.15);
+		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
+		strategy2.addStrategyModule(new ReRouteLandmarks(this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
+		manager.addStrategy(strategy2,0.15);
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 
 		// Tend to re-use best plan
-		strategy = new PlanStrategy(new ExpBetaPlanSelector());
-		manager.addStrategy(strategy, 0.7);
+		PlanStrategy strategy3 = new PlanStrategy(new ExpBetaPlanSelector());
+		manager.addStrategy(strategy3, 0.7);
 		this.log.info("  added strategy ExpBetaPlan with probability 0.7");
 
 		return manager;
 	}
-
+////	JH
+//	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
+//		return this.twm;
+//	}
+//	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
+//		this.twm=twm;
+//	}
+//// JH end
 }
