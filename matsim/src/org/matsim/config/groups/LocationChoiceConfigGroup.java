@@ -66,10 +66,10 @@ public class LocationChoiceConfigGroup extends Module {
 			return getRestraintFcnExp();
 		}
 		if (SCALEFACTOR.equals(key)) {
-			return getScalefactor();
+			return getScaleFactor();
 		}
 		if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
-			return getRecursionTravelspeedChange();
+			return getRecursionTravelSpeedChange();
 		}
 		if (RECURSIONTRAVELSPEED.equals(key)) {
 			return getRecursionTravelSpeed();
@@ -109,19 +109,19 @@ public class LocationChoiceConfigGroup extends Module {
 		} else if (SCALEFACTOR.equals(key)) {
 			if (Double.parseDouble(value) < 1) {
 				log.warn("Scale factor must be greater than 1! Scale factor is set to default value 1");
-				setScalefactor("1");
+				setScaleFactor("1");
 			}
 			else {
-				setScalefactor(value);
+				setScaleFactor(value);
 			}
 			
 		} else if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 || Double.parseDouble(value) > 1.0 ) {
 				log.warn("'recursionTravelSpeedChange' must be [0..1]! Set to default value 0.1");
-				setRecursionTravelspeedChange("0.1");
+				setRecursionTravelSpeedChange("0.1");
 			}
 			else {
-				setRecursionTravelspeedChange(value);
+				setRecursionTravelSpeedChange(value);
 			}
 		} else if (RECURSIONTRAVELSPEED.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 ) {
@@ -178,16 +178,16 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setRestraintFcnExp(final String restraintFcnExp) {
 		this.restraintFcnExp = restraintFcnExp;
 	}
-	public String getScalefactor() {
+	public String getScaleFactor() {
 		return this.scaleFactor;
 	}
-	public void setScalefactor(final String scaleFactor) {
+	public void setScaleFactor(final String scaleFactor) {
 		this.scaleFactor = scaleFactor;
 	}
-	public String getRecursionTravelspeedChange() {
+	public String getRecursionTravelSpeedChange() {
 		return recursionTravelSpeedChange;
 	}
-	public void setRecursionTravelspeedChange(String recursionTravelSpeedChange) {
+	public void setRecursionTravelSpeedChange(String recursionTravelSpeedChange) {
 		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
 	}
 	public String getMaxRecursions() {

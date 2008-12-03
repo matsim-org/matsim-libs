@@ -42,13 +42,15 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 	protected int unsuccessfullLC = 0;
-	private double recursion_travelspeedchange = 0.2;
-	protected int max_recursions = 10;
+	private double recursionTravelSpeedChange = 0.1;
+	private double recursionTravelSpeed = 30.0;
+	protected int maxRecursions = 10;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler) {
 		super(network, controler);
-		this.recursion_travelspeedchange = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelspeedChange());
-		this.max_recursions = Integer.parseInt(Gbl.getConfig().locationchoice().getMaxRecursions());
+		this.recursionTravelSpeedChange = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelSpeedChange());
+		this.maxRecursions = Integer.parseInt(Gbl.getConfig().locationchoice().getMaxRecursions());
+		this.recursionTravelSpeed = Double.parseDouble(Gbl.getConfig().locationchoice().getRecursionTravelSpeed());
 	}
 	
 	@Override
@@ -80,7 +82,8 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			
 			//initially using 25.3 km/h + 20%
 			// micro census 2005
-			double speed = 30.36/3.6;
+			//double speed = 30.36/3.6;
+			double speed = this.recursionTravelSpeed;
 			
 			if (sc.getTtBudget() < 1.0) {
 				continue;
@@ -92,11 +95,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			while (change != 0) {				
 				// shrinking only every second time
 				if (change == -1 && shrinked) {
-					speed *= (1.0 - this.recursion_travelspeedchange);
+					speed *= (1.0 - this.recursionTravelSpeedChange);
 					shrinked = true;
 				}
 				else if (change == 1) {
-					speed *= (1.0 + this.recursion_travelspeedchange);
+					speed *= (1.0 + this.recursionTravelSpeedChange);
 					shrinked = false;
 				}				
 				change = this.handleSubChain(sc, speed, nrOfTrials);
@@ -107,7 +110,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	
 	protected int handleSubChain(SubChain subChain, double speed, int trialNr){
-		if (trialNr > this.max_recursions) {		
+		if (trialNr > this.maxRecursions) {		
 			this.unsuccessfullLC += 1;
 					
 			Iterator<Act> act_it = subChain.getSlActs().iterator();
@@ -220,19 +223,19 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	// for test cases:
-	public double getRecursion_travelspeedchange() {
-		return recursion_travelspeedchange;
+	public double getRecursionTravelSpeedChange() {
+		return recursionTravelSpeedChange;
 	}
 
-	public void setRecursion_travelspeedchange(double recursion_travelspeedchange) {
-		this.recursion_travelspeedchange = recursion_travelspeedchange;
+	public void setRecursionTravelSpeedChange(double recursionTravelSpeedChange) {
+		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
 	}
 
-	public int getMax_recursions() {
-		return max_recursions;
+	public int getMaxRecursions() {
+		return maxRecursions;
 	}
 
-	public void setMax_recursions(int max_recursions) {
-		this.max_recursions = max_recursions;
+	public void setMaxRecursions(int maxRecursions) {
+		this.maxRecursions = maxRecursions;
 	}
 }

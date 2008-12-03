@@ -30,8 +30,8 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	}
 	
 	public void testConstructor() {
-		assertEquals(this.locationmutator.getMax_recursions(), 10);
-		assertEquals(this.locationmutator.getRecursion_travelspeedchange(), 0.1);
+		assertEquals(this.locationmutator.getMaxRecursions(), 10);
+		assertEquals(this.locationmutator.getRecursionTravelSpeedChange(), 0.1);
 	}
 	
 	
