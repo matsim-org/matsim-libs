@@ -21,7 +21,6 @@
 package playground.gregor.systemopt;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.Id;
@@ -54,8 +53,8 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	private final HashMap<String,LinkInfo> linkInfos = new HashMap<String, LinkInfo>();
 	private final HashMap<String,SocialCostRole> socCosts = new HashMap<String, SocialCostRole>();
 	
-	private HashSet<String> old = new HashSet<String>();
-	private HashSet<String> current = new HashSet<String>();
+//	private HashSet<String> old = new HashSet<String>();
+//	private HashSet<String> current = new HashSet<String>();
 	
 	private final static int MSA_OFFSET = 20;
 	
@@ -112,9 +111,9 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	}
 
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		this.old = this.current;
-		this.current = new HashSet<String>();
-		
+//		this.old = this.current;
+//		this.current = new HashSet<String>();
+//		
 //		double time = Gbl.getConfig().simulation().getEndTime();
 //		for (Entry<String, LinkInfo> e : this.linkInfos.entrySet()) {
 //			if (e.getValue().agentsLeftLink.size() > 0) {
@@ -165,7 +164,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		super.handleEvent(event);
-		this.current.add(event.agentId);
+//		this.current.add(event.agentId);
 	}
 
 	
@@ -181,37 +180,37 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		int uB = getTimeSlotIndex(eventTime) - 1;
 		
 
-		if (uB < lB) {
-			info.agentsLeftLink.clear();
-			return;
-		}
+//		if (uB < lB) {
+//			info.agentsLeftLink.clear();
+//			return;
+//		}
 		
-		//compute soc costs
-		int [][] agents = new int [(uB-lB)+1][2]; 
-		
-//		ConcurrentLinkedQueue<AgentInfo> ais = new ConcurrentLinkedQueue<AgentInfo>(); 
-		
-		for (AgentInfo ai : info.agentsLeftLink) {
-			int idx = getTimeSlotIndex(ai.enterTime) -lB;
-			if (idx < 0) {
-				continue;
-			}
-			if (idx > (uB-lB)){
-				continue;
-//				ais.add(ai);
-			}
-				
-			
-			try {
-				agents[idx][0]++;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			if (this.old.contains(ai.id)){
-				agents[idx][1]++;
-			}			
-			
-		}
+//		//compute soc costs
+//		int [][] agents = new int [(uB-lB)+1][2]; 
+//		
+////		ConcurrentLinkedQueue<AgentInfo> ais = new ConcurrentLinkedQueue<AgentInfo>(); 
+//		
+//		for (AgentInfo ai : info.agentsLeftLink) {
+//			int idx = getTimeSlotIndex(ai.enterTime) -lB;
+//			if (idx < 0) {
+//				continue;
+//			}
+//			if (idx > (uB-lB)){
+//				continue;
+////				ais.add(ai);
+//			}
+//				
+//			
+//			try {
+//				agents[idx][0]++;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			if (this.old.contains(ai.id)){
+//				agents[idx][1]++;
+//			}			
+//			
+//		}
 		
 		
 
@@ -221,13 +220,14 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 
 		double socCost = 0;
 		for (int i = uB; i >= lB; i--) {
-			int idx = i - lB;
-			double w = (double)agents[idx][1]/agents[idx][0];
-			if (Double.isNaN(w)) {
-				w = 0;
-			}
+//			int idx = i - lB;
+//			double w = (double)agents[idx][1]/agents[idx][0];
+//			if (Double.isNaN(w)) {
+//				w = 0;
+//			}
 			socCost += this.travelTimeBinSize;
-			sc.setSocCost(i,w * (socCost-this.travelTimeBinSize/2));
+//			sc.setSocCost(i,w * (socCost-this.travelTimeBinSize/2));
+			sc.setSocCost(i, (socCost-this.travelTimeBinSize/2));
 		}
 		
 		while (info.agentsLeftLink.size() > 0) {
