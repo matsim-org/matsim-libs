@@ -40,19 +40,17 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
  */
 
 public class SNCoordinateArrivalTimes extends MultithreadedModuleA {
-//	private Hashtable<Facility,ArrayList<TimeWindow>> twm = null;
-	private Controler controler;
 
-//    public SNCoordinateArrivalTimes(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap) {
+	private Controler controler;
+//	private playground.jhackney.controler.SNController3 controler;
+
 	public SNCoordinateArrivalTimes(Controler controler) {
 
-//    	this.twm=timeWindowMap;
     	this.controler=controler;
     }
 
     public PlanAlgorithm getPlanAlgoInstance() {
-//	return new SNSecLocShortest(factypes, network, tcost, ttime);
-//	return new SNAdjustTimes(this.twm);
+
     	return new SNAdjustTimes(this.controler);
     }
 

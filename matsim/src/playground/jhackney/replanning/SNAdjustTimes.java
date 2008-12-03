@@ -18,11 +18,9 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
 
 public class SNAdjustTimes implements PlanAlgorithm {
 
-//	Hashtable<Facility,ArrayList<TimeWindow>> twm = null;
 	private Controler controler;
 	private final Logger log = Logger.getLogger(SNAdjustTimes.class);
 
-//	public SNAdjustTimes(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap){
 	public SNAdjustTimes(Controler controler){
 		this.controler=controler;
 	}

@@ -25,7 +25,7 @@ import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 public class SNController3 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController3.class);
-//	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
+	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
 
 	public SNController3(String args[]){
 		super(args);
@@ -69,12 +69,12 @@ public class SNController3 extends Controler {
 
 		return manager;
 	}
-////	JH
-//	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
-//		return this.twm;
-//	}
-//	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
-//		this.twm=twm;
-//	}
-//// JH end
+//	JH
+	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
+		return this.twm;
+	}
+	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
+		this.twm=twm;
+	}
+// JH end
 }
