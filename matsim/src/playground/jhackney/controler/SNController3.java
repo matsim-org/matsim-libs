@@ -14,6 +14,7 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -25,7 +26,6 @@ import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 public class SNController3 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController3.class);
-	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
 
 	public SNController3(String args[]){
 		super(args);
@@ -48,7 +48,7 @@ public class SNController3 extends Controler {
 		StrategyManager manager = new StrategyManager();
 
 		// Adjust activity start times by social network and time windows
-		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());
+		PlanStrategy strategy1 = new PlanStrategy(new KeepSelected());// only facilities visited in last iteration are in time window hastable
 		StrategyModule socialNetStrategyModule= new SNCoordinateArrivalTimes(this);
 		strategy1.addStrategyModule(socialNetStrategyModule);
 		manager.addStrategy(strategy1, 0.15);
