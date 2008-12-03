@@ -8,8 +8,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.utils.geometry.Coord;
@@ -50,7 +48,7 @@ public class CMCFNetworkConverter {
 			 String capacity = edge.getChildText("capacity");
 			 //build a new edge in 
 			 Id matsimid  = new IdImpl(id);
-			 //TODO freespeed is set to 1.3 find something better
+			 //TODO free speed is set to 1.3 find something better
 			 result.createLink(matsimid, result.getNode(from), result.getNode(to),
 					 Double.parseDouble(length),
 					  1.3 ,

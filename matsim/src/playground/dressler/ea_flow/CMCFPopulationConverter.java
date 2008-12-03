@@ -1,33 +1,39 @@
 package playground.dressler.ea_flow;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.basic.v01.BasicLegImpl;
+import org.matsim.basic.v01.BasicPerson;
+import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPopulationImpl;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkReader;
 import org.matsim.network.NetworkReaderMatsimV1;
-import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterV5;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class CMCFPopulationConverter {
 	
 
 	@SuppressWarnings("unchecked")
-	public static Population readCMCFDemands(String filename, NetworkLayer network) throws JDOMException, IOException{
-		Population result = new Population();
+	public static BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
+		BasicPopulationImpl result = new BasicPopulationImpl();
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
 		Element demandgraph = cmcfdemands.getRootElement();
@@ -44,13 +50,46 @@ public class CMCFPopulationConverter {
 			 int dem = (int) Math.round(Double.parseDouble(demand));
 			 Node tonode = network.getNode(to);
 			 Node fromnode = network.getNode(from);
-			 for (int i = 1 ; i<= dem ;i++) {
+			 Coord coordfrom = fromnode.getCoord();
+			 Coord coordto = tonode.getCoord();
+			 Link fromlink = null;
+			 Link tolink = null;
+			 //find edges
+			 if (!coordinates){
+				LinkedList<Link> tolinks = new LinkedList<Link>();
+				tolinks.addAll( tonode.getInLinks().values());
+				if(tolinks.isEmpty()){
+					throw new IllegalArgumentException(tonode.getOrigId()+ " has no ingoing edges!!!");
+				}
+				tolink = tolinks.getFirst();
+				LinkedList<Link> fromlinks = new LinkedList<Link>();
+				fromlinks.addAll( fromnode.getOutLinks().values());
+				if(tolinks.isEmpty()){
+					throw new IllegalArgumentException(tonode.getOrigId()+ " has no outgoing edges!!!");
+				}
+				fromlink = fromlinks.getFirst();
 				 
+			 }
+			 for (int i = 1 ; i<= dem ;i++) {
 				 Id matsimid  = new IdImpl(id+"."+i);
 				 Person p = new PersonImpl(matsimid);
 				 Plan plan = new Plan(p);
-			//TODO hier weitermachen
-
+				 BasicActImpl home = new BasicActImpl("home");
+				 home.setEndTime(0.);
+				 BasicActImpl work = new BasicActImpl("work");
+				 BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
+				 if (coordinates){
+					home.setCoord(coordfrom);
+					work.setCoord(coordto);
+				 }else{
+					home.setLinkId(fromlink.getId());
+					work.setLinkId(tolink.getId());
+				 }
+				 plan.addAct(home);
+				 plan.addLeg(leg);
+				 plan.addAct(work);
+				 p.addPlan(plan);
+				 result.addPerson(p);
 			 
 			 }
 		 }
@@ -62,23 +101,28 @@ public class CMCFPopulationConverter {
 	 * @param args
 	 */
 	public static void main(String[] args) { 
-		if(args.length<2 || args.length > 3){
-			System.out.println("usage: 1. argument network file 2. argument inputfile 3. argument outfile (optional)");
+		if(args.length<3 || args.length > 4){
+			System.out.println("usage:1. c ore e for coordinates or edges in plans 2. argument network file 3. argument inputfile 4. argument outfile (optional)");
 			return;
 		}
-		String netfile = args[0].trim();
-		String inputfile = args[1].trim();
+		boolean coordinates= true;
+		String coord = args[0].trim();
+		if (coord.equals("e")){
+			coordinates = false;
+		}
+		String netfile = args[1].trim();
+		String inputfile = args[2].trim();
 		String outfile = inputfile.substring(0, inputfile.length()-4)+"_msimDEM.xml";
-		if(args.length == 3){
-			outfile = args[2];
+		if(args.length == 4){
+			outfile = args[3];
 		}
 		try {
 			NetworkLayer network = new NetworkLayer();
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
 			netreader.readFile(netfile);
-			Population population = readCMCFDemands(inputfile,network); 
-			PopulationWriter writer = new PopulationWriter( population, outfile, "V5");
-			writer.write();
+			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = readCMCFDemands(inputfile,network,coordinates); 
+			PopulationWriterV5 writer = new PopulationWriterV5( population);
+			writer.writeFile(outfile);
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();
