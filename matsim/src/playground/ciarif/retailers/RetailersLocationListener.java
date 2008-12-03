@@ -57,7 +57,6 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		this.newRetailersLocations = newRetailersLocations;
 	}
 
-	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler();
 		this.eventsToFacilityRelocate = new EventsToFacilityRelocate(controler.getFacilities(),

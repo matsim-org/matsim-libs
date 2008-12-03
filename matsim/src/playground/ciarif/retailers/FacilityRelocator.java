@@ -19,7 +19,7 @@ public class FacilityRelocator implements ActStartEventHandler, ActEndEventHandl
 
 
 private TreeMap<Id, FacilityRelocator> newRetailersLocation;
-private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class); //Chiedere Andreas perchè si puo/deve usare questo logger!!!
+private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class); //Chiedere Andreas perchï¿½ si puo/deve usare questo logger!!!
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -48,19 +48,16 @@ private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class); 
 		
 	}
 
-	@Override
 	public void handleEvent(ActStartEvent event) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void handleEvent(ActEndEvent event) {
 		// TODO Auto-generated method stub
 		
