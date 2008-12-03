@@ -44,7 +44,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String restraintFcnExp = "0.0";
 	private String scaleFactor = "1.0";
 	private String recursionTravelSpeedChange = "0.1";
-	private String recursionTravelSpeed = "30.0";
+	private String recursionTravelSpeed = "8.5";
 	private String maxRecursions = "0";
 	
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
@@ -125,8 +125,8 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (RECURSIONTRAVELSPEED.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 ) {
-				log.warn("'recursionTravelSpeed' must be positive! Set to default value 30.0");
-				setRecursionTravelSpeed("30.0");
+				log.warn("'recursionTravelSpeed' must be positive! Set to default value 8.5");
+				setRecursionTravelSpeed("8.5");
 			}
 			else {
 				setRecursionTravelSpeed(value);
