@@ -20,12 +20,12 @@
 	</module>
 	
 	<module name="locationchoice">
-		<param name="constrained" value="true"/> <!-- true: travel time budget constraint (Horni et Al. 2008) -->
+		<param name="constrained" value="true"/> <!-- true: travel time budget constraint (Horni et al. 2008) -->
 		<param name="restraintFcnFactor" value="0.131687242798"/> <!-- factor of the fac.cap.restraint function -->
 		<param name="restraintFcnExp" value="5.0"/> <!-- exponent of the fac.cap.restraint function -->
 		<param name="scaleFactor" value="1"/> <!-- for sample scenarios, i.e. if 10% population then scalefactor = 10 -->
 		<param name="recursionTravelSpeedChange" value="0.1"/>
-		<param name="recursionTravelSpeed" value="8.4333333333333333"/>  <!-- MZ: 25.3 km/h + 20%  = 8.43 m/s -->
+		<param name="recursionTravelSpeed" value="8.4333333333333333"/>  <!-- [m/s] MZ: 25.3 km/h + 20%  = 8.43 m/s -->
 		<param name="maxRecursions" value="10"/> <!-- positive integer, if 0 := universal choice set -->
 	</module>
 		
