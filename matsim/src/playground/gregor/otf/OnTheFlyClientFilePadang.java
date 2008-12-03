@@ -1,6 +1,5 @@
 package playground.gregor.otf;
 
-import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 import java.util.Iterator;
@@ -169,11 +168,11 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 		Gbl.createConfig(null);
 		final OTFVisConfig conf = new OTFVisConfig();
-		conf.setLinkWidth(10);
+//		conf.setLinkWidth(10);
 		Gbl.getConfig().addModule("otfvis", conf);
 		
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
 		

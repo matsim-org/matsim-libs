@@ -22,7 +22,6 @@ package playground.gregor.systemopt;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.Id;
@@ -37,7 +36,6 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -117,21 +115,19 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		this.old = this.current;
 		this.current = new HashSet<String>();
 		
-		double time = Gbl.getConfig().simulation().getEndTime();
-		for (Entry<String, LinkInfo> e : this.linkInfos.entrySet()) {
-			if (e.getValue().agentsLeftLink.size() > 0) {
-//				applySocCostToRouterOnly(e.getValue(), e.getKey(),time);
-			}
-		}
+//		double time = Gbl.getConfig().simulation().getEndTime();
+//		for (Entry<String, LinkInfo> e : this.linkInfos.entrySet()) {
+//			if (e.getValue().agentsLeftLink.size() > 0) {
+////				applySocCostToRouterOnly(e.getValue(), e.getKey(),time);
+//			}
+//		}
 		
 	}
 	
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		super.handleEvent(event);
-		if (!this.old.contains(event.agentId)){
-			return;
-		}
+
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
 		aol.enterTime = event.time;
@@ -140,9 +136,6 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		if (!this.old.contains(event.agentId)){
-			return;
-		}
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
 		aol.enterTime = event.time;
@@ -153,9 +146,6 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		super.handleEvent(event);
-		if (!this.old.contains(event.agentId)){
-			return;
-		}
 		
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = info.agentsOnLink.poll();
@@ -187,15 +177,57 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 			this.socCosts.put(linkId, sc);
 		}
 		
-		
 		int lB = Math.max(info.lastFSSlice + 1,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
 		int uB = getTimeSlotIndex(eventTime) - 1;
+		
 
+		if (uB < lB) {
+			info.agentsLeftLink.clear();
+			return;
+		}
+		
 		//compute soc costs
+		int [][] agents = new int [(uB-lB)+1][2]; 
+		
+//		ConcurrentLinkedQueue<AgentInfo> ais = new ConcurrentLinkedQueue<AgentInfo>(); 
+		
+		for (AgentInfo ai : info.agentsLeftLink) {
+			int idx = getTimeSlotIndex(ai.enterTime) -lB;
+			if (idx < 0) {
+				continue;
+			}
+			if (idx > (uB-lB)){
+				continue;
+//				ais.add(ai);
+			}
+				
+			
+			try {
+				agents[idx][0]++;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (this.old.contains(ai.id)){
+				agents[idx][1]++;
+			}			
+			
+		}
+		
+		
+
+		
+
+
+
 		double socCost = 0;
 		for (int i = uB; i >= lB; i--) {
+			int idx = i - lB;
+			double w = (double)agents[idx][1]/agents[idx][0];
+			if (Double.isNaN(w)) {
+				w = 0;
+			}
 			socCost += this.travelTimeBinSize;
-			sc.setSocCost(i,socCost-this.travelTimeBinSize/2);
+			sc.setSocCost(i,w * (socCost-this.travelTimeBinSize/2));
 		}
 		
 		while (info.agentsLeftLink.size() > 0) {
@@ -213,25 +245,6 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		
 	}
 	
-	//TODO this is just a workaround - since we can not produce AgentMoneyEvents after the simulation is finished
-	private void applySocCostToRouterOnly(final LinkInfo info, final String linkId, final double eventTime){
-		SocialCostRole sc = this.socCosts.get(linkId);
-		if (sc == null) {
-			sc = new SocialCostRole();
-			this.socCosts.put(linkId, sc);
-		}
-		
-		
-		int lB = Math.max(info.lastFSSlice + 1,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
-		int uB = getTimeSlotIndex(eventTime) - 1;
-
-		//compute soc costs
-		double socCost = 0;
-		for (int i = uB; i >= lB; i--) {
-			socCost += this.travelTimeBinSize;
-			sc.setSocCost(i,socCost-this.travelTimeBinSize/2);
-		}
-	}
 	
 	private int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.travelTimeBinSize;
