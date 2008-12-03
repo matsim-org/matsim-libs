@@ -45,15 +45,13 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 		super.loadConfig(this.getInputDirectory() + "config.xml");
 
-//		for (BasicLeg.Mode mode : Gbl.getConfig().planomat().getPossibleModes()) {
-//			System.out.println(mode);
-//		}
-//		System.out.println("ende");
-//		System.out.println(Gbl.getConfig().planomat().getPossibleModes().length);
-//		System.out.println(BasicLeg.Mode.car.equals(Gbl.getConfig().planomat().getPossibleModes()[0]));
-//		System.out.println(BasicLeg.Mode.pt.equals(Gbl.getConfig().planomat().getPossibleModes()[1]));
-		// [TODO] don't know why the first test fails...
-		assertEquals( new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt}, Gbl.getConfig().planomat().getPossibleModes());
+		BasicLeg.Mode[] expectedModes = new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt};
+		BasicLeg.Mode[] actualModes = Gbl.getConfig().planomat().getPossibleModes();
+		
+		assertEquals( expectedModes.length, actualModes.length);
+		for (int ii=0; ii < expectedModes.length; ii++) {
+			assertEquals(expectedModes[ii], actualModes[ii]);
+		}
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		
 	}
