@@ -227,7 +227,7 @@ public class PopulationReaderWriterV5Test extends MatsimTestCase {
 		assertNotNull(activity.getLocation());
 		assertEquals(id666, activity.getLocation().getId());
 		assertEquals(LocationType.FACILITY, activity.getLocation().getLocationType());
-		assertEquals(new Integer(40), activity.getCapacity());
+		assertEquals(Integer.valueOf(40), activity.getCapacity());
 		assertNotNull(activity.getOpeningTime(DayType.wk));
 		assertEquals(8.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getStartTime(), EPSILON);
 		assertEquals(17.0 * 3600.0, activity.getOpeningTime(DayType.wk).first().getEndTime(), EPSILON);

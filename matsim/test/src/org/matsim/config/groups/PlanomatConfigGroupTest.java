@@ -20,6 +20,7 @@
 
 package org.matsim.config.groups;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -52,7 +53,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 //		System.out.println(BasicLeg.Mode.car.equals(Gbl.getConfig().planomat().getPossibleModes()[0]));
 //		System.out.println(BasicLeg.Mode.pt.equals(Gbl.getConfig().planomat().getPossibleModes()[1]));
 		// [TODO] don't know why the first test fails...
-		assertEquals( PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT, Gbl.getConfig().planomat().getPossibleModes());
+		assertEquals( new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt}, Gbl.getConfig().planomat().getPossibleModes());
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		
 	}

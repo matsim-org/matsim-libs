@@ -32,7 +32,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.BasicLeg;
-import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
 import org.matsim.facilities.Facilities;
@@ -146,7 +145,8 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 			if (
 					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
 					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
-				  Gbl.getConfig().planomat().setPossibleModes(PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT);
+				
+				  Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
 			}
 
 			tTravelEstimator.resetTravelTimes();
@@ -337,7 +337,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of 
 		Gbl.getConfig().planomat().setPopSize(1);
 		Gbl.getConfig().planomat().setJgapMaxGenerations(0);
-		Gbl.getConfig().planomat().setPossibleModes(PlanomatConfigGroup.POSSIBLE_MODES_CAR_PT);
+		Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
 		
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
