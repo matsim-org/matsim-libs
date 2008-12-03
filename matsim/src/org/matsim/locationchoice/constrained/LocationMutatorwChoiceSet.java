@@ -154,7 +154,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	protected boolean modifyLocation(Act act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
-		ArrayList<Facility> choiceSet = this.computeChoiceSet
+		ArrayList<Facility> choiceSet = this.computeChoiceSetCircle
 		(startCoord, endCoord, radius, act.getType());
 		
 		if (choiceSet.size()>1) {
@@ -184,7 +184,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return leg.getTravelTime();
 	}
 		
-	protected List<SubChain> calcActChains(final Plan plan) {
+	public List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();	
 		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
@@ -215,7 +215,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	}
 	
 	
-	private ArrayList<Facility>  computeChoiceSet(Coord coordStart, Coord coordEnd, 
+	public ArrayList<Facility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
