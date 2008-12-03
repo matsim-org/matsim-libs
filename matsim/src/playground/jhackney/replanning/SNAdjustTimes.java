@@ -47,9 +47,9 @@ public class SNAdjustTimes implements PlanAlgorithm {
 			// Might be easier to set start time of thisAct to the
 			// average arrival time of friends at thisAct
 
-			this.log.info("old "+thisAct.getStartTime());
+//			this.log.info("old "+thisAct.getStartTime());
 			thisAct.setStartTime(getAvgFriendArrTime(thisAct));
-			this.log.info("new "+thisAct.getStartTime());
+//			this.log.info("new "+thisAct.getStartTime());
 
 		}
 
