@@ -27,14 +27,14 @@ import org.matsim.facilities.Facility;
 
 public class RetailersControler extends Controler {
 	
-	private TreeMap<Id, Facility> retailersToBeRelocated;
+	private Retailers retailersToBeRelocated;
 	private Facilities facilities;
 	
 	public RetailersControler(final String[] args) {
 		super(args);
 		
 		this.facilities = super.getFacilities();
-		this.retailersToBeRelocated = new TreeMap<Id, Facility>();
+		this.retailersToBeRelocated = new Retailers();
 		this.addControlerListener(new RetailersLocationListener(this.retailersToBeRelocated));		
 	}
 
