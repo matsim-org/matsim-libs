@@ -34,6 +34,7 @@ import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -62,13 +63,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "1100", "0", null);
-		network.createNode("4", "1200", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "60000", "9", null, null);
-		/* ------ */ network.createLink("2", "2", "3", "1000", "10", "6000", "2", null, null);
-		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "1100", "0", null);
+		Node node4 = network.createNode("4", "1200", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
+		/* ------ */ network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
+		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -147,13 +148,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "1100", "0", null);
-		network.createNode("4", "1200", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "60000", "9", null, null);
-		Link link2 = network.createLink("2", "2", "3", "1000", "10", "6000", "2", null, null);
-		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "1100", "0", null);
+		Node node4 = network.createNode("4", "1200", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
+		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -165,6 +166,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+		route.setStartLink(link1);
+		route.setEndLink(link3);
 		route.setNodes("2 3");
 		leg.setRoute(route);
 		plan.createAct("w", link3);
@@ -178,6 +181,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
 			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			route.setStartLink(link2);
+			route.setEndLink(link3);
 			route.setNodes("3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -221,13 +226,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "1100", "0", null);
-		network.createNode("4", "1200", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "60000", "9", null, null);
-		Link link2 = network.createLink("2", "2", "3", "1000", "10", "6000", "2", null, null);
-		Link link3 = network.createLink("3", "3", "4", "100", "10", "60000", "9", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "1100", "0", null);
+		Node node4 = network.createNode("4", "1200", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
+		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -239,6 +244,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+		route.setStartLink(link1);
+		route.setEndLink(link3);
 		route.setNodes("2 3");
 		leg.setRoute(route);
 		plan.createAct("w", link3);
@@ -252,6 +259,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
 			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			route.setStartLink(link2);
+			route.setEndLink(link3);
 			route.setNodes("3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -265,6 +274,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			a2.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
 			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			route.setStartLink(link1);
+			route.setEndLink(link3);
 			route.setNodes("2 3");
 			leg.setRoute(route);
 			plan.createAct("w", link3);
@@ -364,19 +375,19 @@ public class QueueSimulationTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "1100", "0", null);
-		network.createNode("4", "2100", "0", null);
-		network.createNode("5", "3100", "0", null);
-		network.createNode("6", "3200", "0", null);
-		network.createNode("7", "3300", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "60000", "9", null, null);
-		network.createLink("2", "2", "3", "1000", "10", "6000", "2", null, null);
-		network.createLink("3", "3", "4", "1000", "10", "6000", "2", null, null);
-		network.createLink("4", "4", "5", "1000", "10", "6000", "2", null, null);
-		Link link5 = network.createLink("5", "5", "6", "100", "10", "60000", "9", null, null);
-		Link link6 = network.createLink("6", "6", "7", "100", "10", "60000", "9", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "1100", "0", null);
+		Node node4 = network.createNode("4", "2100", "0", null);
+		Node node5 = network.createNode("5", "3100", "0", null);
+		Node node6 = network.createNode("6", "3200", "0", null);
+		Node node7 = network.createNode("7", "3300", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
+		network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
+		network.createLink(new IdImpl("3"), node3, node4, 1000, 10, 6000, 2);
+		network.createLink(new IdImpl("4"), node4, node5, 1000, 10, 6000, 2);
+		Link link5 = network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
+		Link link6 = network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
