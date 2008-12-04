@@ -56,7 +56,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		schedulingModule.finish();
 		
 		for (int i=0;i<list[0].size();i++){
-			assignment.print(list[0].get(i).getPerson().getId()+"\t"+list[0].get(i).getScore()+"\t");
+			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
 			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
 				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
 			}
@@ -77,7 +77,10 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		}
 		assignmentModule.finish();
 		for (int i=0;i<Statistics.list.size();i++){
-			assignment.println(Statistics.list.get(i)[0]+"\t"+Statistics.list.get(i)[1]+"\t"+Statistics.list.get(i)[2]);
+			for (int j=0;j<Statistics.list.get(i).size();j++){
+				assignment.print(Statistics.list.get(i).get(j)+"\t");
+			}
+			assignment.println();
 		}
 		Statistics.list.clear();
 	}
@@ -86,15 +89,20 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		
 		double offset = 0.5;
 		double basis = this.coefficients.getPrimActsDistance();
-		double [][] score = new double [2][3];
+		double [][] score = new double [2][2];
 		double [][] tmp = new double [this.iterations][3];
+		int inc=1;
 		
 		for (int i=0;i<this.iterations;i++){
 			score[0][1]=basis+(i+1)*offset;
 			this.coefficients.setPrimActsDistance(score[0][1]);
 			score[0][0] = this.calculate();
 			
-			score[1][1]=basis-(i+1)*offset;
+			if (basis-(i+1)*offset>=0) score[1][1]=basis-(i+1)*offset;
+			else {
+				score [1][1] = basis+((this.iterations)+inc)*offset;
+				inc += 1;
+			}
 			this.coefficients.setPrimActsDistance(score[1][1]);
 			score[1][0] = this.calculate();
 				double tmpScore = Double.MIN_VALUE;
