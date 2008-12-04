@@ -472,6 +472,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 		}
 
+	public static GLContext getMotherContext() {
+		return motherContext;
+	}
+
+	public static void setMotherContext(GLContext motherContext) {
+		OTFOGLDrawer.motherContext = motherContext;
+	}
+
 	public static void addItem(OTFGLDrawable item) {
 		newItems.add(item);
 	}
