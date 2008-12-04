@@ -36,6 +36,10 @@
           <target>1.5</target>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
+          <compilerArguments>
+            <Xmaxwarns>1000</Xmaxwarns>
+            <Xmaxerrs>100</Xmaxerrs>
+          </compilerArguments>
         </configuration>
       </plugin>
       <plugin>
