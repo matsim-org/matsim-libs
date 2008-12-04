@@ -37,7 +37,7 @@ import org.matsim.population.routes.CarRoute;
  * @author dgrether
  *
  */
-public class HierarchicalRouteProvider extends AbstractRouteProvider implements RouteProvider {
+public class HierarchicalRouteProvider extends AbstractRouteProvider {
 
 	private static final Logger log = Logger.getLogger(HierarchicalRouteProvider.class);
 
@@ -72,7 +72,7 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider implements 
 			else {
 				routeNodes.addAll(subRoute.getNodes().subList(1, subRoute.getNodes().size()));
 			}
-			returnRoute.setNodes(routeNodes);
+			returnRoute.setNodes(departureLink, routeNodes, destinationLink);
 			if (isCompleteRoute(returnRoute, destinationLink)) {
 				return returnRoute;
 			}

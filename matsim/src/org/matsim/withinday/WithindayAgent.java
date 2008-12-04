@@ -37,6 +37,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.scoring.PlanScorer;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.collections.Tuple;
@@ -149,21 +150,19 @@ public class WithindayAgent extends PersonAgent {
 		CarRoute alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
 		Leg currentLeg = this.getCurrentLeg();
+		Route oldRoute = currentLeg.getRoute();
 
 		//create Route of already passed Nodes
 		//TODO dg use Route.getSubroute method
 		Node lastPassedNode = currentLink.getFromNode();
 		List<Node> oldRouteNodes = ((CarRoute) currentLeg.getRoute()).getNodes();
-		CarRoute alreadyPassedNodes = (CarRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
 		int lastPassedNodeIndex = oldRouteNodes.indexOf(lastPassedNode);
-		//this in fact a bit sophisticated construction is needed because Route.setRoute(..) doesn't use the List interface and
+		//this in fact a bit sophisticated construction is needed because Route.setNode(..) doesn't use the List interface and
 		//is bound to a ArrayList instead
-		ArrayList<Node> passedNodesList = new ArrayList<Node>();
+		List<Node> passedNodesList = new ArrayList<Node>();
 		if (lastPassedNodeIndex != -1) {
 			passedNodesList.addAll(oldRouteNodes.subList(0, lastPassedNodeIndex+1));
-			alreadyPassedNodes.setNodes(passedNodesList);
 		}
-		alreadyPassedNodes.setNodes(passedNodesList);
 		//create new plan
 		Plan newPlan = new Plan(this.getPerson());
 		newPlan.copyPlan(oldPlan);
@@ -180,11 +179,11 @@ public class WithindayAgent extends PersonAgent {
     Leg oldLeg = (Leg) newPlan.getActsLegs().remove(currentLegIndex);
     Leg newLeg = new Leg(oldLeg);
     //concat the Route of already passed nodes with the new route
-    ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(alreadyPassedNodes.getNodes().size() + alternativeRoute.getNodes().size());
-    newRouteConcatedList.addAll(alreadyPassedNodes.getNodes());
+    ArrayList<Node> newRouteConcatedList = new ArrayList<Node>(passedNodesList.size() + alternativeRoute.getNodes().size());
+    newRouteConcatedList.addAll(passedNodesList);
     newRouteConcatedList.addAll(alternativeRoute.getNodes());
     CarRoute newRoute = (CarRoute) ((NetworkLayer) currentLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
-    newRoute.setNodes(newRouteConcatedList);
+    newRoute.setNodes(oldRoute.getStartLink(), newRouteConcatedList, oldRoute.getEndLink());
     //put the new route in the leg and the leg in the plan
     newLeg.setRoute(newRoute);
     newPlan.getActsLegs().add(currentLegIndex, newLeg);
@@ -210,7 +209,7 @@ public class WithindayAgent extends PersonAgent {
 	    	log.trace("  new route: " + newRoute + " nodes: " + buffer.toString());
     	}
     	this.getPerson().exchangeSelectedPlan(newPlan, false);
-    	this.exchangeCurrentLeg(currentLegIndex, newLeg);
+    	this.exchangeCurrentLeg(newLeg);
   
     	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId().toString(), alternativeRoute));
     }
@@ -261,19 +260,10 @@ public class WithindayAgent extends PersonAgent {
 		return l;
 	}
 
-
-	public void exchangeCurrentLeg(int currentLegIndex, Leg newLeg) {
+	public void exchangeCurrentLeg(Leg newLeg) {
 		this.cachedNextLink = null;
 		this.setCurrentLeg(newLeg);
 	}
-	
-//	/**
-//	 * @return the vehicle
-//	 */
-//	public OccupiedVehicle getVehicle() {
-//		return this.vehicle;
-//	}
-
 
 	public void setAgentContentment(final AgentContentment contentment) {
 		this.contentment = contentment;
