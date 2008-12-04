@@ -47,7 +47,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		Gbl.createWorld().setNetworkLayer(network);
 		Population population = new Population(Population.NO_STREAMING);
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
-		reader.parse("test/scenarios/equil/plans2.xml");
+		reader.parse(getInputDirectory() + "plans2.xml");
 
 		assertEquals("population size.", 2, population.size());
 		Person person1 = population.getPerson(new IdImpl("1"));
@@ -56,14 +56,25 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		Route route1a = leg1a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("1")), route1a.getStartLink());
 		assertEquals("different endLink for first leg.", network.getLink(new IdImpl("20")), route1a.getEndLink());
-		Leg leg2a = (Leg) plan1.getActsLegs().get(3);
+		Leg leg1b = (Leg) plan1.getActsLegs().get(3);
+		Route route1b = leg1b.getRoute();
+		assertEquals("different startLink for second leg.", network.getLink(new IdImpl("20")), route1b.getStartLink());
+		assertEquals("different endLink for second leg.", network.getLink(new IdImpl("20")), route1b.getEndLink());
+		Leg leg1c = (Leg) plan1.getActsLegs().get(5);
+		Route route1c = leg1c.getRoute();
+		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route1c.getStartLink());
+		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route1c.getEndLink());
+
+		Person person2 = population.getPerson(new IdImpl("2"));
+		Plan plan2 = person2.getPlans().get(0);
+		Leg leg2a = (Leg) plan2.getActsLegs().get(1);
 		Route route2a = leg2a.getRoute();
-		assertEquals("different startLink for second leg.", network.getLink(new IdImpl("20")), route2a.getStartLink());
-		assertEquals("different endLink for second leg.", network.getLink(new IdImpl("20")), route2a.getEndLink());
-		Leg leg3a = (Leg) plan1.getActsLegs().get(5);
-		Route route3a = leg3a.getRoute();
-		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route3a.getStartLink());
-		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route3a.getEndLink());
+		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("2")), route2a.getStartLink());
+		assertEquals("different endLink for first leg.", network.getLink(new IdImpl("20")), route2a.getEndLink());
+		Leg leg2b = (Leg) plan2.getActsLegs().get(3);
+		Route route2b = leg2b.getRoute();
+		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route2b.getStartLink());
+		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route2b.getEndLink());
 	}
 
 }

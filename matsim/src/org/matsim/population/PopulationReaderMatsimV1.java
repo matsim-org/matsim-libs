@@ -163,6 +163,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.currplan = this.currperson.createPlan(selected);
+		this.prevRoute = null;
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {

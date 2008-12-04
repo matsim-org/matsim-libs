@@ -275,6 +275,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			throw new NumberFormatException(
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
+		this.prevRoute = null;
 		this.currplan = this.currperson.createPlan(selected);
 
 		String scoreString = atts.getValue("score");
