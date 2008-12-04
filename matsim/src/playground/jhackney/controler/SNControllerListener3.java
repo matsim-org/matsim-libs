@@ -147,10 +147,15 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	
 	private final Logger log = Logger.getLogger(SNControllerListener3.class);
 
-	private Controler controler = null;
+//	private Controler controler = null;
+	private playground.jhackney.controler.SNController3 controler=null;
 
+	public SNControllerListener3(playground.jhackney.controler.SNController3 controler){
+		this.controler=controler;
+	}
+	
 	public void notifyStartup(final StartupEvent event) {
-		this.controler = event.getControler();
+//		this.controler = event.getControler();
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());

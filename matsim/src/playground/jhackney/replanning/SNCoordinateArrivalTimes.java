@@ -41,10 +41,9 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 public class SNCoordinateArrivalTimes extends MultithreadedModuleA {
 
-	private Controler controler;
-//	private playground.jhackney.controler.SNController3 controler;
+	private playground.jhackney.controler.SNController3 controler;
 
-	public SNCoordinateArrivalTimes(Controler controler) {
+	public SNCoordinateArrivalTimes(playground.jhackney.controler.SNController3 controler) {
 
     	this.controler=controler;
     }

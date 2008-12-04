@@ -18,10 +18,11 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
 
 public class SNAdjustTimes implements PlanAlgorithm {
 
-	private Controler controler;
+//	private Controler controler;
+	private playground.jhackney.controler.SNController3 controler;
 	private final Logger log = Logger.getLogger(SNAdjustTimes.class);
 
-	public SNAdjustTimes(Controler controler){
+	public SNAdjustTimes(playground.jhackney.controler.SNController3 controler){
 		this.controler=controler;
 	}
 	public void run(Plan plan) {

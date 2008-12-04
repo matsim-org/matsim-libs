@@ -26,14 +26,18 @@ import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 public class SNController3 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController3.class);
-
+	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
+	protected SNControllerListener3 snControllerListener;
+		
 	public SNController3(String args[]){
 		super(args);
+		this.snControllerListener=new SNControllerListener3(this);
+		this.addControlerListener(new SNControllerListener3(this));
 	}
 
 	public static void main(final String[] args) {
 		final Controler controler = new SNController3(args);
-		controler.addControlerListener(new SNControllerListener3());
+//		controler.addControlerListener(new SNControllerListener3());
 		controler.setOverwriteFiles(true);
 		controler.run();
 		System.exit(0);
