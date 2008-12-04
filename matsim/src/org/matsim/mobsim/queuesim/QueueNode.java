@@ -93,8 +93,14 @@ public class QueueNode {
 		if (nextLink != null) {
 
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
-			// FIXME: Ich hätte gerne die alte Konstruktion wieder, dass explizit über den Knoten nach den outgoing links
-			// gesucht wird.  Ansonsten kann man hier nämlich teleportieren.  kai, nov08
+			// _FIXME: Ich haette gerne die alte Konstruktion wieder, dass explizit ueber den Knoten nach den outgoing links
+			// gesucht wird.  Ansonsten kann man hier naemlich teleportieren.  kai, nov08
+			/* This is done in PersonAgent.chooseNextLink() (see few lines above). 
+			 * The line here only does the lookup from Link to QueueLink. If one
+			 * still wants to have the check, I propose to use 
+			 * currentQueueLink.getToNode() == nextQueueLink.getFromNode(), which should be
+			 * more efficient then looping through all outgoing links.  marcel/04dec2008
+			 */
 
 			if (nextQueueLink.hasSpace()) {
 				currentQueueLink.popFirstFromBuffer();
