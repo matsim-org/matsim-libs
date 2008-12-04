@@ -39,7 +39,7 @@ public class Retailers {
 	private static Retailers singleton = new Retailers();
 	private String name = null; // probably unnecessary, or include it into schema
 	private String desc = null;
-	private final TreeMap<Id, Retailer> Retailers = new TreeMap<Id, Retailer>();
+	private final TreeMap<Id, Facility> Retailers = new TreeMap<Id, Facility>();
 	private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
 	
 
@@ -100,11 +100,11 @@ public class Retailers {
 		return this.desc;
 	}
 
-	public final TreeMap<Id, Retailer> getRetailers() {
+	public final TreeMap<Id, Facility> getRetailers() {
 		return this.Retailers;
 	}
 
-	public final Retailer getRetailer(final Id locId) {
+	public final Facility getRetailer(final Id locId) {
 		return this.Retailers.get(locId);
 	}
 

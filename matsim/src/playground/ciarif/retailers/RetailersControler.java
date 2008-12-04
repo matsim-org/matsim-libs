@@ -22,18 +22,20 @@ package playground.ciarif.retailers;
 import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
-
+import org.matsim.facilities.Facilities;
+import org.matsim.facilities.Facility;
 
 public class RetailersControler extends Controler {
 	
-	private TreeMap<Id, NewRetailerLocation> newRetailersLocations;
+	private TreeMap<Id, Facility> retailersToBeRelocated;
+	private Facilities facilities;
 	
 	public RetailersControler(final String[] args) {
 		super(args);
 		
-		this.newRetailersLocations = new TreeMap<Id, NewRetailerLocation>();
-		this.addControlerListener(new RetailersLocationListener(this.newRetailersLocations));		
+		this.facilities = super.getFacilities();
+		this.retailersToBeRelocated = new TreeMap<Id, Facility>();
+		this.addControlerListener(new RetailersLocationListener(this.retailersToBeRelocated));		
 	}
 
    

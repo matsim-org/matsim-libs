@@ -29,9 +29,6 @@ package playground.ciarif.retailers;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-//import java.io.BufferedWriter;
-//import java.io.IOException;
-//import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.controler.events.BeforeMobsimEvent;
@@ -41,46 +38,56 @@ import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.interfaces.basic.v01.BasicLocation;
-//import org.matsim.gbl.Gbl;
-//import org.matsim.locationchoice.facilityload.EventsToFacilityLoad;
-//import org.matsim.locationchoice.facilityload.FacilityPenalty;
-//import org.matsim.utils.io.IOUtils;
-//import org.matsim.world.algorithms.WorldBottom2TopCompletion;
-//import org.matsim.world.algorithms.WorldCheck;
-//import org.matsim.world.algorithms.WorldValidation;
-import org.matsim.world.Location;
 import org.matsim.network.Link;
+/*import org.matsim.interfaces.basic.v01.BasicLocation;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import org.apache.log4j.Logger;//import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.facilityload.EventsToFacilityLoad;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.utils.io.IOUtils;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.Location;*/
+
 
 public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
 
 	
-	private TreeMap<Id, Facility> retailersToBeRelocated;
+	private Retailers retailersToBeRelocated;
 
-	public RetailersLocationListener(TreeMap<Id, Facility> retailersToBeRelocated) {
+	public RetailersLocationListener(Retailers retailersToBeRelocated) {
 		this.retailersToBeRelocated = retailersToBeRelocated;
 	}
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler();
-		Facilities facilities = controler.getFacilities();
-		Iterator<Facility> iter_fac = this.retailersToBeRelocated.values().iterator();
+		Map<Id,Link> links = controler.getNetwork().getLinks();
+		//Facilities facilities = controler.getFacilities();
+		//Retailers retailersToBeRelocated = chooseRetailersTBR (facilities);
+		Iterator<Facility> iter_fac = this.retailersToBeRelocated.getRetailers().values().iterator();
+				
 		while (iter_fac.hasNext()) {
 			Facility f = iter_fac.next();
-			Map<Id,Link> links = controler.getNetwork().getLinks();
-			Link link = newRetailersLocation (links);//Location location = facilities.getLocation(f.getId());
-	
+			int key = newRetailersLocation (links);//Location location = facilities.getLocation(f.getId());
+			f.setLocation(links.get(key).getCenter());
+			links.remove(key);
 		}
 	}
 			
+//	private TreeMap<Id, Facility> chooseRetailersTBR(Facilities facilities) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 	// Might it be a separate class instead of a method? For example 
 	// a class where more different methods would implement different
 	// ways (algorithms) to choose the new locations.
 	
-	Link newRetailersLocation (Map<Id,Link> links){
+	private int newRetailersLocation (Map<Id,Link> links){
 		int rd = MatsimRandom.random.nextInt(links.size()-1);
-		Link link = links.get(rd);
-		return link;
+		return rd;
 	}
 	
 	public void notifyBeforeMobsim (BeforeMobsimEvent event) {
