@@ -29,6 +29,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.population.Act;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -72,7 +74,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		
 		optimizedAgentsLoop:
 		for (int j=0;j<agents.getNumberOfAgents();j++){
-/*
+
 			// hard constraints
 			for (int i=0;i<plan.getPerson().getKnowledge().getActivities(true).size();i++){
 				boolean in = false;
@@ -87,7 +89,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 					continue optimizedAgentsLoop;
 				}
 			}
-			*/
+			
 			// distance (=soft) fitness
 			distanceAgent=0;
 			if (this.distance=="distance"){
@@ -103,8 +105,17 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
 			}
 			if (distanceAgent<distance){
-				assignedAgent=j;
-				distance = distanceAgent;
+				/*if (Statistics.prt==true){
+					if (agents.filling[j]>0){
+						assignedAgent=j;
+						distance = distanceAgent;
+						agents.filling[j]--;
+					}
+				}
+				else {*/
+					assignedAgent=j;
+					distance = distanceAgent;
+				//}
 			}
 		}
 		if (distance==Double.MAX_VALUE){
@@ -116,9 +127,16 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		this.router.run(plan);
 		this.timer.run(plan);
 		
-		if (Statistics.prt==true) Statistics.list.add(new String []{plan.getPerson().getId().toString(),agents.getAgentPerson(assignedAgent).getId().toString(),""+plan.getScore()});	
+		if (Statistics.prt==true) {
+			ArrayList<String> prt = new ArrayList<String>();
+			prt.add(""+plan.getPerson().getId().toString());
+			prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
+			prt.add(""+plan.getScore());
+			for (int y=0;y<plan.getActsLegs().size();y+=2){
+				prt.add(((Act)(plan.getActsLegs().get(y))).getType());
+			}
+			Statistics.list.add(prt);	
+		}	
 	}	
-	
-	
 }
 	
