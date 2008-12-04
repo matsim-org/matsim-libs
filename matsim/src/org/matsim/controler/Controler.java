@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Hashtable;
 
 import javax.swing.event.EventListenerList;
 
@@ -74,7 +72,6 @@ import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
@@ -102,7 +99,6 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
@@ -155,9 +151,6 @@ public class Controler {
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
-	// JH
-	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
-	// JH end
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
@@ -1022,14 +1015,7 @@ public class Controler {
 	public final Events getEvents() {
 		return this.events;
 	}
-//	JH
-	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
-		return this.twm;
-	}
-	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
-		this.twm=twm;
-	}
-// JH end
+
 	/**
 	 * @return real-world traffic counts if available, <code>null</code> if no data is available.
 	 */
