@@ -151,7 +151,9 @@ public class RecyclingModule implements StrategyModule {
 		this.assignmentModule.finish();
 		
 		for (int i=0;i<Statistics.list.size();i++){
-			assignment.println(Statistics.list.get(i)[0]+"\t"+Statistics.list.get(i)[1]+"\t"+Statistics.list.get(i)[2]);
+			for (int j=0;j<Statistics.list.get(i).size();j++){
+				assignment.println(Statistics.list.get(i).get(j));
+			}
 		}
 		Statistics.list.clear();
 	}
