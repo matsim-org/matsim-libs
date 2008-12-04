@@ -52,7 +52,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
 	protected final String						distance, homeLocation;
-	protected LinkedList<String>					nonassignedAgents;
+	protected LinkedList<String>				nonassignedAgents;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
 	
@@ -117,7 +117,11 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.router.run(plan);
 		this.timer.run(plan);
 		
-		Statistics.list.add(new String []{plan.getPerson().getId().toString(),agents.getAgentPerson(assignedAgent).getId().toString(),""+plan.getScore()});	
+		ArrayList<String> prt = new ArrayList<String>();
+		prt.add(""+plan.getPerson().getId().toString());
+		prt.add(""+agents.getAgentPerson(assignedAgent).getId().toString());
+		prt.add(""+plan.getScore());
+		Statistics.list.add(prt);	
 				
 	}	
 	
@@ -140,12 +144,10 @@ public class AgentsAssigner implements PlanAlgorithm{
 					if (((Act)(bestPlan.getActsLegs().get(i))).getType().equals(primActs.get(j).getType())){
 						Facility fac = (Facility) this.controler.getFacilities().getLocation(primActs.get(j).getFacility().getId());
 						((Act)(bestPlan.getActsLegs().get(i))).setFacility(fac);
-						//log.info("Für type "+primActs.get(j).getType()+", set Facility = "+primActs.get(j).getFacility().getId()+" für Person "+out.getPerson().getId());
 						primActs.remove(j);
 						break;
 					}
 				}
-				//log.info("Für type "+((Act)(bestPlan.getActsLegs().get(i))).getType()+", Facility = "+((Act)(bestPlan.getActsLegs().get(i))).getFacility().getId()+" für Person "+out.getPerson().getId());
 			}
 		}
 		
