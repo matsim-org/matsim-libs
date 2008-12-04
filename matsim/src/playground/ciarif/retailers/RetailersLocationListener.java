@@ -61,6 +61,11 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		this.retailersToBeRelocated = retailersToBeRelocated;
 	}
 
+	public RetailersLocationListener(
+			TreeMap<Id, Facility> retailersToBeRelocated2) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,Link> links = controler.getNetwork().getLinks();

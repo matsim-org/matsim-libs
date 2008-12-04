@@ -70,15 +70,15 @@ public class Retailers {
 	 * @param cust_spm the numbers of costumers to be served
 	 * @return the created Retailer object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Retailer createRetailer(final Id id, final int cust_sqm ) {
-		// check id string for uniqueness
-		if (this.Retailers.containsKey(id)) {
-			return null;
-		}
-		Retailer c = new Retailer(id, cust_sqm);
-		this.Retailers.put(id, c);
-		return c;
-	}
+//	public final Retailer createRetailer(final Id id, final int cust_sqm ) {
+//		// check id string for uniqueness
+//		if (this.Retailers.containsKey(id)) {
+//			return null;
+//		}
+//		Facility c = new Facility(id, cust_sqm);
+//		this.Retailers.put(id, c);
+//		return c;
+//	}
 
 	public final void setName(final String name) {
 		this.name = name;
