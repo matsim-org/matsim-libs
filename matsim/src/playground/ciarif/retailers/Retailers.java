@@ -43,7 +43,7 @@ public class Retailers {
 	private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
 	
 
-	private Retailers() {
+	public Retailers() {
 	}
 
 	public static final Retailers getSingleton() {

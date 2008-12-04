@@ -56,7 +56,7 @@ public class RetailersReader extends MatsimXmlParser {
 	private void startRetailer(final Attributes meta) {
 		int locId = Integer.parseInt(meta.getValue("id"));
 		int cust_sqm = Integer.parseInt(meta.getValue("cust_sqm"));
-		this.curr_retailer = this.retailers.createRetailer(new IdImpl(locId), cust_sqm);
+		//this.curr_retailer = this.retailers.createRetailer(new IdImpl(locId), cust_sqm);
 		if (this.curr_retailer == null) {
 			log.warn("There is already a retailers object for location " + locId +
 					". The retailers for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");
