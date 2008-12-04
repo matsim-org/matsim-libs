@@ -53,6 +53,7 @@ public class PersonAgent {
 	private transient Link destinationLink;
 
 	private Leg currentLeg;
+	private List<Node> cacheRouteNodes = null;
 
 	private int currentNodeIndex;
 
@@ -102,6 +103,7 @@ public class PersonAgent {
 
 	protected void setCurrentLeg(final Leg leg) {
 		this.currentLeg  = leg;
+		this.cacheRouteNodes = null;
 	}
 
 	public int getCurrentNodeIndex() {
@@ -169,6 +171,7 @@ public class PersonAgent {
 		// set the route according to the next leg
 		Leg leg = (Leg) this.getActsLegs().get(this.nextActivity+1);
 		this.currentLeg = leg;
+		this.cacheRouteNodes = null;
 		this.currentNodeIndex = 1;
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
@@ -219,9 +222,11 @@ public class PersonAgent {
 		if (this.cachedNextLink != null) {
 			return this.cachedNextLink;
 		}
-		List<Node> route = ((CarRoute) this.currentLeg.getRoute()).getNodes();
-
-		if (this.currentNodeIndex >= route.size() ) {
+		if (this.cacheRouteNodes == null) {
+			this.cacheRouteNodes = ((CarRoute) this.currentLeg.getRoute()).getNodes();
+		}
+		
+		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {
 			// we have no more information for the route, so we should have arrived at the destination link
 			if (this.currentLink.getToNode().equals(this.destinationLink.getFromNode())) {
 				this.cachedNextLink = this.destinationLink;
@@ -233,7 +238,7 @@ public class PersonAgent {
 			return null;
 		}
 
-		Node destNode = route.get(this.currentNodeIndex);
+		Node destNode = this.cacheRouteNodes.get(this.currentNodeIndex);
 
 		for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 			if (link.getToNode() == destNode) {
