@@ -37,6 +37,10 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
 
 /**
+ * This test uses the org.matsim.examples equil scenario with two agents
+ * to check the calculation of scores and traveltimes in the framework.
+ * The scores and traveltimes calculated by MATSim are compared
+ * with values analytically computed by hand.
  * @author dgrether
  */
 public class EquilTwoAgentsTest extends MatsimTestCase {
