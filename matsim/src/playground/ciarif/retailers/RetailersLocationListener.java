@@ -76,7 +76,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		while (iter_fac.hasNext()) {
 			Facility f = iter_fac.next();
 			int key = newRetailersLocation (links);//Location location = facilities.getLocation(f.getId());
-			f.setLocation(links.get(key).getCenter());
+			//f.setLocation(links.get(key).getCenter());
 			links.remove(key);
 		}
 	}
