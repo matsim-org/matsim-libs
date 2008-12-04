@@ -69,7 +69,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 
 	private void getLinksTillLink(final List<Link> links, final Link nextLink, final Link startLink) {
 		Link link = startLink;
-		for (;;) { // loop until we hit "return;"
+		while (true) { // loop until we hit "return;"
 			for (Link outLink : link.getToNode().getOutLinks().values()) {
 				if (outLink == nextLink) {
 					return;
@@ -248,7 +248,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 			this.uncompressedLength = 0;
 			return;
 		}
-		for (; iter.hasNext(); ) {
+		while (iter.hasNext()) {
 			Node node = iter.next();
 			// find link from prevNode to node
 			Link link = null;
