@@ -26,10 +26,10 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatConfigGroupTest extends MatsimTestCase {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+//	protected void setUp() throws Exception {
+//		super.setUp();
+//	}
+//
 	public void testPlanomatConfigGroup() {
 		
 		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
@@ -37,7 +37,12 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		assertEquals( PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES, Gbl.getConfig().planomat().getPossibleModes() );
+		BasicLeg.Mode[] expectedModes = PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES;
+		BasicLeg.Mode[] actualModes = Gbl.getConfig().planomat().getPossibleModes();
+		assertEquals(expectedModes.length, actualModes.length);
+		for (int ii=0; ii < expectedModes.length; ii++) {
+			assertEquals(expectedModes[ii], actualModes[ii]);
+		}
 		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 	}
 

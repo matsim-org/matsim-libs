@@ -29,8 +29,7 @@ public class PlanomatConfigGroup extends Module {
 	private int jgapMaxGenerations;
 
 	public static final String POSSIBLE_MODES = "possibleModes";
-	protected static final BasicLeg.Mode[] POSSIBLE_MODES_CAR = new BasicLeg.Mode[]{BasicLeg.Mode.car};
-	protected static final BasicLeg.Mode[] DEFAULT_POSSIBLE_MODES = PlanomatConfigGroup.POSSIBLE_MODES_CAR;
+	static final BasicLeg.Mode[] DEFAULT_POSSIBLE_MODES = new BasicLeg.Mode[]{BasicLeg.Mode.car};
 	private BasicLeg.Mode[] possibleModes;
 
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR_NAME = "legTravelTimeEstimator";
@@ -135,11 +134,11 @@ public class PlanomatConfigGroup extends Module {
 	}
 
 	public BasicLeg.Mode[] getPossibleModes() {
-		return possibleModes;
+		return possibleModes.clone();
 	}
 
 	public void setPossibleModes(BasicLeg.Mode[] possibleModes) {
-		this.possibleModes = possibleModes;
+		this.possibleModes = possibleModes.clone();
 	}
 
 	public void setPopSize(int popSize) {
