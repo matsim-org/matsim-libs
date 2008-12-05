@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PersonEntersVehicleEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.events.handler.EventHandler;
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
-
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
-
-		return suite;
-	}
-
-
+public interface DepartureAtFacilityEventHandler extends EventHandler {
+	public void handleEvent(DepartureAtFacilityEvent event);
 }

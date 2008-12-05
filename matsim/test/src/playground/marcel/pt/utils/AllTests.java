@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.utils;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,11 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
+		TestSuite suite = new TestSuite("Tests for playground.marcel.pt.utils");
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
+		suite.addTestSuite(FacilityVisitorsTest.class);
 
 		return suite;
 	}

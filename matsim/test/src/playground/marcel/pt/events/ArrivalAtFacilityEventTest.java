@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ArrivalAtFacilityEventTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package playground.marcel.pt.events;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.events.XmlEventsTester;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.marcel.pt");
-
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.events.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
-
-		return suite;
+public class ArrivalAtFacilityEventTest extends MatsimTestCase {
+	
+	public void testWriteReadXml() {
+		XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", new ArrivalAtFacilityEvent(3605.0, null));
 	}
-
-
 }
