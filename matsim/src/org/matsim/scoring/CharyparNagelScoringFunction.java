@@ -175,16 +175,16 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	/* At the moment, the following values are all static's. But in the longer run,
 	 * they should be agent-specific or facility-specific values...
 	 */
-	protected static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
-	protected static double marginalUtilityOfWaiting = Double.NaN;
-	protected static double marginalUtilityOfLateArrival = Double.NaN;
-	protected static double marginalUtilityOfEarlyDeparture = Double.NaN;
-	protected static double marginalUtilityOfTraveling = Double.NaN;
-	private static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
-	private static double marginalUtilityOfTravelingWalk = Double.NaN;
-	protected static double marginalUtilityOfPerforming = Double.NaN;
-	private static double marginalUtilityOfDistance = Double.NaN;
-	private static double abortedPlanScore = Double.NaN;
+	/*package*/ static final TreeMap<String, ActUtilityParameters> utilParams = new TreeMap<String, ActUtilityParameters>();
+	/*package*/ static double marginalUtilityOfWaiting = Double.NaN;
+	/*package*/ static double marginalUtilityOfLateArrival = Double.NaN;
+	/*package*/ static double marginalUtilityOfEarlyDeparture = Double.NaN;
+	/*package*/ static double marginalUtilityOfTraveling = Double.NaN;
+	/*package*/ static double marginalUtilityOfTravelingPT = Double.NaN; // public transport
+	/*package*/ static double marginalUtilityOfTravelingWalk = Double.NaN;
+	/*package*/ static double marginalUtilityOfPerforming = Double.NaN;
+	/*package*/ static double marginalUtilityOfDistance = Double.NaN;
+	/*package*/ static double abortedPlanScore = Double.NaN;
 
 	protected static void init() {
 		if (initialized) return;

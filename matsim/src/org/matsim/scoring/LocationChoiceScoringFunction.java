@@ -20,6 +20,9 @@
 
 package org.matsim.scoring;
 
+import static org.matsim.scoring.CharyparNagelScoringFunction.marginalUtilityOfEarlyDeparture;
+import static org.matsim.scoring.CharyparNagelScoringFunction.marginalUtilityOfLateArrival;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -112,7 +115,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 			//---------------------------------------------------------------------------
 				
 		} else {
-			tmpScore += 2*marginalUtilityOfLateArrival*Math.abs(duration);
+			tmpScore += 2*super.marginalUtilityOfLateArrival*Math.abs(duration);
 		}
 		
 				

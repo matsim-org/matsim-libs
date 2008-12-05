@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CharyparNagelOpenTimesScoringFunctionTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.scoring;
 
 import org.matsim.basic.v01.IdImpl;
@@ -5,6 +25,7 @@ import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
@@ -36,16 +57,16 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 
 		Activity noWedAndWkDay = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
-		noWedAndWkDay.createOpentime(DayType.fri, 8.0 * 3600, 16.0 * 3600);
+		noWedAndWkDay.addOpeningTime(new OpeningTime(DayType.fri, 8.0 * 3600, 16.0 * 3600));
 
 		Activity wkdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
-		wkdayActivity.createOpentime(DayType.wkday, 7.5 * 3600, 18.0 * 3600);
+		wkdayActivity.addOpeningTime(new OpeningTime(DayType.wkday, 7.5 * 3600, 18.0 * 3600));
 
 		Activity wednesdayActivity = testFacility.createActivity(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
-		wednesdayActivity.createOpentime(DayType.wed, 6.0 * 3600, 11.0 * 3600);
-		wednesdayActivity.createOpentime(DayType.wed, 13.0 * 3600, 19.0 * 3600);
+		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 6.0 * 3600, 11.0 * 3600));
+		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 13.0 * 3600, 19.0 * 3600));
 		// this one should be ignored
-		wednesdayActivity.createOpentime(DayType.wkday, 4.0 * 3600, 20.0 * 3600);
+		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wkday, 4.0 * 3600, 20.0 * 3600));
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
