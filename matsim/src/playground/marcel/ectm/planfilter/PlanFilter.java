@@ -168,10 +168,9 @@ public class PlanFilter {
 				if (!subnet.getNodes().containsKey(toNode.getId())) {
 					subnet.createNode(toNode.getId().toString(), Double.toString(toNode.getCoord().getX()), Double.toString(toNode.getCoord().getY()), toNode.getType());
 				}
-				subnet.createLink(link.getId().toString(), fromNode.getId().toString(), toNode.getId().toString(),
-						Double.toString(link.getLength()), Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
-						Double.toString(link.getCapacity(Time.UNDEFINED_TIME)), Double.toString(link.getLanes(Time.UNDEFINED_TIME)),
-						link.getOrigId(), link.getType());
+				subnet.createLink(link.getId(), subnet.getNode(fromNode.getId()), subnet.getNode(toNode.getId()),
+						link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME),
+						link.getCapacity(Time.UNDEFINED_TIME), link.getLanes(Time.UNDEFINED_TIME));
 			}
 		}
 		new NetworkWriter(subnet, "ivtch-osm_zrh14km.xml").write();

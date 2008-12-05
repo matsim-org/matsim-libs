@@ -36,6 +36,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
@@ -171,13 +172,13 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		world.setNetworkLayer(network);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "200", "0", null);
-		network.createNode("4", "300", "0", null);
-		network.createLink("1", "1", "2", "100", "10", "3600", "1", null, null);
-		network.createLink("2", "2", "3", "100", "10", "3600", "1", null, null);
-		network.createLink("3", "3", "4", "100", "10", "3600", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "200", "0", null);
+		Node node4 = network.createNode("4", "300", "0", null);
+		network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
+		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 
 		return network;
 	}
@@ -188,6 +189,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @param depTime the departure time for the first person.
 	 * @param depLink the departure link.
 	 * @param destLink the destination link.
+	 * @param network
 	 * @param count the number of persons to create
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger

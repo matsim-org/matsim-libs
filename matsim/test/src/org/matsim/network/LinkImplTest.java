@@ -20,12 +20,13 @@
 
 package org.matsim.network;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class LinkImplTest extends MatsimTestCase {
 
-	/** Tests the method {@link LinkImpl#calcDistance(org.matsim.utils.geometry.CoordI)}.
+	/** Tests the method {@link LinkImpl#calcDistance(org.matsim.utils.geometry.Coord)}.
 	 *
 	 * @author mrieser
 	 **/
@@ -47,15 +48,15 @@ public class LinkImplTest extends MatsimTestCase {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		final NetworkLayer network = new NetworkLayer();
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "0", "1000", null);
-		network.createNode("3", "1000", "2000", null);
-		network.createNode("4", "2000", "2000", null);
-		network.createNode("5", "1000", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "1000", "1", "3600", "1", null, null);
-		Link link2 = network.createLink("2", "2", "3", "1500", "1", "3600", "1", null, null);
-		Link link3 = network.createLink("3", "3", "4", "1000", "1", "3600", "1", null, null);
-		Link link4 = network.createLink("4", "4", "5", "2800", "1", "3600", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "0", "1000", null);
+		Node node3 = network.createNode("3", "1000", "2000", null);
+		Node node4 = network.createNode("4", "2000", "2000", null);
+		Node node5 = network.createNode("5", "1000", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 1, 3600, 1);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1500, 1, 3600, 1);
+		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
+		Link link4 = network.createLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
 
 		// do the following cases for each link
 

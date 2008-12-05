@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
@@ -42,12 +43,12 @@ public class ActLinkFilterTest extends MatsimTestCase {
 
 		// fixture: 2 links and 2 persons
 		NetworkLayer network = new NetworkLayer();
-		network.createNode("1", "100.0", "100.0", "unknown");
-		network.createNode("2", "200.0", "200.0", "unknown");
-		network.createNode("3", "300.0", "300.0", "unknown");
+		Node node1 = network.createNode("1", "100.0", "100.0", "unknown");
+		Node node2 = network.createNode("2", "200.0", "200.0", "unknown");
+		Node node3 = network.createNode("3", "300.0", "300.0", "unknown");
 
-		network.createLink("1", "1", "2", "1000.0", "20", "200", "2", "1", "unknown");
-		network.createLink("2", "2", "3", "1000.0", "20", "200", "2", "2", "unknown");
+		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 20, 200, 2);
+		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 20, 200, 2);
 
 		TreeMap<String, Person> persons = new TreeMap<String, Person>();
 

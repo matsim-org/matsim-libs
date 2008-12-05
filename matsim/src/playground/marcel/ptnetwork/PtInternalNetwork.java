@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.geometry.CoordImpl;
@@ -1251,15 +1252,18 @@ public class PtInternalNetwork {
 			}
 			for (TempLink link : line.links) {
 				if (link.type != null) {
-					PtLink l = (PtLink) layer.createLink(link.linkID, link.fromNodeID, link.toNodeID,
-							Double.toString(link.length), "50", "10000", "1", link.linkID, link.type);
+					PtLink l = (PtLink) layer.createLink(new IdImpl(link.linkID), layer.getNode(link.fromNodeID), layer.getNode(link.toNodeID),
+							link.length, 50, 10000, 1);
+					l.setOrigId(link.linkID);
+					l.setType(link.type);
 					if (link.type.equals("P")) {
 						l.cost = link.cost;
 					}
 
 				} else {
-					PtLink l = (PtLink) layer.createLink(link.linkID, link.fromNodeID, link.toNodeID,
-							Double.toString(link.length), "50", "10000", "1", link.linkID, null);
+					PtLink l = (PtLink) layer.createLink(new IdImpl(link.linkID), layer.getNode(link.fromNodeID), layer.getNode(link.toNodeID),
+							link.length, 50, 10000, 1);
+					l.setOrigId(link.linkID);
 					l.setDepartures(link.departures);
 
 					if(l.getLength()<=0.0){

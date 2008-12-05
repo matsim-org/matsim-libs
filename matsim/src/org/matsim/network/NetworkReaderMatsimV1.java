@@ -26,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -135,9 +136,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		this.network.createLink(atts.getValue("id"), atts.getValue("from"), atts.getValue("to"), atts.getValue("length"),
-														atts.getValue("freespeed"), atts.getValue("capacity"), atts.getValue("permlanes"),
-														atts.getValue("origid"), atts.getValue("type"));
+		Link l = this.network.createLink(new IdImpl(atts.getValue("id")), network.getNode(atts.getValue("from")), network.getNode(atts.getValue("to")),
+				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
+				Double.parseDouble(atts.getValue("permlanes")));
+		l.setOrigId(atts.getValue("origid"));
+		l.setType(atts.getValue("type"));
 		if (atts.getValue("volume") != null) {
 			log.info("Attribute volume for element link is deprecated.");
 		}

@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.Count;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -156,55 +158,57 @@ public class OSMReader extends MatsimXmlParser {
 		String fromId = Long.toString(fromNode.id);
 		String toId = Long.toString(toNode.id);
 		String len = Double.toString(length);
-		String freespeed = "13.3";
-		String capacity = "600";
-		String nofLanes = "1";
+		double freespeed = 13.3;
+		int capacity = 600;
+		int nofLanes = 1;
 		String origId = Long.toString(way.id);
 
 		if ("motorway".equals(highway)) {
-			nofLanes = "2";
-			capacity = "4000";
-			freespeed = Double.toString(120.0/3.6);
+			nofLanes = 2;
+			capacity = 4000;
+			freespeed = 120.0/3.6;
 		} else if ("motorway_link".equals(highway)) {
-			capacity = "1500";
-			freespeed = Double.toString(80.0/3.6);
+			capacity = 1500;
+			freespeed = 80.0/3.6;
 		} else if ("trunk".equals(highway)) {
-			capacity = "2000";
-			freespeed = Double.toString(80.0/3.6);
+			capacity = 2000;
+			freespeed = 80.0/3.6;
 		} else if ("trunk_link".equals(highway)) {
-			capacity = "1500";
-			freespeed = Double.toString(60.0/3.6);
+			capacity = 1500;
+			freespeed = 60.0/3.6;
 		} else if ("primary".equals(highway)) {
-			capacity = "1500";
-			freespeed = Double.toString(80.0/3.6);
+			capacity = 1500;
+			freespeed = 80.0/3.6;
 		} else if ("primary_link".equals(highway)) {
-			capacity = "1500";
-			freespeed = Double.toString(60.0/3.6);
+			capacity = 1500;
+			freespeed = 60.0/3.6;
 		} else if ("secondary".equals(highway)) {
-			capacity = "1000";
-			freespeed = Double.toString(60.0/3.6);
+			capacity = 1000;
+			freespeed = 60.0/3.6;
 		} else if ("tertiary".equals(highway) || "minor".equals(highway)) {
-			capacity = "600";
-			freespeed = Double.toString(45.0/3.6);
+			capacity = 600;
+			freespeed = 45.0/3.6;
 		} else if ("unclassified".equals(highway)) {
-			capacity = "600";
-			freespeed = Double.toString(45.0/3.6);
+			capacity = 600;
+			freespeed = 45.0/3.6;
 		} else if ("residential".equals(highway)) {
-			capacity = "600";
-			freespeed = Double.toString(35.0/3.6);
+			capacity = 600;
+			freespeed = 35.0/3.6;
 		} else if ("living_street".equals(highway)) {
-			capacity = "300";
-			freespeed = Double.toString(20.0/3.6);
+			capacity = 300;
+			freespeed = 20.0/3.6;
 		} else {
 			System.out.println("unknown kind of highway: " + highway);
 			return;
 			// later: show warning about unknown highway-type
 		}
 
-		network.createLink(Long.toString(this.id), fromId, toId, len, freespeed, capacity, nofLanes, origId, null);
+		Link l = network.createLink(new IdImpl(this.id), network.getNode(new IdImpl(fromNode.id)), network.getNode(new IdImpl(toNode.id)), length, freespeed, capacity, nofLanes);
+		l.setOrigId(origId);
 		this.id++;
 		if (!oneway) {
-			network.createLink(Long.toString(this.id), toId, fromId, len, freespeed, capacity, nofLanes, origId, null);
+			l = network.createLink(new IdImpl(this.id), network.getNode(new IdImpl(toNode.id)), network.getNode(new IdImpl(fromNode.id)), length, freespeed, capacity, nofLanes);
+			l.setOrigId(origId);
 			this.id++;
 		}
 	}

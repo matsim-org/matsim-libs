@@ -78,10 +78,9 @@ public class PtNetworkAggregator {
 			Node toHb = findHaltebereich(ptLink.getToNode());
 			Link link = findConnectingLink(fromHb, toHb);
 			if (link == null) {
-				link = this.network.createLink(ptLink.getId().toString(),
-						fromHb.getId().toString(), toHb.getId().toString(),
-						Double.toString(fromHb.getCoord().calcDistance(toHb.getCoord())),
-						"2", "1000", "1", null, null);
+				link = this.network.createLink(ptLink.getId(),
+						this.network.getNode(fromHb.getId()), this.network.getNode(toHb.getId()),
+						fromHb.getCoord().calcDistance(toHb.getCoord()), 2, 1000, 1);
 			}
 			this.linkMatching.put(ptLink.getId(), link.getId());
 		}

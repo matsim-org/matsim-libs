@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -202,7 +203,9 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 						}
 					}
 
-					this.createLink(Integer.toString((this.idCounter+1000000)), nxt.getId().toString(), act.getId().toString(), Double.toString(act.getCoord().calcDistance(nxt.getCoord())), "50", "10000", "1",Integer.toString((this.idCounter+1000000)), "P");
+					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(nxt.getId()), getNode(act.getId()), act.getCoord().calcDistance(nxt.getCoord()), 50, 10000, 1);
+					l.setOrigId(Integer.toString((this.idCounter+1000000)));
+					l.setType("P");
 					this.idCounter++;
 					fixcnt++;
 					act=nxt;
@@ -230,7 +233,9 @@ public class PtNetworkLayer extends NetworkLayer implements LeastCostPathCalcula
 						}
 					}
 
-					this.createLink(Integer.toString(this.idCounter+1000000), act.getId().toString(), nxt.getId().toString(), Double.toString(act.getCoord().calcDistance(nxt.getCoord())), "50", "10000", "1",""+(this.idCounter+1000000), "P");
+					Link l = this.createLink(new IdImpl(this.idCounter+1000000), getNode(act.getId()), getNode(nxt.getId()), act.getCoord().calcDistance(nxt.getCoord()), 50, 10000, 1);
+					l.setOrigId(Integer.toString(this.idCounter+1000000));
+					l.setType("P");
 					this.idCounter++;
 					fixcnt++;
 					act=nxt;

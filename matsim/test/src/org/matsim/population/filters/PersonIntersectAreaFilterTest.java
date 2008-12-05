@@ -28,6 +28,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
@@ -48,18 +49,18 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		NetworkLayer network = new NetworkLayer();
-		network.createNode("0", "0", "0", null);
-		network.createNode("1", "10", "10", null);
-		network.createNode("2", "90", "10", null);
-		network.createNode("3", "10", "90", null);
-		network.createNode("4", "90", "90", null);
-		network.createNode("5", "100", "100", null);
-		Link link0 = network.createLink("0", "0", "1",  "20", "20", "100", "1", null, null);
-/*	Link link1=*/network.createLink("1", "1", "2", "100", "20", "100", "1", null, null);
-		Link link2 = network.createLink("2", "2", "4", "100", "20", "100", "1", null, null);
-/*	Link link3=*/network.createLink("3", "1", "3", "100", "20", "100", "1", null, null);
-		Link link4 = network.createLink("4", "3", "4", "100", "20", "100", "1", null, null);
-		Link link5 = network.createLink("5", "4", "5",  "20", "20", "100", "1", null, null);
+		Node node0 = network.createNode("0", "0", "0", null);
+		Node node1 = network.createNode("1", "10", "10", null);
+		Node node2 = network.createNode("2", "90", "10", null);
+		Node node3 = network.createNode("3", "10", "90", null);
+		Node node4 = network.createNode("4", "90", "90", null);
+		Node node5 = network.createNode("5", "100", "100", null);
+		Link link0 = network.createLink(new IdImpl("0"), node0, node1, 20, 20, 100, 1);
+/*	Link link1=*/network.createLink(new IdImpl("1"), node1, node2, 100, 20, 100, 1);
+		Link link2 = network.createLink(new IdImpl("2"), node2, node4, 100, 20, 100, 1);
+/*	Link link3=*/network.createLink(new IdImpl("3"), node1, node3, 100, 20, 100, 1);
+		Link link4 = network.createLink(new IdImpl("4"), node3, node4, 100, 20, 100, 1);
+		Link link5 = network.createLink(new IdImpl("5"), node4, node5, 20, 20, 100, 1);
 
 		Gbl.createWorld().setNetworkLayer(network);
 

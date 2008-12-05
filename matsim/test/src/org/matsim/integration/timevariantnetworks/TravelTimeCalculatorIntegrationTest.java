@@ -20,11 +20,13 @@
 
 package org.matsim.integration.timevariantnetworks;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 import org.matsim.network.TimeVariantLinkImpl;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
 import org.matsim.network.NetworkChangeEvent.ChangeValue;
@@ -47,13 +49,13 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "200", "0", null);
-		network.createNode("4", "300", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "3600", "1", null, null);
-		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink("2", "2", "3", "100", "10", "3600", "1", null, null);
-		network.createLink("3", "3", "4", "100", "10", "3600", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "200", "0", null);
+		Node node4 = network.createNode("4", "300", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
+		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
@@ -82,13 +84,13 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		network.createNode("1", "0", "0", null);
-		network.createNode("2", "100", "0", null);
-		network.createNode("3", "200", "0", null);
-		network.createNode("4", "300", "0", null);
-		Link link1 = network.createLink("1", "1", "2", "100", "10", "3600", "1", null, null);
-		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink("2", "2", "3", "100", "10", "3600", "1", null, null);
-		network.createLink("3", "3", "4", "100", "10", "3600", "1", null, null);
+		Node node1 = network.createNode("1", "0", "0", null);
+		Node node2 = network.createNode("2", "100", "0", null);
+		Node node3 = network.createNode("3", "200", "0", null);
+		Node node4 = network.createNode("4", "300", "0", null);
+		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
+		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
