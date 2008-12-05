@@ -14,6 +14,7 @@ public class PTTravelTime implements TravelTime {
 	//minutes
 	public double getLinkTravelTime(Link link, double time) {
 		double travelTime =0;
+		//System.out.println(link.getId());
 		if (link.getType().equals("Transfer")){
 			travelTime= ptTimeTable.GetTransferTime(link, time);
 			if (travelTime<0) {travelTime= Double.MAX_VALUE;} ///

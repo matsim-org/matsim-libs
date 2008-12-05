@@ -1,14 +1,6 @@
 package playground.mmoyo.PTCase2;
 
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkFactory;
-import org.matsim.network.Node;
-import org.matsim.network.Link;
-import java.util.Iterator;
-import java.util.Map;
-import playground.mmoyo.PTRouter.PTNode;
 
 public class PTOb {
 	private NetworkLayer ptNetworkLayer; 
@@ -26,12 +18,16 @@ public class PTOb {
 	    this.plansFile= plansFile;
 	    this.ptNetFile= ptNetFileName;
 	    this.ptTimeTable = new PTTimeTable2(timeTableFile);
-	    this.ptNetworkLayer= this.ptNetworkFactory.readNetwork(ptNetFileName,ptTimeTable);
-		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
 	}
 
-	public void createPTNet(String inNetFile){
+	public void readPTNet(String netFile){
+		this.ptNetworkLayer= this.ptNetworkFactory.readNetwork(netFile,ptTimeTable);
+		ptRouter2 = new PTRouter2(ptNetworkLayer, ptTimeTable);
+	}
+	
+	public void createPTNetWithTLinks(String inNetFile, String outNetFile ){
 		this.ptNetworkLayer = ptNetworkFactory.createNetwork(inNetFile, this.ptTimeTable, ptNetFile);
+		this.ptNetworkFactory.writeNet(this.ptNetworkLayer, outNetFile);
 	}
 
 	public NetworkLayer getPtNetworkLayer() {

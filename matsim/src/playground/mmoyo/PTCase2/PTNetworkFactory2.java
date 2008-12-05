@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.MatsimNetworkReader;
+import org.matsim.network.NetworkWriter;
 import org.matsim.network.NetworkFactory;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -26,10 +27,10 @@ public class PTNetworkFactory2 {
 	}
 	
 	public NetworkLayer createNetwork(String inFileName, PTTimeTable2 ptTimeTable, String OutFileName){
-		NetworkLayer ptNetworkLayer = readNetFile(inFileName);
-		readTimeTable(ptNetworkLayer, ptTimeTable);
-		createTransferLinks(ptNetworkLayer, ptTimeTable);
-		return ptNetworkLayer;
+		NetworkLayer ptNetworkLayer1 = readNetFile(inFileName);
+		readTimeTable(ptNetworkLayer1, ptTimeTable);
+		createTransferLinks(ptNetworkLayer1, ptTimeTable);
+		return ptNetworkLayer1;
 	}
 	
 	public NetworkLayer readNetwork(String inFileName, PTTimeTable2 ptTimeTable){
@@ -40,6 +41,7 @@ public class PTNetworkFactory2 {
 	
 	private NetworkLayer readNetFile(String inFileName){
 		NetworkFactory networkFactory = new NetworkFactory();
+	
 		NetworkLayer tempNet= new NetworkLayer(networkFactory);
 		NetworkLayer ptNetworkLayer= new NetworkLayer(networkFactory);
 		
@@ -81,9 +83,15 @@ public class PTNetworkFactory2 {
 			double travelTime=0;
 			double lastTravelTime=0;
 			boolean first=true;
+			
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
+				
+				//System.out.print("strIdNode:" + strIdNode);
+				//System.out.println(ptNode==null);
+				//System.out.println(ptLine.getId().toString());
+				//System.out.println(ptLine.getId() ==null);
 				ptNode.setIdPTLine(ptLine.getId());
 
 				double min = ptLine.getMinutes().get(indexMin);
@@ -207,6 +215,8 @@ public class PTNetworkFactory2 {
 		String capacity = "1";
 		String permlanes = "1";
 		String origid = "0";
+		
+		//System.out.println(idLink + " " + from);
 		ptNetworkLayer.createLink(idLink, from, to, length, freespeed, capacity, permlanes, origid, ptType);
 	}
 	
@@ -221,6 +231,13 @@ public class PTNetworkFactory2 {
 		String permlanes = "1";
 		String origid = "0";
 		ptNetworkLayer.createLink(idLink, idFromNode, idToNode, length, freespeed, capacity, permlanes, origid, ptType);
+	}
+	
+	public void writeNet(NetworkLayer net, String fileName){
+		System.out.println("writing pt network...");
+		new NetworkWriter(net, fileName).write();
+		System.out.println("done.");
+		
 	}
 	
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
