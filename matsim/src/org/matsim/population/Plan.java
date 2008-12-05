@@ -94,7 +94,7 @@ public class Plan extends BasicPlanImpl {
 	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
 	 */
   @Deprecated
-	public final Act createAct(final String type, final String x, final String y, String link, final String startTime,
+	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
 			 final String endTime, final String dur, final String isPrimary) throws IllegalStateException {
 		verifyCreateAct(endTime);
 		Coord coord = null;
@@ -103,13 +103,7 @@ public class Plan extends BasicPlanImpl {
 		}
 		Act a = new Act(type, coord);
 		if (link != null) {
-			try {
-				a.setLinkFromString(link);
-			} catch ( Exception ee ) {
-				log.info( ee.getMessage() ) ;
-				log.warn("the link has a problem.  Not setting it and hoping for the best ..." ) ;
-				link = null ;
-			}
+			a.setLinkFromString(link);
 		} else if (coord == null) {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
