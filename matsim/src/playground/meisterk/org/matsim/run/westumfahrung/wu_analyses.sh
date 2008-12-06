@@ -111,9 +111,9 @@ for i in `seq 1 12`;
 			ln -s /home/meisterk/workspace/MATSim/input/linksets/westumfahrung-nordring.txt input/linkset_after.txt
 			;;
 		11)
-			# wu-fm-gt-nr vs wu-fm-gt-nouetli	uetli -> wt(flama)
+			# wu-fm-gt vs wu-fm-gt-nouetli	uetli -> wt(flama)
 			# configure before and after scenario
-			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt-nr/*before* input
+			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt/*before* input
 			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt-nouetli/*after* input
 
 			# configure linksets
@@ -121,9 +121,9 @@ for i in `seq 1 12`;
 			ln -s /home/meisterk/workspace/MATSim/input/linksets/westtangente-flama.txt input/linkset_after.txt
 			;;
 		12)	
-			# wu-fm-gt-nr vs wu-fm-gt-nouetli	wt(flama) -> wu\uetli
+			# wu-fm-gt vs wu-fm-gt-nouetli	wt(flama) -> wu\uetli
 			# configure before and after scenario
-			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt-nr/*before* input
+			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt/*before* input
 			ln -s /home/meisterk/workspace/MATSim/input/wu-fm-gt-nouetli/*after* input
 
 			# configure linksets
@@ -132,6 +132,6 @@ for i in `seq 1 12`;
 			;;
 		esac
 		# run the analysis
-		make MAINCLASS=org/matsim/run/CompareScenariosWestumfahrung CONFIG='input/name_before.txt input/network_before.xml input/plans_before.xml.gz input/events_before.dat input/linkset_before.txt input/name_after.txt input/network_after.xml input/plans_after.xml.gz input/events_after.dat input/linkset_after.txt' DTD='' MEMORY='-Xms512M -Xmx1024M' run
+		make MAINCLASS=playground/meisterk/org/matsim/run/westumfahrung/CompareScenarios CONFIG='input/name_before.txt input/network_before.xml input/plans_before.xml.gz input/events_before.dat input/linkset_before.txt input/name_after.txt input/network_after.xml input/plans_after.xml.gz input/events_after.dat input/linkset_after.txt' DTD='' MEMORY='-Xms512M -Xmx1024M' run
         done 
 

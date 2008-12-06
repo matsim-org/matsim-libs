@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
@@ -31,8 +33,6 @@ import org.matsim.population.filters.PersonFilter;
 import org.matsim.population.filters.PersonIdFilter;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.utils.misc.Time;
 
 import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
@@ -45,9 +45,9 @@ import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
  * @author meisterk
  *
  */
-public class CompareScenariosWestumfahrung {
+public class CompareScenarios {
 
-	public class CaseStudyResult {
+	static class CaseStudyResult {
 
 		private String name;
 		private Population plans;
@@ -91,11 +91,9 @@ public class CompareScenariosWestumfahrung {
 
 	private static final Logger log = Logger.getLogger(ShopsOf2005ToFacilities.class);
 	
-	private Population inputPlans = null;
-
 	// transit agents have ids > 1'000'000'000
-	private final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
-	private final String NON_TRANSIT_PERSON_ID_PATTERN = "[0-9]{1,9}";
+	private static final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
+	private static final String NON_TRANSIT_PERSON_ID_PATTERN = "[0-9]{1,9}";
 
 	// compare 2 scenarios
 	private String scenarioNameBefore = "before";
@@ -103,16 +101,15 @@ public class CompareScenariosWestumfahrung {
 	private String[] scenarioNames = new String[]{scenarioNameBefore, scenarioNameAfter};
 
 	// analyses
-	private final int TRANSIT_AGENTS_ANALYSIS_NAME = 0;
-	private final int NON_TRANSIT_AGENTS_ANALYSIS_NAME = 1;
-	private final int ROUTE_SWITCHERS_ANALYSIS_NAME = 2;
-	private final int WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME = 3;
+	private static final int TRANSIT_AGENTS_ANALYSIS_NAME = 0;
+	private static final int NON_TRANSIT_AGENTS_ANALYSIS_NAME = 1;
+	private static final int ROUTE_SWITCHERS_ANALYSIS_NAME = 2;
+	private static final int WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME = 3;
 	private TreeMap<Integer, String> analysisNames = new TreeMap<Integer, String>();
 
 	// analysisRegions
 	private HashSet<Id> weststrasseLinkIds = new HashSet<Id>();
 
-	private TreeMap<String, String> scenarioNameInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> plansInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> eventsInputFilenames = new TreeMap<String, String>();
 	private TreeMap<String, String> networkInputFilenames = new TreeMap<String, String>();
@@ -132,13 +129,17 @@ public class CompareScenariosWestumfahrung {
 	 */
 	public static void main(String[] args) {
 
-		CompareScenariosWestumfahrung compareScenarios = new CompareScenariosWestumfahrung();
+		CompareScenarios compareScenarios = new CompareScenarios();
 		compareScenarios.run(args);
 
 	}
 
 	private void run(String[] args) {
 
+		Gbl.createConfig(new String[]{});
+		Gbl.getConfig().global().setLocalDtdBase("dtd/");
+		System.out.println(Gbl.getConfig().global().getLocalDtdBase());
+		
 		log.info("Processing command line parameters...");
 		this.processArgs(args);
 		log.info("Processing command line parameters...done.");
@@ -166,7 +167,6 @@ public class CompareScenariosWestumfahrung {
 			FileUtils.writeLines(scenarioComparisonFile, "UTF-8", scenarioComparisonLines);
 			FileUtils.writeLines(routeSwitchersFile, "UTF-8", routeSwitchersLines);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -176,6 +176,8 @@ public class CompareScenariosWestumfahrung {
 
 		List<String> lines = new ArrayList<String>();
 		File scenarioNameInputFile = null;
+
+		final int NUMBER_OF_SCENARIOS = 2;
 		
 		if (args.length != 10) {
 			System.out.println("Usage:");
@@ -192,35 +194,34 @@ public class CompareScenariosWestumfahrung {
 			System.out.println("args[8]: events_after.dat");
 			System.out.println("args[9]: linkset_after.txt");
 			System.out.println("");
-			System.exit(-1);
+			throw new RuntimeException();
 		} else {
 			int argsIndex = 0;
-			for (int ii=0; ii<=1; ii++) {
+			for (int scenarioCounter = 0; scenarioCounter < NUMBER_OF_SCENARIOS; scenarioCounter++) {
 				scenarioNameInputFile = new File(args[argsIndex]);
 				try {
 					lines = FileUtils.readLines(scenarioNameInputFile, "UTF-8");
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				switch(ii) {
+				switch(scenarioCounter) {
 				case 0:
 					scenarioNameBefore = lines.get(0);
-					scenarioNames[ii] = lines.get(0);
+					scenarioNames[scenarioCounter] = lines.get(0);
 					break;
 				case 1:
 					scenarioNameAfter = lines.get(0);
-					scenarioNames[ii] = lines.get(0);
+					scenarioNames[scenarioCounter] = lines.get(0);
 					break;
 				}
 				argsIndex++;
-				networkInputFilenames.put(scenarioNames[ii], args[argsIndex]);
+				networkInputFilenames.put(scenarioNames[scenarioCounter], args[argsIndex]);
 				argsIndex++;
-				plansInputFilenames.put(scenarioNames[ii], args[argsIndex]);
+				plansInputFilenames.put(scenarioNames[scenarioCounter], args[argsIndex]);
 				argsIndex++;
-				eventsInputFilenames.put(scenarioNames[ii], args[argsIndex]);
+				eventsInputFilenames.put(scenarioNames[scenarioCounter], args[argsIndex]);
 				argsIndex++;
-				linkSetFilenames.put(scenarioNames[ii], args[argsIndex]);
+				linkSetFilenames.put(scenarioNames[scenarioCounter], args[argsIndex]);
 				argsIndex++;
 			}
 		}
@@ -229,10 +230,10 @@ public class CompareScenariosWestumfahrung {
 
 	private void init() {
 
-		analysisNames.put(new Integer(TRANSIT_AGENTS_ANALYSIS_NAME), "transit");
-		analysisNames.put(new Integer(NON_TRANSIT_AGENTS_ANALYSIS_NAME), "non transit");
-		analysisNames.put(new Integer(ROUTE_SWITCHERS_ANALYSIS_NAME), "route switchers");
-		analysisNames.put(new Integer(WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME), "weststrasse neighbors");
+		analysisNames.put(Integer.valueOf(TRANSIT_AGENTS_ANALYSIS_NAME), "transit");
+		analysisNames.put(Integer.valueOf(NON_TRANSIT_AGENTS_ANALYSIS_NAME), "non transit");
+		analysisNames.put(Integer.valueOf(ROUTE_SWITCHERS_ANALYSIS_NAME), "route switchers");
+		analysisNames.put(Integer.valueOf(WESTSTRASSE_NEIGHBORS_ANALYSIS_NAME), "weststrasse neighbors");
 
 		List<String> lines = new ArrayList<String>();
 
@@ -245,7 +246,6 @@ public class CompareScenariosWestumfahrung {
 			try {
 				lines = FileUtils.readLines(linkSetFile, "UTF-8");
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			linkSet = new HashSet<Id>();
@@ -255,8 +255,6 @@ public class CompareScenariosWestumfahrung {
 				} catch (NumberFormatException e) {
 					log.info("Reading in " + line + " link set...");
 					linkSetNames.put(scenarioName, line);
-					// TODO Auto-generated catch block
-					//e.printStackTrace();
 				}
 			}
 			linkSets.put(scenarioName, linkSet);
@@ -267,17 +265,14 @@ public class CompareScenariosWestumfahrung {
 		try {
 			lines = FileUtils.readLines(linkSetFile, "UTF-8");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		linkSet = new HashSet<Id>();
+//		linkSet = new HashSet<Id>();
 		for (String line : lines) {
 			try {
 				weststrasseLinkIds.add(new IdImpl(Integer.parseInt(line)));
 			} catch (NumberFormatException e) {
 				log.info("Reading in " + line + " link set...");
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
 			}
 		}
 		
@@ -309,7 +304,7 @@ public class CompareScenariosWestumfahrung {
 
 	/**
 	 * Gets all agents that use a set of links in one plans file and use another set in another plans file.
-	 * For example. Find all agents that use the Westtangente in a scenario with out the Westumfahrung, that
+	 * For example: Find all agents that use the Westtangente in a scenario without the Westumfahrung, that
 	 * switch to the Westumfahrung in a case study where the Westumfahrung was included in the scenario.
 	 * 
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
@@ -397,7 +392,7 @@ public class CompareScenariosWestumfahrung {
 		log.info("number of non transit agents: " + nonTransitAgentsIds.size());
 
 		Iterator<Id> personIterator = null;
-		HashSet<Id> subPop = new HashSet<Id>();
+//		HashSet<Id> subPop = new HashSet<Id>();
 		for (Integer analysis : analysisNames.keySet()) {
 
 			ArrayList<CaseStudyResult> results = new ArrayList<CaseStudyResult>();
@@ -428,7 +423,6 @@ public class CompareScenariosWestumfahrung {
 					try {
 						plansSubPop.addPerson(scenarioPlans.get(scenarioName).getPerson(personIterator.next()));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -445,12 +439,18 @@ public class CompareScenariosWestumfahrung {
 									continue;
 								}
 							}
-							routeSwitchersLines.add(new String(
-									person.getId() + "\t" +
+							routeSwitchersLines.add(
+									person.getId().toString() + "\t" +
 									homeActivity.getLinkId().toString() + "\t" +
-									homeActivity.getCoord().getX() + "\t" +
-									homeActivity.getCoord().getY()
-							));
+									Double.toString(homeActivity.getCoord().getX()) + "\t" +
+									Double.toString(homeActivity.getCoord().getY()));
+							
+//							routeSwitchersLines.add(new String(
+//									person.getId() + "\t" +
+//									homeActivity.getLinkId().toString() + "\t" +
+//									homeActivity.getCoord().getX() + "\t" +
+//									homeActivity.getCoord().getY()
+//							));
 						}
 					}
 				}
