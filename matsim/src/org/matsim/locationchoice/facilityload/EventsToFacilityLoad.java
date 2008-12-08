@@ -49,7 +49,7 @@ public class EventsToFacilityLoad implements ActStartEventHandler, ActEndEventHa
 		
 		this.facilityPenalties = facilityPenalties;
 		
-		log.info(facilities.getFacilities().values().size() +"facilities size");
+		log.info("facilities size: " + facilities.getFacilities().values().size());
 		Iterator<? extends Facility> iter_fac = facilities.getFacilities().values().iterator();
 		while (iter_fac.hasNext()){
 			Facility f = iter_fac.next();
