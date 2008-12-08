@@ -98,6 +98,10 @@ public class Module {
 	protected Map<String, String> getParams() {
 		return this.params;
 	}
+	
+//	protected Map<String,String> getComments() { // TODO (see email)
+//		return null ;
+//	}
 
 	@Override
 	public final String toString() {
