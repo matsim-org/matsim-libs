@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.TreeMap;
 
 import javax.swing.event.EventListenerList;
 
@@ -41,6 +42,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
 import org.matsim.config.MatsimConfigReader;
@@ -74,6 +76,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -178,6 +181,8 @@ public class Controler {
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
+	
+	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -1110,6 +1115,14 @@ public class Controler {
 	 */
 	public static final String getOutputFilename(final String filename) {
 		return outputPath + "/" + filename;
+	}
+
+	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
+		return facilityPenalties;
+	}
+
+	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+		this.facilityPenalties = facilityPenalties;
 	}
 
 	/**
