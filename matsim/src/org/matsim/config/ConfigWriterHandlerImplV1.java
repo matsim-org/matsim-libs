@@ -51,6 +51,7 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
 		Map<String, String> params = module.getParams();
+		// Map<String, String> comments = module.getComments() ; // TODO (see email)
 
 		out.write("\t<module");
 		out.write(" name=\"" + module.getName() + "\" >\n");
@@ -59,6 +60,9 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 		while (it.hasNext()) {
 			Map.Entry<String, String> entry = it.next();
 			out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />\n");
+			// if ( comments.get( entryKey() != null ) {
+			// out.write( "\t\t<!-- " + comments.get( entryKey() ) + " -->" ) ;  // TODO (see email)
+			// }
 		}
 		out.write("\t</module>\n\n");
 	}
