@@ -85,6 +85,20 @@ public class SimpleStaticNetLayer  extends SimpleSceneLayer{
 		}
 	}
 
+	public static class NoQuadDrawer extends SimpleQuadDrawer {
+		public void setQuad(float startX, float startY, float endX, float endY) {
+		}
+	
+		public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer.SimpleQuadDrawer#onDraw(javax.media.opengl.GL)
+		 */
+		@Override
+		public void onDraw(GL gl) {
+		}
+}
 	protected OGLProvider myDrawer;
 	protected static final Map<OGLProvider, Integer> netDisplListMap = new HashMap<OGLProvider, Integer>(); // not yet defined
 	protected int netDisplList = -1;
