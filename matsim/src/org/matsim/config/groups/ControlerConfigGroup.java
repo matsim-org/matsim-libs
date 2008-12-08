@@ -103,6 +103,12 @@ public class ControlerConfigGroup extends Module {
 		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));		
 		return map;
 	}
+	
+//	@Override
+//	protected final TreeMap<String,String> getComments() {
+//		TreeMap<String,String> map = new TreeMap<String,String>() ;
+//		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for the router") ;
+//	}
 
 
 	/* direct access */
