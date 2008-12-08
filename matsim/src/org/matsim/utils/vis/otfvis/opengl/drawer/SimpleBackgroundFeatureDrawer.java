@@ -20,8 +20,14 @@
 
 package org.matsim.utils.vis.otfvis.opengl.drawer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.media.opengl.GL;
 
+import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,10 +43,17 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 
-	final OTFFeature feature;
-		
-	public SimpleBackgroundFeatureDrawer(final Feature feature, final float [] color){
-		this.feature = getOTFFeature(feature, color);
+	final List<OTFFeature> featureList = new ArrayList<OTFFeature>();
+	
+	protected int featureDisplList = -1;
+	
+	public SimpleBackgroundFeatureDrawer(final FeatureSource features, final float [] color) throws IOException{
+		final Iterator<Feature> it = features.getFeatures().iterator();
+		while (it.hasNext()){
+			final Feature ft = it.next();
+			featureList.add(getOTFFeature(ft, color));
+		}
+
 	}
 	
 	
@@ -81,17 +94,31 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer {
 
 
 	public void onDraw(final GL gl) {
-		
-		if (!this.feature.converted) {
-			this.feature.setOffset((float)this.offsetEast, (float)this.offsetNorth);
+	
+		onPrepareDraw(gl);
+		gl.glCallList(featureDisplList);
+
+	}
+	
+	public void onPrepareDraw(final GL gl) {
+		if(featureDisplList == -1) {
+			featureDisplList = gl.glGenLists(1);
+			gl.glNewList(featureDisplList, GL.GL_COMPILE);
+
+			for(OTFFeature feature : featureList) {
+				if (!feature.converted) {
+					feature.setOffset((float)this.offsetEast, (float)this.offsetNorth);
+				}
+				gl.glColor4f(feature.color[0],feature.color[1],feature.color[2],feature.color[3]);
+				gl.glBegin(feature.glType);
+				for (int i =  0; i < feature.npoints; i++) {
+					gl.glVertex3d(feature.xpoints[i], feature.ypoints[i], 0);	
+					
+				}
+				gl.glEnd();
+			}
+			gl.glEndList();
 		}
-		gl.glColor4f(this.feature.color[0],this.feature.color[1],this.feature.color[2],this.feature.color[3]);
-		gl.glBegin(this.feature.glType);
-		for (int i =  0; i < this.feature.npoints; i++) {
-			gl.glVertex3d(this.feature.xpoints[i], this.feature.ypoints[i], 0);	
-			
-		}
-		gl.glEnd();
 		
 	}
 

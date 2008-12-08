@@ -2,12 +2,10 @@ package playground.gregor.otf;
 
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
-import java.util.Iterator;
 
 import javax.swing.JFrame;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
@@ -17,6 +15,7 @@ import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
+import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -95,12 +94,8 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	}
 	private void loadFeatureLayer(final String shapeFile, final float [] color) throws Exception {
 		final FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
+		OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundFeatureDrawer(fs,color));
 
-		final Iterator<Feature> it = fs.getFeatures().iterator();
-		while (it.hasNext()){
-			final Feature ft = it.next();
-			OGLSimpleBackgroundLayer.addPersistentItem(new SimpleBackgroundFeatureDrawer(ft,color));
-		}
 		
 		
 	}
@@ -151,6 +146,10 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
 		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
 		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		//connect1.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		
 		
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
@@ -161,6 +160,10 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect2.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
 		connect2.add(OGLAgentPointLayer.AgentPadangRegionDrawer.class, OGLAgentPointLayer.class);		
 		connect2.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		//connect2.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 //	
 		//main2(args);
 		

@@ -21,25 +21,17 @@
 package playground.david.otfivs.executables;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.StringUtils;
-import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
@@ -126,6 +118,7 @@ public class OTFTBin2MVI extends OTFQuadFileHandler.Writer {
 				}
 				times = getString(4);
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Expceted unexpected end of file.. dumping rest of vehicles");
