@@ -55,6 +55,8 @@ public class OnTheFlyClientQuad extends Thread {
 	private final String url;
 	private OTFConnectionManager connect = new OTFConnectionManager();
 	private final boolean isMac;
+	protected String id1 = "test1";
+	public static OTFHostControlBar hostControl2;
 	
 	public OnTheFlyClientQuad(String url) {
 		this.url = url;
@@ -88,7 +90,6 @@ public class OnTheFlyClientQuad extends Thread {
 	
 	@Override
 	public void run() {
-		String id1 = "test1";
 		boolean fullscreen = false;
 
 		OTFVisConfig visconf = new OTFVisConfig();
@@ -132,7 +133,9 @@ public class OnTheFlyClientQuad extends Thread {
 
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 
+			
 			pane.setLeftComponent(drawer.getComponent());
+
 //			pane.getContentPane().add(drawer.getComponent());
 			pane.validate();
 			if(hostControl.isLiveHost()) {
@@ -145,6 +148,11 @@ public class OnTheFlyClientQuad extends Thread {
 				// only set custom frame size if not in fullscreen mode
 				frame.setSize(1024, 600);
 			}
+//			hostControl2 = hostControl;
+//			Gbl.startMeasurement();
+//			hostControl2.countto(3600);
+//			Gbl.printElapsedTime();
+			//new Thread(){public void run(){ hostControl2.countto(7200);};}.start();
 			drawer.invalidate((int)hostControl.getTime());
 			frame.setVisible(true);
 			hostControl.addHandler(id1, drawer);

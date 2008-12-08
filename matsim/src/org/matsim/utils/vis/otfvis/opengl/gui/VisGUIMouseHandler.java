@@ -72,7 +72,7 @@ implements MouseWheelListener{
     private QuadTree.Rect viewBounds = null;
 
 
-    private Camera camera;
+    private Camera camera = new Camera();
     //private Animator cameraAnimator;
 	//private Point2D.Float clickPoint = null;
 

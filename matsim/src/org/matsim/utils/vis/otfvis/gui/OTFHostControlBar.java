@@ -214,15 +214,19 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		OTFClientQuad clientQ = servQ.convertToClient(id, host, connect);
 		System.out.println("Creating receivers");
 		clientQ.createReceiver(connect);
+		readConstData(clientQ);
+		
+		return clientQ;
+	}
+
+	private void readConstData(OTFClientQuad clientQ) throws RemoteException {
 		clientQ.getConstData();
 		// if this is a recorded session, build random access index
 		if (!liveHost ) buildIndex();
 		simTime = host.getLocalTime();
 		updateTimeLabel();
 
-		return clientQ;
 	}
-
 	/*package*/ class PreloadHelper extends Thread {
 
 		public void preloadCache() {
@@ -416,8 +420,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
-		stopMovie();
 		synchronized(blockReading) {
+			int i=0;
 			if (host.requestNewTime(newTime, prefTime)) {
 				simTime = host.getLocalTime();
 				invalidateHandlers();
@@ -433,12 +437,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private void pressed_STEP_F() throws IOException {
-		requestTimeStep(simTime+1, OTFServerRemote.TimePreference.LATER);
+		if(movieTimer != null) pressed_PAUSE();
+		else requestTimeStep(simTime+1, OTFServerRemote.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_FF() throws IOException {
 		int bigStep = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getBigTimeStep();
-		requestTimeStep(simTime+bigStep, OTFServerRemote.TimePreference.LATER);
+		if(movieTimer != null) pressed_PAUSE();
+		else requestTimeStep(simTime+bigStep, OTFServerRemote.TimePreference.LATER);
 	}
 
 	private void pressed_STEP_B() throws IOException {
@@ -693,6 +699,26 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		if(!isLiveHost()) {
 			new PreloadHelper().start();
 		}
+	}
+
+	public void countto(int i) {
+		try {
+			for(int t=0;t<i;t++){
+				int simTime = host.getLocalTime();
+				host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER);
+				//updateTimeLabel();
+				//repaint();
+				//invalidateHandlers();
+//				System.out.println(simTime);
+			
+			}
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("FERTIHHHH");
 	}
 
 }

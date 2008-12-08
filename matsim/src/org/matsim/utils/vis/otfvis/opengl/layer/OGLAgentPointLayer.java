@@ -102,25 +102,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			}
 		}
 		
-		public void onDraw(GL gl) {
-			if (posBuffers.size() == 0) {
-				return;
-			}
-			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
-
-			setAgentSize();
-
-			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
-
-			setTexture();
-			if (texture != null) {
-				texture.enable();
-				gl.glEnable(GL.GL_TEXTURE_2D);
-				gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
-				texture.bind();	        	
-			}
-
+		protected void drawArray(GL gl) {
 			ByteBuffer colors =  null;
 			FloatBuffer vertex =  null;
 
@@ -138,7 +120,33 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			// for possibly adding data
 			vertex.position((count % BUFFERSIZE) * 2);
 			colors.position((count % BUFFERSIZE) * 4);
+		}
+		
+		protected boolean isEmpty() {
+			return posBuffers.size() == 0;
+		}
+		
+		public void onDraw(GL gl) {
+			if (isEmpty()) {
+				return;
+			}
+			gl.glEnable(GL.GL_POINT_SPRITE_ARB);
 
+			setAgentSize();
+
+			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);   
+
+			setTexture();
+			if (texture != null) {
+				texture.enable();
+				gl.glEnable(GL.GL_TEXTURE_2D);
+				gl.glTexEnvf(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
+				texture.bind();	        	
+			}
+
+			drawArray(gl);
+			
 			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 			gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
 			if (texture != null ) {

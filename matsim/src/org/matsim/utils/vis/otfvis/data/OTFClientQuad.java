@@ -168,14 +168,18 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private void getData(QuadTree.Rect bound, boolean readConst, SceneGraph result, boolean readAdd)
 			throws RemoteException {
 		bound = host.isLive() ? bound : this.top.getBounds();
-		byte[] bbyte = readConst ? host.getQuadConstStateBuffer(id):host.getQuadDynStateBuffer(id, bound);
+		byte[] bbyte;
+//		Gbl.startMeasurement();
+		if( readConst )bbyte = host.getQuadConstStateBuffer(id);
+		else bbyte= host.getQuadDynStateBuffer(id, bound);
+		
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
-		Gbl.startMeasurement();
-		//int colls = 
+//		Gbl.printElapsedTime();
+//		System.out.println("^from serv time -- v read in time");
+//		Gbl.startMeasurement();
 		this.execute(bound, this.new ReadDataExecutor(in, readConst, result));
 		if (readAdd) getAdditionalData(in, readConst, result);
-		//System.out.println("# readData: " + colls);
-
+//		Gbl.printElapsedTime();
 		PoolFactory.resetAll();
 		
 	}

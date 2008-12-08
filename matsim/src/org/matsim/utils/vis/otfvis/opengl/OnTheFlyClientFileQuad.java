@@ -191,10 +191,11 @@ public class OnTheFlyClientFileQuad extends Thread {
 			filename = args[0];
 		} else {
 //			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-//			filename = "output/OTFQuadfile.mvi";
+			filename = "output/OTFQuadfile10p.mvi";
 //			filename = "../../tmp/1000.events.mvi";
 //			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
-			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
+//			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
+//			filename = "testCUDA10p.mvi";
 		}
 
 		

@@ -698,7 +698,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	 * @throws RemoteException
 	 */
 	public void invalidate(int time) throws RemoteException {
-
 		agentSize = Float.parseFloat(Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.AGENT_SIZE));
 		//scaledAgentSize = agentSize * this.mouseMan.getScale();
 

@@ -37,6 +37,7 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.events.Events;
+import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
@@ -175,7 +176,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			buf.position(0);
 			QuadStorage act = quads.get(id);
 			act.quad.writeDynData(act.rect, buf);
-			act.buffer = buf.array();
+			act.buffer = new byte[buf.position()];
+			buf.position(0);
+			buf.get(act.buffer);
 		}
 		updateThis.clear();
 
@@ -298,7 +301,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		quads.get(id).quad.writeConstData(buf);
 		byte [] result;
 		synchronized (buf) {
-			result = buf.array();
+			int pos = buf.position();
+			result = new byte[pos];
+			buf.position(0);
+			buf.get(result);
 		}
 		return result;
 	}
@@ -307,6 +313,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private transient final ByteBuffer buf = ByteBuffer.allocate(20000000);
 
 	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException {
+		byte[] result;
+//		Gbl.startMeasurement();
 		QuadStorage updateQuad = quads.get(id);
 		updateQuad.rect = bounds;
 
@@ -314,7 +322,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			synchronized (buf) {
 				buf.position(0);
 				updateQuad.quad.writeDynData(bounds, buf);
-				return buf.array();
+				int pos = buf.position();
+				result = new byte[pos];
+				buf.position(0);
+				buf.get(result);
+//				Gbl.printElapsedTime();
+				return result;
 			}
 		}
 		// otherwise == PLAY, we need to sort this into the array of demanding quads and then they will be fillesd next in getStatus is called
@@ -326,6 +339,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+//		Gbl.printElapsedTime();
 
 		return updateQuad.buffer;
 	}
