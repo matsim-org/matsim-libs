@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -103,6 +104,8 @@ import org.matsim.router.util.TravelTime;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.utils.io.IOUtils;
+import org.matsim.utils.logging.CollectLogMessagesAppender;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -128,6 +131,8 @@ public class Controler {
 
 	private static String outputPath = null;
 
+	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
+	
 	private int traveltimeBinSize = 15*60; // use default of 15mins
 	private boolean overwriteFiles = false;
 	private static int iteration = -1;
@@ -159,7 +164,7 @@ public class Controler {
 
 	/** Stores data commonly used by all router instances. */
 	private PreProcessLandmarks commonRoutingData = null;
-
+	
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is in every iteration,
 	 * <tt>2</tt> in every second, <tt>10</tt> in every 10th, and so forth. <tt>0</tt> disables the writing
@@ -181,6 +186,11 @@ public class Controler {
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
+	/**
+	 * This variable is used to store the log4j output before it can be written to 
+	 * a file. This is needed to set the output directory before logging.
+	 */
+	private CollectLogMessagesAppender collectLogMessagesAppender = null;
 	
 	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
 
@@ -202,11 +212,10 @@ public class Controler {
 		} else {
 			Logger root = Logger.getRootLogger();
 			root.setLevel(Level.INFO);
-			PatternLayout layout = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
-			ConsoleAppender consoleAppender = new ConsoleAppender(layout, "System.out");
+			ConsoleAppender consoleAppender = new ConsoleAppender(DEFAULTLOG4JLAYOUT, "System.out");
 			consoleAppender.setName("A1");
 			root.addAppender(consoleAppender);
-			consoleAppender.setLayout(layout);
+			consoleAppender.setLayout(DEFAULTLOG4JLAYOUT);
 			log.error("");
 			log.error("Could not find configuration file " + logProperties + " for Log4j in the classpath.");
 			log.error("A default configuration is used, setting log level to INFO with a ConsoleAppender.");
@@ -248,6 +257,9 @@ public class Controler {
 
 	private Controler(final String configFileName, final String dtdFileName, final Config config) {
 		super();
+		//catch logs before doing something
+		this.collectLogMessagesAppender = new CollectLogMessagesAppender();
+		Logger.getRootLogger().addAppender(this.collectLogMessagesAppender);
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
 		this.configFileName = configFileName;
@@ -262,7 +274,6 @@ public class Controler {
 			this.config.addCoreModules();
 		}
 		Gbl.setConfig(this.config);
-
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 	}
 
@@ -282,6 +293,7 @@ public class Controler {
 	private void init() {
 		loadConfig();
 		setupOutputDir();
+		initLogging();
 		loadData();
 		setup();
 		loadCoreListeners();
@@ -398,6 +410,20 @@ public class Controler {
 	 * private methods
 	 * =================================================================== */
 
+	/**
+	 * Initializes log4j to write log output to files in output directory.
+	 */
+	private void initLogging() {
+		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
+		try {
+			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender.getLogEvents());
+		} catch (IOException e) {
+			log.error("Cannot create logfiles: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/**
 	 * Loads the configuration object with the correct settings.
 	 */

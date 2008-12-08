@@ -33,14 +33,54 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
+import org.matsim.controler.Controler;
 
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
 
 	private static final String GZ = ".gz";
 
+	/**
+	 * Call this method to create 2 log4j logfiles in the output directory specified as parameter.
+	 * The first logfile contains all messages the second only those above log Level.WARN (Priority.WARN).
+	 * 
+	 * @param outputDirectory the outputdirectory to create the files, whithout seperator at the end.
+	 * @param logEvents List of LoggingEvents, may be null, contains log information which should be written 
+	 * to the files, e.g. LoggingEvents which occurred before the files can be created.
+	 * @throws IOException 
+	 * 
+	 * @author dgrether
+	 */
+	public static void initOutputDirLogging(String outputDirectory, List<LoggingEvent> logEvents) throws IOException {
+		Logger root = Logger.getRootLogger();
+		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + System.getProperty("file.separator") + "logfile.log");
+		root.addAppender(appender);
+		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + System.getProperty("file.separator") + "logfileWarningsErrors.log");
+		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
+		//however it is only working with the deprecated method
+		warnErrorAppender.setThreshold(Priority.WARN);
+//		LevelRangeFilter filter = new LevelRangeFilter();
+//		filter.setLevelMax(Level.ALL);
+//		filter.setAcceptOnMatch(true);
+//		filter.setLevelMin(Level.WARN);
+//		warnErrorAppender.addFilter(filter);
+		root.addAppender(warnErrorAppender);
+		for (LoggingEvent e : logEvents) {
+			root.callAppenders(e);
+		}
+	}
+	
+	
+	
+	
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
 	 * Supports gzip-compressed files, such files are automatically decompressed.
