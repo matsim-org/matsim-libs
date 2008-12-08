@@ -29,6 +29,7 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Integration Tests for MATSim Replanning");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(ChangeLegModeIntegrationTest.class);
 		suite.addTestSuite(DeterministicMultithreadedReplanningTest.class);
 		suite.addTestSuite(ResumableRunsTest.class);
 		//$JUnit-END$

@@ -31,6 +31,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.locationchoice.LocationChoice;
 import org.matsim.network.NetworkLayer;
+import org.matsim.replanning.modules.ChangeLegMode;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatOptimizeTimes;
@@ -76,7 +77,7 @@ public class StrategyManagerConfigLoader {
 		TravelCost travelCostCalc = controler.getTravelCostCalculator();
 		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Facilities facilities = controler.getFacilities();
-		
+
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
 		int externalCounter = 0;
@@ -147,6 +148,10 @@ public class StrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new ExpBetaPlanChanger());
 			} else if (classname.equals("SelectRandom")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
+			} else if (classname.equals("ChangeLegMode")) {
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				strategy.addStrategyModule(new ChangeLegMode(config));
+				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 				// JH

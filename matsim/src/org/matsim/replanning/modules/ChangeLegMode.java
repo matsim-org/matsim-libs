@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ChangeLegMode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,41 @@
 
 package org.matsim.replanning.modules;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.basic.v01.BasicLeg;
+import org.matsim.config.Config;
+import org.matsim.gbl.MatsimRandom;
+import org.matsim.population.algorithms.ChooseRandomLegMode;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.StringUtils;
 
-public class AllTests {
+public class ChangeLegMode extends MultithreadedModuleA {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.replanning.modules");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ChangeLegModeTest.class);
-		suite.addTestSuite(TimeAllocationMutatorTest.class);
-		//$JUnit-END$
-		return suite;
+	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
+	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
+
+	private BasicLeg.Mode[] availableModes = new BasicLeg.Mode[] { BasicLeg.Mode.car, BasicLeg.Mode.pt };
+
+	public ChangeLegMode() {
+	}
+
+	public ChangeLegMode(final BasicLeg.Mode[] availableModes) {
+		this.availableModes = availableModes.clone();
+	}
+
+	public ChangeLegMode(final Config config) {
+		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
+		if (modes != null) {
+			String[] parts = StringUtils.explode(modes, ',');
+			this.availableModes = new BasicLeg.Mode[parts.length];
+			for (int i = 0, n = parts.length; i < n; i++) {
+				this.availableModes[i] = BasicLeg.Mode.valueOf(parts[i].trim());
+			}
+		}
+	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
 	}
 
 }
