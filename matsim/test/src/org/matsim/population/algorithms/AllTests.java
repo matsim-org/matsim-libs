@@ -27,6 +27,7 @@ public class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.population.algorithms");
+		suite.addTestSuite(ChooseRandomLegModeTest.class);
 		suite.addTestSuite(ParallelPersonAlgorithmRunnerTest.class);
 		suite.addTestSuite(PlanAnalyzeSubtoursTest.class);
 		return suite;
