@@ -20,7 +20,7 @@
 	</module>
 	
 	<module name="locationchoice">
-		<param name="constrained" value="true"/> <!-- true: travel time budget constraint (Horni et al. 2008) -->
+		<param name="constrained" value="null"/> <!-- true: travel time budget constraint (Horni et al. 2008) -->
 		<param name="restraintFcnFactor" value="0.131687242798"/> <!-- factor of the fac.cap.restraint function -->
 		<param name="restraintFcnExp" value="5.0"/> <!-- exponent of the fac.cap.restraint function -->
 		<param name="scaleFactor" value="1"/> <!-- for sample scenarios, i.e. if 10% population then scalefactor = 10 -->
