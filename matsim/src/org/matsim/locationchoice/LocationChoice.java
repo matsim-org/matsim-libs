@@ -28,9 +28,11 @@ import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
+import org.matsim.scoring.LocationChoiceScoringFunctionFactory;
 
 
 
@@ -60,6 +62,13 @@ public class LocationChoice extends MultithreadedModuleA {
 			final NetworkLayer network,
 			final Controler controler) {
 		
+		log.info("adding FacilitiesLoadCalculator");
+		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
+		
+		log.info("Scoring with LocationChoiceScoringFunction");
+		controler.setScoringFunctionFactory(
+				new LocationChoiceScoringFunctionFactory(controler.getFacilityPenalties()));
+				
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
 			log.info("Doing constrained location choice");
