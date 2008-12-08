@@ -39,7 +39,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String MAX_RECURSIONS = "maxRecursions";
 
 	//default values
-	private String constrained = "false";
+	private String constrained = null; // null: to check in if loc. choice is set in the config
 	private String restraintFcnFactor = "0.0";
 	private String restraintFcnExp = "0.0";
 	private String scaleFactor = "1.0";
