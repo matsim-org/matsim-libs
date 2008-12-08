@@ -1,0 +1,36 @@
+############################### 
+Setup of a scenario comparison
+################################ 
+
+Imagine you want to perform comparison of case #11 in wu_analyses.sh.
+
+	1, Check out the westumfahrung results module from our CVS ($WU_PATH).
+	2, Check out the networks that were used to produce the results. ($NETWORK_PATH)
+	3, Check out which run belongs to which scenario in description.xls.
+	4, cp wu_analyses.sh to MATSim base directory ($MATSim).
+	5a, Prepare "before" scenario results data and populate folders with it
+		cd $WU_PATH/run376/it.240
+		gunzip 240.deq_events.dat.*
+		cd $MATSim/input
+		mkdir wu-fm-gt
+		cd wu-fm-gt
+		ln -s $WU_PATH/run376/it.240/240.plans.xml.gz ./plans_before.xml.gz
+		ln -s $NETWORK_PATH/ivtch-changed-wu-flama/network.xml ./network_before.xml
+		ln -s $WU_PATH/run376/it.240/240.deq_events.dat.0 ./events_before.dat.0
+		ln -s $WU_PATH/run376/it.240/240.deq_events.dat.1 ./events_before.dat.1
+		ln -s $WU_PATH/run376/it.240/240.deq_events.dat.2 ./events_before.dat.2
+		ln -s $WU_PATH/run376/it.240/240.deq_events.dat.3 ./events_before.dat.3
+		echo 'wu-fm-gt' > name_before.txt
+	5b, Do the same for for the "after" scenario
+		- replace 'wu-fm-gt' with 'wu-fm-gt-nouetli'.
+		- replace 'before' in filenames with 'after'.
+		- use the other network
+	6, cp -R $MATSim/src/playground/meisterk/res/linksets/ workspace/MATSim/input/
+	7, In wu_analyses.sh, replace 'for i in `seq 1 12`' with 'for i in `seq 11 11`'	in order to run only case #11.
+	8, cd $MATSim
+	9, Run the script in background and retain output: sh ./wu_analyses.sh > run.log 2>&1 &
+	10, Follow the output with
+		tail -f run.log
+	11, After the successful run, find your results in two files in $MATSim/output:
+		- wu-fm-gt_vs_wu-fm-gt-nouetli__uetliberg_to_westtangente-flama__routeswitchers.txt
+		- wu-fm-gt_vs_wu-fm-gt-nouetli__uetliberg_to_westtangente-flama__summary.txt

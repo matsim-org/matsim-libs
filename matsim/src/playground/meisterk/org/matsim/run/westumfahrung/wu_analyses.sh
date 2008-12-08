@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# for execution, move this script to MATSim base directory
 for i in `seq 1 12`;
         do
 		# clean up input directory
-		rm input/network_*
-		rm input/plans_*
-		rm input/events_*
-		rm input/linkset_*
-		rm input/name_*
+		rm -f input/network_*
+		rm -f input/plans_*
+		rm -f input/events_*
+		rm -f input/linkset_*
+		rm -f input/name_*
 
 		case $i in
 		1)
