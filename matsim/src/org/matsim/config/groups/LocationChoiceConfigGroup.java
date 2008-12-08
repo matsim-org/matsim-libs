@@ -39,7 +39,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String MAX_RECURSIONS = "maxRecursions";
 
 	//default values
-	private String constrained = null;
+	private String constrained = "false";
 	private String restraintFcnFactor = "0.0";
 	private String restraintFcnExp = "0.0";
 	private String scaleFactor = "1";
@@ -84,9 +84,13 @@ public class LocationChoiceConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (CONSTRAINED.equals(key)) {
 			if (!(value.equals("true") || value.equals("false"))) {
-				log.warn("set 'constrained' to either 'true' or 'false'.");
+				log.warn("set 'constrained' to either 'true' or 'false'. Set to default value 'false'");
+				setMode("false");
 			}
-			setMode(value);
+			else {
+				setMode(value);
+			}
+			
 			
 		} else if (RESTR_FCN_FACTOR.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
