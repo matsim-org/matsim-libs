@@ -10,7 +10,7 @@ interface RetailersWriterHandler extends WriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	// <Retailers ... > ... </retailers>
 	//////////////////////////////////////////////////////////////////////
-	public void startRetailers(final Retailers counts, final BufferedWriter out) throws IOException;
+	public void startRetailers(final Retailers_Old counts, final BufferedWriter out) throws IOException;
 	public void endRetailers(final BufferedWriter out) throws IOException;
 	//////////////////////////////////////////////////////////////////////
 	// <Retailer ... > ... </retailer>

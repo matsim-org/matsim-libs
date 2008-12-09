@@ -16,8 +16,8 @@ public class RetailerControlerListener implements StartupListener,IterationEndsL
 		}
 
 		public void notifyStartup(final StartupEvent controlerStartupEvent) {
-			MatsimRetailersReader retailers_parser = new MatsimRetailersReader(Retailers.getSingleton());
-			retailers_parser.readFile("input/retailers.txt"); //TODO Now is hard coded but should use a config file
+			//MatsimRetailersReader retailers_parser = new MatsimRetailersReader(Retailers.getSingleton());
+			//retailers_parser.readFile("input/retailers.txt"); //TODO Now is hard coded but should use a config file
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {

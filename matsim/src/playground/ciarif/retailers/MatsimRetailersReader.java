@@ -10,7 +10,7 @@ import org.xml.sax.SAXException;
 
 public class MatsimRetailersReader extends MatsimXmlParser {
 
-	public MatsimRetailersReader(Retailers singleton) {
+	public MatsimRetailersReader(Retailers_Old singleton) {
 		// TODO Auto-generated constructor stub
 	}
 

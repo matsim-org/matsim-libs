@@ -23,12 +23,12 @@ public class RetailersReader extends MatsimXmlParser {
 	private final static String RETAILER = "retailer";
 	private final static String FACILITY = "facility";
 
-	private final Retailers retailers;
+	private final Retailers_Old retailers;
 	private Retailer curr_retailer = null;
 
 	private static final Logger log = Logger.getLogger(RetailersReader.class);
 
-	public RetailersReader (final Retailers retailers) {
+	public RetailersReader (final Retailers_Old retailers) {
 		this.retailers = retailers;
 	}
 

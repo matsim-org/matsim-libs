@@ -11,7 +11,7 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	// <retailers ... > ... </retailers>
 	//////////////////////////////////////////////////////////////////////
-	public void startRetailers(final Retailers retailers, final BufferedWriter out) throws IOException {
+	public void startRetailers(final Retailers_Old retailers, final BufferedWriter out) throws IOException {
 		out.write("<retailers ");
 		out.write("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
 		out.write("xsi:noNamespaceSchemaLocation=\"http://matsim.org/files/dtd/retailers_v1.xsd\"\n");
