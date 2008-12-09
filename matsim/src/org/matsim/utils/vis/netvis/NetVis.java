@@ -237,7 +237,7 @@ public class NetVis {
 		}
     }
     
-    public void displayNetwork(String filename) {
+    public static void displayNetwork(String filename) {
     	if (filename.endsWith("xml")) {
     		GeneralConfig gconf = new GeneralConfig(
     				true,
