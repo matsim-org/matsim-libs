@@ -17,7 +17,8 @@ public class PTTravelTime implements TravelTime {
 		//System.out.println(link.getId());
 		if (link.getType().equals("Transfer")){
 			travelTime= ptTimeTable.GetTransferTime(link, time);
-			if (travelTime<0) {travelTime= Double.MAX_VALUE;} ///
+			//if (travelTime<0) {travelTime= Double.MAX_VALUE;} ///
+			if (travelTime<0) {travelTime= 0;} ///
 			///System.out.println("link:" + link + " travelTime:" + travelTime);
 		}else if (link.getType().equals("Walking")){
 			travelTime = link.getLength()* WALKING_SPEED ;	

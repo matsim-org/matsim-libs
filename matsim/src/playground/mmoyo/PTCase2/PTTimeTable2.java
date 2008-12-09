@@ -93,7 +93,7 @@ public class PTTimeTable2{
 		Id idToNode= link.getToNode().getId();
 		double nextDeparture = nextDeparture(idToNode,time); 
 		double transferTime= 0;
-		if (nextDeparture>time){
+		if (nextDeparture>=time){
 			transferTime= nextDeparture-time;
 		}else{
 			//count seconds between 01:00 am and firt departure  
