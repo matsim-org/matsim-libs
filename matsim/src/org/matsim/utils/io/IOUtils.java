@@ -47,6 +47,10 @@ import org.matsim.controler.Controler;
 public class IOUtils {
 
 	private static final String GZ = ".gz";
+	
+	public static final String LOGFILE = "logfile.log";
+	
+	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
 
 	/**
 	 * Call this method to create 2 log4j logfiles in the output directory specified as parameter.
@@ -61,9 +65,11 @@ public class IOUtils {
 	 */
 	public static void initOutputDirLogging(String outputDirectory, List<LoggingEvent> logEvents) throws IOException {
 		Logger root = Logger.getRootLogger();
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + System.getProperty("file.separator") + "logfile.log");
+		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + 
+				System.getProperty("file.separator") + LOGFILE);
 		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + System.getProperty("file.separator") + "logfileWarningsErrors.log");
+		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + 
+				System.getProperty("file.separator") + WARNLOGFILE);
 		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
 		//however it is only working with the deprecated method
 		warnErrorAppender.setThreshold(Priority.WARN);
@@ -73,8 +79,10 @@ public class IOUtils {
 //		filter.setLevelMin(Level.WARN);
 //		warnErrorAppender.addFilter(filter);
 		root.addAppender(warnErrorAppender);
-		for (LoggingEvent e : logEvents) {
-			root.callAppenders(e);
+		if (logEvents != null) {
+			for (LoggingEvent e : logEvents) {
+				root.callAppenders(e);
+			}
 		}
 	}
 	

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * AllTests
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.utils;
+package org.matsim.utils.io;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public class AllTests {
 
+
+/**
+ * @author dgrether
+ *
+ */
+public class AllTests {
+	
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
+		TestSuite suite = new TestSuite("Test for org.matsim.utils.io");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.utils.charts.AllTests.suite());
-		suite.addTest(org.matsim.utils.collections.AllTests.suite());
-		suite.addTest(org.matsim.utils.geometry.AllTests.suite());
-		suite.addTest(org.matsim.utils.gis.AllTests.suite());
-		suite.addTest(org.matsim.utils.io.AllTests.suite());
-		suite.addTest(org.matsim.utils.misc.AllTests.suite());
-		suite.addTest(org.matsim.utils.vis.AllTests.suite());
-		suite.addTestSuite(WorldUtilsTest.class);
+		suite.addTestSuite(org.matsim.utils.io.IOUtilsTest.class);
 		//$JUnit-END$
 		return suite;
 	}
-
 }
