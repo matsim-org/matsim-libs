@@ -236,6 +236,18 @@ public class NetVis {
 			}
 		}
     }
+    
+    public void displayNetwork(String filename) {
+    	if (filename.endsWith("xml")) {
+    		GeneralConfig gconf = new GeneralConfig(
+    				true,
+    				filename);
+    		(new NetVis(gconf, VisConfig.newDefaultConfig(), null)).run();
+    	}
+    	else {
+    		throw new IllegalArgumentException(filename + " seems to be no valid network file!");
+    	}
+    }
 
     public static void main(String[] args) {
     	Gbl.createConfig(null);
