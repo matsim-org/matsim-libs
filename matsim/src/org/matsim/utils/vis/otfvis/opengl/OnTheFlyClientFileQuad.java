@@ -23,8 +23,13 @@ package org.matsim.utils.vis.otfvis.opengl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
@@ -93,6 +98,30 @@ public class OnTheFlyClientFileQuad extends Thread {
 		OTFDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 
 		return drawer2;
+	}
+
+	private void openAndReadConfigs(String fileName) {
+		ZipFile zipFile;
+		DataInputStream inFile;
+		// open file
+		try {
+			File sourceZipFile = new File(fileName);
+			// Open Zip file for reading
+			zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+			int i=0;
+			ZipEntry infoEntry = zipFile.getEntry("config" + i + ".bin");
+			while(infoEntry != null) {
+				//load config settings
+				inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
+				infoEntry = zipFile.getEntry("config" + ++i + ".bin");
+			}
+
+			OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	@Override
