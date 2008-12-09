@@ -214,6 +214,34 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return manager.getSubChains();
 	}
 	
+	/* 
+	 * All but one activity type are fixed. No primary activities are moved.
+	 * Needed for the computation of shopping location choice sets.
+	 */
+	public List<SubChain> calcActChainsHavingOneFlexibleActivityType(final Plan plan, String flexibleActivityType) {
+		ManageSubchains manager = new ManageSubchains();	
+		
+		final ArrayList<?> actslegs = plan.getActsLegs();
+		for (int j = 0; j < actslegs.size(); j=j+2) {
+			final Act act = (Act)actslegs.get(j);
+						
+			// found secondary activity
+			if (act.getType().equals(flexibleActivityType)) {			
+				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
+			}		
+			// found primary activity
+			else {			
+				if (j == (actslegs.size()-1)) {
+					manager.primaryActivityFound(act, null);
+				}
+				else {
+					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
+				}
+			}
+		}
+		return manager.getSubChains();
+	}
+	
 	
 	public ArrayList<Facility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
