@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans name="test_plan_person_1">
+
+<!-- ====================================================================== -->
+
+	<person id="1">
+		<knowledge>
+			<activity type="home">
+				<location id="1" isPrimary="yes">
+				</location>
+			</activity>
+
+			<activity type="leisure">
+				<location id="43">
+				</location>
+			</activity>
+
+			<activity type="shopping">
+				<location id="37">
+				</location>
+			</activity>
+
+			<activity type="work">
+				<location id="10" isPrimary="yes">
+				</location>
+			</activity>
+
+		</knowledge>
+
+		<plan score="270.87065836636157" selected="no">
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="00:00:00" dur="08:00:00" end_time="08:00:00" />
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:00:00" arr_time="08:00:00">
+				<route dist="9000.0" trav_time="00:19:59">
+					1 11 21 31 41 51 61 71 81 91 
+				</route>
+			</leg>
+			<act type="work" link="172" facility="10" x="9000.0" y="500.0" start_time="08:00:00" dur="08:00:00" end_time="16:00:00" />
+			<leg num="1" mode="car" dep_time="16:00:00" trav_time="00:00:00" arr_time="16:00:00">
+				<route dist="6000.0" trav_time="00:13:20">
+					92 82 72 62 52 42 41 
+				</route>
+			</leg>
+			<act type="shopping" link="5" facility="37" x="4500.0" y="0.0" start_time="16:00:00" dur="02:00:00" end_time="18:00:00" />
+			<leg num="2" mode="car" dep_time="18:00:00" trav_time="00:00:00" arr_time="18:00:00">
+				<route dist="3000.0" trav_time="00:06:40">
+					51 52 53 54 
+				</route>
+			</leg>
+			<act type="leisure" link="59" facility="43" x="4500.0" y="3000.0" start_time="18:00:00" dur="02:00:00" end_time="20:00:00" />
+			<leg num="3" mode="car" dep_time="20:00:00" trav_time="00:00:00" arr_time="20:00:00">
+				<route dist="6000.0" trav_time="00:13:19">
+					44 34 24 23 22 12 2 
+				</route>
+			</leg>
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="20:00:00" dur="04:00:00" end_time="24:00:00" />
+		</plan>
+
+		<plan score="309.8208214835656" selected="yes">
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="00:00:00" dur="08:00:00" end_time="08:00:00" />
+			<leg num="0" mode="car" dep_time="08:00:00" trav_time="00:22:19" arr_time="08:22:19">
+				<route dist="9000.0" trav_time="00:19:59">
+					1 11 21 31 41 51 61 71 81 91 
+				</route>
+			</leg>
+			<act type="work" link="172" facility="10" x="9000.0" y="500.0" start_time="08:22:19" dur="06:37:40" end_time="15:00:00" />
+			<leg num="1" mode="car" dep_time="15:00:00" trav_time="00:15:33" arr_time="15:15:33">
+				<route dist="6000.0" trav_time="00:13:20">
+					92 82 72 62 52 42 41 
+				</route>
+			</leg>
+			<act type="shopping" link="5" facility="37" x="4500.0" y="0.0" start_time="15:15:33" dur="02:44:26" end_time="18:00:00" />
+			<leg num="2" mode="car" dep_time="18:00:00" trav_time="00:08:55" arr_time="18:08:55">
+				<route dist="3000.0" trav_time="00:06:40">
+					51 52 53 54 
+				</route>
+			</leg>
+			<act type="leisure" link="59" facility="43" x="4500.0" y="3000.0" start_time="18:08:55" dur="03:51:04" end_time="22:00:00" />
+			<leg num="3" mode="car" dep_time="22:00:00" trav_time="00:15:33" arr_time="22:15:33">
+				<route dist="6000.0" trav_time="00:13:19">
+					44 34 24 23 22 12 2 
+				</route>
+			</leg>
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="22:15:33" dur="01:44:26" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</plans>
