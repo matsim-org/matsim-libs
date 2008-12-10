@@ -124,13 +124,13 @@ implements MouseWheelListener{
 	    	camera.setTarget(cameraTarget);
 	    }
 	   
-	void scrollToNewPos(Point3f cameraEnd){
+	public void scrollToNewPos(Point3f cameraEnd){
 		Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		scrollCamera(cameraStart, cameraEnd, "location");
 		scrollCamera(cameraTarget, targetEnd, "target");
 	}
 
-	void setToNewPos(Point3f cameraEnd){
+	public void setToNewPos(Point3f cameraEnd){
     	Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		cameraStart = cameraEnd;
 		cameraTarget = targetEnd;
@@ -216,7 +216,7 @@ implements MouseWheelListener{
 			Point3f newcameraStart = getOGLPos(start.x, start.y);
 			//setToNewPos(newcameraStart);
 			Point2D.Double point = new Point2D.Double(newcameraStart.getX(), newcameraStart.getY());
-			clickHandler.handleClick(point, button);
+			clickHandler.handleClick(point, button, e);
 			currentRect = null;
 		}
 		button = 0;

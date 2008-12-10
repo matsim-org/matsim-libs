@@ -577,7 +577,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		if(quad != null) quad.clearCache();
 	}
 
-	public void handleClick(Double point, int mouseButton) {
+	public void handleClick(Double point, int mouseButton, MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}

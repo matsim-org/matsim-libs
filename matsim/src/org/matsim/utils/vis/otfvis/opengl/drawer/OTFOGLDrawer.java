@@ -29,11 +29,20 @@ import static javax.media.opengl.GL.GL_VIEWPORT;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,7 +64,13 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
@@ -76,6 +91,7 @@ import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.opengl.gui.VisGUIMouseHandler;
 import org.matsim.utils.vis.otfvis.opengl.queries.QueryLinkId;
 
+import com.sun.opengl.util.ImageUtil;
 import com.sun.opengl.util.Screenshot;
 import com.sun.opengl.util.j2d.TextRenderer;
 import com.sun.opengl.util.j2d.TextureRenderer;
@@ -561,6 +577,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	}
 
+	BufferedImage current;
 	synchronized public void display(GLAutoDrawable drawable) {
 //		Gbl.startMeasurement();
 		
@@ -620,6 +637,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				e.printStackTrace();
 			}
 		}
+		if(current == null) current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
 	}
 
 	public void addOverlay(OTFGLOverlay overlay) {
@@ -631,7 +649,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public void init(GLAutoDrawable drawable) {
 		this.gl = drawable.getGL();
-
 		this.gl.setSwapInterval(0);
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
@@ -668,8 +685,83 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.statusDrawer = new StatusTextDrawer(drawable);
 	}
 
-
-	public void handleClick(Point2D.Double point, int mouseButton) {
+	class ZoomEntry {
+		Point3f zoomstart;
+		BufferedImage snap;
+		public ZoomEntry(BufferedImage snap, Point3f zoomstart) {
+			super();
+			this.snap = snap;
+			this.zoomstart = zoomstart;
+		}
+	}
+	List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	
+	public boolean zoomrestore = false;
+	public Point3f zoomstore;
+	JDialog zoomD;
+	void showZoomDialog() {
+		Container parent = canvas.getParent();
+		zoomD = new JDialog(  );
+		zoomD.setUndecorated(true);
+		zoomD.setLocationRelativeTo(canvas.getParent());
+		Point pD = canvas.getLocationOnScreen();
+		Dimension cD = canvas.getSize();
+		canvas.getParent();
+		zoomD.setLocation(pD);
+		zoomD.setPreferredSize(canvas.getSize());
+	    GridLayout gbl = new GridLayout(3,3); 
+	    zoomD.getContentPane().setLayout( gbl ); 
+		ArrayList<JButton> buttons = new ArrayList<JButton>();
+		
+		for(int i=0; i<zooms.size();i++) {
+			ZoomEntry z = zooms.get(i);
+			//ImageIcon icon = new ImageIcon(z.snap);
+			JButton b = new JButton();//icon);
+			buttons.add(i, b);
+			b.setActionCommand(Integer.toString(i));
+			b.addActionListener( new ActionListener() { 
+				  public void actionPerformed( ActionEvent e ) {
+					  int num = Integer.parseInt(e.getActionCommand());
+					  mouseMan.setToNewPos(zooms.get(num).zoomstart);
+					  zoomD.setVisible(false); 
+				  } 
+				} ); 			
+			zoomD.getContentPane().add(b);
+		}
+		zoomD.doLayout();
+		zoomD.pack();
+		for(int i=0; i<zooms.size();i++) {
+			ZoomEntry z = zooms.get(i);
+			JButton b = buttons.get(i);
+			ImageIcon icon = new ImageIcon(ImageUtil.createThumbnail(z.snap,Math.min(z.snap.getWidth(),b.getSize().width)-20));
+			b.setIcon(icon);
+		}
+		zoomD.setVisible(true);
+	}
+	
+	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e) {
+		if(mouseButton == 4 && false){
+			JPopupMenu popmen = new JPopupMenu(); 
+			JMenuItem menu1 = new JMenuItem( "Zoom"); 
+			popmen.add( menu1 ); 
+			popmen.add( new AbstractAction("Store Zoom...") { 
+		        public void actionPerformed( ActionEvent e ) { 
+		        	zoomstore = mouseMan.getView();
+		        	current = null;
+		        	redraw();
+		        	BufferedImage image = ImageUtil.createThumbnail(current, 300);
+		        	zooms.add(new ZoomEntry(image,zoomstore));
+		          } 
+		        } ); 
+			popmen.add( new AbstractAction("Load Zoom...") { 
+		        public void actionPerformed( ActionEvent e ) { 
+		        	showZoomDialog();
+		        	mouseMan.setToNewPos(zoomstore); 
+		          } 
+		        } ); 
+			popmen.show(this.getComponent(),e.getX(), e.getY());
+			return;
+		}
 		Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
 		if(queryHandler != null) queryHandler.handleClick(origPoint, mouseButton);
 	}
@@ -763,6 +855,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public Point3f getView() {
 		return this.mouseMan.getView();
+	}
+
+	public void setView(Point3f point) {
+		this.mouseMan.setToNewPos(point);
+		redraw();
 	}
 
 	/**

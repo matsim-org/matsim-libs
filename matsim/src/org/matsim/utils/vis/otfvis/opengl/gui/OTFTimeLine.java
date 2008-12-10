@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -176,7 +177,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 		return null;
 	}
 
-	public void handleClick(java.awt.geom.Point2D.Double point, int mouseButton) {
+	public void handleClick(java.awt.geom.Point2D.Double point, int mouseButton, MouseEvent e) {
 		// TODO Auto-generated method stub
 	}
 
