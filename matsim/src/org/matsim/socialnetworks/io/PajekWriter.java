@@ -63,11 +63,11 @@ public class PajekWriter {
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
 	public PajekWriter(String dir, Facilities facilities){
-		this.dir=dir+"/";
-		File pjDir=new File(dir+"pajek/");
-		log.info("PajekWriter1 make dir "+dir + "pajek/");
+		this.dir=new String(dir+"/");
+		File pjDir=new File(this.dir+"pajek/");
+		log.info("PajekWriter1 make dir "+this.dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){
-			Gbl.errorMsg("Cannot create directory "+dir+"pajek/");
+			Gbl.errorMsg("Cannot create directory "+this.dir+"pajek/");
 		}
 		log.info("is a dumb writer for UNDIRECTED nets. Replace it with something that iterates through Persons and call it from SocialNetworksTest.");
 		FacilitiesFindScenarioMinMaxCoords fff= new FacilitiesFindScenarioMinMaxCoords();
