@@ -37,6 +37,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RECURSIONTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
 	private static final String RECURSIONTRAVELSPEED = "recursionTravelSpeed";
 	private static final String MAX_RECURSIONS = "maxRecursions";
+	private static final String FIX_BY_ACTTYPE = "fixByActType";
 
 	//default values
 	private String constrained = "false";
@@ -46,6 +47,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String recursionTravelSpeedChange = "0.1";
 	private String recursionTravelSpeed = "8.5";
 	private String maxRecursions = "0";
+	private String fixByActType = "false";
 	
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 	
@@ -76,6 +78,9 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (MAX_RECURSIONS.equals(key)) {
 			return getMaxRecursions();
+		}
+		if (FIX_BY_ACTTYPE.equals(key)) {
+			return getFixByActType();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -141,6 +146,14 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setMaxRecursions(value);
 			}
+		} else if (FIX_BY_ACTTYPE.equals(key)) {
+			if (!(value.equals("true") || value.equals("false"))) {
+				log.warn("set 'fixByActType' to either 'true' or 'false'. Set to default value 'false'");
+				setMode("false");
+			}
+			else {
+				setMode(value);
+			}
 		} else		
 		{
 			throw new IllegalArgumentException(key);
@@ -157,6 +170,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RECURSIONTRAVELSPEEDCHANGE);
 		this.addParameterToMap(map, RECURSIONTRAVELSPEED);
 		this.addParameterToMap(map, MAX_RECURSIONS);
+		this.addParameterToMap(map, FIX_BY_ACTTYPE);
 		return map;
 	}
 
@@ -202,5 +216,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setRecursionTravelSpeed(String recursionTravelSpeed) {
 		this.recursionTravelSpeed = recursionTravelSpeed;
+	}
+	public String getFixByActType() {
+		return fixByActType;
+	}
+	public void setFixByActType(String fixByActType) {
+		this.fixByActType = fixByActType;
 	}
 }

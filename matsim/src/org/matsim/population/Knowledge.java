@@ -364,6 +364,22 @@ public class Knowledge extends CustomizableImpl implements BasicKnowledge<Activi
 		return false;
 	}
 	
+	/**
+	 * Returns if act_type is defined as primary somewhere
+	 * @param act_type The activity type of the {@link Activity Activities}
+	 */
+	public final boolean isSomewherePrimary(String act_type) {
+		if (activities == null) { 
+			return false; 
+		}
+		for (KActivity ka : activities) {
+			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 
 	public final String getDescription() {

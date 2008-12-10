@@ -187,14 +187,24 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	public List<SubChain> calcActChains(final Plan plan) {
 		
 		ManageSubchains manager = new ManageSubchains();	
-		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
-		
+		List<Act> movablePrimaryActivities = null; 
+		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
+			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		}
+				
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean movable = movablePrimaryActivities.contains(act);
+			boolean isPrimary = false;
+			boolean movable = false;
+			if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {	
+				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+				movable = movablePrimaryActivities.contains(act);
+			}
+			else {
+				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
+			}
 			
 			// found secondary activity
 			// test for home if by accident home is not declared as primary

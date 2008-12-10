@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
@@ -46,15 +47,26 @@ public class RandomLocationMutator extends LocationMutator {
 	 */
 	@Override
 	public void handlePlan(final Plan plan){
-				
-		List<Act> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		
+		List<Act> movablePrimaryActivities = null; 
+		if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {
+			movablePrimaryActivities = defineMovablePrimaryActivities(plan);
+		}
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
-			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
-			boolean movable = movablePrimaryActivities.contains(act);
 			
+			boolean isPrimary = false;
+			boolean movable = false;
+			if (Gbl.getConfig().locationchoice().getFixByActType().equals("false")) {	
+				isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
+				movable = movablePrimaryActivities.contains(act);
+			}
+			else {
+				isPrimary = plan.getPerson().getKnowledge().isSomewherePrimary(act.getType());
+			}
+					
 			if (!isPrimary || movable) {
 				int length = this.facilities_of_type.get(act.getType()).length;
 				// only one facility: do not need to do location choice
