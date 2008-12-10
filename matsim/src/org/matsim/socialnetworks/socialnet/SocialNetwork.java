@@ -130,9 +130,8 @@ public class SocialNetwork {
 		int numLinks = (int) ((kbar * personList.length) / 2.);
 		
 		double p0=1.;
-		double rmin=1000.;
-		double rmax=100000.;
-		double alpha=1.5;
+		double rmin = Double.parseDouble(socnetConfig.getRmin());
+		double alpha=Double.parseDouble(socnetConfig.getAlpha());
 		double c=p0/(Math.pow(rmin,-alpha));
 		log.info(alpha+" "+c+" "+p0+" "+rmin);
 		int i=0;

@@ -63,7 +63,7 @@ public class PajekWriter {
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
 	public PajekWriter(String dir, Facilities facilities){
-		this.dir=dir;
+		this.dir=dir+"/";
 		File pjDir=new File(dir+"pajek/");
 		log.info("PajekWriter1 make dir "+dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){

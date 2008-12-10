@@ -42,7 +42,7 @@ public class ActivityActReader {
 			}
 			// Handle errors in opening the file
 			catch (Exception e)
-			{   System.err.println(" File not found or other input error: "+fileName);
+			{   System.err.println(" Input error. Probably the mental map file of Acts <-> Facilities was not found for this iteration. Check paths and file locations: "+fileName);
 			}
 		}
 

@@ -103,7 +103,7 @@ public class SocialNetworkStatistics {
 	public SocialNetworkStatistics(String dir) {
 
 		// statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
-		statsoutdir = dir + "stats/";
+		statsoutdir = dir + "/stats/";
 	}
 
 	public void openFiles() {
