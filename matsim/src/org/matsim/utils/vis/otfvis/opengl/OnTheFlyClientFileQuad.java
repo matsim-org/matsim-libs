@@ -100,7 +100,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 		return drawer2;
 	}
 
-	private void openAndReadConfigs(String fileName) {
+	private void openAndReadZooms(String fileName) {
 		ZipFile zipFile;
 		DataInputStream inFile;
 		// open file

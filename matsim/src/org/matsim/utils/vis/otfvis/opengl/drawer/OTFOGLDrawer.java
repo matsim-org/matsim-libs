@@ -31,9 +31,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -71,6 +69,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
@@ -687,11 +686,13 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	class ZoomEntry {
 		Point3f zoomstart;
+		String name;
 		BufferedImage snap;
-		public ZoomEntry(BufferedImage snap, Point3f zoomstart) {
+		public ZoomEntry(BufferedImage snap, Point3f zoomstart, String name ){
 			super();
 			this.snap = snap;
 			this.zoomstart = zoomstart;
+			this.name = name;
 		}
 	}
 	List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
@@ -716,7 +717,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			//ImageIcon icon = new ImageIcon(z.snap);
-			JButton b = new JButton();//icon);
+			JButton b = new JButton(z.name);//icon);
 			buttons.add(i, b);
 			b.setActionCommand(Integer.toString(i));
 			b.addActionListener( new ActionListener() { 
@@ -739,18 +740,49 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		zoomD.setVisible(true);
 	}
 	
+	private void storeZoom(boolean withName, String name) {
+    	zoomstore = mouseMan.getView();
+    	current = null;
+
+    	if(withName) {
+
+    		final JDialog d = new JDialog((JFrame)null,"Name fŸr diesen Zoom", true);
+    		JTextField field = new JTextField(20);
+    	    ActionListener al =  new ActionListener() { 
+    	        public void actionPerformed( ActionEvent e ) {
+    	        	d.setVisible(false);
+    	        	
+    	      } }; 
+    	      field.addActionListener(al);
+    		d.getContentPane().add(field);
+    		d.pack();
+    		d.setVisible(true);
+    		name = field.getText();
+    	}
+    	redraw();
+    	BufferedImage image = ImageUtil.createThumbnail(current, 300);
+    	zooms.add(new ZoomEntry(image,zoomstore, name));
+		
+	}
+	
 	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 && false){
 			JPopupMenu popmen = new JPopupMenu(); 
 			JMenuItem menu1 = new JMenuItem( "Zoom"); 
 			popmen.add( menu1 ); 
 			popmen.add( new AbstractAction("Store Zoom...") { 
-		        public void actionPerformed( ActionEvent e ) { 
-		        	zoomstore = mouseMan.getView();
-		        	current = null;
-		        	redraw();
-		        	BufferedImage image = ImageUtil.createThumbnail(current, 300);
-		        	zooms.add(new ZoomEntry(image,zoomstore));
+		        public void actionPerformed( ActionEvent e ) {
+		        	storeZoom(false, "");
+		          } 
+		        } ); 
+			popmen.add( new AbstractAction("Store named Zoom...") { 
+		        public void actionPerformed( ActionEvent e ) {
+		        	storeZoom(true, "");
+		          } 
+		        } ); 
+			popmen.add( new AbstractAction("Store inital Zoom...") { 
+		        public void actionPerformed( ActionEvent e ) {
+		        	storeZoom(false, "*Initial*");
 		          } 
 		        } ); 
 			popmen.add( new AbstractAction("Load Zoom...") { 
