@@ -21,11 +21,12 @@
 package org.matsim.locationchoice;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
@@ -33,7 +34,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
@@ -163,34 +163,35 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	
 	
 	protected List<Act>  defineMovablePrimaryActivities(final Plan plan) {
-
-		/*
-		 * TODO: maybe better use a hash-map for both structures (speed-up?) 
-		 */
-		List<Act> movablePrimaryActivities = new Vector<Act>();		
-		TreeMap<String, List<Act>> primaryActivities = new TreeMap<String, List<Act>>();
+	
+		List<Act> primaryActivities = new Vector<Act>();
 		
 		final ArrayList<?> actslegs = plan.getActsLegs();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Act act = (Act)actslegs.get(j);
 			boolean isPrimary = plan.getPerson().getKnowledge().isPrimary(act.getType(), act.getFacilityId());
 			
-			if (isPrimary && !primaryActivities.containsKey(act.getType())) {
-				primaryActivities.put(act.getType(), new Vector<Act>());
-			}
-			
-			if (isPrimary && !act.getType().startsWith("h")) {					
-				primaryActivities.get(act.getType()).add(act);
+			if (isPrimary) {
+				primaryActivities.add(act);
 			}
 		}
+		Collections.shuffle(primaryActivities);
 		
-		Iterator<List<Act>> it = primaryActivities.values().iterator();
+		List<Act> movablePrimaryActivities = new Vector<Act>();
+		
+		// key: activity.type + activity.facility
+		HashMap<String, Boolean> fixPrimaries = new HashMap<String, Boolean>();
+				
+		Iterator<Act> it = primaryActivities.iterator();
 		while (it.hasNext()) {
-			List<Act> list = it.next();
-			if (list.size() > 1) {
-				int index = MatsimRandom.random.nextInt(list.size()-1);
-				list.remove(index);
-				movablePrimaryActivities.addAll(list);
+			Act a = it.next();		
+			String key = a.getType()+a.getFacility().getId().toString();
+			if (fixPrimaries.containsKey(key)) {
+				// there is already one activity performed of the specific type at this location
+				movablePrimaryActivities.add(a);
+			}
+			else {
+				fixPrimaries.put(key, true);
 			}
 		}
 		return movablePrimaryActivities;
