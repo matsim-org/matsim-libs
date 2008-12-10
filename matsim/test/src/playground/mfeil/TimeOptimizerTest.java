@@ -62,7 +62,7 @@ public class TimeOptimizerTest extends MatsimTestCase{
 	protected void setUp() throws Exception {
 
 		super.setUp();
-		//super.loadConfig(this.getClassInputDirectory() + "config.xml");
+	
 		super.loadConfig("test/scenarios/chessboard/config.xml");
 		
 		log.info("Reading facilities xml file...");
@@ -98,7 +98,6 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		this.ltte = new CetinCompatibleLegTravelTimeEstimator(this.tTravelEstimator, this.travelCostEstimator, this.depDelayCalc, this.network);
 		
 		this.testee = new TimeOptimizer14 (ltte, new PlanScorer(new JohScoringFunctionFactory()));
-		
 		
 
 	}
@@ -210,8 +209,35 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		for (int i=0;i<alIn.size();i+=2){
 			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
 		}
-		
-		
 	}
 	
+	public void testRun (){
+		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
+		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		
+		log.info("Reading output plan xml file...");
+		Population popTest = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPopulationReader(popTest);
+		plansReader.readFile("test/input/playground/mfeil/output_person_1.xml");
+		popTest.printPlansCount();
+		log.info("Reading output plan xml file...done.");
+		
+		Plan targetPlan = popTest.getPerson(this.TEST_PERSON_ID).getPlans().get(1);
+		
+		this.testee.run(plan);
+		
+		/* Test whether differences are smaller than 10 sec because leg estimator causes minor time differences*/
+		for (int i=0;i<plan.getActsLegs().size();i++){
+			if (i%2==0){
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getDuration()-((Act)(targetPlan.getActsLegs().get(i))).getDuration())<10);
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getStartTime()-((Act)(targetPlan.getActsLegs().get(i))).getStartTime())<10);
+				assert(java.lang.Math.abs(((Act)(plan.getActsLegs().get(i))).getEndTime()-((Act)(targetPlan.getActsLegs().get(i))).getEndTime())<10);
+			}
+			else {
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getTravelTime()-((Leg)(targetPlan.getActsLegs().get(i))).getTravelTime())<10);
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getDepartureTime()-((Leg)(targetPlan.getActsLegs().get(i))).getDepartureTime())<10);
+				assert(java.lang.Math.abs(((Leg)(plan.getActsLegs().get(i))).getArrivalTime()-((Leg)(targetPlan.getActsLegs().get(i))).getArrivalTime())<10);
+			}
+		}
+	}
 }
