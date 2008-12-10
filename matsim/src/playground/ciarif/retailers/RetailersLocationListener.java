@@ -40,6 +40,9 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
+import org.matsim.population.Act;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
 /*import org.matsim.interfaces.basic.v01.BasicLocation;
 import java.io.BufferedWriter;
@@ -71,43 +74,33 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,Link> links = controler.getNetwork().getLinks();
+		NewRetailersLocation nrl = new NewRetailersLocation(links);
 		Facilities facilities = controler.getFacilities();
 		this.retailers = new Retailers (facilities);
-		this.retailersToBeRelocated = Retailers.selectRetailersForRelocation(retailers);
-		System.out.println("  rtbr = " + retailersToBeRelocated.getRetailers());
-		
+		this.retailersToBeRelocated = Retailers.selectRetailersForRelocation(retailers,40);
+		System.out.println("  rtbr = " + this.retailersToBeRelocated.getRetailers());
 		Iterator<Facility> iter_fac = this.retailersToBeRelocated.getRetailers().values().iterator();
 				
 		while (iter_fac.hasNext()) {
 			Facility f = iter_fac.next();
-			int key = newRetailersLocation (links);//Location location = facilities.getLocation(f.getId());
-			
-			System.out.println("  Links = " + links);
+			Coord coord = nrl.findLocation().getCenter();
+			//f.setLocation(coord);
 			System.out.println("  Facility Link = " + f.getLink());
 			System.out.println("  Facility Coord = " + f.getCenter());
-			System.out.println("  Link key = " + key);
-			IdImpl id = new IdImpl(110);
-			Link l = links.get(id);
-			System.out.println("  Link = " + l);
-			Coord coord = links.get(id).getCenter();
-			System.out.println("  Link Coord = " + coord);
-			//f.setLocation(links.get(id).getCenter());
-			links.remove(id);
-			System.out.println("  Facility Link = " + f.getLink());
-			System.out.println("  Facility Coord = " + f.getCenter());
+			//controler.getFacilities().g
 		}
 	}
 			
-	// Might it be a separate class instead of a method? For example 
-	// a class where more different methods would implement different
-	// ways (algorithms) to choose the new locations.
-	private int newRetailersLocation (Map<Id,Link> links){
-		int rd = MatsimRandom.random.nextInt(links.size()-1);
-		return rd;
-	}
-	
 	public void notifyBeforeMobsim (BeforeMobsimEvent event) {
 		//TODO: Implement
+		Controler controler = event.getControler();
+		Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
+		
+		while (per_iter.hasNext()) {
+			Person person = per_iter.next();
+			Plan plan = person.getSelectedPlan();
+			person.removePlan(plan);
+		}
 		//set routes to null of selected plans
 		// router
 	}

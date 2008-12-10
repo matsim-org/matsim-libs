@@ -34,7 +34,6 @@ public class RetailersControler extends Controler {
 		super(args);
 		
 		this.facilities = super.getFacilities();
-		System.out.println("  Facilities = " + facilities);
 		this.retailersToBeRelocated = new Retailers();
 		this.addControlerListener(new RetailersLocationListener(this.retailersToBeRelocated));		
 	}
