@@ -95,37 +95,36 @@ public class MentalMap {
 
 		while(planActIter.hasNext()){
 			Act myAct = (Act) planActIter.next();
-
-			Activity myActivity = null;
-			// If there is already knowledge in the initial plans file, use it
-			if(this.knowledge.getActivities(myAct.getType()).size()>0){
-				myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
-				myAct.setFacility(myActivity.getFacility());
-				//TODO JH add logic to label this activity primary or secondary
-				this.knowledge.addActivity(myActivity, false);
-//				learnActsActivities(myAct,myActivity);
-			}
-
-			// Else the activity is null and we choose an activity to assign to the act
-			Link myLink = myAct.getLink();
-			// These Locations are facilities by the new convention
-			Collection<Location> locations = myLink.getUpMapping().values();
-			// These Objects are facilities by convention
-			Object[] facs =  locations.toArray();
-			// Assign a random activity (a facility) on the link to the act
-			// thus giving it in effect a street address
-			while(myActivity==null){
-				int k = MatsimRandom.random.nextInt(facs.length);
-				Facility f = (Facility) facs[k];
-				myActivity = f.getActivity(myAct.getType());
-				if(myActivity!=null){
+			if(myAct.getFacility()==null){ // new Acts are assigned a facility in the Plans file
+				Activity myActivity = null;
+				// If there is already knowledge in the initial plans file, use it
+				if(this.knowledge.getActivities(myAct.getType()).size()>0){
+					myActivity=this.knowledge.getActivities(myAct.getType()).get(MatsimRandom.random.nextInt(this.knowledge.getActivities(myAct.getType()).size()));
 					myAct.setFacility(myActivity.getFacility());
 					//TODO JH add logic to label this activity primary or secondary
-					this.knowledge.addActivity(myActivity,false);
+					this.knowledge.addActivity(myActivity, false);
 //					learnActsActivities(myAct,myActivity);
 				}
+
+				// Else the activity is null and we choose an activity to assign to the act
+				Link myLink = myAct.getLink();
+				// These Locations are facilities by the new convention
+				Collection<Location> locations = myLink.getUpMapping().values();
+				// These Objects are facilities by convention
+				Object[] facs =  locations.toArray();
+				// Assign a random activity (a facility) on the link to the act
+				// thus giving it in effect a street address
+				while(myActivity==null){
+					int k = MatsimRandom.random.nextInt(facs.length);
+					Facility f = (Facility) facs[k];
+					myActivity = f.getActivity(myAct.getType());
+					if(myActivity!=null){
+						myAct.setFacility(myActivity.getFacility());
+						//TODO JH add logic to label this activity primary or secondary
+						this.knowledge.addActivity(myActivity,false);
+					}
+				}
 			}
-//			System.out.println("## DEBUG MentalMap2 "+myPlan.getPerson().getId()+" "+myActivity.toString()+" "+myAct.toString());
 		}
 	}
 
