@@ -105,7 +105,6 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 
 	private static final boolean CALCSTATS = true;
-	private static final String DIRECTORY_SN = "socialnets/";
 	public static String SOCNET_OUT_DIR = null;
 
 	SocialNetwork snet;
@@ -362,15 +361,13 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 
 //		If the user has an existing file that maps activities to acts, open it and read it in
-		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
-			this.log.info("  Opening the file to read in the map of Acts to Facilities");
-			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+//		Attempt to open file of mental maps and read it in
+		System.out.println("  Opening the file to read in the map of Acts to Facilities");
+		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
 
-//			Change to make this the input directory -- JH
-			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
-			aar.openFile(fileName);
-			this.log.info(" ... done");
-		}
+		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+		aar.openFile(fileName);
+		System.out.println(" ... done");
 
 		Iterator<Person> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
@@ -383,26 +380,21 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
-//				Note that this crashes if I am using an output plans file with a lot of activities.
-//				The activities and acts are not associated correctly.
-//				does this mean that the act.RefId() needs to be unique per act AND plan?
+				k.getMentalMap().prepareActs(plan);// // JH Hack to make sure act types are compatible with social nets
 				k.getMentalMap().initializeActActivityMapRandom(plan);
 				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
 //				Reset activity spaces because they are not read or written correctly
 				k.resetActivitySpaces();
 			}
 		}
-		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
-			aar.close();//close the file with the input act-activity map
-		}
+		aar.close();//close the file with the input act-activity map
 	}
 
 	private void snsetup() {
 
 //		Config config = Gbl.getConfig();
 
-		SOCNET_OUT_DIR = Controler.getOutputFilename(DIRECTORY_SN);
+		SOCNET_OUT_DIR = this.controler.getConfig().socnetmodule().getOutDirName();
 		File snDir = new File(SOCNET_OUT_DIR);
 		if (!snDir.mkdir() && !snDir.exists()) {
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");

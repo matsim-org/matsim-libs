@@ -78,6 +78,7 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
+import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 
@@ -117,7 +118,6 @@ import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 public class SNControllerListener3 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
 
 	private static final boolean CALCSTATS = true;
-	private static final String DIRECTORY_SN = "socialnets/";
 	public static String SOCNET_OUT_DIR = null;
 
 	SocialNetwork snet;
@@ -128,7 +128,6 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
 
 	SpatialInteractorEvents plansInteractorS;
-	int max_sn_iter;
 	int snIter;
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
@@ -162,7 +161,8 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 
-		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+//		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
@@ -301,7 +301,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
 				aaw=new ActivityActWriter();
-				aaw.openFile(SOCNET_OUT_DIR+"ActivityActMap"+snIter+".txt");
+				aaw.openFile(SOCNET_OUT_DIR+"/ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
 				aaw.close();
@@ -313,8 +313,8 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 //			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
 //			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
 //			this.log.info(" ... done");
-
-//			Write out the KML for the EgoNet of a chosen agent
+//
+////			Write out the KML for the EgoNet of a chosen agent
 //			this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
 //			Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
 ////			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
@@ -357,16 +357,13 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
 
 
-//		If the user has an existing file that maps activities to acts, open it and read it in
-		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
-			this.log.info("  Opening the file to read in the map of Acts to Facilities");
-			aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
+//		Attempt to open file of mental maps and read it in
+		System.out.println("  Opening the file to read in the map of Acts to Facilities");
+		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
 
-//			Change to make this the input directory -- JH
-			String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
-			aar.openFile(fileName);
-			this.log.info(" ... done");
-		}
+		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
+		aar.openFile(fileName);
+		System.out.println(" ... done");
 
 		Iterator<Person> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
@@ -379,37 +376,35 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.getMentalMap().prepareActs(plan); // Always call this first, to make sure the Acts have a reference Id
-//				Note that this crashes if I am using an output plans file with a lot of activities.
-//				The activities and acts are not associated correctly.
-//				does this mean that the act.RefId() needs to be unique per act AND plan?
+				k.getMentalMap().prepareActs(plan); // // JH Hack to make sure act types are compatible with social nets
 				k.getMentalMap().initializeActActivityMapRandom(plan);
 				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
 //				Reset activity spaces because they are not read or written correctly
 				k.resetActivitySpaces();
 			}
 		}
-		if(Boolean.valueOf(Gbl.getConfig().socnetmodule().getReadMentalMap())){
-			aar.close();//close the file with the input act-activity map
-		}
+		aar.close();//close the file with the input act-activity map
 	}
 
 	private void snsetup() {
 
 //		Config config = Gbl.getConfig();
 
-		SOCNET_OUT_DIR = Controler.getOutputFilename(DIRECTORY_SN);
+		SOCNET_OUT_DIR = this.controler.getConfig().socnetmodule().getOutDirName();// no final slash
 		File snDir = new File(SOCNET_OUT_DIR);
 		if (!snDir.mkdir() && !snDir.exists()) {
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");
 		}
 
-		this.max_sn_iter = Integer.parseInt(this.controler.getConfig().socnetmodule().getNumIterations());
 		this.replan_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
 		String rndEncounterProbString = this.controler.getConfig().socnetmodule().getFacWt();
 		String xchangeInfoString = this.controler.getConfig().socnetmodule().getXchange();
 		this.infoToExchange = getFacTypes(xchangeInfoString);
 		this.fractionS = toNumber(rndEncounterProbString);
+		// TODO JH 12.2008 This has to coincide with the activity types in the plan
+		// activityTypesForEncounters should be filled by entries in the config.xml, added to a list like replanning modules
+		// rndEncounterProbString should be associated with the activity types like the probabilities for replanning modules is done
+		// 
 		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
 
 		this.log.info(" Instantiating the Pajek writer ...");
