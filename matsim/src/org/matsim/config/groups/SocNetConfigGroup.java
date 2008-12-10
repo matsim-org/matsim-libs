@@ -34,29 +34,26 @@ public class SocNetConfigGroup extends Module {
 	private static final String SOCNET_LINKREMOVALP = "socnetlinkremovalp";
 	private static final String SOCNET_LINKREMOVALAGE = "socnetlinkremovalage";
 	private static final String SOCNET_KBAR = "kbar";
-	private static final String SOCNET_INTERACTOR_TYPE1 = "nonspatial_interactor_type";
 	private static final String SOCNET_INTERACTOR_TYPE2 = "spatial_interactor_type";
 	private static final String SOCNET_NUM_NONSPATIAL_INTERACTIONS = "num_ns_interactions";
-	private static final String SOCNET_NUM_SN_ITERATIONS = "max_sn_iter";
 	private static final String SOCNET_TYPE_INFO_EXCHANGED_WEIGHT = "factype_ns";
 	private static final String SOCNET_FACILITY_TYPE_WEIGHT = "s_weights";
 	private static final String SOCNET_EDGE_TYPE = "edge_type";
 	private static final String SOCNET_FRACT_NS = "fract_ns_interact";
 	private static final String SOCNET_FRACT_INTRO = "fract_introduce_friends";
-	private static final String SOCNET_FRACT_S = "fract_s_interact";
 	private static final String SOCNET_SWITCH_WEIGHTS = "switch_weights";
 	private static final String SOCNET_PROB_BEFRIEND = "prob_befriend";
 	private static final String SOCNET_OUT_DIR = "outputDirSocialNets";
 	private static final String SOCNET_DEG_SAT = "degree_saturation_rate";
 	private static final String SOCNET_RP_INT = "replanning_interval";
-	private static final String SOCNET_GRID = "grid_spacing";
 	private static final String INPUT_SN_DIR = "inputSocNetDir";
 	private static final String INIT_ITER = "inputIter";
-	private static final String READ_MENTALMAP = "readMentalMap";
 	private static final String BETA1 ="betafriendfoe";
 	private static final String BETA2 =	"betanfriends"; 
 	private static final String BETA3 ="betalognfriends";
 	private static final String BETA4 ="betatimewithfriends";
+	private static final String ALPHA ="euclid_alpha";
+	private static final String RMIN = "euclid_rmin";
 
 
 	private String graphalgo = null;
@@ -74,13 +71,12 @@ public class SocNetConfigGroup extends Module {
 	private String edgetype=null;
 	private String pctnsinteract=null; // double [0,1]
 	private String triangles=null; // double
-	private String pctsinteract=null; // double [0,1]
 	private String sweights=null; // own config module (strategy)
 	private String pfriend=null; // double
-	private String outdir="socialnets/";
+//	private String outdir="socialnets/";
+	private String outdir=null;//
 	private String degsat=null; // double
 	private String interval=null;//int
-	private String grid_spacing=null;// int
 	private String input_sn_dir=null;// String
 	private String init_iter=null;// int
 	private String read_mm=null;// boolean
@@ -88,6 +84,8 @@ public class SocNetConfigGroup extends Module {
 	private String beta2=null;//double
 	private String beta3=null;//double
 	private String beta4=null;//double
+	private String alpha=null;//double
+	private String rmin=null;//double
 
 
 	public SocNetConfigGroup() {
@@ -107,14 +105,10 @@ public class SocNetConfigGroup extends Module {
 			setSocNetLinkRemovalP(value);
 		}else if (SOCNET_LINKREMOVALAGE.equals(key)) {
 			setSocNetLinkRemovalAge(value);
-		}else if (SOCNET_INTERACTOR_TYPE1.equals(key)) {
-			setSocNetInteractor1(value);
 		}else if (SOCNET_INTERACTOR_TYPE2.equals(key)) {
 			setSocNetInteractor2(value);
 		}else if (SOCNET_NUM_NONSPATIAL_INTERACTIONS.equals(key)) {
 			setSocNetNSInteractions(value);
-		}else if (SOCNET_NUM_SN_ITERATIONS.equals(key)) {
-			setNumIterations(value);
 		}else if (SOCNET_TYPE_INFO_EXCHANGED_WEIGHT.equals(key)) {
 			setXchange(value);
 		}else if (SOCNET_FACILITY_TYPE_WEIGHT.equals(key)) {
@@ -125,8 +119,6 @@ public class SocNetConfigGroup extends Module {
 			setFractNSInteract(value);
 		}else if (SOCNET_FRACT_INTRO.equals(key)) {
 			setTriangles(value);
-		}else if (SOCNET_FRACT_S.equals(key)) {
-			setFractSInteract(value);
 		}else if (SOCNET_SWITCH_WEIGHTS.equals(key)) {
 			setSWeights(value);
 		}else if (SOCNET_PROB_BEFRIEND.equals(key)) {
@@ -137,14 +129,10 @@ public class SocNetConfigGroup extends Module {
 			setDegSat(value);
 		}else if (SOCNET_RP_INT.equals(key)) {
 			setRPInt(value);
-		}else if (SOCNET_GRID.equals(key)) {
-			setGridSpace(value);
 		}else if (INPUT_SN_DIR.equals(key)) {
 			setInDirName(value);
 		}else if (INIT_ITER.equals(key)){
 			setInitIter(value);
-		}else if (READ_MENTALMAP.equals(key)){
-			setReadMentalMap(value);
 		}else if (BETA1.equals(key)){
 			setBeta1(value);
 		}else if (BETA2.equals(key)){
@@ -153,6 +141,10 @@ public class SocNetConfigGroup extends Module {
 			setBeta3(value);
 		}else if (BETA4.equals(key)){
 			setBeta4(value);
+		}else if (ALPHA.equals(key)){
+			setAlpha(value);
+		}else if (RMIN.equals(key)){
+			setRmin(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -173,14 +165,10 @@ public class SocNetConfigGroup extends Module {
 			return getSocNetLinkRemovalP();
 		}else if (SOCNET_LINKREMOVALAGE.equals(key)) {
 			return getSocNetLinkRemovalAge();
-		}else if (SOCNET_INTERACTOR_TYPE1.equals(key)) {
-			return getSocNetInteractor1();
 		}else if (SOCNET_INTERACTOR_TYPE2.equals(key)) {
 			return getSocNetInteractor2();
 		}else if (SOCNET_NUM_NONSPATIAL_INTERACTIONS.equals(key)) {
 			return getSocNetNSInteractions();
-		}else if (SOCNET_NUM_SN_ITERATIONS.equals(key)) {
-			return getNumIterations();
 		}else if (SOCNET_TYPE_INFO_EXCHANGED_WEIGHT.equals(key)) {
 			return getXchange();
 		}else if (SOCNET_FACILITY_TYPE_WEIGHT.equals(key)) {
@@ -191,26 +179,20 @@ public class SocNetConfigGroup extends Module {
 			return getFractNSInteract();
 		}else if (SOCNET_FRACT_INTRO.equals(key)) {
 			return getTriangles();
-		}else if (SOCNET_FRACT_S.equals(key)) {
-			return getFractSInteract();
 		}else if (SOCNET_SWITCH_WEIGHTS.equals(key)) {
 			return getSWeights();
 		}else if (SOCNET_PROB_BEFRIEND.equals(key)) {
 			return getPBefriend();
 		}else if (SOCNET_OUT_DIR.equals(key)) {
-			return getOutDir();
+			return getOutDirName();
 		}else if (SOCNET_DEG_SAT.equals(key)) {
 			return getDegSat();
 		}else if (SOCNET_RP_INT.equals(key)) {
 			return getRPInt();
-		}else if (SOCNET_GRID.equals(key)) {
-			return getGridSpace();
 		}else if (INPUT_SN_DIR.equals(key)) {
 			return getInDirName();
 		}else if (INIT_ITER.equals(key)){
 			return getInitIter();
-		}else if (READ_MENTALMAP.equals(key)){
-			return getReadMentalMap();
 		}else if (BETA1.equals(key)){
 			return getBeta1();
 		}else if (BETA2.equals(key)){
@@ -233,25 +215,20 @@ public class SocNetConfigGroup extends Module {
 		addParameterToMap(map, SOCNET_LINKREMOVALALGO);
 		addParameterToMap(map, SOCNET_LINKREMOVALP);
 		addParameterToMap(map, SOCNET_LINKREMOVALAGE);
-		addParameterToMap(map, SOCNET_INTERACTOR_TYPE1);
 		addParameterToMap(map, SOCNET_INTERACTOR_TYPE2);
 		addParameterToMap(map, SOCNET_NUM_NONSPATIAL_INTERACTIONS);
-		addParameterToMap(map, SOCNET_NUM_SN_ITERATIONS);
 		addParameterToMap(map, SOCNET_TYPE_INFO_EXCHANGED_WEIGHT);
 		addParameterToMap(map, SOCNET_FACILITY_TYPE_WEIGHT);
 		addParameterToMap(map, SOCNET_EDGE_TYPE);
 		addParameterToMap(map, SOCNET_FRACT_NS);
 		addParameterToMap(map, SOCNET_FRACT_INTRO);
-		addParameterToMap(map, SOCNET_FRACT_S);
 		addParameterToMap(map, SOCNET_SWITCH_WEIGHTS);
 		addParameterToMap(map, SOCNET_PROB_BEFRIEND);
 		addParameterToMap(map, SOCNET_OUT_DIR);
 		addParameterToMap(map, SOCNET_DEG_SAT);
 		addParameterToMap(map, SOCNET_RP_INT);
-		addParameterToMap(map, SOCNET_GRID);
 		addParameterToMap(map, INPUT_SN_DIR);
 		addParameterToMap(map, INIT_ITER);
-		addParameterToMap(map, READ_MENTALMAP);
 		addParameterToMap(map, BETA1);
 		addParameterToMap(map, BETA2);
 		addParameterToMap(map, BETA3);
@@ -354,12 +331,6 @@ public class SocNetConfigGroup extends Module {
 	public void setTriangles(final String triangles) {
 		this.triangles = triangles;
 	}
-	public String getFractSInteract() {
-		return this.pctsinteract;
-	}
-	public void setFractSInteract(final String pctsinteract) {
-		this.pctsinteract = pctsinteract;
-	}
 	public String getSWeights() {
 		return this.sweights;
 	}
@@ -372,7 +343,7 @@ public class SocNetConfigGroup extends Module {
 	public void setPBefriend(final String pfriend) {
 		this.pfriend = pfriend;
 	}
-	public String getOutDir() {
+	public String getOutDirName() {
 		return this.outdir;
 	}
 	public void setOutDir(final String outdir) {
@@ -389,12 +360,6 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setRPInt(final String interval) {
 		this.interval = interval;
-	}
-	public String getGridSpace() {
-		return this.grid_spacing;
-	}
-	public void setGridSpace(final String grid_spacing) {
-		this.grid_spacing = grid_spacing;
 	}
 	public String getInDirName() {
 		return this.input_sn_dir;
@@ -437,5 +402,17 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setBeta4(final String beta4){
 		this.beta4 = beta4;
+	}
+	public String getAlpha(){
+		return this.alpha;
+	}
+	public void setAlpha(final String alpha){
+		this.alpha = alpha;
+	}
+	public String getRmin(){
+		return this.rmin;
+	}
+	public void setRmin(final String rmin){
+		this.rmin = rmin;
 	}
 }
