@@ -149,10 +149,10 @@ public class LocationChoiceConfigGroup extends Module {
 		} else if (FIX_BY_ACTTYPE.equals(key)) {
 			if (!(value.equals("true") || value.equals("false"))) {
 				log.warn("set 'fixByActType' to either 'true' or 'false'. Set to default value 'false'");
-				setMode("false");
+				setFixByActType("false");
 			}
 			else {
-				setMode(value);
+				setFixByActType(value);
 			}
 		} else		
 		{
