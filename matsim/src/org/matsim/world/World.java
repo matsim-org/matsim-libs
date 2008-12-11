@@ -193,6 +193,35 @@ public class World {
 		return true;
 	}
 
+	public final boolean removeMapping(Location loc1, Location loc2) {
+		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
+			// loc1 = down_loc; loc2 = up_loc
+			if (loc1.getUpMapping().containsKey(loc2.getId()) && loc2.getDownMapping().containsKey(loc1.getId())) {
+				loc1.getUpMapping().remove(loc2.getId());
+				loc2.getDownMapping().remove(loc1.getId());
+				return true;
+			}
+			else {
+				log.warn("loc1="+loc1+",loc2="+loc2+": mapping not found.");
+				return false;
+			}
+		} else if (this.getMappingRule(loc2.getLayer(),loc1.getLayer()) != null) {
+			// loc1 = up_loc; loc2 = down_loc
+			if (loc1.getDownMapping().containsKey(loc2.getId()) && loc2.getUpMapping().containsKey(loc1.getId())) {
+				loc1.getDownMapping().remove(loc2.getId());
+				loc2.getUpMapping().remove(loc1.getId());
+				return true;
+			}
+			else {
+				log.warn("loc1="+loc1+",loc2="+loc2+": mapping not found.");
+				return false;
+			}
+		} else {
+			log.warn("loc1="+loc1+",loc2="+loc2+": mapping rule not found.");
+			return false;
+		}
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
