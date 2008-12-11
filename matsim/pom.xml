@@ -122,6 +122,13 @@
       <systemPath>${basedir}/libs/TimingFramework-0.53.jar</systemPath>
     </dependency>
     <dependency>
+      <groupId>truezip</groupId>
+      <artifactId>truezip</artifactId>
+      <version>6.6</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/truezip-6.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
       <version>2.3.5</version>
