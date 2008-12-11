@@ -47,6 +47,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
+import org.matsim.utils.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
 
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener {
@@ -319,7 +320,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		}
 		Action exitAction = new AbstractAction("Quit") {
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				OnTheFlyClientFileQuad.endProgram(0);
 			}
 		};
 		fileMenu.add(exitAction);

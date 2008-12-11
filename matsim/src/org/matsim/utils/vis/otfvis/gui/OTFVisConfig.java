@@ -22,7 +22,6 @@ package org.matsim.utils.vis.otfvis.gui;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
 
 import org.matsim.config.Module;
 import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
@@ -89,9 +87,11 @@ public class OTFVisConfig extends Module implements Serializable{
 		return zooms;
 	}
 	public void addZoom(ZoomEntry entry) {
+		setModified();
 		zooms.add(entry);
 	}
 	public void deleteZoom(ZoomEntry entry) {
+		setModified();
 		zooms.remove(entry);
 	}
 	public Point3f getZoomValue(String zoomName) {
@@ -138,7 +138,28 @@ public class OTFVisConfig extends Module implements Serializable{
 	private boolean drawTime = false;
 	private boolean drawOverlays = true;
 	private boolean renderImages = false;
+	private boolean modified = false;
 
+	/**
+	 * @return the modified
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+	/**
+	 * @param modified the modified to set
+	 */
+	private void setModified() {
+		this.modified = true;
+	}
+	
+	/**
+	 * @param modified the modified to unset
+	 */
+	public void clearModified() {
+		this.modified = false;
+	}
+	
 	@Override
 	public String getValue(final String key) {
 		if (AGENT_SIZE.equals(key)) {
@@ -186,6 +207,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setAgentSize(float agentSize) {
+		if(this.agentSize != agentSize) setModified();
 		this.agentSize = agentSize;
 	}
 
@@ -194,6 +216,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setMiddleMouseFunc(String middleMouseFunc) {
+		if(this.middleMouseFunc != middleMouseFunc) setModified();
 		this.middleMouseFunc = middleMouseFunc;
 	}
 
@@ -202,6 +225,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setLeftMouseFunc(String leftMouseFunc) {
+		if(this.leftMouseFunc != leftMouseFunc) setModified();
 		this.leftMouseFunc = leftMouseFunc;
 	}
 
@@ -210,6 +234,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setRightMouseFunc(String rightMouseFunc) {
+		if(this.rightMouseFunc != rightMouseFunc) setModified();
 		this.rightMouseFunc = rightMouseFunc;
 	}
 
@@ -252,6 +277,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	 * @param bigTimeStep the bigTimeStep to set
 	 */
 	public void setBigTimeStep(int bigTimeStep) {
+		if(this.bigTimeStep != bigTimeStep) setModified();
 		this.bigTimeStep = bigTimeStep;
 	}
 
@@ -288,6 +314,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setNetworkColor(final Color networkColor) {
+		setModified();
 		this.networkColor = new Color(networkColor.getRed(), networkColor.getGreen(), networkColor.getBlue(), 128);
 	}
 
@@ -296,6 +323,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setBackgroundColor(final Color bgColor) {
+		setModified();
 		this.backgroundColor = bgColor;
 	}
 
@@ -304,6 +332,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setLinkWidth(final float linkWidth) {
+		setModified();
 		this.linkWidth = linkWidth;
 	}
 
@@ -318,6 +347,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	 * @param showParking the showParking to set
 	 */
 	public void setShowParking(boolean showParking) {
+		setModified();
 		this.showParking = showParking;
 	}
 
@@ -332,10 +362,12 @@ public class OTFVisConfig extends Module implements Serializable{
 	 * @param drawLinkIds the drawLinkIds to set
 	 */
 	public void setDrawLinkIds(boolean drawLinkIds) {
+		setModified();
 		this.drawLinkIds = drawLinkIds;
 	}
 
 	public void setDrawOverlays(boolean drawOverlays) {
+		setModified();
 		this.drawOverlays = drawOverlays;
 	}
 	
@@ -343,6 +375,7 @@ public class OTFVisConfig extends Module implements Serializable{
 		return drawOverlays;
 	}
 	public void setDrawTime(boolean draw) {
+		setModified();
 		this.drawTime = draw;
 	}
 	
@@ -351,6 +384,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public boolean setRenderImages(boolean render) {
+		setModified();
 		return renderImages = render;
 	}
 	

@@ -26,6 +26,10 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,6 +45,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
@@ -68,6 +73,21 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDra
 
 import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.DefaultArchiveDetector;
+
+class OTFFrame extends JFrame {
+	   public OTFFrame(String string) {
+		super(string);
+	}
+
+	protected void processWindowEvent(WindowEvent e) {
+
+	        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+	        	OnTheFlyClientFileQuad.endProgram(0);
+	        } else {
+		        super.processWindowEvent(e);
+	        }
+	    }
+}
 
 class OTFFileSettingsSaver implements OTFSettingsSaver {
 	String fileName;
@@ -152,6 +172,51 @@ class OTFFileSettingsSaver implements OTFSettingsSaver {
 }
 
 public class OnTheFlyClientFileQuad extends Thread {
+	
+	public static void endProgram(int code) {
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		if(config.isModified()) {
+			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
+			final JOptionPane optionPane = new JOptionPane(
+				    "There are potenially unsaved changes in Preferences.\nQuit anyway?",
+				    JOptionPane.QUESTION_MESSAGE,
+				    JOptionPane.YES_NO_OPTION);
+			dialog.setContentPane(optionPane);
+			dialog.setDefaultCloseOperation(
+				    JDialog.DO_NOTHING_ON_CLOSE);
+				dialog.addWindowListener(new WindowAdapter() {
+				    public void windowClosing(WindowEvent we) {
+				        
+				    }
+				});
+				optionPane.addPropertyChangeListener(
+				    new PropertyChangeListener() {
+				        public void propertyChange(PropertyChangeEvent e) {
+				            String prop = e.getPropertyName();
+
+				            if (dialog.isVisible() 
+				             && (e.getSource() == optionPane)
+				             && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+				                //If you were going to check something
+				                //before closing the window, you'd do
+				                //it here.
+				                dialog.setVisible(false);
+				            }
+				        }
+				    });
+			dialog.pack();
+			dialog.setVisible(true);
+			int value = ((Integer)optionPane.getValue()).intValue();
+			if (value == JOptionPane.YES_OPTION) {
+			    // well then Quit
+			} else if (value == JOptionPane.NO_OPTION) {
+				return;
+			}
+
+		}
+		System.exit(code);
+	}
+	
 	protected OTFHostControlBar hostControl = null;
 
 	private final String filename;
@@ -223,7 +288,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 			
 			System.out.println("Loading file " + this.filename + " ....");
 			this.hostControl = new OTFHostControlBar("file:" + this.filename);
-			JFrame frame = new JFrame("MATSim OTFVis");
+			JFrame frame = new OTFFrame("MATSim OTFVis");
 		    frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 
 
 			if (isMac) {
