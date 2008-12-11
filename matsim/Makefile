@@ -143,6 +143,7 @@ LIBS := $(LIBS):libs/geotools/xsdlib-20050614.jar
 LIBS := $(LIBS):libs/TimingFramework-0.53.jar
 LIBS := $(LIBS):libs/jogl-1.1.1/gluegen-rt.jar
 LIBS := $(LIBS):libs/jogl-1.1.1/jogl.jar
+LIBS := $(LIBS):libs/truezip-6.jar
 
 CLASSPATH = classes
 SOURCEPATH = src
