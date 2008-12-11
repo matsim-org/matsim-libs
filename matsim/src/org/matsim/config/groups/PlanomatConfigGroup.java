@@ -66,7 +66,7 @@ public class PlanomatConfigGroup extends Module {
 	public void addParam(final String param_name, final String value) {
 
 		if (PlanomatConfigGroup.POSSIBLE_MODES.equals(param_name)) {
-			String[] possibleModesStringArray = value.split(" ");
+			String[] possibleModesStringArray = value.split(",");
 			this.possibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
 			for (int ii=0; ii < possibleModesStringArray.length; ii++) {
 				this.possibleModes[ii] = BasicLeg.Mode.valueOf(possibleModesStringArray[ii]);

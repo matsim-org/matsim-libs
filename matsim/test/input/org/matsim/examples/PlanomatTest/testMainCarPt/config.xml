@@ -71,7 +71,7 @@
 	</module>
 
 	<module name="planomat">
-		<param name="possibleModes" value="car pt" />
+		<param name="possibleModes" value="car,pt" />
 	</module>
 
 </config>
