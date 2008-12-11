@@ -82,7 +82,7 @@ public class OnTheFlyClientQuadSwing{
 			pane.setContinuousLayout(true);
 			pane.setOneTouchExpandable(true);
 			frame.getContentPane().add(pane);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl);
+			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
 
 
 			OTFClientQuad clientQ2 = hostControl.createNewView(null, factory, connect2);

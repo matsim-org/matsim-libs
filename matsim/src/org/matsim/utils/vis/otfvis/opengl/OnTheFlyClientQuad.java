@@ -121,7 +121,7 @@ public class OnTheFlyClientQuad extends Thread {
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl);
+			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
 
 			OTFDefaultNetWriterFactoryImpl factory = new OTFDefaultNetWriterFactoryImpl();
 			if (connect.getEntries(QueueLink.class).isEmpty())	factory.setLinkWriterFac(new OTFLinkLanesAgentsNoParkingHandler.Writer());

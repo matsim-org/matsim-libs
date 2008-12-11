@@ -20,6 +20,7 @@
 
 package org.matsim.config;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author mrieser
  * @author balmermi
  */
-public class Module {
+public class Module  implements Serializable{
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -512,7 +512,7 @@ public class CALinkOTFVis extends Thread {
 			pane.setContinuousLayout(true);
 			pane.setOneTouchExpandable(true);
 			frame.getContentPane().add(pane);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl);
+			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
 
 			OTFConnectionManager connectR = new OTFConnectionManager();
 

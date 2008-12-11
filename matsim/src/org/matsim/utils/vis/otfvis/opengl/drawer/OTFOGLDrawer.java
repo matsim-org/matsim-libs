@@ -31,6 +31,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -82,6 +83,7 @@ import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFDataSimpleAgent;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
+import org.matsim.utils.vis.otfvis.gui.OTFVisConfig.ZoomEntry;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQueryHandler;
@@ -463,11 +465,15 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		} else {
 			this.canvas = new GLCanvas(caps, null, motherContext, null);
 		}
+		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 
 		this.canvas.addGLEventListener(this);
 		this.mouseMan = new VisGUIMouseHandler(this);
 		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
 
+		Point3f initialZoom = config.getZoomValue("*Initial*");
+		if(initialZoom != null) this.mouseMan.setToNewPos(initialZoom);
+		
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
@@ -484,7 +490,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		linkTexWidth = size;
 
 		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
-		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
 		}
 
 	public static GLContext getMotherContext() {
@@ -684,22 +689,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.statusDrawer = new StatusTextDrawer(drawable);
 	}
 
-	class ZoomEntry {
-		Point3f zoomstart;
-		String name;
-		BufferedImage snap;
-		public ZoomEntry(BufferedImage snap, Point3f zoomstart, String name ){
-			super();
-			this.snap = snap;
-			this.zoomstart = zoomstart;
-			this.name = name;
-		}
-	}
-	List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	private ZoomEntry lastZoom = null;
+	private JDialog zoomD;
 	
-	public boolean zoomrestore = false;
-	public Point3f zoomstore;
-	JDialog zoomD;
 	void showZoomDialog() {
 		Container parent = canvas.getParent();
 		zoomD = new JDialog(  );
@@ -712,41 +704,55 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		zoomD.setPreferredSize(canvas.getSize());
 	    GridLayout gbl = new GridLayout(3,3); 
 	    zoomD.getContentPane().setLayout( gbl ); 
+	    //zoomD.getContentPane().setLayout( new FlowLayout() ); 
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
+		final List<ZoomEntry> zooms = config.getZooms();
 		
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			//ImageIcon icon = new ImageIcon(z.snap);
-			JButton b = new JButton(z.name);//icon);
+			JButton b = new JButton(z.getName());//icon);
+			b.setToolTipText(z.getName());
+			b.setPreferredSize(new Dimension(220, 100));
 			buttons.add(i, b);
 			b.setActionCommand(Integer.toString(i));
 			b.addActionListener( new ActionListener() { 
 				  public void actionPerformed( ActionEvent e ) {
 					  int num = Integer.parseInt(e.getActionCommand());
-					  mouseMan.setToNewPos(zooms.get(num).zoomstart);
+					  lastZoom = zooms.get(num);
+					  mouseMan.setToNewPos(lastZoom.getZoomstart());
 					  zoomD.setVisible(false); 
 				  } 
 				} ); 			
 			zoomD.getContentPane().add(b);
 		}
+		JButton bb = new JButton("Cancel");
+		bb.addActionListener( new ActionListener() { 
+			  public void actionPerformed( ActionEvent e ) {
+				  lastZoom = null;
+				  zoomD.setVisible(false); 
+			  } 
+			} ); 	
+		bb.setPreferredSize(new Dimension(220, 100));
+		zoomD.getContentPane().add(bb);
 		zoomD.doLayout();
 		zoomD.pack();
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
 			JButton b = buttons.get(i);
-			ImageIcon icon = new ImageIcon(ImageUtil.createThumbnail(z.snap,Math.min(z.snap.getWidth(),b.getSize().width)-20));
+			ImageIcon icon = new ImageIcon(ImageUtil.createThumbnail(z.getSnap(),Math.min(z.getSnap().getWidth(),b.getSize().width)-20));
 			b.setIcon(icon);
 		}
 		zoomD.setVisible(true);
 	}
 	
 	private void storeZoom(boolean withName, String name) {
-    	zoomstore = mouseMan.getView();
+    	Point3f zoomstore = mouseMan.getView();
     	current = null;
 
     	if(withName) {
 
-    		final JDialog d = new JDialog((JFrame)null,"Name fŸr diesen Zoom", true);
+    		final JDialog d = new JDialog((JFrame)null,"Name for this zoom", true);
     		JTextField field = new JTextField(20);
     	    ActionListener al =  new ActionListener() { 
     	        public void actionPerformed( ActionEvent e ) {
@@ -761,7 +767,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
     	}
     	redraw();
     	BufferedImage image = ImageUtil.createThumbnail(current, 300);
-    	zooms.add(new ZoomEntry(image,zoomstore, name));
+    	config.addZoom(new ZoomEntry(image,zoomstore, name));
 		
 	}
 	
@@ -769,26 +775,37 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		if(mouseButton == 4 && false){
 			JPopupMenu popmen = new JPopupMenu(); 
 			JMenuItem menu1 = new JMenuItem( "Zoom"); 
-			popmen.add( menu1 ); 
-			popmen.add( new AbstractAction("Store Zoom...") { 
+			menu1.setBackground(Color.lightGray);
+			popmen.add( menu1 );
+			popmen.addSeparator();
+			popmen.add( new AbstractAction("Store Zoom") { 
 		        public void actionPerformed( ActionEvent e ) {
 		        	storeZoom(false, "");
+		          } 
+		        } ); 
+			popmen.add( new AbstractAction("Store inital Zoom") { 
+		        public void actionPerformed( ActionEvent e ) {
+		        	storeZoom(false, "*Initial*");
 		          } 
 		        } ); 
 			popmen.add( new AbstractAction("Store named Zoom...") { 
 		        public void actionPerformed( ActionEvent e ) {
 		        	storeZoom(true, "");
 		          } 
-		        } ); 
-			popmen.add( new AbstractAction("Store inital Zoom...") { 
-		        public void actionPerformed( ActionEvent e ) {
-		        	storeZoom(false, "*Initial*");
-		          } 
-		        } ); 
+		        } );
+			popmen.addSeparator();
 			popmen.add( new AbstractAction("Load Zoom...") { 
 		        public void actionPerformed( ActionEvent e ) { 
 		        	showZoomDialog();
-		        	mouseMan.setToNewPos(zoomstore); 
+		        	if(lastZoom != null) mouseMan.setToNewPos(lastZoom.getZoomstart()); 
+		          } 
+		        } ); 
+			popmen.add( new AbstractAction("Delete last Zoom") { 
+		        public void actionPerformed( ActionEvent e ) { 
+		        	if(lastZoom != null) {
+		        		config.deleteZoom(lastZoom);
+		        		lastZoom = null;
+		        	}
 		          } 
 		        } ); 
 			popmen.show(this.getComponent(),e.getX(), e.getY());

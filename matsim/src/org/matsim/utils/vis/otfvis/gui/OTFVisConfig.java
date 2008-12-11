@@ -21,14 +21,88 @@
 package org.matsim.utils.vis.otfvis.gui;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+
 import org.matsim.config.Module;
+import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 
 
-public class OTFVisConfig extends Module {
+public class OTFVisConfig extends Module implements Serializable{
+	private static final long serialVersionUID = 1L;
 	public static final String GROUP_NAME = "otfvis";
+
+	public static class ZoomEntry  implements Serializable{
+		private static final long serialVersionUID = 1L;
+		
+		public Point3f getZoomstart() {
+			return zoomstart;
+		}
+		public BufferedImage getSnap() {
+			return snap;
+		}
+		public String getName() {
+			return name;
+		}
+		
+		Point3f zoomstart;
+		BufferedImage snap;
+		String name;
+		
+		public ZoomEntry() {
+			
+		}
+		
+		public ZoomEntry(BufferedImage snap, Point3f zoomstart, String name) {
+			super();
+			this.snap = snap;
+			this.zoomstart = zoomstart;
+			this.name = name;
+		}
+
+		private synchronized void writeObject( java.io.ObjectOutputStream s ) throws IOException {
+			s.writeUTF(name);
+			s.writeFloat(zoomstart.x);
+			s.writeFloat(zoomstart.y);
+			s.writeFloat(zoomstart.z);
+			ImageIO.write(snap, "jpg", s);
+		}
+
+
+		private synchronized void readObject( java.io.ObjectInputStream s ) throws IOException, ClassNotFoundException {
+			name = s.readUTF();
+			zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
+			snap = ImageIO.read(s);
+		}
+	}
+	
+	public List<ZoomEntry> getZooms() {
+		return zooms;
+	}
+	public void addZoom(ZoomEntry entry) {
+		zooms.add(entry);
+	}
+	public void deleteZoom(ZoomEntry entry) {
+		zooms.remove(entry);
+	}
+	public Point3f getZoomValue(String zoomName) {
+		Point3f result = null;
+		for(ZoomEntry entry : zooms) {
+			if(entry.name.equals(zoomName))result = entry.zoomstart;
+		}
+		return result;
+	}
+
+	List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
 
 	public OTFVisConfig() {
 		super(GROUP_NAME);
@@ -45,7 +119,7 @@ public class OTFVisConfig extends Module {
 	public static final String BIG_TIME_STEP = "bigTimeStep";
 //	public static final String TIME_STEP = "timeStep";
 
-	private  float agentSize = 300.f;
+	private  float agentSize = 120.f;
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Select";
@@ -283,5 +357,6 @@ public class OTFVisConfig extends Module {
 	public boolean renderImages() {
 		return renderImages;
 	}
+	
 
 }

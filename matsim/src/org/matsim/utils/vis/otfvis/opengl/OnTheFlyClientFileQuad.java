@@ -22,18 +22,33 @@ package org.matsim.utils.vis.otfvis.opengl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
@@ -49,6 +64,7 @@ import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;
+import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.utils.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.utils.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
@@ -56,7 +72,91 @@ import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.utils.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.DefaultArchiveDetector;
 
+class OTFFileSettingsSaver implements OTFSettingsSaver {
+	String fileName;
+	
+	public OTFFileSettingsSaver(String filename) {
+		this.fileName = filename;
+	}
+
+	public OTFVisConfig openAndReadConfig() {
+		ZipFile zipFile;
+		ObjectInputStream inFile;
+		// open file
+		try {
+			File sourceZipFile = new File(fileName);
+			// Open Zip file for reading
+			zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+			int i=0;
+			ZipEntry infoEntry = zipFile.getEntry("config.bin");
+			if(infoEntry != null) {
+				//load config settings
+				inFile = new ObjectInputStream(zipFile.getInputStream(infoEntry));
+				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, (OTFVisConfig)inFile.readObject());
+			} 
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		// Test if loading worked, otherwise create default
+		if(Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME) == null) {
+			Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, new OTFVisConfig());
+		}
+		return (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+	}		
+
+	private void openAndSaveConfig() {
+		// We have to use truezip API here as Java does not UPDATE zip files correctly
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		try {
+			de.schlichtherle.io.File.setDefaultArchiveDetector(new DefaultArchiveDetector(
+			        ArchiveDetector.NULL, // delegate
+			        new String[] {
+			            "mvi", "de.schlichtherle.io.archive.zip.JarDriver",
+			        }));
+			de.schlichtherle.io.File ipF = new de.schlichtherle.io.File(fileName);
+			// we somehow have to wait here till file is not in use from PRECHACHING anymore
+			if(!ipF.canWrite()) {
+	    		final JDialog d = new JDialog((JFrame)null,"MVI File is read-only", true);
+	    		JLabel field = new JLabel("Can not access .MVI!\n Maybe it is in use, please try again later.");
+	    		JButton ok = new JButton("Ok");
+	    	    ActionListener al =  new ActionListener() { 
+	    	        public void actionPerformed( ActionEvent e ) {
+	    	        	d.setVisible(false);
+	    	        	
+	    	      } }; 
+	    	      ok.addActionListener(al);
+	    	      d.getContentPane().setLayout( new FlowLayout() );
+		    		d.getContentPane().add(field);
+		    		d.getContentPane().add(ok);
+		    		d.doLayout();
+	    		d.pack();
+	    		d.setVisible(true);
+	    		de.schlichtherle.io.File.umount(true);
+	    		return;
+			}
+			OutputStream out = new de.schlichtherle.io.FileOutputStream(fileName + "/config.bin");
+			try {
+				ObjectOutputStream outFile = new ObjectOutputStream(out);
+				outFile.writeObject(config);
+			} finally {
+			    out.close(); // ALWAYS close the stream!
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void saveSettings() {
+		openAndSaveConfig();
+	}
+}
 
 public class OnTheFlyClientFileQuad extends Thread {
 	protected OTFHostControlBar hostControl = null;
@@ -100,29 +200,6 @@ public class OnTheFlyClientFileQuad extends Thread {
 		return drawer2;
 	}
 
-	private void openAndReadZooms(String fileName) {
-		ZipFile zipFile;
-		DataInputStream inFile;
-		// open file
-		try {
-			File sourceZipFile = new File(fileName);
-			// Open Zip file for reading
-			zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
-			int i=0;
-			ZipEntry infoEntry = zipFile.getEntry("config" + i + ".bin");
-			while(infoEntry != null) {
-				//load config settings
-				inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
-				infoEntry = zipFile.getEntry("config" + ++i + ".bin");
-			}
-
-			OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
 
 	@Override
 	public void run() {
@@ -142,20 +219,15 @@ public class OnTheFlyClientFileQuad extends Thread {
 			JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
 			
 			if (Gbl.getConfig() == null) Gbl.createConfig(null);
+			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(this.filename);
 			
 			OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 			if (visconf == null) {
-				visconf = new OTFVisConfig();
-				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+				visconf = saver.openAndReadConfig();
+			} else {
+				System.out.println("OTFVisConfig already defined, cant read settings from file");
 			}
 			
-			
-			
-			
-
-
-
-//			hostControl = new OTFHostControlBar("file:../MatsimJ/output/OTFQuadfile10p.mvi.gz");
 			System.out.println("Loading file " + this.filename + " ....");
 			this.hostControl = new OTFHostControlBar("file:" + this.filename);
 			JFrame frame = new JFrame("MATSim OTFVis");
@@ -171,7 +243,7 @@ public class OnTheFlyClientFileQuad extends Thread {
 			pane.setContinuousLayout(true);
 			pane.setOneTouchExpandable(true);
 			frame.getContentPane().add(pane);
-			PreferencesDialog.buildMenu(frame, visconf, this.hostControl);
+			PreferencesDialog.buildMenu(frame, visconf, this.hostControl, saver);
 
 			if(!hostControl.isLiveHost()) frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
 

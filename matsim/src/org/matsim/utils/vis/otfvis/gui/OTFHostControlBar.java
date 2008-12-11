@@ -254,7 +254,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-
+			
+			((OTFQuadFileHandler.Reader)host).closeFile();
 		}
 		@Override
 		public void run() {

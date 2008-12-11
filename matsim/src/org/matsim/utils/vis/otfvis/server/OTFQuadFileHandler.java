@@ -298,6 +298,15 @@ public class OTFQuadFileHandler {
 			}
 		}
 
+		public void closeFile() {
+			try {
+				this.zipFile.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 		public static class OTFObjectInputStream extends ObjectInputStream {
 			public OTFObjectInputStream(InputStream in) throws IOException {
 				super(in);

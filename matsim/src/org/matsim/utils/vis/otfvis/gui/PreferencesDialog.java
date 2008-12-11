@@ -46,6 +46,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.utils.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
 
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener  {
@@ -177,7 +178,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				label.setText("AgentSize:");
 				label.setBounds(10, 145, 80, 31);
 				this.agentSizeSlider = new JSlider();
-				BoundedRangeModel model = new DefaultBoundedRangeModel(100,0,10,300);
+				BoundedRangeModel model = new DefaultBoundedRangeModel((int)cfg.getAgentSize(),0,10,300);
 				this.agentSizeSlider.setModel(model);
 				this.agentSizeSlider.setLabelTable(this.agentSizeSlider.createStandardLabels(100, 100));
 				this.agentSizeSlider.setPaintLabels(true);
@@ -248,7 +249,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		return this.middleMFunc;
 	}
 
-    public static PreferencesDialog buildMenu(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar host) {
+    public static PreferencesDialog buildMenu(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar host, final OTFSettingsSaver save) {
     	PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
     	Class partypes[] = new Class[3];
         partypes[0] = JFrame.class;
@@ -282,23 +283,32 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			e.printStackTrace();
 		}
 
-		buildMenu(frame, preferencesDialog);
+		buildMenu(frame, preferencesDialog, save);
         return preferencesDialog;
 	}
 
-    public static void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog) {
+    public static void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu( "File" );
         menuBar.add( fileMenu );
-        Action exitAction = new AbstractAction() {
+        Action prefAction = new AbstractAction() {
             { putValue( Action.NAME, "Preferences..." );
               putValue( Action.MNEMONIC_KEY, 0 ); }
             public void actionPerformed( final ActionEvent e ) {
               preferencesDialog.setVisible(true);
             }
           };
-          fileMenu.add( exitAction );
-          fileMenu.add("Open...");
+          fileMenu.add( prefAction );
+          if(save != null)  {
+              Action saveAction = new AbstractAction() {
+                  { putValue( Action.NAME, "Save Settings" );
+                    putValue( Action.MNEMONIC_KEY, 1 ); }
+                  public void actionPerformed( final ActionEvent e ) {
+                    save.saveSettings();
+                  }
+                };
+                fileMenu.add(saveAction);
+          }
 
         frame.setJMenuBar( menuBar );
  	}
