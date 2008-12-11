@@ -56,11 +56,10 @@ public class Retailers {
 			
 			int randomKey = MatsimRandom.random.nextInt(ret.size());
 						retailersForRelocation.getRetailers().put(new IdImpl(ii), ret.get(randomKey));
-			System.out.println(" ret vector = " + ret);
 			ret.remove(randomKey);
 			ii=ii+1;
 		}
-		System.out.println("  retailers_a = " + retailersForRelocation.getRetailers());
+		System.out.println("  retailers_a = " + retailersForRelocation.getRetailers().keySet());
 		return retailersForRelocation;
 	}
 

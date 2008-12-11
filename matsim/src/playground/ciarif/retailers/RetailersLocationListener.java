@@ -78,17 +78,20 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		Facilities facilities = controler.getFacilities();
 		this.retailers = new Retailers (facilities);
 		this.retailersToBeRelocated = Retailers.selectRetailersForRelocation(retailers,40);
-		System.out.println("  rtbr = " + this.retailersToBeRelocated.getRetailers());
+		System.out.println("  rtbr = " + this.retailersToBeRelocated.getRetailers().values());
 		Iterator<Facility> iter_fac = this.retailersToBeRelocated.getRetailers().values().iterator();
 				
 		while (iter_fac.hasNext()) {
 			Facility f = iter_fac.next();
-			Coord coord = nrl.findLocation().getCenter();
-			//f.setLocation(coord);
+			Link link = nrl.findLocation();
+			Coord coord = link.getCenter();
+			f.setLocation(coord);
 			System.out.println("  Facility Link = " + f.getLink());
 			System.out.println("  Facility Coord = " + f.getCenter());
-			//controler.getFacilities().g
+			facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
+			//facilities.getFacilities().get(f.getId()).addUpMapping(link);
 		}
+		System.out.println("  Controler facilities = " + facilities.getFacilities().values());
 	}
 			
 	public void notifyBeforeMobsim (BeforeMobsimEvent event) {
@@ -99,7 +102,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		while (per_iter.hasNext()) {
 			Person person = per_iter.next();
 			Plan plan = person.getSelectedPlan();
-			person.removePlan(plan);
+			//person.removePlan(plan);
 		}
 		//set routes to null of selected plans
 		// router
