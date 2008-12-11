@@ -31,7 +31,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -69,6 +68,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
@@ -726,6 +726,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				} ); 			
 			zoomD.getContentPane().add(b);
 		}
+		JPanel pane = new JPanel();
 		JButton bb = new JButton("Cancel");
 		bb.addActionListener( new ActionListener() { 
 			  public void actionPerformed( ActionEvent e ) {
@@ -733,8 +734,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				  zoomD.setVisible(false); 
 			  } 
 			} ); 	
-		bb.setPreferredSize(new Dimension(220, 100));
-		zoomD.getContentPane().add(bb);
+		bb.setPreferredSize(new Dimension(120, 40));
+		pane.add(bb);
+		zoomD.getContentPane().add(pane);
 		zoomD.doLayout();
 		zoomD.pack();
 		for(int i=0; i<zooms.size();i++) {
@@ -772,7 +774,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	}
 	
 	public void handleClick(Point2D.Double point, int mouseButton, MouseEvent e) {
-		if(mouseButton == 4 && false){
+		if(mouseButton == 4 ){
 			JPopupMenu popmen = new JPopupMenu(); 
 			JMenuItem menu1 = new JMenuItem( "Zoom"); 
 			menu1.setBackground(Color.lightGray);
