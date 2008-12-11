@@ -20,9 +20,6 @@
 
 package org.matsim.planomat;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -39,13 +36,11 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LinearInterpolatingTTCalculator;
-import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -53,7 +48,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.population.routes.CarRoute;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -66,24 +60,7 @@ import org.matsim.utils.misc.Time;
 
 public class PlanOptimizeTimesTest extends MatsimTestCase {
 
-	private enum PlanomatTestRun {
-
-		NOEVENTS_CAR("noevents_car"),
-		WITHEVENTS_CAR("withevents_car"),
-		NOEVENTS_CAR_PT("noevents_car_pt"),
-		WITHEVENTS_CAR_PT("withevents_car_pt");
-
-		private String testIdentifier;
-
-		private PlanomatTestRun(String testIdentifier) {
-			this.testIdentifier = testIdentifier;
-		}
-
-		public String getTestIdentifier() {
-			return testIdentifier;
-		}
-
-	}
+	private enum PlanomatTestRun {NOEVENTS_CAR, WITHEVENTS_CAR, NOEVENTS_CAR_PT, WITHEVENTS_CAR_PT;}
 
 	private static final Logger log = Logger.getLogger(PlanOptimizeTimesTest.class);
 
@@ -115,15 +92,37 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		this.network = null;
-		this.facilities = null;
-		this.population = null;
-		super.tearDown();
+	public void testRunDefault() {
+		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
+	}
+
+	public void testRunDefaultWithEvents() {
+		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR);
 	}
 	
-	public void testRun() {
+	public void testRunCarPt() {
+		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
+	}
+	
+	public void testRunCarPtWithEvents() {
+		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR_PT);
+	}
+	
+	public void testRunDefaultManyModes() {
+
+		Gbl.getConfig().plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
+		
+		log.info("Reading plans xml file...");
+		population = new Population(Population.NO_STREAMING);
+		PopulationReader plansReader = new MatsimPopulationReader(population);
+		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		population.printPlansCount();
+		log.info("Reading plans xml file...done.");
+
+		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
+	}
+	
+	private void runATestRun(PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
@@ -137,59 +136,57 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
+		testee.getSeedGenerator().setSeed(Gbl.getConfig().global().getRandomSeed());
 
-		for (PlanomatTestRun planomatTestRun : PlanomatTestRun.values()) {
+		log.info("Testing " + testRun.toString() + "...");
 
-			log.info("Testing " + planomatTestRun.getTestIdentifier() + "...");
-			
-			if (
-					PlanomatTestRun.NOEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) || 
-					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
-				
-				  Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
-			}
+		if (
+				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) || 
+				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
 
-			tTravelEstimator.resetTravelTimes();
-			depDelayCalc.resetDepartureDelays();
-			if (
-					PlanomatTestRun.WITHEVENTS_CAR.getTestIdentifier().equals(planomatTestRun.getTestIdentifier()) ||
-					PlanomatTestRun.WITHEVENTS_CAR_PT.getTestIdentifier().equals(planomatTestRun.getTestIdentifier())) {
+			Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
+		}
 
-				new MatsimEventsReader(events).readFile(this.getInputDirectory() + "equil-times-only-1000.events.txt.gz");
+		tTravelEstimator.resetTravelTimes();
+		depDelayCalc.resetDepartureDelays();
+		if (
+				PlanomatTestRun.WITHEVENTS_CAR.equals(testRun) ||
+				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
 
-			}
-
-			// init test Plan
-			final String TEST_PERSON_ID = "100";
-			final int TEST_PLAN_NR = 0;
-
-			// first person
-			Person testPerson = population.getPerson(TEST_PERSON_ID);
-			// only plan of that person
-			Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
-
-			// actual test
-			testee.run(testPlan);
-
-			// write out the test person and the modified plan into a file
-			Population outputPopulation = new Population();
-			outputPopulation.addPerson(testPerson);
-
-			System.out.println("Writing plans file...");
-			PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans_" + planomatTestRun.getTestIdentifier() + ".xml.gz", "v4");
-			plans_writer.write();
-			System.out.println("Writing plans file...DONE.");
-
-			// actual test: compare checksums of the files
-			final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans_" + planomatTestRun.getTestIdentifier() + ".xml.gz");
-			final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans_" + planomatTestRun.getTestIdentifier() + ".xml.gz");
-			log.info("Expected checksum: " + Long.toString(expectedChecksum));
-			log.info("Actual checksum: " + Long.toString(actualChecksum));
-			assertEquals(expectedChecksum, actualChecksum);
-
-			log.info("Testing " + planomatTestRun.getTestIdentifier() + "...done.");
+			new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
 
 		}
+
+		// init test Plan
+		final String TEST_PERSON_ID = "100";
+		final int TEST_PLAN_NR = 0;
+
+		// first person
+		Person testPerson = population.getPerson(TEST_PERSON_ID);
+		// only plan of that person
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+
+		// actual test
+		testee.run(testPlan);
+
+		// write out the test person and the modified plan into a file
+		Population outputPopulation = new Population();
+		outputPopulation.addPerson(testPerson);
+
+		System.out.println("Writing plans file...");
+		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
+		plans_writer.write();
+		System.out.println("Writing plans file...DONE.");
+
+		// actual test: compare checksums of the files
+		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
+		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
+		log.info("Expected checksum: " + Long.toString(expectedChecksum));
+		log.info("Actual checksum: " + Long.toString(actualChecksum));
+		assertEquals(expectedChecksum, actualChecksum);
+
+		log.info("Testing " + testRun.toString() + "...done.");
+
 	}
 
 	public void testInitSampleChromosome() {
@@ -213,10 +210,9 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		testChromosome = testee.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
-		assertEquals(3, testChromosome.getGenes().length);
+		assertEquals(2, testChromosome.getGenes().length);
 		assertEquals(DoubleGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(DoubleGene.class, testChromosome.getGenes()[1].getClass());
-		assertEquals(IntegerGene.class, testChromosome.getGenes()[2].getClass());
 
 	}
 
@@ -299,34 +295,6 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 	}
 
-	public void testGetOriginalRoutes() {
-		
-		// init test Plan
-		final String TEST_PERSON_ID = "100";
-		final int TEST_PLAN_NR = 0;
-
-		// first person
-		Person testPerson = population.getPerson(TEST_PERSON_ID);
-		// only plan of that person
-		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
-		
-		CarRoute expectedRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
-		expectedRoute.setNodes("2 7 12");
-		
-		HashMap<Leg, CarRoute> legsRoutes = PlanOptimizeTimes.getLegsRoutes(testPlan);
-		
-		// this code should changes to the route of the plan leg object, 
-		// but should not affect the previously saved routes 
-		Leg modifyMe = testPlan.getNextLeg(testPlan.getFirstActivity());
-		CarRoute differentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
-		differentRoute.setNodes("2 10 12");
-		modifyMe.setRoute(differentRoute);
-		
-		List<Node> actualRoute = legsRoutes.get(modifyMe).getNodes();
-		assertEquals(expectedRoute.getNodes(), actualRoute);
-		
-	}
-	
 	public void testGenerateRandomDemand() {
 
 		final int TEST_PLAN_NR = 0;
@@ -338,7 +306,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		Gbl.getConfig().planomat().setPopSize(1);
 		Gbl.getConfig().planomat().setJgapMaxGenerations(0);
 		Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
-		
+
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
@@ -349,16 +317,16 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
 
 		for (Person person : this.population) {
-			
+
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.run(plan);
 		}
-		
+
 		System.out.println("Writing plans file...");
 		PopulationWriter plans_writer = new PopulationWriter(this.population, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
 		plans_writer.write();
 		System.out.println("Writing plans file...DONE.");
-		
+
 		// actual test: compare checksums of the files
 		final long expectedChecksum = CRCChecksum.getCRCFromGZFile(this.getInputDirectory() + "plans.xml.gz");
 		final long actualChecksum = CRCChecksum.getCRCFromGZFile(this.getOutputDirectory() + "output_plans.xml.gz");
@@ -367,5 +335,5 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 
 	}
-	
+
 }

@@ -45,15 +45,4 @@
 		<param name="activityClosingTime_1"     value="24:00:00" />
 	</module>
 	
-	<module name="planomat">
-	
-<!--		<param name="optimizationToolbox" value="jgap" />-->
-<!--		<param name="populationSize" value="10" />-->
-<!--		<param name="scoringFunction" value="CharyparNagel" />-->
-<!--		<param name="jgapMaxGenerations" value="1000" />-->
-<!--		<param name="" value="" />-->
-<!--		<param name="" value="" />-->
-<!--		<param name="" value="" />-->
-	
-	</module>
 </config>

@@ -21,7 +21,6 @@
 package org.matsim.planomat;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import org.jgap.Chromosome;
@@ -34,8 +33,8 @@ import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StockRandomGenerator;
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLeg.Mode;
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
@@ -45,8 +44,7 @@ import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.scoring.ScoringFunction;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.utils.misc.Time;
@@ -158,9 +156,11 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, PlanOptimizeTimes.MAX_ACTIVITY_DURATION));
 			}
 
-			for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
-				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
-			} 
+			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
+					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
+				} 
+			}
 
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
@@ -191,12 +191,9 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		Act activity = null;
 		Leg leg = null;
 
-		HashMap<Leg, CarRoute> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
-
+		Route tempRoute = null;
+		
 		Gene[] fittestGenes = individual.getGenes();
-//		for (Gene gene: fittestGenes) {
-//			System.out.println(gene.getAllele().toString());
-//		}
 
 		int max = plan.getActsLegs().size();
 		double now = 0.0;
@@ -235,12 +232,18 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 
-				// set mode to result from optimization
-				int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
-				int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
-				Mode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
-//				System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
-				leg.setMode(mode);
+				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+					// set mode to result from optimization
+					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
+					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
+					Mode mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
+//					System.out.println(ii + "\t" + subtourIndex + "\t" + modeIndex + "\t" + modeName);
+					leg.setMode(mode);
+				} // otherwise leave modes untouched
+
+				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+					tempRoute = leg.getRoute();
+				}
 
 				// set arrival time to estimation
 				Act origin = ((Act) plan.getActsLegs().get(ii - 1));
@@ -255,9 +258,10 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 				leg.setTravelTime(travelTimeEstimation);
 				
-				// correctly set route object
-				// restore original routes, because planomat must not alter routes at all
-				leg.setRoute(originalRoutes.get(leg));
+				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
+					// restore original routes, because planomat must not alter routes at all
+					leg.setRoute(tempRoute);
+				}
 				leg.getRoute().setTravelTime(travelTimeEstimation);
 
 				now += leg.getTravelTime();
@@ -270,20 +274,17 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		// invalidate score information
 		plan.setScore(Double.NaN);
 
+		// reset leg travel time estimator
+		this.legTravelTimeEstimator.reset();
+		
 	}
 
-	public static HashMap<Leg, CarRoute> getLegsRoutes(final Plan plan) {
-		
-		HashMap<Leg, CarRoute> routes = new HashMap<Leg, CarRoute>();
-		
-		LegIterator legIterator = plan.getIteratorLeg();
-		while (legIterator.hasNext()) {
-			Leg curLeg = (Leg) legIterator.next();
-			routes.put(curLeg, new NodeCarRoute((CarRoute) curLeg.getRoute()));
-		}
-		
-		return routes;
-		
+	public void setSeedGenerator(Random seedGenerator) {
+		this.seedGenerator = seedGenerator;
+	}
+
+	public Random getSeedGenerator() {
+		return seedGenerator;
 	}
 	
 }

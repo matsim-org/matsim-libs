@@ -37,6 +37,11 @@ import org.matsim.population.Leg;
  */
 public class BeeLine implements LegTravelTimeEstimator {
 	
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	final static double SPEED = 20.0 / 3.6; // 20km/h --> m/s
 	
 	@Override

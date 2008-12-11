@@ -26,10 +26,6 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatConfigGroupTest extends MatsimTestCase {
 
-//	protected void setUp() throws Exception {
-//		super.setUp();
-//	}
-//
 	public void testPlanomatConfigGroup() {
 		
 		super.loadConfig(this.getInputDirectory() + "empty_config.xml");

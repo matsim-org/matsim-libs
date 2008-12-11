@@ -71,7 +71,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 
 			legTravelTimeEstimation = (now - departureTime);
 
-		} else if (legIntermediate.getMode().equals(BasicLeg.Mode.pt)) {
+		} else {
 	
 			legTravelTimeEstimation = super.getLegTravelTimeEstimation(personId, departureTime, actOrigin, actDestination, legIntermediate);
 			

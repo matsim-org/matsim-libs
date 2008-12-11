@@ -20,12 +20,16 @@
 
 package org.matsim.planomat.costestimators;
 
+import java.util.HashMap;
+import java.util.List;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
@@ -44,6 +48,11 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected DepartureDelayAverageCalculator tDepDelayCalc;
 	private PlansCalcRoute plansCalcRoute;
 
+	/**
+	 * TODO this variable has to be reset after each agent
+	 */
+	private HashMap<Route, List<Link>> linkRoutesCache = new HashMap<Route, List<Link>>();
+	
 	public FixedRouteLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
 			TravelCost linkTravelCostEstimator,
@@ -73,7 +82,16 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected double processRouteTravelTime(final CarRoute route, final double start) {
 
 		double now = start;
-		for (Link link : route.getLinks()) {
+		
+		List<Link> links = null;
+		if (this.linkRoutesCache.containsKey(route)) {
+			links = this.linkRoutesCache.get(route);
+		} else {
+			links = route.getLinks();
+			this.linkRoutesCache.put(route, links);
+		}
+		
+		for (Link link : links) {
 			now = this.processLink(link, now);
 		}
 		return now;
@@ -92,5 +110,8 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		return this.getClass().getSimpleName();
 	}
 
-
+	public void reset() {
+		this.linkRoutesCache.clear();
+	}
+	
 }

@@ -51,4 +51,6 @@ public interface LegTravelTimeEstimator {
 			Act actDestination,
 			Leg legIntermediate);
 	
+	public void reset();
+	
 }

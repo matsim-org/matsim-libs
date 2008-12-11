@@ -5,8 +5,18 @@
 	<module name="planomat">
 <!--		<param name="" value="" />-->
 		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
+
+		<!--  -->
+		<!-- possibleModes -->
+		<!-- Examples of values: "car", "car pt", "car pt walk" -->
+		<!-- Default value: "" -->
+		<!--  -->
+		<!-- Defines the choice set for leg modes. -->
+		<!-- Planomat will produce no other leg modes than those listed in the value of this parameter. -->
+		<!-- When set to its default value, leg modes remain untouched, and planomat will only perform time optimization. -->
+		<!--  -->
 		<param name="possibleModes" value="car pt" />
-		
+
 	</module>
 
 </config>

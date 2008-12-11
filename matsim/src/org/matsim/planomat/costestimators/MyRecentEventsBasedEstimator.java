@@ -36,6 +36,11 @@ import org.matsim.population.Leg;
 public class MyRecentEventsBasedEstimator
 implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public MyRecentEventsBasedEstimator() {
 		super();
 	}
