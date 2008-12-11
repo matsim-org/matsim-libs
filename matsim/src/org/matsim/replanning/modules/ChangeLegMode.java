@@ -27,6 +27,24 @@ import org.matsim.population.algorithms.ChooseRandomLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.StringUtils;
 
+/**
+ * Changes the transportation mode of all legs in a plan to a randomly chosen
+ * different mode (but the same mode for all legs in that plan) given a list
+ * of possible modes.
+ *
+ * By default, the module chooses between "car" and "pt". If other modes should
+ * be used, it can be done so in the configuration:
+ * <pre>
+ * &lt;module name="changeLegMode" />
+ *   &lt!-- provide a comma-separated list of leg modes -->
+ *   &lt;param name="modes" key="car,walk,bike" />
+ * &lt;/module>
+ * </pre>
+ *
+ * @see ChooseRandomLegMode
+ *
+ * @author mrieser
+ */
 public class ChangeLegMode extends MultithreadedModuleA {
 
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
