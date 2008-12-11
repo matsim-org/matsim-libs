@@ -106,7 +106,7 @@
 <!ELEMENT leg            (route)?>
 <!ATTLIST leg
           num            CDATA                                                 #IMPLIED
-          mode           (miv|car|ride|motorbike|pt|train|bus|tram|bike|walk|undef) #REQUIRED
+          mode           (miv|car|ride|motorbike|pt|train|bus|tram|bike|walk|undef|undefined) #REQUIRED
           dep_time       CDATA                                                 #IMPLIED
           trav_time      CDATA                                                 #IMPLIED
           arr_time       CDATA                                                 #IMPLIED>
