@@ -26,7 +26,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
-import org.matsim.socialnetworks.io.PajekWriter;
+
 /**
  * A sample location choice replanning StrategyModule. The facility
  * (the place an activity takes place) is exchanged randomly for another
