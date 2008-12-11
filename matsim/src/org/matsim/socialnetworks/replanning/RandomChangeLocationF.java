@@ -167,6 +167,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLinkId(fFromFacilities.getLink().getId());
 					newAct.setCoord(fFromFacilities.getCenter());
 					newAct.setFacility(fFromFacilities);
+					k.getMentalMap().addActivity(fFromFacilities.getActivity(factype));
 					changed = true;
 				}
 			}
@@ -184,8 +185,6 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
-//				Not needed with new change to Act --> Facility JH 7.2008
-//				k.getMentalMap().learnActsActivities(newAct,fFromKnowledge.getActivity(factype));
 				person.setSelectedPlan(newPlan);
 //				System.out.println("   ### new location for "+person.getId()+" "+newAct.getType());
 
