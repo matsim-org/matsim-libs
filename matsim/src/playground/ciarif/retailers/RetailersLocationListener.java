@@ -85,10 +85,10 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 			Facility f = iter_fac.next();
 			Link link = nrl.findLocation();
 			Coord coord = link.getCenter();
-			f.setLocation(coord);
+			//f.setLocation(coord);
 			System.out.println("  Facility Link = " + f.getLink());
 			System.out.println("  Facility Coord = " + f.getCenter());
-			facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
+			//facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
 			//facilities.getFacilities().get(f.getId()).addUpMapping(link);
 		}
 		System.out.println("  Controler facilities = " + facilities.getFacilities().values());
@@ -102,6 +102,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		while (per_iter.hasNext()) {
 			Person person = per_iter.next();
 			Plan plan = person.getSelectedPlan();
+			//plan.
 			//person.removePlan(plan);
 		}
 		//set routes to null of selected plans
