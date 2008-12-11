@@ -19,18 +19,8 @@ package playground.jhackney.replanning;
  *                                                                         *
  * *********************************************************************** */
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import org.matsim.controler.Controler;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
-import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.MultithreadedModuleA;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
 /**
  * A sample of schedule coordination in a replanning StrategyModule. The departure
  * time for an act is adjusted according to when friends will be at the act.
