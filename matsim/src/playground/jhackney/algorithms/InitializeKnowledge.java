@@ -49,8 +49,11 @@ public class InitializeKnowledge {
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				Plan plan = person.getPlans().get(ii);
 
-				k.getMentalMap().prepareActs(plan); // JH Hack to make sure act types are compatible with social nets
+				// JH Hack to make sure act types are compatible with social nets
+				k.getMentalMap().prepareActs(plan);
+				// JH If the Acts are not initialized with a Facility they get a random Facility on the Link
 				k.getMentalMap().initializeActActivityMapRandom(plan);
+				// JH If there is a user-supplied file of Facilities for the Act, read it in
 				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities, aar);
 			}
 		}
