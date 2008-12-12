@@ -52,6 +52,8 @@ public class SNController4 extends Controler {
 
 		StrategyManager manager = new StrategyManager();
 
+		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
+		
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());// only facilities visited in last iteration are in time window hastable
 		StrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.network,this.travelCostCalculator,this.travelTimeCalculator);
