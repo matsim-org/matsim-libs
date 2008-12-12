@@ -24,7 +24,7 @@ public class SimulationParameters {
 	public static final int PRIORITY_ENTER_ROAD_MESSAGE = 100;
 
 	// INPUT
-	static long maxSimulationLength = 800000; // in s
+	public static long maxSimulationLength = 800000; // in s
 	public static long linkCapacityPeriod = 0; // 
 	public static double gapTravelSpeed = 15.0; // in m/s
 	public static double flowCapacityFactor = 1.0;
