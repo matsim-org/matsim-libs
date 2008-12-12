@@ -159,9 +159,7 @@ public class Vehicle extends SimUnit {
 			road.giveBackPromisedSpaceToRoad(); // next road
 			scheduleEndLegMessage(scheduleTime, road);
 		} else {
-			sendMessage(MessageFactory
-					.getEnterRoadMessage(road.scheduler, this), road,
-					scheduleTime);
+			_scheduleEnterRoadMessage(scheduleTime,road);
 		}
 	}
 
@@ -181,6 +179,12 @@ public class Vehicle extends SimUnit {
 		}
 
 		scheduleLeaveRoadMessage(scheduleTime, previousRoad);
+	}
+	
+	protected void _scheduleEnterRoadMessage(double scheduleTime, Road road) {
+		sendMessage(MessageFactory
+				.getEnterRoadMessage(road.scheduler, this), road,
+				scheduleTime);
 	}
 
 	public void scheduleEndRoadMessage(double scheduleTime, Road road) {
