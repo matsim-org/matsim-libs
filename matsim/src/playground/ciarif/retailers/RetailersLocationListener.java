@@ -21,11 +21,12 @@
 package playground.ciarif.retailers;
 
 /**
- * Detect facilities' locations before to enter the main loop
+ * 
  *
  * @author ciarif
  */
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,12 +39,14 @@ import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
+import org.matsim.basic.v01.*;
 /*import org.matsim.interfaces.basic.v01.BasicLocation;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -55,6 +58,11 @@ import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldValidation;
 import org.matsim.world.Location;*/
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+
+import playground.ciarif.models.subtours.PersonInitDemandSummaryTable;
+import playground.ciarif.models.subtours.PersonSubtour;
+import playground.ciarif.models.subtours.Subtour;
 
 
 public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
@@ -66,47 +74,57 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		this.retailersToBeRelocated = retailersToBeRelocated;
 	}
 
-	public RetailersLocationListener(
-			TreeMap<Id, Facility> retailersToBeRelocated) {
-		// TODO Auto-generated constructor stub
-	}
-
+	RetailersSummaryWriter rs = new RetailersSummaryWriter("output/triangle/output_retailers.txt", this.retailers);
+	
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler();
+		new WorldBottom2TopCompletion().run(Gbl.getWorld());
 		Map<Id,Link> links = controler.getNetwork().getLinks();
 		NewRetailersLocation nrl = new NewRetailersLocation(links);
 		Facilities facilities = controler.getFacilities();
 		this.retailers = new Retailers (facilities);
 		this.retailersToBeRelocated = Retailers.selectRetailersForRelocation(retailers,40);
-		System.out.println("  rtbr = " + this.retailersToBeRelocated.getRetailers().values());
 		Iterator<Facility> iter_fac = this.retailersToBeRelocated.getRetailers().values().iterator();
 				
 		while (iter_fac.hasNext()) {
 			Facility f = iter_fac.next();
 			Link link = nrl.findLocation();
 			Coord coord = link.getCenter();
-			//f.setLocation(coord);
-			System.out.println("  Facility Link = " + f.getLink());
-			System.out.println("  Facility Coord = " + f.getCenter());
-			//facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
-			//facilities.getFacilities().get(f.getId()).addUpMapping(link);
+			f.setLocation(coord);
+			facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
+			this.retailers.getRetailers().put(f.getId(),facilities.getFacilities().get(f.getId()));
 		}
-		System.out.println("  Controler facilities = " + facilities.getFacilities().values());
-	}
+		rs.write(retailers);
+		
+		Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
+		
+		while (per_iter.hasNext()) {
+			Person person = per_iter.next();
 			
+			Iterator<Plan> plan_iter = controler.getPopulation().getPersons().values().iterator().next().getPlans().iterator();
+			
+			while (plan_iter.hasNext()) {
+				
+			}
+			Plan plan = person.getSelectedPlan();
+			
+		}
+	}
+	
 	public void notifyBeforeMobsim (BeforeMobsimEvent event) {
 		//TODO: Implement
 		Controler controler = event.getControler();
 		Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
 		
 		while (per_iter.hasNext()) {
-			Person person = per_iter.next();
-			Plan plan = person.getSelectedPlan();
+			
+		
+			//Plan plan = person.getPlans();
+			
 			//plan.
 			//person.removePlan(plan);
 		}
 		//set routes to null of selected plans
-		// router
+		//router
 	}
-
 }

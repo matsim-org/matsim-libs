@@ -127,7 +127,7 @@ public class PersonInitDemandSummaryTable {
 			}
 			
 			out.flush();
-			this.out.close();
+			//this.out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);

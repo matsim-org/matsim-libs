@@ -29,8 +29,8 @@ public class Retailers {
 				
 				this.retailers.put(id,this.facilities.getFacilities().get(id));
 			}
-			System.out.println("  retailers = " + this.retailers.keySet());
 		}
+		System.out.println("  retailers = " + this.retailers.keySet());
 	}
 
 	public Retailers() {
@@ -59,7 +59,7 @@ public class Retailers {
 			ret.remove(randomKey);
 			ii=ii+1;
 		}
-		System.out.println("  retailers_a = " + retailersForRelocation.getRetailers().keySet());
+		//System.out.println("  retailers_a = " + retailersForRelocation.getRetailers().keySet());
 		return retailersForRelocation;
 	}
 
