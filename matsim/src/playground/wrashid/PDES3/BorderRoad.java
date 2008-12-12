@@ -9,16 +9,20 @@ import playground.wrashid.DES.Vehicle;
 
 public class BorderRoad extends Road {
 
+	
+
+	
 	private int startingRoadZoneId = 0;
 	private int endingRoadZoneId = 0;
 
-	public BorderRoad(Scheduler scheduler, Link link, int startingRoadZoneId,
+	public BorderRoad(PScheduler scheduler, Link link, int startingRoadZoneId,
 			int endingRoadZoneId) {
 		super(scheduler, link);
 		this.startingRoadZoneId = startingRoadZoneId;
 		this.endingRoadZoneId = endingRoadZoneId;
 	}
 
+	// see documentation in class Road
 	public void enterRequest(Vehicle vehicle, double simTime) {
 		synchronized (this) {
 			super.enterRequest(vehicle, simTime);
@@ -28,31 +32,22 @@ public class BorderRoad extends Road {
 	// see documentation in class Road
 	public void enterRoad(Vehicle vehicle, double simTime) {
 		synchronized (this) {
-			double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
-			nextAvailableTimeForLeavingStreet = simTime
-					+ link.getLength()
-					/ link
-							.getFreespeed(SimulationParameters.linkCapacityPeriod);
-
-			noOfCarsPromisedToEnterRoad--;
-			carsOnTheRoad.add(vehicle);
-
-			earliestDepartureTimeOfCar.add(nextAvailableTimeForLeavingStreet);
-
+			// if schedule end road message will happen
+			// it must be scheduled in the endingRoadZoneId
+			if (carsOnTheRoad.size() == 0) {
+				((PVehicle) vehicle).setCurrentZoneId(endingRoadZoneId);
+				((PVehicle) vehicle).setOwnsCurrentZone(false);
+			}
+			super.enterRoad(vehicle, simTime);
+			// if end road message was scheduled, we can reset the setOwnsCurrentZoneProperty
+			// when the scheduled message wakes up, this message is in the new zone
 			if (carsOnTheRoad.size() == 1) {
-				nextAvailableTimeForLeavingStreet = Math.max(
-						nextAvailableTimeForLeavingStreet,
-						timeOfLastLeavingVehicle + inverseOutFlowCapacity);
-				// This line of code needs to be changed (schedule not a message
-				// in the current thread, but in the road end thread)
-				vehicle.scheduleEndRoadMessage(
-						nextAvailableTimeForLeavingStreet, this);
-			} else {
-
+				((PVehicle) vehicle).setOwnsCurrentZone(true);
 			}
 		}
 	}
 
+	// see documentation in class Road
 	public void leaveRoad(Vehicle vehicle, double simTime) {
 		synchronized (this) {
 			super.leaveRoad(vehicle, simTime);
