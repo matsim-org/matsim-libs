@@ -233,12 +233,12 @@ public class Road extends SimUnit {
 			// 'stuckTime' the car behind has to wait an additional stuckTime
 			// (this logic was adapted to adhere to the C++ implementation)
 			if (deadlockPreventionMessages.size() > 0) {
-				if (deadlockPreventionMessages.getLast()
-						.getMessageArrivalTime()
-						+ SimulationParameters.stuckTime < scheduler
-						.getSimTime()) {
-					System.out.println();
-				}
+				//if (deadlockPreventionMessages.getLast()
+				//		.getMessageArrivalTime()
+				//		+ SimulationParameters.stuckTime < scheduler
+				//		.getSimTime()) {
+				//	System.out.println();
+				//}
 				deadlockPreventionMessages
 						.add(vehicle.scheduleDeadlockPreventionMessage(
 								deadlockPreventionMessages.getLast()
