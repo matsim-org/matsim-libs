@@ -17,14 +17,14 @@ public class StartingLegMessage extends EventMessage {
 		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
-			road.enterRequest(vehicle);
+			road.enterRequest(vehicle,getMessageArrivalTime());
 		} else {
 			// move to first link in next leg and schedule an end leg message
 			vehicle.moveToFirstLinkInNextLeg();
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
 
-			vehicle.scheduleEndLegMessage(scheduler.getSimTime()
+			vehicle.scheduleEndLegMessage(getMessageArrivalTime()
 					+ vehicle.getCurrentLeg().getTravelTime(), road);
 		}
 	}

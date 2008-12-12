@@ -9,7 +9,7 @@ public class EnterRoadMessage extends EventMessage {
 	public void handleMessage() {
 		// enter the next road
 		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
-		road.enterRoad(vehicle);
+		road.enterRoad(vehicle,getMessageArrivalTime());
 	}
 
 	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {

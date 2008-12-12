@@ -35,8 +35,8 @@ public class EndLegMessage extends EventMessage {
 			// then set the departure time to the current simulation time
 			// this avoids that messages in the past are put into the scheduler
 			// (which makes no sense anyway)
-			if (departureTime < scheduler.getSimTime()) {
-				departureTime = scheduler.getSimTime();
+			if (departureTime < getMessageArrivalTime()) {
+				departureTime = getMessageArrivalTime();
 			}
 
 			// update current link (we arrived at a new activity)

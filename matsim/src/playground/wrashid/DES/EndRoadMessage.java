@@ -14,14 +14,14 @@ public class EndRoadMessage extends EventMessage {
 			vehicle.moveToFirstLinkInNextLeg();
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
-			road.enterRequest(vehicle);
+			road.enterRequest(vehicle,getMessageArrivalTime());
 		} else if (!vehicle.isCurrentLegFinished()) {
 			// if leg is not finished yet
 			vehicle.moveToNextLinkInLeg();
 
 			Road nextRoad = Road.getRoad(vehicle.getCurrentLink().getId()
 					.toString());
-			nextRoad.enterRequest(vehicle);
+			nextRoad.enterRequest(vehicle,getMessageArrivalTime());
 		}
 	}
 

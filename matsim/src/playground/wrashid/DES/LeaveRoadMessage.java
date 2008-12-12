@@ -8,7 +8,7 @@ public class LeaveRoadMessage extends EventMessage {
 	@Override
 	public void handleMessage() {
 		Road road = (Road) this.getReceivingUnit();
-		road.leaveRoad(vehicle);
+		road.leaveRoad(vehicle,getMessageArrivalTime());
 	}
 
 	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
