@@ -47,28 +47,30 @@ import org.matsim.controler.Controler;
 public class IOUtils {
 
 	private static final String GZ = ".gz";
-	
+
 	public static final String LOGFILE = "logfile.log";
-	
+
 	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
+
+	private final static Logger log = Logger.getLogger(IOUtils.class);
 
 	/**
 	 * Call this method to create 2 log4j logfiles in the output directory specified as parameter.
 	 * The first logfile contains all messages the second only those above log Level.WARN (Priority.WARN).
-	 * 
+	 *
 	 * @param outputDirectory the outputdirectory to create the files, whithout seperator at the end.
-	 * @param logEvents List of LoggingEvents, may be null, contains log information which should be written 
+	 * @param logEvents List of LoggingEvents, may be null, contains log information which should be written
 	 * to the files, e.g. LoggingEvents which occurred before the files can be created.
-	 * @throws IOException 
-	 * 
+	 * @throws IOException
+	 *
 	 * @author dgrether
 	 */
-	public static void initOutputDirLogging(String outputDirectory, List<LoggingEvent> logEvents) throws IOException {
+	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents) throws IOException {
 		Logger root = Logger.getRootLogger();
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + 
+		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
 				System.getProperty("file.separator") + LOGFILE);
 		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory + 
+		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
 				System.getProperty("file.separator") + WARNLOGFILE);
 		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
 		//however it is only working with the deprecated method
@@ -85,10 +87,10 @@ public class IOUtils {
 			}
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
 	 * Supports gzip-compressed files, such files are automatically decompressed.
@@ -357,9 +359,13 @@ public class IOUtils {
 			if (outDirContents[i].isDirectory()) {
 				deleteDir(outDirContents[i]);
 			}
-			outDirContents[i].delete();
+			if (!outDirContents[i].delete()) {
+				log.error("Could not delete " + outDirContents[i].getAbsolutePath());
+			}
 		}
-		dir.delete();
+		if (!dir.delete()) {
+			log.error("Could not delete " + dir.getAbsolutePath());
+		}
 	}
 
 	/**
