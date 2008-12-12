@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class WorldParserWriterTest extends MatsimTestCase {
 
@@ -57,7 +57,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(world);
 		new WorldBottom2TopCompletion().run(world);
-		new WorldValidation().run(world);
+		new WorldMappingInfo().run(world);
 		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}

@@ -279,7 +279,7 @@
 
 <!-- ====================================================================== -->
 
-	<mapping mapping_rule="cell[+]-[?]blk">
+	<mapping mapping_rule="cell[m]-[m]blk">
 		<ref down_zone_id="0" up_zone_id="1" />
 		<ref down_zone_id="1" up_zone_id="1" />
 		<ref down_zone_id="100" up_zone_id="19" />
@@ -454,7 +454,7 @@
 
 <!-- ====================================================================== -->
 
-	<mapping mapping_rule="blk[+]-[1]municipality">
+	<mapping mapping_rule="blk[m]-[m]municipality">
 		<ref down_zone_id="1" up_zone_id="1" />
 		<ref down_zone_id="10" up_zone_id="3" />
 		<ref down_zone_id="11" up_zone_id="4" />

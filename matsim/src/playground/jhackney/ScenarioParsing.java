@@ -27,7 +27,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.jhackney.algorithms.PersonsRandomizeId;
 

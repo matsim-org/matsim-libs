@@ -31,7 +31,7 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class FacilitiesParserWriterTest extends MatsimTestCase {
 
@@ -60,7 +60,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(world);
 		new WorldBottom2TopCompletion().run(world);
-		new WorldValidation().run(world);
+		new WorldMappingInfo().run(world);
 		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}
