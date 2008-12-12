@@ -163,6 +163,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				newAct.setLinkId(f.getLink().getId());
 				newAct.setCoord(f.getCenter());
 				newAct.setFacility(f);
+				k.getMentalMap().addActivity(f.getActivity(factype));
 				changed = true;
 			}
 

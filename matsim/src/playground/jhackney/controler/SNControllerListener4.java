@@ -242,15 +242,15 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			//TODO  Should be an algorithm
 			this.log.info("Forgetting knowledge");
 			this.log.info("No forgetting knowledge in this run");
-//			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-//			Iterator<Person> iperson = personList.iterator();
-//			while (iperson.hasNext()) {
-//				Person p = iperson.next();
-//				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-//				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
-//			}
-//			this.log.info(" ... forgetting knowledge done");
-//			Gbl.printMemoryUsage();
+			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
+			Iterator<Person> iperson = personList.iterator();
+			while (iperson.hasNext()) {
+				Person p = iperson.next();
+				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
+				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
+			}
+			this.log.info(" ... forgetting knowledge done");
+			Gbl.printMemoryUsage();
 
 			//dissolve social ties
 			this.log.info(" Removing social links ...");
