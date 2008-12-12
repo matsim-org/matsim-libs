@@ -34,11 +34,12 @@ public class ManageSubchains {
 
 	private double ttBudget = 0.0;
 	private double totalTravelDistance = 0.0;
-	
+		
 	public void secondaryActivityFound(Act act, Leg leg) {
 		/* 
 		 * No plan starts with secondary activity!
 		 */
+		this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		this.subChains.get(subChainIndex).addAct(act);
 		this.secondaryActFound = true;	
 		this.ttBudget += leg.getTravelTime();
@@ -73,6 +74,7 @@ public class ManageSubchains {
 			this.secondaryActFound = false;
 			this.ttBudget = leg.getTravelTime();
 			this.totalTravelDistance = leg.getRoute().getDist();
+			this.subChains.get(subChainIndex).defineMode(leg.getMode());
 		}			
 	}
 

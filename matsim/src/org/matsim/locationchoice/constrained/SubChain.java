@@ -22,9 +22,9 @@ package org.matsim.locationchoice.constrained;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.population.Act;
 import org.matsim.utils.geometry.Coord;
+import org.matsim.basic.v01.BasicLeg.Mode;
 
 public class SubChain {
 	
@@ -37,7 +37,22 @@ public class SubChain {
 	
 	private Coord startCoord = null;
 	private Coord endCoord = null;
+	
+	//car, walk, mixed
+	private String mode = null;
 
+	public void defineMode(Mode mode) {
+		if (this.mode == null) {
+			this.mode = mode.toString();
+			return;
+		}
+		if (this.mode.equals("mixed")) {
+			return;
+		}
+		if (!this.mode.equals(mode.toString())) {
+			this.mode = "mixed";
+		}	
+	}
 	
 	public SubChain() {
 		secondaryActs = new Vector<Act>();		
@@ -103,6 +118,14 @@ public class SubChain {
 
 	public void setTotalTravelDistance(double totalTravelDistance) {
 		this.totalTravelDistance = totalTravelDistance;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 		
 }
