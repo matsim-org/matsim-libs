@@ -51,6 +51,12 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mrieser
  */
 public abstract class MatsimXmlParser extends DefaultHandler {
+
+	static {
+		System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
+		System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+	}
+
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<StringBuffer>();
