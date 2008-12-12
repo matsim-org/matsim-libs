@@ -18,7 +18,7 @@ public class Test1 {
 		Timer t=new Timer();
 		int f=0;
 		Test1 t1=new Test1();
-		int target=1000000000;
+		int target=100000000;
 		t.startTimer();
 		for (int i=0;i<target;i++){
 			f=0;
