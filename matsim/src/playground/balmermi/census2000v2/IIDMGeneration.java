@@ -32,7 +32,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -101,7 +101,7 @@ public class IIDMGeneration {
 
 		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ public class IIDMGeneration {
 
 		log.info("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		log.info("  done.");
 		
 		//////////////////////////////////////////////////////////////////////

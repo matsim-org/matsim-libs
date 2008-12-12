@@ -30,7 +30,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000v2.data.Households;
@@ -95,7 +95,7 @@ public class PopulationCreation {
 
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		System.out.println("  done.");
 		
 		//////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ public class PopulationCreation {
 		System.out.println("  running world modules... ");
 		new WorldFacilityZoneMapping(households).run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(Gbl.getWorld());
 		System.out.println("  done.");
 		

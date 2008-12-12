@@ -40,7 +40,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 /**
  * Prints statistics of facility load
@@ -78,7 +78,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		controler.getWorld().complete();
 		new WorldCheck().run(controler.getWorld());
 		new WorldBottom2TopCompletion().run(controler.getWorld());
-		new WorldValidation().run(controler.getWorld());
+		new WorldMappingInfo().run(controler.getWorld());
 		new WorldCheck().run(controler.getWorld());
 		log.info("world checking done.");
 	}

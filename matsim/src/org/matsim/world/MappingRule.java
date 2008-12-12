@@ -22,20 +22,34 @@ package org.matsim.world;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
+import org.matsim.facilities.Facilities;
+import org.matsim.network.NetworkLayer;
 
+/**
+ * Connects two {@link Layer layers} such that for all layers in the {@link World world}
+ * a hierarchy is defined. The bottom layer is usually the {@link NetworkLayer network}, the next higher is
+ * the {@link Facilities facility layer}, followed by an open number of {@link ZoneLayer zone layers}.
+ * 
+ * <p><b>Note:</b> The concept of the mapping cardinality is deprecated. It will be always treated as an 
+ * <code>[m]-[m]</code> cardinality (undefined/unchecked cardinality).</p>
+ * 
+ * <p><b>Note:</b> The concept of a hierarchical layer structure will be changed in the future.</p>
+ * 
+ * @author balmermi
+ */
 public class MappingRule {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	private static final Logger log = Logger.getLogger(MappingRule.class);
+
 	private final Layer downLayer;
-	private final char downCardinality;
 	private final Layer upLayer;
-	private final char upCardinality;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -43,19 +57,21 @@ public class MappingRule {
 
 	protected MappingRule(final String mapping_rule, final TreeMap<Id,Layer> layers) {
 		if (!mapping_rule.matches("[a-zA-Z]+\\[[\\?\\*1\\+m]\\]-\\[[\\?\\*1\\+m]\\][a-zA-Z]+")) {
-			Gbl.errorMsg("[mapping_rule=" + mapping_rule + " does not match]");
+			throw new RuntimeException("mapping_rule="+mapping_rule+" does not match.");
 		}
 		String [] strings = mapping_rule.split("\\[|\\]-\\[|\\]");
-		this.downLayer = layers.get(new IdImpl(strings[0]));
-		this.downCardinality = strings[1].charAt(0);
-		this.upCardinality = strings[2].charAt(0);
-		this.upLayer = layers.get(new IdImpl(strings[3]));
+		downLayer = layers.get(new IdImpl(strings[0]));
+		char downC = strings[1].charAt(0);
+		char upC = strings[2].charAt(0);
+		upLayer = layers.get(new IdImpl(strings[3]));
 
-		if (this.downLayer == null) { Gbl.errorMsg("[down_layer_type=" + strings[0] + " does not exist]"); }
-		if (this.upLayer == null) { Gbl.errorMsg("[up_layer_type=" + strings[3] + " does not exist]"); }
-		if (this.downLayer.equals(this.upLayer)) { Gbl.errorMsg("[down_layer=" + this.downLayer + "and up_layer=" + this.upLayer + " are equal]"); }
-		if (this.downLayer.getUpRule() != null) { Gbl.errorMsg("[down_layer=" + this.downLayer + " already holds a up_rule]"); }
-		if (this.upLayer.getDownRule() != null) { Gbl.errorMsg("[up_layer_type=" + this.upLayer.getType() + " already holds a down_rule"); }
+		if ((downC != 'm') || (upC != 'm')) { log.warn("Cardinalities of a mapping between two layers do not have any purpose anymore. It will be treated as [m]-[m]"); }
+		
+		if (downLayer == null) { throw new RuntimeException("down_layer_type="+strings[0]+" does not exist."); }
+		if (upLayer == null) { throw new RuntimeException("up_layer_type="+strings[3]+" does not exist."); }
+		if (downLayer.equals(this.upLayer)) { throw new RuntimeException("down_layer="+downLayer+" and up_layer="+upLayer+" are equal."); }
+		if (downLayer.getUpRule() != null) { throw new RuntimeException("down_layer="+downLayer.getType()+" already holds a up_rule."); }
+		if (upLayer.getDownRule() != null) { throw new RuntimeException("up_layer_type="+upLayer.getType()+" already holds a down_rule."); }
 
 		this.downLayer.setUpRule(this);
 		this.upLayer.setDownRule(this);
@@ -66,19 +82,11 @@ public class MappingRule {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Layer getDownLayer() {
-		return this.downLayer;
+		return downLayer;
 	}
 
 	public final Layer getUpLayer() {
-		return this.upLayer;
-	}
-
-	public final char getDownCardinality() {
-		return this.downCardinality;
-	}
-
-	public final char getUpCardinality() {
-		return this.upCardinality;
+		return upLayer;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -87,7 +95,6 @@ public class MappingRule {
 
 	@Override
 	public final String toString() {
-		return this.downLayer.getType() + "[" + this.downCardinality + "]-[" +
-				this.upCardinality + "]" + this.upLayer.getType();
+		return downLayer.getType()+"[m]-[m]"+upLayer.getType();
 	}
 }

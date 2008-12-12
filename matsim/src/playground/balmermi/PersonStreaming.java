@@ -31,7 +31,7 @@ import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 import playground.balmermi.algos.PersonXY2Facility;
 
@@ -55,7 +55,7 @@ public class PersonStreaming {
 
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 
 		//////////////////////////////////////////////////////////////////////

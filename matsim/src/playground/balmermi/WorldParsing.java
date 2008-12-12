@@ -26,7 +26,7 @@ import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class WorldParsing {
 
@@ -49,7 +49,7 @@ public class WorldParsing {
 		System.out.println();
 
 		System.out.println("  running world algorithms... ");
-		new WorldValidation().run(world);
+		new WorldMappingInfo().run(world);
 		new WorldBottom2TopCompletion().run(world);
 		System.out.println("  done.");
 

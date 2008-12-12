@@ -16,7 +16,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.Counter;
 import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
-import org.matsim.world.algorithms.WorldValidation;
+import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class PlanRemoveUnselected {
 
@@ -89,7 +89,7 @@ public class PlanRemoveUnselected {
 		Gbl.getWorld().complete();
 		new WorldCheck().run(Gbl.getWorld());
 		new WorldBottom2TopCompletion().run(Gbl.getWorld());
-		new WorldValidation().run(Gbl.getWorld());
+		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		log.info("world checking done.");
 
