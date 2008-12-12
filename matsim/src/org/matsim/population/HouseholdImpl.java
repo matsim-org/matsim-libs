@@ -20,7 +20,7 @@
 package org.matsim.population;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,14 +35,14 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 	private Map<Id, Person> members;
 
 	private Map<Id, Vehicle> vehicles;
-	
-	public HouseholdImpl(Id id) {
+
+	public HouseholdImpl(final Id id) {
 		super(id);
 	}
-	
-	public void addMember(Person member) {
+
+	public void addMember(final Person member) {
 		if (this.members == null) {
-			this.members = new HashMap<Id, Person>();
+			this.members = new LinkedHashMap<Id, Person>();
 		}
 		this.members.put(member.getId(), member);
 		member.setHousehold(this);
@@ -55,23 +55,23 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		}
 		return new ArrayList<Id>(this.members.keySet());
 	}
-	
+
 	@Override
-	public void setMemberIds(List<Id> members) {
+	public void setMemberIds(final List<Id> members) {
 		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
 				"Use method addMember(Person p) instead!");
 	}
-	
+
 	public Map<Id, Person> getMembers() {
 		return this.members;
 	}
 
 	@Override
-	public void setVehicleIds(List<Id> vehicleIds) {
+	public void setVehicleIds(final List<Id> vehicleIds) {
 		throw new UnsupportedOperationException("Do not set only Ids on this level in inheritance hierarchy!" +
 		"Use method addVehicle() instead!");
 	}
-	
+
 	@Override
 	public List<Id> getVehicleIds() {
 		if (this.vehicles == null) {
@@ -79,14 +79,14 @@ public class HouseholdImpl extends BasicHouseholdImpl implements Household {
 		}
 		return new ArrayList<Id>(this.vehicles.keySet());
 	}
-	
+
 	public Map<Id, Vehicle> getVehicles() {
 		return this.vehicles;
 	}
 
-	public void addVehicle(Vehicle v) {
+	public void addVehicle(final Vehicle v) {
 		if (this.vehicles == null) {
-			this.vehicles = new HashMap<Id, Vehicle>();
+			this.vehicles = new LinkedHashMap<Id, Vehicle>();
 		}
 		this.vehicles.put(v.getId(), v);
 	}
