@@ -195,8 +195,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		}
 
 		// try to get the dtd from the web
-		log.info("Trying to get some info (e.g. dtd) from www.matsim.org.  In some cases (e.g. network interface up but no connection),");
-		log.info(" this may take a bit ..." ) ;
+		log.info("Trying to load " + systemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
 		try {
 			InputStream is = new URL(systemId).openStream();
 			/* If there was no exception until here, than the path is valid.
@@ -205,7 +204,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return new InputSource(is);
 		} catch (IOException e) {
 			// There was a problem getting the (remote) file, just show the error as information for the user
-			Logger.getLogger(this.getClass()).error(e.toString() + ". May not be fatal." ) ;
+			log.error(e.toString() + ". May not be fatal." ) ;
 		}
 
 		// systemId could not be resolved, try it locally
@@ -214,7 +213,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			String localFileName = config.global().getLocalDtdBase() + shortSystemId;
 			File dtdFile = new File(localFileName);
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				Logger.getLogger(this.getClass()).info("Using the local DTD " + localFileName);
+				log.info("Using the local DTD " + localFileName);
 				return new InputSource(localFileName);
 			}
 		}
@@ -222,12 +221,12 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
-			Logger.getLogger(this.getClass()).info("Using local DTD from jar-file " + shortSystemId);
+			log.info("Using local DTD from jar-file " + shortSystemId);
 			return new InputSource(stream);
 		}
 
 		// We could neither get the remote nor the local version of the dtd, show a warning
-		Logger.getLogger(this.getClass()).warn("Could neither get the DTD from the web nor a local one. " + systemId);
+		log.warn("Could neither get the DTD from the web nor a local one. " + systemId);
 		return null;
 	}
 
