@@ -170,6 +170,12 @@ public class Facilities extends Layer implements Iterable<Facility> {
 		return facs;
 	}
 
+	// implementation of Iterable
+	@SuppressWarnings("unchecked")
+	public final Iterator<Facility> iterator() {
+		return (Iterator<Facility>) getFacilities().values().iterator();
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// print methods
 	//////////////////////////////////////////////////////////////////////
@@ -182,11 +188,5 @@ public class Facilities extends Layer implements Iterable<Facility> {
 
 	public final void printFacilitiesCount() {
 		log.info("    facility # " + this.counter);
-	}
-
-	// implementation of Iterable
-	@SuppressWarnings("unchecked")
-	public final Iterator<Facility> iterator() {
-		return (Iterator<Facility>) getFacilities().values().iterator();
 	}
 }
