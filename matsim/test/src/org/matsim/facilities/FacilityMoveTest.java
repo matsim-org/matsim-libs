@@ -42,7 +42,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 		new CoordImpl(1.0,1.0), new CoordImpl(0.5,1.0), new CoordImpl(0.5,0.5),
 		new CoordImpl(0.0,0.0), new CoordImpl(-0.5,-0.5)
 	};
-	private static final int[] F_UP_SIZE = { 5, 3, 2, 1, 1 };
+	private static final String[] F_UP_ZONEID = { "z", "z", "z", "z00", null };
 	private static final String[] F_DOWN_LINKID = { "l0011", "l0211", "l0211", "l0011", "l0011" };
 	
 	//////////////////////////////////////////////////////////////////////
@@ -82,7 +82,10 @@ public class FacilityMoveTest extends MatsimTestCase {
 	
 	private final void validate(World world, int i) {
 		Facility f = (Facility)world.getLayer(Facilities.LAYER_TYPE).getLocations().values().iterator().next();
-		if (world.getLayer(ZONE_ID) != null) { assertEquals(F_UP_SIZE[i],f.getUpMapping().size()); }
+		if (world.getLayer(ZONE_ID) != null) {
+			if (f.getUpMapping().isEmpty()) { assertNull(F_UP_ZONEID[i]); }
+			else { assertEquals(F_UP_ZONEID[i],f.getUpMapping().values().iterator().next().getId().toString()); }
+		}
 		else { assertEquals(0,f.getUpMapping().size()); }
 		
 		if (world.getLayer(NetworkLayer.LAYER_TYPE) != null) { assertEquals(F_DOWN_LINKID[i],f.getLink().getId().toString()); }

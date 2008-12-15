@@ -35,6 +35,7 @@ import org.matsim.utils.geometry.Coord;
 import org.matsim.world.AbstractLocation;
 import org.matsim.world.Location;
 import org.matsim.world.World;
+import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
 public class Facility extends AbstractLocation {
@@ -92,9 +93,8 @@ public class Facility extends AbstractLocation {
 	 * will not be updated (i.e. the references to links and facilities in a {@link Plan}
 	 * of an agent of the {@link Population}).</p>
 	 * 
-	 * <p><b>Mapping rule (zone-facility):</b> The facility gets all zones assigned, in which 
-	 * the facility is located in, or---if the facility is located outside of all given zones,
-	 * the nearest zone is assigned.</p>
+	 * <p><b>Mapping rule (zone-facility):</b> The facility gets one zones assigned, in which 
+	 * the facility is located in, or---if no such zone exists---the facility does not get a zone assigned.</p>
 	 * 
 	 * <p><b>Mapping rule (facility-link):</b> The facility gets the nearest right entry link assigned
 	 * (see also {@link NetworkLayer#getNearestRightEntryLink(Coord)}).</p>
@@ -109,11 +109,18 @@ public class Facility extends AbstractLocation {
 			removeAllUpMappings();
 			ZoneLayer zones = (ZoneLayer)layer.getUpRule().getUpLayer();
 			ArrayList<Location> nearestZones = zones.getNearestLocations(center);
-			log.info("  added "+nearestZones.size()+" new up-mappings (zone):");
-			for (Location z : nearestZones) {
-				addUpMapping(z);
-				z.addDownMapping(this);
-				log.info("  - zone id="+z.getId());
+			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
+			else {
+				// choose the first of the list (The list is generated via a defined order of the zones,
+				// therefore the chosen zone is deterministic). 
+				Zone z = (Zone)nearestZones.get(0);
+				if (!z.contains(center)) { /* f is not located IN any of the nearest zones */ }
+				else {
+					addUpMapping(z);
+					z.addDownMapping(this);
+					log.info("  added "+up_mapping.size()+" new up-mappings (zone):");
+					log.info("  - zone id="+z.getId());
+				}
 			}
 		}
 		if (layer.getDownRule() != null) {

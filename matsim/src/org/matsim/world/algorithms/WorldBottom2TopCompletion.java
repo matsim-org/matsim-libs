@@ -22,25 +22,34 @@ package org.matsim.world.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
-import org.matsim.world.MappingRule;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
+/**
+ * Connects locations of neighbor layers.
+ * 
+ * <p>It connects different neighbor layers according to the layer connection produced by {@link World#complete()}.
+ * mappings between two zones will not be touched but the mapping between zone<==>facility, zone<==>link, facility<==>link resp.
+ * will be generated.</p>
+ * 
+ * <p><b>Note:</b> by defining a set of link types that should be excluded from the facility<==>link mapping,
+ * the module is able to set the facilities to links, that actually can be accessed, and e.g. highways can be excluded.</p>
+ * 
+ * @author balmermi
+ */
 public class WorldBottom2TopCompletion {
 
 	//////////////////////////////////////////////////////////////////////
@@ -67,144 +76,184 @@ public class WorldBottom2TopCompletion {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mapNetFac(Facilities up_facilities, NetworkLayer down_network) {
-		Iterator<? extends Location> f_it = up_facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility up_f = (Facility)f_it.next();
-			Link down_link = down_network.getNearestRightEntryLink(up_f.getCenter());
-			up_f.addDownMapping(down_link);
-			down_link.addUpMapping(up_f);
-		}
-	}
-	
-	private final boolean completeNetFacMapping(final MappingRule m) {
-		Facilities up_facilities = (Facilities)m.getUpLayer();
-		NetworkLayer down_network = (NetworkLayer)m.getDownLayer();
-
+	/**
+	 * Extracts those links and nodes from the given {@link NetworkLayer network} such
+	 * that all links with types given in {@link #excludingLinkTypes} are excluded.
+	 * It returns a newly created network. The given one will not be changed.
+	 * 
+	 * <p><b>Note:</b> The new network that will be returned is not necessarily a 
+	 * "cleaned one" (strongly connected digraph), but "empty {@link Node nodes}" are removed.</p>
+	 * 
+	 * @param network the network that will be the base for created a sub-network
+	 * @return copy of the given network without links with type given in {@link #excludingLinkTypes}
+	 * and without empty nodes
+	 */
+	private final NetworkLayer extractSubNetwork(final NetworkLayer network) {
+		log.info("  extracting sub network...");
 		// get all links from the network with specified link types
-		ArrayList<Link> linksRemoved = new ArrayList<Link>();
-		for (Link l : down_network.getLinks().values()) { if (this.excludingLinkTypes.contains(l.getType())) { linksRemoved.add(l); } }
-
-		if (linksRemoved.size() == down_network.getLinks().size()) {
+		ArrayList<Link> remainingLinks = new ArrayList<Link>();
+		for (Link l : network.getLinks().values()) {
+			if (!excludingLinkTypes.contains(l.getType())) { remainingLinks.add(l); }
+		}
+		if (remainingLinks.isEmpty()) {
 			StringBuffer str = new StringBuffer();
 			for (String s : this.excludingLinkTypes) { str.append(s); str.append(","); }
-			log.warn("No link will be left for the given link types ("+str+"). Therefore, completing the network-facility mapping with the whole network.");
-
-			// find and assign the nearest (right entry) link of all links to each facility
-			this.mapNetFac(up_facilities,down_network);
+			log.warn("No link will be left for the given link types ("+str+"). Therefore, connecting the facility<-->link mapping with the whole network.");
+			return network;
 		}
-		else {
-			// remove all links from the network with specified link types
-			for (Link l : linksRemoved) { down_network.removeLink(l); }
-			
-			// also remove all nodes which have now no incident links
-			ArrayList<Node> nodesRemoved = new ArrayList<Node>();
-			for (Node n : down_network.getNodes().values()) { if (n.getIncidentLinks().isEmpty()) { nodesRemoved.add(n); } }
-			for (Node n : nodesRemoved) { down_network.removeNode(n); }
+		NetworkLayer subNetwork = new NetworkLayer();
+		// add nodes and links to the subNetwork
+		for (Link l : remainingLinks) {
+			Node fn = l.getFromNode();
+			Node nfn = subNetwork.getNode(fn.getId());
+			if (nfn == null) { nfn = subNetwork.createNode(fn.getId(),fn.getCoord()); }
 
-			// find and assign the nearest (right entry) link of the remaining links to each facility
-			this.mapNetFac(up_facilities,down_network);
-			
-			// restore the removed nodes
-			for (Node n : nodesRemoved) {
-				down_network.createNode(n.getId(),n.getCoord(),n.getType());
-			}
+			Node tn = l.getToNode();
+			Node ntn = subNetwork.getNode(tn.getId());
+			if (ntn == null) { ntn = subNetwork.createNode(tn.getId(),tn.getCoord()); }
 
-			// restore the removed links
-			for (Link l : linksRemoved) {
-				down_network.createLink(l.getId(),l.getFromNode(),l.getToNode(),
-				    l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),
-				    l.getCapacity(Time.UNDEFINED_TIME),l.getLanes(Time.UNDEFINED_TIME),
-				    l.getOrigId(),l.getType());
-			}
+			subNetwork.createLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getLanes(Time.UNDEFINED_TIME));
 		}
-		return true;
+		log.info("  done.");
+		return subNetwork;
 	}
-
-	private final boolean completeNetZoneMapping(final MappingRule m) {
-		log.warn("[completeNetZoneMapping()] TODO: No mapping will be created for rule=" + m);
-		return true;
-	}
-
-	private final boolean completeFacZoneMapping(final MappingRule m) {
-		// Iterates through ALL zones and ALL facilities. JH
-		Facilities down_facilities = (Facilities)m.getDownLayer();
-		ZoneLayer up_zones = (ZoneLayer)m.getUpLayer();
-		Iterator<? extends Location> f_it = down_facilities.getLocations().values().iterator();
-		while (f_it.hasNext()) {
-			Facility down_f = (Facility)f_it.next();
-			ArrayList<Zone> zones = new ArrayList<Zone>();
-			Iterator<? extends Location> z_it = up_zones.getLocations().values().iterator();
-			while(z_it.hasNext()){
-				Zone up_zone = (Zone)z_it.next();
-				if(up_zone.contains(down_f.getCenter())){
-					zones.add(up_zone);
-				}
-			}
-			if(zones.isEmpty()){
-				log.warn("[completeFacZoneMapping()] No Zone found for "+ down_f);
-			}
-			else {
-				Zone zone = zones.get(MatsimRandom.random.nextInt(zones.size()));
-				down_f.addUpMapping(zone);
-				zone.addDownMapping(down_f);
-			}
-		}
-		return true;
-	}
-
-	private final boolean completeZoneZoneMapping(final MappingRule m) {
-		return true;
-	}
-
+	
 	//////////////////////////////////////////////////////////////////////
 
-	private final boolean completeMapping(final MappingRule m) {
-		Layer up_layer = m.getUpLayer();
-		Layer down_layer = m.getDownLayer();
-		if (down_layer instanceof NetworkLayer) {
-			if (up_layer instanceof Facilities) { return this.completeNetFacMapping(m); }
-			else if (up_layer instanceof ZoneLayer) { return this.completeNetZoneMapping(m); }
-			else { Gbl.errorMsg("This should never happen!"); }
+	/**
+	 * Sets the mapping between each {@link Facility facility} of the given {@link Facilities facility layer} and
+	 * the {@link Link links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
+	 * given {@link World world}, but the {@link NetworkLayer network} does not have to be necessarily part of the
+	 * world. It could also be a sub-network of the network of the {@link World world} as created by the method {@link #extractSubNetwork(NetworkLayer)}.
+	 * In both cases the facility layer will be connected with the network in the same world.
+	 * 
+	 * <p><b>Mapping rule:</b> each {@link Facility facility} of the {@link Facilities facilities layer} will be
+	 * connected with <em>exactly</em> one link of the {@link NetworkLayer network layer}. the links of the network will get zero, one or many mappings to
+	 * facilities of the facilities layer. (facilities[*]-[1]links)</p>
+	 * 
+	 * @param facilities a layer of the world
+	 * @param network either a layer of the world or a network created with {@link #extractSubNetwork(NetworkLayer)} from a network layer of the world.
+	 * @param world the world in which the facility and the network layer will be mapped
+	 */
+	private final void connect(Facilities facilities, NetworkLayer network, World world) {
+		log.info("  connecting facilities with links...");
+		for (Facility f : facilities.getFacilities().values()) {
+			// remove previous mappings for facility f
+			if (!f.removeAllDownMappings()) { throw new RuntimeException("could not remove old factivity<-->link mappings"); }
+			// add the nearest right entry link mapping to the facility f
+			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
+			Location l = network.getNearestRightEntryLink(f.getCenter());
+			l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
+			if (!world.addMapping(f,l)) { throw new RuntimeException("could not add nearest right entry factivity<-->link mappings"); }
 		}
-		else if (down_layer instanceof Facilities) {
-			if (up_layer instanceof ZoneLayer) {
-				return this.completeFacZoneMapping(m);
+		log.info("  done.");
+	}
+	
+	/**
+	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
+	 * the {@link Facility facilities} of the {@link Facilities facility layer} as part of a {@link World world}.
+	 * 
+	 * <p><b>Mapping rule:</b> each {@link Facility facility} of the {@link Facilities facilities layer} will be
+	 * connected with zero or one zone. A zone will only be assigned if the facility is located within the zone.
+	 * If more than one zone exists for which the facility is located in, the first one (smallest zone {@link Id id})
+	 * will be chosen. (zones[?]-[*]facilities)</p>
+	 * 
+	 * @param zones a layer of the world
+	 * @param facilities a layer of the world
+	 * @param world the world in which the zone and the facility layer will be mapped
+	 */
+	private final void connect(ZoneLayer zones, Facilities facilities, World world) {
+		log.info("  connecting zones with facilities...");
+		for (Facility f : facilities.getFacilities().values()) {
+			// remove previous mappings for facility f
+			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
+			// add the zone mapping to facility f
+			ArrayList<Location> nearestZones = zones.getNearestLocations(f.getCenter());
+			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
+			else {
+				// choose the first of the list (The list is generated via a defined order of the zones,
+				// therefore the chosen zone is deterministic). 
+				Zone z = (Zone)nearestZones.get(0);
+				if (!z.contains(f.getCenter())) { /* f is not located IN any of the nearest zones */ }
+				else {
+					if (!world.addMapping(z,f)) { throw new RuntimeException("could not add zone<-->facility mapping"); }
+				}
 			}
-			Gbl.errorMsg("This should never happen!");
 		}
-		else if (down_layer instanceof ZoneLayer) {
-			if (up_layer instanceof ZoneLayer) {
-				return this.completeZoneZoneMapping(m);
-			}
-			Gbl.errorMsg("This should never happen!");
-		}
-		else { Gbl.errorMsg("That's very weird!!!"); }
-		return false;
+		log.info("  done.");
 	}
 
+	/**
+	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
+	 * the {@link Link links} of the {@link NetworkLayer network layer} as part of a {@link World world}.
+	 * 
+	 * <p><b>Mapping rule:</b> each {@link Link link} of the {@link NetworkLayer network layer} will be
+	 * connected with zero or one zone. A zone will only be assigned if the center of the link is located within the zone.
+	 * If more than one zone exists for which the center of the link is located in, the first one (smallest zone {@link Id id})
+	 * will be chosen. (zones[?]-[*]links)</p>
+	 * 
+	 * @param zones a layer of the world
+	 * @param network a layer of the world
+	 * @param world the world in which the zone and the network layer will be mapped
+	 */
+	private final void connect(ZoneLayer zones, NetworkLayer network, World world) {
+		log.info("  connecting zones with links...");
+		for (Link l : network.getLinks().values()) {
+			// remove previous mappings for link l
+			if (!l.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->link mappings");  }
+			// add the zone mapping to link l
+			ArrayList<Location> nearestZones = zones.getNearestLocations(l.getCenter());
+			if (nearestZones.isEmpty()) { /* link does not belong to a zone */ }
+			else {
+				// choose the first of the list (The list is generated via a defined order of the zone,
+				// therefore the chosen zone is deterministic). 
+				Zone z = (Zone)nearestZones.get(0);
+				if (!z.contains(l.getCenter())) { /* link center is not located IN any of the nearest zones */ }
+				else {
+					if (!world.addMapping(z,l)) { throw new RuntimeException("could not add zone<-->link mapping"); }
+				}
+			}
+		}
+		log.info("  done.");
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
 	public void run(World world) {
-		log.info("    running " + this.getClass().getName() + " module...");
+		log.info("running " + this.getClass().getName() + " module (MATSim-FUSION)...");
 
-		world.complete();
-
-		int nof_layers = world.getLayers().size();
-		if (nof_layers == 0) { log.info("      nof_layers=0: Nothing to do."); }
-		else if (nof_layers == 1) { log.info("      nof_layers=1: Nothing to do."); }
-		else {
-			Layer l = world.getBottomLayer();
-			while (l.getUpRule() != null) {
-				MappingRule m = l.getUpRule();
-				boolean ok = this.completeMapping(m);
-				if (!ok) { Gbl.errorMsg("m=" + m + ": completion was not successful!"); }
-				l = m.getUpLayer();
+		if (world.getLayers().size() > 1) {
+			Layer downLayer = world.getBottomLayer();
+			while (downLayer.getUpRule() != null) {
+				Layer upLayer = downLayer.getUpRule().getUpLayer();
+				if (downLayer.getLocations().isEmpty() || upLayer.getLocations().isEmpty()) {
+					log.warn("downLayer="+downLayer.getType()+", upLayer="+upLayer.getType()+
+					         ": mapping cannot be set since at least one of the layers does not contain any locations. (this may not be fatal)");
+				}
+				else {
+					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof Facilities)) {
+						if (excludingLinkTypes.isEmpty()) {
+							connect((Facilities)upLayer,(NetworkLayer)downLayer,world);
+						}
+						else {
+							NetworkLayer subNetwork = extractSubNetwork((NetworkLayer)downLayer);
+							connect((Facilities)upLayer,subNetwork,world);
+						}
+					}
+					else if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ZoneLayer)) {
+						connect((ZoneLayer)upLayer,(NetworkLayer)downLayer,world);
+					}
+					else if ((downLayer instanceof Facilities) && (upLayer instanceof ZoneLayer)) {
+						connect((ZoneLayer)upLayer,(Facilities)downLayer,world);
+					}
+					else { /* zone<-->zone: nothing to do (keep it as it is) */ }
+				}
+				downLayer = upLayer;
 			}
 		}
 
-		log.info("    done.");
+		log.info("done.");
 	}
 }

@@ -21,7 +21,9 @@
 package org.matsim.world;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
+import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 
 public class World {
 
@@ -54,60 +57,15 @@ public class World {
 	// complete
 	//////////////////////////////////////////////////////////////////////
 
-	private final void completeZoneLayers() {
-		// get zone layers
-		ArrayList<ZoneLayer> zlayers = new ArrayList<ZoneLayer>();
-		Iterator<Id> lid_it = this.layers.keySet().iterator();
-		while (lid_it.hasNext()) {
-			Id lid = lid_it.next();
-			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != Facilities.LAYER_TYPE)) {
-				zlayers.add((ZoneLayer)this.layers.get(lid));
-			}
-		}
-
-		if (zlayers.size() > 0) {
-			if (zlayers.size() != (this.rules.size()+1)) {
-				throw new RuntimeException("This should never happen!");
-			}
-
-			// find the top layer
-			this.top_layer = null;
-			for (int i=0; i<zlayers.size(); i++) {
-				Layer l = zlayers.get(i);
-				if (zlayers.get(i).getUpRule() == null) { this.top_layer = l; }
-			}
-			if (this.top_layer == null) {
-				throw new RuntimeException("Something is completely wrong!");
-			}
-
-			// find the bottom layer
-			int step_cnt = 1;
-			this.bottom_layer = this.top_layer;
-			while (this.bottom_layer.getDownRule() != null) {
-				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
-				step_cnt++;
-			}
-			if (step_cnt != zlayers.size()) {
-				throw new RuntimeException("Something is completely wrong!");
-			}
-
-		}
-		else {
-			if (!this.rules.isEmpty()) {
-				throw new RuntimeException("This should never happen!");
-			}
-			this.top_layer = null;
-			this.bottom_layer = null;
-		}
-	}
-
 	public final void complete() {
-		// first, remove rules and mappings containing network and/or facility layers
+		complete(new HashSet<String>());
+	}
+	
+	public final void complete(Set<String> excludingLinkTypes) {
+		// 1. remove rules and mappings containing network and/or facility layers
 		Layer f_layer = this.layers.get(Facilities.LAYER_TYPE);
 		Layer n_layer = this.layers.get(NetworkLayer.LAYER_TYPE);
-		Iterator<Layer> l_it = this.layers.values().iterator();
-		while (l_it.hasNext()) {
-			Layer l = l_it.next();
+		for (Layer l : layers.values()) {
 			if (f_layer != null) {
 				this.removeMappingRule(f_layer.getType(),l.getType());
 				this.removeMappingRule(l.getType(),f_layer.getType());
@@ -117,53 +75,66 @@ public class World {
 				this.removeMappingRule(l.getType(),n_layer.getType());
 			}
 		}
-
-		// second, complete the zone layers
-		this.completeZoneLayers();
-
-		// third, create rules and mappings for the facility layer
+		// 2. complete the zone layers
+		// 2.1. get the zone layers
+		ArrayList<ZoneLayer> zlayers = new ArrayList<ZoneLayer>();
+		Iterator<Id> lid_it = this.layers.keySet().iterator();
+		while (lid_it.hasNext()) {
+			Id lid = lid_it.next();
+			if ((lid != NetworkLayer.LAYER_TYPE) && (lid != Facilities.LAYER_TYPE)) {
+				zlayers.add((ZoneLayer)this.layers.get(lid));
+			}
+		}
+		// 2.2 set the top and bottom layer reference
+		if (zlayers.size() == 0) {
+			if (!this.rules.isEmpty()) { throw new RuntimeException("data inconsistency"); }
+			this.top_layer = null;
+			this.bottom_layer = null;
+		}
+		else { // zlayers.size() > 0
+			if (zlayers.size() != (this.rules.size()+1)) { throw new RuntimeException("data inconsistency"); }
+			// 2.2.1. find the top layer
+			this.top_layer = null;
+			for (int i=0; i<zlayers.size(); i++) {
+				Layer l = zlayers.get(i);
+				if (zlayers.get(i).getUpRule() == null) { this.top_layer = l; }
+			}
+			if (this.top_layer == null) { throw new RuntimeException("data inconsistency"); }
+			// 2.2.2. find the bottom layer
+			int step_cnt = 1;
+			this.bottom_layer = this.top_layer;
+			while (this.bottom_layer.getDownRule() != null) {
+				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
+				step_cnt++;
+			}
+			if (step_cnt != zlayers.size()) { throw new RuntimeException("data inconsistency"); }
+		}
+		// 3. create mapping rule (but no zone<->facility mappings) for the facility layer
 		if (f_layer != null) {
-			if (this.bottom_layer == null) {
-				// no zone layers exist
+			if (this.bottom_layer == null) { // no zone layers exist
 				this.top_layer = this.bottom_layer = f_layer;
 			}
 			else {
-				// TODO [balmermi] actually we could defined a specific mapping rule,
-				// but then we need to set the mappings also.
-				// So, i'm too lazy and define the mapping "m-m".
 				this.createMappingRule(f_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-				// same as this.bottom_layer = f_layer, but with error checks
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
 		}
-
-		// forth, create rules and mappings for the net layer
+		// 4. create mapping rule (but no facility<->link mappings) for the net layer
 		if (n_layer != null) {
-			if (this.bottom_layer == null) {
-				// no zone nor facility layer exist
+			if (this.bottom_layer == null) { // no zone nor facility layer exist
 				this.top_layer = this.bottom_layer = n_layer;
 			}
 			else if (this.bottom_layer.getType() == Facilities.LAYER_TYPE) {
-				// TODO [balmermi] a facility belongs to exactly one link
-				// and a link contains zero, one or may facilities. The actual
-				// mapping needs to be done later (as a MATSim-FUSION module)
-				this.createMappingRule(n_layer.getType().toString() + "[1]-[*]" + this.bottom_layer.getType().toString());
-				// same as this.bottom_layer = n_layer, but with error checks
+				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
 			else {
-				// TODO [balmermi] actually we could defined a specific mapping rule,
-				// but then we need to set the mappings also.
-				// So, i'm too lazy and define the mapping "m-m".
-				// TODO [balmermi] actually it does not make that sense
-				// to connect the network with a zone layer anymore, since the
-				// facility layer shoulkd be in between. Well... we will change
-				// the whole strucutre anyway...
 				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-				// same as this.bottom_layer = n_layer, but with error checks
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
 			}
 		}
+		// 5. connect the locations from neighbor layers
+		new WorldBottom2TopCompletion(excludingLinkTypes).run(this);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -287,7 +258,7 @@ public class World {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void addMapping(Location loc1, Location loc2) {
+	public final boolean addMapping(Location loc1, Location loc2) {
 		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
 			// loc1 = down_loc; loc2 = up_loc
 			loc1.addUpMapping(loc2);
@@ -298,7 +269,9 @@ public class World {
 			loc2.addUpMapping(loc1);
 		} else {
 			log.warn(this.toString() + "[loc1=" + loc1 + ",loc2=" + loc2 + " mapping rule not found]");
+			return false;
 		}
+		return true;
 	}
 
 	protected final void addMapping(final MappingRule mapping_rule, final String down_zone_id, final String up_zone_id) {

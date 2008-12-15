@@ -32,6 +32,7 @@ public class AllTests {
 		suite.addTest(org.matsim.facilities.algorithms.AllTests.suite());
 		suite.addTestSuite(FacilitiesTest.class);
 		suite.addTestSuite(FacilitiesParserWriterTest.class);
+		suite.addTestSuite(FacilityMoveTest.class);
 		//$JUnit-END$
 		return suite;
 	}
