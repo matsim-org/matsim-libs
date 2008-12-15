@@ -37,7 +37,7 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.replanning.modules.ExternalModule;
 import org.matsim.replanning.modules.PlanomatExe;
-import org.matsim.replanning.modules.PlanomatOptimizeTimes;
+import org.matsim.replanning.modules.PlanomatModule;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
@@ -135,12 +135,12 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(controler);
+				StrategyModule planomatStrategyModule = new PlanomatModule(controler);
 				strategy.addStrategyModule(planomatStrategyModule);
 //				setDecayingModuleProbability(manager, strategy, 100, rate); // FIXME [KM] Why "100" and not controler.firstIteration as in "PlanomatReRoute"
 			} else if (classname.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(controler);
+				StrategyModule planomatStrategyModule = new PlanomatModule(controler);
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 				setDecayingModuleProbability(manager, strategy, Gbl.getConfig().controler().getFirstIteration(), rate);

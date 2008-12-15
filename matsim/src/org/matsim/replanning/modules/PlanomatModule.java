@@ -22,7 +22,7 @@ package org.matsim.replanning.modules;
 
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.planomat.PlanOptimizeTimes;
+import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -33,12 +33,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author meisterk
  */
-public class PlanomatOptimizeTimes extends MultithreadedModuleA {
+public class PlanomatModule extends MultithreadedModuleA {
 
 	private Controler controler;
 	private DepartureDelayAverageCalculator tDepDelayCalc = null;
 	
-	public PlanomatOptimizeTimes(Controler controler) {
+	public PlanomatModule(Controler controler) {
 		super();
 		this.controler = controler;
 	}
@@ -64,7 +64,7 @@ public class PlanomatOptimizeTimes extends MultithreadedModuleA {
 				this.controler.getNetwork());
 		
 		PlanAlgorithm planomatAlgorithm = null;
-		planomatAlgorithm = new PlanOptimizeTimes(
+		planomatAlgorithm = new Planomat(
 				legTravelTimeEstimator, 
 				this.controler.getScoringFunctionFactory());
 

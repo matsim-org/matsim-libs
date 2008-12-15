@@ -58,11 +58,11 @@ import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.utils.misc.Time;
 
-public class PlanOptimizeTimesTest extends MatsimTestCase {
+public class PlanomatTest extends MatsimTestCase {
 
 	private enum PlanomatTestRun {NOEVENTS_CAR, WITHEVENTS_CAR, NOEVENTS_CAR_PT, WITHEVENTS_CAR_PT;}
 
-	private static final Logger log = Logger.getLogger(PlanOptimizeTimesTest.class);
+	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
@@ -135,7 +135,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 		testee.getSeedGenerator().setSeed(Gbl.getConfig().global().getRandomSeed());
 
 		log.info("Testing " + testRun.toString() + "...");
@@ -204,7 +204,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 
 		IChromosome testChromosome = null;
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(null, null);
+		Planomat testee = new Planomat(null, null);
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(testPlan);
@@ -273,7 +273,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		ltte = new CharyparEtAlCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 
 		// run the method
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, null);
+		Planomat testee = new Planomat(ltte, null);
 
 		testee.writeChromosome2Plan(testChromosome, testPlan, planAnalyzeSubtours);
 
@@ -314,7 +314,7 @@ public class PlanOptimizeTimesTest extends MatsimTestCase {
 		LegTravelTimeEstimator ltte = new CetinCompatibleLegTravelTimeEstimator(tTravelEstimator, travelCostEstimator, depDelayCalc, network);
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory();
 
-		PlanOptimizeTimes testee = new PlanOptimizeTimes(ltte, scoringFunctionFactory);
+		Planomat testee = new Planomat(ltte, scoringFunctionFactory);
 
 		for (Person person : this.population) {
 

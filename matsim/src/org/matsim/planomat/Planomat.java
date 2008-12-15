@@ -61,7 +61,7 @@ import org.matsim.utils.misc.Time;
  * @author meisterk
  *
  */
-public class PlanOptimizeTimes implements PlanAlgorithm {
+public class Planomat implements PlanAlgorithm {
 
 	/**
 	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome. 
@@ -73,7 +73,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 
 	private Random seedGenerator = null;
 	
-	public PlanOptimizeTimes(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
+	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
@@ -153,7 +153,7 @@ public class PlanOptimizeTimes implements PlanAlgorithm {
 		try {
 
 			for (int ii=0; ii < planAnalyzeSubtours.getSubtourIndexation().length; ii++) {
-				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, PlanOptimizeTimes.MAX_ACTIVITY_DURATION));
+				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, Planomat.MAX_ACTIVITY_DURATION));
 			}
 
 			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
