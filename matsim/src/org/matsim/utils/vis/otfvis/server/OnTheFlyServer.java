@@ -260,7 +260,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public void pause()  throws RemoteException{
-		status = PAUSE;
+		synchronized (updateFinished) {
+			status = PAUSE;
+		}
 	}
 
 	public void play()  throws RemoteException{

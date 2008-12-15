@@ -421,20 +421,18 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
-		synchronized(blockReading) {
-			int i=0;
-			if (host.requestNewTime(newTime, prefTime)) {
-				simTime = host.getLocalTime();
-				invalidateHandlers();
-				return true;
-			}
-			if (prefTime == OTFServerRemote.TimePreference.EARLIER) {
-				System.out.println("No previous timestep found");
-			} else {
-				System.out.println("No succeeding timestep found");
-			}
-			return false;
+		int i=0;
+		if (host.requestNewTime(newTime, prefTime)) {
+			simTime = host.getLocalTime();
+			invalidateHandlers();
+			return true;
 		}
+		if (prefTime == OTFServerRemote.TimePreference.EARLIER) {
+			System.out.println("No previous timestep found");
+		} else {
+			System.out.println("No succeeding timestep found");
+		}
+		return false;
 	}
 
 	private void pressed_STEP_F() throws IOException {
@@ -625,6 +623,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			try {
 				if(!host.isLive()) return;
 				// this is only calles for Live Servers!
+				// before we sent the host sleeping, we make sure, there i no pending getTimeStep waiting for results
 				if (synchronizedPlay) ((OTFLiveServerRemote)host).pause();
 				else ((OTFLiveServerRemote)host).play();
 			} catch (RemoteException e) {
