@@ -72,8 +72,8 @@ public class RandomLocationMutator extends LocationMutator {
 				// only one facility: do not need to do location choice
 				if (length > 1) {
 				//	Facility facility = (Facility)this.quad_trees.get(act.getType()).values().toArray()[
-				//	                       MatsimRandom.random.nextInt(size-1)];
-					Facility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.random.nextInt(length-1)];
+				//	                       MatsimRandom.random.nextInt(size)];
+					Facility facility = this.facilities_of_type.get(act.getType())[MatsimRandom.random.nextInt(length)];
 					
 					act.setFacility(facility);
 					act.setLink(this.network.getNearestLink(facility.getCenter()));
