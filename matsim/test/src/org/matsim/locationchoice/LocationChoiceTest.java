@@ -13,20 +13,26 @@ import org.matsim.testcases.MatsimTestCase;
 public class LocationChoiceTest  extends MatsimTestCase {
 	
 	private LocationChoice locationchoice = null;
-	private Controler controler = null;
+	private Initializer initializer;
 	
 	public LocationChoiceTest() {
-		this.initialize();
 	}
 	
-	private void initialize() {
-		Gbl.reset();
-		String path = "test/input/org/matsim/locationchoice/config.xml";		
-		String configpath[] = {path};
-		controler = new Controler(configpath);
-		controler.setOverwriteFiles(true);
-		controler.run();		
-		this.locationchoice = new LocationChoice(controler.getNetwork(), controler);
+	protected void setUp() throws Exception {
+        super.setUp();
+        this.initializer = new Initializer();
+        this.initializer.init(this);
+        this.initialize();     
+    }
+	
+	protected void tearDown() throws Exception {
+         super.tearDown();
+         Gbl.reset();
+    }
+	
+	private void initialize() {		
+		this.locationchoice = new LocationChoice(this.initializer.getControler().getNetwork(), 
+				this.initializer.getControler());
 	}
 	
 	public void testConstructorandInitLocal() {
@@ -38,7 +44,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		IllegalAccessException, InvocationTargetException {
 		
 		// TODO: why is it not working in constructor?
-		this.initialize();
+		//this.initialize();
 		
 		locationchoice.setControler(null);
 		locationchoice.setNetwork(null);
@@ -48,14 +54,15 @@ public class LocationChoiceTest  extends MatsimTestCase {
         Method method = null;
 		method = this.locationchoice.getClass().getDeclaredMethod("initLocal", new Class[]{NetworkLayer.class, Controler.class});
 		method.setAccessible(true);
-		method.invoke(this.locationchoice, new Object[]{controler.getNetwork(), controler});
+		method.invoke(this.locationchoice, new Object[]{this.initializer.getControler().getNetwork(),
+				this.initializer.getControler()});
 		
 		assertNotNull("controler not initialized", this.locationchoice.getControler());
 		assertNotNull("network not initialized", this.locationchoice.getNetwork());
 	}
 	
 	public void testGetPlanAlgoInstance() {
-		this.initialize();
+		//this.initialize();
 		locationchoice.setConstrained(false);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
 		locationchoice.setConstrained(true);
@@ -63,7 +70,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	}	
 	
 	public void testFinish() {	
-		this.initialize();
+		//this.initialize();
 		locationchoice.getPlanAlgoInstance();
 		assertEquals(false, locationchoice.getPlanAlgoInstances().isEmpty());
 		locationchoice.init();

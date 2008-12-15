@@ -3,32 +3,33 @@ package org.matsim.locationchoice.constrained;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
-import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.Initializer;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ManageSubchainsTest extends MatsimTestCase {
 	
 	private ManageSubchains manager = null;
-	private Controler controler = null;
+	private Initializer initializer;
 	
 	public ManageSubchainsTest() {
 		manager = new ManageSubchains();
-		this.initialize();
 	}
 	
-	private void initialize() {
-		Gbl.reset();
-		String path = "test/input/org/matsim/locationchoice/config.xml";		
-		String configpath[] = {path};
-		controler = new Controler(configpath);
-		controler.setOverwriteFiles(true);
-		controler.run();		
-	}
+	protected void setUp() throws Exception {
+        super.setUp();
+        this.initializer = new Initializer();
+        this.initializer.init(this);     
+    }
+	
+	protected void tearDown() throws Exception {
+         super.tearDown();
+         Gbl.reset();
+    }
 	
 	public void testPrimarySecondaryActivityFound() {
-		Plan plan = controler.getPopulation().getPerson("1").getSelectedPlan();
+		Plan plan = this.initializer.getControler().getPopulation().getPerson("1").getSelectedPlan();
 		Act act = plan.getFirstActivity();
 		Leg leg = plan.getNextLeg(act);
 		this.manager.primaryActivityFound(act, leg);

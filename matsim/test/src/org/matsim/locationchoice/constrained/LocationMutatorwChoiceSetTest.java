@@ -4,8 +4,8 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 
 import org.matsim.population.Plan;
-import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.locationchoice.Initializer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -13,19 +13,26 @@ import org.matsim.testcases.MatsimTestCase;
 public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	
 	private LocationMutatorwChoiceSet locationmutator = null;
-	private Controler controler = null;
+	private Initializer initializer;
 	
 	public LocationMutatorwChoiceSetTest() {
 	}
 	
-	private void initialize() {
-		Gbl.reset();
-		String path = "test/input/org/matsim/locationchoice/config.xml";		
-		String configpath[] = {path};
-		controler = new Controler(configpath);
-		controler.setOverwriteFiles(true);
-		controler.run();		
-		this.locationmutator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+	protected void setUp() throws Exception {
+        super.setUp();
+        this.initializer = new Initializer();
+        this.initializer.init(this); 
+        this.initialize();
+    }
+	
+	protected void tearDown() throws Exception {
+         super.tearDown();
+         Gbl.reset();
+    }
+	
+	private void initialize() {		
+		this.locationmutator = new LocationMutatorwChoiceSet(this.initializer.getControler().getNetwork(),
+				this.initializer.getControler());
 	}
 	
 	public void testConstructor() {
@@ -37,7 +44,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	
 	public void testHandlePlan() {
 		this.initialize();
-		Plan plan = controler.getPopulation().getPerson("1").getSelectedPlan();		
+		Plan plan = this.initializer.getControler().getPopulation().getPerson("1").getSelectedPlan();		
 		this.locationmutator.handlePlan(plan);
 		assertEquals(plan.getFirstActivity().getCoord().getX(), -25000.0);
 		assertEquals(plan.getNextLeg(plan.getFirstActivity()).getRoute(), null);
@@ -45,7 +52,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 	
 	public void testCalcActChains() {
 		this.initialize();
-		Plan plan = controler.getPopulation().getPerson("1").getSelectedPlan();		
+		Plan plan = this.initializer.getControler().getPopulation().getPerson("1").getSelectedPlan();		
 		List<SubChain> list = this.locationmutator.calcActChains(plan);
 		assertEquals(list.size(), 1);
 	}
