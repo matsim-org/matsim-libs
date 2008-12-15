@@ -45,6 +45,7 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(getInputDirectory() + "network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		CarRoute route1 = new NodeCarRoute();
 		route1.setNodes("3 6 7 12");

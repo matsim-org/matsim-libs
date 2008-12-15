@@ -197,6 +197,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		final NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 		final QueueNetwork qnet = new QueueNetwork(net);
 
 		final OTFTVeh2MVI test  = new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s);

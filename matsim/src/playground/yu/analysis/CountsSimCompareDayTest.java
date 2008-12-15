@@ -47,6 +47,7 @@ public class CountsSimCompareDayTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();

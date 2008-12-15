@@ -40,6 +40,7 @@ public class ScoringTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("examples/equil/network.xml");
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		Population population = new Population(Population.NO_STREAMING);
 		new MatsimPopulationReader(population).readFile("../mystudies/scoringtest/plans.xml");
 

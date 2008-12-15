@@ -38,7 +38,7 @@ import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.utils.charts.XYScatterChart;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.algorithms.InitializeKnowledge;
@@ -65,7 +65,7 @@ public class AnalyzeActivitySpaces {
 		Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 
 		Population plans = Scenario.readPlans();
 			//read in social network

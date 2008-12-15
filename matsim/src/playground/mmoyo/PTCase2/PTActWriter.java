@@ -42,6 +42,7 @@ public class PTActWriter {
 		config = Gbl.createConfig(new String[]{pt.getConfig(), "http://www.matsim.org/files/dtd/plans_v4.dtd"});
 		Gbl.setConfig(config);
 		Gbl.getWorld().setNetworkLayer(pt.getPtNetworkLayer());
+		Gbl.getWorld().complete();
 
 		this.ptTravelTime =new PTTravelTime(pt.getPtTimeTable());
 		this.ptnProximity= new PTNProximity(this.pt.getPtNetworkLayer()); 

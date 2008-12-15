@@ -42,6 +42,7 @@ public class PadangEventConverter {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
 

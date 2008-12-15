@@ -50,6 +50,7 @@ public class EquilTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		PopulationReader plansReader = new MatsimPopulationReader(population);

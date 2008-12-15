@@ -25,7 +25,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
@@ -49,7 +49,7 @@ public class CreateKMZFromOutput {
 		Scenario.readWorld();
 		Scenario.readFacilities();
 		NetworkLayer network =Scenario.readNetwork();
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 
 		
 //		Write out the KML for the EgoNet of a chosen agent

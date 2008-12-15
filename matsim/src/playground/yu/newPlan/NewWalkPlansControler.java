@@ -41,6 +41,7 @@ public class NewWalkPlansControler {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);

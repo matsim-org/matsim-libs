@@ -61,6 +61,7 @@ public class GenerateDemand {
 		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();
 		Gbl.getWorld().setFacilityLayer(facilityLayer);
+		Gbl.getWorld().complete();
 		System.out.println("Reading facilities...done.");
 		
 		System.out.println("Setting up plans objects...");

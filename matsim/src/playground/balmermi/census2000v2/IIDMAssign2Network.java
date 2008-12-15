@@ -36,7 +36,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -105,7 +105,7 @@ public class IIDMAssign2Network {
 		excludingLinkTypes.add("94"); excludingLinkTypes.add("95"); excludingLinkTypes.add("96"); excludingLinkTypes.add("97");
 		excludingLinkTypes.add("98"); excludingLinkTypes.add("99");
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(Gbl.getWorld());
+		new WorldConnectLocations(excludingLinkTypes).run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 		log.info("  done.");

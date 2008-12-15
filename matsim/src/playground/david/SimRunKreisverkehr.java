@@ -54,8 +54,9 @@ public class SimRunKreisverkehr {
 		World world = Gbl.getWorld();
 
 		NetworkLayer network = new NetworkLayer();
-				new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		int cellcount = 0;
 		int cellcount2 = 0;

@@ -179,6 +179,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		world.complete();
 
 		return network;
 	}

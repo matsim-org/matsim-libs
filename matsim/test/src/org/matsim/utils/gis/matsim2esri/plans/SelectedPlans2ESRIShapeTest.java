@@ -52,6 +52,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		new MatsimPopulationReader(population).readFile(populationFilename);
@@ -93,6 +94,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		new MatsimPopulationReader(population).readFile(populationFilename);

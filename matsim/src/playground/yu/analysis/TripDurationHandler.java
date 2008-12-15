@@ -158,6 +158,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		System.out.println("-->reading plansfile: " + plansFilename);

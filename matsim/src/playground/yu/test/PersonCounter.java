@@ -75,6 +75,7 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		PersonCounter pc = new PersonCounter();

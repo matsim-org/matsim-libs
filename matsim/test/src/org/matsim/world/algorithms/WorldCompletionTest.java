@@ -119,32 +119,32 @@ public class WorldCompletionTest extends MatsimTestCase {
 
 		log.info("  running WorldBottom2TopCompletion module without excludingLinkTypes... ");
 		excludingLinkTypes.clear();
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes).run(world);
 		log.info("    done.");
 		
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[1]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("1");
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes).run(world);
 		log.info("    done.");
 		
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[2]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("2");
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes).run(world);
 		log.info("    done.");
 		
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[1,2]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("1");
 		excludingLinkTypes.add("2");
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes).run(world);
 		log.info("    done.");
 		
 		log.info("  running WorldBottom2TopCompletion module with excludingLinkTypes=[3]... ");
 		excludingLinkTypes.clear();
 		excludingLinkTypes.add("3");
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(world);
+		new WorldConnectLocations(excludingLinkTypes).run(world);
 		log.info("    done.");
 
 		TriangleScenario.writeWorld(world);

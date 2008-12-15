@@ -143,6 +143,7 @@ public class PlanScoreAnalysis {
 		MatsimNetworkReader netReader = new MatsimNetworkReader(net);
 		netReader.readFile(NETWORK);
 		Gbl.getWorld().setNetworkLayer(net);
+		Gbl.getWorld().complete();
 
 		Population plans = new Population(false);
 		MatsimPopulationReader reader = new MatsimPopulationReader(plans);

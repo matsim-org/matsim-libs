@@ -29,7 +29,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -54,7 +54,7 @@ public class PersonStreaming {
 		System.out.println("  done.");
 
 		new WorldCheck().run(Gbl.getWorld());
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 		new WorldMappingInfo().run(Gbl.getWorld());
 		new WorldCheck().run(Gbl.getWorld());
 

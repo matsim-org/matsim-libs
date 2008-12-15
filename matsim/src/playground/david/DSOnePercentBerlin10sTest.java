@@ -75,6 +75,7 @@ public class DSOnePercentBerlin10sTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 		QueueNetwork qnet = new QueueNetwork(network);
 		double sum = 0.0;
 

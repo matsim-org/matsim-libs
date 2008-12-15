@@ -48,6 +48,7 @@ public class VolumefromEventsTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Events events = new Events();
 		VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1,

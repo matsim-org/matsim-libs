@@ -348,6 +348,7 @@ public class PrimaryLocationDrawing {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 		Gbl.getWorld().setNetworkLayer(network);		
+		Gbl.getWorld().complete();
 
 
 

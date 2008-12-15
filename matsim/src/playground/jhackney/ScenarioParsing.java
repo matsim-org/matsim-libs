@@ -24,7 +24,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldCreateRasterLayer;
 import org.matsim.world.algorithms.WorldMappingInfo;

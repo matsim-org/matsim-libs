@@ -213,6 +213,7 @@ public class RouteSummaryTest {
 		System.out.println("-->reading networkfile: " + netFilename);
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 

@@ -76,7 +76,7 @@ import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
@@ -157,7 +157,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 //		this.controler = event.getControler();
 
 		// Complete the world to make sure that the layers all have relevant mapping rules
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
 

@@ -143,6 +143,7 @@ public class ReducePopulationExe {
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		relevantPopulation = new Population(Population.USE_STREAMING);
 		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");

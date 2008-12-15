@@ -89,6 +89,7 @@ public class MATSimNet2QGIS {
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 	}
 
 	/**

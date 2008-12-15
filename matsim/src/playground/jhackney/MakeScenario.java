@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlansScenarioCut;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -96,7 +96,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 		System.out.println("  Completing World ... ");
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 		System.out.println("  done.");
 		//////////////////////////////////////////////////////////////////////
 

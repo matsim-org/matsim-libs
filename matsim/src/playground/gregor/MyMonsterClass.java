@@ -405,6 +405,7 @@ public class MyMonsterClass {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 
@@ -557,6 +558,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 		Population population = new Population(Population.NO_STREAMING);
@@ -613,6 +615,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 		System.out.println("reading subnetwork xml file... ");
@@ -657,6 +660,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(net);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 
@@ -727,6 +731,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(old_netfile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 
@@ -776,6 +781,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 //		network.beforeSim();
@@ -855,6 +861,7 @@ int three=0;
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netfile);
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 
 		List<Node> shell = new ArrayList<Node>();

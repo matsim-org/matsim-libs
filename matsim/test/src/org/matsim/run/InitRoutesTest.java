@@ -62,6 +62,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 		world.setNetworkLayer(network);
+		world.complete();
 		
 		// create one person with missing link in act
 		Population population = new Population(Population.NO_STREAMING);

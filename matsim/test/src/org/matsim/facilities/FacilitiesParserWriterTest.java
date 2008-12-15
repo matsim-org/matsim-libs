@@ -29,7 +29,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -59,9 +58,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(world);
-		new WorldBottom2TopCompletion().run(world);
 		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		System.out.println("  done.");
 	}
 
@@ -100,6 +97,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file independent of the world...");
 		Facilities facilities = new Facilities();
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -124,6 +122,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -147,6 +146,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		final World world = new World();
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(this.config.world().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		System.out.println("  running world modules... ");
@@ -156,6 +156,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -180,6 +181,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading facilites xml file as a layer of the world...");
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		this.runModules(facilities, world);
@@ -187,6 +189,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(this.config.world().getInputFile());
+		world.complete();
 		System.out.println("  done.");
 
 		System.out.println("  running world modules... ");

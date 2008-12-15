@@ -93,6 +93,7 @@ public class MergePlans {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population plansA = new Population();
 		PopulationWriter pw = new PopulationWriter(plansA);

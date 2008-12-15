@@ -181,6 +181,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		world.complete();
 		RoadPricingScheme scheme = reader.getScheme();
 		assertEquals(tollType, scheme.getType());
 

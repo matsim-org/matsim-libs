@@ -110,6 +110,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createLink(new IdImpl("1"), node2, node3, 100, 5, 100, 1);
 		network.createLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// setup person
 		Plan plan;

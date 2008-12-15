@@ -328,6 +328,7 @@ public class CompareScenarios {
 			new MatsimNetworkReader(network).readFile(networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 			Gbl.getWorld().setNetworkLayer(network);
+			Gbl.getWorld().complete();
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null);
 			Population plans = new Population(false);

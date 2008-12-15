@@ -43,7 +43,6 @@ import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -122,6 +121,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  reading network xml file... ");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		log.info("\n");
@@ -130,9 +130,7 @@ public class TriangleTest extends MatsimTestCase {
 
 		log.info("  running world modules... ");
 		new WorldCheck().run(world);
-		new WorldBottom2TopCompletion().run(world);
 		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		log.info("  done.");
 
 		log.info("\n");

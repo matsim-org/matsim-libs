@@ -188,6 +188,7 @@ public class OTFTBin2MVI extends OTFQuadFileHandler.Writer {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
 		OTFTBin2MVI test  = new OTFTBin2MVI(qnet, vehFileName, outFileName, intervall_s);

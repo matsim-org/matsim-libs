@@ -63,6 +63,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Link link5 = network.createLink(new IdImpl("5"), node4, node5, 20, 20, 100, 1);
 
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// create a test person
 		Person person = new PersonImpl(new IdImpl("1"));

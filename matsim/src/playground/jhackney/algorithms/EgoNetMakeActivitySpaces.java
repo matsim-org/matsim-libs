@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
@@ -58,7 +58,7 @@ public class EgoNetMakeActivitySpaces {
 		
 		//read in facilities knowledge
 		new InitializeKnowledge(plans, facilities);
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 		//////////////////////////////////////////////////////////////////////
 
 //		// ch.cut.640000.200000.740000.310000.xml

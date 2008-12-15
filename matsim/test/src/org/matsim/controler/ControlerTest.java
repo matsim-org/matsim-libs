@@ -75,6 +75,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
 		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4, 100, 10, 7200, 1);
+		Gbl.getWorld().complete();
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
@@ -198,6 +199,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2,  100, 10, 7200, 1);
 		network.createLink(new IdImpl(2), node2, node3, 1000, 10,   36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
+		Gbl.getWorld().complete();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);
@@ -274,6 +276,7 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
 		network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
+		Gbl.getWorld().complete();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);

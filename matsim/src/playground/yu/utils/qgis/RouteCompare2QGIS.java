@@ -177,6 +177,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		// ------------------------RouteSummaryA--------------------------------
 		Population populationA = new Population();
 

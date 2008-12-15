@@ -56,6 +56,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		Gbl.getWorld().complete();
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
@@ -91,6 +92,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		Gbl.getWorld().complete();
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);

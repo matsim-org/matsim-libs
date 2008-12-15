@@ -60,6 +60,7 @@ public class NewIdPlan extends NewPlan {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population plans = new Population();
 		NewIdPlan nip = new NewIdPlan(plans);

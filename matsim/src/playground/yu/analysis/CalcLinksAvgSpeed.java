@@ -323,6 +323,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Events events = new Events();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
@@ -366,6 +367,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Events events = new Events();
 

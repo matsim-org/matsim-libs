@@ -198,6 +198,7 @@ public class Fixture {
 		// run mobsim once without toll and get score for network1/population1
 		NetworkLayer network = createNetwork1();
 		world.setNetworkLayer(network);
+		world.complete();
 		Population referencePopulation = Fixture.createPopulation1(network);
 		Events events = new Events();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());

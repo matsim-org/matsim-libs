@@ -66,6 +66,7 @@ public class StartingTimeRandomizer {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		world.setNetworkLayer(net);
+		world.complete();
 		Population pop = new Population();
 		new MatsimPopulationReader(pop).readFile(planIn);
 		

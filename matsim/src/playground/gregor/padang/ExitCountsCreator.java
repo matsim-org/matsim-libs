@@ -280,6 +280,7 @@ public class ExitCountsCreator {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("./networks/padang_net.xml");
 		world.setNetworkLayer(network);
+		world.complete();
 		System.out.println("done. ");
 		HashMap<Id,EvacuationAreaLink> links = new HashMap<Id,EvacuationAreaLink>();
 		EvacuationAreaFileReader er = new EvacuationAreaFileReader(links);

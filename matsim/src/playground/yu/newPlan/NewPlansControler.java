@@ -47,6 +47,7 @@ public class NewPlansControler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		NewAgentPtPlan nap = new NewAgentPtPlan(population);

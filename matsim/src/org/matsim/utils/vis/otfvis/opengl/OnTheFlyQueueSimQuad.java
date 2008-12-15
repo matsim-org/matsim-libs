@@ -126,6 +126,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 
 		Population population = new Population();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);

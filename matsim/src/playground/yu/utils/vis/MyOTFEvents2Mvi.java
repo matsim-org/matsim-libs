@@ -55,6 +55,7 @@ public class MyOTFEvents2Mvi {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(args[0]);
 		Gbl.createWorld().setNetworkLayer(net);
+		Gbl.getWorld().complete();
 
 		new OTFEvent2MVI(new QueueNetwork(net), args[1], args[2], Integer
 				.parseInt(args[3])).convert();

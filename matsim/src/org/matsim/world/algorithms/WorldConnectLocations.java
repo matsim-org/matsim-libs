@@ -50,13 +50,13 @@ import org.matsim.world.ZoneLayer;
  * 
  * @author balmermi
  */
-public class WorldBottom2TopCompletion {
+public class WorldConnectLocations {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(WorldBottom2TopCompletion.class);
+	private final static Logger log = Logger.getLogger(WorldConnectLocations.class);
 	
 	private final Set<String> excludingLinkTypes;
 
@@ -64,11 +64,11 @@ public class WorldBottom2TopCompletion {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldBottom2TopCompletion() {
+	public WorldConnectLocations() {
 		this(new HashSet<String>());
 	}
 	
-	public WorldBottom2TopCompletion(Set<String> excludingLinkTypes) {
+	public WorldConnectLocations(Set<String> excludingLinkTypes) {
 		this.excludingLinkTypes = excludingLinkTypes;
 	}
 

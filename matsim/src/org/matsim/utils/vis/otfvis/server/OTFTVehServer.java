@@ -69,6 +69,7 @@ public class OTFTVehServer implements OTFServerRemote {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
 		this.quad = new OTFServerQuad(qnet);

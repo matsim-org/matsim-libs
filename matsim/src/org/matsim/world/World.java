@@ -31,7 +31,7 @@ import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Facilities;
 import org.matsim.network.NetworkLayer;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 public class World {
 
@@ -134,7 +134,7 @@ public class World {
 			}
 		}
 		// 5. connect the locations from neighbor layers
-		new WorldBottom2TopCompletion(excludingLinkTypes).run(this);
+		new WorldConnectLocations(excludingLinkTypes).run(this);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -239,7 +239,6 @@ public class World {
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}
 		this.layers.put(Facilities.LAYER_TYPE, facilityLayer);
-		this.complete();
 	}
 
 	public void setNetworkLayer(final NetworkLayer network) {
@@ -247,7 +246,6 @@ public class World {
 			throw new IllegalArgumentException("network=null not allowed!");
 		}
 		this.layers.put(NetworkLayer.LAYER_TYPE, network);
-		this.complete();
 	}
 
 	protected final void setName(final String name) {

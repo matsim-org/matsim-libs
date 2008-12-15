@@ -330,6 +330,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		Node node1 = network.createNode("1", "0", "0", null);
 		Node node2 = network.createNode("2", "100", "0", null);
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
+		Gbl.getWorld().complete();
 		// add a lanes change to 2 at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
 		change1.addLink(link);
@@ -381,6 +382,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		Node node1 = network.createNode("1", "0", "0", null);
 		Node node2 = network.createNode("2", "100", "0", null);
 		Link link = network.createLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
+		Gbl.getWorld().complete();
 		// add a flow capacity change to 2 Veh/s at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
 		change1.addLink(link);

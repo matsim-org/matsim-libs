@@ -117,6 +117,7 @@ public class ModeChoicePlan extends NewPlan {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		ModeChoicePlan mcp = new ModeChoicePlan(population);

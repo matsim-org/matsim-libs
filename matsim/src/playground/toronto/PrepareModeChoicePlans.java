@@ -44,6 +44,7 @@ public class PrepareModeChoicePlans {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		Population population = new Population(Population.USE_STREAMING);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(population, outputPlansFile);
 		population.addAlgorithm(planGenerator);

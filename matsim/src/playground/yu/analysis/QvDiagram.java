@@ -31,6 +31,7 @@ public class QvDiagram {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Events events = new Events();
 		VolumesAnalyzer va = new VolumesAnalyzer(300, 24 * 3600 - 1, network);

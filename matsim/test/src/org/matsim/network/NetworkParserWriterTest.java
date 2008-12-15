@@ -31,7 +31,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -68,9 +67,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		log.info("  running world modules... ");
 		new WorldCheck().run(world);
-		new WorldBottom2TopCompletion().run(world);
 		new WorldMappingInfo().run(world);
-		new WorldCheck().run(world);
 		log.info("  done.");
 	}
 
@@ -109,6 +106,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file independent of the world...");
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -133,6 +131,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file as a layer of the world...");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -157,6 +156,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(this.config.world().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		log.info("  running world modules... ");
@@ -166,6 +166,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file as a layer of the world... ");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -190,6 +191,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file as a layer of the world... ");
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		this.runModules(network, world);
@@ -197,6 +199,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 		worldReader.readFile(this.config.world().getInputFile());
+		world.complete();
 		log.info("  done.");
 
 		log.info("  running world modules... ");

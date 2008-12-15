@@ -38,7 +38,7 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.IOUtils;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -77,7 +77,7 @@ public class FacilitiesLoadCalculator implements StartupListener, AfterMobsimLis
 		//TODO: Move this to the controler
 		controler.getWorld().complete();
 		new WorldCheck().run(controler.getWorld());
-		new WorldBottom2TopCompletion().run(controler.getWorld());
+		new WorldConnectLocations().run(controler.getWorld());
 		new WorldMappingInfo().run(controler.getWorld());
 		new WorldCheck().run(controler.getWorld());
 		log.info("world checking done.");

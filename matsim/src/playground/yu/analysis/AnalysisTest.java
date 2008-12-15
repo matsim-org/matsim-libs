@@ -79,6 +79,7 @@ public class AnalysisTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		OnRouteModalSplit orms = null;
 		TravelTimeModalSplit ttms = null;

@@ -42,7 +42,7 @@ import org.matsim.network.Link;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 
 
 public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
@@ -58,7 +58,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		Controler controler = event.getControler();
-		new WorldBottom2TopCompletion().run(Gbl.getWorld());
+		new WorldConnectLocations().run(Gbl.getWorld());
 		Map<Id,Link> links = controler.getNetwork().getLinks();
 		NewRetailersLocation nrl = new NewRetailersLocation(links);
 		Facilities facilities = controler.getFacilities();

@@ -47,6 +47,7 @@ public class NewPtPlan3Controler {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		NewAgentPtPlan3 nap3 = new NewAgentPtPlan3(population);

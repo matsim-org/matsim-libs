@@ -54,6 +54,7 @@ public class VolvoAnalysisMain {
 		NetworkLayer network = new NetworkLayer();
 		Gbl.getWorld().setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		Gbl.getWorld().complete();
 		System.out.println("  done.");
 		System.out.println("  reading tolls...");
 		RoadPricingScheme hundekopf;

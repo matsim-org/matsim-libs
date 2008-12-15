@@ -89,6 +89,7 @@ public class CopyOfFilterBerlinKutter {
 		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		relevantPopulation = new Population(false);
 		Population population = new MyPopulation();

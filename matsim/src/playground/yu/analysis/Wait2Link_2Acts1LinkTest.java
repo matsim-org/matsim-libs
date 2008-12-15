@@ -209,6 +209,7 @@ public class Wait2Link_2Acts1LinkTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 		Population population = new Population();
 
 		SameActLoc sal = new SameActLoc();

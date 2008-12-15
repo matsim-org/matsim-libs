@@ -89,6 +89,7 @@ public class WithindayAgentTest extends TestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(filename);
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		return network;
 	}
 

@@ -57,6 +57,7 @@ public class MyPlansToPlans {
 		NetworkLayer network = new NetworkLayer();
 		world.setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
+		world.complete();
 
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans);

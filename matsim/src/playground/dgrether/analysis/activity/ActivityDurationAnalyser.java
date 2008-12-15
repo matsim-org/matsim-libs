@@ -83,6 +83,7 @@ public class ActivityDurationAnalyser {
 		config = Gbl.createConfig(new String[] {configfile});
 //		config = Gbl.createConfig(null);
 		Gbl.getWorld().setNetworkLayer(net);
+		Gbl.getWorld().complete();
 
 		
 		//reading road pricing scheme for filtering

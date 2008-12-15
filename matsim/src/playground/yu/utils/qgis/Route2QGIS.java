@@ -169,6 +169,7 @@ public class Route2QGIS extends SelectedPlans2ESRIShape implements X2QGIS {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 

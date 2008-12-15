@@ -38,8 +38,9 @@ public class ExternalMobsimTest {
 		Gbl.createConfig(defaultArgs);
 
 		NetworkLayer network = new NetworkLayer();
-				new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
+		new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
 		Gbl.getWorld().setNetworkLayer ( network ) ;
+		Gbl.getWorld().complete();
 
 
 		System.out.println("[External MOBSIM called"  + "]");

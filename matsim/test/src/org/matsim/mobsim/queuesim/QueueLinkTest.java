@@ -114,6 +114,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();

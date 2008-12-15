@@ -56,6 +56,7 @@ public class OnTheFlyQueueSimSWISS {
 		net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 
 		Gbl.printElapsedTime();
 

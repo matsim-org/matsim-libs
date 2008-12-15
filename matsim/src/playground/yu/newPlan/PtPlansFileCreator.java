@@ -176,6 +176,7 @@ public class PtPlansFileCreator {
 		pfc.setNetwork(new NetworkLayer());
 		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
 		Gbl.getWorld().setNetworkLayer(pfc.getNetwork());
+		Gbl.getWorld().complete();
 
 		pfc.setPop(new Population());
 		PopulationWriter writer = new PopulationWriter(pfc.getPop(),

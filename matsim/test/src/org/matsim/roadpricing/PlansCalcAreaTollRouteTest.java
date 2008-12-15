@@ -50,6 +50,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testBestAlternatives() {
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -108,6 +109,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testTolledActLink() {
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -136,6 +138,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testAllAlternativesTolled() {
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
@@ -161,6 +164,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 	public void testOutsideTollTime() {
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);

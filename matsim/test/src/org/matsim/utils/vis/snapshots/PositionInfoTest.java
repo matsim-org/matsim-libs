@@ -45,6 +45,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Node node1 = network.createNode("1", "0", "0", null);
 		Node node2 = network.createNode("2", "1000", "1000", null);
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
+		Gbl.getWorld().complete();
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 250, 0, 10, PositionInfo.VehicleState.Driving, null);
@@ -66,6 +67,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Node node1 = network.createNode("1", "0", "0", null);
 		Node node2 = network.createNode("2", "1000", "1000", null);
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);
+		Gbl.getWorld().complete();
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 500, 0, 10, PositionInfo.VehicleState.Driving, null);

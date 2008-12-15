@@ -440,6 +440,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		network.createLink(new IdImpl("-24"), node14, node4, 1000.0, 100.0, 3600.0, 1);
 
 		Gbl.createWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		return network;
 	}

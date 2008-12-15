@@ -49,6 +49,7 @@ public class DoublePlanControler {
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new Population();
 		DoublePlan dp = new DoublePlan(population);

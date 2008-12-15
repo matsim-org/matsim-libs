@@ -51,6 +51,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
 		toll.setType("distance");
@@ -101,6 +102,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		NetworkLayer network = Fixture.createNetwork2();
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme(network);
 		toll.setType("cordon");

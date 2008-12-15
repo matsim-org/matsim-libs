@@ -120,6 +120,7 @@ public class Plansgenerator {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		new MatsimNetworkReader(network).readFile(filename);
+		Gbl.getWorld().complete();
 
 		return network;
 	}

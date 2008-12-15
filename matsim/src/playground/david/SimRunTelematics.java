@@ -42,8 +42,9 @@ public class SimRunTelematics {
 		World world = Gbl.createWorld();
 
 		NetworkLayer network = new NetworkLayer();
-				new MatsimNetworkReader(network).readFile(netFileName);
+		new MatsimNetworkReader(network).readFile(netFileName);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Population population = new MyPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(population);

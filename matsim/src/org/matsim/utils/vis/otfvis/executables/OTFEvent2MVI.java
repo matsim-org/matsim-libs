@@ -77,6 +77,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
 		world.setNetworkLayer(net);
+		world.complete();
 		QueueNetwork qnet = new QueueNetwork(net);
 
 		String eventFile = null;

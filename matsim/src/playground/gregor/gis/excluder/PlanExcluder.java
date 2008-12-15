@@ -118,6 +118,7 @@ public class PlanExcluder {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 		
 		
 		final Population population = new Population();

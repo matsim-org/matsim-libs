@@ -59,6 +59,7 @@ public class LegDistanceTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		// Plans population = new Plans();
 		// System.out.println("-->reading plansfile: " + plansFilename);

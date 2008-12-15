@@ -69,6 +69,7 @@ public class ModeActivityDurationAnalyser {
 		config = Gbl.createConfig(new String[] {CONFIGFILE});
 //		config = Gbl.createConfig(null);
 		Gbl.getWorld().setNetworkLayer(net);
+		Gbl.getWorld().complete();
 
 		Population plans = new Population(Population.NO_STREAMING);
 		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans);

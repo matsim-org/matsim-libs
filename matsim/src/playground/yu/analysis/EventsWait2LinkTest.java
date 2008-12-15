@@ -90,6 +90,7 @@ public class EventsWait2LinkTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
+		world.complete();
 
 		Events events = new Events();
 

@@ -28,7 +28,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldCheck;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
@@ -56,7 +56,7 @@ public class WorldParserWriterTest extends MatsimTestCase {
 	private final void runModules(final World world) {
 		System.out.println("  running world modules... ");
 		new WorldCheck().run(world);
-		new WorldBottom2TopCompletion().run(world);
+		new WorldConnectLocations().run(world);
 		new WorldMappingInfo().run(world);
 		new WorldCheck().run(world);
 		System.out.println("  done.");

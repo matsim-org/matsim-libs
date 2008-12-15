@@ -46,6 +46,7 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		Gbl.getWorld().setNetworkLayer(network);
+		Gbl.getWorld().complete();
 
 		Population population = new Population();
 		new MatsimPopulationReader(population).readFile(populationFilename);

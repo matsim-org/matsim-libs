@@ -25,7 +25,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-import org.matsim.world.algorithms.WorldBottom2TopCompletion;
+import org.matsim.world.algorithms.WorldConnectLocations;
 import org.matsim.world.algorithms.WorldMappingInfo;
 
 public class WorldParsing {
@@ -50,7 +50,7 @@ public class WorldParsing {
 
 		System.out.println("  running world algorithms... ");
 		new WorldMappingInfo().run(world);
-		new WorldBottom2TopCompletion().run(world);
+		new WorldConnectLocations().run(world);
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
