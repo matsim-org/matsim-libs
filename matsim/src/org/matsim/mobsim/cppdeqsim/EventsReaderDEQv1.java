@@ -153,7 +153,7 @@ public class EventsReaderDEQv1 {
 		}
 	}
 
-	protected final BasicEvent createEvent(final double time, final int agentID, final int linkID, final int flag, final int legNumber) {
+	public static final BasicEvent createEvent(final double time, final int agentID, final int linkID, final int flag, final int legNumber) {
 		BasicEvent event = null;
 
 		switch (flag) {
