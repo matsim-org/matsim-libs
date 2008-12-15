@@ -64,7 +64,7 @@ public class RetailersSummaryWriter {
 		try {
 					
 			this.retailers = retailers;
-					System.out.println("retailers"+ this.retailers.getRetailers().values());
+					System.out.println("retailers "+ this.retailers.getRetailers().values());
 					Iterator<Facility>	ret_iter = this.retailers.getRetailers().values().iterator();
 					
 					while (ret_iter.hasNext()) {
@@ -76,9 +76,7 @@ public class RetailersSummaryWriter {
 					out.write(f.getLink().getCenter().getX()+ "\t");
 					out.write(f.getLink().getCenter().getY()+"\n");
 					}
-					//System.out.println("Anzahl"+subtour.getPurpose());
-					
-					
+										
 					out.flush();
 				
 		} 

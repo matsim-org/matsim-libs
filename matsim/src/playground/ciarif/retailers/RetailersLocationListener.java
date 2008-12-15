@@ -70,15 +70,15 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 			Facility f = iter_fac.next();
 			Link link = nrl.findLocation();
 			Coord coord = link.getCenter();
-			System.err.println("disabled code that didn't compile. 12dec2008/marcel");
-			System.exit(-1);
-//			f.setLocation(coord);
-//			facilities.getFacilities().get(f.getId()).setLocation(coord);//controler.getFacilities().g
+//			System.err.println("disabled code that didn't compile. 12dec2008/marcel");
+//			System.exit(-1);
+			f.moveTo(coord);
+			facilities.getFacilities().get(f.getId()).moveTo(coord);
 			this.retailers.getRetailers().put(f.getId(),facilities.getFacilities().get(f.getId()));
 		}
 		this.rs.write(this.retailers);
 
-		Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
+		/*Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
 
 		while (per_iter.hasNext()) {
 			Person person = per_iter.next();
@@ -90,22 +90,23 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 			}
 			Plan plan = person.getSelectedPlan();
 
-		}
+		}*/
 	}
 
 	public void notifyBeforeMobsim (final BeforeMobsimEvent event) {
 		//TODO: Implement
+		System.out.println("test!!!!! ");
 		Controler controler = event.getControler();
 		Iterator<Person> per_iter = controler.getPopulation().getPersons().values().iterator();
 
-		while (per_iter.hasNext()) {
+		//while (per_iter.hasNext()) {
 
 
 			//Plan plan = person.getPlans();
 
 			//plan.
 			//person.removePlan(plan);
-		}
+		//}
 		//set routes to null of selected plans
 		//router
 	}
