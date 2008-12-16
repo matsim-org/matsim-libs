@@ -1,65 +1,55 @@
 package playground.ciarif.retailers;
 
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-//import org.matsim.facilities.Facility;
+import org.matsim.gbl.MatsimRandom;
+import org.matsim.network.Link;
+import org.matsim.network.NetworkLayer;
+import org.matsim.population.Leg;
+import org.matsim.population.Person;
+import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class Retailer {
 	private final Id id;
-	private int cust_sqm; // must be a double
-
-	private final HashMap<Integer,Facility> facilities = new HashMap<Integer, Facility>();
-	// private final HashMap<IdI,Facility> facilities = new HashMap<IdI, Facility>();
-
-	private final HashMap<Id,Double> fac_minCusts = new HashMap<Id,Double>();
+	private final Map<Id,Facility> facilities = new LinkedHashMap<Id,Facility>();
 	
-	protected Retailer(final Id id, final int cust_sqm) {
+	protected Retailer(final Id id) {
 		this.id = id;
-		this.cust_sqm = cust_sqm;
 	}
 
-	public final boolean setFacility(Id fac_id, Double minCustsqm) {
-		// TODO: implement
-		return false;
-	}
-	
-	public final boolean setFacility(org.matsim.facilities.Facility fac, Double minCustsqm) {
-		// TODO: implement
-		return false;
-	}
-	
-	public final void setCust_sqm(final int cust_sqm) {
-		this.cust_sqm = cust_sqm;
-	}
-
-	public final Id getRetailerId() {
+	public final Id getId() {
 		return this.id;
 	}
 
-	public final int getCust_Squm() {
-		return this.cust_sqm;
+	public final boolean addFacility(Facility f) {
+		if (f == null) { return false; }
+		if (this.facilities.containsKey(f.getId())) { return false; }
+		this.facilities.put(f.getId(),f);
+		return true;
+	}
+	
+	public final Facility getFacility(final Id facId) {
+		return this.facilities.get(facId);
 	}
 
-	// NO! Always use IdI for that instead of String or int or similar
-	public final Facility getFacility(final Id fac_id) {
-//	public final Facility getFacility(final int h) {
-		return this.facilities.get(fac_id);
-	}
-
-	public final HashMap<Integer,Facility> getFacilities() {
+	public final Map<Id,Facility> getFacilities() {
 		return this.facilities;
 	}
-
-	@Override
-	public final String toString() {
-		return "[Loc_id=" + this.id + "]" +
-		"[cust_sqm=" + this.cust_sqm + "]" +
-		"[nof_facilities=" + this.facilities.size() + "]";
+	
+	public final Map<Id,Facility> moveFacilities(final NetworkLayer network) {
+		for (Facility f : this.facilities.values()) {
+			Object[] links = network.getLinks().values().toArray();
+			int rd = MatsimRandom.random.nextInt(links.length);
+			Link link = (Link)links[rd];
+			Coord coord = link.getCenter();
+			f.moveTo(coord);
+		}
+		return this.facilities;
 	}
+	
 }

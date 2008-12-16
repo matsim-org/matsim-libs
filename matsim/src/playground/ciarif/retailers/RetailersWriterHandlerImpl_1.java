@@ -32,7 +32,7 @@ public class RetailersWriterHandlerImpl_1 implements RetailersWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 	public void startRetailer(final Retailer retailer, final BufferedWriter out) throws IOException {
 		out.write("\t<retailer");
-		out.write(" loc_id=\"" + retailer.getRetailerId() + "\"");
+//		out.write(" loc_id=\"" + retailer.getRetailerId() + "\"");
 		out.write(">\n");
 	}
 	public void endRetailer(final BufferedWriter out) throws IOException {

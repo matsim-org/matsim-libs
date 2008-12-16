@@ -69,8 +69,8 @@ public class RetailersReader extends MatsimXmlParser {
 		if (this.curr_retailer != null) {
 			String fac_id = meta.getValue("id");
 			String min_cust_sqm = meta.getValue("min_cust_sqm");
-			boolean ok = this.curr_retailer.setFacility(new IdImpl(fac_id), Double.parseDouble(min_cust_sqm));
-			if (!ok) { Gbl.errorMsg("Fac id=" + fac_id + " does not exist in the facilities DB!"); }
+//			boolean ok = this.curr_retailer.setFacility(new IdImpl(fac_id), Double.parseDouble(min_cust_sqm));
+//			if (!ok) { Gbl.errorMsg("Fac id=" + fac_id + " does not exist in the facilities DB!"); }
 		}
 	}
 

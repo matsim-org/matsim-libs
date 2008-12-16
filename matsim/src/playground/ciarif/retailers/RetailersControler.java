@@ -19,28 +19,13 @@
 
 package playground.ciarif.retailers;
 
-import java.util.TreeMap;
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.facilities.Facilities;
-import org.matsim.facilities.Facility;
 
-public class RetailersControler extends Controler {
+public class RetailersControler {
 	
-	private Retailers retailersToBeRelocated;
-	private Facilities facilities;
-	
-	public RetailersControler(final String[] args) {
-		super(args);
-		
-		this.facilities = super.getFacilities();
-		this.retailersToBeRelocated = new Retailers();
-		this.addControlerListener(new RetailersLocationListener(this.retailersToBeRelocated));		
-	}
-
-   
     public static void main (final String[] args) { 
-    	RetailersControler controler = new RetailersControler(args);
+    	Controler controler = new Controler(args);
+    	controler.addControlerListener(new RetailersLocationListener("../../output/output_retailers.txt"));
     	controler.run();
     }
 }

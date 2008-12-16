@@ -3,14 +3,8 @@ package playground.ciarif.retailers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 import org.matsim.facilities.Facility;
-import org.matsim.population.Plan;
-
-import playground.ciarif.models.subtours.PersonSubtour;
-import playground.ciarif.models.subtours.Subtour;
 
 public class RetailersSummaryWriter {
 //////////////////////////////////////////////////////////////////////
@@ -32,7 +26,7 @@ public class RetailersSummaryWriter {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);
 			out = new BufferedWriter(fw);
-			out.write("Fac_id \t fac_x \t fac_y\t Link_id\t Link_x \t Link_y\n");
+			out.write("Fac_id\tfac_x\tfac_y\tLink_id\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -60,53 +54,24 @@ public class RetailersSummaryWriter {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	private void writeRetailers (Retailers retailers) {
-		try {
-					
-			this.retailers = retailers;
-					System.out.println("retailers "+ this.retailers.getRetailers().values());
-					Iterator<Facility>	ret_iter = this.retailers.getRetailers().values().iterator();
-					
-					while (ret_iter.hasNext()) {
-					Facility f = ret_iter.next();
-					out.write(f.getId()+"\t");
-					out.write(f.getActivity("shop").getLocation().getCenter().getX()+ "\t");
-					out.write(f.getActivity("shop").getLocation().getCenter().getY()+"\t");
-					out.write(f.getLink().getId()+"\t");
-					out.write(f.getLink().getCenter().getX()+ "\t");
-					out.write(f.getLink().getCenter().getY()+"\n");
-					}
-										
-					out.flush();
-				
-		} 
-		
-		catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		}
-		
-	}
-	
-	
 	public void write(Retailers retailers) {
 		try {
-			//Iterator<Facility> ret_it = this.retailers.getRetailers().values().iterator();
-//			while (ps_it.hasNext()) {
-//				PersonSubtour personSubtour = ps_it.next();
-			writeRetailers (retailers);
+			this.retailers = retailers;
+			System.out.println("retailers "+ this.retailers.getRetailers().values());
+			out.write("NEXT ITERATION\n");
+			for (Retailer r : retailers.getRetailers().values()) {
+				for (Facility f : r.getFacilities().values()) {
+					out.write(f.getId()+"\t");
+					out.write(f.getCenter().getX()+ "\t");
+					out.write(f.getCenter().getY()+"\t");
+					out.write(f.getLink().getId()+"\t");
+					out.write(f.getLink().getId()+"\n");
+				}
+			}
 			out.flush();
-			//this.out.close();
-		} 
-		
+		}
 		catch (IOException e) {
 			e.printStackTrace();
-			System.exit(-1);
 		}
-		
-	}
-
-	public void run(Plan plan) {
-		
 	}
 }

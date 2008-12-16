@@ -26,8 +26,10 @@ package playground.ciarif.retailers;
  * @author ciarif
  */
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
@@ -35,93 +37,83 @@ import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationStartsListener;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.Leg;
-import org.matsim.population.MatsimPopulationReader;
+import org.matsim.gbl.MatsimRandom;
+import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
-import org.matsim.population.PopulationWriter;
-import org.matsim.utils.geometry.Coord;
-import org.matsim.world.algorithms.WorldConnectLocations;
-import org.matsim.router.*;
+import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
 
 public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
 
-	private Retailers retailersToBeRelocated;
 	private Retailers retailers;
+	private final RetailersSummaryWriter rs;
+	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
+	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
+	private PlansCalcRouteLandmarks pcrl = null;
 
-	public RetailersLocationListener(final Retailers retailersToBeRelocated) {
-		this.retailersToBeRelocated = retailersToBeRelocated;
+	public RetailersLocationListener(final String retailerSummaryFileName) {
+		rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
 	}
-
-	RetailersSummaryWriter rs = new RetailersSummaryWriter("output/triangle/output_retailers.txt", this.retailers);
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		Controler controler = event.getControler();
-		new WorldConnectLocations().run(Gbl.getWorld());
-		Map<Id,Link> links = controler.getNetwork().getLinks();
-		NewRetailersLocation nrl = new NewRetailersLocation(links);
-		Facilities facilities = controler.getFacilities();
-		this.retailers = new Retailers (facilities);
-		this.retailersToBeRelocated = Retailers.selectRetailersForRelocation(this.retailers,40);
-		Iterator<Facility> iter_fac = this.retailersToBeRelocated.getRetailers().values().iterator();
 
-		while (iter_fac.hasNext()) {
-			Facility f = iter_fac.next();
-			Link link = nrl.findLocation();
-			Coord coord = link.getCenter();
-			f.moveTo(coord);
-			//f.setLocation(coord);
-			facilities.getFacilities().get(f.getId()).moveTo(coord);
-			this.retailers.getRetailers().put(f.getId(),facilities.getFacilities().get(f.getId()));
+		preprocess.run(controler.getNetwork());
+		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
+		
+		Map<Id,Facility> shopFac =  controler.getFacilities().getFacilities("shop");
+		ArrayList<Facility> retailerFacilities = this.getFraction(shopFac,0.4);
+		this.retailers = this.createRetailers(retailerFacilities);
+	}
+
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+		Controler controler = event.getControler();
+		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
+		for (Retailer r : retailers.getRetailers().values()) {
+			Map<Id,Facility> facs =  r.moveFacilities(controler.getNetwork());
+			movedFacilities.putAll(facs);
 		}
 		this.rs.write(this.retailers);
 		
-		Iterator<Person> pers_iter = controler.getPopulation().getPersons().values().iterator();
-
-		while (pers_iter.hasNext()) {
-			
-			Iterator<Plan> plan_iter = pers_iter.next().getPlans().iterator();
-
-			while (plan_iter.hasNext()) {
-					
-				Iterator<Leg> leg_iter = plan_iter.next().getIteratorLeg();
-			
-				while (leg_iter.hasNext()) {
-							
-					leg_iter.next().setRoute(null);
+		for (Person p : controler.getPopulation().getPersons().values()) {
+			for (Plan plan : p.getPlans()) {
+				boolean routeIt = false;
+				Iterator<?> actIter = plan.getIteratorAct();
+				while (actIter.hasNext()) {
+					Act act = (Act)actIter.next();
+					if (movedFacilities.containsKey(act.getFacilityId())) {
+						act.setLink(act.getFacility().getLink());
+						routeIt = true;
+					}
+				}
+				if (routeIt) {
+					pcrl.run(plan);
 				}
 			}
 		}
-	}
-
-	public void notifyBeforeMobsim (final BeforeMobsimEvent event) {
-		
-		Controler controler = event.getControler();
-		Iterator<Person> pers_iter = controler.getPopulation().getPersons().values().iterator();
-
-		while (pers_iter.hasNext()) {
-			
-			final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-			PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
-			NetworkLayer network = controler.getNetwork();
-			preprocess.run(network);
-			PlansCalcRouteLandmarks pcrl = new PlansCalcRouteLandmarks(network, preprocess, timeCostCalc, timeCostCalc);
-			pcrl.run(pers_iter.next());
-			pcrl.run(pers_iter.next().getSelectedPlan());
-			//PlansCalcRouteDijkstra pcrd = new PlansCalcRouteDijkstra(network, timeCostCalc, timeCostCalc);
-			//pcrd.run(pers_iter.next());
-			//pcrd.run(pers_iter.next().getSelectedPlan());
-		}
 	}	
-			
+
+	private final ArrayList<Facility> getFraction(Map<Id,Facility> facs, double fraction) {
+		ArrayList<Facility> fs = new ArrayList<Facility>();
+		for (Facility f : facs.values()) {
+			double rd = MatsimRandom.random.nextDouble();
+			if (rd < fraction) { fs.add(f); }
+		}
+		return fs;
+	}
+	
+	private final Retailers createRetailers(ArrayList<Facility> retailerFacilities) {
+		Retailers retailers = new Retailers();
+		for (Facility f : retailerFacilities) {
+			Retailer r = new Retailer(f.getId());
+			if (!r.addFacility(f)) { throw new RuntimeException("Could not add facility id="+f.getId()+" to retailer."); } 
+			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
+		}
+		return retailers;
+	}
+	
 }
