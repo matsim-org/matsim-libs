@@ -22,7 +22,6 @@ package org.matsim.population;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLegImpl;
-import org.matsim.network.NetworkFactory;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.population.routes.Route;
@@ -51,16 +50,6 @@ public class Leg extends BasicLegImpl {
 			this.route = new NodeCarRoute();
 			((CarRoute)this.route).setNodes(leg.getRoute().getStartLink(), ((CarRoute) (leg.getRoute())).getNodes(), leg.getRoute().getEndLink());
 		}
-	}
-	
-	/**
-	 * @deprecated please use {@link NetworkFactory#createRoute(org.matsim.basic.v01.BasicLeg.Mode)}
-	 * @return new NodeCarRoute
-	 */
-	public final CarRoute createRoute() {
-//		TODO [MR] deleted deprecated method. set to deprecated on 2dec2008/mrieser
-		this.route = new NodeCarRoute();
-		return (CarRoute) this.route;
 	}
 
 	@Override
