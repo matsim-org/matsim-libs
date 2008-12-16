@@ -370,6 +370,7 @@ public class Controler {
 			} else {
 				log.info("S H U T D O W N   ---   regular shutdown completed.");
 			}
+			IOUtils.closeOutputDirLogging();
 		}
 	}
 

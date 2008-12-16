@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -57,21 +58,25 @@ public class IOUtils {
 	/**
 	 * Call this method to create 2 log4j logfiles in the output directory specified as parameter.
 	 * The first logfile contains all messages the second only those above log Level.WARN (Priority.WARN).
+	 * After the end of the programm run it is strongly recommended to close the file logger by calling
+	 * the method closeOutputDirLogging().
 	 *
 	 * @param outputDirectory the outputdirectory to create the files, whithout seperator at the end.
 	 * @param logEvents List of LoggingEvents, may be null, contains log information which should be written
 	 * to the files, e.g. LoggingEvents which occurred before the files can be created.
 	 * @throws IOException
-	 *
+	 * @see IOUtils#closeOutputDirLogging()
 	 * @author dgrether
 	 */
 	public static void initOutputDirLogging(final String outputDirectory, final List<LoggingEvent> logEvents) throws IOException {
 		Logger root = Logger.getRootLogger();
 		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
 				System.getProperty("file.separator") + LOGFILE);
+		appender.setName(LOGFILE);
 		root.addAppender(appender);
 		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
 				System.getProperty("file.separator") + WARNLOGFILE);
+		warnErrorAppender.setName(WARNLOGFILE);
 		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
 		//however it is only working with the deprecated method
 		warnErrorAppender.setThreshold(Priority.WARN);
@@ -87,9 +92,20 @@ public class IOUtils {
 			}
 		}
 	}
-
-
-
+	/**
+	 * Call this method to close the log file streams opened by a call of IOUtils.initOutputDirLogging().
+	 * This avoids problems concerning open streams after the termination of the program.
+	 * @see IOUtils#initOutputDirLogging(String, List)
+	 */
+	public static void closeOutputDirLogging() {
+		Logger root = Logger.getRootLogger();
+		Appender app = root.getAppender(LOGFILE);
+		root.removeAppender(app);
+		app.close();
+		app = root.getAppender(WARNLOGFILE);
+		root.removeAppender(app);
+		app.close();
+	}
 
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
