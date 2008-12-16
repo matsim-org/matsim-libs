@@ -23,18 +23,24 @@ package playground.christoph.events.algorithms;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Node;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.util.KnowledgeTools;
 
 public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelInitialReplanner.class);
+	
+	protected static boolean removeKnowledge = false;
 	
 	/** 
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
@@ -52,6 +58,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		for (int i = 0; i < numOfThreads; i++) 
 		{
 			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners, time);
+			replannerThread.setRemoveKnowledge(removeKnowledge);
 			replannerThreads[i] = replannerThread;
 			
 			Thread thread = new Thread(replannerThread, "Thread#" + i);
@@ -98,6 +105,11 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		run(persons, time);
 	}
 	
+	public static void setRemoveKnowledge(boolean value)
+	{
+		removeKnowledge = value;
+	}
+	
 	
 	/**
 	 * The thread class that really handles the persons.
@@ -105,6 +117,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	private static class ReplannerThread implements Runnable 
 	{
 		public final int threadId;
+		private boolean removeKnowledge = false;
 		private double time = 0.0;
 		private final ArrayList<PlanAlgorithm> replanners;
 		private final PlanAlgorithm[][] replannerArray;
@@ -118,6 +131,11 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 			this.time = time;
 		}
 
+		public void setRemoveKnowledge(boolean value)
+		{
+			removeKnowledge = value;
+		}
+		
 		public void handlePerson(final Person person)
 		{
 			this.persons.add(person);
@@ -150,6 +168,12 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 				
 				replanner.run(person.getSelectedPlan());
 
+				// If flag is set, remove Knowledge after doing the replanning.
+				if (removeKnowledge)
+				{
+					KnowledgeTools.removeKnowledge(person);
+				}
+				
 				numRuns++;
 				if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
 			

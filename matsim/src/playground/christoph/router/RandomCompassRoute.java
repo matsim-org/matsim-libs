@@ -30,6 +30,7 @@ import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.population.routes.Route;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 
 import playground.christoph.router.util.KnowledgeTools;
@@ -39,9 +40,11 @@ import playground.christoph.router.util.TabuSelector;
 
 public class RandomCompassRoute extends PersonLeastCostPathCalculator implements Cloneable{
 
+	protected static int errorCounter = 0;
+	
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
-	protected double compassProbability = 0.8;
+	protected double compassProbability = 0.35;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
@@ -80,6 +83,12 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
+			if (nodes.size() > maxLinks) 
+			{
+				log.warn("Route has reached the maximum allowed length - break!");
+				errorCounter++;
+				break;
+			}
 			if (nodes.size() > maxLinks)
 			{
 				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
@@ -173,9 +182,9 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 */
 		if (maxLinks == path.links.size())
 		{
-			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
+//			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
 		}
-	
+
 		if (removeLoops) LoopRemover.removeLoops(path);
 				
 		return path;
@@ -214,6 +223,16 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		
 		return phi;
+	}
+	
+	public static int getErrorCounter()
+	{
+		return errorCounter;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		errorCounter = i;
 	}
 	
 	public RandomCompassRoute clone()

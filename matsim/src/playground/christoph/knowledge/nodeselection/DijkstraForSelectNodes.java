@@ -40,7 +40,6 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.TravelCost;
 import org.matsim.utils.misc.Time;
 
-import playground.christoph.knowledge.utils.GetAllNodes;
 
 
 public class DijkstraForSelectNodes {
@@ -170,12 +169,12 @@ public class DijkstraForSelectNodes {
 	            
 	        node.setVisited(true);
 	           
-	        relaxNode(node);
+	        relaxOutgoingNode(node);
 	    }
 	}
 
-	// Search shortest Paths to all nodes within the network.
-	public void executeNetwork(Node start)
+	// Search shortest Fowardpaths to all nodes within the network.
+	public void executeForwardNetwork(Node start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -191,7 +190,28 @@ public class DijkstraForSelectNodes {
 	    	
 	        node.setVisited(true);
 	           
-	        relaxNode(node);
+	        relaxOutgoingNode(node);
+	    }
+	}
+	
+	// Search shortest Backwardpaths to all nodes within the network.
+	public void executeBackwardNetwork(Node start)
+	{		
+		DijkstraNode startNode = dijkstraNodeMap.get(start);
+		init(startNode);
+		
+	    // the current node
+	    DijkstraNode node;
+	    
+	    // extract the node with the shortest distance
+	    while ((node = unvisitedNodes.poll()) != null)
+	    {
+	    	// catch possible error
+	    	assert !isVisited(node);
+	    	
+	        node.setVisited(true);
+	           
+	        relaxIngoingNode(node);
 	    }
 	}
 	
@@ -213,9 +233,39 @@ public class DijkstraForSelectNodes {
 		return minDistances;
 	}
 	
+	// expand ingoing node
+	private void relaxIngoingNode(DijkstraNode node)
+	{		
+		ArrayList<Link> ingoingLinks = node.ingoingLinks();
+		for (int i = 0; i < ingoingLinks.size(); i++)
+		{
+			// get current link
+			Link link = ingoingLinks.get(i);
+			
+			// get destination node
+			DijkstraNode fromNode = dijkstraNodeMap.get(link.getFromNode());
+			
+			// if node has not been visited
+			if (!fromNode.isVisited())
+			{			
+				double shortDist = node.getMinDist() + getLinkCost(link, time); 
+	            
+				// Found new shortest path to the destination node?
+				if (shortDist < fromNode.getMinDist())
+				{
+					// store new "shortest" distance
+					setMinDistance(fromNode, shortDist);
+		                                
+					// store new "previous" node
+					setPreviousNode(fromNode, node);
+				}
+
+			}
+		}        
+	}
 	
-	// expand node
-	private void relaxNode(DijkstraNode node)
+	// expand outgoing node
+	private void relaxOutgoingNode(DijkstraNode node)
 	{		
 		ArrayList<Link> outgoingLinks = node.outgoingLinks();
 		for (int i = 0; i < outgoingLinks.size(); i++)
@@ -388,6 +438,24 @@ class DijkstraNode
 		visited = false;
 		minDist = Double.MAX_VALUE;
 	}
+
+	protected ArrayList<DijkstraNode> ingoingNodes()
+	{
+		ArrayList<DijkstraNode> ingoingNodes = new ArrayList<DijkstraNode>();
+		
+		Map<Id, Node> myMap = (Map<Id, Node>)node.getInNodes();
+		
+		Iterator nodeIterator = myMap.values().iterator();
+		while(nodeIterator.hasNext())
+		{
+			Node node = (Node)nodeIterator.next();
+
+			// zugehörigen DijsktraNode aus der Map holen
+			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
+			ingoingNodes.add(dijkstraNode);
+		}
+		return ingoingNodes;
+	}
 	
 	protected ArrayList<DijkstraNode> outgoingNodes()
 	{
@@ -407,6 +475,21 @@ class DijkstraNode
 		return outgoingNodes;
 	}
 
+	protected ArrayList<Link> ingoingLinks()
+	{
+		ArrayList<Link> ingoingLinks = new ArrayList<Link>();
+		
+		Map<Id, Link> myMap = (Map<Id, Link>)node.getInLinks();
+		
+		Iterator linkIterator = myMap.values().iterator();
+		while(linkIterator.hasNext())
+		{
+			Link link = (Link)linkIterator.next();
+			ingoingLinks.add(link);
+		}
+		return ingoingLinks;
+	}
+	
 	protected ArrayList<Link> outgoingLinks()
 	{
 		ArrayList<Link> outgoingLinks = new ArrayList<Link>();

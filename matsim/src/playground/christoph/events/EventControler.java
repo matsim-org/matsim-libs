@@ -45,6 +45,7 @@ import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.nodeselection.FileNameCreator;
 import playground.christoph.knowledge.KMLPersonWriter;
+import playground.christoph.knowledge.nodeselection.CreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
@@ -60,6 +61,7 @@ import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
+import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 
 
@@ -70,6 +72,12 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator
  *
  * @author Christoph Dobler
  */
+
+//mysimulations/kt-zurich/config10pct_factor_0.075_replanning.xml
+//mysimulations/kt-zurich/config10pct_factor_0.05.xml
+//mysimulations/kt-zurich/config10pct_factor_0.075.xml
+//mysimulations/kt-zurich/config10pct_factor_0.10.xml
+
 //mysimulations/census2000_dilZh30km_miv_transitincl_10pct/config.xml
 //mysimulations/berlin/config.xml
 /* Example for the new entries in a config.xml file to read / write selected nodes from / to files.
@@ -142,9 +150,17 @@ public class EventControler extends Controler{
 		
 		// Dijkstra for Replanning
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
-		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
-		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime);
+		//KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
+		
+		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
+		TravelTimeDistanceCostCalculator travelCost = new TravelTimeDistanceCostCalculator(travelTime);
+		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+
+		// Use the Wrapper with the same CostCalculator as the MobSim uses
+		//KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(this.getTravelCostCalculator());
+		
+		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(dijkstraWrapper, dijkstraWrapper);
 		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(dijkstraRouter);
@@ -186,7 +202,7 @@ public class EventControler extends Controler{
 		nodeSelectors.add(new SelectNodesCircular(this.network));
 		
 		SelectNodesDijkstra selectNodesDijkstra = new SelectNodesDijkstra(this.network);
-		selectNodesDijkstra.setCostFactor(1.3);
+		selectNodesDijkstra.setCostFactor(1.05);
 		nodeSelectors.add(selectNodesDijkstra);
 	}
 
@@ -200,6 +216,9 @@ public class EventControler extends Controler{
 		// CostCalculator entsprechend setzen!
 //		setCostCalculator();
 
+//		log.info("Remove not selected Plans");
+//		clearPlans();
+		
 		log.info("Read known Nodes Maps from a File");
 		readKnownNodesMap();
 		
@@ -238,8 +257,8 @@ public class EventControler extends Controler{
 		 * The existing plans could for example be the results of a relaxed solution of
 		 * a standard MATSim simulation.
 		 */
-		log.info("do initial Replanning");
-		doInitialReplanning();
+//		log.info("do initial Replanning");
+//		doInitialReplanning();
 		
 		sim.run();
 	}
@@ -264,10 +283,10 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 			
 			counter++;
-			if(counter < 100000)
+			if(counter < 1000000)
 			{
 				Map<String,Object> customAttributes = p.getCustomAttributes();
-				customAttributes.put("initialReplanning", new Boolean(false));
+				customAttributes.put("initialReplanning", new Boolean(true));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
 				customAttributes.put("endActivityReplanning", new Boolean(false));
 				
@@ -305,7 +324,11 @@ public class EventControler extends Controler{
 			Person p = PersonIterator.next();
 		
 			Map<String,Object> customAttributes = p.getCustomAttributes();
-			customAttributes.put("Replanner", replanners.get(5));
+//			customAttributes.put("Replanner", replanners.get(1));	// Random
+//			customAttributes.put("Replanner", replanners.get(2));	// Tabu
+//			customAttributes.put("Replanner", replanners.get(3));	// Compass
+//			customAttributes.put("Replanner", replanners.get(4));	// RandomCompass
+			customAttributes.put("Replanner", replanners.get(5));	// DijstraWrapper
 		}
 	}
 	
@@ -316,11 +339,15 @@ public class EventControler extends Controler{
 	 * If non is selected the Person knows every Node of the network.
 	 *
 	 * At the moment: Selection Modules are assigned hard coded.
-	 * Later: Modules are assigned based on probabilities from config files. 
+	 * Later: Modules are assigned based on probabilities from config files.
+	 * 
+	 * If no NodeSelectors is added (the ArrayList is initialized but empty)
+	 * the person knows the entire Network (KnowledgeTools.knowsLink(...)
+	 * always returns true).
 	 */
 	protected void setNodeSelectors()
 	{
-		int counter = 0;
+//		int counter = 0;
 		
 		Iterator<Person> PersonIterator = this.getPopulation().iterator();
 		while (PersonIterator.hasNext())
@@ -331,8 +358,8 @@ public class EventControler extends Controler{
 			
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
 			
-			if (counter++ < 100000) personNodeSelectors.add(nodeSelectors.get(1));
-			if (counter++ < 50) personNodeSelectors.add(nodeSelectors.get(1));
+//			personNodeSelectors.add(nodeSelectors.get(1));	// Circular NodeSelector
+			personNodeSelectors.add(nodeSelectors.get(1));	// Dijkstra NodeSelector
 			
 			customAttributes.put("NodeSelectors", personNodeSelectors);
 		}
@@ -351,10 +378,10 @@ public class EventControler extends Controler{
 			log.info("Path: " + path);
 
 			// reading single File
-			//new SelectionReaderMatsim(this.network, this.population).readFile(path);
+			new SelectionReaderMatsim(this.network, this.population).readFile(path);
 			
 			//reading multiple Files automatically
-			new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
+			//new SelectionReaderMatsim(this.network, this.population).readMultiFile(path);
 			
 			log.info("Read input selection file!");
 		}
@@ -373,10 +400,10 @@ public class EventControler extends Controler{
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 			
 			// write single File
-			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
+			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write();
 			
 			// write multiple Files automatically
-			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(5000);
+			//new SelectionWriter(this.population, outPutFile, dtdFile, "1.0", "dummy").write(10000);
 
 			
 			//new SelectionWriter(this.population, getOutputFilename("selection.xml.gz"), "1.0", "dummy").write();	
@@ -390,13 +417,13 @@ public class EventControler extends Controler{
 	 */
 	protected void createKnownNodes()
 	{
-		// use only one of these two - they should produce the same results... 
-		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 1);
+		// create Known Nodes Maps on multiple Threads
+		ParallelCreateKnownNodesMap.run(this.population, nodeSelectors, 2);
 		
-		writePersonKML(this.population.getPerson("100139"));
+//		writePersonKML(this.population.getPerson("100139"));
 		
 		// non multi-core calculation
-		//CreateKnownNodesMap.collectAllSelectedNodes(this.population);
+//		CreateKnownNodesMap.collectAllSelectedNodes(this.population);
 
 	}	// setNodes()
 
@@ -416,8 +443,18 @@ public class EventControler extends Controler{
 		}
 		
 		double time = 0.0;
+		// Remove Knowledge after replanning to save memory.
+		ParallelInitialReplanner.setRemoveKnowledge(true);
+		// Run Replanner.
 		ParallelInitialReplanner.run(personsToReplan, time);
 
+		// Number of Routes that could not be created...
+		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");
+		log.info(TabuRoute.getErrorCounter() + " Routes could not be created by TabuRoute.");
+		log.info(CompassRoute.getErrorCounter() + " Routes could not be created by CompassRoute.");
+		log.info(RandomCompassRoute.getErrorCounter() + " Routes could not be created by RandomCompassRoute.");
+		log.info(DijkstraWrapper.getErrorCounter() + " Routes could not be created by DijkstraWrapper.");
+		
 /*
 		for (Person person : this.getPopulation().getPersons().values())
 		{			
@@ -433,6 +470,14 @@ public class EventControler extends Controler{
 */	
 	} //doInitialReplanning
 	
+	// removes all plans, that are currently not selectedS
+	protected void clearPlans()
+	{
+		for (Person person : this.getPopulation().getPersons().values())
+		{
+			person.removeUnselectedPlans();
+		}
+	}
 	
 	protected void writePersonKML(Person person)
 	{

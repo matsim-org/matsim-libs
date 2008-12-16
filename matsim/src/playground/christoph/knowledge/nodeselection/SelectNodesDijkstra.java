@@ -139,10 +139,10 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	@Override
 	public void addNodesToMap(Map<Id, Node> nodesMap)
 	{		
-		dijkstra.executeNetwork(startNode);
+		dijkstra.executeForwardNetwork(startNode);
 		Map<Node, Double> startMap = dijkstra.getMinDistances();
 		
-		dijkstra.executeNetwork(endNode);
+		dijkstra.executeBackwardNetwork(endNode);
 		Map<Node, Double> endMap = dijkstra.getMinDistances();
 		
 		// get the minimal costs to get from the start- to the endnode

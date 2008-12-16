@@ -41,6 +41,8 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
 	
+	protected static int errorCounter = 0;
+	
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
@@ -79,9 +81,10 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks)
+			if (nodes.size() > maxLinks) 
 			{
-				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+				log.warn("Route has reached the maximum allowed length - break!");
+				errorCounter++;
 				break;
 			}
 			
@@ -124,6 +127,16 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		if (removeLoops) LoopRemover.removeLoops(path);
 				
 		return path;
+	}
+	
+	public static int getErrorCounter()
+	{
+		return errorCounter;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		errorCounter = i;
 	}
 	
 	@Override

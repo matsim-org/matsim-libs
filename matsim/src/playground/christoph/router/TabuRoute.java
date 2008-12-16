@@ -40,6 +40,8 @@ import playground.christoph.router.util.TabuSelector;
 
 public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneable{
 
+	protected static int errorCounter = 0;
+	
 	private final static Logger log = Logger.getLogger(TabuRoute.class);
 
 	protected boolean removeLoops = false;
@@ -83,9 +85,10 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks)
+			if (nodes.size() > maxLinks) 
 			{
-				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+				log.warn("Route has reached the maximum allowed length - break!");
+				errorCounter++;
 				break;
 			}
 			
@@ -135,6 +138,16 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		if (removeLoops) LoopRemover.removeLoops(path);
 				
 		return path;
+	}
+	
+	public static int getErrorCounter()
+	{
+		return errorCounter;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		errorCounter = i;
 	}
 	
 	@Override

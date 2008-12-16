@@ -44,6 +44,8 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 
 	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
 	
+	protected static int errorCounter = 0;
+	
 	protected Dijkstra dijkstra;
 	
 	protected TravelCost costFunction;
@@ -96,6 +98,16 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 			((KnowledgeTravelTime)timeFunction).setPerson(person);
 		}
 
+	}
+	
+	public static int getErrorCounter()
+	{
+		return errorCounter;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		errorCounter = i;
 	}
 	
 	/*

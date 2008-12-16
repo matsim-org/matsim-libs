@@ -68,6 +68,16 @@ public abstract class PersonLeastCostPathCalculator implements LeastCostPathCalc
 		return this.time;
 	}
 	
+	public static int getErrorCounter()
+	{
+		return 0;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		
+	}
+	
 	@Override
 	public PersonLeastCostPathCalculator clone()
 	{

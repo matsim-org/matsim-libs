@@ -83,7 +83,11 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		// limit the velocity if neccessary
 		if(v > vmax) v = vmax;
 		
-		double travelTime = length / v;
+		double travelTime;
+		
+		if (v > 0.0) travelTime = length / v;
+		else travelTime = Double.MAX_VALUE;
+		
 //		log.info("vehicles " + vehicles + " length " + length + " vmax " + vmax + " v " + v + " traveltime " + travelTime);
 
 /*		
@@ -95,7 +99,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		// check results
 		if(travelTime < link.getFreespeedTravelTime(time))
 		{
-			log.info("TravelTime is shorter than FreeSpeedTravelTime - looks like something is wrong here. Using FreeSpeedTravelTime instead!");
+			log.warn("TravelTime is shorter than FreeSpeedTravelTime - looks like something is wrong here. Using FreeSpeedTravelTime instead!");
 			return link.getFreespeedTravelTime(time);
 		}
 		
@@ -105,15 +109,24 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	protected double getVehiclesOnLink(Link link)
 	{
 		QueueLink queueLink = queueNetwork.getQueueLink(link.getId());
-		
+				
 		// maximum number of vehicles on the link
-		double maxVehiclesOnLink = queueLink.getSpaceCap();
+//		double maxVehiclesOnLink = queueLink.getSpaceCap();
 
 		// TODO verify if the right number of vehicles is used (with or without the buffer)
 		// Return value: vehicle count / space capacity -> * space capacity
-		double vehiclesOnLink = queueLink.getDisplayableSpaceCapValue() * maxVehiclesOnLink;
+//		double vehiclesOnLink = queueLink.getDisplayableSpaceCapValue() * maxVehiclesOnLink;
+//		return vehiclesOnLink;
 		
-		return vehiclesOnLink;
+//		waitingList -> count (maybe)
+//		parkingList -> count
+//		vehQueue -> count
+//		buffer -> count
+				
+		// number of vehicles that are on the link or that are already waiting to enter the link
+		double vehicles = queueLink.getAllVehicles().size() - queueLink.getVehiclesOnParkingList().size();
+		
+		return vehicles;
 	}
 	
 	

@@ -39,6 +39,8 @@ import playground.christoph.router.util.TabuSelector;
 
 public class CompassRoute extends PersonLeastCostPathCalculator {
 
+	protected static int errorCounter = 0;
+	
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
@@ -79,9 +81,11 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
-			if (nodes.size() > maxLinks)
+
+			if (nodes.size() > maxLinks) 
 			{
-				log.warn("Routelength has reached the maximum allows number of links - stop searching!");
+//				log.warn("Route has reached the maximum allowed length - break!");
+				errorCounter++;
 				break;
 			}
 			
@@ -96,6 +100,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 			if (linksArray.length == 0)
 			{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
+				errorCounter++;
 				break;
 			}
 			
@@ -155,12 +160,25 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		
 		if (maxLinks == path.links.size())
 		{
+
+//			log.info("LinkCount " + route.getLinkRoute().length + " distance " + route.getDist());
 			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
+
 		}
 		
 		if (removeLoops) LoopRemover.removeLoops(path);
 				
 		return path;
+	}
+	
+	public static int getErrorCounter()
+	{
+		return errorCounter;
+	}
+	
+	public static void setErrorCounter(int i)
+	{
+		errorCounter = i;
 	}
 	
 	protected double calcAngle(Node currentNode, Node toNode, Node nextLinkNode)
@@ -205,5 +223,16 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		}
 		
 		return phi;
+	}
+	
+	@Override
+	public CompassRoute clone()
+	{
+		CompassRoute clone = new CompassRoute();
+		clone.removeLoops = this.removeLoops;
+		clone.tabuSearch = this.tabuSearch;
+		clone.maxLinks = this.maxLinks;
+		
+		return clone;
 	}
 }

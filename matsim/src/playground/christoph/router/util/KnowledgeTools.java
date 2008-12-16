@@ -70,7 +70,7 @@ public class KnowledgeTools {
 	}
 	
 	/*
-	 * Return only those links, where Start- and Endnode are contained in the Map.
+	 * Returns only those links, where Start- and Endnode are contained in the Map.
 	 * If no Nodes are known, all links are returned.
 	 */
 	public static Link[] getKnownLinks(Link[] links, Map<Id, Node> knownNodesMap)
@@ -114,4 +114,42 @@ public class KnowledgeTools {
 		else return false;
 	}
 	
+	/*
+	 * To save memory, some routers may want to remove a Person's Knowledge after
+	 * doing their routing. An Example would be a Random Router that does only an
+	 * initial planning before starting the mobsim.
+	 */ 
+	public static void removeKnowledge(Person person)
+	{
+		Map<Id, Node> knownNodesMap = null;
+		
+		// Try getting knowledge from the current Person.
+		if(person != null)
+		{		
+			if(person.getKnowledge() != null)
+			{
+				Map<String,Object> customAttributes = person.getKnowledge().getCustomAttributes();
+				
+				if(customAttributes.containsKey("Nodes"))
+				{
+					knownNodesMap = (Map<Id, Node>)customAttributes.get("Nodes");
+					
+					// remove all known nodes!
+					knownNodesMap.clear();
+				}
+				else
+				{
+					log.error("no knowledge found!");
+				}
+			}
+			else
+			{
+				log.error("knowledge = null!");
+			}
+		}
+		else
+		{
+			log.error("person = null!");
+		}
+	}
 }
