@@ -38,8 +38,10 @@
     </act>
 		<leg mode="car" departureTime="06:05:00" travelTime="00:25:00" arrivalTime="06:30:00">
     	<route distance="45.5" travelTime="00:23:23">
-			  <link refId="23"/>
+			  <startLink refId="23"/>
+        <link refId="23"/>
 			  <link refId="24"/>
+        <endLink refId="24"/>
 			</route>
 		</leg>
  		<act type="w" endTime="12:10:00" >
@@ -51,7 +53,9 @@
     </act>
     <leg mode="car">
       <route>
+        <startLink refId="23"></startLink>
         <link refId="23" />
+        <endLink refId="23"></endLink>
       </route>
     </leg>
     <act type="w" >

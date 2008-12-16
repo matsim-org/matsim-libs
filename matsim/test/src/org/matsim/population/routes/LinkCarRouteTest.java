@@ -27,8 +27,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.LinkCarRoute;
 
 /**
  * @author mrieser
@@ -46,7 +44,7 @@ public class LinkCarRouteTest extends AbstractCarRouteTest {
 		Link link2 = network.getLink(new IdImpl("2"));
 		Node node2 = network.getNode(new IdImpl("2"));
 
-		CarRoute route = new LinkCarRoute();
+		CarRoute route = new LinkCarRoute(link1, link2);
 		route.setLinks(link1, null, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());
@@ -61,7 +59,7 @@ public class LinkCarRouteTest extends AbstractCarRouteTest {
 		List<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
 
-		CarRoute route = new LinkCarRoute();
+		CarRoute route = new LinkCarRoute(link1, link2);
 		route.setNodes(link1, nodes, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());

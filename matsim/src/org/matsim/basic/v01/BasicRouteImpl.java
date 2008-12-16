@@ -35,6 +35,20 @@ public class BasicRouteImpl implements BasicRoute {
 	private Id startLinkId = null;
 	private Id endLinkId = null;
 
+	/**
+	 * This constructor is only needed for backwards compatibility reasons and thus is
+	 * set to deprecated. New code should make use of the constructor which sets the Ids of the
+	 * start and the end link of a Route correctly.
+	 */
+	@Deprecated
+	public BasicRouteImpl() {}
+	
+	public BasicRouteImpl(Id startLinkId, Id endLinkId){
+		this.startLinkId = startLinkId;
+		this.endLinkId = endLinkId;
+	}
+	
+	
 	public double getDist() {
 		return dist;
 	}
@@ -59,6 +73,11 @@ public class BasicRouteImpl implements BasicRoute {
 		return this.linkIds;
 	}
 
+	/**
+	 * Deprecated: Use constructor instead.
+	 * @param linkId
+	 */
+	@Deprecated 
 	public void setStartLinkId(final Id linkId) {
 		this.startLinkId = linkId;
 	}
@@ -66,7 +85,11 @@ public class BasicRouteImpl implements BasicRoute {
 	public Id getStartLinkId() {
 		return this.startLinkId;
 	}
-	
+	/**
+	 * Deprecated: Use constructor instead.
+	 * @param linkId
+	 */
+	@Deprecated 	
 	public void setEndLinkId(final Id linkId) {
 		this.endLinkId = linkId;
 	}

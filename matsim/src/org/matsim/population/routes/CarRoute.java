@@ -27,6 +27,12 @@ import org.matsim.network.Node;
 
 public interface CarRoute extends Route {
 
+	/**
+	 * Never use String arguments as parameter except they contain a real String, i.e. 
+	 * textual information like a word or phrase.
+	 * @param route
+	 */
+	@Deprecated 
 	public abstract void setNodes(final String route);
 
 	public abstract List<Node> getNodes();

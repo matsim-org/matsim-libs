@@ -33,6 +33,19 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 
 	private Link startLink = null;
 	private Link endLink = null;
+	
+	/**
+	 * This constructor is only needed for backwards compatibility reasons and thus is
+	 * set to deprecated. New code should make use of the constructor which sets the
+	 * start and the end link of a Route correctly.
+	 */
+	@Deprecated 
+	protected AbstractRoute(){
+	}
+	
+	public AbstractRoute(Link startLink, Link endLink) {
+		super(startLink.getId(), endLink.getId());
+	}
 
 	public Link getEndLink() {
 		return this.endLink;
@@ -50,7 +63,8 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 		this.startLink = link;
 	}
 
-	@Override
+	@Override 
+	@Deprecated
 	public void setStartLinkId(final Id linkId) {
 		throw new UnsupportedOperationException("Please use setStartLink(Link). Setting the link-id is only supported for BasicRoute, but not higher in the class hierarchy.");
 	}
@@ -66,6 +80,7 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 	}
 
 	@Override
+	@Deprecated
 	public Id getEndLinkId() {
 		return (this.endLink == null ? null : this.endLink.getId());
 	}

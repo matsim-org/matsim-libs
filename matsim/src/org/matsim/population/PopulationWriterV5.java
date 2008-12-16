@@ -218,11 +218,18 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 			this.atts.add(this.createTuple(PopulationSchemaV5Names.DISTANCE, route.getDist()));
 		}
 		this.writeStartTag(PopulationSchemaV5Names.ROUTE, this.atts);
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, route.getStartLinkId().toString()));
+		this.writeStartTag(PopulationSchemaV5Names.STARTLINK, this.atts, true);		
 		for (Id id : route.getLinkIds()) {
 			this.atts.clear();
 			this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, id.toString()));
 			this.writeStartTag(PopulationSchemaV5Names.LINK, this.atts, true);
 		}
+		this.atts.clear();
+		this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, route.getEndLinkId().toString()));
+		this.writeStartTag(PopulationSchemaV5Names.ENDLINK, this.atts, true);
+
 		this.writeEndTag(PopulationSchemaV5Names.ROUTE);
 	}
 

@@ -81,10 +81,12 @@ public class BasicPopulationBuilder implements PopulationBuilder {
 		return p;
 	}
 	
-	public BasicRoute createRoute(final List<Id> currentRouteLinkIds) {
-		BasicRouteImpl route = new BasicRouteImpl();
-		List<Id> r = new ArrayList<Id>(currentRouteLinkIds);
-		route.setLinkIds(r);
+	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds) {
+		BasicRouteImpl route = new BasicRouteImpl(startLinkId, endLinkId);
+		if (!currentRouteLinkIds.isEmpty()) {
+				List<Id> r = new ArrayList<Id>(currentRouteLinkIds);
+				route.setLinkIds(r);
+		}
 		return route;
 	}
 

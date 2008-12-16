@@ -46,7 +46,19 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 	/** number of links in uncompressed route */
 	private int uncompressedLength = 0;
 
-	public CompressedCarRoute(final Map<Link, Link> subsequentLinks) {
+	/**
+	 * This constructor is only needed for backwards compatibility reasons and thus is
+	 * set to deprecated. New code should make use of the constructor which sets the
+	 * start and the end link of a Route correctly.
+	 */
+	@Deprecated
+	public CompressedCarRoute(final Map<Link, Link> subsequentLinks){	
+		super();
+		this.subsequentLinks = subsequentLinks;
+	}
+	
+	public CompressedCarRoute(Link startLink, Link endLink, final Map<Link, Link> subsequentLinks) {
+		super(startLink, endLink);
 		this.subsequentLinks = subsequentLinks;
 	}
 
@@ -158,7 +170,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 			}
 		}
 
-		CarRoute subRoute = new CompressedCarRoute(this.subsequentLinks);
+		CarRoute subRoute = new CompressedCarRoute(newStartLink, newEndLink, this.subsequentLinks);
 		subRoute.setLinks(newStartLink, newLinks, newEndLink);
 		return subRoute;
 	}
@@ -175,7 +187,7 @@ public class CompressedCarRoute extends AbstractRoute implements CarRoute {
 		this.route.clear();
 		setStartLink(startLink);
 		setEndLink(endLink);
-		if (srcRoute == null || srcRoute.size() == 0) {
+		if ((srcRoute == null) || (srcRoute.size() == 0)) {
 			this.uncompressedLength = 0;
 			return;
 		}

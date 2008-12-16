@@ -20,12 +20,22 @@
 
 package org.matsim.population.routes;
 
+import org.matsim.network.Link;
+
 
 /**
  * @author mrieser
  */
 public class LinkCarRouteFactory implements RouteFactory {
 
+	public Route createRoute(Link startLink, Link endLink) {
+		return new LinkCarRoute(startLink, endLink);
+	}
+
+	/**
+	 * @see RouteFactory#createRoute()
+	 */
+	@Deprecated
 	public Route createRoute() {
 		return new LinkCarRoute();
 	}

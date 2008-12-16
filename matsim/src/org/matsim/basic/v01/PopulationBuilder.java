@@ -37,7 +37,12 @@ public interface PopulationBuilder {
 
 	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
 
-	BasicRoute createRoute(final List<Id> currentRouteLinkIds);
+	/**
+	 * Creates a new Route object
+	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+	 * @return a BasicRoute Object with the links set accordingly
+	 */
+	BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 
 	BasicPlan createPlan(BasicPerson person, boolean selected);
 

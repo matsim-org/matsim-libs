@@ -37,11 +37,23 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 
 	private double cost = Double.NaN;
 
-	public NodeCarRoute() {
-		// default constructor
+	
+	/**
+	 * This constructor is only needed for backwards compatibility reasons and thus is
+	 * set to deprecated. New code should make use of the constructor which sets the
+	 * start and the end link of a Route correctly.
+	 */
+	@Deprecated
+	public NodeCarRoute(){}
+	
+	public NodeCarRoute(Link startLink, Link endLink) {
+		super(startLink, endLink);
 	}
 
 	public NodeCarRoute(final CarRoute route) {
+		super();
+		super.setStartLink(route.getStartLink());
+		super.setEndLink(route.getEndLink());
 		super.setDist(route.getDist());
 		super.setTravelTime(route.getTravelTime());
 		this.route.addAll(route.getNodes());

@@ -152,7 +152,9 @@ xml:lang="en">
 
 <xs:complexType name="routeType">
   <xs:sequence>
+    <xs:element name="startLink" type="idRefType" minOccurs="1" maxOccurs="1" />
     <xs:element name="link" type="idRefType" minOccurs="0" maxOccurs="unbounded" />
+    <xs:element name="endLink" type="idRefType" minOccurs="1" maxOccurs="1" />
   </xs:sequence>
   <xs:attribute name="distance" type="xs:decimal" use="optional" />
   <xs:attribute name="travelTime" type="xs:time" use="optional" />

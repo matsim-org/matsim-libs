@@ -44,8 +44,16 @@ public class CompressedCarRouteFactory implements RouteFactory {
 		this.subsequentLinks = subsequentLinks;
 	}
 
+	/**
+	 * @see RouteFactory#createRoute()
+	 */
+	@Deprecated
 	public Route createRoute() {
 		return new CompressedCarRoute(this.subsequentLinks);
+	}
+
+	public Route createRoute(Link startLink, Link endLink) {
+		return new CompressedCarRoute(startLink, endLink, this.subsequentLinks);
 	}
 
 }

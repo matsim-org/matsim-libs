@@ -20,6 +20,8 @@
 
 package org.matsim.population.routes;
 
+import org.matsim.network.Link;
+
 /**
  * Provides a simple factory method to create new Route-objects.
  * Implement this interface to provide one specific implementation
@@ -28,5 +30,12 @@ package org.matsim.population.routes;
  * @author mrieser
  */
 public interface RouteFactory {
+	/**
+	 * Method only available for backward compatibility. Make use
+	 * of createRoute(Link, Link) method if possible.
+	 */
+	@Deprecated
 	public Route createRoute();
+	
+	public Route createRoute(Link startLink, Link endLink);
 }

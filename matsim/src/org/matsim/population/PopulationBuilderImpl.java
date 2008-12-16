@@ -22,6 +22,7 @@ package org.matsim.population;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
@@ -40,7 +41,7 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.population.routes.LinkCarRoute;
 
 /**
  * @author dgrether
@@ -97,13 +98,27 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		return createPlan(currentPerson, false);
 	}
 
-	public BasicRoute createRoute(final List<Id> currentRouteLinkIds) {
-		CarRoute route = new NodeCarRoute();
+	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds) {
+		Link start = network.getLink(startLinkId);		
+		Link end = network.getLink(endLinkId);
+		if (start == null) {
+			throw new IllegalStateException("Cann't create Route with StartLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
+		}
+		if (end == null) {
+			throw new IllegalStateException("Cann't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
+		}
+		CarRoute route = new LinkCarRoute(start, end);
 		List<Link> links = new ArrayList<Link>();
+		Link link;
 		for (Id id : currentRouteLinkIds) {
+			Logger.getLogger(PopulationBuilderImpl.class).error("id: " + id);
+			link = this.network.getLink(id);
+			if (link == null) {
+				throw new IllegalStateException("Cann't create Route over Link with Id " + id + " because the Link cannot be found in the loaded Network.");
+			}
 			links.add(this.network.getLink(id));
 		}
-		route.setLinks(null, links, null); // TODO [dg] pass start and endLink instead of null
+		route.setLinks(start, links, end); 
 		return route;
 	}
 

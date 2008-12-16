@@ -21,6 +21,7 @@ package org.matsim.basic.v01;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -74,6 +75,10 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 	private BasicLeg currentLeg;
 	
 	private List<Id> currentRouteLinkIds = new ArrayList<Id>();
+	
+	private Id currentStartLinkId;
+	
+	private Id currentEndLinkId;
 
 	private BasicRoute currentRoute;
 
@@ -145,14 +150,14 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 		  this.currentlocation = null;
 		}
 		else if (PopulationSchemaV5Names.ROUTE.equalsIgnoreCase(name)) {
-			this.currentRoute = this.populationBuilder.createRoute(this.currentRouteLinkIds);
+			this.currentRoute = this.populationBuilder.createRoute(this.currentStartLinkId, this.currentEndLinkId, this.currentRouteLinkIds);
 			if (null != this.currentDistance) {
 				this.currentRoute.setDist(this.currentDistance);
 			}
 			if (null != this.currentTravelTime) {
 				this.currentRoute.setTravelTime(this.currentTravelTime);
 			}
-			this.currentRouteLinkIds.clear();
+			this.currentRouteLinkIds = null;
 			this.currentDistance = null;
 			this.currentTravelTime = null;
 		}
@@ -290,6 +295,7 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 			}
 		}
 		else if (PopulationSchemaV5Names.ROUTE.equalsIgnoreCase(name)){
+			this.currentRouteLinkIds = new LinkedList<Id>();
 			String dist = atts.getValue(PopulationSchemaV5Names.DISTANCE);
 			if (dist != null) {
 				this.currentDistance = Double.valueOf(dist);
@@ -302,6 +308,12 @@ public class BasicPopulationReaderV5 extends MatsimXmlParser implements Populati
 		else if (PopulationSchemaV5Names.LINK.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
 			this.currentRouteLinkIds.add(id);
+		}
+		else if (PopulationSchemaV5Names.STARTLINK.equalsIgnoreCase(name)) {
+			this.currentStartLinkId = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
+		}
+		else if (PopulationSchemaV5Names.ENDLINK.equalsIgnoreCase(name)) {
+			this.currentEndLinkId = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));
 		}
 		else if (PopulationSchemaV5Names.FACILITYID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(PopulationSchemaV5Names.REFID));

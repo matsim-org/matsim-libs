@@ -35,6 +35,8 @@ public interface PopulationSchemaV5Names {
 	public static String MODE = "mode";
 	public static String ROUTE = "route";
 	public static String LINK = "link";
+	public static String STARTLINK = "startLink";
+	public static String ENDLINK = "endLink";
 	public static String REFID = "refId";
 	public static String TYPE = "type";
 	public static String DURATION = "duration";

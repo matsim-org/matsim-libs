@@ -74,13 +74,11 @@ public class BkTestPlansCreator {
 			plan.addAct(act1);
 			
 			BasicLeg leg = new BasicLegImpl(BasicLeg.Mode.car);
-			BasicRouteImpl route = new BasicRouteImpl();
+			BasicRouteImpl route = new BasicRouteImpl(id1, id4);
 			List<Id> linkids = new ArrayList<Id>();
-			route.setStartLinkId(id1);
 			linkids.add(id2);
 			linkids.add(id3);
 			route.setLinkIds(linkids);
-			route.setEndLinkId(id4);
 			leg.setRoute(route);
 			plan.addLeg(leg);
 			
@@ -89,12 +87,10 @@ public class BkTestPlansCreator {
 			plan.addAct(act2);
 			
 			BasicLeg leg2 = new BasicLegImpl(BasicLeg.Mode.car);
-			route = new BasicRouteImpl();
-			route.setStartLinkId(id4);
+			route = new BasicRouteImpl(id4, id5);
 			linkids.clear();
 			linkids.add(id5);
 			linkids.add(id5);
-			route.setEndLinkId(id5);
 			route.setLinkIds(linkids);
 			leg2.setRoute(route);
 			plan.addLeg(leg);

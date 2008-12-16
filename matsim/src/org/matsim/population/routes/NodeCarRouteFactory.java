@@ -20,6 +20,8 @@
 
 package org.matsim.population.routes;
 
+import org.matsim.network.Link;
+
 
 /**
  * Creates new instances of {@link NodeCarRoute}.
@@ -28,6 +30,16 @@ package org.matsim.population.routes;
  */
 public class NodeCarRouteFactory implements RouteFactory {
 
+
+	public Route createRoute(Link startLink, Link endLink) {
+		return new NodeCarRoute(startLink, endLink);
+	}
+
+	/**
+	 * Method only available for backward compatibility. Make use
+	 * of createRoute(Link, Link) method if possible.
+	 */
+	@Deprecated
 	public Route createRoute() {
 		return new NodeCarRoute();
 	}
