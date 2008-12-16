@@ -22,7 +22,6 @@ package org.matsim.population;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
@@ -111,7 +110,6 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		List<Link> links = new ArrayList<Link>();
 		Link link;
 		for (Id id : currentRouteLinkIds) {
-			Logger.getLogger(PopulationBuilderImpl.class).error("id: " + id);
 			link = this.network.getLink(id);
 			if (link == null) {
 				throw new IllegalStateException("Cann't create Route over Link with Id " + id + " because the Link cannot be found in the loaded Network.");
