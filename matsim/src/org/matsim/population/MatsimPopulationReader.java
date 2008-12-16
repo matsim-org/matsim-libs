@@ -44,7 +44,8 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V0 = "plans_v0.dtd";
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
-
+  private static final String POPULATION_V5 = "population_v5.xsd";
+	
 	private final Population plans;
 	private final NetworkLayer network;
 	private MatsimXmlParser delegate = null;
@@ -105,7 +106,13 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		if (PLANS_V4.equals(doctype)) {
 			this.delegate = new PopulationReaderMatsimV4(this.plans, this.network);
 			log.info("using plans_v4-reader.");
-		} else if (PLANS_V1.equals(doctype)) {
+		} 
+		//TODO dg: think about concept for facilities and households which are ignored at the moment
+		else if (POPULATION_V5.equalsIgnoreCase(doctype)) {
+			this.delegate = new PopulationReaderMatsimV5(this.network, this.plans, null, null);
+			log.info("using Population V5 reader.");
+		}
+		else if (PLANS_V1.equals(doctype)) {
 			this.delegate = new PopulationReaderMatsimV1(this.plans, this.network);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
