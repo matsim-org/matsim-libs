@@ -44,7 +44,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V0 = "plans_v0.dtd";
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
-  private static final String POPULATION_V5 = "population_v5.xsd";
+  private static final String POPULATION_V5 = "population_v5.0.xsd";
 	
 	private final Population plans;
 	private final NetworkLayer network;
