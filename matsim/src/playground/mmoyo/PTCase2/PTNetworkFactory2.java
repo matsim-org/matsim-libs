@@ -58,7 +58,8 @@ public class PTNetworkFactory2 {
 	
 		//Add Links
 		for (Link l: tempNet.getLinks().values()){
-			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
+			ptNetworkLayer.createLink(l.getId(), l.getFromNode(), l.getToNode(), 0, 1, 1, 1, "0", l.getType());
+			//createPTLink(ptNetworkLayer, .toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
 		}
 
 		tempNet= null;
@@ -196,48 +197,42 @@ public class PTNetworkFactory2 {
 				toPTNode=  ptNode;
 				idLink= "WW" + String.valueOf(x);
 			}
-			createWalkingLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
+			createPTLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
 			NewWalkLinks.add(new IdImpl(idLink));
 		}//for
 		return NewWalkLinks;
 	}
 	
-	public void removeWalkinkLinks(NetworkLayer ptNetworkLayer,List<IdImpl> WalkingLinkList){
+	public void removeWalkingLinks(NetworkLayer ptNetworkLayer,List<IdImpl> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
 		for (Iterator<IdImpl> iter = WalkingLinkList.iterator(); iter.hasNext();) {
 			ptNetworkLayer.removeLink(ptNetworkLayer.getLink(iter.next()));
 		}
 	}
 	
-	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, String from, String to, String ptType ){
-		String length = "1";
-		String freespeed= "1";
-		String capacity = "1";
-		String permlanes = "1";
-		String origid = "0";
-		
-		//System.out.println(idLink + " " + from);
-		ptNetworkLayer.createLink(idLink, from, to, length, freespeed, capacity, permlanes, origid, ptType);
+	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, String from, String to, String type ){
+		PTNode fromNode= (PTNode)ptNetworkLayer.getNode(from);
+		PTNode toNode= (PTNode)ptNetworkLayer.getNode(to);
+		//System.out.println(idLink + " " + from);		
+		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
 	}
-	
-	public void createWalkingLink(NetworkLayer ptNetworkLayer, String idLink, PTNode fromPTNode , PTNode toPTNode, String ptType ){
-		String idFromNode = fromPTNode.getId().toString();
-		String idToNode = toPTNode.getId().toString();
-		String length = Double.toString(fromPTNode.getCoord().calcDistance(toPTNode.getCoord()));
-
+		
+	public void createPTLink(NetworkLayer net, String strIdLink, PTNode fromNode, PTNode toNode, String Type){
+		IdImpl idLink = new IdImpl(strIdLink);
+		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
+		
 		//For the time being these values are irrelevant in PTsimulation
-		String freespeed= "1";
-		String capacity = "1";
-		String permlanes = "1";
-		String origid = "0";
-		ptNetworkLayer.createLink(idLink, idFromNode, idToNode, length, freespeed, capacity, permlanes, origid, ptType);
+		double freespeed= 1;
+		double capacity = 1;
+		double numLanes = 1;
+		String origId = "0";
+		net.createLink(idLink, fromNode, toNode, length, freespeed, capacity, numLanes, origId, Type);
 	}
 	
 	public void writeNet(NetworkLayer net, String fileName){
 		System.out.println("writing pt network...");
 		new NetworkWriter(net, fileName).write();
 		System.out.println("done.");
-		
 	}
 	
 	public static void printLinks(NetworkLayer ptNetworkLayer) {

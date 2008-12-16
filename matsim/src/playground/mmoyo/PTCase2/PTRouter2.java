@@ -58,8 +58,8 @@ public class PTRouter2 {
 		
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
-		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList1);
-		ptNetworkFactory.removeWalkinkLinks(ptNetworkLayer, walkingLinkList2);
+		ptNetworkFactory.removeWalkingLinks(ptNetworkLayer, walkingLinkList1);
+		ptNetworkFactory.removeWalkingLinks(ptNetworkLayer, walkingLinkList2);
 		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W1"));
 		this.ptNetworkLayer.removeNode(this.ptNetworkLayer.getNode("W2"));
 		this.ptNetworkLayer.removeNode(ptNode1);

@@ -123,6 +123,8 @@ public class PTTimeTable2{
 	//in minutes
 	public double nextDeparture(Id idPTNode,  double dblTime){//,
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
+		return dblTime +1;
+		/*
 		int x=0;
 		while (arrDep[x]<dblTime){
 			x++;
@@ -131,5 +133,6 @@ public class PTTimeTable2{
 			}
 		}
 		return arrDep[x];
+		*/
 	}
 }

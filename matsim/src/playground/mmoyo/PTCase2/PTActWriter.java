@@ -117,8 +117,8 @@ public class PTActWriter {
 		ptNode2= this.pt.getPtNetworkFactory().CreateWalkingNode(pt.getPtNetworkLayer(), new IdImpl("w2"), coord2);
 		path.nodes.add(0, ptNode1);
 		path.nodes.add(ptNode2);
-		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW1", ptNode1 , (PTNode)path.nodes.get(1), "Walking");
-		this.pt.getPtNetworkFactory().createWalkingLink(this.pt.getPtNetworkLayer(), "linkW2", (PTNode)path.nodes.get(path.nodes.size()-2) , ptNode2, "Walking");
+		this.pt.getPtNetworkFactory().createPTLink(this.pt.getPtNetworkLayer(), "linkW1", ptNode1 , (PTNode)path.nodes.get(1), "Walking");
+		this.pt.getPtNetworkFactory().createPTLink(this.pt.getPtNetworkLayer(), "linkW2", (PTNode)path.nodes.get(path.nodes.size()-2) , ptNode2, "Walking");
 	}
 	
 	private void removeWlinks(){
@@ -159,8 +159,8 @@ public class PTActWriter {
 		
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 
-		this.pt.getPtNetworkFactory().removeWalkinkLinks(this.pt.getPtNetworkLayer(), walkingLinkList1);
-		this.pt.getPtNetworkFactory().removeWalkinkLinks(this.pt.getPtNetworkLayer(), walkingLinkList2);
+		this.pt.getPtNetworkFactory().removeWalkingLinks(this.pt.getPtNetworkLayer(), walkingLinkList1);
+		this.pt.getPtNetworkFactory().removeWalkingLinks(this.pt.getPtNetworkLayer(), walkingLinkList2);
 		this.pt.getPtNetworkLayer().removeNode(this.pt.getPtNetworkLayer().getNode("W1"));
 		this.pt.getPtNetworkLayer().removeNode(this.pt.getPtNetworkLayer().getNode("W2"));
 		this.pt.getPtNetworkLayer().removeNode(ptNode1);
