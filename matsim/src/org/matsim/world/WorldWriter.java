@@ -130,7 +130,7 @@ public class WorldWriter extends Writer {
 	public final void write() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeHeader("world");
+			writeDtdHeader("world");
 			this.out.flush();
 			this.writerhandler.startWorld(this.world, this.out);
 			this.writerhandler.writeSeparator(this.out);

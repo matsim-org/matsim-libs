@@ -74,7 +74,7 @@ public class ConfigWriter extends Writer {
 			} else {
 				this.out = new BufferedWriter(this.outstream);
 			}
-			writeHeader("config");
+			writeDtdHeader("config");
 			this.out.flush();
 
 			this.handler.startConfig(this.config, this.out);

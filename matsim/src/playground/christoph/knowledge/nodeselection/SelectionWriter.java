@@ -94,7 +94,7 @@ public class SelectionWriter extends Writer {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 			this.fileOpened = true;
-			this.writeHeader("selection");
+			this.writeDtdHeader("selection");
 			this.handler.startSelection(description, out);
 			this.handler.writeSeparator(this.out);
 		}

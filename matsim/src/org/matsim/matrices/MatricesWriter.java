@@ -58,7 +58,7 @@ public class MatricesWriter extends Writer {
 	public final void write() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeHeader("matrices");
+			writeDtdHeader("matrices");
 			this.out.flush();
 			this.handler.startMatrices(this.matrices, this.out);
 			this.handler.writeSeparator(this.out);
@@ -66,9 +66,9 @@ public class MatricesWriter extends Writer {
 			while (m_it.hasNext()) {
 				Matrix m = m_it.next();
 				this.handler.startMatrix(m, this.out);
-				Iterator<?> eal_it = m.getFromLocations().values().iterator();
+				Iterator<ArrayList<Entry>> eal_it = m.getFromLocations().values().iterator();
 				while (eal_it.hasNext()) {
-					ArrayList<Entry> eal = (ArrayList<Entry>) eal_it.next();
+					ArrayList<Entry> eal = eal_it.next();
 					Iterator<Entry> e_it = eal.iterator();
 					while (e_it.hasNext()) {
 						Entry e = e_it.next();

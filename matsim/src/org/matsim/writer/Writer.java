@@ -25,6 +25,10 @@ import java.io.IOException;
 
 import org.matsim.gbl.Gbl;
 
+/**
+ * Usage of this class discouraged. It will be deprecated soon. Please
+ * use {@link MatsimXmlWriter} for writing XML files.
+ */
 public abstract class Writer {
 
 	//////////////////////////////////////////////////////////////////////
@@ -48,8 +52,7 @@ public abstract class Writer {
 
 	public abstract void write();
 
-	@Deprecated /** this method is clearly not at the right place because one can only use it with dtds **/
-	protected void writeHeader(final String root_elem) {
+	protected void writeDtdHeader(final String root_elem) {
 		try {
 			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 			this.out.write("<!DOCTYPE " + root_elem + " SYSTEM \"" + this.dtd + "\">\n\n");

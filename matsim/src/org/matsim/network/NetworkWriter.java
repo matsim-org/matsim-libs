@@ -62,7 +62,7 @@ public class NetworkWriter extends Writer {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
 
-			this.writeHeader("network");
+			this.writeDtdHeader("network");
 
 			this.handler.startNetwork(this.network, this.out);
 			this.handler.writeSeparator(this.out);

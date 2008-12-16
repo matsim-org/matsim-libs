@@ -33,10 +33,6 @@ import org.matsim.writer.Writer;
 
 public class FacilitiesWriter extends Writer {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
 	private FacilitiesWriterHandler handler = null;
 	private final Facilities facilities;
 
@@ -87,19 +83,17 @@ public class FacilitiesWriter extends Writer {
 	public final void writeOpenAndInit() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeHeader("facilities");
+			writeDtdHeader("facilities");
 			this.handler.startFacilities(this.facilities, this.out);
 			this.handler.writeSeparator(this.out);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public final void writeFacility(Facility f) {
+	public final void writeFacility(final Facility f) {
 		try {
 			this.handler.startFacility(f, this.out);
 			Iterator<Activity> a_it = f.getActivities().values().iterator();
@@ -124,7 +118,6 @@ public class FacilitiesWriter extends Writer {
 			this.handler.writeSeparator(this.out);
 			this.out.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -135,7 +128,6 @@ public class FacilitiesWriter extends Writer {
 			this.out.flush();
 			this.out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
