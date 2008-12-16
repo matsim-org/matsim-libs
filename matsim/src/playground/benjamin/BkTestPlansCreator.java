@@ -86,6 +86,8 @@ public class BkTestPlansCreator {
 			
 			BasicActImpl act2 = new BasicActImpl("w");
 			act2.setLinkId(id4);
+			act2.setStartTime(7.0 * 3600.0);
+			act2.setEndTime(15.0 * 3600.0);
 			plan.addAct(act2);
 			
 			BasicLeg leg2 = new BasicLegImpl(BasicLeg.Mode.car);
@@ -105,7 +107,7 @@ public class BkTestPlansCreator {
 			pop.addPerson(p);
 //			homeEndTime++;				
 		}
-		
+		log.info("created population...");
 		return pop;
 	}
 	
@@ -121,11 +123,13 @@ public class BkTestPlansCreator {
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = pc.createPlans();
 		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);
 		writer.writeFile(outfile);
-		
+		log.info("plans written");
 		//test if correct...
-    pop = new BasicPopulationImpl();
+        pop = new BasicPopulationImpl();
 		BasicPopulationReaderV5 reader = new BasicPopulationReaderV5(pop, null);
 		reader.readFile(outfile);
+		log.info("plans tested.");
+		log.info("finished!");
 	}
 
 }
