@@ -1,9 +1,7 @@
 package playground.benjamin;
 
 import org.matsim.controler.Controler;
-import org.matsim.gbl.Gbl;
 import org.matsim.run.OTFVis;
-import org.matsim.utils.vis.netvis.NetVis;
 
 public class MyMain {
 
@@ -27,15 +25,19 @@ public class MyMain {
 //		
 //	}
 
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 //		Controler c = new Controler("examples/equil/config.xml");
-//		String[] array = new String[3];
-//		String[] arrayfix = {"eins", "zwei", "undsoweiter"};
 //		org.matsim.run.Controler.main(new String[] {"examples/tutorial/singleIteration.xml"});
-		Controler c = new Controler("examples/equil/configOTF.xml");
+		String equilExampleConfig = "examples/equil/configOTF.xml";
+		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+//		String config = equilExampleConfig;
+		String config = oneRouteNoModeTest;
+		
+		Controler c = new Controler(config);
 		c.setOverwriteFiles(true);
 		c.run();
 		
@@ -46,7 +48,7 @@ public class MyMain {
 		
 		String[] visargs = {out};
 		
-		OTFVis.main(new String[] {out});
+		OTFVis.main(new String[] {out});	
 	}
 
 	

@@ -55,11 +55,13 @@ public class BkTestPlansCreator {
 	private Id id3 = new IdImpl(3);
 	private Id id4 = new IdImpl(4);
 	private Id id5 = new IdImpl(5);
+	private Id id6 = new IdImpl(6);
+	private Id id7 = new IdImpl(7);
 	
 	public BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> createPlans() {
 		double firstHomeEndTime = 6.0 * 3600.0;
 		double homeEndTime = firstHomeEndTime;
-		
+		log.info("starting plans creation...");
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = new BasicPopulationImpl();
 		
 		for (int i = 1; i <= 1000; i++) {
@@ -83,24 +85,25 @@ public class BkTestPlansCreator {
 			plan.addLeg(leg);
 			
 			BasicActImpl act2 = new BasicActImpl("w");
-			act2.setLinkId(id3);
+			act2.setLinkId(id4);
 			plan.addAct(act2);
 			
 			BasicLeg leg2 = new BasicLegImpl(BasicLeg.Mode.car);
-			route = new BasicRouteImpl(id4, id5);
-			linkids.clear();
+			route = new BasicRouteImpl(id4, id1);
+			linkids = new ArrayList<Id>();
 			linkids.add(id5);
-			linkids.add(id5);
+			linkids.add(id6);
+			linkids.add(id7);
 			route.setLinkIds(linkids);
 			leg2.setRoute(route);
-			plan.addLeg(leg);
+			plan.addLeg(leg2);
 			
 			BasicActImpl act3 = new BasicActImpl("h");
 			act3.setLinkId(id1);
 			plan.addAct(act3);
 			
 			pop.addPerson(p);
-			homeEndTime++;				
+//			homeEndTime++;				
 		}
 		
 		return pop;
@@ -113,7 +116,7 @@ public class BkTestPlansCreator {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String outfile = "./output/myplans.xml";
+		String outfile = "../studies/bkickhoefer/oneRouteNoModeTest/plans.xml";
 		BkTestPlansCreator pc = new BkTestPlansCreator();
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = pc.createPlans();
 		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);

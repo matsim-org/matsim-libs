@@ -8,7 +8,7 @@ public class MyNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		NetVis.displayNetwork("../studies/bkickhoefer/network.xml");
+		NetVis.displayNetwork("../studies/bkickhoefer/oneRouteNoModeTest/network.xml");
 	}
 
 }
