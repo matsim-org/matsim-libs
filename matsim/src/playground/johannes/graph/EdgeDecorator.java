@@ -24,26 +24,34 @@
 package playground.johannes.graph;
 
 /**
+ * Decorator class for any type of {@link Edge}.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class EdgeDecorator<E extends Edge> extends SparseEdge {
 
 	private E delegate;
-	
+
 	/**
+	 * Creates a new decorator for edge <tt>delegate</tt>.
+	 * 
 	 * @param v1
+	 *            one of the two vertices this edge is connected to.
 	 * @param v2
+	 *            one of the two vertices this edge is connected to.
 	 */
-	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2, E delegate) {
+	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2,
+			E delegate) {
 		super(v1, v2);
 		this.delegate = delegate;
 	}
-	
-//	public void setDelegate(E delegate) {
-//		this.delegate = delegate;
-//	}
-	
+
+	/**
+	 * Returns the decorated edge.
+	 * 
+	 * @return the decorated edge.
+	 */
 	public E getDelegate() {
 		return delegate;
 	}

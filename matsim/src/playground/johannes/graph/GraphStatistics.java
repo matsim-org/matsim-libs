@@ -43,19 +43,37 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 /**
+ * A collection of function to calculate statistical properties of graphs.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class GraphStatistics {
 
 	private static final Logger logger = Logger.getLogger(GraphStatistics.class);
 	
 	private static int maxNumThreads = Runtime.getRuntime().availableProcessors();
-	
+
+	/**
+	 * Sets the number of allowed threads for calculation. Set <tt>num > 1</tt>
+	 * if you have multiple cpus available.
+	 * 
+	 * @param num
+	 *            the number of allowed threads.
+	 */
 	public static void setMaxAllowedThreads(int num) {
 		maxNumThreads = num;
 	}
 
+	/**
+	 * Retrieves the degree statistics of graph <tt>g</tt>. The graph is treated
+	 * as undirected.
+	 * 
+	 * @param g
+	 *            the graph to retrieve the degree statistics from.
+	 * @return A DescriptiveStatistics object containing the degree of each
+	 *         vertex in the graph.
+	 */
 	public static DescriptiveStatistics getDegreeStatistics(Graph g) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		for(Vertex v : g.getVertices())
@@ -63,6 +81,14 @@ public class GraphStatistics {
 		return stats;
 	}
 	
+	/**
+	 * Retrieves the degree distribution of graph <tt>g</tt>. The graph is
+	 * treated as undirected.
+	 * 
+	 * @param g
+	 *            the graph to retrieve the degree distribution from.
+	 * @return the degree distribution.
+	 */
 	public static Frequency getDegreeDistribution(Graph g) {
 		Frequency freq = new Frequency();
 		for(Vertex v : g.getVertices())
@@ -70,6 +96,21 @@ public class GraphStatistics {
 		return freq;
 	}
 	
+	/**
+	 * Calculates the local clustering coefficient of each vertex in graph
+	 * <tt>g</tt>. The local clustering coefficient is defined as:
+	 * <ul>
+	 * <li>C = 0 if k = 0 or k = 1,
+	 * <li>C = 2y/k*(k-1) if k > 1, where y is the number of edges connecting
+	 * neighbors of the vertex.
+	 * </ul>
+	 * 
+	 * @param g
+	 *            the graph the local clustering coefficients are to be
+	 *            calculated.
+	 * @return an object-double map containing the vertex as key and the
+	 *         clustering coefficient as value.
+	 */
 	public static TObjectDoubleHashMap<? extends Vertex> getClustringCoefficients(Graph g) {
 		TObjectDoubleHashMap<Vertex> cc = new TObjectDoubleHashMap<Vertex>();
 		for(Vertex v : g.getVertices()) {
@@ -95,6 +136,14 @@ public class GraphStatistics {
 		return cc;
 	}
 	
+	/**
+	 * Retrieves the clustering statistic of graph <tt>g</tt>.
+	 * 
+	 * @param g
+	 *            the grpah the clustering statistics are to be retrieved.
+	 * @return a DescriptiveStatistics object containing the local clustering
+	 *         coefficient for each vertex.
+	 */
 	public static DescriptiveStatistics getClusteringStatistics(Graph g) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		TObjectDoubleHashMap<? extends Vertex> cc = getClustringCoefficients(g);
@@ -103,6 +152,16 @@ public class GraphStatistics {
 		return stats;
 	}
 	
+	/**
+	 * Calculates the mutuality of graph <tt>g</tt>, where mutuality is defined
+	 * as<br>
+	 * M = number of neighbors two steps away / number of path of length two to
+	 * those vertices.
+	 * 
+	 * @param g
+	 *            the graph the mutuality is to be calculated.
+	 * @return the mutuality of graph <tt>g</tt>.
+	 */
 	public static double getMutuality(Graph g) {
 		int len2Paths = 0;
 		int nVertex2Steps = 0;
@@ -124,6 +183,15 @@ public class GraphStatistics {
 		return nVertex2Steps / (double) len2Paths;
 	}
 	
+	/**
+	 * Calculates the degree correlation of graph <tt>g</tt>.<br>
+	 * See: M.ÊE.ÊJ. Newman. Assortative mixing in networks. Physical Review
+	 * Letters, 89(20), 2002.
+	 * 
+	 * @param g
+	 *            the graph the degree correlation is to be calculated.
+	 * @return the degree correlation.
+	 */
 	public static double getDegreeCorrelation(Graph g) {
 		double product = 0;
 		double sum = 0;
@@ -144,6 +212,14 @@ public class GraphStatistics {
 		return ((norm * product) - Math.pow(norm * sum, 2)) / ((norm * squareSum) - Math.pow(norm * sum, 2));
 	}
 	
+	/**
+	 * Extracts the disconnected components of graph <tt>g</tt>.
+	 * 
+	 * @param g
+	 *            the graph the disconnected components are to be extracted.
+	 * @return a sorted set containing the disconnected components descending in
+	 *         size. A component is represented through a set of its vertices.
+	 */
 	public static SortedSet<Set<Vertex>> getComponents(Graph g) {
 		UnweightedDijkstra<Vertex> dijkstra = new UnweightedDijkstra<Vertex>(g);
 		Queue<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
@@ -172,6 +248,16 @@ public class GraphStatistics {
 		return components;
 	}
 	
+	/**
+	 * Calculates closeness centrality, betweenness centrality, diameter and
+	 * radius of graph <tt>g</tt>.
+	 * 
+	 * @param g
+	 *            the graph the centrality statistics are to be calculated.
+	 * @return a GraphDistance object storing information about closeness
+	 *         centrality, betweenness centrality, diameter and radius of graph
+	 *         <tt>g</tt>.
+	 */
 	public static GraphDistance getCentrality(Graph g) {
 		logger.info("Initializing graph for centrality calculation...");
 		CentralityGraph<Vertex> cGraph = new CentralityGraph<Vertex>(g);
@@ -254,11 +340,11 @@ public class GraphStatistics {
 		}
 	}
 	
-	public static class CentralityGraph<V extends Vertex> extends GraphProjection<Graph, V, Edge> {
+	private static class CentralityGraph<V extends Vertex> extends GraphProjection<Graph, V, Edge> {
 
 		public CentralityGraph(Graph delegate) {
 			super(delegate);
-			decorate(delegate);
+			decorate();
 		}
 
 		@Override
@@ -279,7 +365,7 @@ public class GraphStatistics {
 		
 	}
 	
-	public static class CentralityVertex<V extends Vertex> extends VertexDecorator<V> {
+	private static class CentralityVertex<V extends Vertex> extends VertexDecorator<V> {
 
 		private double closeness;
 
@@ -388,52 +474,104 @@ public class GraphStatistics {
 		}
 	}
 	
+	/**
+	 * Container class storing centrality attributes of a graph.
+	 * 
+	 * @author illenberger
+	 * 
+	 */
 	public static class GraphDistance {
-		
+
 		private TObjectDoubleHashMap<Vertex> vertexCloseness;
-		
+
 		private double graphCloseness;
-		
+
 		private TObjectDoubleHashMap<Vertex> vertexBetweenness;
-		
+
 		private TObjectDoubleHashMap<Vertex> vertexBetweennessNormalized;
-		
+
 		private double graphBetweenness;
-		
+
 		private double graphBetweennessNormalized;
-		
+
 		private int diatmeter;
-		
+
 		private int radius;
-		
+
+		/**
+		 * Returns the closeness values for vertices.
+		 * 
+		 * @return a object-double map containing the vertex as key and the
+		 *         closeness as value.
+		 */
 		public TObjectDoubleHashMap<Vertex> getVertexCloseness() {
 			return vertexCloseness;
 		}
-		
+
+		/**
+		 * Returns the closeness centrality of the graph.
+		 * 
+		 * @return the closeness centrality of the graph.
+		 */
 		public double getGraphCloseness() {
 			return graphCloseness;
 		}
-		
+
+		/**
+		 * Returns the betweenness values for vertices.
+		 * 
+		 * @return a object-double map containing the vertex as key and the
+		 *         betweenness as value.
+		 */
+
 		public TObjectDoubleHashMap<Vertex> getVertexBetweennees() {
 			return vertexBetweenness;
 		}
-		
+
+		/**
+		 * Returns the betweenness centrality of the graph.
+		 * 
+		 * @return the betweenness centrality of the graph.
+		 */
 		public double getGraphBetweenness() {
 			return graphBetweenness;
 		}
-		
+
+		/**
+		 * Returns the betweenness values for vertices normalized with
+		 * (n-1)*(n-2).
+		 * 
+		 * @return a object-double map containing the vertex as key and the
+		 *         normalized betweenness as value.
+		 */
 		public TObjectDoubleHashMap<Vertex> getVertexBetweenneesNormalized() {
 			return vertexBetweennessNormalized;
 		}
-		
+
+		/**
+		 * Returns the betweenness centrality of the graph normalized with
+		 * (n-1)*(n-2).
+		 * 
+		 * @return the normalized betweenness centrality of the graph.
+		 */
 		public double getGraphBetweennessNormalized() {
 			return graphBetweennessNormalized;
 		}
-		
+
+		/**
+		 * Returns the diameter of the graph.
+		 * 
+		 * @return the diameter of the graph.
+		 */
 		public int getDiameter() {
 			return diatmeter;
 		}
-		
+
+		/**
+		 * Returns the radius of the graph.
+		 * 
+		 * @return the radius of the graph.
+		 */
 		public int getRadius() {
 			return radius;
 		}

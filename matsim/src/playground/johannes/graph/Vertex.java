@@ -21,11 +21,34 @@
 package playground.johannes.graph;
 
 import java.util.List;
+import java.util.RandomAccess;
 
+/**
+ * Basic representation of a vertex.
+ * 
+ * @author illenberger
+ * 
+ */
 public interface Vertex {
-	
+
+	/**
+	 * Returns the list of edges connected to this vertex. Although, the
+	 * returned collection is a list, it must not contain duplicate entries. The
+	 * list implementation should implement the {@linkplain RandomAccess}
+	 * interface to allow fast iterating over the collection.
+	 * 
+	 * @return the list of edges connected to this vertex.
+	 */
 	public List<? extends Edge> getEdges();
-	
+
+	/**
+	 * Returns the list of adjacent vertices. Although, the returned collection
+	 * is a list, it must not contain duplicate entries. The list implementation
+	 * should implement the {@linkplain RandomAccess} interface to allow fast
+	 * iterating over the collection.
+	 * 
+	 * @return the list of adjacent vertices.
+	 */
 	public List<? extends Vertex> getNeighbours();
 
 }

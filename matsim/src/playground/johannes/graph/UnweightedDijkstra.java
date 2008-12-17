@@ -29,25 +29,56 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-
 /**
+ * Representation of an unweighted Dijkstra best path algorithm. This algorithm
+ * assigns each edge a weight of 1.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class UnweightedDijkstra<V extends Vertex> {
 
 	private Queue<DijkstraVertex> unsettledVertices;
 	
 	private DijkstraGraph projection;
-	
+
+	/**
+	 * Creates and initializes a new Dijkstra object.
+	 * 
+	 * @param graph
+	 *            The graph on which best path searches should be performed.
+	 */
 	public UnweightedDijkstra(Graph graph) {
 		this.projection = new DijkstraGraph(graph);
 	}
-	
+
+	/**
+	 * Spans up a complete best path tree with <tt>source</tt> as its root node.
+	 * 
+	 * @param source
+	 *            the root node.
+	 * @return a list of reachable vertices.
+	 * 
+	 * @see {@link #run(Vertex, Vertex)}
+	 */
 	public List<DijkstraVertex> run(V source) {
 		return run(source, null);
 	}
 	
+	/**
+	 * Runs the Dijkstra algorithm starting from <tt>source</tt> until
+	 * <tt>target</tt> has been reached and returns a list of all reachable
+	 * vertices wrapped into DijkstraVertex objects. A DijkstraVertex
+	 * knows all its predecessors (if there are multiple best paths from
+	 * <tt>source</tt> to <tt>target</tt>). Use {@link #getPath(Vertex, Vertex)}
+	 * to obtain a specific path.
+	 * 
+	 * @param source
+	 *            the root node.
+	 * @param target
+	 *            the destination node.
+	 * @return a list of all reachable vertices.
+	 */
 	public List<DijkstraVertex> run(V source, V target) {
 		List<DijkstraVertex> reachedVertices = new ArrayList<DijkstraVertex>();
 		DijkstraVertex dsource = projection.getVertex(source); 
@@ -97,6 +128,21 @@ public class UnweightedDijkstra<V extends Vertex> {
 		return reachedVertices;
 	}
 	
+	/**
+	 * Retrieves a path from <tt>source</tt> to <tt>target</tt>.
+	 * 
+	 * @param source
+	 *            the source vertex.
+	 * @param target
+	 *            the target vertex.
+	 * @return a list of vertices in the oder in which they are passed when
+	 *         traversing the path from <tt>source</tt> to <tt>target</tt>
+	 *         excluding the source vertex and including the target vertex.
+	 *         Returns <tt>null</tt> if <tt>source==target</tt>, or if there exists
+	 *         no path from <tt>source</tt> to <tt>target</tt>, or if
+	 *         {@link #run(Vertex)} or {@link #run(Vertex, Vertex)} has never
+	 *         been called before.
+	 */
 	public List<V> getPath(V source, V target) {
 		LinkedList<V> path = new LinkedList<V>();
 		
@@ -110,37 +156,33 @@ public class UnweightedDijkstra<V extends Vertex> {
 		DijkstraVertex dsource = projection.getVertex(source);
 		while(v != dsource) {
 			path.addFirst(v.getDelegate());
-			v = v.getPredecessors()[0];
+			if(v.getPredecessors().length > 0)
+				v = v.getPredecessors()[0];
+			else
+				return null;
 		}
 		return path;
 	}
 	
+	/**
+	 * A decorator class for a graph to store Dijkstra related information.
+	 * 
+	 * @author illenberger
+	 * 
+	 */
 	public class DijkstraGraph extends GraphProjection<Graph, V, Edge> {
-
-//		private Map<V, DijkstraVertex> vMapping = new HashMap<V, DijkstraVertex>();
-//		
-//		@SuppressWarnings("unchecked")
-//		public DijkstraGraph(Graph g) {
-//			super(g);
-//			
-//			for(Vertex v : g.getVertices()) {
-//				vMapping.put((V)v, (DijkstraVertex) addVertex((V)v));
-//			}
-//			
-//			for(Edge e : g.getEdges()) {
-//				DijkstraVertex v1 = vMapping.get(e.getVertices().getFirst());
-//				DijkstraVertex v2 = vMapping.get(e.getVertices().getSecond());
-//				addEdge(v1, v2);
-//			}
-//		}
-		
+	
+		/**
+		 * Creates a new DijkstraGraph out of <tt>delegate</tt>.
+		 * @param delegate the graph to be decorated.
+		 */
 		public DijkstraGraph(Graph delegate) {
 			super(delegate);
-			decorate(delegate);
+			decorate();
 		}
 
-		/* (non-Javadoc)
-		 * @see playground.johannes.graph.GraphProjection#addVertex(playground.johannes.graph.Vertex)
+		/**
+		 * @see {@link GraphProjection#addVertex(Vertex)}
 		 */
 		@Override
 		public VertexDecorator<V> addVertex(V delegate) {
@@ -151,101 +193,120 @@ public class UnweightedDijkstra<V extends Vertex> {
 				return null;
 		}
 
+		/**
+		 * @see {@link GraphProjection#getVertex(Vertex)}
+		 */
 		public DijkstraVertex getVertex(V v) {
-//			return vMapping.get(v);
 			return (DijkstraVertex) super.getVertex(v);
 		}
-
-//		@Override
-//		protected VertexDecorator<V> newVertex() {
-//			return new DijkstraVertex();
-//		}
 	}
 	
-	public class DijkstraVertex extends VertexDecorator<V> implements Comparable<DijkstraVertex>{
-		
+	/**
+	 * A decorator call for vertices to store Dijkstra related information.
+	 * 
+	 * @author illenberger
+	 * 
+	 */
+	public class DijkstraVertex extends VertexDecorator<V> implements
+			Comparable<DijkstraVertex> {
+
 		private boolean isSettled;
-		
+
 		private boolean isVisited;
-		
+
 		private int distance;
-		
+
 		private DijkstraVertex[] predecessors;
-		
+
+		/**
+		 * Creates a new DijkstraVertex.
+		 * 
+		 * @param delegate
+		 *            the vertex to decorate.
+		 */
 		public DijkstraVertex(V delegate) {
 			super(delegate);
 		}
-		
-		public boolean isSettled() {
+
+		/**
+		 * Returns if this vertex is settled.
+		 * 
+		 * @return <tt>true</tt> if this vertex is settled, <tt>false</tt>
+		 *         otherwise.
+		 */
+		private boolean isSettled() {
 			return isSettled;
 		}
-		
-		public void setSettled(boolean flag) {
+
+		/**
+		 * Sets if this vertex is settled.
+		 * 
+		 * @param flag
+		 *            <tt>true</tt> if this vertex is settled, <tt>false</tt>
+		 *            otherwise.
+		 */
+		private void setSettled(boolean flag) {
 			isSettled = flag;
 		}
-		
-		public boolean isVisited() {
+
+		private boolean isVisited() {
 			return isVisited;
 		}
-		
-		public void setVisited(boolean flag) {
+
+		private void setVisited(boolean flag) {
 			isVisited = flag;
 		}
-		
-		public int getDistance() {
+
+		private int getDistance() {
 			return distance;
 		}
-		
-		public void setDistance(int d) {
+
+		private void setDistance(int d) {
 			distance = d;
 		}
-		
-//		public List<DijkstraVertex> getPredecessors() {
-//			return predecessors;
-//		}
-//		
-//		public void setPredecessor(DijkstraVertex v) {
-//			predecessors.clear();
-//			predecessors.add(v);
-//		}
-//		
-//		public void addPredecessor(DijkstraVertex v) {
-//			predecessors.add(v);
-//		}
+
+		/**
+		 * Returns an array of predecessors of this vertex.
+		 * 
+		 * @return an array of predecessors of this vertex.
+		 */
 		public DijkstraVertex[] getPredecessors() {
 			return predecessors;
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		public void setPredecessor(DijkstraVertex v) {
-			if(predecessors.length != 1)
+		private void setPredecessor(DijkstraVertex v) {
+			if (predecessors.length != 1)
 				predecessors = new UnweightedDijkstra.DijkstraVertex[1];
 			predecessors[0] = v;
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		public void addPredecessor(DijkstraVertex v) {
+		private void addPredecessor(DijkstraVertex v) {
 			DijkstraVertex[] newPredecessors = new UnweightedDijkstra.DijkstraVertex[predecessors.length + 1];
-			for(int i = 0; i < predecessors.length; i++)
+			for (int i = 0; i < predecessors.length; i++)
 				newPredecessors[i] = predecessors[i];
 			newPredecessors[predecessors.length] = v;
 			predecessors = newPredecessors;
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		public void reset() {
+		private void reset() {
 			isSettled = false;
 			isVisited = false;
 			distance = Integer.MAX_VALUE;
-//			predecessors = new ArrayList<DijkstraVertex>();
-//			predecessors = new LinkedList<DijkstraVertex>();
 			predecessors = new UnweightedDijkstra.DijkstraVertex[0];
 		}
-		
+
+		/**
+		 * Compares this vertex with vertex <tt>o</tt> according to their
+		 * distance attribute. If distances are equal, both vertices are
+		 * compared according to their hash code.
+		 */
 		public int compareTo(DijkstraVertex o) {
 			int result = this.distance - o.distance;
-			if(result == 0) {
-				if(o.equals(this))
+			if (result == 0) {
+				if (o.equals(this))
 					return 0;
 				else
 					return this.hashCode() - o.hashCode();

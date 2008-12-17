@@ -31,22 +31,51 @@ import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
 
 /**
+ * Class for creating {@link PlainGraph} objects out of GraphML files.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class PlainGraphMLReader extends AbstractGraphMLReader {
 
+	/**
+	 * Creates a new SparseEdge and inserts into the graph between <tt>v1</tt>
+	 * and <tt>v2</tt>.
+	 * 
+	 * @param v1
+	 *            one of the two vertices the edge is connected to.
+	 * @param v2
+	 *            one of the two vertices the edge is connected to.
+	 * @param attrs
+	 *            the edge's attributes.
+	 * @return a new sparse edge.
+	 * @see {@link AbstractGraphMLReader#addEdge(SparseVertex, SparseVertex, Attributes)}
+	 *      .
+	 */
 	@Override
 	protected SparseEdge addEdge(SparseVertex v1, SparseVertex v2,
 			Attributes attrs) {
-		return ((PlainGraph)graph).addEdge(v1, v2);
+		return ((PlainGraph) graph).addEdge(v1, v2);
 	}
 
+	/**
+	 * Creates a new SparseVertex and inserts into the graph.
+	 * 
+	 * @param attrs
+	 *            the vertex's attributes.
+	 * @return a new SparseVertex.
+	 */
 	@Override
 	protected SparseVertex addVertex(Attributes attrs) {
-		return ((PlainGraph)graph).addVertex();
+		return ((PlainGraph) graph).addVertex();
 	}
 
+	/**
+	 * Creates a new empty PlainGraph.
+	 * 
+	 * @param attrs
+	 *            the graph's attributes (ignored).
+	 */
 	@Override
 	protected AbstractSparseGraph newGraph(Attributes attrs) {
 		return new PlainGraph();

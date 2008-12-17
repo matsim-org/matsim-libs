@@ -37,8 +37,12 @@ import playground.johannes.graph.Graph;
 import playground.johannes.graph.Vertex;
 
 /**
+ * Basic class for writing graph objects into GraphML files
+ * (http://graphml.graphdrawing.org/). This class treats graphs as undirected
+ * and unweighted.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class GraphMLWriter extends MatsimXmlWriter {
 
@@ -47,11 +51,22 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	private TObjectIntHashMap<Vertex> vertexTmpIds;
 	
 	private int vertexIdx;
-	
+
+	/**
+	 * Writes <tt>graph</tt> into a GraphML file at <tt>filename</tt>.
+	 * 
+	 * @param graph
+	 *            the graph to be written.
+	 * @param filename
+	 *            the filename for the GraphML file.
+	 * @throws IOException
+	 */
 	public void write(Graph graph, String filename) throws IOException {
 		this.graph = graph;
 		openFile(filename);
 		setPrettyPrint(true);
+		
+		vertexTmpIds = new TObjectIntHashMap<Vertex>();
 		
 		writeXmlHead();
 		
@@ -77,6 +92,15 @@ public class GraphMLWriter extends MatsimXmlWriter {
 		close();
 	}
 	
+	/**
+	 * Returns a list of graph attributes stored in String-String-tuples. The
+	 * returned list has one entry:
+	 * <ul>
+	 * <li>{@link GraphML#EDGEDEFAULT_TAG} - {@link GraphML#UNDIRECTED}
+	 * </ul>
+	 * 
+	 * @return a list of graph attributes stored in String-String-tuples.
+	 */
 	protected List<Tuple<String, String>> getGraphAttributes() {
 		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
 		attrs.add(createTuple(GraphML.EDGEDEFAULT_TAG, GraphML.UNDIRECTED));
@@ -90,23 +114,46 @@ public class GraphMLWriter extends MatsimXmlWriter {
 		vertexIdx = 1;
 		for(Vertex v : graph.getVertices()) {
 			vertexTmpIds.put(v, vertexIdx);
-			writeStartTag(AbstractGraphMLReader.NODE_TAG, getVertexAttributes(v), true);
+			writeStartTag(GraphML.NODE_TAG, getVertexAttributes(v), true);
 			vertexIdx++;
 		}
 	}
 	
+	/**
+	 * Returns a list of vertex attributes stored in String-String-tuples. The
+	 * returned list contains one entry:
+	 * <ul>
+	 * <li>{@link GraphML#ID_TAG} - <tt>vertexIdx</tt>
+	 * </ul>
+	 * 
+	 * @param v
+	 *            the vertex the attributes are to be returned.
+	 * @return a list of vertex attributes.
+	 */
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
-		attrs.add(createTuple(AbstractGraphMLReader.ID_TAG, vertexIdx));
+		attrs.add(createTuple(GraphML.ID_TAG, vertexIdx));
 		return attrs;
 	}
 	
 	private void writeEdges() throws IOException {
 		for(Edge e : graph.getEdges()) {
-			writeStartTag(AbstractGraphMLReader.EDGE_TAG, getEdgeAttributes(e), true);
+			writeStartTag(GraphML.EDGE_TAG, getEdgeAttributes(e), true);
 		}
 	}
 	
+	/**
+	 * Returns a list of edge attributes stored in String-String-tuples. The
+	 * returned list contains two entries:
+	 * <ul>
+	 * <li> {@link GraphML#SOURCE_TAG} - <tt>vertexIdx</tt>
+	 * <li> {@link GraphML#TARGET_TAG} - <tt>vertexIdx</tt>
+	 * </ul>
+	 * 
+	 * @param e
+	 *            the edge the attributes are to be returned.
+	 * @return a list of edge attributes.
+	 */
 	protected List<Tuple<String, String>> getEdgeAttributes(Edge e) {
 		List<Tuple<String, String>> attrs = new LinkedList<Tuple<String,String>>();
 		Vertex v1 = e.getVertices().getFirst();
@@ -114,11 +161,18 @@ public class GraphMLWriter extends MatsimXmlWriter {
 		int idx1 = vertexTmpIds.get(v1);
 		int idx2 = vertexTmpIds.get(v2);
 		if(idx1 > 0 && idx2 > 0) {
-			attrs.add(createTuple(AbstractGraphMLReader.SOURCE_TAG, idx1));
-			attrs.add(createTuple(AbstractGraphMLReader.TARGET_TAG, idx2));
+			attrs.add(createTuple(GraphML.SOURCE_TAG, idx1));
+			attrs.add(createTuple(GraphML.TARGET_TAG, idx2));
 		} else {
 			throw new IllegalArgumentException("Orphaned edges are not allowed!");
 		}
 		return attrs;
+	}
+	
+	public static void main(String[] args) throws IOException {
+		PlainGraphMLReader reader = new PlainGraphMLReader();
+		Graph g = reader.readGraph(args[0]);
+		GraphMLWriter writer = new GraphMLWriter();
+		writer.write(g, args[1]);
 	}
 }

@@ -26,13 +26,28 @@ package playground.johannes.graph;
 import java.util.Set;
 
 /**
+ * Basic representation of a mathematical graph.
+ * 
  * @author illenberger
- *
+ * 
+ */
+/*
+ * joh 28/11/09: Think about, if we also allow adjacency matrices for dense graphs... 
  */
 public interface Graph {
 
+	/**
+	 * Returns the set of vertices. The set should be read-only.
+	 * 
+	 * @return the set of vertices.
+	 */
 	public Set<? extends Vertex> getVertices();
-	
+
+	/**
+	 * Returns the set of edges. The set should be read-only.
+	 * 
+	 * @return the set of edges.
+	 */
 	public Set<? extends Edge> getEdges();
-	
+
 }

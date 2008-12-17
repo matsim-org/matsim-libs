@@ -32,7 +32,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.gbl.Gbl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -43,24 +42,16 @@ import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
 
 /**
+ * Abstract class providing basic parsing functionality for graphs stored in the
+ * GraphML file format (http://graphml.graphdrawing.org/). Subclasses must
+ * implement the factory methods for creating new graphs, vertices and edges.
+ * 
  * @author illenberger
- *
+ * 
  */
 public abstract class AbstractGraphMLReader {
 	
 	private static final Logger logger = Logger.getLogger(AbstractGraphMLReader.class);
-
-	static final String ID_TAG = "id";
-	
-	static final String SOURCE_TAG = "source";
-	
-	static final String TARGET_TAG = "target";
-	
-	static final String GRAPH_TAG = "graph";
-	
-	static final String NODE_TAG = "node";
-	
-	static final String EDGE_TAG = "edge";
 	
 	private TIntObjectHashMap<SparseVertex> vertexMappings;
 	
@@ -70,56 +61,95 @@ public abstract class AbstractGraphMLReader {
 	
 	private int numEdge;
 	
+	private boolean parseEdges;
+	
+	/**
+	 * Creates a new graph out of the graph data stored in <tt>file</tt>.
+	 * 
+	 * @param file
+	 *            the graph file
+	 * @return a new graph.
+	 */
 	public AbstractSparseGraph readGraph(String file) {
 		XMLHandler handler = new XMLHandler();
 		vertexMappings = new TIntObjectHashMap<SparseVertex>();
 		numVertex = 0;
 		numEdge = 0;
-		
+
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		factory.setValidating(false);
 		factory.setNamespaceAware(false);
 		SAXParser parser;
 		try {
 			parser = factory.newSAXParser();
-		
-		XMLReader reader = parser.getXMLReader();
-		reader.setContentHandler(handler);
-		// Ignore the DTD declaration
-//		reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-//		reader.setFeature("http://xml.org/sax/features/validation", false);
-		reader.parse(file);
-		printProgress();
+
+			XMLReader reader = parser.getXMLReader();
+			reader.setContentHandler(handler);
+			/*
+			 * The GraphML specification does not required nodes and edges to be
+			 * in a specific order. Thus we need to first parse the nodes and
+			 * then the edges.
+			 */
+			parseEdges = false;
+			reader.parse(file);
+			parseEdges = true;
+			reader.parse(file);
+			
+			printProgress();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return graph;
 	}
 
+	/**
+	 * Creates a new empty graph with the attributes specified in <tt>attrs</tt>
+	 * .
+	 * 
+	 * @param attrs
+	 *            the graph's attributes.
+	 * @return a new empty graph.
+	 */
 	protected abstract AbstractSparseGraph newGraph(Attributes attrs);
-	
+
+	/**
+	 * Creates a new vertex with the attributes specified in <tt>attrs</tt> and
+	 * inserts it into the graph.
+	 * 
+	 * @param attrs
+	 *            the vertex's attributes.
+	 * @return a new vertex.
+	 */
 	protected abstract SparseVertex addVertex(Attributes attrs);
+
+	/**
+	 * Creates a new edge with the attributes specified in <tt>attrs</tt> and
+	 * inserts it into the graph between <tt>v1</tt> and <tt>v2</tt>.
+	 * 
+	 * @param v1
+	 *            one of the two vertices the edge is connected to.
+	 * @param v2
+	 *            one of the two vertices the edge is connected to.
+	 * @param attrs
+	 *            the edge's attributes.
+	 * @return a new edge.
+	 */
+	protected abstract SparseEdge addEdge(SparseVertex v1, SparseVertex v2,
+			Attributes attrs);
 	
-	protected abstract SparseEdge addEdge(SparseVertex v1, SparseVertex v2, Attributes attrs);
-//	protected AbstractSparseGraph newGraph(Attributes attrs) {
-//		return new AbstractSparseGraph();
-//	}
 	
-	protected SparseVertex newNode(Attributes attrs) {
+	private SparseVertex newNode(Attributes attrs) {
 		SparseVertex v = addVertex(attrs);
 		if(v == null)
 			throw new IllegalArgumentException("A vertex must not be null!");
 		
 		numVertex++;
-		int id = Integer.parseInt(attrs.getValue(ID_TAG));
+		int id = Integer.parseInt(attrs.getValue(GraphML.ID_TAG));
 		vertexMappings.put(id, v);
 		
 		if(numVertex % 100000 == 0)
@@ -128,9 +158,9 @@ public abstract class AbstractGraphMLReader {
 		return v;
 	}
 	
-	protected SparseEdge newEdge(Attributes attrs) {
-		int id1 = Integer.parseInt(attrs.getValue(SOURCE_TAG));
-		int id2 = Integer.parseInt(attrs.getValue(TARGET_TAG));
+	private SparseEdge newEdge(Attributes attrs) {
+		int id1 = Integer.parseInt(attrs.getValue(GraphML.SOURCE_TAG));
+		int id2 = Integer.parseInt(attrs.getValue(GraphML.TARGET_TAG));
 		SparseVertex v1 = vertexMappings.get(id1);
 		SparseVertex v2 = vertexMappings.get(id2);
 		if(v1 != null && v2 != null) {
@@ -152,41 +182,19 @@ public abstract class AbstractGraphMLReader {
 		@Override
 		public void startElement(String uri, String localName, String name,
 				Attributes atts) throws SAXException {
-			if(NODE_TAG.equalsIgnoreCase(name)) {
+			if (GraphML.NODE_TAG.equalsIgnoreCase(name) && parseEdges == false) {
 				newNode(atts);
-			} else if(EDGE_TAG.equalsIgnoreCase(name)) {
+			} else if (GraphML.EDGE_TAG.equalsIgnoreCase(name)
+					&& parseEdges == true) {
 				newEdge(atts);
-			} else if(GRAPH_TAG.equalsIgnoreCase(name)) { 
+			} else if (GraphML.GRAPH_TAG.equalsIgnoreCase(name)
+					&& parseEdges == false) {
+				if (graph != null)
+					throw new UnsupportedOperationException(
+							"For the time being this reader allows only one graph per file!");
+
 				graph = newGraph(atts);
 			}
 		}
-
-		
-		
-//		@Override
-//		public void endTag(String name, String content, Stack<String> context) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//
-//		@Override
-//		public void startTag(String name, Attributes atts, Stack<String> context) {
-//			if(NODE_TAG.equalsIgnoreCase(name)) {
-//				newNode(atts);
-//			} else if(EDGE_TAG.equalsIgnoreCase(name)) {
-//				newEdge(atts);
-//			} else if(GRAPH_TAG.equalsIgnoreCase(name)) { 
-//				newGraph(atts);
-//			}
-//		}
-		
 	}
-	
-//	public static void main(String args[]) {
-//		Gbl.startMeasurement();
-//		AbstractSparseGraph g = new GraphMLReader().readGraph(args[0]);
-//		Gbl.printElapsedTime();
-//		System.out.println(g.toString());
-//		Gbl.printMemoryUsage();
-//	}
 }

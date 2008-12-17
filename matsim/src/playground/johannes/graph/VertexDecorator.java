@@ -23,20 +23,32 @@
  */
 package playground.johannes.graph;
 
-
 /**
+ * Decorator class for any type of {@link Vertex}.
+ * 
  * @author illenberger
- *
+ * 
  */
 public class VertexDecorator<V extends Vertex> extends SparseVertex {
 
 	private V delegate;
-	
+
+	/**
+	 * Creates a new decorator for <tt>delegate</tt>.
+	 * 
+	 * @param delegate
+	 *            the vertex to be decorated.
+	 */
 	protected VertexDecorator(V delegate) {
 		super();
 		this.delegate = delegate;
 	}
-	
+
+	/**
+	 * Returns the decorated vertex.
+	 * 
+	 * @return the decorated vertex.
+	 */
 	public V getDelegate() {
 		return delegate;
 	}

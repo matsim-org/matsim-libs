@@ -26,13 +26,29 @@ package playground.johannes.graph;
 import org.matsim.utils.collections.Tuple;
 
 /**
+ * Basic representation of an undirected and unweighted edge.
+ * 
  * @author illenberger
- *
+ * 
  */
 public interface Edge {
 
+	/**
+	 * Returns a tuple of vertices connected to this edge. The order of the
+	 * vertices is arbitrary.
+	 * 
+	 * @return a tuple of vertices connected to this edge.
+	 */
 	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
-	
+
+	/**
+	 * Returns the vertex that is opposing to vertex <tt>v</tt>.
+	 * 
+	 * @param v
+	 *            a vertex connected to this edge.
+	 * @return the vertex that is opposing to vertex <tt>v</tt>, or
+	 *         <tt>null</tt> if <tt>v</tt> is not connected to this edge.
+	 */
 	public Vertex getOpposite(Vertex v);
-	
+
 }

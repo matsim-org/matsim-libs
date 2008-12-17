@@ -24,32 +24,35 @@
 package playground.johannes.graph.io;
 
 /**
+ * Constants used by {@link AbstractGraphMLReader} and {@link GraphMLWriter}.
+ * 
  * @author illenberger
- *
+ * 
  */
 interface GraphML {
 
 	static final String GRAPHML_TAG = "graphml";
-	
+
 	static final String XMLNS_TAG = "xmlns";
-	
+
 	static final String XMLNS_URL = "http://graphml.graphdrawing.org/xmlns";
-	
-	static final String GRAPH_TAG = "graph"; 
-	
+
+	static final String GRAPH_TAG = "graph";
+
 	static final String EDGEDEFAULT_TAG = "edgedefault";
-	
+
 	static final String UNDIRECTED = "undirected";
-	
+
 	static final String DIRECTED = "directed";
-	
+
 	static final String ID_TAG = "id";
-	
+
 	static final String SOURCE_TAG = "source";
-	
+
 	static final String TARGET_TAG = "target";
-	
+
 	static final String NODE_TAG = "node";
-	
+
 	static final String EDGE_TAG = "edge";
+
 }
