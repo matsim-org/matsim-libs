@@ -140,7 +140,6 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		long timerRunTime = 0;
 		long lcRunTime = 0;
 		int numberTimerCalls = 0;
-		int numberIterLC = 0;
 		//int numberUnsuccessfulLC = 0;
 			
 		/* Instantiate all necessary lists and arrays*/
@@ -256,7 +255,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 					
 					/* Do iterating location choice if requested*/
 					if (this.LC_MODE.equals("iteratingLC")){
-						numberIterLC += this.iterateLC (neighbourhood[x]);
+						this.iterateLC (neighbourhood[x]);
 					}
 					
 					/* Write the solution into a list so that it can be retrieved for later iterations*/
@@ -317,6 +316,9 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		java.util.Collections.sort(tabuList);
 		ArrayList<Object> al = plan.getActsLegs();
 		
+		// TODO must be removed before putting into core!
+		plan.setScore(tabuList.get(tabuList.size()-1).getScore());
+		
 	//	stream.println("Selected solution\t"+tabuList.get(tabuList.size()-1).getScore());
 		
 	//	xs = new double [currentIteration];
@@ -359,15 +361,18 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	//	stream.close();
 		
 		
-		statistics.print(Counter.counter+"_"+plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
+		statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)+"\t");
 		}
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)/bestScore+"\t");
 		}
+		for (int i=0;i<al.size();i+=2){
+			statistics.print(((Act)(al.get(i))).getType()+"\t");
+		}
 		//statistics.println(numberIterLC+"\t"+numberUnsuccessfulLC);
-		statistics.println(numberIterLC);
+		statistics.println();
 		statistics.close();
 	}
    
