@@ -119,7 +119,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	}
 
 	public void reset() {
-		this.scoringFunction.finish();
+		this.scoringFunction.reset();
 	}
 
 	public void startActivity(final double time, final Act act) {
