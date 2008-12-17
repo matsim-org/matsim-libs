@@ -64,7 +64,7 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
@@ -132,7 +132,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	private EventsPostProcess epp=null;
+	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 //	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
@@ -167,7 +167,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 
-		epp=new EventsPostProcess(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
 
 		this.controler.getEvents().addHandler(this.epp);
 
@@ -235,7 +235,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 //			Exchange of knowledge about people
 			this.log.info("Introducing people");
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);

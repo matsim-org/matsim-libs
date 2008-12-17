@@ -29,10 +29,12 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.events.IterationEndsEvent;
 import org.matsim.controler.events.IterationStartsEvent;
 import org.matsim.controler.events.ScoringEvent;
 import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationEndsListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.controler.listener.ScoringListener;
@@ -48,7 +50,8 @@ import org.matsim.population.Population;
 //import org.matsim.scoring.EventsToScore;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
+import org.matsim.socialnetworks.algorithms.PersonForgetKnowledge;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
@@ -97,7 +100,8 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * @author jhackney
  *
  */
-public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
+public class SNControllerListener2 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
+//public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
 
@@ -117,7 +121,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	private String [] infoToExchange;//type of info for non-spatial exchange is read in
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
-	private EventsPostProcess epp=null;
+	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
@@ -129,7 +133,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 	double fractionS[];
 	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
 //	New variables for replanning
-	int replan_interval;
+	int interact_interval;
 
 	private Controler controler = null;
 
@@ -142,12 +146,13 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		this.log.info(" Initializing agent knowledge about geography ...");
 
 //		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
-		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+		initializeKnowledge();
+
 		this.log.info("... done");
 
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 
-		epp=new EventsPostProcess(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
 
 		this.controler.getEvents().addHandler(this.epp);
 
@@ -173,11 +178,15 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		snsetup();
 	}
 
+	private void initializeKnowledge() {
+		// TODO Auto-generated method stub
+		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
+	}
+
 	public void notifyScoring(final ScoringEvent event){
 
 		this.log.info("scoring");
-//		if( event.getIteration()%replan_interval==0 && event.getIteration()!=this.controler.getFirstIteration()){
-		if( event.getIteration()%replan_interval==0){
+		if( event.getIteration()%interact_interval==0){
 //			got new epp from mobsim
 //			make new timewindows and map (uses old plans and new events)
 			Gbl.printMemoryUsage();
@@ -186,6 +195,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 //			teo=new MakeTimeWindowsFromEvents(epp);
 			teo.calculate(epp);
 			this.log.info(" ... done making time windows and map");
+			//
 			twm= teo.getTimeWindowMap();
 //			execute spatial interactions (uses timewindows)
 
@@ -212,7 +222,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 //			Exchange of knowledge about people
 			this.log.info("Introducing people");
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
@@ -221,19 +231,13 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 				this.log.info("  No introductions");
 			}
 			this.log.info("  ... introducing people done");
+
 //			forget knowledge
-			//TODO  Should be an algorithm
 			this.log.info("Forgetting knowledge");
-			Collection<Person> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<Person> iperson = personList.iterator();
-			while (iperson.hasNext()) {
-				Person p = iperson.next();
-//				Remember a number of activities equal to at least the number of
-//				acts per plan times the number of plans in memory
-				int max_memory = (int) (p.getSelectedPlan().getActsLegs().size()/2*p.getPlans().size()*1.5);
-				p.getKnowledge().getMentalMap().manageMemory(max_memory, p.getPlans());
-			}
+			double multiple=Double.parseDouble(this.controler.getConfig().socnetmodule().getMemSize());
+			new PersonForgetKnowledge(multiple).run(controler.getPopulation());
 			this.log.info(" ... forgetting knowledge done");
+			Gbl.printMemoryUsage();
 			Gbl.printMemoryUsage();
 
 			//dissolve social ties
@@ -243,7 +247,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
 
-//			make new actstats (uses new twm AND new socialnet)
+//			update activity statistics
 			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 
@@ -252,8 +256,6 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			this.log.info("SSTEST Finish Scoring with actStats "+snIter);
 			scoring.finish();
 			this.log.info(" ... scoring with actStats finished");
-
-//			snIter++;
 		}
 	}
 
@@ -263,7 +265,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 		Gbl.printMemoryUsage();
 
-		if( event.getIteration()%replan_interval==0){
+		if( event.getIteration()%interact_interval==0){
 
 			Gbl.printMemoryUsage();
 			controler.stopwatch.beginOperation("netstats");
@@ -314,7 +316,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 
 	}
 
-	public void notifyIterationStarts(final IterationStartsEvent event) {
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 
 		this.epp.reset(snIter);// I think this doesn't need to be called
 		this.teo.clearTimeWindowMap();// needs to be called because it's not an eventhandler
@@ -370,7 +372,7 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");
 		}
 
-		this.replan_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
+		this.interact_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
 		String rndEncounterProbString = this.controler.getConfig().socnetmodule().getFacWt();
 		String xchangeInfoString = this.controler.getConfig().socnetmodule().getXchange();
 		this.infoToExchange = getFacTypes(xchangeInfoString);
@@ -403,17 +405,11 @@ public class SNControllerListener2 implements StartupListener, IterationStartsLi
 		EgoNetPlansItersMakeKML.generateStyles();
 		this.log.info("... done");
 
-		this.log.info(" Writing out the initial social network ...");
-		this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), this.controler.getFirstIteration());
-		this.log.info("... done");
-
 		this.log.info(" Setting up the NonSpatial interactor ...");
 		this.plansInteractorNS=new NonSpatialInteractor(this.snet);
 		this.log.info("... done");
 
 		this.log.info(" Setting up the Spatial interactor ...");
-		//InteractorTest
-//		this.plansInteractorS=new SpatialInteractorActs(this.snet);
 		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
 		this.log.info("... done");
 

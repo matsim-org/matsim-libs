@@ -47,7 +47,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
 import org.matsim.socialnetworks.interactions.SpatialInteractorActs;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
@@ -122,7 +122,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
 
 //	private TrackEventsOverlap teo=null;
-	private EventsPostProcess epp=null;
+	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private Hashtable<Act,ArrayList<Double>> actStats=null;
 	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
@@ -168,7 +168,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
 
 		//teo = new TrackEventsOverlap();
-		epp=new EventsPostProcess(this.controler.getPopulation());
+		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
 
 //		this.controler.getEvents().addHandler(this.teo);
 		this.controler.getEvents().addHandler(this.epp);
@@ -322,7 +322,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			}
 
 			// Exchange of knowledge about people
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangles());
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
 				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
