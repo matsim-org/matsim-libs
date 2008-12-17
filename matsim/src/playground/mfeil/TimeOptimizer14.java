@@ -215,6 +215,10 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				((Leg)al.get(i)).setArrivalTime(((Leg)(bestSolution.get(i))).getArrivalTime());
 			}
 		}
+		
+		// NEW NEW
+		this.estimator.reset();
+		
 	}
 	
 	//////////////////////////////////////////////////////////////////////
