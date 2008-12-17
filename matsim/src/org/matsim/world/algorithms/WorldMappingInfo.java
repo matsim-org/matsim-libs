@@ -31,10 +31,10 @@ import org.matsim.world.World;
 /**
  * Calculates and prints the cardinalities of the given {@link MappingRule mappings} in
  * the {@link World world}.
- * 
+ *
  * <p><b>Note:</b> It does not assign the calculated cardinalities to the mapping rule, since cardinalities
  * are no longer supported in this context.</p>
- * 
+ *
  * @see MappingRule
  * @author balmermi
  */
@@ -78,7 +78,9 @@ public class WorldMappingInfo {
 		else if ((minmap == 1) && (maxmap == 1)) { curr_down_cardinality = '1'; }
 		else if ((minmap == 1) && (maxmap > 1)) { curr_down_cardinality = '+'; }
 		else if ((minmap > 1) && (maxmap > 1)) { curr_down_cardinality = '+'; }
-		else { new RuntimeException("invalid."); }
+		else {
+			throw new RuntimeException("invalid.");
+		}
 
 		// calculate current up cardinality
 		minmap = Integer.MAX_VALUE;
@@ -98,7 +100,7 @@ public class WorldMappingInfo {
 		else if ((minmap == 1) && (maxmap == 1)) { curr_up_cardinality = '1'; }
 		else if ((minmap == 1) && (maxmap > 1)) { curr_up_cardinality = '+'; }
 		else if ((minmap > 1) && (maxmap > 1)) { curr_up_cardinality = '+'; }
-		else { new RuntimeException("invalid."); }
+		else { throw new RuntimeException("invalid."); }
 
 		String curr_rule = down_layer.getType().toString()+"["+curr_down_cardinality+"]-["+
 		                   curr_up_cardinality+"]"+up_layer.getType().toString();
