@@ -36,7 +36,7 @@ public class SimpleEvaluator {
 		// 28800s => 8:00
 		// 30600s => 8:30
 		// 32400s => 9:00
-		AllLinkOneIntervalHandler allLinkOneIntervalHandler = new AllLinkOneIntervalHandler(180.0,network,63900,68400);
+		AllLinkOneIntervalHandler allLinkOneIntervalHandler = new AllLinkOneIntervalHandler(180.0,network,0,68400);
 		
 		events.addHandler(allLinkHandler);
 		events.addHandler(oneLinkHandler);

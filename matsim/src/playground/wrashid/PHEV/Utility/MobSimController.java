@@ -27,7 +27,7 @@ public class MobSimController extends Controler {
 		Events events=controler.getEvents();
 		
 		
-		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events);
+		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events,"1");
 		events.addHandler(ecHandler);
 		
 		
@@ -35,6 +35,7 @@ public class MobSimController extends Controler {
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
 		controler.events.printEventsCount();
+		ecHandler.printRecordedSOC();
 	}
 	
 	public static EnergyConsumptionSamples getEnergyConsumptionSamples(){
