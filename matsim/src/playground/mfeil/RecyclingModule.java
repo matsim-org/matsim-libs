@@ -125,8 +125,7 @@ public class RecyclingModule implements StrategyModule {
 
 	public void handlePlan(final Plan plan) {	
 		
-		if (this.list[0].size()<this.testAgentsNumber) this.list[0].add(plan);
-		else this.list[1].add(plan);
+		this.list[1].add(plan);
 	}
 
 	public void finish(){

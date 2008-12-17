@@ -22,6 +22,7 @@ package playground.mfeil;
 
 
 import org.matsim.population.Act;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
 
@@ -52,7 +53,12 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 
 	public void finish(){
 		
-		for (int i=0;i<list[0].size();i++) schedulingModule.handlePlan(list[0].get(i));
+		for (int i=0;i<this.testAgentsNumber;i++) {
+			int pos = (int)MatsimRandom.random.nextDouble()*this.list[1].size();
+			list[0].add(list[1].get(pos));
+			schedulingModule.handlePlan(list[1].get(pos));
+			list[1].remove(pos);
+		}
 		schedulingModule.finish();
 		
 		for (int i=0;i<list[0].size();i++){
