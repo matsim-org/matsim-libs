@@ -85,7 +85,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 					}
 				}
 				if (!in) {
-					log.warn("Anschlag optimizedAgentsLoop! Person "+plan.getPerson().getId()+" bei OptimizedAgent "+agents.getAgentPerson(j).getId());
+					//log.warn("Anschlag optimizedAgentsLoop! Person "+plan.getPerson().getId()+" bei OptimizedAgent "+agents.getAgentPerson(j).getId());
 					continue optimizedAgentsLoop;
 				}
 			}
@@ -119,6 +119,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		if (distance==Double.MAX_VALUE){
+			log.warn("No agent to assign from found!");
 			this.nonassignedAgents.add(plan.getPerson().getId().toString());
 			return;
 		}
