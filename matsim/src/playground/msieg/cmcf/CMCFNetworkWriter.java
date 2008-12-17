@@ -59,7 +59,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 	
 	/**
 	 * Converts the network into CMCF format and writes it to the specified Writer.
-	 * Make sure you have called read() beforce calling this function
+	 * Make sure you have called read() before calling this function
 	 * @param out the Writer where to write the output, or null
 	 */
 	public void convert(Writer out){

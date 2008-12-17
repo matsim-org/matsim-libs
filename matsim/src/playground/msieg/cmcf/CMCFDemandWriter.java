@@ -55,20 +55,19 @@ public class CMCFDemandWriter implements PopulationReader {
 //	}
 	
 	public CMCFDemandWriter(String configPath){
-		this.plans = new Population(Population.NO_STREAMING);
-		this.popReader = new MatsimPopulationReader(this.plans);
+		this(configPath, null);
+	}
+	
+	public CMCFDemandWriter(String configPath, String plansPath){
 		if (Gbl.getConfig() == null) {
 			Gbl.createConfig(new String[] { configPath, "config_v1.dtd" });
 		}
 		this.loadWorld();
-		this.loadNetwork();
-		this.plansPath = Gbl.getConfig().plans().getInputFile();
+		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
 		this.setInputNetwork(Gbl.getConfig().network().getInputFile());
-	}
-	
-	public CMCFDemandWriter(String configPath, String plansPath){
-		this(configPath);
-		this.plansPath = plansPath;
+		
+		this.plans = new Population(Population.NO_STREAMING);
+		this.popReader = new MatsimPopulationReader(this.plans, this.loadNetwork());
 	}
 	
 	public void readFile(){
@@ -187,12 +186,12 @@ public class CMCFDemandWriter implements PopulationReader {
 		Act act1, act2;
 		Leg leg;
 		for (Id id : this.plans.getPersons().keySet()) {
-			//System.out.print('.');
-			
 			plan = this.plans.getPerson(id).getSelectedPlan();
 			act1 = (Act) plan.getFirstActivity();
 			leg = plan.getNextLeg(act1);
 			act2 = plan.getNextActivity(leg);
+			//Commodity c = new Commodity<Node>(act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
+			//System.out.println(act1.getLink().getToNode().getId());
 			com.add( act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
 		}
 		
@@ -201,8 +200,8 @@ public class CMCFDemandWriter implements PopulationReader {
 		int counter = 1;
 		for(Commodity<Node> c: com){
 			log(tab+"\t<commodity id=\""+(counter++)+"\">\n", out);
-			log(tab+"\t\t<from>"+c.getOrigin().getOrigId()+"</from>\n", out);
-			log(tab+"\t\t<to>"+c.getDestination().getOrigId()+"</to>\n", out);
+			log(tab+"\t\t<from>"+c.getOrigin().getId()+"</from>\n", out);
+			log(tab+"\t\t<to>"+c.getDestination().getId()+"</to>\n", out);
 			log(tab+"\t\t<demand>"+c.getDemand()+"</demand>\n", out);
 			log(tab+"\t</commodity>\n", out);
 		}
@@ -249,11 +248,12 @@ public class CMCFDemandWriter implements PopulationReader {
 				System.out.println(" Sorry, but access denied, writing output to console.");
 			}
 		}
-		if(args.length < 4){
-			System.out.println("<!-- WARNING: The input network has not been specified, probably CMCF won't accept the data. -->");
-			cdw.setInputNetwork("unspecified");
-		}
-		else
+//		if(args.length < 4){
+//			System.out.println("<!-- WARNING: The input network has not been specified, probably CMCF won't accept the data. -->");
+//			cdw.setInputNetwork("unspecified");
+//		}
+//		else
+		if(args.length > 3)
 			cdw.setInputNetwork(args[3]);
 		//do it
 		cdw.readFile();
