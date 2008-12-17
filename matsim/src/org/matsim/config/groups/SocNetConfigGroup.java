@@ -54,6 +54,7 @@ public class SocNetConfigGroup extends Module {
 	private static final String BETA4 ="betatimewithfriends";
 	private static final String ALPHA ="euclid_alpha";
 	private static final String RMIN = "euclid_rmin";
+	private static final String MEMSIZE = "memSize";
 
 
 	private String graphalgo = null;
@@ -86,6 +87,7 @@ public class SocNetConfigGroup extends Module {
 	private String beta4=null;//double
 	private String alpha=null;//double
 	private String rmin=null;//double
+	private String memSize=null;//double
 
 
 	public SocNetConfigGroup() {
@@ -145,6 +147,8 @@ public class SocNetConfigGroup extends Module {
 			setAlpha(value);
 		}else if (RMIN.equals(key)){
 			setRmin(value);
+		}else if (MEMSIZE.equals(key)){
+			setMemSize(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -178,7 +182,7 @@ public class SocNetConfigGroup extends Module {
 		}else if (SOCNET_FRACT_NS.equals(key)) {
 			return getFractNSInteract();
 		}else if (SOCNET_FRACT_INTRO.equals(key)) {
-			return getTriangles();
+			return getTriangleProb();
 		}else if (SOCNET_SWITCH_WEIGHTS.equals(key)) {
 			return getSWeights();
 		}else if (SOCNET_PROB_BEFRIEND.equals(key)) {
@@ -201,6 +205,12 @@ public class SocNetConfigGroup extends Module {
 			return getBeta3();
 		}else if (BETA4.equals(key)){
 			return getBeta4();
+		}else if (ALPHA.equals(key)){
+			return getAlpha();
+		}else if (RMIN.equals(key)){
+			return getRmin();
+		}else if (MEMSIZE.equals(key)){
+			return getMemSize();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -233,6 +243,9 @@ public class SocNetConfigGroup extends Module {
 		addParameterToMap(map, BETA2);
 		addParameterToMap(map, BETA3);
 		addParameterToMap(map, BETA4);
+		addParameterToMap(map, ALPHA);
+		addParameterToMap(map, RMIN);
+		addParameterToMap(map, MEMSIZE);
 		return map;
 	}
 	/* direct access */
@@ -325,7 +338,7 @@ public class SocNetConfigGroup extends Module {
 	public void setFractNSInteract(final String pctnsinteract) {
 		this.pctnsinteract = pctnsinteract;
 	}
-	public String getTriangles() {
+	public String getTriangleProb() {
 		return this.triangles;
 	}
 	public void setTriangles(final String triangles) {
@@ -414,5 +427,12 @@ public class SocNetConfigGroup extends Module {
 	}
 	public void setRmin(final String rmin){
 		this.rmin = rmin;
+	}
+	public String getMemSize() {
+		// TODO Auto-generated method stub
+		return this.memSize;
+	}
+	public void setMemSize(final String memSize){
+		this.memSize=memSize;
 	}
 }
