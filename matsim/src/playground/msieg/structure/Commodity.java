@@ -25,7 +25,7 @@ public class Commodity<V> {
 	protected final V origin, destination;
 	protected Number demand;
 	
-	protected Commodity(V origin, V destination, Number demand) {
+	public Commodity(V origin, V destination, Number demand) {
 		super();
 		this.origin = origin;
 		this.destination = destination;

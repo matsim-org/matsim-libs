@@ -190,8 +190,6 @@ public class CMCFDemandWriter implements PopulationReader {
 			act1 = (Act) plan.getFirstActivity();
 			leg = plan.getNextLeg(act1);
 			act2 = plan.getNextActivity(leg);
-			//Commodity c = new Commodity<Node>(act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
-			//System.out.println(act1.getLink().getToNode().getId());
 			com.add( act1.getLink().getToNode(), act2.getLink().getFromNode(), 1);
 		}
 		
@@ -248,11 +246,6 @@ public class CMCFDemandWriter implements PopulationReader {
 				System.out.println(" Sorry, but access denied, writing output to console.");
 			}
 		}
-//		if(args.length < 4){
-//			System.out.println("<!-- WARNING: The input network has not been specified, probably CMCF won't accept the data. -->");
-//			cdw.setInputNetwork("unspecified");
-//		}
-//		else
 		if(args.length > 3)
 			cdw.setInputNetwork(args[3]);
 		//do it
