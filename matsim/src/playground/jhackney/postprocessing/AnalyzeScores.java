@@ -42,7 +42,7 @@ import org.matsim.router.PlansCalcRoute;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
@@ -97,7 +97,7 @@ public class AnalyzeScores {
 		
 		SocialNetwork snet=new SocialNetwork(plans);
 		Events events = new Events();
-		EventsPostProcess epp;
+		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
 		Hashtable<Act,ArrayList<Double>> actStats=null;
 		Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
@@ -111,7 +111,7 @@ public class AnalyzeScores {
 //		twm=teo.getTimeWindowMap();
 
 		System.out.println(" ... Instantiation of events overlap tracking done");
-		epp=new EventsPostProcess(plans);
+		epp=new EventsMapStartEndTimes(plans);
 		teo=new MakeTimeWindowsFromEvents();
 		teo.calculate(epp);
 		twm=teo.getTimeWindowMap();

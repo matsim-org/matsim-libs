@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
@@ -87,7 +87,7 @@ public class AnalyzeTimeCorrelations {
 		// read in events
 		Events events = new Events();
 //		TrackEventsOverlap teo = new TrackEventsOverlap();
-		EventsPostProcess epp=new EventsPostProcess(plans);
+		EventsMapStartEndTimes epp=new EventsMapStartEndTimes(plans);
 		//Fill timeWindowMap
 
 		System.out.println(" Initializing the events ...");
