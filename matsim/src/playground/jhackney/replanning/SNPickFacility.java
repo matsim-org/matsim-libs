@@ -1,12 +1,8 @@
 package playground.jhackney.replanning;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
@@ -163,11 +159,12 @@ public class SNPickFacility implements PlanAlgorithm {
 				newAct.setLinkId(f.getLink().getId());
 				newAct.setCoord(f.getCenter());
 				newAct.setFacility(f);
-				k.getMentalMap().addActivity(f.getActivity(factype));
 				changed = true;
 			}
 
 			if(changed){
+				k.getMentalMap().addActivity(f.getActivity(factype));
+				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
 				ArrayList<?> bestactslegs = newPlan.getActsLegs();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
