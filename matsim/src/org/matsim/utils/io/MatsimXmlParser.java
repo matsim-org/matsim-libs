@@ -206,12 +206,12 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			// There was a problem getting the (remote) file, just show the error as information for the user
 			log.error(e.toString() + ". May not be fatal." ) ;
 		}
-
 		// systemId could not be resolved, try it locally
 		final Config config = Gbl.getConfig();
-		if (config != null && config.global() != null) {
+		if ((config != null) && (config.global() != null)) {
 			String localFileName = config.global().getLocalDtdBase() + shortSystemId;
 			File dtdFile = new File(localFileName);
+			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
 				log.info("Using the local DTD " + localFileName);
 				return new InputSource(localFileName);
@@ -224,7 +224,14 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			log.info("Using local DTD from jar-file " + shortSystemId);
 			return new InputSource(stream);
 		}
-
+		
+		log.info("Trying to access local dtd folder at standard location ./dtd...");
+		File dtdFile = new File("./dtd/" + shortSystemId);
+		if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+			log.info("Using the local DTD " + dtdFile.getAbsolutePath());
+			return new InputSource(dtdFile.getAbsolutePath());
+		}
+		
 		// We could neither get the remote nor the local version of the dtd, show a warning
 		log.warn("Could neither get the DTD from the web nor a local one. " + systemId);
 		return null;
