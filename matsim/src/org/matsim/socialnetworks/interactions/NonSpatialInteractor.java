@@ -53,7 +53,7 @@ public class NonSpatialInteractor{
 		pxk = new PersonExchangeKnowledge(net);
 		proportionOfLinksToActivate = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractNSInteract());
 		numInteractionsPerLink = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetNSInteractions());
-		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getTriangles());
+		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getTriangleProb());
 	}
 
 	public void exchangeGeographicKnowledge(String facType, int iteration) {
