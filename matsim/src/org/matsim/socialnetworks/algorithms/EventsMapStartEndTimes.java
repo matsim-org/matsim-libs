@@ -16,14 +16,14 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
-public class EventsPostProcess implements ActStartEventHandler, ActEndEventHandler {
+public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
 
 	public HashMap<Person, ArrayList<ActStartEvent>> startMap = new HashMap<Person,ArrayList<ActStartEvent>>();
 	public HashMap<Person, ArrayList<ActEndEvent>> endMap = new HashMap<Person,ArrayList<ActEndEvent>>();
 	private Population plans;
-	static final private Logger log = Logger.getLogger(EventsPostProcess.class);
+	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
 
-	public EventsPostProcess(Population plans) {
+	public EventsMapStartEndTimes(Population plans) {
 		super();
 //		makeTimeWindows();
 		this.plans=plans;
