@@ -178,15 +178,16 @@ public class QueueLink {
 		 * the flowCap to handle the flowCap.
 		 */
 		if (this.storageCapacity < this.getLink().getFreespeedTravelTime(time) * this.simulatedFlowCapacity) {
-			if (spaceCapWarningCount <= 10) {
-				log.warn("Link " + this.link.getId() + " too small: enlarge spaceCap.  This is not fatal, but modifies the traffic flow dynamics.");
-				if (spaceCapWarningCount == 10) {
-					log.warn("Additional warnings of this type are suppressed.");
-				}
-				spaceCapWarningCount++;
-			}
-			this.storageCapacity = this.getLink().getFreespeedTravelTime(time)
-					* this.simulatedFlowCapacity;
+			double tempStorageCapacity = this.getLink().getFreespeedTravelTime(time)
+	    * this.simulatedFlowCapacity;
+	    if (spaceCapWarningCount <= 10) {
+	        log.warn("Link " + this.link.getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+	        if (spaceCapWarningCount == 10) {
+	            log.warn("Additional warnings of this type are suppressed.");
+	        }
+	        spaceCapWarningCount++;
+	    }
+	    this.storageCapacity = tempStorageCapacity;
 		}
 	}
 
