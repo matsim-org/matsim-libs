@@ -48,6 +48,7 @@ public class SimulationParameters {
 	// OUTPUT
 	// this is the simulation events object
 	//public static Events processEventThread = null;
+	// The thread for processing the events
 	public static ProcessEventThread processEventThread = null;
 
 	// TESTING
@@ -68,7 +69,7 @@ public class SimulationParameters {
 		GC_MESSAGES = gc_messages;
 	}
 	
-	// The thread for processing the events
+
 
 
 }
