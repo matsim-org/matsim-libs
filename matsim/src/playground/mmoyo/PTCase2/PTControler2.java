@@ -25,33 +25,36 @@ public class PTControler2 {
 		PTOb pt= new PTOb(CONFIG, INPTNETFILE, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
 		
 		int option =3;
+		
+		if (option>0){pt.readPTNet(ZURICHPTN);}
 		switch (option){
 	    	case 0: 
-	    		pt.readPTNet(ZURICHPTN);
-	    		Node ptNode = pt.getPtNetworkLayer().getNode("100048");
-	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("101456");
-	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
+	    		pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
 	    		break;
 	    	case 1:
-	    		pt.readPTNet(ZURICHPTN);
-	    		Coord coord1= new CoordImpl(680291,248300);
-    			Coord coord2= new CoordImpl(684573,246805);
+	    		Coord coord1= new CoordImpl(708146,243607);
+    			Coord coord2= new CoordImpl(709915,244793);
 	    		Path path = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
 	    		pt.getPtRouter2().PrintRoute(path);
 	    		break;
 	    	case 2:
-	    		pt.createPTNetWithTLinks(INPTNETFILE,ZURICHPTN);
+	    		Node ptNode = pt.getPtNetworkLayer().getNode("100048");
+	    		Node ptNode2 = pt.getPtNetworkLayer().getNode("101456");
+	    		pt.getPtRouter2().PrintRoute(pt.getPtRouter2().findRoute(ptNode, ptNode2, 391));
 	    		break;
 	    	case 3:
-	    		pt.readPTNet(ZURICHPTN);
 	    		PTActWriter ptActWriter = new PTActWriter(pt);
 	    		ptActWriter.writePTActsLegs();
 	    		break;
 	    	case 4:
-	    		pt.readPTNet(ZURICHPTN);
 	    		PTTester pttester= new PTTester(pt);
 	    		pttester.countRoutes();
+	    		break;
+	    	case 5:
+	    		playground.mmoyo.PTRouter.PTNProximity ptnProximity = new playground.mmoyo.PTRouter.PTNProximity(pt.getPtNetworkLayer());  
+	    		Coord coord6= new CoordImpl(708146,243607);
+	    		ptnProximity.printNearestBusStops(coord6, 3500);
 	    		
 	    		break;
 		}//switch

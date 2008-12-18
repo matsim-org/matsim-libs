@@ -20,9 +20,7 @@ public class PTControler {
 		int option =3;
 	    switch (option) {
 	    	case 0:   //
-	    		
 	    		break;
-	    	
 	    	case 1:  //creation of PTNetwork to visualize
 	    	 	readCityNetwork();
 	    		ptLinesReader.readFile(PTLINES);
@@ -33,7 +31,7 @@ public class PTControler {
 	    		readCityNetwork();
 	    		createPTNetwork();
 	    		PTNProximity ptnProximity= new PTNProximity (cityNetworkLayer, ptNetworkLayer);
-	    		ptnProximity.printNearesBusStops(cityNetworkLayer.getNode("16"), 3000);
+	    		ptnProximity.printNearestBusStops(cityNetworkLayer.getNode("16"), 3000);
 	    		//ptnProximity.dumpNet();
 	    		break;
 

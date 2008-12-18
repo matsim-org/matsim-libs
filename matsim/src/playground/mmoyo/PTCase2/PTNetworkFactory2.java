@@ -58,8 +58,7 @@ public class PTNetworkFactory2 {
 	
 		//Add Links
 		for (Link l: tempNet.getLinks().values()){
-			ptNetworkLayer.createLink(l.getId(), l.getFromNode(), l.getToNode(), 0, 1, 1, 1, "0", l.getType());
-			//createPTLink(ptNetworkLayer, .toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
+			createPTLink(ptNetworkLayer, l.getId().toString(), l.getFromNode().getId().toString(), l.getToNode().getId().toString(), l.getType());
 		}
 
 		tempNet= null;
@@ -88,13 +87,11 @@ public class PTNetworkFactory2 {
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
-				
-				//System.out.print("strIdNode:" + strIdNode);
-				//System.out.println(ptNode==null);
-				//System.out.println(ptLine.getId().toString());
-				//System.out.println(ptLine.getId() ==null);
+				if (ptNode==null){
+					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
+				}
+	
 				ptNode.setIdPTLine(ptLine.getId());
-
 				double min = ptLine.getMinutes().get(indexMin);
 				travelTime=min-lastTravelTime;
 				if (!first){
@@ -123,19 +120,21 @@ public class PTNetworkFactory2 {
 			PTLine ptLine = iterPTLines.next();
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
+				System.out.println("strIdNode: "+ strIdNode);
 				if(Character.isLetter(strIdNode.charAt(strIdNode.length()-1))){ 	//example of possible node values at intersection:   999, _999, 999b, _999b
 					String keyNode = strIdNode;
 					if (keyNode.charAt(0)=='_'){
-						keyNode = keyNode.substring(1, keyNode.length()-1);
+						keyNode = "~" + keyNode.substring(1, keyNode.length()-1);
 					}
 					if(Character.isLetter(keyNode.charAt(keyNode.length()-1))){
 						keyNode= keyNode.substring(0,keyNode.length()-1);
 					}
+					
 	    			if (!IntersectionMap.containsKey(keyNode)){
 	    				ArrayList<String> ch = new ArrayList<String>();
 	    				IntersectionMap.put(keyNode, ch);
 	    				IntersectionMap.get(keyNode).add(keyNode);
-	    				IntersectionMap.get(keyNode).add("_" + keyNode);
+	    				IntersectionMap.get(keyNode).add(strIdNode);
 	    			}// if IntersectionMap
 	    			IntersectionMap.get(keyNode).add(strIdNode);
 				}//if Character
@@ -210,14 +209,21 @@ public class PTNetworkFactory2 {
 		}
 	}
 	
-	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, String from, String to, String type ){
+	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, String from, String to, String type){
 		PTNode fromNode= (PTNode)ptNetworkLayer.getNode(from);
 		PTNode toNode= (PTNode)ptNetworkLayer.getNode(to);
 		//System.out.println(idLink + " " + from);		
 		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
 	}
-		
+	
 	public void createPTLink(NetworkLayer net, String strIdLink, PTNode fromNode, PTNode toNode, String Type){
+		if (fromNode==null){
+			throw new java.lang.NullPointerException("fromNode does not exist in link:" + strIdLink); 
+		}
+		if (toNode==null){
+			throw new java.lang.NullPointerException("toNode does not exist in link:" + strIdLink); 
+		}
+
 		IdImpl idLink = new IdImpl(strIdLink);
 		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
 		

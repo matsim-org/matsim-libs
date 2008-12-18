@@ -12,6 +12,7 @@ public class PTTravelCost implements TravelCost {
 	}
 
 	public double getLinkTravelCost(Link link, double time) {
+		/*
 		double cost =0;
 		if (link.getType().equals("Transfer")){
 			cost= ptTimeTable.GetTransferTime(link, time);
@@ -24,6 +25,9 @@ public class PTTravelCost implements TravelCost {
 		if (cost<0) {
 			cost=0.1;
 		}  //TODO: lok for negative values
-		return cost;
+		*/
+		//borrar manuel
+		return link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());
+		
 	}
 }

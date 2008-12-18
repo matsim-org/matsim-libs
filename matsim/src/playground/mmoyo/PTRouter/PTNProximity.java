@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -108,15 +107,20 @@ public class PTNProximity {
 	 * @param startPoint
 	 * @return list of nearest nodes
 	 */
+	
 	public PTNode[] getNearestBusStops(Coord coord, int distance){
 		double x = coord.getX();
 		double y= coord.getY();
 		Collection<Node> stopList = this.ptQuadTree.get(x, y, distance);
 		if (stopList.size() == 0) {
 			Node node1 = this.ptQuadTree.get(x, y);
+			
+			//TODO: The agent is forced to walk more than the distance, must be adjusted.
 			if (node1!= null) {
-				stopList.add(node1);
+				distance =(int)coord.calcDistance(node1.getCoord()) + 1;
+				stopList = this.ptQuadTree.get(x, y, distance);
 			}
+	
 		}
 		return stopList.toArray(new PTNode[stopList.size()]);
 	}
@@ -125,9 +129,14 @@ public class PTNProximity {
 		return (PTNode)ptQuadTree.get(x, y);
 	}
 	
-	public void printNearesBusStops(Node node, int distance){
-		Node[] stops = getNearestBusStops(node.getCoord(), distance);
+	public void printNearestBusStops(Node node, int distance){
 		System.out.println ("Bus stops near " + node.getId().toString());
+		printNearestBusStops(node.getCoord(), distance);
+	}
+	
+	public void printNearestBusStops(Coord coord, int distance){
+		System.out.println ("Bus stops near " + coord.getX() + ", " + coord.getY());
+		Node[] stops = getNearestBusStops(coord, distance);
 		for(int x=0; x <stops.length;x++){
 			System.out.println (stops[x].getId().toString());
 		}
