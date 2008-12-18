@@ -99,6 +99,13 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 
 				Leg leg = (Leg) legIter.next();
 
+				// act end event
+				assertEquals(true,
+						list.get(index) instanceof ActEndEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((ActEndEvent) list.get(index)).linkId));
+				index++;
+				
 				// each leg starts with departure on act link
 				assertEquals(true,
 						list.get(index) instanceof AgentDepartureEvent);
@@ -151,6 +158,12 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				assertEquals(true, list.get(index) instanceof AgentArrivalEvent);
 				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
 						((AgentArrivalEvent) list.get(index)).linkId));
+				index++;
+				
+				// each leg ends with arrival on act link
+				assertEquals(true, list.get(index) instanceof ActStartEvent);
+				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+						((ActStartEvent) list.get(index)).linkId));
 				index++;
 			}
 		}
