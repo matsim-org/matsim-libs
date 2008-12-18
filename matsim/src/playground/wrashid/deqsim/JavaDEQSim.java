@@ -21,6 +21,7 @@
 package playground.wrashid.deqsim;
 
 import java.util.HashMap;
+import java.util.concurrent.BrokenBarrierException;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
@@ -33,6 +34,8 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
+import playground.wrashid.DES.DummyEvent;
+import playground.wrashid.DES.ProcessEventThread;
 import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
@@ -53,7 +56,11 @@ public class JavaDEQSim {
 
 		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
-		SimulationParameters.events = events;
+		//SimulationParameters.events = events;
+		// the thread for processing the events
+		SimulationParameters.processEventThread=new ProcessEventThread(events);
+		
+		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
 				.getParam("simulation", "stuckTime"));
 		SimulationParameters.flowCapacityFactor = Double.parseDouble(Gbl
@@ -106,6 +113,18 @@ public class JavaDEQSim {
 
 		scheduler.startSimulation();
 
+		// the main thread (microsimulation) is finished - await the event processing
+		SimulationParameters.processEventThread.close();
+		try {
+			SimulationParameters.processEventThread.getBarrier().await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
 
