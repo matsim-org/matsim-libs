@@ -3,3 +3,6 @@ Date: 18. Dezember
 1 Iteration with 67000 agents (test 6, 10% Zurich), with EventWriterTXT on, took on
 DEQSim: 122 s
 JavaMobSiM: 423s
+
+Update: Using addional Thread for EventProcessing, DEQSim is reduced to 86sec.
+

@@ -37,14 +37,14 @@ public class StartingLegMessage extends EventMessage {
 		event = new ActEndEvent(this.getMessageArrivalTime(), vehicle
 				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
 				.getId().toString(), vehicle.getPreviousActivity().getType());
-		SimulationParameters.events.processEvent(event);
+		SimulationParameters.processEventThread.processEvent(event);
 		
 		// schedule AgentDepartureEvent
 		event = new AgentDepartureEvent(this.getMessageArrivalTime(), vehicle
 				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
 				.getId().toString(), vehicle.getLegIndex() - 1);
 
-		SimulationParameters.events.processEvent(event);
+		SimulationParameters.processEventThread.processEvent(event);
 		
 	}
 

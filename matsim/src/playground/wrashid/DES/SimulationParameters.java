@@ -47,7 +47,8 @@ public class SimulationParameters {
 
 	// OUTPUT
 	// this is the simulation events object
-	public static Events events = null;
+	//public static Events processEventThread = null;
+	public static ProcessEventThread processEventThread = null;
 
 	// TESTING
 	// test injection variables
@@ -66,5 +67,8 @@ public class SimulationParameters {
 	public static void setGC_MESSAGES(boolean gc_messages) {
 		GC_MESSAGES = gc_messages;
 	}
+	
+	// The thread for processing the events
+
 
 }
