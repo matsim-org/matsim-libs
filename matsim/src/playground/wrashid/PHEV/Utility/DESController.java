@@ -35,8 +35,9 @@ class DESController extends Controler {
 		controler.events.printEventsCount();
 		ecHandler.printRecordedSOC();
 		
-		ecHandler.printEnergyConsumptionAtSelectedLink();
-		System.out.println();
+		//ecHandler.printEnergyConsumptionAtSelectedLink();
+		
+		ecHandler.tidyup();
 	}
 	
 	public static EnergyConsumptionSamples getEnergyConsumptionSamples(){

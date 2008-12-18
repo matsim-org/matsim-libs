@@ -1,5 +1,8 @@
 package playground.wrashid.PHEV.Utility;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import org.matsim.basic.v01.Id;
@@ -41,10 +44,29 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	// c2: state of charge
 	private TwoColumnTable<Double, Double> recordedStateOfCharge;
 	private DESController controler2;
-	
+
 	// for measuring the energy consumption for a link
-	private String selectedLink="104";
-	private double energyConsumptionAtLink[]= new double[130000];
+	private String selectedLink = "104";
+	private double energyConsumptionAtLink[] = new double[130000];
+
+	// write charging events to file
+	// String outputFilePath=null;
+	String outputFilePath = "C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\IAMF2009Paper\\10KExperiment\\chargingEvents.txt";
+	OutputStreamWriter chargingOutput;
+
+	private void initOutputFile() {
+		if (outputFilePath == null) {
+			return;
+		}
+		try {
+			FileOutputStream fos = new FileOutputStream(outputFilePath);
+			chargingOutput = new OutputStreamWriter(fos, "UTF8");
+			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\n"); 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	// observedVehicleId: if not null, the SOC of this vehicle is recorded
 	public ElectricCostHandler(MobSimController controler,
@@ -57,6 +79,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		if (observedVehicleId != null) {
 			recordedStateOfCharge = new TwoColumnTable<Double, Double>();
 		}
+		initOutputFile();
 	}
 
 	public ElectricCostHandler(DESController controler2,
@@ -69,6 +92,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		if (observedVehicleId != null) {
 			recordedStateOfCharge = new TwoColumnTable<Double, Double>();
 		}
+		initOutputFile();
 	}
 
 	private void initEnergyLevel(PersonEvent event) {
@@ -85,12 +109,12 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		}
 
 		// change properties of roads
-		//if (event.linkId.equalsIgnoreCase("110") || event.linkId.equalsIgnoreCase("104")){
-		//	event.link.setLength(500);
-		//	event.link.setFreespeed(7.5);
-		//}
-		
-		
+		// if (event.linkId.equalsIgnoreCase("110") ||
+		// event.linkId.equalsIgnoreCase("104")){
+		// event.link.setLength(500);
+		// event.link.setFreespeed(7.5);
+		// }
+
 		if (event.agentId.equalsIgnoreCase(observedVehicleId)) {
 			System.out.println();
 		}
@@ -228,16 +252,33 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		state.energyLevel += energyCharged;
 
 		// we need to log the time, when the charging was finished
-		double eventTime = state.startTimeOfLastAct + energyCharged / chargingPower;
+		double eventTime = state.startTimeOfLastAct + energyCharged
+				/ chargingPower;
 		recordSOCOfVehicle(event, eventTime);
-		
+
 		// update energy consumption
-		if (event.linkId.equalsIgnoreCase(selectedLink)){
-			for (int i=(int)Math.round(state.startTimeOfLastAct);i<(int)Math.round(state.startTimeOfLastAct+energyCharged/chargingPower);i++ ){
-				energyConsumptionAtLink[i]+=chargingPower;
+		if (event.linkId.equalsIgnoreCase(selectedLink)) {
+			for (int i = (int) Math.round(state.startTimeOfLastAct); i < (int) Math
+					.round(state.startTimeOfLastAct + energyCharged
+							/ chargingPower); i++) {
+				energyConsumptionAtLink[i] += chargingPower;
 			}
 		}
-		
+
+		// write output event
+		// do not write out events, which are caused by the first act end (leaving home)
+		if (chargingOutput != null && state.startTimeOfLastAct!=state.startTimeOfLastAct
+				+ energyCharged / chargingPower) {
+			try {
+				chargingOutput.write(event.linkId + "\t" + event.agentId + "\t"
+						+ state.startTimeOfLastAct + "\t" + (state.startTimeOfLastAct
+						+ energyCharged / chargingPower) + "\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public void handleEvent(AgentMoneyEvent event) {
@@ -256,13 +297,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	private void recordSOCOfVehicle(PersonEvent event) {
-		recordSOCOfVehicle(event,event.time);
+		recordSOCOfVehicle(event, event.time);
 	}
-	
+
 	private void recordSOCOfVehicle(PersonEvent event, double time) {
 		if (event.agentId.toString().equalsIgnoreCase(observedVehicleId)) {
-			recordedStateOfCharge.add(time, energyLevel
-					.get(observedVehicleId).energyLevel);
+			recordedStateOfCharge.add(time,
+					energyLevel.get(observedVehicleId).energyLevel);
 		}
 	}
 
@@ -272,48 +313,59 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 			initEnergyLevel(event);
 		}
 		recordSOCOfVehicle(event);
-		
-		//printSomeSOCStatus(event.time);
+
+		// printSomeSOCStatus(event.time);
 	}
-	
+
 	// SOC: State of Charge
 	// prints only a few unique energies
-	public void printSomeSOCStatus(double time){
-		
-		
+	public void printSomeSOCStatus(double time) {
+
 		// key: energyValue
 		// value: agentId
 		HashMap<Double, String> tmpEnergy = new HashMap<Double, String>();
-		
-		for (String agentId:energyLevel.keySet()){
-			tmpEnergy.put(energyLevel.get(agentId).energyLevel,agentId);
-			//System.out.println(agentId+"\t"+energyLevel.get(agentId).energyLevel);
+
+		for (String agentId : energyLevel.keySet()) {
+			tmpEnergy.put(energyLevel.get(agentId).energyLevel, agentId);
+			// System.out.println(agentId+"\t"+energyLevel.get(agentId).energyLevel);
 		}
-		
+
 		// only print, if more than 5 different SOCs
-		if (tmpEnergy.size()<5){
+		if (tmpEnergy.size() < 5) {
 			return;
 		}
-		
+
 		System.out.println("observation time:" + time);
 		System.out.println("agentId\tSOC [J]");
-		
-		for (Double energyLevel:tmpEnergy.keySet()){
-			System.out.println(tmpEnergy.get(energyLevel)+"\t"+energyLevel);
+
+		for (Double energyLevel : tmpEnergy.keySet()) {
+			System.out.println(tmpEnergy.get(energyLevel) + "\t" + energyLevel);
 		}
 		System.exit(0);
 	}
-	
 
-	public void printEnergyConsumptionAtSelectedLink(){
+	public void printEnergyConsumptionAtSelectedLink() {
 		System.out.println("selected link:" + selectedLink);
 		System.out.println("timeId\tSOC [J]");
-		for (int i=0;i<energyConsumptionAtLink.length;i++){
-			if (energyConsumptionAtLink[i]!=0.0){
-				System.out.println(i+"\t"+energyConsumptionAtLink[i]);
+		for (int i = 0; i < energyConsumptionAtLink.length; i++) {
+			if (energyConsumptionAtLink[i] != 0.0) {
+				System.out.println(i + "\t" + energyConsumptionAtLink[i]);
 			}
 		}
-		
+
 	}
 	
+	public void tidyup(){
+		if (chargingOutput==null){
+			return;
+		}
+		try {
+			chargingOutput.flush();
+			chargingOutput.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }
