@@ -21,44 +21,22 @@ package playground.jhackney.postprocessing;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.config.Config;
-import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.events.Events;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.population.algorithms.PersonDrawActivtiySpaces;
-import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
-import org.matsim.router.PlansCalcRoute;
-import org.matsim.scoring.EventsToScore;
-import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
-import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
-import org.matsim.socialnetworks.scoring.TrackActsOverlap;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
-import org.matsim.utils.charts.XYScatterChart;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.ScenarioConfig;
-import playground.jhackney.algorithms.InitializeKnowledge;
-import playground.jhackney.algorithms.PersonGetEgoNetGetPlans;
-import playground.jhackney.algorithms.PlansPlotScoreDistance;
-import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.kml.EgoNetPlansMakeKML;
-import playground.jhackney.scoring.CharyparNagelScoringFunctionFactory;
 
 public class AnalyzeScores {
 
