@@ -36,7 +36,6 @@ import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.StrategyManagerConfigLoader;
 import org.matsim.replanning.modules.ExternalModule;
-import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.PlanomatModule;
 import org.matsim.replanning.modules.ReRoute;
 import org.matsim.replanning.modules.ReRouteDijkstra;
@@ -124,15 +123,6 @@ public class KnowledgeStrategyManagerConfigLoader extends StrategyManagerConfigL
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = settings.getExePath();
 				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
-			} else if (classname.equals("PlanomatExe")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = settings.getExePath();
-				strategy.addStrategyModule(new PlanomatExe(exePath));
-				strategy.addStrategyModule(new ReRoute(controler));
-			} else if (classname.equals("PlanomatTimeRouteExe")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = settings.getExePath();
-				strategy.addStrategyModule(new PlanomatExe(exePath));
 			} else if (classname.equals("Planomat")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule planomatStrategyModule = new PlanomatModule(controler);

@@ -27,7 +27,6 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.replanning.PlanStrategy;
 import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ExternalModule;
-import org.matsim.replanning.modules.PlanomatExe;
 import org.matsim.replanning.modules.ReRouteDijkstra;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.TimeAllocationMutator;
@@ -108,15 +107,6 @@ public class SocialStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
 				strategy.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter));
-			} else if (classname.equals("PlanomatExe")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
-				strategy.addStrategyModule(new PlanomatExe(exePath));
-				strategy.addStrategyModule(new ReRouteDijkstra(network, travelCostCalc, travelTimeCalc));
-			} else if (classname.equals("PlanomatTimeRouteExe")) {
-				strategy = new PlanStrategy(new RandomPlanSelector());
-				String exePath = config.getParam("strategy", "ModuleExePath_" + i);
-				strategy.addStrategyModule(new PlanomatExe(exePath));
 //			} else if (classname.equals("Planomat")) {
 //				strategy = new PlanStrategy(new RandomPlanSelector());
 //				StrategyModule planomatStrategyModule = new PlanomatOptimizeTimes(legTravelTimeEstimator);
