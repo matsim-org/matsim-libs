@@ -81,7 +81,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 		
-	public PlanomatX17 (Controler controler) {
+	public PlanomatX17 (Controler controler, LocationMutatorwChoiceSet locator) {
 		
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
@@ -99,7 +99,7 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		//this.timer		 			= new PlanOptimizeTimes (legTravelTimeEstimator, this.factory);
-		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+		this.locator				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
 		this.WEIGHT_CHANGE_NUMBER 	= 0.6;

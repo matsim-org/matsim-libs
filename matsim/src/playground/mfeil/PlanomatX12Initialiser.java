@@ -53,7 +53,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		this.init(network);
 		this.estimator = null;
 		this.preProcessRoutingData = null;		
-		this.locator = null;
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
 		this.timer = null;
 	
 	}
@@ -86,7 +86,7 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 					this.locator, this.timer);
 		}		
 		else {
-			planomatXAlgorithm =  new PlanomatX17 (this.controler);
+			planomatXAlgorithm =  new PlanomatX17 (this.controler, this.locator);
 		}
 
 		return planomatXAlgorithm;
