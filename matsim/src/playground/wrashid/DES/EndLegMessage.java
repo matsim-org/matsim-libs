@@ -2,6 +2,8 @@ package playground.wrashid.DES;
 
 import java.util.ArrayList;
 
+import org.matsim.events.ActEndEvent;
+import org.matsim.events.ActStartEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.population.Act;
@@ -54,11 +56,28 @@ public class EndLegMessage extends EventMessage {
 	public void processEvent() {
 		BasicEvent event = null;
 
+		// schedule AgentArrivalEvent 
 		event = new AgentArrivalEvent(this.getMessageArrivalTime(), vehicle
 				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
 				.getId().toString(), vehicle.getLegIndex() - 1);
 
 		SimulationParameters.events.processEvent(event);
+		
+		
+		// schedule ActStartEvent
+		Act nextAct= vehicle.getNextActivity();
+		double actStartEventTime=nextAct.getStartTime();
+		
+		if (this.getMessageArrivalTime()>actStartEventTime){
+			actStartEventTime=this.getMessageArrivalTime();
+		}
+		
+		event = new ActStartEvent(actStartEventTime, vehicle
+				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
+				.getId().toString(), nextAct.getType());
+		SimulationParameters.events.processEvent(event);
+		
+		
 	}
 
 }

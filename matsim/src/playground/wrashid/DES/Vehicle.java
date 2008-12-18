@@ -63,6 +63,35 @@ public class Vehicle extends SimUnit {
 		// schedule start leg message
 		scheduleStartingLegMessage(departureTime, road);
 	}
+	
+	// based on the current Leg, the previous activity is computed
+	// this could be implemented more efficiently... (TODO).
+	public Act getPreviousActivity(){
+		Plan plan = ownerPerson.getSelectedPlan();
+		ArrayList<Object> actsLegs = plan.getActsLegs();
+		
+		for (int i=0;i<actsLegs.size();i++){
+			if (actsLegs.get(i)==currentLeg){
+				return ((Act)actsLegs.get(i-1));
+			}
+		}
+		return null;
+	}
+	
+	// based on the current Leg, the next activity is computed
+	// this could be implemented more efficiently... (TODO).
+	public Act getNextActivity(){
+		Plan plan = ownerPerson.getSelectedPlan();
+		ArrayList<Object> actsLegs = plan.getActsLegs();
+		
+		for (int i=0;i<actsLegs.size();i++){
+			if (actsLegs.get(i)==currentLeg){
+				return ((Act)actsLegs.get(i+1));
+			}
+		}
+		return null;
+	}
+	
 
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
