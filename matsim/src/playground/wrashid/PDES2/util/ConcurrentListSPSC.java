@@ -15,6 +15,13 @@ public class ConcurrentListSPSC<T> {
 		}
 	}
 	
+	// the input list will be emptied
+	public void add(LinkedList<T> list){
+		synchronized (inputBuffer){
+			inputBuffer.addAll(list);
+		}
+	}
+	
 	// returns null, if empty, else the first element
 	public T remove(){
 		if (!outputBuffer.isEmpty()){
