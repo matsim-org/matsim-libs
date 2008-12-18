@@ -40,6 +40,9 @@ public class ProcessEventThread implements Runnable {
 	// the problem with this is, that actually the current thread is allowed to 
 	// be slow. But this second approach makes the processEventThread slow instead
 	// of the main thread.
+	
+	// This second proposed approach would again make sense, if we use the main thread
+	// after its completion as a worker thread.
 	public void processEvent(BasicEvent event) {
 		eventQueue.add(event);
 		//preInputBuffer.add(event);
