@@ -1,8 +1,12 @@
-Date: 18. Dezember
-==================
+Date: 18. Dezember 2008
+=======================
 1 Iteration with 67000 agents (test 6, 10% Zurich), with EventWriterTXT on, took on
-DEQSim: 122 s
-JavaMobSiM: 423s
+DEQSim: 122 sec.
+JavaMobSiM: 423sec.
 
-Update: Using addional Thread for EventProcessing, DEQSim is reduced to 86sec.
+
+DEQSim without EventProcessing is: 37sec.
+Using addional Thread for EventProcessing, DEQSim is reduced to 86sec.
+This means, we have reached the maximum throughput for this (as only one handler and no further parallelization possible).
+
 

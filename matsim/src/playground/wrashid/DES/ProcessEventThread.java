@@ -86,7 +86,7 @@ public class ProcessEventThread implements Runnable {
 
 	// call to flush buffer
 	public void close() {
-		processEvent(new DummyEvent(0.0));
+		eventQueue.add(new DummyEvent(0.0));
 		//eventQueue.add(preInputBuffer);
 		//preInputBuffer.clear();
 	}
