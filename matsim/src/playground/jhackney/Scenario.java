@@ -46,7 +46,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.scoring.EventsToScore;
-import org.matsim.socialnetworks.algorithms.EventsPostProcess;
+import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -221,7 +221,7 @@ public abstract class Scenario {
 		return plans;
 	}
 	
-	public static final Events readEvents(int i, EventsPostProcess epp) {
+	public static final Events readEvents(int i, EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
@@ -234,7 +234,7 @@ public abstract class Scenario {
 		return events;
 	}
 	
-	public static final Events readEvents(int i, EventsPostProcess epp, EventsToScore scoring) {
+	public static final Events readEvents(int i, EventsMapStartEndTimes epp, EventsToScore scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
