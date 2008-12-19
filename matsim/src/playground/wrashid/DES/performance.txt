@@ -3,10 +3,20 @@ Date: 18. Dezember 2008
 1 Iteration with 67000 agents (test 6, 10% Zurich), with EventWriterTXT on, took on
 DEQSim: 122 sec.
 JavaMobSiM: 423sec.
-
+(on my office computer)
 
 DEQSim without EventProcessing is: 37sec.
 Using addional Thread for EventProcessing, DEQSim is reduced to 86sec.
 This means, we have reached the maximum throughput for this (as only one handler and no further parallelization possible).
 
 
+19. Dezember 2008
+==================
+1 Iteration, 67K run, on Satwal:
+DEQSim inklusive exra thread for eventProcessing: 125 sec.
+DEQSim inklusive exra thread for eventProcessing + lesser locking/more copying of lists: 100 sec.
+(this needs 88sec instead of 86 on office computer)
+DEQSim events turned off: 41sec. 
+JavaMobSim: 461sec.
+
+=> experiment: 1 million synchronized cost arround 8.7 seconds on Satawal.
