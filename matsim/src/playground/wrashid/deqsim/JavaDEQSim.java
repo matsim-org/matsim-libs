@@ -58,7 +58,7 @@ public class JavaDEQSim {
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
 		//SimulationParameters.events = events;
 		// the thread for processing the events
-		SimulationParameters.processEventThread=new ProcessEventThread(events);
+		SimulationParameters.processEventThread=new ProcessEventThread(events,200000);
 		
 		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
