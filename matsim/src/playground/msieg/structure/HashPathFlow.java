@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * HashPathFlow.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.msieg.structure;
 
 import java.io.BufferedReader;
@@ -67,10 +87,23 @@ public class HashPathFlow<V, E> implements PathFlow<V,E> {
 		return arcFlow;
 	}
 
+	public Commodity<V> getCommodity(V from, V to){
+		for(Commodity<V> c: this.getCommodities()){
+			if(c.getOrigin() == from && c.getDestination() == to)
+				return c;
+		}
+		return null;
+	}
+	
 	public Set<Commodity<V>> getCommodities() {
 		return this.pathFlow.keySet();
 	}
 
+	public Set<List<E>> getFlowPaths(V from, V to) {
+		Commodity<V> c = this.getCommodity(from, to);
+		return c==null ? null: this.getFlowPaths(c);
+	}
+	
 	public Set<List<E>> getFlowPaths(Commodity<V> c) {
 		return this.pathFlow.get(c)==null ? null : this.pathFlow.get(c).keySet();
 	}
@@ -152,9 +185,5 @@ public class HashPathFlow<V, E> implements PathFlow<V,E> {
 		}
 
 		return pFlow;
-	}
-
-	public Map<Commodity<V>, Map<List<E>, Double>> getPathFlow() {
-		return pathFlow;
 	}
 }

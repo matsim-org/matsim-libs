@@ -138,7 +138,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 			tab += '\t';
 		log(tab+"<edges>", out);
 		for (Link l: this.netLayer.getLinks().values()){
-			log(tab+"\t<edge id=\""+l.getOrigId()+"\">\n", out);
+			log(tab+"\t<edge id=\""+l.getId()+"\">\n", out);
 			log(tab+"\t\t<from>"+l.getFromNode().getId()+"</from>\n", out);
 			log(tab+"\t\t<to>"+l.getToNode().getId()+"</to>\n", out);
 			//now read link parameters
