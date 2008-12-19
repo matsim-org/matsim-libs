@@ -42,7 +42,7 @@ public class BKickControler extends Controler {
 	
 	 public static void main(String[] args){
 			String equilExampleConfig = "examples/equil/configOTF.xml";
-			String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+			String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteTwoModeTest/config.xml";
 //			String config = equilExampleConfig;
 			String config = oneRouteNoModeTest;
 			

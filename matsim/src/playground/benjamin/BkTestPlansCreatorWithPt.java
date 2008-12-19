@@ -68,6 +68,7 @@ public class BkTestPlansCreatorWithPt {
 			BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>> p = new BasicPersonImpl(new IdImpl(i));
 			BasicPlan plan = new BasicPlanImpl();
 			plan.setSelected(true);
+			plan.setType(BasicPlan.Type.CAR);
 			p.addPlan(plan);
 			
 			//adding carPlan to person
@@ -110,6 +111,7 @@ public class BkTestPlansCreatorWithPt {
 			
 			plan = new BasicPlanImpl();
 			//plan.setSelected(true);
+			plan.setType(BasicPlan.Type.PT);
 			p.addPlan(plan);
 			
 			
