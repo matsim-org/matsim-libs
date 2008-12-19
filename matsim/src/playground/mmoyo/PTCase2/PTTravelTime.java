@@ -13,8 +13,6 @@ public class PTTravelTime implements TravelTime {
 	
 	//minutes
 	public double getLinkTravelTime(Link link, double time) {
-		//borrar manuel
-		/*
 		double travelTime =0;
 		//System.out.println(link.getId());
 		if (link.getType().equals("Transfer")){
@@ -27,7 +25,6 @@ public class PTTravelTime implements TravelTime {
 		}else if (link.getType().equals("Standard")){
 			travelTime= ptTimeTable.GetTravelTime(link);
 		}
-		*/
-		return link.getFromNode().getCoord().calcDistance(link.getToNode().getCoord());
+		return link.getLength();
 	}
 }

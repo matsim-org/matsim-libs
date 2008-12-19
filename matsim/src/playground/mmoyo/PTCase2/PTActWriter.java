@@ -56,7 +56,7 @@ public class PTActWriter {
 		Population newPopulation = new org.matsim.population.Population(false);
 		int x=0;
 		for (Person person: this.population.getPersons().values()) {
-			//Person person = population.getPerson("2237901");
+			//Person person = population.getPerson("1834734");
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 			
@@ -73,20 +73,24 @@ public class PTActWriter {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
+		    		int distance = (int)lastActCoord.calcDistance(actCoord);
 		    		int distToWalk= distToWalk(person.getAge());
-		    		Path path = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-		    		if(path!=null){
-		    			if (path.nodes.size()>2){
-		    				createWlinks(lastActCoord, path, actCoord);
-		    				legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
-		    				removeWlinks();
-		    			}else{     // if router didn't find a PT connection then walk
-		    				newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-		    			}//legRoute.getRoute().size()>2
-		    		}else{
+		    		if (distance<= distToWalk){
 		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-		    		}//if(legRoute!=null)
-
+		    		}else{	
+			    		Path path = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+			    		if(path!=null){
+			    			if (path.nodes.size()>2){
+			    				createWlinks(lastActCoord, path, actCoord);
+			    				legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+			    				removeWlinks();
+			    			}else{     // if router didn't find a PT connection then walk
+			    				newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    			}//legRoute.getRoute().size()>2
+			    		}else{
+			    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    		}//if(legRoute!=null)
+		    		}//distance<= distToWalk
 				}//if val
 				
 		    	//TODO: this must be read from the city network not from pt network!!! 
@@ -133,7 +137,7 @@ public class PTActWriter {
 		int distance=0;
 		if (personAge>=60)distance=300; 
 		if (personAge>=40 || personAge<60)distance=400;
-		if (personAge>=18 || personAge<40)distance=800;
+		if (personAge>=18 || personAge<40)distance=600;
 		if (personAge<18)distance=300;
 		return distance;
 	}	
@@ -226,8 +230,11 @@ public class PTActWriter {
 				if(linkCounter == (routeLinks.size()-1)){ //Last PTAct: getting off
 					arrTime= depTime+ legTravelTime;
 					legDistance=legDistance + linkDistance;  
-					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.pt, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));	
-					newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
+					//TODO: The legMode car is temporal only for visualization purposes
+					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, arrTime-legTravelTime, legTravelTime, arrTime));	
+					//test
+					//newPlan.addAct(newPTAct("exit pt veh", link.getFromNode().getCoord(), link, arrTime, 0, arrTime));
+					newPlan.addAct(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, 0, arrTime));
 				}
 				
 			
@@ -235,7 +242,8 @@ public class PTActWriter {
 				if (lastLinkType.equals("Standard")){ 
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
-					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.pt, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
+					//TODO: The legMode car is temporal only for visualization purposes
+					newPlan.addLeg(newPTLeg(legNum++, Leg.Mode.car, legRouteLinks, legDistance, depTime, legTravelTime, arrTime));
 					newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					first=false;
 				}
