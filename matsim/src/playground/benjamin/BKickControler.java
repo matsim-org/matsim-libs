@@ -35,7 +35,7 @@ public class BKickControler extends Controler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickScoringFunctionFactory();
+		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
 
 	
