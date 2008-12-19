@@ -33,7 +33,8 @@ public class MyMain {
 //		Controler c = new Controler("examples/equil/config.xml");
 //		org.matsim.run.Controler.main(new String[] {"examples/tutorial/singleIteration.xml"});
 		String equilExampleConfig = "examples/equil/configOTF.xml";
-		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+//		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/configOldUtlFctn.xml";
 //		String config = equilExampleConfig;
 		String config = oneRouteNoModeTest;
 		
