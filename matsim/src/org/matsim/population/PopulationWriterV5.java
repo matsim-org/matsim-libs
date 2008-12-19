@@ -221,10 +221,12 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.atts.clear();
 		this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, route.getStartLinkId().toString()));
 		this.writeStartTag(PopulationSchemaV5Names.STARTLINK, this.atts, true);		
-		for (Id id : route.getLinkIds()) {
-			this.atts.clear();
-			this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, id.toString()));
-			this.writeStartTag(PopulationSchemaV5Names.LINK, this.atts, true);
+		if (null != route.getLinkIds()) {
+			for (Id id : route.getLinkIds()) {
+				this.atts.clear();
+				this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, id.toString()));
+				this.writeStartTag(PopulationSchemaV5Names.LINK, this.atts, true);
+			}			
 		}
 		this.atts.clear();
 		this.atts.add(this.createTuple(PopulationSchemaV5Names.REFID, route.getEndLinkId().toString()));
