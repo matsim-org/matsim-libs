@@ -18,27 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+/**
+ * 
+ */
+package playground.johannes.graph;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/**
+ * @author illenberger
+ *
+ */
 public class AllTests {
 
 	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for playground.johannes.graph");
 
-	
+		suite.addTestSuite(playground.johannes.graph.ReadWriteAnalyze.class);
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-		suite.addTest(playground.johannes.AllTests.suite());
-		
-		//$JUnit-END$
 		return suite;
 	}
 

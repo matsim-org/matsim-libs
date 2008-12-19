@@ -32,7 +32,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
+import org.matsim.utils.io.IOUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -67,7 +69,7 @@ public abstract class AbstractGraphMLReader {
 	 * Creates a new graph out of the graph data stored in <tt>file</tt>.
 	 * 
 	 * @param file
-	 *            the graph file
+	 *            the graph file (can be gzip-compressed).
 	 * @return a new graph.
 	 */
 	public AbstractSparseGraph readGraph(String file) {
@@ -91,9 +93,9 @@ public abstract class AbstractGraphMLReader {
 			 * then the edges.
 			 */
 			parseEdges = false;
-			reader.parse(file);
+			reader.parse(new InputSource(IOUtils.getBufferedReader(file)));
 			parseEdges = true;
-			reader.parse(file);
+			reader.parse(new InputSource(IOUtils.getBufferedReader(file)));
 			
 			printProgress();
 		} catch (ParserConfigurationException e) {

@@ -39,6 +39,14 @@ import playground.johannes.graph.SparseVertex;
 public class PlainGraphMLReader extends AbstractGraphMLReader {
 
 	/**
+	 * @see {@link AbstractGraphMLReader#readGraph(String)}
+	 */
+	@Override
+	public PlainGraph readGraph(String file) {
+		return (PlainGraph) super.readGraph(file);
+	}
+
+	/**
 	 * Creates a new SparseEdge and inserts into the graph between <tt>v1</tt>
 	 * and <tt>v2</tt>.
 	 * 

@@ -67,6 +67,9 @@ public class GraphAnalyser {
 		double dcorrelation = GraphStatistics.getDegreeCorrelation(g);
 		logger.info(String.format("Degree correlation is %1$s.", dcorrelation));
 		
+		double numComponents = GraphStatistics.getComponents(g).size();
+		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
+		
 		GraphDistance gDistance = GraphStatistics.getCentrality(g);
 		logger.info(String.format("Betweenness centrality is %1$s.", gDistance.getGraphBetweenness()));
 		logger.info(String.format("Normalized betweenness centrality is %1$s.", gDistance.getGraphBetweennessNormalized()));
@@ -99,6 +102,10 @@ public class GraphAnalyser {
 			
 			writer.write("dcorrelation=");
 			writer.write(String.valueOf(dcorrelation));
+			writer.newLine();
+			
+			writer.write("components=");
+			writer.write(String.valueOf(numComponents));
 			writer.newLine();
 
 			writer.write("betweenness=");
