@@ -10,7 +10,7 @@ import org.matsim.events.Events;
 import playground.wrashid.PDES2.util.ConcurrentListSPSC;
 
 public class ProcessEventThread implements Runnable {
-	//LinkedList<BasicEvent> preInputBuffer=null;
+	LinkedList<BasicEvent> preInputBuffer=null;
 	ConcurrentListSPSC<BasicEvent> eventQueue = null;
 	Events events;
 	CyclicBarrier cb=new CyclicBarrier(2);
@@ -20,7 +20,7 @@ public class ProcessEventThread implements Runnable {
 		this.events = events;
 		this.preInputBufferMaxLength= preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-
+		preInputBuffer= new LinkedList<BasicEvent>();
 		
 		Thread t = new Thread(this);
 		t.start();
@@ -43,13 +43,19 @@ public class ProcessEventThread implements Runnable {
 	
 	// This second proposed approach would again make sense, if we use the main thread
 	// after its completion as a worker thread.
+	
+	// This can be further improved: make a list of lists, so that no copying is needed
+	// during synchronization
 	public void processEvent(BasicEvent event) {
-		eventQueue.add(event);
-		//preInputBuffer.add(event);
-		//if (preInputBuffer.size()>preInputBufferMaxLength){
-		//	eventQueue.add(preInputBuffer);
-		//	preInputBuffer.clear();
-		//}
+		// first approach (quick on office computer)
+		//eventQueue.add(event);
+		
+		// second approach, lesser locking => faster on Satawal
+		preInputBuffer.add(event);
+		if (preInputBuffer.size()>preInputBufferMaxLength){
+			eventQueue.add(preInputBuffer);
+			preInputBuffer.clear();
+		}
 	}
 
 	public void run() {
