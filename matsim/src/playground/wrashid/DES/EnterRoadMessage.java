@@ -1,5 +1,6 @@
 package playground.wrashid.DES;
 
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
 
@@ -9,7 +10,7 @@ public class EnterRoadMessage extends EventMessage {
 	public void handleMessage() {
 		// enter the next road
 		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
-		road.enterRoad(vehicle,getMessageArrivalTime());
+		road.enterRoad(vehicle, getMessageArrivalTime());
 	}
 
 	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
@@ -20,10 +21,19 @@ public class EnterRoadMessage extends EventMessage {
 	public void processEvent() {
 		BasicEvent event = null;
 
-		event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
-				.getId().toString(), vehicle.getLegIndex() - 1);
+		// the first EnterLink in a leg is a Wait2LinkEvent
+		if (vehicle.getLinkIndex() == -1) {
+			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(),
+					vehicle.getOwnerPerson().getId().toString(), vehicle
+							.getCurrentLink().getId().toString(), vehicle
+							.getLegIndex() - 1);
+		} else {
 
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
+					.getOwnerPerson().getId().toString(), vehicle
+					.getCurrentLink().getId().toString(),
+					vehicle.getLegIndex() - 1);
+		}
 		SimulationParameters.processEventThread.processEvent(event);
 	}
 
