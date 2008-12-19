@@ -115,11 +115,12 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 
 				// each CAR leg must enter/leave act link
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
+					// the first LinkEnterEvent is a AgentWait2LinkEvent
 					assertEquals(true,
-							list.get(index) instanceof LinkEnterEvent);
+							list.get(index) instanceof AgentWait2LinkEvent);
 					assertEquals(true, act.getLinkId().toString()
 							.equalsIgnoreCase(
-									((LinkEnterEvent) list.get(index)).linkId));
+									((AgentWait2LinkEvent) list.get(index)).linkId));
 					index++;
 
 					assertEquals(true,
