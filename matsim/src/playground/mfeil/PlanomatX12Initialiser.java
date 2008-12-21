@@ -25,7 +25,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.replanning.modules.*;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 
 
@@ -39,10 +38,8 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	
 	private final NetworkLayer 				network;
 	private final Controler					controler;
-	private final LegTravelTimeEstimator 	estimator;
 	private final PreProcessLandmarks		preProcessRoutingData;
 	private final LocationMutatorwChoiceSet locator;
-	private final PlanAlgorithm				timer;
 
 	
 	
@@ -51,26 +48,20 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);
-		this.estimator = null;
 		this.preProcessRoutingData = null;		
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
-		this.timer = null;
 	
 	}
 	
 	public PlanomatX12Initialiser (final ControlerMFeil controler, 
 			final PreProcessLandmarks preProcessRoutingData,
-			final LegTravelTimeEstimator estimator,
-			final LocationMutatorwChoiceSet locator,
-			final PlanAlgorithm timer) {
+			final LocationMutatorwChoiceSet locator) {
 		
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);
-		this.estimator = estimator;
 		this.preProcessRoutingData = preProcessRoutingData;	
 		this.locator = locator;
-		this.timer = timer;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -81,9 +72,9 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		if (this.estimator!=null){
-			planomatXAlgorithm = new PlanomatX17 (this.controler, this.preProcessRoutingData, this.estimator,
-					this.locator, this.timer);
+		if (this.preProcessRoutingData!=null){
+			planomatXAlgorithm = new PlanomatX17 (this.controler, this.preProcessRoutingData, 
+					this.locator);
 		}		
 		else {
 			planomatXAlgorithm =  new PlanomatX17 (this.controler, this.locator);

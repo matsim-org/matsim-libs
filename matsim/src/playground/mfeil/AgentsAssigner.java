@@ -27,7 +27,9 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.scoring.PlanScorer;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -35,6 +37,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 
 
 /**
@@ -47,6 +50,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final Controler					controler;
 	protected final PlanAlgorithm				timer;
 	protected final LocationMutatorwChoiceSet 	locator;
+	protected final PlanScorer					scorer;
 	protected final PlansCalcRouteLandmarks 	router;
 	protected final RecyclingModule				module;
 	protected final ScheduleCleaner				cleaner;
@@ -62,12 +66,21 @@ public class AgentsAssigner implements PlanAlgorithm{
 		
 	
 	
-	public AgentsAssigner (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
-			LocationMutatorwChoiceSet locator, PlanAlgorithm timer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
+	public AgentsAssigner (Controler controler, PreProcessLandmarks preProcessRoutingData, 
+			LocationMutatorwChoiceSet locator, PlanScorer scorer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
 			double minimumTime, LinkedList<String> nonassignedAgents){
 		this.controler				= controler;
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
-		this.timer					= timer;
+		this.scorer					= scorer;
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+				controler.getNetwork(), 
+				controler.getTraveltimeBinSize());
+		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				controler.getTravelCostCalculator(), 
+				tDepDelayCalc, 
+				controler.getNetwork());
+		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.locator 				= locator;
 		this.cleaner				= cleaner;
 		this.module					= recyclingModule;

@@ -110,13 +110,20 @@ public class PlanomatX17 implements org.matsim.population.algorithms.PlanAlgorit
 		
 	}
 	
-	public PlanomatX17 (Controler controler, PreProcessLandmarks preProcessRoutingData, LegTravelTimeEstimator legTravelTimeEstimator,
-			LocationMutatorwChoiceSet locator, PlanAlgorithm timer){
+	public PlanomatX17 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator){
 		this.preProcessRoutingData 	= preProcessRoutingData;
 		this.factory				= controler.getScoringFunctionFactory();
 		this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.scorer					= new PlanScorer (this.factory);
-		this.timer					= timer;
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
+				controler.getNetwork(), 
+				controler.getTraveltimeBinSize());
+		LegTravelTimeEstimator legTravelTimeEstimator = Gbl.getConfig().planomat().getLegTravelTimeEstimator(
+				controler.getTravelTimeCalculator(), 
+				controler.getTravelCostCalculator(), 
+				tDepDelayCalc, 
+				controler.getNetwork());
+		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
 		this.locator 				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 

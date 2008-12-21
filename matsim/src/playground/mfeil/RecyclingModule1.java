@@ -45,7 +45,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		this.noOfAgents			= 10;
 		this.coefficients 		= new DistanceCoefficients (1, 1);		
 		this.assignmentModule	= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
-				this.estimator, this.locator, this.timer, this.cleaner, this, 
+				this.locator, this.scorer, this.cleaner, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
 	}
 	

@@ -59,7 +59,7 @@ public class RecyclingModule implements StrategyModule {
 	protected final MultithreadedModuleA		assignmentModule;
 	protected final PreProcessLandmarks			preProcessRoutingData;
 	protected final LocationMutatorwChoiceSet 	locator;
-	//private final PlansCalcRouteLandmarks 	router;
+	protected final PlanScorer					scorer;
 	protected final LegTravelTimeEstimator		estimator;
 	protected final double						minimumTime;
 	protected final ScheduleCleaner				cleaner;
@@ -80,6 +80,7 @@ public class RecyclingModule implements StrategyModule {
 		this.preProcessRoutingData.run(controler.getNetwork());
 		//this.router 				= new PlansCalcRouteLandmarks (controler.getNetwork(), this.preProcessRoutingData, controler.getTravelCostCalculator(), controler.getTravelTimeCalculator());
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler);
+		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(), 
 				controler.getTraveltimeBinSize());
@@ -90,9 +91,9 @@ public class RecyclingModule implements StrategyModule {
 				controler.getNetwork());
 		this.nonassignedAgents = new LinkedList<String>();
 		this.timer					= new TimeOptimizer14 (this.estimator, new PlanScorer(controler.getScoringFunctionFactory()));
-		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.estimator, this.locator, this.timer);
-		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.estimator, this.locator,
-			this.timer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
+		this.schedulingModule 		= new PlanomatX12Initialiser(controler, this.preProcessRoutingData, this.locator);
+		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.preProcessRoutingData, this.locator,
+			this.scorer, this.cleaner, this, this.minimumTime, this.nonassignedAgents);
 		this.minimumTime			= 1800;
 		this.cleaner				= new ScheduleCleaner (this.estimator, this.minimumTime);		
 		this.testAgentsNumber		= 5;
