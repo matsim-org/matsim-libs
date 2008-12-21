@@ -103,7 +103,14 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
 	
-
+	private static final double uMin_education = 0;
+	private static final double uMax_education = 95;
+	private static final double alpha_education = 3;
+	private static final double beta_education = 1.2;
+	private static final double gamma_education = 1;
+	
+	
+	
 	public JohScoringFunction(final Plan plan) {
 		init();
 		this.reset();
@@ -342,6 +349,76 @@ public class JohScoringFunction implements ScoringFunction {
 		actParams = new JohActUtilityParameters("leisure", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure);
 		actParams.setOpeningTime(18*3600);
 		actParams.setClosingTime(22*3600);			
+		utilParams.put(type, actParams);
+		
+		
+		//TODO @ mfeil: bad programming style, I know...
+		type = "education_higher";
+		actParams = new JohActUtilityParameters("education_higher", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
+		
+		type = "education_kindergarten";
+		actParams = new JohActUtilityParameters("education_kindergarten", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
+		
+		type = "education_other";
+		actParams = new JohActUtilityParameters("education_other", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
+		
+		type = "education_primary";
+		actParams = new JohActUtilityParameters("education_primary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
+		
+		type = "education_secondary";
+		actParams = new JohActUtilityParameters("education_secondary", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
+		
+		type = "shop";
+		actParams = new JohActUtilityParameters("shop", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
+		actParams.setOpeningTime(10*3600);
+		actParams.setClosingTime(18*3600);
+		utilParams.put(type, actParams);
+		
+		type = "work_sector2";
+		actParams = new JohActUtilityParameters("work_sector2", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams.setOpeningTime(8*3600);
+		actParams.setClosingTime(18*3600);
+		actParams.setLatestStartTime(10*3600);
+		actParams.setEarliestEndTime(15*3600);
+		utilParams.put(type, actParams);
+		
+		type = "work_sector3";
+		actParams = new JohActUtilityParameters("work_sector3", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams.setOpeningTime(8*3600);
+		actParams.setClosingTime(18*3600);
+		actParams.setLatestStartTime(10*3600);
+		actParams.setEarliestEndTime(15*3600);
+		utilParams.put(type, actParams);
+		
+		type = "tta";
+		actParams = new JohActUtilityParameters("tta", uMin_work, uMax_home, alpha_home, beta_home, gamma_home);
+		actParams.setOpeningTime(3*3600);
+		actParams.setClosingTime(24*3600);
 		utilParams.put(type, actParams);
 		
 	}
