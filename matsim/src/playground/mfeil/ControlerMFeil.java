@@ -32,13 +32,14 @@ import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.BestPlanSelector;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.scoring.*;
+import org.matsim.controler.Controler;
 
 
 /**
  * @author Matthias Feil
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
-public class ControlerMFeil extends org.matsim.controler.Controler {
+public class ControlerMFeil extends Controler {
 	
 	public ControlerMFeil (String [] args){
 		super(args);
