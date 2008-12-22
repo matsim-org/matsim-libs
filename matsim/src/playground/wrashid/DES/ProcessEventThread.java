@@ -13,7 +13,7 @@ public class ProcessEventThread implements Runnable {
 	LinkedList<BasicEvent> preInputBuffer=null;
 	ConcurrentListSPSC<BasicEvent> eventQueue = null;
 	Events events;
-	CyclicBarrier cb=new CyclicBarrier(2);
+	CyclicBarrier cb=null;
 	private int preInputBufferMaxLength;
 
 	public ProcessEventThread(Events events, int preInputBufferMaxLength) {
@@ -21,18 +21,26 @@ public class ProcessEventThread implements Runnable {
 		this.preInputBufferMaxLength= preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<BasicEvent>();
 		preInputBuffer= new LinkedList<BasicEvent>();
+		cb=new CyclicBarrier(2);
+		Thread t = new Thread(this);
+		t.start();
+	}
+	
+	
+	public ProcessEventThread(Events events, int preInputBufferMaxLength, CyclicBarrier cb) {
+		this.events = events;
+		this.preInputBufferMaxLength= preInputBufferMaxLength;
+		eventQueue = new ConcurrentListSPSC<BasicEvent>();
+		preInputBuffer= new LinkedList<BasicEvent>();
+		this.cb=cb;
 		
 		Thread t = new Thread(this);
 		t.start();
 	}
 	
-	public ProcessEventThread(Events events) {
-		this.events = events;
-		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-		
-		Thread t = new Thread(this);
-		t.start();
-	}
+	
+	
+	
 
 	
 	// a different approach was tried, but it was not as efficient:
@@ -83,18 +91,23 @@ public class ProcessEventThread implements Runnable {
 		}
 	}
 
-	
-	
-	// When the main method is finish, it must await this barrier
-	public CyclicBarrier getBarrier(){
-		return cb;
+	// call to flush buffer
+	public void awaitHandler() {
+		processEvent(new DummyEvent(0.0));
+		eventQueue.add(preInputBuffer);
+		preInputBuffer.clear();
+		
+		try {
+			cb.await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	// call to flush buffer
-	public void close() {
-		eventQueue.add(new DummyEvent(0.0));
-		//eventQueue.add(preInputBuffer);
-		//preInputBuffer.clear();
-	}
+
 	
 }
