@@ -114,16 +114,7 @@ public class JavaDEQSim {
 		scheduler.startSimulation();
 
 		// the main thread (microsimulation) is finished - await the event processing
-		SimulationParameters.processEventThread.close();
-		try {
-			SimulationParameters.processEventThread.getBarrier().await();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		SimulationParameters.processEventThread.awaitHandler();
 		
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
