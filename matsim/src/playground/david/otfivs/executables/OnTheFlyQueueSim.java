@@ -114,8 +114,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		Config config = Gbl.createConfig(args);
 
 		config.global().setLocalDtdBase(localDtdBase);
-		config.simulation().setFlowCapFactor(0.5);
-		config.simulation().setStorageCapFactor(0.5);
+		config.simulation().setFlowCapFactor(0.02);
+		config.simulation().setStorageCapFactor(0.02);
 
 		if(args.length >= 1) {
 			netFileName = config.network().getInputFile();
@@ -143,6 +143,8 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		Events events = new Events();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
+		config.simulation().removeStuckVehicles(true);
+		config.simulation().setStuckTime(100);
 		//config.simulation().setEndTime(Time.parseTime("07:02:00"));
 		config.network().setInputFile(netFileName);
 

@@ -152,7 +152,7 @@ public class DEQSim extends ExternalMobsim {
 		System.out.println("done writing plans for deqsim. " + (new Date()));
 	}
 
-	private void writePerson(final DataOutputStream out, final Person person) throws IOException {
+	public static void writePerson(final DataOutputStream out, final Person person) throws IOException {
 		// person id, int, 32bit
 		out.writeInt(Integer.parseInt(person.getId().toString()));
 
