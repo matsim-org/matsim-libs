@@ -29,3 +29,15 @@ used RAM: 881376096B = 860718kB = 840MB  free: 184108192B = 175MB  total: 106548
 satwal:
 used RAM: 1061712368B = 1036828kB = 1012MB  free: 367889936B = 350MB  total: 1429602304B = 1363MB
 => probably because satawal uses 64bit JVM.
+
+
+22. Dezember 2008
+==================
+Using the class: tryouts.performance.EventProcessing (using 1 million iterations), the following was found out on the office computer:
+- the normal Events class needs 17.282 seconds for 2 Handlers (and one thread).
+- with ParallelEvents class, 10.438 seconds are needed (two Handlers, two Thread)
+- 14.751 seconds, 3 threads, 3 handlers
+- 18.063 seconds, 2 threads, 3 handlers
+- 19.095 seconds, 2 threads, 4 handlers
+- 19.079 seconds, 4 threads, 4 handlers
+- 32.892 seconds, 1 threads, 4 handlers

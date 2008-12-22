@@ -49,7 +49,7 @@ public class SimulationParameters {
 	// this is the simulation events object
 	//public static Events processEventThread = null;
 	// The thread for processing the events
-	public static ProcessEventThread processEventThread = null;
+	public static ParallelEvents processEventThread = null;
 
 	// TESTING
 	// test injection variables

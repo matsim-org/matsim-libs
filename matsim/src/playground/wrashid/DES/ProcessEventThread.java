@@ -90,12 +90,17 @@ public class ProcessEventThread implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
-	// call to flush buffer
-	public void awaitHandler() {
+	
+	// schedule dummy event and flush buffered events
+	public void close(){
 		processEvent(new DummyEvent(0.0));
 		eventQueue.add(preInputBuffer);
 		preInputBuffer.clear();
+	}
+
+	// call to flush buffer
+	public void awaitHandler() {
+		close();
 		
 		try {
 			cb.await();
