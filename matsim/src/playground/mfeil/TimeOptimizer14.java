@@ -92,6 +92,9 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		plan.setScore(this.scorer.getScore(plan));
 		
 		
+		// NEW NEW NEW NEW NEW NEW NEW 
+		if (plan.getActsLegs().size()==1) return;		
+		
 		// Initializing 
 		int neighbourhood_size = 0;
 		for (int i = plan.getActsLegs().size()-1;i>0;i=i-2){
