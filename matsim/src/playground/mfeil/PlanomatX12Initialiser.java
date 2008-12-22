@@ -73,11 +73,11 @@ public class PlanomatX12Initialiser extends MultithreadedModuleA{
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
 		if (this.preProcessRoutingData!=null){
-			planomatXAlgorithm = new PlanomatX17 (this.controler, this.preProcessRoutingData, 
+			planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, 
 					this.locator);
 		}		
 		else {
-			planomatXAlgorithm =  new PlanomatX17 (this.controler, this.locator);
+			planomatXAlgorithm =  new PlanomatX18 (this.controler, this.locator);
 		}
 
 		return planomatXAlgorithm;
