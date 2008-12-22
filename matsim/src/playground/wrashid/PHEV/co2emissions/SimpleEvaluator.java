@@ -10,7 +10,7 @@ import org.matsim.network.NetworkLayer;
 public class SimpleEvaluator {
 
 	public static void main(String[] args) {
-		String eventsFilePath = "C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\CO2Emissions\\IAMF2009Paper\\input events\\56.events.txt";
+		String eventsFilePath = "C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\IAMF2009Paper\\CO2Experiment\\input events\\56.events.txt";
 		args=new String[1];
 		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
