@@ -556,6 +556,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
 			
+			//TODO @ mfeil: This needs improvement!!!
 			Leg legHelp;
 			legHelp = new Leg (BasicLeg.Mode.car);
 			
