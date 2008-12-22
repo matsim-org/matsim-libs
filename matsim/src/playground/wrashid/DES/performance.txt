@@ -20,3 +20,12 @@ DEQSim events turned off: 41sec.
 JavaMobSim: 461sec.
 
 => experiment: 1 million synchronized cost arround 8.7 seconds on Satawal.
+In general it was found, that Satawal is much more sensitive to locking, than my office computer.
+office computer = dual core, AMD optron 2.2GHz
+
+memory at same place in simulation:
+office computer: 
+used RAM: 881376096B = 860718kB = 840MB  free: 184108192B = 175MB  total: 1065484288B = 1016MB
+satwal:
+used RAM: 1061712368B = 1036828kB = 1012MB  free: 367889936B = 350MB  total: 1429602304B = 1363MB
+=> probably because satawal uses 64bit JVM.
