@@ -35,6 +35,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
 import playground.wrashid.DES.DummyEvent;
+import playground.wrashid.DES.ParallelEvents;
 import playground.wrashid.DES.ProcessEventThread;
 import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
@@ -58,7 +59,7 @@ public class JavaDEQSim {
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
 		//SimulationParameters.events = events;
 		// the thread for processing the events
-		SimulationParameters.processEventThread=new ProcessEventThread(events,200000);
+		SimulationParameters.processEventThread= (ParallelEvents) events;
 		
 		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
@@ -70,7 +71,7 @@ public class JavaDEQSim {
 
 		// allowed testing to hook in here
 		if (SimulationParameters.testEventHandler != null) {
-			events.addHandler(SimulationParameters.testEventHandler);
+			SimulationParameters.processEventThread.addHandler(SimulationParameters.testEventHandler);
 		}
 
 		if (SimulationParameters.testPlanPath != null) {
@@ -114,7 +115,7 @@ public class JavaDEQSim {
 		scheduler.startSimulation();
 
 		// the main thread (microsimulation) is finished - await the event processing
-		SimulationParameters.processEventThread.awaitHandler();
+		SimulationParameters.processEventThread.awaitHandlerThreads();
 		
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only DES part): ");

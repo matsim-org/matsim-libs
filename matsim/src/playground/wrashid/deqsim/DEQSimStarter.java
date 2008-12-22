@@ -30,6 +30,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 
+import playground.wrashid.DES.ParallelEvents;
+
 public class DEQSimStarter {
 
 	public static void main(String[] args) {
@@ -55,7 +57,7 @@ public class DEQSimStarter {
 		ScenarioData data = new ScenarioData(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
-		Events events = new Events();
+		Events events = new ParallelEvents(2);
 		
 		// run simulation
 		JavaDEQSim client = new JavaDEQSim(network, population, events);
