@@ -39,11 +39,11 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		NetworkFactory factory = new NetworkFactory();
 
 		// test default
-		Route carRoute = factory.createRoute(BasicLeg.Mode.car);
+		Route carRoute = factory.createRoute(BasicLeg.Mode.car, null, null);
 		assertTrue(carRoute instanceof NodeCarRoute);
 
 		try {
-			Route route = factory.createRoute(BasicLeg.Mode.pt);
+			Route route = factory.createRoute(BasicLeg.Mode.pt, null, null);
 			fail("expected IllegalArgumentException, but got route " + route.toString());
 		} catch (IllegalArgumentException e) {
 			log.info("Catched expected IllegalArgumentException: " + e.getMessage());
@@ -55,11 +55,11 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		factory.setRouteFactory(BasicLeg.Mode.pt, new PtRouteMockFactory());
 
 		// test car-mode
-		carRoute = factory.createRoute(BasicLeg.Mode.car);
+		carRoute = factory.createRoute(BasicLeg.Mode.car, null, null);
 		assertTrue(carRoute instanceof CarRouteMock);
 
 		// add pt-mode
-		Route ptRoute = factory.createRoute(BasicLeg.Mode.pt);
+		Route ptRoute = factory.createRoute(BasicLeg.Mode.pt, null, null);
 		assertTrue(ptRoute instanceof PtRouteMock);
 
 		// remove pt-mode
@@ -67,7 +67,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test pt again
 		try {
-			Route route = factory.createRoute(BasicLeg.Mode.pt);
+			Route route = factory.createRoute(BasicLeg.Mode.pt, null, null);
 			fail("expected IllegalArgumentException, but got route " + route.toString());
 		} catch (IllegalArgumentException e) {
 			log.info("Catched expected IllegalArgumentException: " + e.getMessage());
@@ -80,14 +80,12 @@ public class NetworkFactoryTest extends MatsimTestCase {
 			super(startLink, endLink);
 		}
 		
-		CarRouteMock() {}
 	}
+
 	/*package*/ static class PtRouteMock extends AbstractRoute {
 		PtRouteMock(Link startLink, Link endLink){
 			super(startLink, endLink);
 		}
-		
-		PtRouteMock(){}
 		
 	}
 	
@@ -95,18 +93,13 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		public Route createRoute(Link startLink, Link endLink) {
 			return new CarRouteMock(startLink, endLink);
 		}
-		
-		public Route createRoute() {
-			return new CarRouteMock();
-		}
+
 	}
+
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
 		public Route createRoute(Link startLink, Link endLink) {
 			return new PtRouteMock(startLink, endLink);
 		}
 
-		public Route createRoute() {
-			return new PtRouteMock();
-		}
 	}
 }

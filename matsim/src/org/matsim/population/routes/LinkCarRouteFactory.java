@@ -32,12 +32,4 @@ public class LinkCarRouteFactory implements RouteFactory {
 		return new LinkCarRoute(startLink, endLink);
 	}
 
-	/**
-	 * @see RouteFactory#createRoute()
-	 */
-	@Deprecated
-	public Route createRoute() {
-		return new LinkCarRoute();
-	}
-
 }

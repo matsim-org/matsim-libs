@@ -30,12 +30,5 @@ import org.matsim.network.Link;
  * @author mrieser
  */
 public interface RouteFactory {
-	/**
-	 * Method only available for backward compatibility. Make use
-	 * of createRoute(Link, Link) method if possible.
-	 */
-	@Deprecated
-	public Route createRoute();
-	
 	public Route createRoute(Link startLink, Link endLink);
 }
