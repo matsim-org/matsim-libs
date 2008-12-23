@@ -24,6 +24,8 @@ public class ParallelEvents extends Events {
 	// TODO: this is not thread safe yet:
 	// even though, we set the handler, it might be, that the processing
 	// thread does not see this
+	// probably this is ok: because the synchronization happens, when 
+	// processEvent is invoked by the main thread
 	public void addHandler(final EventHandler handler) {
 		events[numberOfAddedEventsHandler].addHandler(handler);
 		numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1)
