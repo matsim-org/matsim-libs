@@ -113,9 +113,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				CarRoute tollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
-				tollRoute.setStartLink(fromLink);
-				tollRoute.setEndLink(toLink);
+				CarRoute tollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 				CarRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -147,7 +145,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRouteLandmarks {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
+					noTollRoute = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);

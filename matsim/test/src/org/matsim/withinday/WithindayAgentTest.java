@@ -94,11 +94,11 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private void createRoutes() {
-		this.route1 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
-		this.route2 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
-		this.agentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
 		Link startLink = this.network.getLink(new IdImpl("2"));
 		Link endLink = this.network.getLink(new IdImpl("7"));
+		this.route1 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
+		this.route2 = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
+		this.agentRoute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, startLink, endLink);
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.add(this.network.getNode("3"));
 		list.add(this.network.getNode("31"));

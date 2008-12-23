@@ -51,13 +51,10 @@ public class HierarchicalRouteProvider extends AbstractRouteProvider {
 		this.providers.add(aStarProvider);
 	}
 
-	/**
-	 * @see org.matsim.withinday.routeprovider.RouteProvider#requestRoute(org.matsim.network.LinkImpl, org.matsim.network.LinkImpl, double)
-	 */
 	@Override
 	public CarRoute requestRoute(Link departureLink, final Link destinationLink, final double time) {
 		CarRoute subRoute;
-		CarRoute returnRoute = (CarRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
+		CarRoute returnRoute = (CarRoute) ((NetworkLayer) departureLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, departureLink, destinationLink);
 		ArrayList<Node> routeNodes = new ArrayList<Node>();
 		for (RouteProvider rp : this.providers) {
 			if (log.isTraceEnabled()) {

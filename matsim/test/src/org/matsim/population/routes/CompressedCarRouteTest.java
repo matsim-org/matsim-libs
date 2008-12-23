@@ -39,11 +39,11 @@ import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
 public class CompressedCarRouteTest extends AbstractCarRouteTest {
 
 	@Override
-	public CarRoute getCarRouteInstance() {
+	public CarRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
 
 		NetworkLayer network = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
-		return new CompressedCarRoute(subsequent.getSubsequentLinks());
+		return new CompressedCarRoute(fromLink, toLink, subsequent.getSubsequentLinks());
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class CompressedCarRouteTest extends AbstractCarRouteTest {
 		links.add(link12);
 		links.add(link13);
 		links.add(linkM24);
-		CarRoute route = getCarRouteInstance();
+		CarRoute route = getCarRouteInstance(link1, link4);
 		route.setLinks(link1, links, link4);
 
 		List<Link> links2 = route.getLinks();

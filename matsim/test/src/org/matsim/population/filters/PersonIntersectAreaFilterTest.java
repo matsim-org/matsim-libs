@@ -78,7 +78,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAct("w", link5);
 
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5);
 		leg.setRoute(route);
 
 		// prepare route
@@ -116,7 +116,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		// prepare bee-line tests
 		leg.setMode(BasicLeg.Mode.walk);
-		leg.setRoute(network.getFactory().createRoute(BasicLeg.Mode.car)); // empty route // TODO should be switched to WalkRoute once that exists...
+		leg.setRoute(network.getFactory().createRoute(BasicLeg.Mode.car, link0, link5)); // empty route // TODO should be switched to WalkRoute once that exists...
 
 		// test bee-line without alternative aoi
 		aoi.clear();

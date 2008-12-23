@@ -20,6 +20,8 @@
 
 package org.matsim.mobsim.queuesim;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -75,14 +77,18 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
+		ArrayList<Node> nodes23 = new ArrayList<Node>();
+		nodes23.add(node2);
+		nodes23.add(node3);
+
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-		route.setNodes("2 3");
+		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		route.setNodes(link1, nodes23, link3);
 		leg.setRoute(route);
 		plan.createAct("w", link3);
 		plans.addPerson(person);
@@ -104,8 +110,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a = plan.createAct("h", link1);
 			a.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-			route.setNodes("2 3");
+			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+			route.setNodes(link1, nodes23, link3);
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
@@ -161,16 +167,21 @@ public class QueueSimulationTest extends MatsimTestCase {
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
 
+		ArrayList<Node> nodes3 = new ArrayList<Node>();
+		nodes3.add(node3);
+
+		ArrayList<Node> nodes23 = new ArrayList<Node>();
+		nodes23.add(node2);
+		nodes23.add(node3);
+
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
 		Plan plan = person.createPlan(true);
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-		route.setStartLink(link1);
-		route.setEndLink(link3);
-		route.setNodes("2 3");
+		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		route.setNodes(link1, nodes23, link3);
 		leg.setRoute(route);
 		plan.createAct("w", link3);
 		plans.addPerson(person);
@@ -182,10 +193,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-			route.setStartLink(link2);
-			route.setEndLink(link3);
-			route.setNodes("3");
+			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
+			route.setNodes(link2, nodes3, link3);
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
@@ -239,6 +248,13 @@ public class QueueSimulationTest extends MatsimTestCase {
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
+		
+		ArrayList<Node> nodes3 = new ArrayList<Node>();
+		nodes3.add(node3);
+
+		ArrayList<Node> nodes23 = new ArrayList<Node>();
+		nodes23.add(node2);
+		nodes23.add(node3);
 
 		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
 		Person person = new PersonImpl(new IdImpl(0));
@@ -246,10 +262,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(6*3600 - 500);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-		route.setStartLink(link1);
-		route.setEndLink(link3);
-		route.setNodes("2 3");
+		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
+		route.setNodes(link1, nodes23, link3);
 		leg.setRoute(route);
 		plan.createAct("w", link3);
 		plans.addPerson(person);
@@ -261,10 +275,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link2);
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-			route.setStartLink(link2);
-			route.setEndLink(link3);
-			route.setNodes("3");
+			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
+			route.setNodes(link2, nodes3, link3);
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
@@ -276,10 +288,8 @@ public class QueueSimulationTest extends MatsimTestCase {
 			Act a2 = plan.createAct("h", link1);
 			a2.setEndTime(7*3600 - 1902);
 			leg = plan.createLeg(BasicLeg.Mode.car);
-			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-			route.setStartLink(link1);
-			route.setEndLink(link3);
-			route.setNodes("2 3");
+			route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link2, link3);
+			route.setNodes(link1, nodes23, link3);
 			leg.setRoute(route);
 			plan.createAct("w", link3);
 			plans.addPerson(person);
@@ -402,14 +412,14 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Act a1 = plan.createAct("h", link1);
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
-		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link5);
 		route.setNodes(nodes);
 		leg.setRoute(route);
 		Act a2 = plan.createAct("w", link5);
 		a2.setEndTime(9*3600);
 		leg = plan.createLeg(BasicLeg.Mode.car);
-		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
-		route.setNodes("6");
+		route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link5, link6);
+		route.setLinks(link5, null, link6);
 		leg.setRoute(route);
 		plan.createAct("h", link6);
 		plans.addPerson(person);

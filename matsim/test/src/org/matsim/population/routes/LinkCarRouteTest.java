@@ -34,8 +34,8 @@ import org.matsim.network.Node;
 public class LinkCarRouteTest extends AbstractCarRouteTest {
 
 	@Override
-	public CarRoute getCarRouteInstance() {
-		return new LinkCarRoute();
+	public CarRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+		return new LinkCarRoute(fromLink, toLink);
 	}
 
 	public void testGetNodes_subsequentLinks_setLinks() {

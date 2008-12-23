@@ -126,9 +126,9 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAct("h", link1);
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car);
+			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link2);
 			leg.setRoute(route);
-			route.setNodes("2");
+			route.setLinks(link1, null, link2);
 			leg.setRoute(route);
 			plan.createAct("w", link2);
 		} catch (Exception e) {

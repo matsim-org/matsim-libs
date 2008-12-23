@@ -44,7 +44,9 @@ public abstract class AbstractRoute extends BasicRouteImpl implements Route {
 	}
 	
 	public AbstractRoute(Link startLink, Link endLink) {
-		super(startLink.getId(), endLink.getId());
+		super((startLink == null ? null : startLink.getId()), (endLink == null ? null : endLink.getId()));
+		this.startLink = startLink;
+		this.endLink = endLink;
 	}
 
 	public Link getEndLink() {

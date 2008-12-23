@@ -55,7 +55,6 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 	public FacilitiesOpentimesKTIYear2() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public void init() {
@@ -69,7 +68,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 	public void run(final Facility facility) {
 
-		Day[] days = Day.values();
+		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
+		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
 		double endTime = -1.0;
 
@@ -88,188 +88,160 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		for (Activity a : activities.values()) {
 			a.setOpentimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
 		}
-		
+
 		// if only presence code and work are present
 		switch(activities.size()){
-		case 2:
-			// standard daily opentimes for industry sector
-			if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR2)) {
-				for (Day day : days) {
-					if (
-							day.equals(Day.MONDAY) ||
-							day.equals(Day.TUESDAY) ||
-							day.equals(Day.WEDNESDAY) ||
-							day.equals(Day.THURSDAY) ||
-							day.equals(Day.FRIDAY)) {
+			case 2:
+				// standard daily opentimes for industry sector
+				if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR2)) {
+					for (DayType day : weekDays) {
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
+								day,
 								7.0 * 3600,
 								18.0 * 3600));
 					}
-				}
-				// open times of the closest shop for services sector
-			} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
-				// eliminate lunch break
-				for (Day day : days) {
-					SortedSet<BasicOpeningTime> dailyOpentime = closestShopOpentimes.get(day.getAbbrevEnglish());
-					if (dailyOpentime != null) {
-						switch(dailyOpentime.size()) {
-						case 2:
-							startTime = Math.min(
-									((OpeningTime) dailyOpentime.toArray()[0]).getStartTime(),
-									((OpeningTime) dailyOpentime.toArray()[1]).getStartTime());
-							endTime = Math.max(
-									((OpeningTime) dailyOpentime.toArray()[0]).getEndTime(),
-									((OpeningTime) dailyOpentime.toArray()[1]).getEndTime());
-							break;
-						case 1:
-							startTime = ((OpeningTime) dailyOpentime.toArray()[0]).getStartTime();
-							endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
-							break;
+					// open times of the closest shop for services sector
+				} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
+					// eliminate lunch break
+					for (DayType day : days) {
+						SortedSet<BasicOpeningTime> dailyOpentime = closestShopOpentimes.get(day);
+						if (dailyOpentime != null) {
+							switch(dailyOpentime.size()) {
+								case 2:
+									startTime = Math.min(
+											((OpeningTime) dailyOpentime.toArray()[0]).getStartTime(),
+											((OpeningTime) dailyOpentime.toArray()[1]).getStartTime());
+									endTime = Math.max(
+											((OpeningTime) dailyOpentime.toArray()[0]).getEndTime(),
+											((OpeningTime) dailyOpentime.toArray()[1]).getEndTime());
+									break;
+								case 1:
+									startTime = ((OpeningTime) dailyOpentime.toArray()[0]).getStartTime();
+									endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
+									break;
+							}
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+									day,
+									startTime,
+									endTime));
 						}
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
 					}
 				}
-			}
-			break;
-			// if presence code, work and one other imputed activity are present
-		case 3:
-			for (String activityType : activities.keySet()) {
-				if (
-						Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
-					activities.get(activityType).setOpentimes(closestShopOpentimes);
-					activities.get(FacilitiesProductionKTI.WORK_SECTOR3).setOpentimes(closestShopOpentimes);
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
-						Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {
-					for (Day day : days) {
-						if (
-								day.equals(Day.MONDAY) ||
-								day.equals(Day.TUESDAY) ||
-								day.equals(Day.WEDNESDAY) ||
-								day.equals(Day.THURSDAY) ||
-								day.equals(Day.FRIDAY)) {
+				break;
+				// if presence code, work and one other imputed activity are present
+			case 3:
+				for (String activityType : activities.keySet()) {
+					if (
+							Pattern.matches(FacilitiesProductionKTI.ACT_TYPE_SHOP + ".*", activityType)) {
+						activities.get(activityType).setOpentimes(closestShopOpentimes);
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).setOpentimes(closestShopOpentimes);
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
+							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {
+						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									8.0 * 3600,
 									12.0 * 3600));
 							activities.get(activityType).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									13.5 * 3600,
 									17.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									8.0 * 3600,
 									17.0 * 3600));
 						}
-					}
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
-						Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
-					for (Day day : days) {
-						if (
-								day.equals(Day.MONDAY) ||
-								day.equals(Day.TUESDAY) ||
-								day.equals(Day.WEDNESDAY) ||
-								day.equals(Day.THURSDAY) ||
-								day.equals(Day.FRIDAY)) {
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
+							Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
+						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									8.0 * 3600,
 									18.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									8.0 * 3600,
 									18.0 * 3600));
 						}
-					}
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.EDUCATION_HIGHER, activityType)) {
-					for (Day day : days) {
-						if (
-								day.equals(Day.MONDAY) ||
-								day.equals(Day.TUESDAY) ||
-								day.equals(Day.WEDNESDAY) ||
-								day.equals(Day.THURSDAY) ||
-								day.equals(Day.FRIDAY)) {
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.EDUCATION_HIGHER, activityType)) {
+						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									7.0 * 3600,
 									22.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
+									day,
 									7.0 * 3600,
 									22.0 * 3600));
-						} else if (day.equals(Day.SATURDAY)) {
+						}
+						activities.get(activityType).addOpeningTime(new OpeningTime(
+								DayType.sat,
+								8.0 * 3600,
+								12.0 * 3600));
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+								DayType.sat,
+								8.0 * 3600,
+								12.0 * 3600));
+
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.LEISURE_SPORTS, activityType)) {
+						for (DayType day : days) {
+							if (
+									day.equals(DayType.mon) ||
+									day.equals(DayType.tue) ||
+									day.equals(DayType.wed) ||
+									day.equals(DayType.thu) ||
+									day.equals(DayType.fri)) {
+								startTime = 9.0 * 3600;
+								endTime = 22.0 * 3600;
+							} else if (
+									day.equals(DayType.sat) ||
+									day.equals(DayType.sun)) {
+								startTime = 9.0 * 3600;
+								endTime = 18.0 * 3600;
+							}
 							activities.get(activityType).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
-									8.0 * 3600,
-									12.0 * 3600));
+									day,
+									startTime,
+									endTime));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-									day.getAbbrevEnglish(),
-									8.0 * 3600,
-									12.0 * 3600));
+									day,
+									startTime,
+									endTime));
 						}
-					}
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.LEISURE_SPORTS, activityType)) {
-					for (Day day : days) {
-						if (
-								day.equals(Day.MONDAY) ||
-								day.equals(Day.TUESDAY) ||
-								day.equals(Day.WEDNESDAY) ||
-								day.equals(Day.THURSDAY) ||
-								day.equals(Day.FRIDAY)) {
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.LEISURE_GASTRO, activityType)) {
+						for (DayType day : days) {
 							startTime = 9.0 * 3600;
-							endTime = 22.0 * 3600;
-						} else if (
-								day.equals(Day.SATURDAY) ||
-								day.equals(Day.SUNDAY)) {
-							startTime = 9.0 * 3600;
-							endTime = 18.0 * 3600;
+							endTime = 24.0 * 3600;
+							activities.get(activityType).addOpeningTime(new OpeningTime(
+									day,
+									startTime,
+									endTime));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+									day,
+									startTime,
+									endTime));
 						}
-						activities.get(activityType).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
-					}
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.LEISURE_GASTRO, activityType)) {
-					for (Day day : days) {
-						startTime = 9.0 * 3600;
-						endTime = 24.0 * 3600;
-						activities.get(activityType).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
-					}
-				} else if (
-						Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
-					for (Day day : days) {
-						startTime = 14.0 * 3600;
-						endTime = 24.0 * 3600;
-						activities.get(activityType).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
-								day.getAbbrevEnglish(),
-								startTime,
-								endTime));
+					} else if (
+							Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
+						for (DayType day : days) {
+							startTime = 14.0 * 3600;
+							endTime = 24.0 * 3600;
+							activities.get(activityType).addOpeningTime(new OpeningTime(
+									day,
+									startTime,
+									endTime));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+									day,
+									startTime,
+									endTime));
+						}
 					}
 				}
-			}
 		}
 	}
 

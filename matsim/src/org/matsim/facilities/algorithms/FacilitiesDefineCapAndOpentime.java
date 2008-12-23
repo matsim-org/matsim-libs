@@ -28,9 +28,22 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.gbl.Gbl;
+import org.matsim.utils.misc.Time;
 
 public class FacilitiesDefineCapAndOpentime {
 
+	private final double TIME_0000 = Time.parseTime("00:00");
+	private final double TIME_0800 = Time.parseTime("08:00");
+	private final double TIME_0830 = Time.parseTime("08:30");
+	private final double TIME_0900 = Time.parseTime("09:00");
+	private final double TIME_1200 = Time.parseTime("12:00");
+	private final double TIME_1300 = Time.parseTime("13:00");
+	private final double TIME_1330 = Time.parseTime("13:30");
+	private final double TIME_1700 = Time.parseTime("17:00");
+	private final double TIME_1800 = Time.parseTime("18:00");
+	private final double TIME_2000 = Time.parseTime("20:00");
+	private final double TIME_2400 = Time.parseTime("24:00");
+	
 	private final int nof_persons;
 
 	public FacilitiesDefineCapAndOpentime(final int nof_persons) {
@@ -74,27 +87,27 @@ public class FacilitiesDefineCapAndOpentime {
 				Activity a = a_it.next();
 				if (a.getType().equals("home")) {
 					a.setCapacity(this.nof_persons/home_cnt);
-					a.addOpeningTime(new OpeningTime(DayType.wk,"00:00","24:00"));
+					a.addOpeningTime(new OpeningTime(DayType.wk, TIME_0000, TIME_2400));
 				}
 				else if (a.getType().equals("work")) {
 					a.setCapacity(this.nof_persons/work_cnt);
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"08:00","18:00"));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0800, TIME_1800));
 				}
 				else if (a.getType().equals("education")) {
 					a.setCapacity(this.nof_persons/educ_cnt);
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"08:00","12:00"));
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"13:00","17:00"));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0800, TIME_1200));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1300, TIME_1700));
 				}
 				else if (a.getType().equals("shop")) {
 					a.setCapacity(this.nof_persons/shop_cnt);
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"08:30","12:00"));
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"13:30","20:00"));
-					a.addOpeningTime(new OpeningTime(DayType.sat,"09:00","17:00"));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0830, TIME_1200));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1330, TIME_2000));
+					a.addOpeningTime(new OpeningTime(DayType.sat, TIME_0900, TIME_1700));
 				}
 				else if (a.getType().equals("leisure")) {
 					a.setCapacity(this.nof_persons/leis_cnt);
-					a.addOpeningTime(new OpeningTime(DayType.wkday,"17:00","24:00"));
-					a.addOpeningTime(new OpeningTime(DayType.wkend,"20:00","24:00"));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1700, TIME_2400));
+					a.addOpeningTime(new OpeningTime(DayType.wkend, TIME_2000, TIME_2400));
 				}
 				else { Gbl.errorMsg("[something is wrong!]"); }
 			}

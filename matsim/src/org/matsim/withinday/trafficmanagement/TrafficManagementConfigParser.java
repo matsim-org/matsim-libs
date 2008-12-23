@@ -22,7 +22,6 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.events.Events;
@@ -42,8 +41,6 @@ import org.xml.sax.Attributes;
 
 
 public class TrafficManagementConfigParser extends MatsimXmlParser {
-
-	private final static Logger log = Logger.getLogger(TrafficManagementConfigParser.class);
 
 	private final static String TRAFFICMANAGEMENT = "trafficmanagement";
 

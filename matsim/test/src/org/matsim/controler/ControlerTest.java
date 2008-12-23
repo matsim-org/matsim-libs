@@ -21,6 +21,7 @@
 package org.matsim.controler;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
@@ -87,9 +88,12 @@ public class ControlerTest extends MatsimTestCase {
 		Act a1 = plan1.createAct("h", link1);
 		a1.setEndTime(7.0*3600);
 		Leg leg1 = plan1.createLeg(Mode.car);
-		CarRoute route1 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car);
+		CarRoute route1 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
 		leg1.setRoute(route1);
-		route1.setNodes("2 3");
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		nodes.add(node2);
+		nodes.add(node3);
+		route1.setNodes(link1, nodes, link3);
 		plan1.createAct("h", link3);
 		population.addPerson(person1);
 
@@ -98,9 +102,9 @@ public class ControlerTest extends MatsimTestCase {
 		Act a2 = plan2.createAct("h", link1);
 		a2.setEndTime(7.0*3600);
 		Leg leg2 = plan2.createLeg(Mode.car);
-		CarRoute route2 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car);
+		CarRoute route2 = (CarRoute)network.getFactory().createRoute(BasicLeg.Mode.car, link1, link3);
 		leg2.setRoute(route2);
-		route2.setNodes("2 3");
+		route2.setNodes(link1, nodes, link3);
 		plan2.createAct("h", link3);
 		population.addPerson(person2);
 

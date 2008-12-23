@@ -20,13 +20,15 @@
 
 package org.matsim.population.routes;
 
+import org.matsim.network.Link;
+
 /**
  * @author mrieser
  */
 public class NodeCarRouteTest extends AbstractCarRouteTest {
 
-	public CarRoute getCarRouteInstance() {
-		return new NodeCarRoute();
+	public CarRoute getCarRouteInstance(final Link fromLink, final Link toLink) {
+		return new NodeCarRoute(fromLink, toLink);
 	}
 	
 }
