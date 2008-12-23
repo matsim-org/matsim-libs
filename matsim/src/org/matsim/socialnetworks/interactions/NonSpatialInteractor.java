@@ -23,6 +23,7 @@ package org.matsim.socialnetworks.interactions;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
@@ -37,6 +38,7 @@ import org.matsim.socialnetworks.socialnet.SocialNetwork;
  * @author J.Hackney
  */
 public class NonSpatialInteractor{
+	private final Logger log = Logger.getLogger(NonSpatialInteractor.class);
 	SocialNetwork net;
 	Object links[];
 
@@ -53,11 +55,11 @@ public class NonSpatialInteractor{
 		pxk = new PersonExchangeKnowledge(net);
 		proportionOfLinksToActivate = Double.parseDouble(Gbl.getConfig().socnetmodule().getFractNSInteract());
 		numInteractionsPerLink = Integer.parseInt(Gbl.getConfig().socnetmodule().getSocNetNSInteractions());
-		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getTriangleProb());
+		fract_intro=Double.parseDouble(Gbl.getConfig().socnetmodule().getFriendIntroProb());
 	}
 
 	public void exchangeGeographicKnowledge(String facType, int iteration) {
-		System.out.println("  |Exchanging knowledge about "+facType+" activity");
+		this.log.info("  |Exchanging knowledge about "+facType+" activity");
 
 
 //		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
@@ -100,9 +102,15 @@ public class NonSpatialInteractor{
 	 *
 	 * @author jhackney
 	 * @param iteration
+	 * @param pctMeet TODO
 	 */
-	public void exchangeSocialNetKnowledge(int iteration) {
+	public void exchangeSocialNetKnowledge(int iteration, double pctMeet) {
 
+		if(!(pctMeet>0)){
+			this.log.info("No friends introduced");
+			return;
+		}
+		
 //		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
 		links = net.getLinks().toArray();
 		final List<Object> list = (List<Object>) Arrays.asList( links );

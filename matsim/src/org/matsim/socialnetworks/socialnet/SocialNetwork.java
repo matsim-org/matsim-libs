@@ -106,7 +106,7 @@ public class SocialNetwork {
 					+ sNAlgorithmName_
 					+ " < is not known. Poor choice of input parameter in module "
 					+ SocNetConfigGroup.GROUP_NAME
-					+ ". Check spelling or choose from: random, wattssmallworld, jingirnew, barabasialbert, empty, read");
+					+ ". Check spelling or choose from: euclidrandom, random, wattssmallworld, jingirnew, barabasialbert, empty, read");
 		}
 	}
 

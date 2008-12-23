@@ -47,8 +47,13 @@ public class SpatialInteractorEvents {
 	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration,
 			Hashtable<Facility,ArrayList<TimeWindow>> twm) {
 
-		this.log.info(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
+		this.log.info(" Looking through plans and tracking which Persons could interact "+iteration);
 
+		if(!(total_spatial_fraction(rndEncounterProb.values().toArray())>0)){
+			this.log.info(" No spatial interactions "+iteration);
+			return;
+		}
+		
 //		this.timeWindowMap=teo.getTimeWindowMap();
 		this.timeWindowMap=twm;
 
@@ -352,5 +357,14 @@ public class SpatialInteractorEvents {
 				}
 			}
 		}
+	}
+	private double total_spatial_fraction(Object[] fractionS2) {
+//		See if we use spatial interaction at all: sum of these must > 0 or else no spatial
+//		interactions take place
+		double total_spatial_fraction=0;
+		for (int jjj = 0; jjj < fractionS2.length; jjj++) {
+			total_spatial_fraction = (double) total_spatial_fraction + Double.parseDouble(fractionS2[jjj].toString());
+		}
+		return total_spatial_fraction;
 	}
 }
