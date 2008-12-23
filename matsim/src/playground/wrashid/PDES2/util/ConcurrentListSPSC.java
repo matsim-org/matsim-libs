@@ -1,5 +1,6 @@
 package playground.wrashid.PDES2.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,7 +17,7 @@ public class ConcurrentListSPSC<T> {
 	}
 	
 	// the input list will be emptied
-	public void add(LinkedList<T> list){
+	public void add(ArrayList<T> list){
 		synchronized (inputBuffer){
 			inputBuffer.addAll(list);
 		}
