@@ -59,6 +59,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 	}
 
 	public void checkAssertions() {
+		
+		// at least one event
+		assertEquals(true,events.size()>0);
+		
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
 		for (LinkedList<PersonEvent> list : events.values()) {
