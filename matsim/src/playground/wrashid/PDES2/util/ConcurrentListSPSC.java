@@ -24,10 +24,10 @@ public class ConcurrentListSPSC<T> {
 	
 	// returns null, if empty, else the first element
 	public T remove(){
-		if (!outputBuffer.isEmpty()){
+		if (outputBuffer.size()>0){
 			return outputBuffer.poll();
 		}
-		if (!inputBuffer.isEmpty()){
+		if (inputBuffer.size()>0){
 			synchronized (inputBuffer){
 				//swap buffers
 				LinkedList<T> tempList=null; 
