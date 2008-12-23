@@ -57,6 +57,7 @@ public class DEQSimStarter {
 		ScenarioData data = new ScenarioData(config);
 		NetworkLayer network = data.getNetwork();
 		Population population = data.getPopulation();
+		// TODO: remove this after integration into core.
 		Events events = new ParallelEvents(2);
 		
 		// run simulation

@@ -115,6 +115,7 @@ public class JavaDEQSim {
 		scheduler.startSimulation();
 
 		// the main thread (microsimulation) is finished - await the event processing
+		// TODO: remove this after integration into core
 		SimulationParameters.processEventThread.awaitHandlerThreads();
 		
 		t.endTimer();
