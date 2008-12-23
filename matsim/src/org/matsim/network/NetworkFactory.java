@@ -92,17 +92,28 @@ public class NetworkFactory {
 	
 	/**
 	 * @param mode the transport mode the route should be for
+	 * @param startLink the link where the route starts
+	 * @param endLink the link where the route ends
 	 * @return a new Route for the specified mode
 	 * @throws IllegalArgumentException if no {@link RouteFactory} is registered that creates routes for the specified mode.
 	 * 
 	 * @see #setRouteFactory(org.matsim.basic.v01.BasicLeg.Mode, RouteFactory)
 	 */
+	public Route createRoute(final BasicLeg.Mode mode, final Link startLink, final Link endLink) {
+		final RouteFactory factory = this.routeFactories.get(mode);
+		if (factory == null) {
+			throw new IllegalArgumentException("There is no factory known to create routes for leg-mode " + mode.toString());
+		}
+		return factory.createRoute(startLink, endLink);
+	}
+	
+	@Deprecated
 	public Route createRoute(final BasicLeg.Mode mode) {
 		final RouteFactory factory = this.routeFactories.get(mode);
 		if (factory == null) {
 			throw new IllegalArgumentException("There is no factory known to create routes for leg-mode " + mode.toString());
 		}
-		return factory.createRoute();
+		return factory.createRoute(null, null);
 	}
 
 	/**
