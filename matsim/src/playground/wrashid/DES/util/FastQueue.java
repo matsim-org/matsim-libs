@@ -6,8 +6,9 @@ import java.util.Iterator;
 
 public class FastQueue<T> {
 
-	// max length limited by 2^8*2^22
-	private int maxDimentions=22;
+	// max length
+	private int maxDimentions=30;
+	private static int minQueueSize=256;
 	private T[][] array= (T[][]) new Object[maxDimentions][0];
 	private int headDimention, headIndex;
 	private int tailDimention, tailIndex;
@@ -18,7 +19,7 @@ public class FastQueue<T> {
 		headIndex=0;
 		tailIndex=0;
 		tailDimention=0;
-		array[headDimention]=(T[]) new Object[256];
+		array[headDimention]=(T[]) new Object[minQueueSize];
 	}
 	
 	public FastQueue(int initialCapacity){
@@ -29,17 +30,40 @@ public class FastQueue<T> {
 		array[headDimention]=(T[]) new Object[initialCapacity];
 	}
 	
-	// don't insert null values!!!
+	public FastQueue(int initialCapacity, int maxDimentions){
+		headDimention=0;
+		headIndex=0;
+		tailIndex=0;
+		tailDimention=0;
+		this.maxDimentions=maxDimentions;
+		array[headDimention]=(T[]) new Object[initialCapacity];
+	}
+	
+	
+	// don't insert null values, because they are just inserted as normal objects
 	public void add(T t){
-		if (array[tailDimention].length==tailIndex){
+		if (array[tailDimention]==null || array[tailDimention].length==tailIndex){
 			// need to create new array perhaps
-			tailDimention++;
-			if (array[tailDimention].length==0){
-				array[tailDimention]=(T[]) new Object[array[tailDimention-1].length*2];
+			tailDimention=(tailDimention+1) % maxDimentions;
+			if (array[tailDimention]==null || array[tailDimention].length==0){
+				// the length of the next dimention is proportional to the current
+				// length of the queue. reasoning: we could have a long lived queue
+				// with lots of adds and removes. So, the total memory of the queue should
+				// not grow too much
+				// because, size might be zero, we must use some min size
+				array[tailDimention]=(T[]) new Object[Math.max(minQueueSize, size()*2)];
+			} else {
+				// not enough space
+				// this should cause an out of boundry exception
+				array[tailDimention][array[tailDimention].length]=null;
 			}
 			tailIndex=0;
 		}
+		try{
 		array[tailDimention][tailIndex]=t;
+		}catch (Exception e){
+			System.out.println();
+		}
 		tailIndex++;
 		size++;
 	}
@@ -55,7 +79,7 @@ public class FastQueue<T> {
 			if (headIndex==array[headDimention].length){
 				// release unused array
 				array[headDimention]=null;
-				headDimention++;
+				headDimention=(headDimention+1) % maxDimentions ;
 				headIndex=0;
 			}
 			size--;
