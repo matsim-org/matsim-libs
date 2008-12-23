@@ -1,5 +1,6 @@
 package playground.wrashid.DES;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -10,7 +11,7 @@ import org.matsim.events.Events;
 import playground.wrashid.PDES2.util.ConcurrentListSPSC;
 
 public class ProcessEventThread implements Runnable {
-	LinkedList<BasicEvent> preInputBuffer=null;
+	ArrayList<BasicEvent> preInputBuffer=null;
 	ConcurrentListSPSC<BasicEvent> eventQueue = null;
 	Events events;
 	CyclicBarrier cb=null;
@@ -20,7 +21,7 @@ public class ProcessEventThread implements Runnable {
 		this.events = events;
 		this.preInputBufferMaxLength= preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-		preInputBuffer= new LinkedList<BasicEvent>();
+		preInputBuffer= new ArrayList<BasicEvent>();
 		cb=new CyclicBarrier(2);
 		Thread t = new Thread(this);
 		t.start();
@@ -31,7 +32,7 @@ public class ProcessEventThread implements Runnable {
 		this.events = events;
 		this.preInputBufferMaxLength= preInputBufferMaxLength;
 		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-		preInputBuffer= new LinkedList<BasicEvent>();
+		preInputBuffer= new ArrayList<BasicEvent>();
 		this.cb=cb;
 		
 		Thread t = new Thread(this);
