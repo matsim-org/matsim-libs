@@ -149,6 +149,7 @@ public class ScenarioCut {
 		System.out.println("done. " + (new Date()));
 		
 		System.out.println("completing world... " + (new Date()));
+		network.reconnect();
 		Gbl.getWorld().complete();
 		System.out.println("done. " + (new Date()));
 

@@ -513,6 +513,12 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 				"[nof_nodes=" + this.nodes.size() + "]";
 	}
 
+	public void reconnect() {
+		this.nodeQuadTree.clear();
+		this.nodeQuadTree = null;
+		buildQuadTree();
+	}
+	
 	public void connect() {
 		buildQuadTree();
 	}
