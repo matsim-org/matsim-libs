@@ -19,6 +19,8 @@
 package playground.benjamin;
 
 import org.matsim.controler.Controler;
+import org.matsim.population.Population;
+import org.matsim.population.algorithms.PlanCalcType;
 import org.matsim.run.OTFVis;
 import org.matsim.scoring.ScoringFunctionFactory;
 
@@ -38,6 +40,14 @@ public class BKickControler extends Controler {
 		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
 	}
 
+	@Override
+	protected Population loadPopulation() {
+		Population pop = super.loadPopulation();
+		pop.addAlgorithm(new PlanCalcType());
+		pop.runAlgorithms();
+		return pop;
+	}
+	
 	
 	
 	 public static void main(String[] args){
