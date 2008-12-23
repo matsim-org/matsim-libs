@@ -37,11 +37,12 @@ public class BasicLegImpl implements BasicLeg {
 		this.mode = mode;
 	}
 	
-	
+	@Deprecated
 	public final int getNum() {
 		return this.num;
 	}
 
+	@Deprecated
 	public final void setNum(int num) {
 		this.num = num;
 	}

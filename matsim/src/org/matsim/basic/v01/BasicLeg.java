@@ -24,13 +24,8 @@ package org.matsim.basic.v01;
 * @author dgrether
 */
 public interface BasicLeg {
-	
+
 	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
-	
-	@Deprecated
-	public int getNum();
-	@Deprecated
-	public void setNum(int num);
 
 	public Mode getMode();
 
