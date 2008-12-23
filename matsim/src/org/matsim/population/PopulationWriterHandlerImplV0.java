@@ -234,8 +234,6 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 
 	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
-		if (leg.getNum() != Integer.MIN_VALUE)
-			out.write(" num=\"" + leg.getNum() + "\"");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime() != Integer.MIN_VALUE)
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
