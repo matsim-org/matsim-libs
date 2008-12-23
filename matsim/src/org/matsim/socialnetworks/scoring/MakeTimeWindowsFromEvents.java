@@ -46,7 +46,7 @@ public class MakeTimeWindowsFromEvents {
 	
 	public MakeTimeWindowsFromEvents(){
 	}
-	public void calculate(EventsMapStartEndTimes epp){
+	public void makeTimeWindows(EventsMapStartEndTimes epp){
 		HashMap<Person, ArrayList<ActStartEvent>> startMap = epp.startMap;
 		HashMap<Person, ArrayList<ActEndEvent>> endMap = epp.endMap;
 		Object[] persons = startMap.keySet().toArray();
