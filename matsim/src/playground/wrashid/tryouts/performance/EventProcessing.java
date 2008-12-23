@@ -33,7 +33,7 @@ public class EventProcessing {
 				.getInputFile());
 		System.out.println("  done.");
 		
-		Events events = new ParallelEvents(4);
+		Events events = new ParallelEvents(2);
 		//Events events = new Events();
 
 		events.addHandler(ep.new Handler1());
