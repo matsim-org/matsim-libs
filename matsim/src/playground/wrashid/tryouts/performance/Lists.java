@@ -29,7 +29,19 @@ public class Lists {
 		//testArrayListAddAll(testArrayListAdd());
 
 		// infinity... / OutOfMemory
-		testLinkedListAddAll (testLinkedListAdd());
+		//testLinkedListAddAll (testLinkedListAdd());
+		
+		
+		// -----------------------------------------------
+		
+		// infinity
+		//testArrayListPoll(testArrayListAdd());
+		
+		// list.size()>0: 1266 ms
+		// !list.isEmpty(): 1438 ms
+		testLinkedListPoll(testLinkedListAdd());
+		
+		// -----------------------------------------------
 		
 	}
 
@@ -85,5 +97,20 @@ public class Lists {
 		System.out.println("time [ms]: " + (System.currentTimeMillis() - time));
 	}
 	
+	public static void testArrayListPoll(ArrayList<Integer> list){
+		long time = System.currentTimeMillis();
+		while (list.size()>0){
+			list.remove(0);
+		}
+		System.out.println("time [ms]: " + (System.currentTimeMillis() - time));
+	}
+	
+	public static void testLinkedListPoll(LinkedList<Integer> list){
+		long time = System.currentTimeMillis();
+		while (list.size()>0){
+			list.poll();
+		}
+		System.out.println("time [ms]: " + (System.currentTimeMillis() - time));
+	}
 
 }
