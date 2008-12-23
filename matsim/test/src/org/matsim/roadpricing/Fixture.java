@@ -175,7 +175,7 @@ public class Fixture {
 		person.addPlan(plan);
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = new NodeCarRoute(homeLink, workLink);
 		route.setNodes(routeNodes);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");

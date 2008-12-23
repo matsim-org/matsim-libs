@@ -177,7 +177,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			CarRoute route = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
+			CarRoute route = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 			route.setNodes(fromLink, path.nodes, toLink);
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
@@ -185,9 +185,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			CarRoute route = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car);
-			route.setStartLink(fromLink);
-			route.setEndLink(toLink);
+			CarRoute route = (CarRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(BasicLeg.Mode.car, fromLink, toLink);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -227,16 +225,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			// so let's calculate the final part.
 			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * 2.0);
-			CarRoute route = new NodeCarRoute(); // TODO [MR] change to PtRoute once available
+			CarRoute route = new NodeCarRoute(fromLink, toLink); // TODO [MR] change to PtRoute once available
 			route.setNodes(fromLink, path.nodes, toLink);
 			route.setTravelTime(travTime);
 			route.setTravelCost(path.travelCost); 
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			CarRoute route = new NodeCarRoute();
-			route.setStartLink(fromLink);
-			route.setEndLink(toLink);
+			CarRoute route = new NodeCarRoute(fromLink, toLink);
 			route.setTravelTime(0);
 			leg.setRoute(route);
 			travTime = 0;
@@ -253,7 +249,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 3.0 / 3.6; // 3.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);
@@ -268,7 +264,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 15.0 / 3.6; // 15.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);
@@ -283,7 +279,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
 		double speed = 50.0 / 3.6; // 50.0 km/h --> m/s
 		// create an empty route, but with realistic traveltime
-		CarRoute route = new NodeCarRoute();
+		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / speed);
 		route.setTravelTime(travTime);
 		leg.setRoute(route);

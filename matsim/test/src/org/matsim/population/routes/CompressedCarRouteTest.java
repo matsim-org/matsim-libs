@@ -31,8 +31,6 @@ import org.matsim.network.Link;
 import org.matsim.network.LinkIdComparator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.SubsequentLinksAnalyzer;
-import org.matsim.population.routes.CarRoute;
-import org.matsim.population.routes.CompressedCarRoute;
 
 
 /**
@@ -97,7 +95,7 @@ public class CompressedCarRouteTest extends AbstractCarRouteTest {
 		subsequentLinks.put(link2, link3);
 		subsequentLinks.put(link3, link4);
 
-		CarRoute route = new CompressedCarRoute(subsequentLinks);
+		CarRoute route = new CompressedCarRoute(link0, link4, subsequentLinks);
 		route.setLinks(link0, links, link4);
 
 		List<Link> links2 = route.getLinks();

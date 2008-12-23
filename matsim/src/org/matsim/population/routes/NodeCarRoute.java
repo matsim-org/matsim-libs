@@ -51,9 +51,7 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 	}
 
 	public NodeCarRoute(final CarRoute route) {
-		super();
-		super.setStartLink(route.getStartLink());
-		super.setEndLink(route.getEndLink());
+		super(route.getStartLink(), route.getEndLink());
 		super.setDist(route.getDist());
 		super.setTravelTime(route.getTravelTime());
 		this.route.addAll(route.getNodes());
