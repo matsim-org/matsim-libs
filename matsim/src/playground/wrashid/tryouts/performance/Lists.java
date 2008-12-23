@@ -39,10 +39,11 @@ public class Lists {
 		
 		// list.size()>0: 1266 ms
 		// !list.isEmpty(): 1438 ms
-		testLinkedListPoll(testLinkedListAdd());
+		//testLinkedListPoll(testLinkedListAdd());
 		
 		// -----------------------------------------------
-		
+		// see results in code
+		testMixedAddAll();
 	}
 
 	public static ArrayList<Integer> testArrayListAdd() {
@@ -110,6 +111,38 @@ public class Lists {
 		while (list.size()>0){
 			list.poll();
 		}
+		System.out.println("time [ms]: " + (System.currentTimeMillis() - time));
+	}
+	
+	
+	
+	public static void testMixedAddAll(){
+		
+		ArrayList<Integer> list = new ArrayList<Integer>(10000000);
+		LinkedList<Integer> list1 = new LinkedList<Integer>();
+		LinkedList<Integer> list2 = new LinkedList<Integer>();
+
+		for (int i = 0; i < 10000000; i++) {
+			list.add(i);
+			list2.add(i);
+		}
+		
+		long time = System.currentTimeMillis();
+		
+		// 3704 ms
+		//list1.addAll(list);
+		
+		// 5407 ms
+		//for (int i=0;i<list.size();i++){
+		//	list1.add(list.get(i));
+		//}
+		
+		// infinity, as before
+		//for (int i=0;i<list.size();i++){
+		//	list1.addAll(list2);
+		//}
+		
+		
 		System.out.println("time [ms]: " + (System.currentTimeMillis() - time));
 	}
 
