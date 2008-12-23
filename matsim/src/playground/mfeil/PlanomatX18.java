@@ -738,8 +738,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					
 				}
 				else {
+					scoredInNeighbourhood[x]=0;
 					for (int i = 0; i<solutionLong.size();i++) {
-						scoredInNeighbourhood[x]=0;
 						if (checkForEquality(neighbourhood[x], solutionLong.get(solutionLong.size()-1-i))){
 							nonTabuNeighbourhood.add(solutionLong.get(solutionLong.size()-1-i));
 							neighbourhood[x].setScore(solutionLong.get(solutionLong.size()-1-i).getScore());
