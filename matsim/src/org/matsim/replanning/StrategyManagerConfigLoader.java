@@ -51,6 +51,7 @@ import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherF;
 import org.matsim.socialnetworks.replanning.RandomFacilitySwitcherK;
+import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -145,15 +146,20 @@ public class StrategyManagerConfigLoader {
 			} else if (classname.equals("SelectPathSizeLogit")) {
 				strategy = new PlanStrategy(new PathSizeLogitSelector());
 				// JH
-			} else if (classname.equals("SNSecLoc")){
+			} else if (classname.equals("KSecLoc")){
 //				System.out.println(" #### Choosing social network replanning algorithm");
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(network, travelCostCalc, travelTimeCalc);
 				strategy.addStrategyModule(socialNetStrategyModule);
-			} else if (classname.equals("SecLoc")){
+			} else if (classname.equals("FSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				StrategyModule socialNetStrategyModule= new RandomFacilitySwitcherF(network, travelCostCalc, travelTimeCalc, facilities);
 				strategy.addStrategyModule(socialNetStrategyModule);
+			} else if (classname.equals("SSecLoc")){
+				strategy = new PlanStrategy(new RandomPlanSelector());
+				StrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(network,travelCostCalc,travelTimeCalc);
+				strategy.addStrategyModule(socialNetStrategyModule);
+				// JH
 			} else if (classname.equals("LocationChoice")) {
 		    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
 		    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
