@@ -38,6 +38,7 @@ public class SocNetConfigGroup extends Module {
 	private static final String SOCNET_NUM_NONSPATIAL_INTERACTIONS = "num_ns_interactions";
 	private static final String SOCNET_TYPE_INFO_EXCHANGED_WEIGHT = "factype_ns";
 	private static final String SOCNET_FACILITY_TYPE_WEIGHT = "s_weights";
+	private static final String SOCNET_ACT_TYPES = "act_types";
 	private static final String SOCNET_EDGE_TYPE = "edge_type";
 	private static final String SOCNET_FRACT_NS = "fract_ns_interact";
 	private static final String SOCNET_FRACT_INTRO = "fract_introduce_friends";
@@ -46,15 +47,16 @@ public class SocNetConfigGroup extends Module {
 	private static final String SOCNET_OUT_DIR = "outputDirSocialNets";
 	private static final String SOCNET_DEG_SAT = "degree_saturation_rate";
 	private static final String SOCNET_RP_INT = "replanning_interval";
-	private static final String INPUT_SN_DIR = "inputSocNetDir";
-	private static final String INIT_ITER = "inputIter";
+	private static final String SN_INPUT_DIR = "inputSocNetDir";
+	private static final String SN_INIT_ITER = "inputIter";
 	private static final String BETA1 ="betafriendfoe";
 	private static final String BETA2 =	"betanfriends"; 
 	private static final String BETA3 ="betalognfriends";
 	private static final String BETA4 ="betatimewithfriends";
-	private static final String ALPHA ="euclid_alpha";
-	private static final String RMIN = "euclid_rmin";
-	private static final String MEMSIZE = "memSize";
+	private static final String SN_ALPHA ="euclid_alpha";
+	private static final String SN_RMIN = "euclid_rmin";
+	private static final String SN_MEMSIZE = "memSize";
+	private static final String SN_REPORT = "reporting_interval";
 
 
 	private String graphalgo = null;
@@ -69,9 +71,10 @@ public class SocNetConfigGroup extends Module {
 	private String maxiterations=null; // integer
 	private String xchangew=null; // double vector
 	private String facweights=null; // double vector
+	private String acttypes=null;//String
 	private String edgetype=null;
 	private String pctnsinteract=null; // double [0,1]
-	private String triangles=null; // double
+	private String pctintro=null; // double
 	private String sweights=null; // own config module (strategy)
 	private String pfriend=null; // double
 //	private String outdir="socialnets/";
@@ -88,7 +91,7 @@ public class SocNetConfigGroup extends Module {
 	private String alpha=null;//double
 	private String rmin=null;//double
 	private String memSize=null;//double
-
+	private String reportInt=null;//int
 
 	public SocNetConfigGroup() {
 		super(GROUP_NAME);
@@ -115,12 +118,14 @@ public class SocNetConfigGroup extends Module {
 			setXchange(value);
 		}else if (SOCNET_FACILITY_TYPE_WEIGHT.equals(key)) {
 			setFacWt(value);
+		}else if (SOCNET_ACT_TYPES.equals(key)) {
+			setActTypes(value);
 		}else if (SOCNET_EDGE_TYPE.equals(key)) {
 			setEdgeType(value);
 		}else if (SOCNET_FRACT_NS.equals(key)) {
 			setFractNSInteract(value);
 		}else if (SOCNET_FRACT_INTRO.equals(key)) {
-			setTriangles(value);
+			setFriendIntroProb(value);
 		}else if (SOCNET_SWITCH_WEIGHTS.equals(key)) {
 			setSWeights(value);
 		}else if (SOCNET_PROB_BEFRIEND.equals(key)) {
@@ -131,9 +136,9 @@ public class SocNetConfigGroup extends Module {
 			setDegSat(value);
 		}else if (SOCNET_RP_INT.equals(key)) {
 			setRPInt(value);
-		}else if (INPUT_SN_DIR.equals(key)) {
+		}else if (SN_INPUT_DIR.equals(key)) {
 			setInDirName(value);
-		}else if (INIT_ITER.equals(key)){
+		}else if (SN_INIT_ITER.equals(key)){
 			setInitIter(value);
 		}else if (BETA1.equals(key)){
 			setBeta1(value);
@@ -143,12 +148,14 @@ public class SocNetConfigGroup extends Module {
 			setBeta3(value);
 		}else if (BETA4.equals(key)){
 			setBeta4(value);
-		}else if (ALPHA.equals(key)){
+		}else if (SN_ALPHA.equals(key)){
 			setAlpha(value);
-		}else if (RMIN.equals(key)){
+		}else if (SN_RMIN.equals(key)){
 			setRmin(value);
-		}else if (MEMSIZE.equals(key)){
+		}else if (SN_MEMSIZE.equals(key)){
 			setMemSize(value);
+		}else if (SN_REPORT.equals(key)){
+			setReportInterval(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -177,12 +184,14 @@ public class SocNetConfigGroup extends Module {
 			return getXchange();
 		}else if (SOCNET_FACILITY_TYPE_WEIGHT.equals(key)) {
 			return getFacWt();
+		}else if (SOCNET_ACT_TYPES.equals(key)) {
+			return getActTypes();
 		}else if (SOCNET_EDGE_TYPE.equals(key)) {
 			return getEdgeType();
 		}else if (SOCNET_FRACT_NS.equals(key)) {
 			return getFractNSInteract();
 		}else if (SOCNET_FRACT_INTRO.equals(key)) {
-			return getTriangleProb();
+			return getFriendIntroProb();
 		}else if (SOCNET_SWITCH_WEIGHTS.equals(key)) {
 			return getSWeights();
 		}else if (SOCNET_PROB_BEFRIEND.equals(key)) {
@@ -193,9 +202,9 @@ public class SocNetConfigGroup extends Module {
 			return getDegSat();
 		}else if (SOCNET_RP_INT.equals(key)) {
 			return getRPInt();
-		}else if (INPUT_SN_DIR.equals(key)) {
+		}else if (SN_INPUT_DIR.equals(key)) {
 			return getInDirName();
-		}else if (INIT_ITER.equals(key)){
+		}else if (SN_INIT_ITER.equals(key)){
 			return getInitIter();
 		}else if (BETA1.equals(key)){
 			return getBeta1();
@@ -205,12 +214,14 @@ public class SocNetConfigGroup extends Module {
 			return getBeta3();
 		}else if (BETA4.equals(key)){
 			return getBeta4();
-		}else if (ALPHA.equals(key)){
+		}else if (SN_ALPHA.equals(key)){
 			return getAlpha();
-		}else if (RMIN.equals(key)){
+		}else if (SN_RMIN.equals(key)){
 			return getRmin();
-		}else if (MEMSIZE.equals(key)){
+		}else if (SN_MEMSIZE.equals(key)){
 			return getMemSize();
+		}else if (SN_REPORT.equals(key)){
+			return getReportInterval();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -229,6 +240,7 @@ public class SocNetConfigGroup extends Module {
 		addParameterToMap(map, SOCNET_NUM_NONSPATIAL_INTERACTIONS);
 		addParameterToMap(map, SOCNET_TYPE_INFO_EXCHANGED_WEIGHT);
 		addParameterToMap(map, SOCNET_FACILITY_TYPE_WEIGHT);
+		addParameterToMap(map, SOCNET_ACT_TYPES);
 		addParameterToMap(map, SOCNET_EDGE_TYPE);
 		addParameterToMap(map, SOCNET_FRACT_NS);
 		addParameterToMap(map, SOCNET_FRACT_INTRO);
@@ -237,15 +249,16 @@ public class SocNetConfigGroup extends Module {
 		addParameterToMap(map, SOCNET_OUT_DIR);
 		addParameterToMap(map, SOCNET_DEG_SAT);
 		addParameterToMap(map, SOCNET_RP_INT);
-		addParameterToMap(map, INPUT_SN_DIR);
-		addParameterToMap(map, INIT_ITER);
+		addParameterToMap(map, SN_INPUT_DIR);
+		addParameterToMap(map, SN_INIT_ITER);
 		addParameterToMap(map, BETA1);
 		addParameterToMap(map, BETA2);
 		addParameterToMap(map, BETA3);
 		addParameterToMap(map, BETA4);
-		addParameterToMap(map, ALPHA);
-		addParameterToMap(map, RMIN);
-		addParameterToMap(map, MEMSIZE);
+		addParameterToMap(map, SN_ALPHA);
+		addParameterToMap(map, SN_RMIN);
+		addParameterToMap(map, SN_MEMSIZE);
+		addParameterToMap(map, SN_REPORT);
 		return map;
 	}
 	/* direct access */
@@ -326,6 +339,12 @@ public class SocNetConfigGroup extends Module {
 	public void setFacWt(final String facweights) {
 		this.facweights = facweights;
 	}
+	public String getActTypes() {
+		return this.acttypes;
+	}
+	public void setActTypes(final String acttypes) {
+		this.acttypes = acttypes;
+	}
 	public String getEdgeType() {
 		return this.edgetype;
 	}
@@ -338,11 +357,11 @@ public class SocNetConfigGroup extends Module {
 	public void setFractNSInteract(final String pctnsinteract) {
 		this.pctnsinteract = pctnsinteract;
 	}
-	public String getTriangleProb() {
-		return this.triangles;
+	public String getFriendIntroProb() {
+		return this.pctintro;
 	}
-	public void setTriangles(final String triangles) {
-		this.triangles = triangles;
+	public void setFriendIntroProb(final String xx) {
+		this.pctintro = xx;
 	}
 	public String getSWeights() {
 		return this.sweights;
@@ -429,10 +448,15 @@ public class SocNetConfigGroup extends Module {
 		this.rmin = rmin;
 	}
 	public String getMemSize() {
-		// TODO Auto-generated method stub
 		return this.memSize;
 	}
 	public void setMemSize(final String memSize){
 		this.memSize=memSize;
+	}
+	public String getReportInterval() {
+		return this.reportInt;
+	}
+	public void setReportInterval(final String value){
+		this.reportInt=value;
 	}
 }
