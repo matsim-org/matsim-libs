@@ -17,15 +17,15 @@ public class Scheduler {
 	}
 
 	public void startSimulation() {
-
 		Message m;
-
 		while (!queue.isEmpty()
 				&& simTime < SimulationParameters.maxSimulationLength) {
 			m = queue.getNextMessage();
-			simTime = m.getMessageArrivalTime();
-			m.processEvent();
-			m.handleMessage();
+			if (m!=null){
+				simTime = m.getMessageArrivalTime();
+				m.processEvent();
+				m.handleMessage();
+			}
 			printLog();
 		}
 	}
