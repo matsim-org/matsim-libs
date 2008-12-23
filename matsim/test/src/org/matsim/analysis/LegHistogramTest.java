@@ -55,7 +55,6 @@ public class LegHistogramTest extends MatsimTestCase {
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Person person2 = new PersonImpl(new IdImpl(2));
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(0);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -104,7 +103,6 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(0);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -142,7 +140,6 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = new PersonImpl(new IdImpl(1));
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(0);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);

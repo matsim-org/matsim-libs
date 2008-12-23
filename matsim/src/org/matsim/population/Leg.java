@@ -47,7 +47,7 @@ public class Leg extends BasicLegImpl {
 		if (leg.route instanceof NodeCarRoute) {
 			this.route = new NodeCarRoute((NodeCarRoute) leg.route);
 		} else {
-			this.route = new NodeCarRoute();
+			this.route = new NodeCarRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
 			((CarRoute)this.route).setNodes(leg.getRoute().getStartLink(), ((CarRoute) (leg.getRoute())).getNodes(), leg.getRoute().getEndLink());
 		}
 	}

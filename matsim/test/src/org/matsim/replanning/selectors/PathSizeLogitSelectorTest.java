@@ -79,7 +79,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -102,7 +101,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		a = new Act("h", l6);
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -123,7 +121,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		a = new Act("h", l6);
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -153,7 +150,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		a = new Act("h", l6);
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -187,7 +183,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -223,7 +218,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Act a = new Act("h", l6);
 		Act b = new Act("w", l7);
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -242,7 +236,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		a = new Act("h", l6);
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
@@ -263,7 +256,6 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		a = new Act("h", l6);
 		b = new Act("w", l7);
 		leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(1);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setArrivalTime(10.0);
