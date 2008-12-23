@@ -103,7 +103,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	
 	private void startOpentime(final Attributes atts) {
 		DayType day = getDayType(atts.getValue("day"));
-		this.curractivity.createOpentime(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time")));
+		this.curractivity.addOpeningTime(new OpeningTime(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
 	}
 
 	

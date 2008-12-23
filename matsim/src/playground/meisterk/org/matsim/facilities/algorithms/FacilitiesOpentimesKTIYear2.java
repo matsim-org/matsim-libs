@@ -101,10 +101,10 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							day.equals(Day.WEDNESDAY) ||
 							day.equals(Day.THURSDAY) ||
 							day.equals(Day.FRIDAY)) {
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).createOpentime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								7.0 * 3600,
-								18.0 * 3600);
+								18.0 * 3600));
 					}
 				}
 				// open times of the closest shop for services sector
@@ -127,10 +127,10 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
 							break;
 						}
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
+								endTime));
 					}
 				}
 			}
@@ -152,18 +152,18 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.WEDNESDAY) ||
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
-							activities.get(activityType).createOpentime(
+							activities.get(activityType).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									12.0 * 3600);
-							activities.get(activityType).createOpentime(
+									12.0 * 3600));
+							activities.get(activityType).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									13.5 * 3600,
-									17.0 * 3600);
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+									17.0 * 3600));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									17.0 * 3600);
+									17.0 * 3600));
 						}
 					}
 				} else if (
@@ -176,14 +176,14 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.WEDNESDAY) ||
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
-							activities.get(activityType).createOpentime(
+							activities.get(activityType).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									18.0 * 3600);
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+									18.0 * 3600));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									18.0 * 3600);
+									18.0 * 3600));
 						}
 					}
 				} else if (
@@ -195,23 +195,23 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 								day.equals(Day.WEDNESDAY) ||
 								day.equals(Day.THURSDAY) ||
 								day.equals(Day.FRIDAY)) {
-							activities.get(activityType).createOpentime(
+							activities.get(activityType).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									7.0 * 3600,
-									22.0 * 3600);
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+									22.0 * 3600));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									7.0 * 3600,
-									22.0 * 3600);
+									22.0 * 3600));
 						} else if (day.equals(Day.SATURDAY)) {
-							activities.get(activityType).createOpentime(
+							activities.get(activityType).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									12.0 * 3600);
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+									12.0 * 3600));
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 									day.getAbbrevEnglish(),
 									8.0 * 3600,
-									12.0 * 3600);
+									12.0 * 3600));
 						}
 					}
 				} else if (
@@ -231,42 +231,42 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 							startTime = 9.0 * 3600;
 							endTime = 18.0 * 3600;
 						}
-						activities.get(activityType).createOpentime(
+						activities.get(activityType).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+								endTime));
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
+								endTime));
 					}
 				} else if (
 						Pattern.matches(FacilitiesProductionKTI.LEISURE_GASTRO, activityType)) {
 					for (Day day : days) {
 						startTime = 9.0 * 3600;
 						endTime = 24.0 * 3600;
-						activities.get(activityType).createOpentime(
+						activities.get(activityType).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+								endTime));
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
+								endTime));
 					}
 				} else if (
 						Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
 					for (Day day : days) {
 						startTime = 14.0 * 3600;
 						endTime = 24.0 * 3600;
-						activities.get(activityType).createOpentime(
+						activities.get(activityType).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).createOpentime(
+								endTime));
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
 								day.getAbbrevEnglish(),
 								startTime,
-								endTime);
+								endTime));
 					}
 				}
 			}

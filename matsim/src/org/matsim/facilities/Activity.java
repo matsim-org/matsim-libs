@@ -56,15 +56,6 @@ public class Activity implements BasicActivity {
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// create methods
-	//////////////////////////////////////////////////////////////////////
-	@Deprecated
-	public final void createOpentime(final DayType day, final double startTime, final double endTime) {
-		OpeningTime o = new OpeningTime(day, startTime, endTime);
-		this.addOpeningTime(o);
-	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// add methods
