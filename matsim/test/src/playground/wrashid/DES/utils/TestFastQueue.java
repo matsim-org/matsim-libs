@@ -1,0 +1,42 @@
+package playground.wrashid.DES.utils;
+
+import org.matsim.testcases.MatsimTestCase;
+
+import playground.wrashid.DES.util.FastQueue;
+
+public class TestFastQueue extends MatsimTestCase {
+	
+	
+	public void testAdd(){
+		FastQueue<Integer> fq=new FastQueue<Integer>();
+		fq.add(1);
+		assertEquals(true, fq.poll()==1);
+		assertEquals(true, fq.size()==0);
+	}
+	
+	public void testAdd1(){
+		FastQueue<Integer> fq=new FastQueue<Integer>();
+		
+		for (int i=0;i<100000;i++){
+			fq.add(i);
+		}
+		
+		for (int i=0;i<100000;i++){
+			assertEquals(true, fq.poll()==i);
+		}
+		
+		assertEquals(true, fq.size()==0);
+	}
+	
+	public void testGet(){
+		FastQueue<Integer> fq=new FastQueue<Integer>();
+		
+		for (int i=0;i<100000;i++){
+			fq.add(i);
+		}
+		
+		for (int i=0;i<100000;i++){
+			assertEquals(true, fq.get(i)==i);
+		}
+	}
+}
