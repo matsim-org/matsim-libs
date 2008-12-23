@@ -25,12 +25,9 @@ import org.matsim.basic.v01.IdImpl;
 public class DepartureEvent {
 
 	private final IdImpl agentId;
-	//private int legId;
 
-	public DepartureEvent(final IdImpl agentId, final int legId) {
-		super();
+	public DepartureEvent(final IdImpl agentId) {
 		this.agentId = agentId;
-		//this.legId = legId;
 	}
 
 	@Override
@@ -38,13 +35,11 @@ public class DepartureEvent {
 		if (!(arg0 instanceof DepartureEvent)) return false;
 
 		DepartureEvent event = (DepartureEvent)arg0;
-//		return (this.agentId.equals(event.agentId) && (this.legId == event.legId));
 		return (this.agentId.equals(event.agentId));
 	}
 
 	@Override
 	public String toString() {
-//		return "[[agentId = " + agentId + "][legId = " + legId + "]]";
 		return "[[agentId = " + this.agentId + "]";
 	}
 

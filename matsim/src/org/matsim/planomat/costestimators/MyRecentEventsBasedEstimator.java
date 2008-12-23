@@ -103,7 +103,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 	public void handleEvent(final AgentDepartureEvent event) {
 
-		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId), event.legId);
+		DepartureEvent depEvent = new DepartureEvent(new IdImpl(event.agentId));
 
 		this.departureEventsTimes.put(depEvent, event.time);
 		this.departureEventsLinkIDs.put(depEvent, new IdImpl(event.linkId));
@@ -113,7 +113,7 @@ implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEvent
 
 		IdImpl agentId = new IdImpl(event.agentId);
 
-		DepartureEvent removeMe = new DepartureEvent(agentId, event.legId);
+		DepartureEvent removeMe = new DepartureEvent(agentId);
 
 		Double departureTime = this.departureEventsTimes.remove(removeMe);
 		Id departureLinkId = this.departureEventsLinkIDs.remove(removeMe);
