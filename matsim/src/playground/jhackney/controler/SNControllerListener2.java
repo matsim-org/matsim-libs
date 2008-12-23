@@ -65,6 +65,9 @@ import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.InitializeKnowledge;
+import playground.jhackney.algorithms.ParamStringToNumberArray;
+import playground.jhackney.algorithms.ParamStringToStringArray;
+import playground.jhackney.algorithms.ParamStringsToStringDoubleMap;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 
 
@@ -101,41 +104,34 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  *
  */
 public class SNControllerListener2 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
-//public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
+//	public class SNControllerListener2 implements StartupListener, IterationStartsListener, IterationEndsListener,  ScoringListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener,  AfterMobsimListener{
 //	public class SNControllerListenerRePlanSecLoc implements StartupListener, IterationStartsListener, IterationEndsListener{
 
 
-	private static final boolean CALCSTATS = true;
-	public static String SOCNET_OUT_DIR = null;
+	private int dummyReportInterval=50;
+	private static String SOCNET_OUT_DIR = null;
+	private SocialNetwork snet;// static? I just need one
+	private SocialNetworkStatistics snetstat;// static? I just need one
+	private PajekWriter pjw;// static? I just need one
+	private NonSpatialInteractor plansInteractorNS;// static? I just need one
+	private SpatialInteractorEvents plansInteractorS;// static? I just need one
 
-	SocialNetwork snet;
-	SocialNetworkStatistics snetstat;
-	ActivityActWriter aaw;
-	ActivityActReader aar = null;
-	PajekWriter pjw;
-	NonSpatialInteractor plansInteractorNS;//non-spatial (not observed, ICT)
+	private EventsMapStartEndTimes epp=null;//static? I just need one
+	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
+	private Hashtable<Act,ArrayList<Double>> actStats=null;// static? I just need one
+	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;// static? I just need one
+	//
+	private HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();// static? I just need one
+	//
+	private String [] infoToExchange;
 
-	SpatialInteractorEvents plansInteractorS;
-	int snIter;
-	private String [] infoToExchange;//type of info for non-spatial exchange is read in
-	public static String activityTypesForEncounters[]={"home","work","shop","education","leisure"};
+	private int interact_interval;
+	private int snIter;
 
-	private EventsMapStartEndTimes epp=null;
-	private MakeTimeWindowsFromEvents teo=null;
-	private Hashtable<Act,ArrayList<Double>> actStats=null;
-	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
-
-	private final Logger log = Logger.getLogger(SNControllerListener2.class);
-
-//	Variables for allocating the spatial meetings among different types of activities
-	double fractionS[];
-	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
-//	New variables for replanning
-	int interact_interval;
-
 	private Controler controler = null;
+	private final Logger log = Logger.getLogger(SNControllerListener2.class);
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
@@ -144,28 +140,29 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		new WorldConnectLocations().run(Gbl.getWorld());
 
 		this.log.info(" Initializing agent knowledge about geography ...");
-
-//		initializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
 		initializeKnowledge();
-
 		this.log.info("... done");
 
-		this.log.info("   Instantiating a new social network scoring factory with new SocialActs");
+		setupSNScoring();
 
+		snsetup();
+	}
+
+	private void setupSNScoring() {
+		// 
+		this.log.info("   Instantiating a new social network scoring factory with new Event Tracker");
 		epp=new EventsMapStartEndTimes(this.controler.getPopulation());
-
 		this.controler.getEvents().addHandler(this.epp);
-
-		//TODO superfluous in 0th iteration and not necessary anymore except that scoring function needs it (can null be passed?)
+		//TODO null in 0th iteration. Scoring function needs to know the memory address (can null be passed and still set up the right memory address?)
 		teo=new MakeTimeWindowsFromEvents();
-		teo.calculate(epp);
+		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
+		this.log.info("... done");
 
-		this.log.info(" ... Instantiation of events overlap tracking done");
+		this.log.info(" Setting up scoring factory ...");
 		actStats = CompareTimeWindows.calculateTimeWindowEventActStats(twm);
 		EventSocScoringFactory factory = new EventSocScoringFactory("leisure", controler.getScoringFunctionFactory(),actStats);
 //		SocScoringFactoryEvent factory = new playground.jhackney.scoring.SocScoringFactoryEvent("leisure", actStats);
-
 		this.controler.setScoringFunctionFactory(factory);
 		this.log.info("... done");
 
@@ -174,12 +171,9 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		scoring = new EventsToScore(this.controler.getPopulation(),factory);
 		this.controler.getEvents().addHandler(scoring);
 		this.log.info(" ... Instantiation of social network scoring done");
-
-		snsetup();
 	}
 
-	private void initializeKnowledge() {
-		// TODO Auto-generated method stub
+	protected void initializeKnowledge() {
 		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
 	}
 
@@ -187,28 +181,26 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 		this.log.info("scoring");
 		if( event.getIteration()%interact_interval==0){
-//			got new epp from mobsim
-//			make new timewindows and map (uses old plans and new events)
+//			Got new events from mobsim
+//			Now make new TimeWindows and update the Map of Agent<->TimeWindow (uses old plans and new events)
 			Gbl.printMemoryUsage();
-			controler.stopwatch.beginOperation("spatialencounters");
-			this.log.info(" Making time Windows and Map from Events");
-//			teo=new MakeTimeWindowsFromEvents(epp);
-			teo.calculate(epp);
-			this.log.info(" ... done making time windows and map");
-			//
-			twm= teo.getTimeWindowMap();
-//			execute spatial interactions (uses timewindows)
 
-			if (total_spatial_fraction(this.fractionS) > 0) {
-				this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
-			} else {
-				this.log.info("     (none)");
-			}
+			controler.stopwatch.beginOperation("timewindowmap");			
+			this.log.info(" Making time Windows and Map from Events");
+			teo.makeTimeWindows(epp);
+			twm= teo.getTimeWindowMap();
+			this.log.info(" ... done making time windows and map");
+			controler.stopwatch.endOperation("timewindowmap");
+
+//			Spatial interactions can change the social network and/or knowledge
+			controler.stopwatch.beginOperation("spatialencounters");
+			this.log.info(" Beginning spatial encounters");
+			this.plansInteractorS.interact(this.controler.getPopulation(), this.rndEncounterProbs, snIter, twm);
 			this.log.info(" ... Spatial interactions done\n");
 			controler.stopwatch.endOperation("spatialencounters");
 
 			Gbl.printMemoryUsage();
-//			execute nonspatial interactions (uses new social network)
+//			Execute nonspatial interactions (uses new social network). Can change social network and/or knowledge
 			this.log.info(" Non-Spatial interactions ...");
 			controler.stopwatch.beginOperation("infoexchange");
 			for (int ii = 0; ii < this.infoToExchange.length; ii++) {
@@ -220,16 +212,11 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			}
 			controler.stopwatch.endOperation("infoexchange");
 
-//			Exchange of knowledge about people
+//			Exchange of knowledge about people. Changes social network (makes new friends)
 			this.log.info("Introducing people");
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
-			if (fract_intro > 0) {
-				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
-			}
-			else{
-				this.log.info("  No introductions");
-			}
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
+			this.log.info("  Knowledge about other people is being exchanged ...");
+			this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, fract_intro);
 			this.log.info("  ... introducing people done");
 
 //			forget knowledge
@@ -237,7 +224,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			double multiple=Double.parseDouble(this.controler.getConfig().socnetmodule().getMemSize());
 			new PersonForgetKnowledge(multiple).run(controler.getPopulation());
 			this.log.info(" ... forgetting knowledge done");
-			Gbl.printMemoryUsage();
+
 			Gbl.printMemoryUsage();
 
 			//dissolve social ties
@@ -247,7 +234,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			this.log.info(" ... removing social links done");
 			controler.stopwatch.endOperation("dissolvelinks");
 
-//			update activity statistics
+//			Update activity statistics with pruned social network
 			this.log.info(" Remaking actStats from events");
 			this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
 
@@ -267,19 +254,19 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 		if( event.getIteration()%interact_interval==0){
 
-			Gbl.printMemoryUsage();
-			controler.stopwatch.beginOperation("netstats");
-			this.log.info(" Calculating and reporting network statistics ...");
-			this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
-			this.log.info(" ... done");
-			controler.stopwatch.endOperation("netstats");
+			if(dummyReportInterval>0 && event.getIteration()%dummyReportInterval==0){//50
+				Gbl.printMemoryUsage();
+				controler.stopwatch.beginOperation("netstats");
+				this.log.info(" Calculating and reporting network statistics ...");
+				this.snetstat.calculate(snIter, this.snet, this.controler.getPopulation());
+				this.log.info(" ... done");
+				controler.stopwatch.endOperation("netstats");
 
-			Gbl.printMemoryUsage();
+				Gbl.printMemoryUsage();
 
-			if(CALCSTATS && event.getIteration()%50==0){//50
 
 				this.log.info("  Opening the file to write out the map of Acts to Facilities");
-				aaw=new ActivityActWriter();
+				ActivityActWriter aaw=new ActivityActWriter();
 				aaw.openFile(SOCNET_OUT_DIR+"/ActivityActMap"+snIter+".txt");
 				this.log.info(" Writing out the map between Acts and Facilities ...");
 				aaw.write(snIter,this.controler.getPopulation());
@@ -287,80 +274,55 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 				this.log.info(" ... done");
 			}
 
-//			if(event.getIteration()%10==0){
-//			this.log.info(" Writing out social network for iteration " + snIter + " ...");
-//			this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
-//			this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
-//			this.log.info(" ... done");
+//			if(event.getIteration()%dummyReportInterval==0){
+			if(event.getIteration()==this.controler.getLastIteration()){
+				this.log.info(" Writing out social network for iteration " + snIter + " ...");
+				this.pjw.write(this.snet.getLinks(), this.controler.getPopulation(), snIter);
+				this.pjw.writeGeo(this.controler.getPopulation(), this.snet, snIter);
+				this.log.info(" ... done");
 
-//			Write out the KML for the EgoNet of a chosen agent BROKEN 12.2008
-//			this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-//			Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
-////			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
-//			EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
-//			this.log.info(" ... done");
-//			}
+//				Write out the KML for the EgoNet of a chosen agent BROKEN 12.2008
+//				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
+//				Person testP=this.controler.getPopulation().getPerson("21924270");//1pct
+////				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
+//				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration());
+//				this.log.info(" ... done");
+			}
 			snIter++;
 		}
 		if (event.getIteration() == this.controler.getLastIteration()) {
-			if(CALCSTATS){
-				this.log.info("----------Closing social network statistic files and wrapping up ---------------");
-				this.snetstat.closeFiles();
-			}
-		}
-
-		if (event.getIteration() == this.controler.getLastIteration()){
-
+			this.log.info("----------Closing social network statistic files ---------------");
+			this.snetstat.closeFiles();
+			this.log.info("----------Closing KMZ files ---------------");
 			EgoNetPlansItersMakeKML.write();
 		}
-
 	}
 
+	/**
+	 * The EventHandlers are usually only used in Scoring, the second-to-last step
+	 * in the iteration, and then are reset at the top of the next iteration in
+	 * notifyIterationStarts.<p>
+	 * 
+	 * However the results of the last MobSim, which are based on the Events,
+	 * might still be needed for certain
+	 * social network calculations two steps later
+	 * in RePlanning.<p>
+	 * 
+	 * Clear these results here, after RePlanning, rather than in
+	 * notifyIterationStarts, in case they are needed in RePlanning.<p>
+	 * 
+	 * See Controler.doIterations()
+	 */
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 
-		this.epp.reset(snIter);// I think this doesn't need to be called
-		this.teo.clearTimeWindowMap();// needs to be called because it's not an eventhandler
-		this.actStats.clear();// needs to be called because it's not an eventhandler
+		this.teo.clearTimeWindowMap();
+		this.actStats.clear();
 	}
 
 	/* ===================================================================
 	 * private methods
 	 * =================================================================== */
 
-//	void initializeKnowledge(final Population plans, Facilities facilities ) {
-//
-//		// Knowledge is already initialized in some plans files
-//		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
-//
-//
-////		Attempt to open file of mental maps and read it in
-//		System.out.println("  Opening the file to read in the map of Acts to Facilities");
-//		aar = new ActivityActReader(Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue());
-//
-//		String fileName = Gbl.getConfig().socnetmodule().getInDirName()+ "ActivityActMap"+Integer.valueOf(Gbl.getConfig().socnetmodule().getInitIter()).intValue()+".txt";
-//		aar.openFile(fileName);
-//		System.out.println(" ... done");
-//
-//		Iterator<Person> p_it = plans.getPersons().values().iterator();
-//		while (p_it.hasNext()) {
-//			Person person=p_it.next();
-//
-//			Knowledge k = person.getKnowledge();
-//			if(k ==null){
-//				k = person.createKnowledge("created by " + this.getClass().getName());
-//			}
-//			for (int ii = 0; ii < person.getPlans().size(); ii++) {
-//				Plan plan = person.getPlans().get(ii);
-//
-//				k.getMentalMap().prepareActs(plan); // // JH Hack to make sure act types are compatible with social nets
-//				k.getMentalMap().initializeActActivityMapRandom(plan);
-//				k.getMentalMap().initializeActActivityMapFromFile(plan,facilities,aar);
-////				Reset activity spaces because they are not read or written correctly
-//				k.resetActivitySpaces();
-//			}
-//		}
-//		aar.close();//close the file with the input act-activity map
-//	}
 
 	private void snsetup() {
 
@@ -372,31 +334,29 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 			Gbl.errorMsg("The iterations directory " + SOCNET_OUT_DIR + " could not be created.");
 		}
 
+		this.dummyReportInterval = Integer.parseInt(this.controler.getConfig().socnetmodule().getReportInterval());
 		this.interact_interval = Integer.parseInt(this.controler.getConfig().socnetmodule().getRPInt());
-		String rndEncounterProbString = this.controler.getConfig().socnetmodule().getFacWt();
 		String xchangeInfoString = this.controler.getConfig().socnetmodule().getXchange();
-		this.infoToExchange = getFacTypes(xchangeInfoString);
-		this.fractionS = toNumber(rndEncounterProbString);
-		this.rndEncounterProbs = mapActivityWeights(activityTypesForEncounters, rndEncounterProbString);
+		this.infoToExchange = new ParamStringToStringArray(xchangeInfoString).getArray();
+		this.rndEncounterProbs = new ParamStringsToStringDoubleMap(this.controler.getConfig().socnetmodule().getActTypes(), this.controler.getConfig().socnetmodule().getFacWt()).getMap();
 
 		this.log.info(" Instantiating the Pajek writer ...");
 		this.pjw = new PajekWriter(SOCNET_OUT_DIR, (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE));
 		this.log.info("... done");
 
+		if(this.controler.getConfig().socnetmodule().getSocNetAlgo()==(null)){
+			this.log.error("No social network is set. This controller requires you to configure a social network");
+		}
+
 		this.log.info(" Initializing the social network ...");
 		this.snet = new SocialNetwork(this.controler.getPopulation());
 		this.log.info("... done");
 
-		if(CALCSTATS){
-//			this.log.info(" Calculating the statistics of the initial social network)...");
+		if(dummyReportInterval>0){
 			this.log.info(" Opening the files for the social network statistics...");
 			this.snetstat=new SocialNetworkStatistics(SOCNET_OUT_DIR);
 			this.snetstat.openFiles();
-//			Social networks do not change until the first iteration of Replanning,
-//			so we can skip writing out this initial state because the networks will still be unchanged after the first assignment
-//			this.snetstat.calculate(0, this.snet, this.controler.getPopulation());
 			this.log.info(" ... done");
-
 		}
 
 		this.log.info("  Initializing the KML output");
@@ -413,104 +373,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		this.plansInteractorS=new SpatialInteractorEvents(this.snet, teo);
 		this.log.info("... done");
 
-		this.snIter = this.controler.getFirstIteration();
-	}
-
-	/**
-	 * A method for decyphering the config codes. Part of configuration
-	 * reader. Replace eventually with a routine that runs all of the
-	 * facTypes but uses a probability for each one, summing to 1.0. Change
-	 * the interactors accordingly.
-	 *
-	 * @param longString
-	 * @return
-	 */
-	private String[] getFacTypes(final String longString) {
-		String patternStr = ",";
-		String[] s;
-		log.info(this.getClass()+ "getFacTypes:	!!add keyword\"any\" and a new interact method to exchange info of any factility types (compatible with probabilities)");
-		if (longString.equals("all-p")) {
-			s = new String[5];
-			s[0] = "home";
-			s[1] = "work";
-			s[2] = "education";
-			s[3] = "leisure";
-			s[4] = "shop";
-		} else if (longString.equals("all+p")) {
-			s = new String[6];
-			s[0] = "home";
-			s[1] = "work";
-			s[3] = "education";
-			s[4] = "leisure";
-			s[5] = "shop";
-			s[6] = "person";
-		} else {
-			s = longString.split(patternStr);
-		}
-		for (int i = 0; i < s.length; i++) {
-			// if(s[i]!="home"&&s[i]!="work"&&s[i]!="education"&&s[i]!="leisure"&&s[i]!="shop"&&s[i]!="person"&&s[i]!="none"){
-			if (!s[i].equals("home") && !s[i].equals("work") && !s[i].equals("education") && !s[i].equals("leisure")
-					&& !s[i].equals("shop") && !s[i].equals("person") && !s[i].equals("none")) {
-				this.log.info(this.getClass() + ":" + s[i]);
-				Gbl.errorMsg("Error on type of info to exchange. Check config file. Use commas with no spaces");
-			}
-		}
-		return s;
-	}
-
-	private double[] toNumber(final String longString) {
-		String patternStr = ",";
-		String[] s;
-		s = longString.split(patternStr);
-		double[] w = new double[s.length];
-		double sum = 0.;
-		for (int i = 0; i < s.length; i++) {
-			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
-				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
-			}
-			sum=sum+w[i];
-		}
-		if(s.length!=5){
-			Gbl.errorMsg("Number of weights for spatial interactions must equal number of facility types. Check config.");
-		}
-		if(sum<0){
-			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
-		}
-		return w;
-	}
-	private HashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
-		String patternStr = ",";
-		String[] s;
-		HashMap<String,Double> map = new HashMap<String,Double>();
-		s = longString.split(patternStr);
-		double[] w = new double[s.length];
-		double sum = 0.;
-		for (int i = 0; i < s.length; i++) {
-			w[i] = Double.valueOf(s[i]).doubleValue();
-			if(w[i]<0.||w[i]>1.){
-				Gbl.errorMsg("All parameters \"s_weights\" must be >0 and <1. Check config file.");
-			}
-			sum=sum+w[i];
-			map.put(types[i],w[i]);
-		}
-		if(s.length!=5){
-			Gbl.errorMsg("Number of weights for spatial interactions must equal number of facility types. Check config.");
-		}
-		if(sum<0){
-			Gbl.errorMsg("At least one weight for the type of information exchange or meeting place must be > 0, check config file.");
-		}
-		return map;
-	}
-
-	private double total_spatial_fraction(final double[] fractionS2) {
-//		See if we use spatial interaction at all: sum of these must > 0 or else no spatial
-//		interactions take place
-		double total_spatial_fraction=0;
-		for (int jjj = 0; jjj < fractionS2.length; jjj++) {
-			total_spatial_fraction = total_spatial_fraction + fractionS2[jjj];
-		}
-		return total_spatial_fraction;
+		this.snIter = this.controler.getFirstIteration();		
 	}
 
 	/**

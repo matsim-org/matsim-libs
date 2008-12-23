@@ -148,7 +148,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 		//TODO scoring function needs it (can null be passed?)
 		teo=new MakeTimeWindowsFromEvents();
-		teo.calculate(epp);
+		teo.makeTimeWindows(epp);
 		controler.setTwm(teo.getTimeWindowMap());
 
 		this.log.info(" ... Instantiation of events overlap tracking done");
@@ -181,7 +181,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			controler.stopwatch.beginOperation("spatialencounters");
 			this.log.info(" Making time Windows and Map from Events");
 //			teo=new MakeTimeWindowsFromEvents(epp);
-			teo.calculate(epp);
+			teo.makeTimeWindows(epp);
 			this.log.info(" ... done making time windows and map");
 //			twm= teo.getTimeWindowMap();
 			controler.setTwm(teo.getTimeWindowMap());
@@ -211,10 +211,10 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 //			Exchange of knowledge about people
 			this.log.info("Introducing people");
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
+				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, 0);
 			}
 			else{
 				this.log.info("  No introductions");

@@ -175,7 +175,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		
 		//TODO superfluous in 0th iteration and not necessary anymore except that scoring runction needs it (can null be passed?)
 		teo=new MakeTimeWindowsFromEvents();
-		teo.calculate(epp);
+		teo.makeTimeWindows(epp);
 		twm=teo.getTimeWindowMap();
 		
 		this.log.info(" ... Instantiation of events overlap tracking done");
@@ -210,7 +210,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		
 		Gbl.printMemoryUsage();
 		teo=new MakeTimeWindowsFromEvents();
-		teo.calculate(epp);
+		teo.makeTimeWindows(epp);
 		twm= teo.getTimeWindowMap();
 
 		this.actStats.putAll(CompareTimeWindows.calculateTimeWindowEventActStats(twm));
@@ -322,10 +322,10 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			}
 
 			// Exchange of knowledge about people
-			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getTriangleProb());
+			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
+				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, 0);
 			}
 
 			this.log.info("  ... done");

@@ -20,9 +20,9 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
+import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 
 import playground.jhackney.replanning.SNCoordinateArrivalTimes;
-import playground.jhackney.replanning.SNPickFacilityFromAlter;
 
 public class SNController4 extends Controler {
 
