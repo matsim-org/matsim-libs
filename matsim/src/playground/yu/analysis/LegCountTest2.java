@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -96,14 +95,6 @@ public class LegCountTest2 {
 			}
 		}
 
-		public static int getLegsNumber(final Plan selectedPlan) {
-			int i = 0;
-			for (LegIterator li = selectedPlan.getIteratorLeg(); li.hasNext();)
-				i = li.next().getNum();
-			i++;
-			return i;
-		}
-
 		private void carAppend(final int legsNumber) {
 			carUserCount++;
 			carLegCount += legsNumber;
@@ -118,7 +109,7 @@ public class LegCountTest2 {
 		public void run(final Person person) {
 			Plan p = person.getSelectedPlan();
 			if (p != null) {
-				int nLegs = getLegsNumber(p);
+				int nLegs = (p.getActsLegs().size() + 1) / 2;
 				try {
 					writer.write(person.getId() + "\t" + nLegs + "\n");
 					writer.flush();
