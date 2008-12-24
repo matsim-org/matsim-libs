@@ -22,10 +22,7 @@ package org.matsim.socialnetworks.socialnet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -37,7 +34,25 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.socialnetworks.io.MakeSocialNetworkFromFile;
 import org.matsim.utils.geometry.Coord;
-
+/**
+ * SocialNetwork is an object organizing the social ties between Persons. It serves two
+ * purposes: to provide utilities for adding, removing, and changing
+ * the strength or other characteristics of social ties; and to provide convenient container
+ * structures for accessing this information.<p>
+ * The social ties themselves are
+ * stored privately as EgoNetwork objects in each Person's Knowledge and can be accessed via each Person.<p>
+ * A SocialNetwork contains
+ * of a list of edges and some general characteristics to which all EgoNets conform:
+ * <li>Edge type (edge parameter: directed, undirected)
+ * <li>Saturation rate (node parameter: likelihood of adding more edges given current degree)
+ * <li>Edge removal algorithm (multiple parameters)</li><br><br>
+ * 
+ * 
+ * <p>
+ * There are several initialization algorithms programmed in SocialNetwork.
+ * @author jhackney
+ *
+ */
 public class SocialNetwork {
 
 	private boolean UNDIRECTED;
@@ -111,7 +126,7 @@ public class SocialNetwork {
 	}
 
 	/**
-	 * Generates a Bernoulli (Erd�s/Renyi) network with link
+	 * Generates a Bernoulli (Erdos/Renyi) network with link
 	 * probability modified by the distance between alters
 	 *
 	 * 
