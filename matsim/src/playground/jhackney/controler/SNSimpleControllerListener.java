@@ -1,3 +1,5 @@
+package playground.jhackney.controler;
+
 /* *********************************************************************** *
  * project: org.matsim.*
  * SNControlerListener2.java
@@ -17,8 +19,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ import playground.jhackney.kml.EgoNetPlansItersMakeKML;
  * @author jhackney
  *
  */
-public class SNControllerListener2 implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
+public class SNSimpleControllerListener implements StartupListener, BeforeMobsimListener, IterationEndsListener,  ScoringListener{
 
 	private int reportInterval=50;
 	private static String SOCNET_OUT_DIR = null;
@@ -111,7 +111,7 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 
 	private EventsToScore scoring = null;
 	private Controler controler = null;
-	private final Logger log = Logger.getLogger(SNControllerListener2.class);
+	private final Logger log = Logger.getLogger(SNSimpleControllerListener.class);
 
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
@@ -349,4 +349,5 @@ public class SNControllerListener2 implements StartupListener, BeforeMobsimListe
 		new InitializeKnowledge(this.controler.getPopulation(), this.controler.getFacilities());
 	}
 }
+
 

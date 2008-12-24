@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.replanning.PlanStrategy;
@@ -14,15 +11,11 @@ import org.matsim.replanning.StrategyManager;
 import org.matsim.replanning.modules.ReRouteLandmarks;
 import org.matsim.replanning.modules.StrategyModule;
 import org.matsim.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
-
-import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 
 public class SNController4 extends Controler {
 
