@@ -558,7 +558,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			
 			//TODO @ mfeil: This needs improvement!!!
 			Leg legHelp;
-			legHelp = new Leg (BasicLeg.Mode.car);
+			legHelp = new Leg (BasicLeg.Mode.walk);
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	
