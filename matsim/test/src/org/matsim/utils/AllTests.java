@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.matsim.utils");
+		TestSuite suite = new TestSuite("Tests for org.matsim.utils");
 		//$JUnit-BEGIN$
 		suite.addTest(org.matsim.utils.charts.AllTests.suite());
 		suite.addTest(org.matsim.utils.collections.AllTests.suite());
@@ -35,6 +35,7 @@ public class AllTests {
 		suite.addTest(org.matsim.utils.io.AllTests.suite());
 		suite.addTest(org.matsim.utils.misc.AllTests.suite());
 		suite.addTest(org.matsim.utils.vis.AllTests.suite());
+		suite.addTestSuite(NetworkUtilsTest.class);
 		suite.addTestSuite(WorldUtilsTest.class);
 		//$JUnit-END$
 		return suite;
