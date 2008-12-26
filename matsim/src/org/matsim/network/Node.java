@@ -129,6 +129,10 @@ public class Node extends BasicNodeImpl implements Comparable<Node> {
 	public final void setTopoType(final int topotype) {
 		this.topoType = topotype;
 	}
+	
+	public final void setType(final String type) {
+		this.type = type == null ? null : type.intern();
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
