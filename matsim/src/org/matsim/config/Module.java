@@ -21,6 +21,7 @@
 package org.matsim.config;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -100,9 +101,12 @@ public class Module  implements Serializable{
 		return this.params;
 	}
 	
-//	protected Map<String,String> getComments() { // TODO (see email)
-//		return null ;
-//	}
+	/**
+	 * @return a Map containing description to some or all parameters return in {@link #getParams()}.
+	 */
+	protected Map<String, String> getComments() {
+		return new HashMap<String, String>();
+	}
 
 	@Override
 	public final String toString() {

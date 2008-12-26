@@ -22,16 +22,9 @@ package org.matsim.config;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
-
-	//////////////////////////////////////////////////////////////////////
-	//
-	// interface implementation
-	//
-	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
 	// <config ... > ... </config>
@@ -51,18 +44,16 @@ public class ConfigWriterHandlerImplV1 implements ConfigWriterHandler {
 
 	public void writeModule(final Module module, final BufferedWriter out) throws IOException {
 		Map<String, String> params = module.getParams();
-		// Map<String, String> comments = module.getComments() ; // TODO (see email)
+		Map<String, String> comments = module.getComments();
 
 		out.write("\t<module");
 		out.write(" name=\"" + module.getName() + "\" >\n");
 
-		Iterator<Map.Entry<String, String>> it = params.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, String> entry = it.next();
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			if (comments.get(entry.getKey()) != null) {
+				out.write( "\n\t\t<!-- " + comments.get(entry.getKey()) + " -->\n");
+			}
 			out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />\n");
-			// if ( comments.get( entryKey() != null ) {
-			// out.write( "\t\t<!-- " + comments.get( entryKey() ) + " -->" ) ;  // TODO (see email)
-			// }
 		}
 		out.write("\t</module>\n\n");
 	}
