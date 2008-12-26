@@ -33,7 +33,6 @@ import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.stats.algorithms.PlanStats;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 
 public class Plan extends BasicPlanImpl {
@@ -90,45 +89,11 @@ public class Plan extends BasicPlanImpl {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @deprecated use method with less arguments and make use of the appropriate setters afterwards
-	 */
-  @Deprecated
-	public final Act createAct(final String type, final String x, final String y, final String link, final String startTime,
-			 final String endTime, final String dur, final String isPrimary) throws IllegalStateException {
-		verifyCreateAct(endTime);
-		Coord coord = null;
-		if ((x != null) && (y != null)) {
-			coord = new CoordImpl(Double.parseDouble(x), Double.parseDouble(y));
-		}
-		Act a = new Act(type, coord);
-		if (link != null) {
-			a.setLinkFromString(link);
-		} else if (coord == null) {
-			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
-		}
-		if (startTime != null) {
-			a.setStartTime(Time.parseTime(startTime));
-		}
-		if (endTime != null) {
-			a.setEndTime(Time.parseTime(endTime));
-		}
-		if (dur != null) {
-			a.setDuration(Time.parseTime(dur));
-		}
-		if( link != null) {
-			a.setLinkId(a.getLink().getId());
-		}
-		this.actsLegs.add(a);
-		return a;
-	}
-
 	public Leg createLeg(final BasicLeg.Mode mode) throws IllegalStateException {
 		verifyCreateLeg();
 		Leg leg = new Leg(mode);
 		// Override leg number with an appropriate value
-		int legnum = (this.actsLegs.size()-1) /2;
-		leg.setNum(legnum);
+		leg.setNum((this.actsLegs.size()-1) /2);
 		this.actsLegs.add(leg);
 		return leg;
 	}
@@ -187,8 +152,7 @@ public class Plan extends BasicPlanImpl {
 			}
 			else {
 				// remove an in-between act
-				Leg prev_leg = (Leg)this.actsLegs.get(index-1); // prev leg
-				prev_leg.setNum(Integer.MIN_VALUE);
+				Leg prev_leg = (Leg)this.actsLegs.get(index-1); // prev leg;
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
 				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -214,7 +178,6 @@ public class Plan extends BasicPlanImpl {
 			if (index != this.actsLegs.size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)this.actsLegs.get(index+2);
-				next_leg.setNum(Integer.MIN_VALUE);
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
 				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
@@ -378,7 +341,7 @@ public class Plan extends BasicPlanImpl {
 		return null;
 	}
 
-	//FIXME NAME SHOULD be getPreviousAct!!!
+	//FIXME [MR] rename to getPreviousAct!!!
 	public Act getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {

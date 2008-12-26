@@ -28,8 +28,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -173,10 +176,26 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		Act act = this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"),
-					atts.getValue("y100"), atts.getValue("link"), atts
-							.getValue("start_time"), atts.getValue("end_time"), atts
-							.getValue("dur"), null);
+		Link link = null;
+		Coord coord = null;
+		Act act = null;
+		if (atts.getValue("link") != null) {
+			link = this.network.getLink(atts.getValue("link"));
+			act = this.currplan.createAct(atts.getValue("type"), link);
+			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
+				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
+				act.setCoord(coord);
+			}
+		} else if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
+			coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
+			act = this.currplan.createAct(atts.getValue("type"), coord);
+		} else {
+			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
+		}
+		act.setStartTime(Time.parseTime(atts.getValue("start_time")));
+		act.setDuration(Time.parseTime(atts.getValue("dur")));
+		act.setEndTime(Time.parseTime(atts.getValue("end_time")));
+
 		if (this.routeNodes != null) {
 			this.currroute.setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeNodes), act.getLink());
 			this.routeNodes = null;

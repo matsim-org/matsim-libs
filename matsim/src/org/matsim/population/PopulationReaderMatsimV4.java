@@ -33,8 +33,11 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.geometry.Coord;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
@@ -312,8 +315,24 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startAct(final Attributes atts) {
-		this.curract = this.currplan.createAct(atts.getValue("type"), atts.getValue("x"), atts.getValue("y"), atts.getValue("link"),
-				atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"),null);
+		Link link = null;
+		Coord coord = null;
+		if (atts.getValue("link") != null) {
+			link = this.network.getLink(atts.getValue("link"));
+			this.curract = this.currplan.createAct(atts.getValue("type"), link);
+			if (atts.getValue("x") != null && atts.getValue("y") != null) {
+				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+				this.curract.setCoord(coord);
+			}
+		} else if (atts.getValue("x") != null && atts.getValue("y") != null) {
+			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
+			this.curract = this.currplan.createAct(atts.getValue("type"), coord);
+		} else {
+			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
+		}
+		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
+		this.curract.setDuration(Time.parseTime(atts.getValue("dur")));
+		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		if (atts.getValue("facility") != null) {
 			this.curract.setFacility(atts.getValue("facility"));
 		}
