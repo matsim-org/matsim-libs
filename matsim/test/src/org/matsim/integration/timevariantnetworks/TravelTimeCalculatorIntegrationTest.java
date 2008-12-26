@@ -35,6 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
@@ -49,10 +50,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "100", "0", null);
-		Node node3 = network.createNode("3", "200", "0", null);
-		Node node4 = network.createNode("4", "300", "0", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(200, 0));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(300, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
@@ -85,10 +86,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		Gbl.getWorld().setNetworkLayer(network);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "100", "0", null);
-		Node node3 = network.createNode("3", "200", "0", null);
-		Node node4 = network.createNode("4", "300", "0", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(200, 0));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(300, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);

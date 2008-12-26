@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
+import org.matsim.utils.geometry.CoordImpl;
 import org.xml.sax.SAXException;
 
 public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
@@ -38,9 +39,9 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "0", "1000", null);
-		Node node3 = network.createNode("3", "1000", "2000", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1000, 2000));
 		network.createLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 1500, 1.667, 3600, 1);
 

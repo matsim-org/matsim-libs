@@ -29,6 +29,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class ActLinkFilterTest extends MatsimTestCase {
 
@@ -43,9 +44,9 @@ public class ActLinkFilterTest extends MatsimTestCase {
 
 		// fixture: 2 links and 2 persons
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1", "100.0", "100.0", "unknown");
-		Node node2 = network.createNode("2", "200.0", "200.0", "unknown");
-		Node node3 = network.createNode("3", "300.0", "300.0", "unknown");
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(100.0, 100.0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(200.0, 200.0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(300.0, 300.0));
 
 		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 20, 200, 2);
 		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 20, 200, 2);

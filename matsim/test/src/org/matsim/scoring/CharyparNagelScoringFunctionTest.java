@@ -37,6 +37,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * Test the correct working of {@link CharyparNagelScoringFunction} according to the formulas in:
@@ -79,12 +80,12 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		scoring.addActivityParams(params);
 
 		this.network = new NetworkLayer();
-		Node node1 = this.network.createNode("1",    "0.0", "0.0", null);
-		Node node2 = this.network.createNode("2",   "500.0", "0.0", null);
-		Node node3 = this.network.createNode("3",  "5500.0", "0.0", null);
-		Node node4 = this.network.createNode("4",  "6000.0", "0.0", null);
-		Node node5 = this.network.createNode("5", "11000.0", "0.0", null);
-		Node node6 = this.network.createNode("6", "11500.0", "0.0", null);
+		Node node1 = this.network.createNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
+		Node node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
+		Node node3 = this.network.createNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
+		Node node4 = this.network.createNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
+		Node node5 = this.network.createNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
+		Node node6 = this.network.createNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
 		Link link1 = this.network.createLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
 		this.network.createLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
 		Link link3 = this.network.createLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);

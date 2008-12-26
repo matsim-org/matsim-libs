@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * A very simple test for the NetworkCleaner, it doesn't test by far all possible cases.
@@ -38,11 +39,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSink() {
 		// create a simple network
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1",   "0",   "0", null);
-		Node node2 = network.createNode("2", "100",   "0", null);
-		Node node3 = network.createNode("3", "100", "100", null);
-		Node node4 = network.createNode("4",   "0", "100", null);
-		Node node5 = network.createNode("5", "200", "200", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(  0,   0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100,   0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(100, 100));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(  0, 100));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(200, 200));
 		network.createLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
@@ -63,11 +64,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSink() {
 		// create a simple network
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1",   "0",   "0", null);
-		Node node2 = network.createNode("2", "100",   "0", null);
-		Node node3 = network.createNode("3", "100", "100", null);
-		Node node4 = network.createNode("4",   "0", "100", null);
-		Node node5 = network.createNode("5", "200", "200", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(  0,   0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100,   0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(100, 100));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(  0, 100));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(200, 200));
 		network.createLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
@@ -89,11 +90,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSource() {
 		// create a simple network
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1",   "0",   "0", null);
-		Node node2 = network.createNode("2", "100",   "0", null);
-		Node node3 = network.createNode("3", "100", "100", null);
-		Node node4 = network.createNode("4",   "0", "100", null);
-		Node node5 = network.createNode("5", "200", "200", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(  0,   0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100,   0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(100, 100));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(  0, 100));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(200, 200));
 		network.createLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
@@ -114,11 +115,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSource() {
 		// create a simple network
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1",   "0",   "0", null);
-		Node node2 = network.createNode("2", "100",   "0", null);
-		Node node3 = network.createNode("3", "100", "100", null);
-		Node node4 = network.createNode("4",   "0", "100", null);
-		Node node5 = network.createNode("5", "200", "200", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(  0,   0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100,   0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(100, 100));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(  0, 100));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(200, 200));
 		network.createLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);

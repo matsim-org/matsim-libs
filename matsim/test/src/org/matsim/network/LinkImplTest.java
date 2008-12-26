@@ -48,11 +48,11 @@ public class LinkImplTest extends MatsimTestCase {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		final NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "0", "1000", null);
-		Node node3 = network.createNode("3", "1000", "2000", null);
-		Node node4 = network.createNode("4", "2000", "2000", null);
-		Node node5 = network.createNode("5", "1000", "0", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(1000, 2000));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(2000, 2000));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(1000, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 1, 3600, 1);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1500, 1, 3600, 1);
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);

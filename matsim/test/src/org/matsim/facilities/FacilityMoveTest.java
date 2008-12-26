@@ -68,11 +68,11 @@ public class FacilityMoveTest extends MatsimTestCase {
 	
 	private final NetworkLayer buildNetwork(World world) {
 		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		Node n00 = network.createNode("n00","0.0","0.0",null);
-		Node n02 = network.createNode("n02","0.0","2.0",null);
-		Node n11 = network.createNode("n11","1.0","1.0",null);
-		Node n20 = network.createNode("n20","2.0","0.0",null);
-		Node n22 = network.createNode("n22","2.0","2.0",null);
+		Node n00 = network.createNode(new IdImpl("n00"), new CoordImpl("0.0","0.0"));
+		Node n02 = network.createNode(new IdImpl("n02"), new CoordImpl("0.0","2.0"));
+		Node n11 = network.createNode(new IdImpl("n11"), new CoordImpl("1.0","1.0"));
+		Node n20 = network.createNode(new IdImpl("n20"), new CoordImpl("2.0","0.0"));
+		Node n22 = network.createNode(new IdImpl("n22"), new CoordImpl("2.0","2.0"));
 		network.createLink(new IdImpl("l0011"),n00,n11,2,1,2000,1);
 		network.createLink(new IdImpl("l0211"),n02,n11,2,1,2000,1);
 		network.createLink(new IdImpl("l2011"),n20,n11,2,1,2000,1);

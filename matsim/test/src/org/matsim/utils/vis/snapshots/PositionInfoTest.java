@@ -26,6 +26,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 public class PositionInfoTest extends MatsimTestCase {
@@ -42,8 +43,8 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createWorld().setNetworkLayer(network);
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "1000", "1000", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
 		Gbl.getWorld().complete();
 
@@ -64,8 +65,8 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createWorld().setNetworkLayer(network);
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "1000", "1000", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);
 		Gbl.getWorld().complete();
 

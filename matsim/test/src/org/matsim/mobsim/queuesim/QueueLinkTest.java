@@ -32,6 +32,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.geometry.CoordImpl;
 
 /**
  * @author dgrether
@@ -47,8 +48,8 @@ public class QueueLinkTest extends MatsimTestCase {
 		super.setUp();
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "1", "0", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
 		this.link = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		super.loadConfig(null);
 		this.queueNetwork = new QueueNetwork(network);
@@ -108,9 +109,9 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testBuffer() {
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
-		Node node1 = network.createNode("1", "0", "0", null);
-		Node node2 = network.createNode("2", "1", "0", null);
-		Node node3 = network.createNode("3", "2", "0", null);
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		Gbl.createWorld().setNetworkLayer(network);

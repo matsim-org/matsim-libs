@@ -50,12 +50,12 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		NetworkLayer network = new NetworkLayer();
-		Node node0 = network.createNode("0", "0", "0", null);
-		Node node1 = network.createNode("1", "10", "10", null);
-		Node node2 = network.createNode("2", "90", "10", null);
-		Node node3 = network.createNode("3", "10", "90", null);
-		Node node4 = network.createNode("4", "90", "90", null);
-		Node node5 = network.createNode("5", "100", "100", null);
+		Node node0 = network.createNode(new IdImpl("0"), new CoordImpl(0, 0));
+		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(10, 10));
+		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(90, 10));
+		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(10, 90));
+		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(90, 90));
+		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(100, 100));
 		Link link0 = network.createLink(new IdImpl("0"), node0, node1, 20, 20, 100, 1);
 /*	Link link1=*/network.createLink(new IdImpl("1"), node1, node2, 100, 20, 100, 1);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node4, 100, 20, 100, 1);
