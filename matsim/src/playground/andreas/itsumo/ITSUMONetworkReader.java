@@ -26,7 +26,9 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
+import org.matsim.utils.geometry.CoordImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -134,7 +136,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("network_name")) {
 
 			} else if (lname.equals("node")) {
-				ITSUMONetworkReader.this.network.createNode(this.nodeId, this.xCoord, this.yCoord, null);
+				ITSUMONetworkReader.this.network.createNode(new IdImpl(this.nodeId), new CoordImpl(this.xCoord, this.yCoord));
 			} else if (lname.equals("node_id")) {
 				this.nodeId = content.trim();
 			} else if (lname.equals("x_coord")) {
@@ -145,10 +147,9 @@ public class ITSUMONetworkReader {
 
 			} else if (lname.equals("laneset")) {
 				double length = ITSUMONetworkReader.this.network.getNode(this.lanesetFrom).getCoord().calcDistance(ITSUMONetworkReader.this.network.getNode(this.lanesetTo).getCoord());
-				double capacity = 3600.0; // MR TODO calculate capacity from speed
-				ITSUMONetworkReader.this.network.createLink(this.lanesetId, this.lanesetFrom, this.lanesetTo, Double.toString(length),
-						Double.toString(this.laneSpeed / this.lanesCount), Double.toString(capacity), Integer.toString(this.lanesCount),
-						(String)null, (String)null);
+				double capacity = 3600.0; // TODO calculate capacity from speed
+				network.createLink(new IdImpl(this.lanesetId), network.getNode(this.lanesetFrom), network.getNode(this.lanesetTo),
+						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);
 			} else if (lname.equals("laneset_id")) {
 				this.lanesetId = content.trim();
 			} else if (lname.equals("start_node")) {

@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -129,7 +130,8 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		Node node = this.network.createNode( atts.getValue("id"), atts.getValue("x"), atts.getValue("y"), atts.getValue("type"));
+		Node node = this.network.createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		node.setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			node.setOrigId(atts.getValue("origid"));
 		}

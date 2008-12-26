@@ -1,6 +1,7 @@
 package playground.andreas.intersection.dijkstra;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -27,21 +28,20 @@ public class NetworkWrapper {
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : networkLayer.getLinks().values()) {
-			wrappedNetwork.createNode(link.getId().toString(), String.valueOf(link.getToNode().getCoord().getX()),
-					String.valueOf(link.getToNode().getCoord().getY()), null);
+			wrappedNetwork.createNode(link.getId(), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 
 		for (Node node : networkLayer.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					wrappedNetwork.createLink(String.valueOf(numberOfLinksGenerated),
-							inLink.getId().toString(), outLink.getId().toString(),
-							String.valueOf(outLink.getLength()),
-							String.valueOf(outLink.getFreespeed(Time.UNDEFINED_TIME)),
-							String.valueOf(outLink.getCapacity(Time.UNDEFINED_TIME)),
-							String.valueOf(outLink.getLanes(Time.UNDEFINED_TIME)),
-							String.valueOf(numberOfLinksGenerated), outLink.getType());
+					Link link = wrappedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
+							wrappedNetwork.getNode(inLink.getId()), wrappedNetwork.getNode(outLink.getId().toString()),
+							outLink.getLength(),
+							outLink.getFreespeed(Time.UNDEFINED_TIME),
+							outLink.getCapacity(Time.UNDEFINED_TIME),
+							outLink.getLanes(Time.UNDEFINED_TIME));
+					link.setType(outLink.getType());
 					numberOfLinksGenerated++;
 				}
 			}

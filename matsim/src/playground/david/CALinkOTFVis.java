@@ -24,6 +24,7 @@ import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.utils.collections.QuadTree.Rect;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
@@ -281,8 +282,8 @@ class OTFServerQUADCA extends OTFServerQuad {
 	public OTFServerQUADCA(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		NetworkLayer net = new NetworkLayer();
-		BasicNode node1 = net.createNode("0","0","500","");
-		BasicNode node2 = net.createNode("1",new Integer(CALink.LINKLEN).toString(),"500","");
+		BasicNode node1 = net.createNode(new IdImpl("0"), new CoordImpl(0, 500));
+		BasicNode node2 = net.createNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
 
 		Link lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
 		link = new CALink(lk, null, null);

@@ -53,7 +53,6 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		depTimes.put(event.agentId, event.time);
 	}
 
-	// DS TODO can not see if slot handling is corrupted through int -> double transition MR??
 	public void handleEvent(AgentWait2LinkEvent event) {
 		wait2linkTimes.put(event.agentId, event.time);
 		Double depTime = depTimes.get(event.agentId);

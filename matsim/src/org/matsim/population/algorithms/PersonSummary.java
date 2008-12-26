@@ -82,7 +82,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 			if (person.getCarAvail().equals("always")) { this.caravail_groups[0][0]++; }
 			else if (person.getCarAvail().equals("sometimes")) { this.caravail_groups[0][1]++; }
 			else { this.caravail_groups[0][2]++; }
-			if (person.getEmployed().equals("yes")) { this.employed_groups[0]++; }
+			if (person.isEmployed()) { this.employed_groups[0]++; }
 		}
 		else if (person.getAge() < 18) {
 			this.age_groups[1]++;
@@ -90,7 +90,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 			if (person.getCarAvail().equals("always")) { this.caravail_groups[1][0]++; }
 			else if (person.getCarAvail().equals("sometimes")) { this.caravail_groups[1][1]++; }
 			else { this.caravail_groups[1][2]++; }
-			if (person.getEmployed().equals("yes")) { this.employed_groups[1]++; }
+			if (person.isEmployed()) { this.employed_groups[1]++; }
 		}
 		else if (person.getAge() < 28) {
 			this.age_groups[2]++;
@@ -98,7 +98,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 			if (person.getCarAvail().equals("always")) { this.caravail_groups[2][0]++; }
 			else if (person.getCarAvail().equals("sometimes")) { this.caravail_groups[2][1]++; }
 			else { this.caravail_groups[2][2]++; }
-			if (person.getEmployed().equals("yes")) { this.employed_groups[2]++; }
+			if (person.isEmployed()) { this.employed_groups[2]++; }
 		}
 		else if (person.getAge() < 65) {
 			this.age_groups[3]++;
@@ -106,7 +106,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 			if (person.getCarAvail().equals("always")) { this.caravail_groups[3][0]++; }
 			else if (person.getCarAvail().equals("sometimes")) { this.caravail_groups[3][1]++; }
 			else { this.caravail_groups[3][2]++; }
-			if (person.getEmployed().equals("yes")) { this.employed_groups[3]++; }
+			if (person.isEmployed()) { this.employed_groups[3]++; }
 		}
 		else {
 			this.age_groups[4]++;
@@ -114,18 +114,14 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 			if (person.getCarAvail().equals("always")) { this.caravail_groups[4][0]++; }
 			else if (person.getCarAvail().equals("sometimes")) { this.caravail_groups[4][1]++; }
 			else { this.caravail_groups[4][2]++; }
-			if (person.getEmployed().equals("yes")) { this.employed_groups[4]++; }
+			if (person.isEmployed()) { this.employed_groups[4]++; }
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);
 
-			int acts = 0;
-			for (int j=0; j<plan.getActsLegs().size(); j=j+2) {
-//				Act act = (Act)plan.getActsLegs().get(j);
-				acts++;
-				this.act_cnt++;
-			}
+			int acts = plan.getActsLegs().size() / 2 + 1;
+			this.act_cnt += acts;
 
 			this.av_act_per_plan = this.av_act_per_plan * this.plan_cnt + acts;
 			this.plan_cnt++;

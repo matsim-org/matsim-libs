@@ -24,9 +24,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.algorithms.NetworkAlgorithm;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class NetworkParseETNet extends NetworkAlgorithm {
 
@@ -62,7 +64,7 @@ public class NetworkParseETNet extends NetworkAlgorithm {
 				String[] entries = curr_line.split("\t", -1);
 				// ID  X  Y
 				// 0   1  2
-				network.createNode(entries[0],entries[1],entries[2],null);
+				network.createNode(new IdImpl(entries[0]), new CoordImpl(entries[1],entries[2]));
 			}
 			buffered_reader.close();
 			file_reader.close();
