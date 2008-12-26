@@ -1241,13 +1241,13 @@ public class PtInternalNetwork {
 		}
 
 		for (TempHP pednode : this.pedNodes) {
-			layer.createNode(pednode.getHp_Id(), Double.toString(pednode.getCoord().getX()), Double.toString(pednode.getCoord().getY()), "P");
+			layer.createNode(new IdImpl(pednode.getHp_Id()), pednode.getCoord()).setType("P");
 		}
 
 		for (TempLine line : this.lines.values()) {
 			for (TempHP hp : line.hps) {
 				if(hp.getHb_Id()!=null){
-					layer.createNode(hp.getHp_Id(),Double.toString(hp.getCoord().getX()),Double.toString(hp.getCoord().getY()),null);
+					layer.createNode(new IdImpl(hp.getHp_Id()), hp.getCoord());
 				}
 			}
 			for (TempLink link : line.links) {

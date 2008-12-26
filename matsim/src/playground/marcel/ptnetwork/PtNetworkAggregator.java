@@ -61,9 +61,7 @@ public class PtNetworkAggregator {
 		for (Iterator<? extends Node> iter = ptNetwork.getNodes().values().iterator(); iter.hasNext(); ) {
 			Node ptNode = iter.next();
 			if (PtNetworkLayer.PEDESTRIAN_TYPE.equals(ptNode.getType())) {
-				this.network.createNode(ptNode.getId().toString(),
-						Integer.toString((int) ptNode.getCoord().getX()), Integer.toString((int) ptNode.getCoord().getY()),
-						ptNode.getType());
+				this.network.createNode(ptNode.getId(), ptNode.getCoord()).setType(ptNode.getType());
 			}
 		}
 

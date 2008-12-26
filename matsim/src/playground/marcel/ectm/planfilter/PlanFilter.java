@@ -162,11 +162,11 @@ public class PlanFilter {
 				bigAOI.put(link.getId(),link);
 				Node fromNode = link.getFromNode();
 				if (!subnet.getNodes().containsKey(fromNode.getId())) {
-					subnet.createNode(fromNode.getId().toString(), Double.toString(fromNode.getCoord().getX()), Double.toString(fromNode.getCoord().getY()), fromNode.getType());
+					subnet.createNode(fromNode.getId(), fromNode.getCoord());
 				}
 				Node toNode = link.getToNode();
 				if (!subnet.getNodes().containsKey(toNode.getId())) {
-					subnet.createNode(toNode.getId().toString(), Double.toString(toNode.getCoord().getX()), Double.toString(toNode.getCoord().getY()), toNode.getType());
+					subnet.createNode(toNode.getId(), toNode.getCoord());
 				}
 				subnet.createLink(link.getId(), subnet.getNode(fromNode.getId()), subnet.getNode(toNode.getId()),
 						link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME),

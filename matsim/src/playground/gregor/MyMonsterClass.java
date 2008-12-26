@@ -799,7 +799,7 @@ int three=0;
 		for (Node node : network.getNodes().values()) {
 			if ((node.getCoord().getX() <= maxX) && (node.getCoord().getX() >= minX) )
 				if ((node.getCoord().getY() <= maxY) && (node.getCoord().getY() >= minY) )
-					new_network.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
+					new_network.createNode(node.getId(), node.getCoord()).setType(node.getType());
 		}
 
 		int extracted = 0;
@@ -811,13 +811,13 @@ int three=0;
 					if ((to.getX() <= maxX) && (to.getX() >= minX)) {
 						if ((to.getY() <= maxY) && (to.getY() >= minY)) {
 
-							new_network.createLink(link.getId().toString(),
-									link.getFromNode().getId().toString(), link
-											.getToNode().getId().toString(),
-									Double.toString(link.getLength()),
-									Double.toString(link.getFreespeed(Time.UNDEFINED_TIME)),
-									Double.toString(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)),
-									Integer.toString(link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME)),
+							new_network.createLink(link.getId(),
+									new_network.getNode(link.getFromNode().getId()),
+									new_network.getNode(link.getToNode().getId()),
+									link.getLength(),
+									link.getFreespeed(Time.UNDEFINED_TIME),
+									link.getCapacity(Time.UNDEFINED_TIME),
+									link.getLanesAsInt(Time.UNDEFINED_TIME),
 									link.getOrigId(), link.getType());
 							extracted++;
 							if (extracted % 1000 == 0)
@@ -964,7 +964,7 @@ int three=0;
 		String[] result = line.split(" ", 4);
 		double x = Double.parseDouble(result[1]) * 1000;
 		double y = Double.parseDouble(result[2]) * 1000;
-		network.createNode(result[0], Double.toString(x), Double.toString(y), null);
+		network.createNode(new IdImpl(result[0]), new CoordImpl(x, y));
 	}
 	private static void parseLink(final String line, final NetworkLayer network, final String id) {
 

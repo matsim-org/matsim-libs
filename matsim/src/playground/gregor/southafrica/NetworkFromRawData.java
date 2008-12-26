@@ -36,15 +36,16 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
@@ -180,7 +181,7 @@ public class NetworkFromRawData {
 		if (ele  == 0) {
 			Collection<Node> nodes = this.el1.get(c.x, c.y, CATCH_RADIUS);
 			if (nodes.size() == 0) {
-				node = this.network.createNode(""+this.nodeID++, ""+c.x, ""+c.y, "");
+				node = this.network.createNode(new IdImpl(this.nodeID++), new CoordImpl(c.x, c.y));
 				this.el1.put(c.x, c.y, node);
 			} else {
 				node = this.el1.get(c.x,c.y);
@@ -189,7 +190,7 @@ public class NetworkFromRawData {
 		} else if (ele == 1) {
 			Collection<Node> nodes = this.el2.get(c.x, c.y, CATCH_RADIUS);
 			if (nodes.size() == 0) {
-				node = this.network.createNode(""+this.nodeID++, ""+c.x, ""+c.y, "");
+				node = this.network.createNode(new IdImpl(this.nodeID++), new CoordImpl(c.x, c.y));
 				this.el2.put(c.x, c.y, node);
 			} else {
 				node = this.el2.get(c.x,c.y);
@@ -197,7 +198,7 @@ public class NetworkFromRawData {
 		} else if (ele == 2) {
 			Collection<Node> nodes = this.el3.get(c.x, c.y, CATCH_RADIUS);
 			if (nodes.size() == 0) {
-				node = this.network.createNode(""+this.nodeID++, ""+c.x, ""+c.y, "");
+				node = this.network.createNode(new IdImpl(this.nodeID++), new CoordImpl(c.x, c.y));
 				this.el3.put(c.x, c.y, node);
 			} else {
 				node = this.el3.get(c.x,c.y);

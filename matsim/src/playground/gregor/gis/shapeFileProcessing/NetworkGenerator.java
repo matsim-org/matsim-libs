@@ -22,17 +22,15 @@ package playground.gregor.gis.shapeFileProcessing;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -129,10 +127,10 @@ public class NetworkGenerator {
 	
 	private void processLineString(LineString ls){
 		
-		String from = getNode(ls.getStartPoint());
-		String to  = getNode(ls.getEndPoint());
-		this.network.createLink(Integer.toString(this.linkId++), from, to, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
-		this.network.createLink(Integer.toString(this.linkId++), to, from, Double.toString(ls.getLength()), "1.66", "1.33", "1", "0", null);
+		Node from = this.network.getNode(getNode(ls.getStartPoint()));
+		Node to  = this.network.getNode(getNode(ls.getEndPoint()));
+		this.network.createLink(new IdImpl(this.linkId++), from, to, ls.getLength(), 1.66, 1.33, 1);
+		this.network.createLink(new IdImpl(this.linkId++), to, from, ls.getLength(), 1.66, 1.33, 1);
 	}
 	
 	
@@ -142,7 +140,7 @@ public class NetworkGenerator {
 			throw new RuntimeException("two different nodes on the same location is not allowd!");
 		} 
 		if (tmp.size() == 0) {
-			Node n = network.createNode(Integer.toString(this.nodeId++), Double.toString(p.getX()), Double.toString(p.getY()), "");
+			Node n = network.createNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
 			addNode(n);
 			return n.getId().toString();
 		} else {

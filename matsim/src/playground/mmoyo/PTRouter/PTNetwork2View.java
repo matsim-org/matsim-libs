@@ -40,7 +40,7 @@ public class PTNetwork2View extends NetworkLayer {
 
 	private void addNode(Node node){
 		if (this.getNode(node.getId().toString()) == null) {
-			this.createNode(node.getId().toString(), Double.toString(node.getCoord().getX()), Double.toString(node.getCoord().getY()), node.getType());
+			this.createNode(node.getId(), node.getCoord()).setType(node.getType());
 		}
 	}
 

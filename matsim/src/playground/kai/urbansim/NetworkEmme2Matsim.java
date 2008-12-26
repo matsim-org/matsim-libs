@@ -14,6 +14,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.io.IOUtils;
 
 /**
@@ -66,7 +67,7 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						Node node = network.createNode(idStr,xxStr,yyStr,"unknownType") ;
+						Node node = network.createNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
 						if ( NW_NAME==PSRC ) {
 							node.setOrigId(parts[7]);		
 						}

@@ -120,7 +120,7 @@ public class OSMReader extends MatsimXmlParser {
 				node.used = false;
 			}
 			if (node.used) {
-				network.createNode(Long.toString(node.id), Double.toString(node.coord.getX()), Double.toString(node.coord.getY()), null);
+				network.createNode(new IdImpl(node.id), node.coord);
 			}
 		}
 

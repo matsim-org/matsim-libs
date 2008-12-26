@@ -36,14 +36,15 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -52,7 +53,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
  * NetworkGenerator kann aus einem speziell aufbereiteten *.shp-File von 
- * LineStrings ein MATSim Netzwerk generieren. Insbesondere mŸssen die 
+ * LineStrings ein MATSim Netzwerk generieren. Insbesondere mï¿½ssen die 
  * LineStrings in ihren Attributen fromNode und toNode ID haben. 
  * 
  * @author laemmel
@@ -112,11 +113,11 @@ public class NetworkGenerator {
 			final Coordinate fromC = ls.getStartPoint().getCoordinate();
 			final Coordinate toC = ls.getEndPoint().getCoordinate();
 			if ( this.network.getNode(from.toString()) == null){
-				this.network.createNode(from.toString(),Double.toString(fromC.x), Double.toString(fromC.y), "");
+				this.network.createNode(new IdImpl(from), new CoordImpl(fromC.x, fromC.y));
 			}
 
 			if ( this.network.getNode(to.toString()) == null){
-				this.network.createNode(to.toString(),Double.toString(toC.x), Double.toString(toC.y), "");
+				this.network.createNode(new IdImpl(to), new CoordImpl(toC.x, toC.y));
 			}
 			
 		}

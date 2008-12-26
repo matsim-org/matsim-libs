@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.evacuation.EvacuationAreaFileReader;
 import org.matsim.evacuation.EvacuationAreaLink;
 import org.matsim.evacuation.EvacuationPlansGeneratorAndNetworkTrimmer;
@@ -35,6 +36,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class EvacuationNetGenerator {
 
@@ -67,14 +69,14 @@ public class EvacuationNetGenerator {
 	 */
 	private void createEvacuationLinks(final NetworkLayer network) {
 
-		network.createNode(saveNodeAId, saveAX, saveAY, null);
-		network.createNode(saveNodeBId, saveBX, saveBY, null);
+		Node nodeA = network.createNode(new IdImpl(saveNodeAId), new CoordImpl(saveAX, saveAY));
+		Node nodeB = network.createNode(new IdImpl(saveNodeBId), new CoordImpl(saveBX, saveBY));
 
 		/* TODO [GL] the capacity of the evacuation links should be a very high value but for unknown reason Double.MAX_VALUE
 		 * does not work, may be the better solution will be to implement a method in QueueLink to set the spaceCap to infinity
 		 *anyway, this solution is just a workaround the spaceCap problem should be solved in an other way - gl */
-		final String capacity ="99999999999999999999"; // (new Double (Double.MAX_VALUE)).toString();
-		network.createLink(saveLinkId, saveNodeAId, saveNodeBId, "10", "100000", capacity, "1", null, null);
+		final double capacity = Double.parseDouble("99999999999999999999"); // (new Double (Double.MAX_VALUE)).toString();
+		network.createLink(new IdImpl(saveLinkId), nodeA, nodeB, 10, 100000, capacity, 1);
 
 		int linkId = 1;
 		for (final Node node : network.getNodes().values()) {
@@ -82,7 +84,7 @@ public class EvacuationNetGenerator {
 			if (isSaveNode(node) && !nodeId.equals(saveNodeAId) && !nodeId.equals(saveNodeBId)){
 				linkId++;
 				final String sLinkID = "el" + Integer.toString(linkId);
-				network.createLink(sLinkID, nodeId, saveNodeAId, "10", "100000", capacity, "1", null, null);
+				network.createLink(new IdImpl(sLinkID), node, nodeA, 10, 100000, capacity, 1);
 			}
 		}
 	}

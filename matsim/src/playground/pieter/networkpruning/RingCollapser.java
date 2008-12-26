@@ -1,25 +1,19 @@
 package playground.pieter.networkpruning;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.Node;
-import org.matsim.network.algorithms.NetworkCalcTopoType;
-import org.matsim.network.algorithms.NetworkCleaner;
-import org.matsim.network.algorithms.NetworkMergeDoubleLinks;
 import org.matsim.network.algorithms.NetworkSummary;
 import org.matsim.utils.geometry.Coord;
-
-import sun.reflect.generics.tree.Tree;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class RingCollapser {
 	private NetworkLayer network;
@@ -141,7 +135,7 @@ public class RingCollapser {
 			averageX /= nodeCount;
 			averageY /= nodeCount;
 	//		create centroidNode;
-			Node centroidNode = this.network.createNode("" + ++this.maxNodeId, ""+averageX, ""+averageY,"");
+			Node centroidNode = this.network.createNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
 			return centroidNode;
 		}
 

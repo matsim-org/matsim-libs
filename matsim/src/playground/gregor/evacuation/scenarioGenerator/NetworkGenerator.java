@@ -36,10 +36,12 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
@@ -103,7 +105,7 @@ public class NetworkGenerator {
 		for (final Feature node : this.pn) {
 			final Coordinate c = node.getDefaultGeometry().getGeometryN(0).getCoordinate();
 			final Integer id = (Integer) node.getAttribute(1);
-			this.network.createNode(id.toString(),Double.toString(c.x), Double.toString(c.y), "");
+			this.network.createNode(new IdImpl(id.toString()), new CoordImpl(c.x, c.y));
 		}
 		
 		
@@ -117,11 +119,11 @@ public class NetworkGenerator {
 			final Coordinate fromC = ls.getStartPoint().getCoordinate();
 			final Coordinate toC = ls.getEndPoint().getCoordinate();
 			if ( this.network.getNode(from.toString()) == null){
-				this.network.createNode(from.toString(),Double.toString(fromC.x), Double.toString(fromC.y), "");
+				this.network.createNode(new IdImpl(from.toString()), new CoordImpl(fromC.x, fromC.y));
 			}
 
 			if ( this.network.getNode(to.toString()) == null){
-				this.network.createNode(to.toString(),Double.toString(toC.x), Double.toString(toC.y), "");
+				this.network.createNode(new IdImpl(to.toString()), new CoordImpl(toC.x, toC.y));
 			}
 			
 		}

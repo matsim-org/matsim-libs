@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -43,6 +44,7 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
@@ -90,8 +92,8 @@ public class ExitCountsCreator {
 	 */
 	private void addExitCounts() {
 
-		this.network.createNode(saveNodeAId, saveAX, saveAY, null);
-		this.network.createNode(saveNodeBId, saveBX, saveBY, null);
+		this.network.createNode(new IdImpl(saveNodeAId), new CoordImpl(saveAX, saveAY));
+		this.network.createNode(new IdImpl(saveNodeBId), new CoordImpl(saveBX, saveBY));
 		for (Node node : this.network.getNodes().values()) {
 			String nodeId =  node.getId().toString();
 			if (isSaveNode(node) && !nodeId.equals(saveNodeAId) && !nodeId.equals(saveNodeBId)){
