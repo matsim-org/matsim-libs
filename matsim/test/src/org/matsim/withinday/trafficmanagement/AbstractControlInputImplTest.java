@@ -28,6 +28,7 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.NetworkUtils;
 
 /**
  * @author dgrether
@@ -48,9 +49,9 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		Gbl.getWorld().complete();
 
 		CarRoute route1 = new NodeCarRoute();
-		route1.setNodes("3 6 7 12");
+		route1.setNodes(NetworkUtils.getNodes(network, "3 6 7 12"));
 		CarRoute route2 = new NodeCarRoute();
-		route2.setNodes("3 8 9 12");
+		route2.setNodes(NetworkUtils.getNodes(network, "3 8 9 12"));
 
 		//control input test class
 		ControlInputTestImpl ci = new ControlInputTestImpl();

@@ -37,6 +37,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.utils.NetworkUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -187,12 +188,12 @@ public class CMCFScenarioGeneratorNoReroute {
 			act1.setEndTime(homeEndTime);
 			// leg to home
 			Leg leg = plan.createLeg(BasicLeg.Mode.car);
-			CarRoute route = new NodeCarRoute();
+			CarRoute route = new NodeCarRoute(l1, l6);
 			if (!isAlternativeRouteEnabled) {
-				route.setNodes("2 3 5 6");
+				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l6);
 			}
 			if (isAlternativeRouteEnabled) {
-				route.setNodes("2 3 4 5 6");
+				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
 			}
 			leg.setRoute(route);
 			Act act2 = plan.createAct("h", l6.getCenter());

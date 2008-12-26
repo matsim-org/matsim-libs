@@ -45,6 +45,7 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.world.World;
 
 public class QueueSimulationTest extends MatsimTestCase {
@@ -413,7 +414,7 @@ public class QueueSimulationTest extends MatsimTestCase {
 		a1.setEndTime(8*3600);
 		Leg leg = plan.createLeg(BasicLeg.Mode.car);
 		CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, link1, link5);
-		route.setNodes(nodes);
+		route.setNodes(link1, NetworkUtils.getNodes(network, nodes), link5);
 		leg.setRoute(route);
 		Act a2 = plan.createAct("w", link5);
 		a2.setEndTime(9*3600);

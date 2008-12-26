@@ -37,6 +37,7 @@ import org.matsim.population.PopulationWriter;
 import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -68,8 +69,9 @@ public class Plansgenerator {
 		init();
 		this.plans = new Population(false);
 		int homeEndtime = 6 * 3600;
-		final Link link1 = ((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE)).getLink(new IdImpl("1"));
-		final Link link20 = ((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE)).getLink(new IdImpl("20"));
+		NetworkLayer networkLayer = (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
+		final Link link1 = networkLayer.getLink(new IdImpl("1"));
+		final Link link20 = networkLayer.getLink(new IdImpl("20"));
 		final Coord homeCoord = new CoordImpl(-25000, 0);
 		final Coord workCoord = new CoordImpl(10000, 0);
 		for (int i = 1; i <= 100; i++) {
@@ -83,8 +85,8 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			Leg leg = plan.createLeg(Mode.car);
-			CarRoute route = new NodeCarRoute();
-			route.setNodes("2 4 5");
+			CarRoute route = new NodeCarRoute(link1, link20);
+			route.setNodes(link1, NetworkUtils.getNodes(networkLayer, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
 			a = plan.createAct("w", workCoord);
@@ -92,8 +94,8 @@ public class Plansgenerator {
 			a.setDuration(2.5 * 3600);
 			//leg to work
 			leg = plan.createLeg(Mode.car);
-			route = new NodeCarRoute();
-			route.setNodes("13 14 15 1");
+			route = new NodeCarRoute(link20, link1);
+			route.setNodes(link20, NetworkUtils.getNodes(networkLayer, "13 14 15 1"), link1);
 			leg.setRoute(route);
 			a = plan.createAct("h", homeCoord);
 			a.setLink(link1);

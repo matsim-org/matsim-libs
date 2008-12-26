@@ -36,6 +36,7 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**
@@ -82,7 +83,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		leg.setRoute(route);
 
 		// prepare route
-		route.setNodes("1 2 4");
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 4"), link5);
 
 		// prepare area of interest
 		HashMap<Id, Link> aoi = new HashMap<Id, Link>();

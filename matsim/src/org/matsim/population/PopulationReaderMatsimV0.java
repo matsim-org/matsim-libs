@@ -31,6 +31,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -63,7 +64,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private CarRoute currroute = null;
 
 	private Act prevAct = null;
-	private CarRoute prevRoute = null;
+	private String routeNodes = null;
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
@@ -101,9 +102,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		} else if (LEG.equals(name)) {
 			this.currleg = null;
 		} else if (ROUTE.equals(name)) {
-			this.currroute.setNodes(content);
-			this.prevRoute = this.currroute;
-			this.currroute = null;
+			this.routeNodes = content;
 		}
 	}
 
@@ -142,7 +141,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.currplan = this.currperson.createPlan(selected);
-		this.prevRoute = null;
+		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {
@@ -156,11 +155,14 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 		if (atts.getValue("zone") != null) {
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
-		this.prevAct = this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
+		Act act = this.currplan.createAct(atts.getValue("type"), atts.getValue("x100"), atts.getValue("y100"), atts.getValue("link"),
 				atts.getValue("start_time"), atts.getValue("end_time"), atts.getValue("dur"), atts.getValue("primary"));
-		if (this.prevRoute != null) {
-			this.prevRoute.setEndLink(this.prevAct.getLink());
+		if (this.routeNodes != null) {
+			this.currroute.setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeNodes), act.getLink());
+			this.routeNodes = null;
+			this.currroute = null;
 		}
+		this.prevAct = act;
 	}
 
 	private void startLeg(final Attributes atts) {
@@ -171,9 +173,8 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute() {
-		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car);
+		this.currroute = (CarRoute) this.network.getFactory().createRoute(BasicLeg.Mode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
-		this.currroute.setStartLink(this.prevAct.getLink());
 	}
 
 }

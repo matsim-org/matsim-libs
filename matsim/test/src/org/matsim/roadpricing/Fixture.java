@@ -38,6 +38,7 @@ import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
@@ -176,7 +177,7 @@ public class Fixture {
 		plan.createAct("h", homeLink).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createLeg(Mode.car);//"car", startTime, "00:01", null);
 		CarRoute route = new NodeCarRoute(homeLink, workLink);
-		route.setNodes(routeNodes);
+		route.setNodes(homeLink, NetworkUtils.getNodes((NetworkLayer) homeLink.getLayer(), routeNodes), workLink);
 		leg.setRoute(route);
 		plan.createAct("w", workLink);//, null, "24:00", null, "yes");
 		return person;

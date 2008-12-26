@@ -31,7 +31,7 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.StringUtils;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**
@@ -49,11 +49,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 
 	public void testSetNodes_asList() {
 		NetworkLayer network = createTestNetwork();
-		List<Node> nodes = new ArrayList<Node>();
-		nodes.add(network.getNode(new IdImpl("12")));
-		nodes.add(network.getNode(new IdImpl("13")));
-		nodes.add(network.getNode(new IdImpl("3")));
-		nodes.add(network.getNode(new IdImpl("4")));
+		List<Node> nodes = NetworkUtils.getNodes(network, "12 13 3 4");
 		final Link link11 = network.getLink(new IdImpl("11"));
 		final Link link4 = network.getLink(new IdImpl("4"));
 		CarRoute route = getCarRouteInstance(link11, link4);
@@ -92,12 +88,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 
 	public void testSetLinks() {
 		NetworkLayer network = createTestNetwork();
-		List<Link> links = new ArrayList<Link>();
-		links.add(network.getLink(new IdImpl("-22")));
-		links.add(network.getLink(new IdImpl("2")));
-		links.add(network.getLink(new IdImpl("3")));
-		links.add(network.getLink(new IdImpl("24")));
-		links.add(network.getLink(new IdImpl("14")));
+		List<Link> links = NetworkUtils.getLinks(network, "-22 2 3 24 14");
 		final Link link11 = network.getLink(new IdImpl("11"));
 		final Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link11, link15);
@@ -118,7 +109,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
 		CarRoute route = getCarRouteInstance(link1, link4);
-		route.setNodes(link1, getNodesFromString(network, "2 12 13 3 4"), link4);
+		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		List<Node> nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 5, nodes.size());
 
@@ -164,7 +155,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
 		CarRoute route = getCarRouteInstance(link1, link4);
-		route.setNodes(link1, getNodesFromString(network, "2 12 13 3 4"), link4);
+		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		
 		assertEquals("different distance calculated.", 4000.0, route.getDist(), EPSILON);
 	}
@@ -174,7 +165,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
 		CarRoute route = getCarRouteInstance(link1, link4);
-		route.setNodes(link1, getNodesFromString(network, "2 12 13 3 4"), link4);
+		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 
 		List<Id> ids = route.getLinkIds();
 		assertEquals("number of links in route.", 4, ids.size());
@@ -189,7 +180,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		CarRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("12")), network.getNode(new IdImpl("4")));
 		List<Node> nodes = subRoute.getNodes();
@@ -212,7 +203,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		CarRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("1")), network.getNode(new IdImpl("3")));
 		List<Node> nodes = subRoute.getNodes();
@@ -237,7 +228,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		CarRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("4")), network.getNode(new IdImpl("15")));
 		List<Node> nodes = subRoute.getNodes();
@@ -258,7 +249,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link1, link15);
-		route.setNodes(link1, getNodesFromString(network, "2 12 13 3 4 14 15"), link15);
+		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4 14 15"), link15);
 
 		Node node2 = network.getNode(new IdImpl("2"));
 		CarRoute subRoute = route.getSubRoute(node2, node2);
@@ -276,7 +267,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		Node node15 = network.getNode(new IdImpl("15"));
 		CarRoute subRoute = route.getSubRoute(node15, node15);
@@ -294,7 +285,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
 			route.getSubRoute(
@@ -311,7 +302,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
 			route.getSubRoute(
@@ -328,7 +319,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
 		CarRoute route = getCarRouteInstance(link0, link15);
-		route.setNodes(link0, getNodesFromString(network, "1 2 12 13 3 4 14 15"), link15);
+		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		Node node = network.getNode(new IdImpl("3"));
 		CarRoute subRoute = route.getSubRoute(node, node);
@@ -346,7 +337,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link11 = network.getLink(new IdImpl("11"));
 		Link link12 = network.getLink(new IdImpl("12"));
 		CarRoute route = getCarRouteInstance(link11, link12);
-		route.setNodes(link11, getNodesFromString(network, "12"), link12);
+		route.setNodes(link11, NetworkUtils.getNodes(network, "12"), link12);
 
 		Node node = network.getNode(new IdImpl("12"));
 		CarRoute subRoute = route.getSubRoute(node, node);
@@ -382,7 +373,7 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		Link link12 = network.getLink(new IdImpl("12"));
 		Link link13 = network.getLink(new IdImpl("13"));
 		CarRoute route = getCarRouteInstance(link12, link13);
-		route.setNodes(link12, getNodesFromString(network, "13"), link13);
+		route.setNodes(link12, NetworkUtils.getNodes(network, "13"), link13);
 		assertEquals(1, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
 	}
@@ -445,12 +436,4 @@ public abstract class AbstractCarRouteTest extends MatsimTestCase {
 		return network;
 	}
 	
-	private List<Node> getNodesFromString(final NetworkLayer network, final String nodes) {
-		List<Node> nodesList = new ArrayList<Node>();
-		for (String node : StringUtils.explode(nodes, ' ')) {
-			nodesList.add(network.getNode(node));
-		}
-		return nodesList;
-	}
-
 }
