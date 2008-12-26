@@ -84,7 +84,9 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 
 
 	/** Usage of this method is discouraged, as the method will soon be deprecated. */
+	@Deprecated
 	public final Node createNode(final String id, final String x, final String y, final String type) {
+		// TODO [MR] delete this method. no more usages as of 26dec2008
 		return createNode(new IdImpl(id), new CoordImpl(x, y), type);
 	}
 
