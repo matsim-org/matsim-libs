@@ -58,7 +58,6 @@ public class OutputDelegate {
 	private final List<Section> sections_;
 	private final List<CountsGraph> cg_list_;
 	private String iterPath_;
-	private String projectName_ = "PROJECT NAME";
 
 	public OutputDelegate(final String iterPath) {
 		this.iterPath_ = iterPath;
@@ -78,14 +77,9 @@ public class OutputDelegate {
 		this.iterPath_ = iterPath;
 	}
 
-	public void setProjectName(final String projectName) {
-		this.projectName_ = projectName;
-	}
-
 	public List<CountsGraph> getGraphs() {
 		return this.cg_list_;
 	}
-
 
 	public void outPutAll(final boolean htmlset, final boolean pdfset){
 		if (htmlset) {
@@ -195,7 +189,6 @@ public class OutputDelegate {
 			writer.println("<img src=\"div/logo.png\" width=\"224\" height=\"52\" style=\"border:none;\" alt=\"logo\"/><br/>Multi-Agent Transport Simulation Toolkit");
 			writer.println("</div>");
 			writer.println("<h3>Counting Volumes</h3>");
-			writer.println("<h2>"+this.projectName_+"</h2>");
 			writer.println("</div>");
 
 			writer.println("<div id=\"footer\">");

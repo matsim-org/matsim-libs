@@ -35,16 +35,12 @@ public class CountsGraphWriter {
 	private String iter_path_;
 	private List<CountSimComparison> ccl_;
 	private int iteration_;
-	private boolean pdfset_=true;
-	private boolean htmlset_=true;
+	private final boolean pdfset_;
+	private final boolean htmlset_;
 	private OutputDelegate outputDelegate_;
-	private String projectName_="PROJECT X";
 	private List<CountsGraphsCreator> graphsCreators;
 
 	private static final Logger log = Logger.getLogger(CountsGraphWriter.class);
-
-	public CountsGraphWriter() {
-	}
 
 	public CountsGraphWriter(final String iter_path, final List<CountSimComparison> ccl, final int iteration, final boolean htmlset,final boolean pdfset) {
 		this.iter_path_=iter_path+"/graphs/";
@@ -62,20 +58,8 @@ public class CountsGraphWriter {
 		this.graphsCreators=new Vector<CountsGraphsCreator>();
 	}
 
-	public void setPDFOutput(final boolean pdfset) {
-		this.pdfset_=pdfset;
-	}
-
-	public void setHTMLOutput(final boolean htmlset) {
-		this.htmlset_=htmlset;
-	}
-
 	public OutputDelegate getOutput() {
 		return this.outputDelegate_;
-	}
-
-	public void setProjectName(final String projectName) {
-		this.projectName_=projectName;
 	}
 
 	public void setGraphsCreator(final CountsGraphsCreator graphsCreator) {
@@ -84,8 +68,6 @@ public class CountsGraphWriter {
 
 	public void createGraphs() {
 		log.info("Creating graphs");
-		this.outputDelegate_.setProjectName(this.projectName_);
-
 
 		Iterator<CountsGraphsCreator> cgc_it = this.graphsCreators.iterator();
 		while (cgc_it.hasNext()) {
