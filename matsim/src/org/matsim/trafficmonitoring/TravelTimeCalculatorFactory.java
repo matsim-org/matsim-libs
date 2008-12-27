@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,10 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.network.Link;
 
-
-
 public class TravelTimeCalculatorFactory {
-
 	
 	private Constructor<? extends TravelTimeRole> prototypeContructorTravelTimeRole;
 	private static final Class[] PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE = {Link.class, int.class};
@@ -41,18 +38,18 @@ public class TravelTimeCalculatorFactory {
 			this.prototypeContructorTravelTimeRole = TravelTimeRoleArray.class
 			.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEROLE);
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		
 		try {
 			this.prototypeContructorTravelTimeAggregator = OptimisticTravelTimeAggregator.class
 			.getConstructor(PROTOTYPECONSTRUCTOR_TRAVELTIMEAGGREGATOR);
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -68,9 +65,9 @@ public class TravelTimeCalculatorFactory {
 						"Wrong prototype constructor!");
 			}
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -86,57 +83,41 @@ public class TravelTimeCalculatorFactory {
 						"Wrong prototype constructor!");				
 			}
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
 	public AbstractTravelTimeAggregator createTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
 		AbstractTravelTimeAggregator ret;
-		Exception ex;
 		try {
 			ret = this.prototypeContructorTravelTimeAggregator.newInstance(new Object[] {numSlots, travelTimeBinSize});
 			return ret;
 		} catch (InstantiationException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		}
-		throw new RuntimeException(
-				"Cannot instantiate link from prototype, this should never happen, but never say never!",
-				ex);
 	}
 	
 	public TravelTimeRole createTravelTimeRole(Link link, int numSlots) {
 		TravelTimeRole ret;
-		Exception ex;
 		try {
 			ret = this.prototypeContructorTravelTimeRole.newInstance(new Object[] {link, numSlots});
 			return ret;
 		} catch (InstantiationException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			ex = e;
+			throw new RuntimeException(e);
 		}
-		throw new RuntimeException(
-				"Cannot instantiate link from prototype, this should never happen, but never say never!",
-				ex);
 	}
 }
