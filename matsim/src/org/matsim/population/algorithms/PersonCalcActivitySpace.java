@@ -360,7 +360,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	// test run for checking ellipse act spaces
-	// TODO: when the others (i.e. cassini) are also done,
+	// _TODO: when the others (i.e. cassini) are also done,
 	// generalize it, define params, and make the code nicer. balmermi
 //	private void runEllipse(Person person, ArrayList<Coord> coords) {
 //		final Knowledge know = person.getKnowledge();
@@ -536,7 +536,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 //		act_space.addParams(params);
 //	}
 //
-//	// TODO: checking the cassini. balmermi
+//	// _TODO: checking the cassini. balmermi
 //	private void runCassini(Person person) {
 //		final Knowledge know = person.getKnowledge();
 //		if (know == null) {
