@@ -37,7 +37,6 @@ public class NodeData {
 	private int iterationID;
 	private double trace;
 	private NodeData prev = null;
-	private boolean isHead;
 	private final boolean isShadow;
 	private final HashMap<Integer,NodeData> shadowNodes;
 	private int shadowID = Integer.MIN_VALUE;
@@ -86,11 +85,7 @@ public class NodeData {
 	public double getTrace() {
 		return this.trace;
 	}
-	
-	public boolean isHead() {
-		return this.isHead;
-	}
-	
+
 	public boolean isShadow() {
 		return this.isShadow;
 	}
@@ -111,9 +106,6 @@ public class NodeData {
 	//////////////////////////////////////////////////////////////////////
 	// setter
 	//////////////////////////////////////////////////////////////////////
-	public void setHead(final boolean isHead) {
-		this.isHead = isHead;
-	}
 
 	public void addShadow(final NodeData shadow) {
 		this.shadowNodes.put(shadow.getShadowID(), shadow);
@@ -127,11 +119,6 @@ public class NodeData {
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
-	
-	public NodeData drawNode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	public void visitInitNode(final double startTime, final int iterationID) {
 		this.cost = 0;
@@ -155,7 +142,6 @@ public class NodeData {
 		this.iterationID = iterationID;
 		this.trace = trace;
 		this.prev = fromNodeData;
-		this.isHead = true;
 		this.fromMatSimNode = fromNodeData.getMatsimNode();
 	}
 	
@@ -217,30 +203,5 @@ public class NodeData {
 			return node.getCost();
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

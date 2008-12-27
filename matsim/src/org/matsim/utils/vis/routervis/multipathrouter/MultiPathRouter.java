@@ -205,8 +205,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 
 		final double currTime = outNodeD.getTime();
 		final double currCost = outNodeD.getCost();
-		
-		outNodeD.setHead(false);
 
 		for (final Link l : outNodeD.getMatsimNode().getOutLinks().values()) {
 			final Node n = l.getToNode();
@@ -233,8 +231,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	private void relaxShadowNode(final NodeData outNodeD,final PriorityQueue<NodeData> pendingNodes) {
 		final double currTime = outNodeD.getTime();
 		final double currCost = outNodeD.getCost();
-		
-		outNodeD.setHead(false);
 
 		for (final Link l : outNodeD.getMatsimNode().getOutLinks().values()) {
 			final Node n = l.getToNode();
@@ -248,9 +244,6 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		}		
 		
 	}
-	
-
-
 
 	/**
 	 * Adds some parameters to the given Node then adds it to the set of pending
