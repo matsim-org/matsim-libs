@@ -71,6 +71,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
 import org.matsim.utils.collections.QuadTree;
@@ -253,6 +254,9 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 
 }
 public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
+	
+	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
+	
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
 	//private static float scaledAgentSize = 10.f;
@@ -508,7 +512,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 		this.gl.glNewList(this.netDisplList, GL.GL_COMPILE);
 
-		System.out.print("DRAWING NET ONCE: objects count: " + this.netItems.size() );
+		log.info("DRAWING NET ONCE: objects count: " + this.netItems.size() );
 		OTFGLDrawableImpl.gl = this.gl;
 		for (OTFGLDrawable item : this.netItems) {
 			item.draw();
@@ -525,7 +529,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			item.draw();
 		}
 		this.gl.glEndList();
-		//System.out.println("CLIENT DRAWER DRAWED  == " + netItems.size()  +"objects time");
+		//log.info("CLIENT DRAWER DRAWED  == " + netItems.size()  +"objects time");
 	}
 
 
@@ -662,11 +666,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
 		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
-		int test = this.gl.glGetError();
-		System.out.println("GLerror = " + test);
+		//int test = this.gl.glGetError();
+		//log.info("GLerror = " + test);
 		//TextureIO.newTexture(new TextureData(GL.GL_RGBA, size,size,0,GL.GL_RGBA8,GL.GL_INT,false,false,true,IntBuffer.wrap(buffer),null));
-		test = this.gl.glGetError();
-		System.out.println("GLerror = " + test);
+		//test = this.gl.glGetError();
+		//log.info("GLerror = " + test);
 
 		// create two new lists
 		this.netDisplList = this.gl.glGenLists(1);
@@ -873,7 +877,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 				}
 			}
-			//			System.out.println("Scale: " + scaledAgentSize + " Invalidate : " );
+			//			log.info("Scale: " + scaledAgentSize + " Invalidate : " );
 			//			Gbl.printElapsedTime();
 		}
 		// Todo put drawing to displyLists here and in
@@ -923,7 +927,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		} catch (IOException e) {
-			System.err.println("Error loading " + filename); // TODO switch to Log4J, include exception-message to output
+			log.error("Error loading " + filename, e);
 		}
 		return t;
 	}
@@ -935,7 +939,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		} catch (IOException e) {
-			System.err.println("Error loading Texture from stream: " + e.getMessage());
+			log.error("Error loading Texture from stream", e);
 		}
 		return t;
 	}
