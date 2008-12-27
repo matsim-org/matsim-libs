@@ -198,47 +198,6 @@ public class Plan extends BasicPlanImpl {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Loops through all acts and updates their start-, endtime and duration according to the
-	 * departure and arrival times in the legs between the acts
-	 */
-	public final void setActTimesFromLegTimes() {
-		Act act1 = (Act)this.actsLegs.get(0);
-		Act act2 = null;
-
-		// the end time of act1 must be defined by definition, so take it as given
-		if (act1.getStartTime() == Time.UNDEFINED_TIME) {
-			act1.setStartTime(0);
-			act1.setDuration(act1.getEndTime());
-		} else {
-			act1.setDuration(act1.getEndTime() - act1.getStartTime());
-		}
-
-		for (int i = 2; i < this.actsLegs.size(); i = i+2) {
-			act2 = (Act)this.actsLegs.get(i);
-			Leg leg = (Leg)this.actsLegs.get(i-1);
-			act1.setEndTime(leg.getDepartureTime());
-			act2.setStartTime(leg.getArrivalTime());
-			act1.setDuration(act1.getEndTime() - act1.getStartTime());
-			act1 = act2;
-		}
-
-		double endTime = act1.getEndTime();
-		if ((endTime == Time.UNDEFINED_TIME) || (endTime < act1.getStartTime())) {
-			double duration = act1.getDuration();
-			if (duration == Time.UNDEFINED_TIME) {
-				// there was no planned duration
-				if (act1.getStartTime() < 24*3600) {	// TODO replace `24' with something like sim-duration
-					duration = 24*3600 - act1.getStartTime();	// the last act lasts until midnight
-				} else {
-					duration = 3600;	// midnight is already over, just make the duration one hour long
-				}
-			}
-			act1.setEndTime(act1.getStartTime() + duration);
-			act1.setDuration(duration);
-		}
-	}
-
 	public void setPerson(final Person person) {
 		this.person = person;
 	}
