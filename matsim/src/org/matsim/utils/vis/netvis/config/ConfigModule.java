@@ -53,7 +53,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     private final String moduleName;
 
-    private File rootFile;
+//    private File rootFile;
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -67,7 +67,7 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     public ConfigModule(String moduleName) {
         this.moduleName = moduleName;
-        this.rootFile = null;
+//        this.rootFile = null;
 //        completeCache();
     }
 
@@ -130,9 +130,9 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
             File file = new File(value);
             if (file.isAbsolute()) {
                 return file.getPath();
-            } else if (rootFile != null) {
-                return rootFile + File.separator + value;
-            } else
+//            } else if (rootFile != null) {
+//                return rootFile + File.separator + value;
+            } //else
                 return value;
         }
         return null;
