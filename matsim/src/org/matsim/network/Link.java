@@ -8,8 +8,6 @@ public interface Link extends BasicLink, Location {
 
 	public double calcDistance(final Coord coord);
 
-	// DS TODO try to remove these and update references
-	// (for the time being, they are here because otherwise the returned type is wrong. kai)
 	public Node getFromNode();
 
 	public Node getToNode();

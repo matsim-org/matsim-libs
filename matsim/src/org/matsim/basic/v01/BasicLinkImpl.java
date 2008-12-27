@@ -38,7 +38,7 @@ implements BasicLink
 	protected double length = Double.NaN;
 	protected double freespeed = Double.NaN;
 	protected double capacity = Double.NaN;
-	protected double permlanes = Double.NaN;
+	protected double nofLanes = Double.NaN;
 
 	// TODO [balmermi] A link exists only iff a to- and a from node is defined.
 	// Furthermore: Since a BasicLink is a location, and a location is a geographic
@@ -117,18 +117,16 @@ implements BasicLink
 		this.length = length;
 	}
 
-	//TODO permlanes should be refectored to lanes or getLanes() and so on to getPermLanes() [GL]
-
 	public double getLanes(final double time) {
-		return this.permlanes;
+		return this.nofLanes;
 	}
 
 	public int getLanesAsInt(final double time) {
-		return Math.round((float)Math.max(this.permlanes,1.0d));
+		return Math.round((float)Math.max(this.nofLanes,1.0d));
 	}
 
 	public void setLanes(final double lanes) {
-		this.permlanes = lanes;
+		this.nofLanes = lanes;
 	}
 
 	public LocationType getLocationType() {

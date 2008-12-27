@@ -58,7 +58,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		super.length = length;
 		super.freespeed = freespeed;
 		super.capacity = capacity;
-		super.permlanes = lanes;
+		super.nofLanes = lanes;
 
 		this.freespeedTravelTime = length / freespeed;
 		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
@@ -79,9 +79,9 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 			cpWarnCnt++ ;
 			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]"); 
 		}
-		if (this.permlanes < 1 && plWarnCnt <= 0 ) { 
+		if (this.nofLanes < 1 && plWarnCnt <= 0 ) { 
 			plWarnCnt++ ;
-			log.warn("[permlanes="+this.permlanes+" may cause problems. Future occurences of this warning are suppressed.]"); 
+			log.warn("[permlanes="+this.nofLanes+" may cause problems. Future occurences of this warning are suppressed.]"); 
 		}
 	}
 
@@ -175,7 +175,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		"[length=" + this.length + "]" +
 		"[freespeed=" + this.freespeed + "]" +
 		"[capacity=" + this.capacity + "]" +
-		"[permlanes=" + this.permlanes + "]" +
+		"[permlanes=" + this.nofLanes + "]" +
 		"[origid=" + this.origid + "]" +
 		"[type=" + this.type + "]";
 	}

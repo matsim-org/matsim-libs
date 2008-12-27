@@ -295,7 +295,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		this.aLanesTimes = new double [this.aLanesEvents];
 		this.aLanesValues = new double [this.aLanesEvents];
 		this.aLanesTimes[0] = Double.NEGATIVE_INFINITY;
-		this.aLanesValues[0] = this.permlanes;
+		this.aLanesValues[0] = this.nofLanes;
 
 		int numEvent = 0;
 		if (this.changeEvents != null) {
