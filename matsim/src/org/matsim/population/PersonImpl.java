@@ -71,24 +71,22 @@ public class PersonImpl implements Person{
 		return this.selectedPlan;
 	}
 
-	/**
-	 * @see org.matsim.population.Person#setSelectedPlan(T)
-	 */
 	public void setSelectedPlan(final Plan selectedPlan) {
 		if (delegate.getPlans().contains(selectedPlan)) {
 			this.selectedPlan = selectedPlan;
-		}
-		//FIXME dg nov 08: we should think about the following: the
+			
+		//_FIXME dg nov 08: we should think about the following: the
 		//methods comment states that nothing is changed if the plan
 		//is not contained in the db, however from my point of view
 		//this could be reason for bugs -> Exception???
-		//
-//		else {
-//			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
-//		}
+
+		// I like the idea. I thus enabled the code you wrote below. mr/27dec2008
+
+		} else if (selectedPlan != null) {
+			throw new IllegalStateException("The plan to be set as selected is not stored in the person's plans");
+		}
 	}
-	
-	
+
 	public Plan createPlan(final boolean selected) {
 		Plan p = new Plan(this);
 		this.delegate.getPlans().add(p);
@@ -370,7 +368,5 @@ public class PersonImpl implements Person{
 	public void setKnowledge(Knowledge knowledge) {
 		((BasicPersonImpl)this.delegate).setKnowledge(knowledge);
 	}
-
-
 
 }
