@@ -62,7 +62,7 @@ public class NetworkMergeDoubleLinks {
 			double fs = Math.max(link1.getFreespeed(Time.UNDEFINED_TIME),link2.getFreespeed(Time.UNDEFINED_TIME));
 			int lanes = link1.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + link2.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 			double length = Math.max(link1.getLength(),link2.getLength());
-			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
+//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
 			link1.setCapacity(cap);
 			link1.setFreespeed(fs);
 			link1.setLanes(lanes);

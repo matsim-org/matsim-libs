@@ -359,7 +359,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		List<Link> routeLinks = route.getLinks();
 		double ttFreeSpeedPart = 0.0;
 		int agentsToQueueAtBottleNeck = 0;
-		boolean guidanceObjectWillQueue = false;
+//		boolean guidanceObjectWillQueue = false;
 		Link currentBottleNeck = bottleNeck;
 		double currentBottleNeckCapacity = 0;
 		double ttFreeSpeedBeforeBottleNeck = 0;
@@ -439,7 +439,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 					}
 
 					if ((agentsUpToLink / currentBottleNeckCapacity) >= freeSpeedUpToLink) {
-						guidanceObjectWillQueue = true;
+//						guidanceObjectWillQueue = true;
 						currentBottleNeck = link;
 						agentsToQueueAtBottleNeck = agentsUpToLink;
 						// log.debug("Distribution check: Critical link. All agents on link

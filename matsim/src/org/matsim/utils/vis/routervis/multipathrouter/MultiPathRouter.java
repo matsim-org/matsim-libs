@@ -185,22 +185,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 		//TODO [gl] DEBUG
 		colorizePaths(toNodes,fromNode);
 		
-		if (true)    // that's a joke, isn't it? // marcel,2008nov28, please also read the note/todo below
-		return null;
-		
-		final ArrayList<Node> routeNodes = new ArrayList<Node>();
-		NodeData tmpNode = getData(toNode);
-		final double cost  = 0;
-		while (tmpNode.getId() != fromNode.getId()) {
-			routeNodes.add(0, tmpNode.getMatsimNode());
-			tmpNode = tmpNode.drawNode();
-
-		}
-		routeNodes.add(0, tmpNode.getMatsimNode()); // add the fromNode at the beginning of the list
-
-		final Path path = new Path(routeNodes, null, (int) (arrivalTime - startTime), cost); // TODO [MR] collect links; I will fix that once that "if (true)" above is fixed.
-
-		return path;
+		return null; // just visualization, no need to return the route
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -210,7 +195,7 @@ abstract class MultiPathRouter implements VisLeastCostPathCalculator{
 	 * Expands the given Node in the routing algorithm; may be overridden in
 	 * sub-classes.
 	 *
-	 * @param outNode
+	 * @param outNodeD
 	 *            The NodeData to be expanded.
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.

@@ -59,7 +59,7 @@ public class CetinCompatibleLegTravelTimeEstimator extends FixedRouteLegTravelTi
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			Act actOrigin, Act actDestination, Leg legIntermediate) {
 
-		double legTravelTimeEstimation = Double.MIN_VALUE;
+		double legTravelTimeEstimation;
 		
 		if (legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
 

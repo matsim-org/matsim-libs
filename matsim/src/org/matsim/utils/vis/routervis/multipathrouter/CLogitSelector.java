@@ -39,9 +39,9 @@ public class CLogitSelector extends LogitSelector {
 				final String key = curr.getPrev().getId().toString() + " " + curr.getId().toString();
 				final LogitLink l = this.pathTree.get(key);
 				CF_k += l.numPaths * l.cost / toNode.getCost();
-				if (Double.isNaN(CF_k)) {
-					int i=0; i++;
-				}
+//				if (Double.isNaN(CF_k)) {
+//					int i=0; i++;
+//				}
 				curr = curr.getPrev();
 			} while (curr.getPrev() != null);
 			CF_k = -BETA * Math.log(CF_k);

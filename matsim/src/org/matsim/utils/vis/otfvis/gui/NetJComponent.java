@@ -88,7 +88,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 		private float scale = 1.f;
 		public MyNetVisScrollPane(NetJComponent networkComponent) {
 			super(networkComponent);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -124,8 +123,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
     private double viewMinX, viewMinY, viewMaxX, viewMaxY;
 
 	private final OTFClientQuad quad;
-
-	private final JFrame frame;
 
 	private transient SceneGraph sceneGraph;
 	private MyNetVisScrollPane networkScrollPane = null;
@@ -179,7 +176,6 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 
     public NetJComponent(JFrame frame, OTFClientQuad quad) {
         this.quad = quad;
-        this.frame = frame;
  
         // calculate size of frame
 
@@ -509,7 +505,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 				if ((currentRect.getHeight() > 10)
 						&& (currentRect.getWidth() > 10)) {
 					float scale =  networkScrollPane.getScale();
-					scale = networkScrollPane.scaleNetwork(currentRect,scale);
+					/*scale = */networkScrollPane.scaleNetwork(currentRect,scale);
 				} else {
 					// try to find agent under mouse
 					// calc mouse pos to component pos

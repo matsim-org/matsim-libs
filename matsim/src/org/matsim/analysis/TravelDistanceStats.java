@@ -57,7 +57,7 @@ import org.matsim.utils.io.IOUtils;
  */
 
 /*
- * TODO: This is copy-paste based on "ScoreStats". Refactoring needed!
+ * TODO: [AH] This is copy-paste based on "ScoreStats". Refactoring needed!
  */
 public class TravelDistanceStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
@@ -113,8 +113,6 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		int nofLegTravelDistanceBest = 0;
 		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
-		int nofExecutedIvPlans = 0;
-		int nofExecutedOevPlans = 0;
 
 		for (Person person : this.population.getPersons().values()) {
 			Plan worstPlan = null;
@@ -144,12 +142,6 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 				if (plan.isSelected()) {
 					sumLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
 					nofLegTravelDistanceExecuted++;
-					if (plan.getType() == Plan.Type.CAR) {
-						nofExecutedIvPlans ++;
-					}
-					else if (plan.getType() == Plan.Type.PT) {
-						nofExecutedOevPlans++;
-					}
 				}
 			}
 
@@ -241,9 +233,8 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		}
 		if (numberOfLegs>0) {
 			return planTravelDistance/numberOfLegs;
-		} else {
-			return 0.0;
 		}
+		return 0.0;
 	}
 
 }

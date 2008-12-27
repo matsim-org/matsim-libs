@@ -51,9 +51,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 		this.quad.addAdditionalElement(this.writer);
 	}
 
-	private int cntPositions = 0;
 	private double lastTime = -1;
-	private int cntTimesteps = 0;
 
 	private void convert() {
 
@@ -100,13 +98,11 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 	}
 
 	private void addVehicle(double time, ExtendedPositionInfo position) {
-		this.cntPositions++;
 
 		// Init lastTime with first occurence of time!
 		if (this.lastTime == -1) this.lastTime = time;
 
 		if (time != this.lastTime) {
-			this.cntTimesteps++;
 
 			if (time % 600 == 0 ) {
 				System.out.println("Parsing T = " + time + " secs");
@@ -119,7 +115,6 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 					dump((int)this.lastTime);
 					this.writer.positions.clear();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			this.lastTime = time;

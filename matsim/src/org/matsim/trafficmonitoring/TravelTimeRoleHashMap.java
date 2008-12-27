@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,26 +28,15 @@ import org.matsim.utils.misc.IntegerCache;
 public class TravelTimeRoleHashMap implements TravelTimeRole {
 	private final HashMap<Integer,TimeStruct> travelTimes;
 	
-//	private int currIdx;
-//	private int currCnt;
-//	private double currTimeSum;
 	private final Link link;
 
-	
-
-	public TravelTimeRoleHashMap(final Link link, final int numSlots) {
-
+	public TravelTimeRoleHashMap(final Link link) {
 		this.travelTimes =  new HashMap<Integer,TimeStruct>();
 		this.link = link;
 		resetTravelTimes();
-
 	}
 
-
 	public void resetTravelTimes() {
-//		this.currCnt = 0;
-//		this.currIdx = 0;
-//		this.currTimeSum = 0;
 		this.travelTimes.clear();
 	}
 
@@ -60,43 +49,10 @@ public class TravelTimeRoleHashMap implements TravelTimeRole {
 			this.travelTimes.put(IntegerCache.getInteger(timeSlice), new TimeStruct(traveltime,1));
 		}
 		
-//		if (timeSlice != this.currIdx){
-//			changeCurrent(timeSlice);
-//
-//		}
-//		this.currCnt++;
-//		this.currTimeSum += traveltime;
 	}
-
-//	private void changeCurrent(final int index) {
-//		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(this.currIdx));
-//		// save old
-//		if (curr != null ){
-//			curr.cnt += this.currCnt;
-//			curr.timeSum += this.currTimeSum;
-//		} else if (this.currCnt > 0){
-//			this.travelTimes.put(IntegerCache.getInteger(this.currIdx), new TimeStruct(this.currTimeSum,this.currCnt));
-//
-//		}
-//
-//		// set new
-//		this.currIdx = index;
-//		curr = this.travelTimes.get(IntegerCache.getInteger(this.currIdx));
-//		if (curr == null){
-//			this.currCnt = 0;
-//			this.currTimeSum = 0;
-//		} else {
-//			this.currCnt = curr.cnt;
-//			this.currTimeSum = curr.timeSum;
-//		}
-//
-//	}
 
 	public double getTravelTime(final int timeSlice, final double now) {
 
-//		if (timeSlice == this.currIdx) {
-//			return this.currTimeSum / this.currCnt;
-//		}
 		TimeStruct ts = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
 		if (ts == null){
 			return this.link.getLength() / this.link.getFreespeed(now);
@@ -106,13 +62,13 @@ public class TravelTimeRoleHashMap implements TravelTimeRole {
 
 	}
 
-	private static class TimeStruct{
+	private static class TimeStruct {
 		public double timeSum;
 		public int cnt;
 		public TimeStruct(final double timeSum, final int cnt){
 			this.cnt = cnt;
 			this.timeSum = timeSum;
 		}
-	};
+	}
 
 }

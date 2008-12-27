@@ -124,10 +124,10 @@ public class World {
 			if (this.bottom_layer == null) { // no zone nor facility layer exist
 				this.top_layer = this.bottom_layer = n_layer;
 			}
-			else if (this.bottom_layer.getType() == Facilities.LAYER_TYPE) {
-				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
-				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
-			}
+//			else if (this.bottom_layer.getType() == Facilities.LAYER_TYPE) {
+//				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
+//				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();
+//			}  // it's the same as the "else" below
 			else {
 				this.createMappingRule(n_layer.getType().toString() + "[m]-[m]" + this.bottom_layer.getType().toString());
 				this.bottom_layer = this.bottom_layer.getDownRule().getDownLayer();

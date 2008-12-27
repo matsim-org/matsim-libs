@@ -63,20 +63,20 @@ import com.sun.opengl.util.texture.TextureCoords;
 
 public class VisGUIMouseHandler extends MouseInputAdapter
 implements MouseWheelListener{
-    private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
-    private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
- 	double[] modelview = new double[16];
+	private Point3f cameraStart = new Point3f(30000f, 3000f, 1500f);
+	private Point3f cameraTarget = new Point3f(30000f, 3000f, 0f);
+	double[] modelview = new double[16];
 	double[] projection = new double[16];
 	int[] viewport = new int[4];
-    //private GL gl = null;
-    private QuadTree.Rect viewBounds = null;
+	//private GL gl = null;
+	private QuadTree.Rect viewBounds = null;
 
 
-    private Camera camera = new Camera();
-    //private Animator cameraAnimator;
+	private Camera camera = new Camera();
+	//private Animator cameraAnimator;
 	//private Point2D.Float clickPoint = null;
 
-    private double aspectRatio = 1;
+	private double aspectRatio = 1;
 	public Point start = null;
 
 	public Rectangle currentRect = null;
@@ -84,46 +84,46 @@ implements MouseWheelListener{
 
 	private int button = 0;
 	private final OTFDrawer clickHandler;
-	
+
 	public VisGUIMouseHandler(OTFDrawer clickHandler) {
 		this.clickHandler = clickHandler;
 	}
 
 	private void invalidateHandler() {
-       	try {
+		try {
 			clickHandler.invalidate(-1);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	void scrollCamera(Point3f start, Point3f end, String prop){
-        KeyValues<Point3f> values = KeyValues.create(new EvaluatorPoint3f(),
-                start, end);
 
-        //KeyTimes times = new KeyTimes(0f, 1f);
-        KeyFrames frames = new KeyFrames(values);
-        PropertySetter ps = new PropertySetter(camera, prop, frames);
-        Animator cameraAnimator = new Animator(2000, ps);
-        cameraAnimator.setStartDelay(0);
-        cameraAnimator.setAcceleration(0.2f);
-        cameraAnimator.setDeceleration(0.3f);
-        cameraAnimator.addTarget(new TimingTargetAdapter() {
-            @Override
+	void scrollCamera(Point3f start, Point3f end, String prop){
+		KeyValues<Point3f> values = KeyValues.create(new EvaluatorPoint3f(),
+				start, end);
+
+		//KeyTimes times = new KeyTimes(0f, 1f);
+		KeyFrames frames = new KeyFrames(values);
+		PropertySetter ps = new PropertySetter(camera, prop, frames);
+		Animator cameraAnimator = new Animator(2000, ps);
+		cameraAnimator.setStartDelay(0);
+		cameraAnimator.setAcceleration(0.2f);
+		cameraAnimator.setDeceleration(0.3f);
+		cameraAnimator.addTarget(new TimingTargetAdapter() {
+			@Override
 			public void end() {
-            	cameraStart = camera.getLocation();
-            	cameraTarget = camera.getTarget();
-             }});
-        cameraAnimator.start();
+				cameraStart = camera.getLocation();
+				cameraTarget = camera.getTarget();
+			}});
+		cameraAnimator.start();
 	}
 
-	   private void initCamera() {
-	        camera = new Camera();
-	    	camera.setLocation(cameraStart);
-	    	camera.setTarget(cameraTarget);
-	    }
-	   
+	private void initCamera() {
+		camera = new Camera();
+		camera.setLocation(cameraStart);
+		camera.setTarget(cameraTarget);
+	}
+
 	public void scrollToNewPos(Point3f cameraEnd){
 		Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		scrollCamera(cameraStart, cameraEnd, "location");
@@ -131,12 +131,12 @@ implements MouseWheelListener{
 	}
 
 	public void setToNewPos(Point3f cameraEnd){
-    	Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
+		Point3f targetEnd = new Point3f(cameraEnd.getX(), cameraEnd.getY(),0);
 		cameraStart = cameraEnd;
 		cameraTarget = targetEnd;
 		camera.setTarget(cameraTarget);
 		camera.setLocation(cameraStart);
-    	invalidateHandler();
+		invalidateHandler();
 	}
 
 	@Override
@@ -146,15 +146,15 @@ implements MouseWheelListener{
 		int mbutton = e.getButton();
 		String function = "";
 		switch (mbutton) {
-		case 1:
-			function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.LEFT_MOUSE_FUNC);
-			break;
-		case 2:
-			function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.MIDDLE_MOUSE_FUNC);
-			break;
-		case 3:
-			function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.RIGHT_MOUSE_FUNC);
-			break;
+			case 1:
+				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.LEFT_MOUSE_FUNC);
+				break;
+			case 2:
+				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.MIDDLE_MOUSE_FUNC);
+				break;
+			case 3:
+				function = Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.RIGHT_MOUSE_FUNC);
+				break;
 		}
 		if(function.equals("Zoom")) button = 1;
 		else if (function.equals("Pan")) button = 2;
@@ -162,13 +162,11 @@ implements MouseWheelListener{
 		else if (function.equals("Select")) button = 4;
 		else button = 0;
 		start = new Point(x, y);
-		Point3f pp = getOGLPos(x, y);
-		//clickPoint = new Point2D.Float(pp.getX(),pp.getY());
+		//		Point3f pp = getOGLPos(x, y);
+		//		clickPoint = new Point2D.Float(pp.getX(),pp.getY());
 		alpha = 1.0f;
 		currentRect = null;
-
 	}
-
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
@@ -187,7 +185,7 @@ implements MouseWheelListener{
 	public void mouseReleased(MouseEvent e) {
 		// update screen one last time
 		mouseDragged(e);
-		
+
 		Rectangle screenRect = new Rectangle(start);
 		screenRect.add(e.getPoint());
 		if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
@@ -199,17 +197,17 @@ implements MouseWheelListener{
 				Point3f newPos = new Point3f((float)currentRect.getCenterX(),(float)currentRect.getCenterY(),(float)(cameraStart.getZ()*ratio));
 				if (button == 1) {
 					scrollToNewPos(newPos);
-			        Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
-			        rectFader.setStartDelay(200);
-			        rectFader.setAcceleration(0.4f);
-			        rectFader.start();
+					Animator rectFader = PropertySetter.createAnimator(2020, this, "alpha", 1.0f, 0.f);
+					rectFader.setStartDelay(200);
+					rectFader.setAcceleration(0.4f);
+					rectFader.start();
 				} else {
 					clickHandler.handleClick(currentRect, button);
 					currentRect = null;
 					setAlpha(0);
 				}
 				//InfoText.showText("Zoom", newPos.getX(),newPos.getY(),newPos.getZ());
-		        // Cube fader
+				// Cube fader
 				//currentRect = null;
 			}
 		} else {
@@ -243,96 +241,95 @@ implements MouseWheelListener{
 	public void setAlpha(float a){
 		alpha = a;
 		// This only redraws GUI Elements, no need to invalidate(), just redraw()
-       if (clickHandler != null) clickHandler.redraw();
+		if (clickHandler != null) clickHandler.redraw();
 	}
-	
+
 	Texture marker = null;
 
 
-	    /**
-	     * Renders the given texture so that it is centered within the given
-	     * dimensions.
-	     */
-	    private void renderFace(GL gl, Texture t) {
-	        TextureCoords tc = t.getImageTexCoords();
-	        float tx1 = tc.left();
-	        float ty1 = tc.top();
-	        float tx2 = tc.right();
-	        float ty2 = tc.bottom();
+	/**
+	 * Renders the given texture so that it is centered within the given
+	 * dimensions.
+	 */
+	private void renderFace(GL gl, Texture t) {
+		TextureCoords tc = t.getImageTexCoords();
+		float tx1 = tc.left();
+		float ty1 = tc.top();
+		float tx2 = tc.right();
+		float ty2 = tc.bottom();
 
-//	        int imgw = t.getImageWidth();
-//	        int imgh = t.getImageHeight();
-//	        if (imgw > imgh) {
-//	            h *= ((float)imgh) / imgw;
-//	        } else {
-//	            w *= ((float)imgw) / imgh;
-//	        }
-//	        float w2 = w/2f;
-//	        float h2 = h/2f;
+		//	        int imgw = t.getImageWidth();
+		//	        int imgh = t.getImageHeight();
+		//	        if (imgw > imgh) {
+		//	            h *= ((float)imgh) / imgw;
+		//	        } else {
+		//	            w *= ((float)imgw) / imgh;
+		//	        }
+		//	        float w2 = w/2f;
+		//	        float h2 = h/2f;
 
-	        float z = 20f;
-	        t.enable();
-	        t.bind();
+		float z = 20f;
+		t.enable();
+		t.bind();
 
-	        //System.out.println("b:" + button);
-	        if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
-	        else gl.glColor4f(alpha, alpha, alpha, alpha);
+		//System.out.println("b:" + button);
+		if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
+		else gl.glColor4f(alpha, alpha, alpha, alpha);
 
-	        gl.glBegin(GL_QUADS);
-	        gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(currentRect.x, currentRect.y, z);
-	        gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(currentRect.x, currentRect.y + currentRect.height, z);
-	        gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y + currentRect.height, z);
-	        gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y, z);
-	        gl.glEnd();
-	        t.disable();
+		gl.glBegin(GL_QUADS);
+		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(currentRect.x, currentRect.y, z);
+		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(currentRect.x, currentRect.y + currentRect.height, z);
+		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y + currentRect.height, z);
+		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(currentRect.x + currentRect.width, currentRect.y, z);
+		gl.glEnd();
+		t.disable();
 
-	    }
+	}
 
-	    public void updateBounds() {
-			Point3f p1 = getOGLPos(viewport[0], viewport[1]);
-			Point3f p2 = getOGLPos(viewport[2], viewport[3]);
-			viewBounds =  new QuadTree.Rect(p1.x, p1.y, p2.x, p2.y);
-	    }
-	    
-	    public void updateMatrices(GL gl) {
-	        // update matrices for mouse position calculation
-			gl.glGetDoublev( GL_MODELVIEW_MATRIX, modelview,0);
-			gl.glGetDoublev( GL_PROJECTION_MATRIX, projection,0);
-			gl.glGetIntegerv( GL_VIEWPORT, viewport,0 );
-			updateBounds();
-	    }
-	    
+	public void updateBounds() {
+		Point3f p1 = getOGLPos(viewport[0], viewport[1]);
+		Point3f p2 = getOGLPos(viewport[2], viewport[3]);
+		viewBounds =  new QuadTree.Rect(p1.x, p1.y, p2.x, p2.y);
+	}
+
+	public void updateMatrices(GL gl) {
+		// update matrices for mouse position calculation
+		gl.glGetDoublev( GL_MODELVIEW_MATRIX, modelview,0);
+		gl.glGetDoublev( GL_PROJECTION_MATRIX, projection,0);
+		gl.glGetIntegerv( GL_VIEWPORT, viewport,0 );
+		updateBounds();
+	}
+
 	public void drawElements(GL gl){
 		if((currentRect != null) && (alpha >= 0.f)){
 			if(marker == null) marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
 
-			float z = 20f;
-	        gl.glEnable(GL_BLEND);
-	        gl.glBlendFunc(GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glEnable(GL_BLEND);
+			gl.glBlendFunc(GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-	        renderFace(gl, marker);
+			renderFace(gl, marker);
 			gl.glDisable(GL_BLEND);
 		} else {
 			currentRect = null;
 			alpha = 1.0f;
 		}
-		
+
 	}
 
-	   public void setFrustrum(GL gl) {
-		   
-		   GLU glu = new GLU();
-	       gl.glMatrixMode(GL_PROJECTION);
-	       gl.glLoadIdentity();
-	       glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
+	public void setFrustrum(GL gl) {
 
-	       gl.glMatrixMode(GL_MODELVIEW);
-	       gl.glLoadIdentity();
-	       
-	       camera.setup(gl, glu);
-		   updateMatrices(gl);
+		GLU glu = new GLU();
+		gl.glMatrixMode(GL_PROJECTION);
+		gl.glLoadIdentity();
+		glu.gluPerspective(45.0, aspectRatio, 1.0, cameraStart.getZ()*1.1);
 
-	   }
+		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glLoadIdentity();
+
+		camera.setup(gl, glu);
+		updateMatrices(gl);
+
+	}
 
 
 	public void scaleNetworkRelative(float scale) {
@@ -344,16 +341,16 @@ implements MouseWheelListener{
 		viewBounds = viewBounds.scale(effectiveScale, effectiveScale);
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),(float)zPos));
 	}
-	
+
 	public void scaleNetwork(float scale) {
 		this.scale = scale;
-    	float test = bounds.height*0.7f;
+		float test = bounds.height*0.7f;
 		float zPos = (test*scale);
 		if (zPos < minZoom) zPos =minZoom;
 		if (zPos > maxZoom) zPos =maxZoom;
 		setToNewPos(new Point3f(cameraStart.getX(),cameraStart.getY(),zPos));
 	}
-	
+
 	synchronized public Point3f getOGLPos(int x, int y)
 	{
 		double[] obj_pos = new double[3];
@@ -371,7 +368,7 @@ implements MouseWheelListener{
 		GLU glu = new GLU();
 		obj_pos[2]=0; // Check view relative z-koord of layer zero == visnet layer
 		glu.gluProject( obj_pos[0], obj_pos[1],obj_pos[2], modelview,0, projection,0, viewport,0, w_pos,0);
-//		glu.gluUnProject( winX, winY, winZ, DoubleBuffer.wrap(modelview), DoubleBuffer.wrap(projection), IntBuffer.wrap(viewport), DoubleBuffer.wrap(obj_pos));
+		//		glu.gluUnProject( winX, winY, winZ, DoubleBuffer.wrap(modelview), DoubleBuffer.wrap(projection), IntBuffer.wrap(viewport), DoubleBuffer.wrap(obj_pos));
 		glu.gluUnProject( winX, winY, w_pos[2], modelview,0, projection,0, viewport,0, obj_pos,0);
 
 		posX = (float)obj_pos[0];
@@ -380,7 +377,7 @@ implements MouseWheelListener{
 		// maintain z-pos == zoom level
 		return new Point3f(posX, posY, cameraStart.getZ());
 	}
-	
+
 	public CoordImpl getPixelsize() {
 		Point3f p1 = getOGLPos(300,300);
 		Point3f p2 = getOGLPos(301,301);
@@ -399,7 +396,7 @@ implements MouseWheelListener{
 	public void setAspectRatio(double aspectRatio) {
 		this.aspectRatio = aspectRatio;
 	}
-	
+
 	Rectangle2D.Float bounds = null;
 	private float minZoom;
 	private float maxZoom;
@@ -407,16 +404,16 @@ implements MouseWheelListener{
 		this.minZoom = minZoom;
 		this.maxZoom = 1.5f * Math.max(maxNorthing- minNorthing, (maxEasting-minEasting));
 		bounds = new Rectangle2D.Float(minEasting, minNorthing, maxEasting - minEasting, maxNorthing- minNorthing);
-		
-    	cameraStart = new Point3f((maxEasting-minEasting)/2, (maxNorthing-minNorthing)/2, (maxNorthing-minNorthing)*0.8f);
-    	cameraTarget = new Point3f(cameraStart.getX(), cameraStart.getY(),0);
+
+		cameraStart = new Point3f((maxEasting-minEasting)/2, (maxNorthing-minNorthing)/2, (maxNorthing-minNorthing)*0.8f);
+		cameraTarget = new Point3f(cameraStart.getX(), cameraStart.getY(),0);
 		viewBounds =  new QuadTree.Rect(minEasting, minNorthing, maxEasting - minEasting, maxNorthing- minNorthing);
 	}
 
 	public QuadTree.Rect getBounds(){
 		return viewBounds;
 	}
-	
+
 	public Point3f getView() {
 		return cameraStart;
 	}

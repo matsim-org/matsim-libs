@@ -64,8 +64,6 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 			this.matrices = null;
 		} else if (MATRIX.equals(name)) {
 			this.currMatrix = null;
-		} else if (ENTRY.equals(name)) {
-
 		}
 	}
 

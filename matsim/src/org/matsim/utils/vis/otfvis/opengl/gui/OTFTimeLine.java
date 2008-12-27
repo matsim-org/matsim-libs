@@ -21,7 +21,6 @@ import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicSliderUI;
 
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
@@ -74,7 +73,6 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 			Rectangle bounds = g.getClipBounds();
 			bounds.grow(-32, 0);
 
-			BasicSliderUI ui = (BasicSliderUI)getUI();
 			double delta = getMaximum() - getMinimum();
 			// get cached timesteps for hostctrl and draw them
 			synchronized (cachedTime) {

@@ -21,8 +21,6 @@
 package org.matsim.utils.vis.otfvis.opengl.gl;
 
 import org.jdesktop.animation.timing.interpolation.Evaluator;
-import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
-
 
 public class EvaluatorPoint3f extends Evaluator<Point3f> {
     public Point3f evaluate(Point3f v0, Point3f v1, float fraction) {

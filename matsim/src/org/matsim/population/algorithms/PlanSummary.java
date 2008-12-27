@@ -117,10 +117,8 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	}
 
 	public void run(Plan plan) {
-		int acts = 0;
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
-			acts++;
 			this.actCnt++;
 			Act act = (Act)actsLegs.get(j);
 			String actType = act.getType();

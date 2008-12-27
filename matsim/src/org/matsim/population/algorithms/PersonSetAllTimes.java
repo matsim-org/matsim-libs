@@ -29,10 +29,6 @@ import org.matsim.utils.misc.Time;
 
 public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 
-	//////////////////////////////////////////////////////////////////////
-	// menber variables
-	//////////////////////////////////////////////////////////////////////
-
 	private static final int EARLIEST_ENDTIME = 6*3600;
 	private static final int LATEST_ENDTIME = 11*3600;
 	private static final int W_DUR = 8*3600;
@@ -42,27 +38,14 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 	private static final int S_DUR_SHORT = 1*3600;
 	private static final int S_DUR_LONG = 8*3600;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
 	public PersonSetAllTimes() {
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// private methods
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void run(final Person person) {
 		for (int i=0; i<person.getPlans().size(); i++) {
 			Plan plan = person.getPlans().get(i);
 
-			int a_cnt = 0;
 			int w_cnt = 0;
 			int e_cnt = 0;
 			int l_cnt = 0;
@@ -88,7 +71,6 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 					act.setEndTime(Time.UNDEFINED_TIME);
 				}
 				else {
-					a_cnt++;
 					if (act.getType().equals("w")) { w_cnt++; }
 					if (act.getType().equals("e")) { e_cnt++; }
 					if (act.getType().equals("l")) { l_cnt++; }
@@ -138,10 +120,7 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 						else { System.err.println("HAE?: s_cnt>2"); System.exit(-1); }
 					}
 				}
-				else if (act.getType().equals("h")) {
-					;
-				}
-				else {
+				else if (!act.getType().equals("h")) {
 					System.err.println("ERROR: in " + this.getClass().getName() +
 														 " in run(Person person):" +
 														 " does not know act type = " + act.getType() + ".");

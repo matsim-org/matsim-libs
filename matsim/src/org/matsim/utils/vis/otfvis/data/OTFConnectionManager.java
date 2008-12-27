@@ -159,8 +159,8 @@ public class OTFConnectionManager implements Cloneable {
 			Entry entry = iter.next();
 			// make sure, that the static members have been initialized
 			try {
-				Object o = entry.to.newInstance();
-				Object p = entry.from.newInstance();
+				entry.to.newInstance();
+				entry.from.newInstance();
 			} catch (InstantiationException e) {
 				log.warn("For Writer class" + entry.from.getCanonicalName()+ " or " + entry.to.getCanonicalName() + " instance could not be generated");
 			} catch (IllegalAccessException e) {

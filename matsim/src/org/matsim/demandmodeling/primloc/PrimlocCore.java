@@ -20,6 +20,13 @@
 
 package org.matsim.demandmodeling.primloc;
 
+import java.text.DecimalFormat;
+
+import org.apache.log4j.Logger;
+import org.matsim.gbl.MatsimRandom;
+
+import Jama.Matrix;
+
 /**
  * Solves primary location choice with capacity constraints.
  * 
@@ -30,14 +37,6 @@ package org.matsim.demandmodeling.primloc;
  * @author Fabrice Marchal
  *
  */
-
-import java.text.DecimalFormat;
-
-import org.matsim.gbl.MatsimRandom;
-
-import Jama.Matrix;
-
-
 public class PrimlocCore {
 
 	//
@@ -73,6 +72,7 @@ public class PrimlocCore {
 	// Travel Cost statistics
 	double minCost, maxCost, avgCost, stdCost;
 
+	private final static Logger log = Logger.getLogger(PrimlocCore.class);
 
 	public PrimlocCore(){
 		df = (DecimalFormat) DecimalFormat.getInstance();
@@ -85,13 +85,13 @@ public class PrimlocCore {
 	
 	public void runModel(){
 		
-		System.out.println("PLCM: Running model with mu = "+df.format(mu));
+		log.info("PLCM: Running model with mu = "+df.format(mu));
 
 		setup_expCij();
 		initRent();
 
 		if( verbose ){
-			System.out.println("PLCM:\tInitial rent statistics:");
+			log.info("PLCM:\tInitial rent statistics:");
 			rentStatistics();
 		}
 
@@ -116,7 +116,7 @@ public class PrimlocCore {
 		runModel();
 		errC = calib.error( trips, X );
 		
-		System.out.println("PLCM:\tCalibration loop. Initial condition run completed");
+		log.info("PLCM:\tCalibration loop. Initial condition run completed");
 		calibrationLoopInfo( mu, errC );
 		
 		while( errL < errC ){
@@ -140,8 +140,6 @@ public class PrimlocCore {
 			calibrationLoopInfo( mu, errR );
 		}
 
-		double err = Double.POSITIVE_INFINITY;
-		
 		double omuL = muL;
 		double omuC = muC;
 		double omuR = muR;
@@ -149,7 +147,7 @@ public class PrimlocCore {
 		while( (count++<maxiter) && (Math.min( errR-errC, errL-errC)/errC > threshold3) ){
 			mu = (muC+muL)/2;
 			runModel();
-			err = calib.error( trips, X );
+			double err = calib.error( trips, X );
 			calibrationLoopInfo( mu, err );
 			if( err< errC ){
 				muR = muC;
@@ -185,7 +183,7 @@ public class PrimlocCore {
 	}
 	
 	void calibrationLoopInfo( double mu, double err){
-		System.out.println("PLCM:\tCalibration loop: mu = "+df.format(mu)+",\t error = "+df.format(err));
+		log.info("PLCM:\tCalibration loop: mu = "+df.format(mu)+",\t error = "+df.format(err));
 	}
 
 
@@ -243,7 +241,7 @@ public class PrimlocCore {
 				undefs++;
 		}
 		if( undefs> 0 )
-			System.err.println("Warning: rent undefined in "+undefs+" locations");
+			log.warn("rent undefined in "+undefs+" locations");
 	}
 
 	private void rentStatistics(){
@@ -271,7 +269,7 @@ public class PrimlocCore {
 		double sigmaR = mu * Math.sqrt( 1.0/count*sumR2 - 1.0/(count*count)*sumR1*sumR1 );
 		double minR = -mu*Math.log(maxix);
 		double maxR = -mu*Math.log(minix);
-		System.out.println("PLCM:\t\tRent interval: [ "+ df.format(minR) + ", " + df.format(maxR) + " ]\t std.dev. = " + df.format(sigmaR) );
+		log.info("PLCM:\t\tRent interval: [ "+ df.format(minR) + ", " + df.format(maxR) + " ]\t std.dev. = " + df.format(sigmaR) );
 	}
 
 	private void setup_expCij(){
@@ -341,7 +339,7 @@ public class PrimlocCore {
 			residual = Math.sqrt(residual/sumx);
 			if( verbose ){
 				if( (iterations %10 == 0) || (residual < threshold1 ) ){
-					System.out.println("PLCM:\t\tResidual = " + df.format(residual) +" (iterative substitution #" + iterations + " )");
+					log.info("PLCM:\t\tResidual = " + df.format(residual) +" (iterative substitution #" + iterations + " )");
 					rentStatistics();
 				}
 			}
@@ -419,7 +417,7 @@ public class PrimlocCore {
 			}
 			residual =  Math.sqrt( sumy/sumx );
 			if( verbose ){
-				System.out.println( "PLCM:\t\tResidual = "+df.format(residual)+" (linear system solved in "+duration+" s)" );
+				log.info( "PLCM:\t\tResidual = "+df.format(residual)+" (linear system solved in "+duration+" s)" );
 				rentStatistics();
 			}
 			

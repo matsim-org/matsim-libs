@@ -20,25 +20,24 @@
 
 package org.matsim.withinday.routeprovider;
 
+import java.io.Serializable;
 import java.util.Comparator;
-
 
 /**
  * Compares two RouteProviders by the return value of their getPriority() method.
  * Note: this comparator imposes orderings that are inconsistent with equals.
+ * 
  * @author dgrether
- *
  */
-public class RouteProviderComparator implements Comparator<RouteProvider> {
-  /**
-	 * 
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
+public class RouteProviderComparator implements Comparator<RouteProvider>, Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	public int compare(RouteProvider rp1, RouteProvider rp2) {
 		if (rp1.getPriority() > rp2.getPriority()) {
 			return 1;
 		}
-		else if (rp1.getPriority() < rp2.getPriority()) {
+		if (rp1.getPriority() < rp2.getPriority()) {
 			return -1;
 		}
 		return 0;

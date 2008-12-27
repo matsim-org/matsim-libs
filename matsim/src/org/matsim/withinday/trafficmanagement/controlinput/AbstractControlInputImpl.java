@@ -276,11 +276,10 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 					this.lastTimeMainRoute = deltaT;
 					timeDifferenceHasChanged = true;
 				}
-
-				else {
+//				else {
 					// System.err.println("not sure why this could ever happen
 					// 2vnowskljdf");
-				}
+//				}
 			}
 		}
 		else if (event.linkId.equals(this.lastLinkOnAlternativeRoute)) {

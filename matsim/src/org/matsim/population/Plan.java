@@ -58,18 +58,14 @@ public class Plan extends BasicPlanImpl {
 	}
 
 	public final Act createAct(final String type, final Coord coord) throws IllegalStateException {
-		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException(ACT_ERROR);
-		}
+		verifyCreateAct(Time.UNDEFINED_TIME);
 		Act a = new Act(type, coord);
 		this.actsLegs.add(a);
 		return a;
 	}
 
 	public final Act createAct(final String type, final Facility fac) throws IllegalStateException {
-		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException(ACT_ERROR);
-		}
+		verifyCreateAct(Time.UNDEFINED_TIME);
 		Act a = new Act(type, fac);
 		this.actsLegs.add(a);
 		return a;
@@ -77,9 +73,7 @@ public class Plan extends BasicPlanImpl {
 
 
 	public final Act createAct(final String type, final Link link) throws IllegalStateException {
-		if (this.actsLegs.size() % 2 != 0) {
-			throw new IllegalStateException(ACT_ERROR);
-		}
+		verifyCreateAct(Time.UNDEFINED_TIME);
 		Act a = new Act(type, link);
 		this.actsLegs.add(a);
 		return a;
@@ -105,11 +99,11 @@ public class Plan extends BasicPlanImpl {
 	}
 
 	private static long noEndTimeCnt = 0 ;
-	private final void verifyCreateAct(final String end_time) throws IllegalStateException {
+	private final void verifyCreateAct(final double endTime) throws IllegalStateException {
 		if (this.actsLegs.size() % 2 != 0) {
 			throw new IllegalStateException(ACT_ERROR);
 		}
-		if ((this.actsLegs.size() == 0) && (end_time == null)) {
+		if ((this.actsLegs.size() == 0) && (endTime == Time.UNDEFINED_TIME)) {
 			if ( noEndTimeCnt < 1 ) {
 				noEndTimeCnt++ ;
 			log.warn( "First 'act' has no end time.  Some people think that the first 'act' should have an end time.  This is, however, not true, since someone can stay at the first act all day.  Future occurences of this warning will be suppressed." ) ;
@@ -251,7 +245,7 @@ public class Plan extends BasicPlanImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// query methods
-	////////////////
+	//////////////////////////////////////////////////////////////////////
 	@Override
 	public final boolean isSelected() {
 		return this.person.getSelectedPlan() == this;
@@ -341,7 +335,6 @@ public class Plan extends BasicPlanImpl {
 		return null;
 	}
 
-	//FIXME [MR] rename to getPreviousAct!!!
 	public Act getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {

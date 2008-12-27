@@ -421,7 +421,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	private boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
-		int i=0;
 		if (host.requestNewTime(newTime, prefTime)) {
 			simTime = host.getLocalTime();
 			invalidateHandlers();

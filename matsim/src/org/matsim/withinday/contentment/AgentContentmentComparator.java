@@ -20,32 +20,29 @@
 
 package org.matsim.withinday.contentment;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.withinday.WithindayAgent;
 
-
 /**
  * Compares two WithindayAgent instances by the return value of their getReplanningNeed() method.
  * Note: this comparator imposes orderings that are inconsistent with equals.
+ * 
  * @author dgrether
- *
  */
-public class AgentContentmentComparator implements Comparator<WithindayAgent> {
+public class AgentContentmentComparator implements Comparator<WithindayAgent>, Serializable {
 
-	/**
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
+	private static final long serialVersionUID = 1L;
+
 	public int compare(WithindayAgent a1, WithindayAgent a2) {
-			if (a1.getReplanningNeed() > a2.getReplanningNeed()) {
-				return 1;
-			}
-			else if (a1.getReplanningNeed() < a2.getReplanningNeed()) {
-				return -1;
-			}
-			else {
-				return 0;
-			}
+		if (a1.getReplanningNeed() > a2.getReplanningNeed()) {
+			return 1;
+		}
+		if (a1.getReplanningNeed() < a2.getReplanningNeed()) {
+			return -1;
+		}
+		return 0;
 	}
 
 }

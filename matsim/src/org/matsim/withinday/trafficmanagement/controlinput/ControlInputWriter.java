@@ -171,28 +171,27 @@ public class ControlInputWriter {
 
 	public void writeTravelTimesPerAgent(final Map<Double, Double> map,
 			final Map<Double, Double> map2) throws IOException {
-		Double tt;
 
 		SortedMap<Double, Double> sortedMap = new TreeMap<Double, Double>(map);
 		SortedMap<Double, Double> sortedMap2 = new TreeMap<Double, Double>(map2);
 
-		for (Double simTime : sortedMap.keySet()) {
+		for (Map.Entry<Double, Double> entry : sortedMap.entrySet()) {
+			double simTime = entry.getKey().doubleValue();
 			if ((outputStartTime <= simTime) && (simTime <= outputEndTime)) {
-				tt = sortedMap.get(simTime);
 				this.measuredPerAgentMainRoute.write(Double.toString(simTime));
 				this.measuredPerAgentMainRoute.write(SEPARATOR);
-				this.measuredPerAgentMainRoute.write(Double.toString(tt));
+				this.measuredPerAgentMainRoute.write(entry.getValue().toString());
 				this.measuredPerAgentMainRoute.write(NEWLINE);
 				this.measuredPerAgentMainRoute.flush();
 			}
 		}
 
-		for (Double simTime : sortedMap2.keySet()) {
+		for (Map.Entry<Double, Double> entry : sortedMap2.entrySet()) {
+			double simTime = entry.getKey().doubleValue();
 			if ((outputStartTime <= simTime) && (simTime <= outputEndTime)) {
-				tt = sortedMap2.get(simTime);
 				this.measuredPerAgentAlternativeRoute.write(Double.toString(simTime));
 				this.measuredPerAgentAlternativeRoute.write(SEPARATOR);
-				this.measuredPerAgentAlternativeRoute.write(Double.toString(tt));
+				this.measuredPerAgentAlternativeRoute.write(entry.getValue().toString());
 				this.measuredPerAgentAlternativeRoute.write(NEWLINE);
 				this.measuredPerAgentAlternativeRoute.flush();
 			}

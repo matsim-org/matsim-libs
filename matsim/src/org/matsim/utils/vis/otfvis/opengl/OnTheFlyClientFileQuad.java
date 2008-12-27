@@ -207,10 +207,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 			dialog.pack();
 			dialog.setVisible(true);
 			int value = ((Integer)optionPane.getValue()).intValue();
-			if (value == JOptionPane.YES_OPTION) {
-			    // well then Quit
-			} else if (value == JOptionPane.NO_OPTION) {
-				return;
+			if (value == JOptionPane.NO_OPTION) {
+				return; // do not quit
 			}
 
 		}

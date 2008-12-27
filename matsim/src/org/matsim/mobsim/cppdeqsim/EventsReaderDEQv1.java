@@ -32,13 +32,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentWait2LinkEvent;
+import org.matsim.events.BasicEvent;
+import org.matsim.events.Events;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.Events;
 
 public class EventsReaderDEQv1 {
 
@@ -177,7 +177,7 @@ public class EventsReaderDEQv1 {
 	}
 
 
-	private class BinaryEventsReader {
+	private static class BinaryEventsReader {
 		BasicEvent event = null;
 		private BasicEvent next = null;
 		private final DataInputStream in;

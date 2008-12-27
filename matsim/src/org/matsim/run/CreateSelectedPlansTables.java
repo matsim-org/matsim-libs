@@ -131,7 +131,7 @@ public class CreateSelectedPlansTables {
 			}
 
 			for (int i=0; i<i_max; i++) {
-				out.write(String.valueOf(i)+"\t");
+				out.write(i + "\t");
 				out.write(this.sumPlanTraveltime[i]/nr_selectedplans+"\t");
 				out.write(this.sumPlanTraveldistance[i]/nr_selectedplans+"\t");
 				out.write(this.sumLegTraveltime[i]/nr_selectedplans+"\t");

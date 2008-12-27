@@ -23,6 +23,7 @@ package org.matsim.network.algorithms;
 import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -228,7 +229,8 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 		int maneuverAssignedCnt = 0;
 		int virtualNodesCnt = 0;
 		int virtualLinksCnt = 0;
-		for (Id nodeId : maneuvers.keySet()) {
+		for (Map.Entry<Id, ArrayList<Tuple<Id, Integer>>> entry : maneuvers.entrySet()) {
+			Id nodeId = entry.getKey();
 			if (network.getNode(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
 			else {
 				// node found
@@ -237,7 +239,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
 				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
 				// assign maneuvers for given node to the matrix
-				ArrayList<Tuple<Id,Integer>> ms = maneuvers.get(nodeId);
+				ArrayList<Tuple<Id,Integer>> ms = entry.getValue();
 				for (Tuple<Id,Integer> m : ms) {
 					// get maneuver path sequence for given maneuver
 					TreeMap<Integer,Id> mSequence = mSequences.get(m.getFirst());
@@ -259,7 +261,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 								// store it to the matrix
 								TreeMap<Id,Boolean> outLinkMap = mmatrix.get(inLink.getId());
 								if (outLinkMap == null) { outLinkMap = new TreeMap<Id,Boolean>(); }
-								outLinkMap.put(outLink.getId(),true);
+								outLinkMap.put(outLink.getId(), Boolean.TRUE);
 								mmatrix.put(inLink.getId(),outLinkMap);
 							}
 							else {
@@ -267,7 +269,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 								// store it to the matrix
 								TreeMap<Id,Boolean> outLinkMap = mmatrix.get(inLink.getId());
 								if (outLinkMap == null) { outLinkMap = new TreeMap<Id,Boolean>(); }
-								outLinkMap.put(outLink.getId(),false);
+								outLinkMap.put(outLink.getId(), Boolean.FALSE);
 								mmatrix.put(inLink.getId(),outLinkMap);
 							}
 							maneuverAssignedCnt++;
@@ -286,8 +288,8 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 					// add missing toLink maneuvers
 					for (Id toLinkId : n.getOutLinks().keySet()) {
 						if (!mmatrix.get(fromLinkId).containsKey(toLinkId)) {
-							if (hasRestrictedManeuver) { mmatrix.get(fromLinkId).put(toLinkId,false); }
-							else { mmatrix.get(fromLinkId).put(toLinkId,true); }
+							if (hasRestrictedManeuver) { mmatrix.get(fromLinkId).put(toLinkId, Boolean.FALSE); }
+							else { mmatrix.get(fromLinkId).put(toLinkId, Boolean.TRUE); }
 						}
 					}
 				}
@@ -295,7 +297,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 				for (Id fromLinkId : n.getInLinks().keySet()) {
 					if (!mmatrix.containsKey(fromLinkId)) {
 						mmatrix.put(fromLinkId,new TreeMap<Id, Boolean>());
-						for (Id toLinkId : n.getOutLinks().keySet()) { mmatrix.get(fromLinkId).put(toLinkId,true); }
+						for (Id toLinkId : n.getOutLinks().keySet()) { mmatrix.get(fromLinkId).put(toLinkId, Boolean.TRUE); }
 					}
 				}
 				// remove all U-turns from the matrix
@@ -305,7 +307,7 @@ public class NetworkTeleatlasAddManeuverRestrictions {
 						for (Id toLinkId : n.getOutLinks().keySet()) {
 							String str2 = toLinkId.toString().substring(0,toLinkId.toString().length()-2);
 							if (str1.equals(str2)) {
-								mmatrix.get(fromLinkId).put(toLinkId,false);
+								mmatrix.get(fromLinkId).put(toLinkId, Boolean.FALSE);
 							}
 						}
 					}

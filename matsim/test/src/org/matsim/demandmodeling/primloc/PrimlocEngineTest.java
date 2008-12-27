@@ -2,9 +2,13 @@ package org.matsim.demandmodeling.primloc;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.TreeMap;
+
 import org.matsim.testcases.MatsimTestCase;
 
 import Jama.Matrix;
@@ -16,7 +20,7 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 
 	PrimlocCore core = new PrimlocCore();
 	
-	public void testPLCM(){
+	public void testPLCM() throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
 		
 		System.out.println("Starting Primary Location Choice Model (PLCM)");
 		System.out.println("PLCM: Looking for PrimaryLocationChoice.xml config file of the Zurich sample dataset in " + testPropertyFile);
@@ -33,7 +37,7 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 		}
 	}
 	
-	void standAloneRun( String propFile, String outputFile ){
+	void standAloneRun( String propFile, String outputFile ) throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
 		TreeMap<Integer,Integer> zonemap = initProperties( propFile ); // model_ID to internal_ID
 	
 		core.setCalibrationError( new PrimlocCalibrationErrorMatrix( gravityModelMatrix() ) );	
@@ -45,7 +49,7 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 		System.out.println("PLCM: done");
 	}
 	
-	TreeMap<Integer,Integer> initProperties( String propertyFile ){
+	private TreeMap<Integer,Integer> initProperties( String propertyFile ) throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
 
 		String zoneFileName=null;
 		String costFileName=null;
@@ -54,25 +58,18 @@ private final static String testPropertyFile = "test/input/org/matsim/demandmode
 
 		Properties props = new Properties();
 
+		props.loadFromXML( new FileInputStream(propertyFile) );
+		zoneFileName = props.getProperty("zoneFileName");
+		costFileName = props.getProperty("costFileName");
+		homesFileName = props.getProperty("homesFileName");
+		jobsFileName = props.getProperty("jobsFileName");
 		
-		try{
-			props.loadFromXML( new FileInputStream(propertyFile) );
-			zoneFileName = props.getProperty("zoneFileName");
-			costFileName = props.getProperty("costFileName");
-			homesFileName = props.getProperty("homesFileName");
-			jobsFileName = props.getProperty("jobsFileName");
-			
-			core.maxiter = Integer.parseInt(props.getProperty("maxiter"));
-			core.mu = Double.parseDouble(props.getProperty("mu"));
-			core.theta = Double.parseDouble( props.getProperty("theta"));
-			core.threshold1 = Double.parseDouble(props.getProperty("threshold1"));
-			core.threshold2 = Double.parseDouble(props.getProperty("threshold2"));
-			core.verbose = Boolean.parseBoolean(props.getProperty("verbose"));
-		}
-		catch( Exception xc ){
-			xc.printStackTrace();
-			System.exit(-1);
-		}
+		core.maxiter = Integer.parseInt(props.getProperty("maxiter"));
+		core.mu = Double.parseDouble(props.getProperty("mu"));
+		core.theta = Double.parseDouble( props.getProperty("theta"));
+		core.threshold1 = Double.parseDouble(props.getProperty("threshold1"));
+		core.threshold2 = Double.parseDouble(props.getProperty("threshold2"));
+		core.verbose = Boolean.parseBoolean(props.getProperty("verbose"));
 
 		//
 		// 1) Read the zone indices

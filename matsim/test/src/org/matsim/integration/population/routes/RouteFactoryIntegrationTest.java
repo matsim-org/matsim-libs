@@ -75,9 +75,6 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 				}
 			}
 		}
-		// free the memory already now
-		controler = null;
-		population = null;
 
 		// test another setting
 		Gbl.reset();

@@ -29,14 +29,12 @@ import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.filters.AbstractPlanFilter;
 
 /**
  * Filters all plans where activities of the same type take place at the same link or set of links.
  * For example: Filter all agents who are neighbors (have their home location on the same link)
  * 
  * @author meisterk
- *
  */
 public class ActLinkFilter extends AbstractPlanFilter {
 

@@ -29,7 +29,6 @@ import org.matsim.utils.vis.otfvis.caching.SceneGraph;
 import org.matsim.utils.vis.otfvis.data.OTFClientQuad;
 import org.matsim.utils.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.utils.vis.otfvis.opengl.drawer.OTFOGLDrawer.FastColorizer;
-import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 
 
 public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
@@ -46,7 +45,7 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 	@Override
 	public void draw() {
 		GL gl = this.myDrawer.getGL();
-		Point3f cam = this.myDrawer.getView();
+//		Point3f cam = this.myDrawer.getView();
 		//float z = cam.z - 500;
 
 		checkNetList(gl);

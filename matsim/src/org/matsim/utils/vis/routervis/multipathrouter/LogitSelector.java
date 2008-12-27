@@ -29,10 +29,7 @@ import org.matsim.network.Node;
 
 public abstract class LogitSelector {
 
-	
 	protected HashMap<String,LogitLink> pathTree = new HashMap<String,LogitLink>();
-	
-	
 
 	public void run(final ArrayList<NodeData> toNodes, final NodeData fromNode) {
 
@@ -80,36 +77,28 @@ public abstract class LogitSelector {
 		final String key =  from.getId().toString() +" " + to.getId().toString();
 		LogitLink d = this.pathTree.get(key);
 		if (d == null) {
-			d = new LogitLink(from,to,key);
+			d = new LogitLink(key);
 			this.pathTree.put(key,d);
 		}
 		return d;
 	}
 
 
-
-
 	static class LogitLink {
 		private final HashSet <LogitLink> pred;
 		private final HashSet <LogitLink> succ;
-//		private Node from;
-//		private Node to;
 		int numPaths;
 		private final String id;
 		double cost = Double.MAX_VALUE;
-//		private double weight;
 		
-		
-		public LogitLink(final Node from, final Node to, final String id){
+		public LogitLink(final String id){
 			this.pred = new HashSet<LogitLink>();
 			this.succ = new HashSet<LogitLink>();
-//			this.from = from;
-//			this.to = to;
 			this.numPaths = 0;
 			this.id = id;
 		}
 
-		public void addPred(final LogitLink  pred) {
+		public void addPred(final LogitLink pred) {
 			this.pred.add(pred);
 		}
 		

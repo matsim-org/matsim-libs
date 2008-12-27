@@ -32,11 +32,11 @@ public class PIDControler implements FeedbackControler {
 	// --------------------------- Instance variables -----------------
 
 	// Control parameters
-	private double K;
+	private double k;
 
-	private double Ti;
+	private double ti;
 
-	private double Td;
+	private double td;
 
 	double[] states;
 
@@ -45,15 +45,15 @@ public class PIDControler implements FeedbackControler {
 	/**
 	 * Constructor
 	 * 
-	 * @param K
-	 * @param Ti
-	 * @param Td
+	 * @param k
+	 * @param ti
+	 * @param td
 	 *            The control parameters
 	 */
-	public PIDControler(double K, double Ti, double Td) {
-		this.K = K;
-		this.Ti = Ti;
-		this.Td = Td;
+	public PIDControler(double k, double ti, double td) {
+		this.k = k;
+		this.ti = ti;
+		this.td = td;
 		double[] s = { 0, 0, 0 };
 		this.states = s;
 		this.lastInput = 0;
@@ -62,14 +62,14 @@ public class PIDControler implements FeedbackControler {
 	/**
 	 * Sets the control parameters
 	 * 
-	 * @param K
-	 * @param Ti
-	 * @param Td
+	 * @param k
+	 * @param ti
+	 * @param td
 	 */
-	public void setParameters(double K, double Ti, double Td) {
-		this.K = K;
-		this.Ti = Ti;
-		this.Td = Td;
+	public void setParameters(double k, double ti, double td) {
+		this.k = k;
+		this.ti = ti;
+		this.td = td;
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class PIDControler implements FeedbackControler {
 		// PID calculations
 
 		double dU = -1
-				* K
-				* ((states[0] - states[1]) + (1 / Ti) * states[0] + Td
+				* k
+				* ((states[0] - states[1]) + (1 / ti) * states[0] + td
 						* (states[0] - 2 * states[1] + states[2]));
 
 		// Boundary cuts

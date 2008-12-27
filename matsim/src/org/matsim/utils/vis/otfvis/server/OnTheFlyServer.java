@@ -37,7 +37,6 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.population.Population;
 import org.matsim.utils.collections.QuadTree;
@@ -46,9 +45,7 @@ import org.matsim.utils.vis.otfvis.data.OTFDataWriter;
 import org.matsim.utils.vis.otfvis.data.OTFNetWriterFactory;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.interfaces.OTFLiveServerRemote;
-import org.matsim.utils.vis.otfvis.interfaces.OTFNetHandler;
 import org.matsim.utils.vis.otfvis.interfaces.OTFQuery;
-
 
 public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServerRemote{
 
@@ -85,7 +82,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private final Set<String> updateThis = new HashSet<String>();
 	private final Set<OTFQuery> queryThis = new HashSet<OTFQuery>();
 
-	private final OTFNetHandler handler = null;
+//	private final OTFNetHandler handler = null;
 	private transient Population pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetwork network = null;
@@ -169,7 +166,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
-	private double lastTime = -1.0;
+//	private double lastTime = -1.0;
 	public void updateOut(double time) {
 		
 		for(String id : updateThis) {
@@ -189,7 +186,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 		queryThis.clear();
 		
-		lastTime = time;
+//		lastTime = time;
 	}
 
 	public int updateStatus(double time) {

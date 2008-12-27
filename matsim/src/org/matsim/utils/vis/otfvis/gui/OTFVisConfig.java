@@ -35,8 +35,9 @@ import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.utils.vis.otfvis.server.OTFQuadFileHandler;
 
 
-public class OTFVisConfig extends Module implements Serializable{
+public class OTFVisConfig extends Module {
 	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "otfvis";
 
 	public static class ZoomEntry  implements Serializable{
@@ -67,7 +68,7 @@ public class OTFVisConfig extends Module implements Serializable{
 			this.name = name;
 		}
 
-		private synchronized void writeObject( java.io.ObjectOutputStream s ) throws IOException {
+		private void writeObject( java.io.ObjectOutputStream s ) throws IOException {
 			s.writeUTF(name);
 			s.writeFloat(zoomstart.x);
 			s.writeFloat(zoomstart.y);
@@ -76,7 +77,7 @@ public class OTFVisConfig extends Module implements Serializable{
 		}
 
 
-		private synchronized void readObject( java.io.ObjectInputStream s ) throws IOException, ClassNotFoundException {
+		private void readObject( java.io.ObjectInputStream s ) throws IOException {
 			name = s.readUTF();
 			zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
 			snap = ImageIO.read(s);
@@ -216,7 +217,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setMiddleMouseFunc(String middleMouseFunc) {
-		if(this.middleMouseFunc != middleMouseFunc) setModified();
+		if(this.middleMouseFunc.equals(middleMouseFunc)) setModified();
 		this.middleMouseFunc = middleMouseFunc;
 	}
 
@@ -225,7 +226,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setLeftMouseFunc(String leftMouseFunc) {
-		if(this.leftMouseFunc != leftMouseFunc) setModified();
+		if(this.leftMouseFunc.equals(leftMouseFunc)) setModified();
 		this.leftMouseFunc = leftMouseFunc;
 	}
 
@@ -234,7 +235,7 @@ public class OTFVisConfig extends Module implements Serializable{
 	}
 
 	public void setRightMouseFunc(String rightMouseFunc) {
-		if(this.rightMouseFunc != rightMouseFunc) setModified();
+		if(this.rightMouseFunc.equals(rightMouseFunc)) setModified();
 		this.rightMouseFunc = rightMouseFunc;
 	}
 

@@ -23,10 +23,6 @@ package org.matsim.utils.vis.otfvis.opengl.gl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import org.matsim.utils.vis.otfvis.opengl.gl.Point3f;
-
-
-
 /**
  * A simple representation of a camera, which allows the user to easily
  * position the viewpoint in 3D space and to aim the viewpoint at a
