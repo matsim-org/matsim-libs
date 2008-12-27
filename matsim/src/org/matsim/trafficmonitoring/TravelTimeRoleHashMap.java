@@ -30,7 +30,8 @@ public class TravelTimeRoleHashMap implements TravelTimeRole {
 	
 	private final Link link;
 
-	public TravelTimeRoleHashMap(final Link link) {
+	public TravelTimeRoleHashMap(final Link link, final int unused) {
+		// unused, must be there because of Prototype-Constructor
 		this.travelTimes =  new HashMap<Integer,TimeStruct>();
 		this.link = link;
 		resetTravelTimes();
