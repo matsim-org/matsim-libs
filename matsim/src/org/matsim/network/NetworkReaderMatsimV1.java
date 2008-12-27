@@ -76,6 +76,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	 * possible exceptions on its own.
 	 *
 	 * @param filename The name of the file to parse.
+	 * @deprecated please use {@link #parse(String)}
 	 */
 	public void readFile(final String filename) {
 		try {
