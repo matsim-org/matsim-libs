@@ -46,7 +46,6 @@ public class PreferencesDialog2 extends PreferencesDialog implements ItemListene
 
 	@Override
 	protected void initGUI() {
-		// TODO Auto-generated method stub
 		super.initGUI();
 		{
 			JPanel panel = new JPanel(null);

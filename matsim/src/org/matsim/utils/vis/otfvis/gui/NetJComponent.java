@@ -516,7 +516,7 @@ public class NetJComponent extends JComponent  implements OTFDrawer {
 //					try {
 //						plan = host.getAgentPlan(id);
 //					} catch (Exception e1) {
-//						// TODO Auto-generated catch block
+//						// _TODO Auto-generated catch block
 //						e1.printStackTrace();
 //					}
 //					if(plan != null) agentRenderer.setPlan(plan);
