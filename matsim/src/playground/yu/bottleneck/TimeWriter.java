@@ -132,7 +132,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		agentDepTimes.clear();
 	}
 
-	public void closefile() {
+	public void closeFile() {
 		if (out != null)
 			try {
 				out.close();
@@ -169,7 +169,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		new MatsimEventsReader(events).readFile(eventsFilename);
 
 		tw.writeChart(chartFilename);
-		tw.closefile();
+		tw.closeFile();
 
 		System.out.println("-> Done!");
 		Gbl.printElapsedTime();

@@ -59,7 +59,7 @@ public class MyControler1 {
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 
-		eventWriter.closefile();
+		eventWriter.closeFile();
 	}
 
 }

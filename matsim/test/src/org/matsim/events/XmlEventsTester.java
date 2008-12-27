@@ -51,7 +51,7 @@ public abstract class XmlEventsTester extends TestCase {
 	public static <T extends BasicEvent> T testWriteReadXml(final String eventsFile, final T event) {
 		EventWriterXML writer = new EventWriterXML(eventsFile);
 		writer.handleEvent(event);
-		writer.closefile();
+		writer.closeFile();
 		assertTrue(new File(eventsFile).exists());
 
 		Events events = new Events();

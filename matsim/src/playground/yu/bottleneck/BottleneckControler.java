@@ -68,8 +68,8 @@ public class BottleneckControler extends Controler {
 		}
 
 		public void notifyShutdown(final ShutdownEvent event) {
-			this.timeWriter.closefile();
-			this.bTV.closefile();
+			this.timeWriter.closeFile();
+			this.bTV.closeFile();
 		}
 	}
 

@@ -53,7 +53,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 		writeEvents.processEvent(event1);
 		writeEvents.processEvent(event2);
 
-		writer.closefile();
+		writer.closeFile();
 
 		// read the events from file
 
@@ -95,7 +95,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 		writeEvents.processEvent(event1);
 		writeEvents.processEvent(event2);
 
-		writer.closefile();
+		writer.closeFile();
 
 		// read the events from file
 

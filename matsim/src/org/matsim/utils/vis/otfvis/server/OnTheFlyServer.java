@@ -107,12 +107,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.events = events;
 	}
 
-	public static boolean useSSL = true;
+//	public static boolean useSSL = true;
 	
 	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, Population population, Events events, boolean useSSL) {
 		OnTheFlyServer result = null;
 		
-		OnTheFlyServer.useSSL = useSSL;
+//		OnTheFlyServer.useSSL = useSSL;
 		
 		if (useSSL) {
 			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
@@ -146,7 +146,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			registry.bind("DSOTFServer_" + ReadableName, result);
 
 			// THIS Line is important, as this checks, if registry is REALLY connected "late binding"
-			String[] liste = registry.list();
+			/*String[] liste =*/ registry.list();
 			System.out.println("OTFServer bound in registry");
 		} catch (Exception e) {
 			System.out.println("OTFServer err: " + e.getMessage());
@@ -247,8 +247,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
-			if (searchDirection == TimePreference.EARLIER) return false;
-			else return true; 
+			return (searchDirection != TimePreference.EARLIER);
 		}
 		if (time == localTime) return true;
 

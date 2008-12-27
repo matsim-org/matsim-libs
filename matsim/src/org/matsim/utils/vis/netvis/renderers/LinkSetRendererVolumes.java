@@ -55,11 +55,6 @@ public class LinkSetRendererVolumes extends RendererA {
         this.linkWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
     }
 
-    @Override
-		public void setTargetComponent(NetJComponent comp) {
-        super.setTargetComponent(comp);
-    }
-
     // -------------------- RENDERING --------------------
 
     @Override

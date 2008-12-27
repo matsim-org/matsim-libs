@@ -48,8 +48,8 @@ public class CreateSelectedPlansTables {
 	private Population plans0;
 	private Population plans1;
 
-	private final String outfileTable="./output/analyseSelectedPlansTable.txt";
-	private final String outfileAverages="./output/analyseSelectedPlansTableAverages.txt";
+	private final static String outfileTable="./output/analyseSelectedPlansTable.txt";
+	private final static String outfileAverages="./output/analyseSelectedPlansTableAverages.txt";
 
 	// true if there are two plans to evaluate (compare)
 	private boolean twoPlans;
@@ -119,7 +119,7 @@ public class CreateSelectedPlansTables {
 			final String header="plansfile_nr\tplantraveltime\tplantraveldistance\t" +
 					"legtraveltime\tlegtraveldistance\tnumberoflegs";
 
-			final BufferedWriter out = IOUtils.getBufferedWriter(this.outfileAverages);
+			final BufferedWriter out = IOUtils.getBufferedWriter(outfileAverages);
 			out.write(header);
 			out.newLine();
 
@@ -159,7 +159,7 @@ public class CreateSelectedPlansTables {
 			}
 
 
-			final BufferedWriter out = IOUtils.getBufferedWriter(this.outfileTable);
+			final BufferedWriter out = IOUtils.getBufferedWriter(outfileTable);
 			out.write(header);
 			out.newLine();
 
@@ -209,7 +209,7 @@ public class CreateSelectedPlansTables {
 					out.write(this.getTravelDist(person_comp)+"\t");
 					this.sumPlanTraveldistance[1]+=this.getTravelDist(person_comp);
 
-					// TODO: using newline(). But still a tab is necessary (!?) Correct that later.
+					// TODO [AH] using newline(). But still a tab is necessary (!?) Correct that later.
 					out.write(this.getNumberOfTrips(person_comp)+"\t");
 					this.sumNrLegs[1]+=this.getNumberOfTrips(person_comp);
 					this.sumLegTraveltime[1]+=(this.getTravelTime(person_comp)/this.getNumberOfTrips(person_comp));
@@ -225,7 +225,7 @@ public class CreateSelectedPlansTables {
 		}
 	}
 
-	/*  TODO: Combine the following three methods and make one method.
+	/*  TODO [AH] Combine the following three methods and make one method.
 	 *  See playground.anhorni.locationchoice.analysis.PersonTimeDistanceCalculator */
 
 	private double getTravelTime(final Person person) {

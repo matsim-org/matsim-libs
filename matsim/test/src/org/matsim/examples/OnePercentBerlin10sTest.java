@@ -76,7 +76,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		sim.run();
 		log.info("STOP testOnePercent10s SIM");
 
-		writer.closefile();
+		writer.closeFile();
 
 		log.info("calculating checksums...");
 		final long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);

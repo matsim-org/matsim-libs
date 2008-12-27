@@ -74,7 +74,7 @@ public class MyControler4 {
 		average.run(population);
 		System.out.println("### the average score is: " + average.getAverage());
 
-		eventWriter.closefile();
+		eventWriter.closeFile();
 
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);

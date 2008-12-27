@@ -45,11 +45,6 @@ public class NodeSetRenderer extends RendererA {
         this.network = network;
     }
 
-    @Override
-		public void setTargetComponent(NetJComponent comp) {
-        super.setTargetComponent(comp);
-    }
-
     // -------------------- RENDERING --------------------
 
     @Override

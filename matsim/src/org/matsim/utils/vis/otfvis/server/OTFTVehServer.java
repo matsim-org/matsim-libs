@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.IdImpl;
@@ -48,7 +47,7 @@ public class OTFTVehServer implements OTFServerRemote {
 	private static final int BUFFERSIZE = 100000000;
 	private BufferedReader reader = null;
 	private double nextTime = -1;
-	private List<Double> times = null;
+//	private List<Double> times = null;
 	private TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
@@ -320,7 +319,8 @@ public class OTFTVehServer implements OTFServerRemote {
 	}
 
 	public Collection<Double> getTimeSteps() throws RemoteException {
-		return times;
+//		return times;
+		return null;
 	}
 
 }

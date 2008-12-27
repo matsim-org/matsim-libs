@@ -126,7 +126,6 @@ public class NetVis {
     		if (rendererName.equals("LinkSetRendererVolumes")) ((LinkSetRendererVolumes)linkSetRenderer).setControlToolbar(buttonComponent);
     		else if (rendererName.equals("LinkSetRendererLanes")) ((LinkSetRendererLanes)linkSetRenderer).setControlToolbar(buttonComponent);
     		else if (rendererName.equals("LinkSetRendererRoutes")) ((LinkSetRendererRoutes)linkSetRenderer).setControlToolbar(buttonComponent);
-    		else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) ((LinkSetRendererCOOPERSVehiclesOnly)linkSetRenderer).setControlToolbar(buttonComponent);
     	}
 
     	// 4. ----- create component serving as drawing area -----

@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  */
 
 public abstract class Gbl {
-	public static String ONLYONCE=" This message given only once.";
+	public final static String ONLYONCE=" This message given only once.";
 
 	private static Config config = null;
 	private static World world = null;

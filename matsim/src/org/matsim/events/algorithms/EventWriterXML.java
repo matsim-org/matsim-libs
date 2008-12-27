@@ -35,7 +35,7 @@ public class EventWriterXML implements BasicEventHandler {
 		init(filename);
 	}
 
-	public void closefile() {
+	public void closeFile() {
 		if (this.out != null)
 			try {
 				this.out.write("</events>");
@@ -46,9 +46,8 @@ public class EventWriterXML implements BasicEventHandler {
 			}
 	}
 
-	public void init(final String outfilename)
-	{
-		closefile();
+	public void init(final String outfilename) {
+		closeFile();
 
 		try {
 			this.out = new BufferedWriter( new FileWriter (outfilename));
@@ -59,7 +58,7 @@ public class EventWriterXML implements BasicEventHandler {
 	}
 
 	public void reset(final int iter) {
-		closefile();
+		closeFile();
 	}
 
 	public void handleEvent(final BasicEvent event) {

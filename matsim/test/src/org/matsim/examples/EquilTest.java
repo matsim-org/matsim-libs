@@ -64,7 +64,7 @@ public class EquilTest extends MatsimTestCase {
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 
-		writer.closefile();
+		writer.closeFile();
 
 		final long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
 		long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);

@@ -126,9 +126,9 @@ public class ColoredStaticNetLayer extends SimpleStaticNetLayer {
 		}
 
 		@Override
-		public void onDraw( GL gl) {
-			final double tx = ((this.texIdx % actLayer.linkTexWidth) *1.0 + 0.5) / actLayer.linkTexWidth;
-			final double ty = ((this.texIdx / actLayer.linkTexWidth)*1.0 + 0.5)/ actLayer.linkTexWidth ;
+		public void onDraw(GL gl) {
+			final double tx = ((this.texIdx % actLayer.linkTexWidth) + 0.5) / actLayer.linkTexWidth;
+			final double ty = ((this.texIdx / actLayer.linkTexWidth) + 0.5)/ actLayer.linkTexWidth;
 			//Draw quad
 			gl.glBegin(gl.GL_QUADS);
 			gl.glTexCoord2d(tx,ty); gl.glVertex3f(this.quad[0].x, this.quad[0].y, 0);

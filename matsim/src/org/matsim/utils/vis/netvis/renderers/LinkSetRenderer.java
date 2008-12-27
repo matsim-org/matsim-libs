@@ -34,9 +34,9 @@ import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRenderer extends RendererA {
 
-    private final boolean RANDOMIZE_LANES = false;
+    private final static boolean RANDOMIZE_LANES = false;
 
-    private final boolean RENDER_CELL_CONTOURS = true;
+    private final static boolean RENDER_CELL_CONTOURS = true;
 
     private final ValueColorizer colorizer = new ValueColorizer();
 
@@ -50,11 +50,6 @@ public class LinkSetRenderer extends RendererA {
 
         this.laneWidth = DisplayLink.LANE_WIDTH
                 * visConfig.getLinkWidthFactor();
-    }
-
-    @Override
-		public void setTargetComponent(NetJComponent comp) {
-        super.setTargetComponent(comp);
     }
 
     // -------------------- RENDERING --------------------

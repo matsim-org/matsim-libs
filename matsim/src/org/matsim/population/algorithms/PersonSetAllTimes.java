@@ -84,26 +84,26 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 				Act act = (Act)plan.getActsLegs().get(j);
 
 				if (act.getType().equals("w")) {
-					if (w_cnt == 0) { System.err.println("HAE?: w_cnt=0"); System.exit(-1); }
+					if (w_cnt == 0) { throw new RuntimeException("HAE?: w_cnt=0"); }
 					else if (w_cnt == 1) { act.setDuration(W_DUR); act.setType("w1"); }
 					else if (w_cnt == 2) { act.setDuration(W_DUR/2); act.setType("w2");}
-					else { System.err.println("HAE?: w_cnt>2"); System.exit(-1); }
+					else { throw new RuntimeException("HAE?: w_cnt>2"); }
 				}
 				else if (act.getType().equals("e")) {
-					if (e_cnt == 0) { System.err.println("HAE?: e_cnt=0"); System.exit(-1); }
+					if (e_cnt == 0) { throw new RuntimeException("HAE?: e_cnt=0"); }
 					else if (e_cnt == 1) { act.setDuration(E_DUR); act.setType("e1");}
 					else if (e_cnt == 2) { act.setDuration(E_DUR/2); act.setType("e2");}
-					else { System.err.println("HAE?: e_cnt>2"); System.exit(-1); }
+					else { throw new RuntimeException("HAE?: e_cnt>2"); }
 				}
 				else if (act.getType().equals("l")) {
 					if ((w_cnt > 0) || (e_cnt > 0)) {
 						act.setDuration(L_DUR_SHORT); act.setType("l");
 					}
 					else {
-						if (l_cnt == 0) { System.err.println("HAE?: l_cnt=0"); System.exit(-1); }
+						if (l_cnt == 0) { throw new RuntimeException("HAE?: l_cnt=0"); }
 						else if (l_cnt == 1) { act.setDuration(L_DUR_LONG); act.setType("l1"); }
 						else if (l_cnt == 2) { act.setDuration(L_DUR_LONG/2); act.setType("l2"); }
-						else { System.err.println("HAE?: l_cnt>2"); System.exit(-1); }
+						else { throw new RuntimeException("HAE?: l_cnt>2"); }
 					}
 				}
 				else if (act.getType().equals("s")) {
@@ -114,17 +114,16 @@ public class PersonSetAllTimes extends AbstractPersonAlgorithm {
 						act.setDuration(S_DUR_SHORT);
 					}
 					else {
-						if (s_cnt == 0) { System.err.println("HAE?: s_cnt=0"); System.exit(-1); }
+						if (s_cnt == 0) { throw new RuntimeException("HAE?: s_cnt=0"); }
 						else if (s_cnt == 1) { act.setDuration(S_DUR_LONG); act.setType("s1"); }
 						else if (s_cnt == 2) { act.setDuration(S_DUR_LONG/2); act.setType("s2"); }
-						else { System.err.println("HAE?: s_cnt>2"); System.exit(-1); }
+						else { throw new RuntimeException("HAE?: s_cnt>2"); }
 					}
 				}
 				else if (!act.getType().equals("h")) {
-					System.err.println("ERROR: in " + this.getClass().getName() +
+					throw new RuntimeException("ERROR: in " + this.getClass().getName() +
 														 " in run(Person person):" +
 														 " does not know act type = " + act.getType() + ".");
-					System.exit(-1);
 				}
 
 				if (j == 0) {

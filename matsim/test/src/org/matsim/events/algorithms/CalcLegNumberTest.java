@@ -43,7 +43,7 @@ public class CalcLegNumberTest extends MatsimTestCase {
 		EventWriterTXT writer = new EventWriterTXT(getOutputDirectory() + "events.txt");
 		events.addHandler(writer);
 		new MatsimEventsReader(events).readFile(getInputDirectory() + "events.txt");
-		writer.closefile();
+		writer.closeFile();
 
 		long cksumReference = CRCChecksum.getCRCFromFile(getInputDirectory() + "events_reference.txt");
 		long cksum = CRCChecksum.getCRCFromFile(getOutputDirectory() + "events.txt");

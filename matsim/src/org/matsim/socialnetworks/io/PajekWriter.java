@@ -24,10 +24,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -63,7 +61,7 @@ public class PajekWriter {
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
 	public PajekWriter(String dir, Facilities facilities){
-		this.dir=new String(dir+"/");
+		this.dir= dir + "/";
 		File pjDir=new File(this.dir+"pajek/");
 		log.info("PajekWriter1 make dir "+this.dir + "pajek/");
 		if(!(pjDir.mkdir())&& !pjDir.exists()){

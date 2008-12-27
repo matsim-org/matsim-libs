@@ -61,7 +61,7 @@ public class MyControler3 {
 		sim.openNetStateWriter("./output/simout", netFilename, 10);
 		sim.run();
 
-		eventWriter.closefile();
+		eventWriter.closeFile();
 
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);

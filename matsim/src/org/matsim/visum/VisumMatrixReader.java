@@ -159,8 +159,8 @@ public class VisumMatrixReader {
 				this.zoneCounter = 0;
 				this.state = STATE_DATA;
 
-			} else if (this.state == STATE_GARBAGE) {
-				// ignore the data
+//			} else if (this.state == STATE_GARBAGE) {
+//				 ignore the data
 			}
 		}
 

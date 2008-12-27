@@ -40,7 +40,7 @@ public class BinaryEvents2TextEvents {
 		eventsReader.readFile(fromFilename);
 		events.printEventsCount();
 
-		ew_txt.closefile();
+		ew_txt.closeFile();
 	}
 
 	private static void usage() {

@@ -33,14 +33,15 @@ import java.awt.image.BufferedImage;
 import org.matsim.utils.vis.netvis.DisplayableLinkI;
 import org.matsim.utils.vis.netvis.DrawableAgentI;
 import org.matsim.utils.vis.netvis.VisConfig;
-import org.matsim.utils.vis.netvis.gui.ControlToolbar;
 import org.matsim.utils.vis.netvis.gui.NetJComponent;
 import org.matsim.utils.vis.netvis.visNet.DisplayLink;
 import org.matsim.utils.vis.netvis.visNet.DisplayNet;
 
 public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 
-	private final boolean RANDOMIZE_LANES = true;
+	private static final boolean RANDOMIZE_LANES = true;
+
+	private static final boolean redrawLanes = false;
 
 	private final ValueColorizer colorizer = new ValueColorizer();
 
@@ -54,11 +55,8 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 		super(visConfig);
 		this.network =  network;
 
-		this.laneWidth = DisplayLink.LANE_WIDTH
-		* visConfig.getLinkWidthFactor();
+		this.laneWidth = DisplayLink.LANE_WIDTH * visConfig.getLinkWidthFactor();
 	}
-
-	private final boolean redrawLanes = false;
 
 	public BufferedImage captureScreen(Graphics2D display) {
 		Component target = getNetJComponent();
@@ -71,11 +69,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 		target.paint(imdisplay);
 
 		return image;
-	}
-
-	@Override
-	public void setTargetComponent(NetJComponent comp) {
-		super.setTargetComponent(comp);
 	}
 
 	// -------------------- RENDERING --------------------
@@ -123,7 +116,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 		}
 	}
 
-	static int ii= 0;
 	@Override
 	protected synchronized void myRendering(Graphics2D display,
 			AffineTransform boxTransform) {
@@ -141,7 +133,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 		if (redrawLanes) {
 			renderLinks(display, boxTransform);
 		} else {
-			//Gbl.startMeasurement();
 			renderLinks(display, boxTransform);
 			display.setTransform(new AffineTransform());
 			display.drawImage(image, null, 0, 0);
@@ -202,14 +193,6 @@ public class LinkSetRendererCOOPERSVehiclesOnly extends RendererA {
 		}
 
 		display.setTransform(originalTransform);
-		//Gbl.printElapsedTime();
-	}
-
-
-	ControlToolbar toolbar = null;
-
-	public void setControlToolbar(ControlToolbar toolbar) {
-		this.toolbar = toolbar;
 	}
 
 }

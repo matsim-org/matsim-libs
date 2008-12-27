@@ -1203,7 +1203,7 @@ public class Controler {
 			int iteration = event.getIteration();
 
 			if (this.eventWriter != null) {
-				this.eventWriter.closefile();
+				this.eventWriter.closeFile();
 				event.getControler().getEvents().removeHandler(this.eventWriter);
 				this.eventWriter = null;
 			}
@@ -1228,7 +1228,7 @@ public class Controler {
 
 		public void notifyShutdown(final ShutdownEvent event) {
 			if (this.eventWriter != null) {
-				this.eventWriter.closefile();
+				this.eventWriter.closeFile();
 			}
 		}
 

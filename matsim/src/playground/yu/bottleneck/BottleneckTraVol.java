@@ -100,7 +100,7 @@ public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHa
 		this.cnt = 0;
 	}
 
-	public void closefile() {
+	public void closeFile() {
 		if (this.out != null) {
 			try {
 				this.out.close();

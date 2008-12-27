@@ -257,8 +257,8 @@ public class QueueNetwork{
 	}
 
 	final private static class LinkActivation implements Comparable<LinkActivation> {
-		final protected double time;
-		final protected QueueLink link;
+		/*package*/ final double time;
+		/*package*/ final QueueLink link;
 		protected LinkActivation(final double time, final QueueLink link) {
 			this.time = time;
 			this.link = link;

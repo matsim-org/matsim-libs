@@ -137,11 +137,6 @@ public class LinkSetRendererRoutes extends RendererA {
 		System.out.println("  done.");
 	}
 
-    @Override
-	public void setTargetComponent(final NetJComponent comp) {
-		super.setTargetComponent(comp);
-	}
-
 	// -------------------- RENDERING --------------------
     @Override
 	protected synchronized void myRendering(final Graphics2D display, final AffineTransform boxTransform) {

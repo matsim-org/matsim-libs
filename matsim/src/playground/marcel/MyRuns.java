@@ -2400,7 +2400,7 @@ public class MyRuns {
 		EventWriterTXT writer = new EventWriterTXT("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events_fixed.txt.gz");
 		events.addHandler(writer);
 		new MatsimEventsReader(events).readFile("/Volumes/Data/VSP/cvs/vsp-cvs/runs/run212/events.txt");
-		writer.closefile();
+		writer.closeFile();
 
 		System.out.println("RUN: readEvents finished.");
 		System.out.println();

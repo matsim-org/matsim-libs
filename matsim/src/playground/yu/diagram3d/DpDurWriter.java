@@ -114,10 +114,10 @@ public class DpDurWriter implements AgentDepartureEventHandler, AgentArrivalEven
 	}
 
 	public void reset(int iteration) {
-		closefile();
+		closeFile();
 	}
 
-	public void closefile() {
+	public void closeFile() {
 		if (this.out != null) {
 			try {
 				this.out.close();

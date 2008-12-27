@@ -20,6 +20,7 @@
 
 package playground.david;
 
+import org.matsim.config.Config;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
@@ -66,11 +67,12 @@ public class DSOnePercentBerlin10sTest {
 		MatsimRandom.reset(7411L);
 
 		World world = Gbl.getWorld();
+		Config config = Gbl.getConfig();
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
-		Gbl.getConfig().simulation().setTimeStepSize(10.0);
-		Gbl.getConfig().simulation().setFlowCapFactor(0.01);
-		Gbl.getConfig().simulation().setStorageCapFactor(0.04);
+		config.simulation().setTimeStepSize(10.0);
+		config.simulation().setFlowCapFactor(0.01);
+		config.simulation().setStorageCapFactor(0.04);
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
@@ -102,7 +104,7 @@ public class DSOnePercentBerlin10sTest {
 		QueueSimulation sim = new QueueSimulation(network, population, events);
 		sim.run();
 
-		writer.closefile();
+		writer.closeFile();
 
 		System.out.println("Aborted Veh # " + counter.stuckvehs);
 		//

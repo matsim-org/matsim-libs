@@ -49,6 +49,6 @@ public class DpDurControler {
 		System.out.println("@done.");
 
 		ddw.writeMatrix();
-		ddw.closefile();
+		ddw.closeFile();
 	}
 }

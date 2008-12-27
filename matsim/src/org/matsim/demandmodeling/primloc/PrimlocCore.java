@@ -174,7 +174,7 @@ public class PrimlocCore {
 				errR = err;
 			}
 			if( (omuL==muL)&&(omuC==muC)&&(omuR==muR)){
-				omuC = muC = (muL+muR)/2+(MatsimRandom.random.nextDouble()-0.5)*(muR-muL)/10;
+				muC = (muL+muR)/2+(MatsimRandom.random.nextDouble()-0.5)*(muR-muL)/10;
 			}
 			omuL = muL;
 			omuC = muC;

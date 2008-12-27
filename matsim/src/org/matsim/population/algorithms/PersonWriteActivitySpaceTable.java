@@ -66,8 +66,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 			out.write("pid\tage\tsex\tcar_avail\tlicence\tct_type\tn_loc\tshape\tarea\tcover\tx\ty\ttheta\ta\tb\tr\n");
 			out.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			Gbl.errorMsg(e);
 		}
 	}
 
@@ -81,8 +80,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 			out.close();
 			fw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			Gbl.errorMsg(e);
 		}
 	}
 
@@ -278,8 +276,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 			}
 			out.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			Gbl.errorMsg(e);
 		}
 	}
 }
