@@ -23,26 +23,17 @@ package org.matsim.counts.algorithms.graphs.helper;
 import java.util.List;
 import java.util.Vector;
 
-
-
 public class Section {
-	private String title_;
+	private final String title_;
 	private List<MyURL> urls_;
 	
-	public Section(){
-		urls_=new Vector<MyURL>();
-	}
 	public Section(String title) {
-		urls_=new Vector<MyURL>();
+		this.urls_=new Vector<MyURL>();
 		this.title_=title;	
-	}
-
-	public void setTitle(String title) {
-		this.title_=title;
 	}
 	
 	public void addURL(MyURL url){
-		urls_.add(url);
+		this.urls_.add(url);
 	}
 	
 	public String getTitle() {

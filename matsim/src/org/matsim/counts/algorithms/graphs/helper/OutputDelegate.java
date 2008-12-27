@@ -213,7 +213,7 @@ public class OutputDelegate {
 				Iterator<MyURL> url_it = sec.getURLs().iterator();
 				while (url_it.hasNext()) {
 					MyURL url=url_it.next();
-					writer.println("<a href=\""+url.getAddress()+"\">"+url.getDisplayText()+"</a><br />");
+					writer.println("<a href=\""+url.address+"\">"+url.displayText+"</a><br />");
 				}//while
 			}
 			writer.println("</div>");
