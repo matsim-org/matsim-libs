@@ -23,19 +23,13 @@ package org.matsim.withinday.trafficmanagement;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputImpl;
 
-
-
 /**
  * @author dgrether
- *
  */
 public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
 
-	/**
-	 *
-	 */
 	public EmptyControlInputImpl() {
 	}
 
@@ -46,17 +40,8 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 		return this.nashTime;
 	}
 
-	/**
-	 * @see org.matsim.events.handler.EventHandler#reset(int)
-	 */
-	public void reset(final int iteration) {
-	}
-
 	public void setNashTime(final double t) {
 		this.nashTime = t;
-	}
-
-	public void finishIteration() {
 	}
 
 	@Override
