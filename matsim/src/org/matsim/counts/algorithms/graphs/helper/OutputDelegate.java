@@ -57,7 +57,7 @@ public class OutputDelegate {
 
 	private final List<Section> sections_;
 	private final List<CountsGraph> cg_list_;
-	private String iterPath_;
+	private final String iterPath_;
 
 	public OutputDelegate(final String iterPath) {
 		this.iterPath_ = iterPath;
@@ -71,10 +71,6 @@ public class OutputDelegate {
 
 	public void addCountsGraph(final CountsGraph cg) {
 		this.cg_list_.add(cg);
-	}
-
-	public void setIterPath(final String iterPath) {
-		this.iterPath_ = iterPath;
 	}
 
 	public List<CountsGraph> getGraphs() {

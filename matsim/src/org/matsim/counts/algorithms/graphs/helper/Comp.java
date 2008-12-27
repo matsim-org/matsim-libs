@@ -22,26 +22,14 @@ package org.matsim.counts.algorithms.graphs.helper;
 
 public class Comp {
 	// make private of course
-	private double xval_;
-	private String url_;
-	private String tooltip_;
+	private final double xval_;
+	private final String url_;
+	private final String tooltip_;
 	
 	public Comp(double xval, String url, String tooltip) {
 		this.xval_=xval;
 		this.url_=url;
 		this.tooltip_=tooltip;
-	}
-	
-	public void setXVal(double xval){
-		this.xval_=xval;
-	}
-	
-	public void setText(String text){
-		this.url_=text;
-	}
-	
-	public void setTooltip(String text){
-		this.url_=text;
 	}
 	
 	public double getXval() {
