@@ -44,12 +44,12 @@ public interface ConfigModuleI {
 
     public static final String MODULE_CLASS_ATTR = "class";
 
-    /**
-     * Returns this sub-configuration's name.
-     *
-     * @return this sub-configuration's name
-     */
-    public String getName();
+//    /**
+//     * Returns this sub-configuration's name.
+//     *
+//     * @return this sub-configuration's name
+//     */
+//    public String getName();
 
     /**
      * Returns this sub-configuration as an xml segment.

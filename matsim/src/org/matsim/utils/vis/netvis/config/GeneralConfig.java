@@ -32,13 +32,13 @@ public class GeneralConfig extends ConfigModule {
 
     // IDENTIFIERS
 
-    public static final String MODULE_NAME = "general";
+		private static final String MODULE_NAME = "general";
 
-    public static final String NET_FILE = "netfile";
+		private static final String NET_FILE = "netfile";
 
     // DEFAULT VALUES
 
-    public static final String DEFAULT_VERBOSE = "true";
+//		private static final String DEFAULT_VERBOSE = "true";
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -50,21 +50,21 @@ public class GeneralConfig extends ConfigModule {
         super(MODULE_NAME);
         set(NET_FILE, netFileName);
     }
-
-    @Override
-    public boolean isComplete() {
-        return containsKey(NET_FILE);
-    }
-
-    // -------------------- CACHING --------------------
-
-    @Override
-    protected void cache(String name, String value) {
-    }
-
-    @Override
-    protected void completeCache() {
-    }
+//
+//    @Override
+//    public boolean isComplete() {
+//        return containsKey(NET_FILE);
+//    }
+//
+//    // -------------------- CACHING --------------------
+//
+//    @Override
+//    protected void cache(String name, String value) {
+//    }
+//
+//    @Override
+//    protected void completeCache() {
+//    }
 
     // -------------------- CONTENT ACCESS --------------------
 

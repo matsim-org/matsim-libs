@@ -37,11 +37,11 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 
     // -------------------- CLASS VARIABLES --------------------
 
-    public static final String PARAM_ELEM = "param";
+		private static final String PARAM_ELEM = "param";
 
-    public static final String PARAM_NAME_ATTR = "name";
+		private static final String PARAM_NAME_ATTR = "name";
 
-    public static final String PARAM_VALUE_ATTR = "value";
+		private static final String PARAM_VALUE_ATTR = "value";
 
     // -------------------- INSTANCE VARIABLES --------------------
 
@@ -62,13 +62,13 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
 //        File cfgfile = new File(fileName);
 //        this.setRootFile(cfgfile.getParent());
         read(fileName);
-        completeCache();
+//        completeCache();
     }
 
     public ConfigModule(String moduleName) {
         this.moduleName = moduleName;
         this.rootFile = null;
-        completeCache();
+//        completeCache();
     }
 
     // -------------------- SETTERS --------------------
@@ -77,34 +77,34 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
         content.put(name.toLowerCase(), value);
         cache(name, value);
     }
-
-    public void setRootFile(String path) {
-        if (path != null)
-            this.rootFile = new File(path);
-        else
-            this.rootFile = null;
-    }
+//
+//    public void setRootFile(String path) {
+//        if (path != null)
+//            this.rootFile = new File(path);
+//        else
+//            this.rootFile = null;
+//    }
 
     // -------------------- HOOKS FOR SUBCLASSING --------------------
 
-    /**
-     * To be overridden by subclasses that perform more specific checks.
-     * Indicates if a subclass configuration module is "complete", depending on
-     * its specific purpose.
-     *
-     * @return <code>true</code> by default
-     */
-    public boolean isComplete() {
-        return true;
-    }
-
-    /**
-     * To be overridden by subclasses that do caching. Initializes cache with
-     * default values. This function is called at last by the constructor of
-     * this class. Does nothing by default.
-     */
-    protected void completeCache() {
-    }
+//    /**
+//     * To be overridden by subclasses that perform more specific checks.
+//     * Indicates if a subclass configuration module is "complete", depending on
+//     * its specific purpose.
+//     *
+//     * @return <code>true</code> by default
+//     */
+//    public boolean isComplete() {
+//        return true;
+//    }
+//
+//    /**
+//     * To be overridden by subclasses that do caching. Initializes cache with
+//     * default values. This function is called at last by the constructor of
+//     * this class. Does nothing by default.
+//     */
+//    protected void completeCache() {
+//    }
 
     /**
      * To be overridden by subclasses that cache values. Is called by
@@ -150,15 +150,15 @@ public class ConfigModule extends DefaultHandler implements ConfigModuleI {
     }
 
     public static String indent(int indentCnt) {
-        StringBuffer result = new StringBuffer("");
+        StringBuffer result = new StringBuffer(indentCnt);
         for (int i = 0; i < indentCnt; i++)
-            result.append(" ");
+            result.append(' ');
         return result.toString();
     }
 
     // -------------------- IMPLEMENTATION OF ConfigModuleI --------------------
 
-    public String getName() {
+    private String getName() {
         return moduleName;
     }
 

@@ -26,15 +26,15 @@ public class TemporalConfig extends ConfigModule {
 
     // -------------------- CLASS VARIABLES --------------------
 
-    public static final String CLASS_NAME = "temporal";
+    private static final String CLASS_NAME = "temporal";
 
-    public static final String START_TIME_S = "starttime";
+    private static final String START_TIME_S = "starttime";
 
-    public static final String END_TIME_S = "endtime";
+    private static final String END_TIME_S = "endtime";
 
-    public static final String BUFFER_SIZE = "buffersize";
+    private static final String BUFFER_SIZE = "buffersize";
 
-    public static final String TIMESTEP_LENGTH_S = "timesteplength";
+    private static final String TIMESTEP_LENGTH_S = "timesteplength";
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -51,12 +51,12 @@ public class TemporalConfig extends ConfigModule {
         set(BUFFER_SIZE, Integer.toString(bufferSize));
         set(TIMESTEP_LENGTH_S, Time.writeTime(timeStepLength_s, Time.TIMEFORMAT_HHMMSS, '-'));
     }
-
-    @Override
-    public boolean isComplete() {
-        return containsKey(START_TIME_S) && containsKey(END_TIME_S)
-                && containsKey(BUFFER_SIZE) && containsKey(TIMESTEP_LENGTH_S);
-    }
+//
+//    @Override
+//    public boolean isComplete() {
+//        return containsKey(START_TIME_S) && containsKey(END_TIME_S)
+//                && containsKey(BUFFER_SIZE) && containsKey(TIMESTEP_LENGTH_S);
+//    }
 
     // -------------------- CACHING --------------------
 

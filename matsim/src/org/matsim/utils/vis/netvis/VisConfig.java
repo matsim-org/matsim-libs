@@ -66,10 +66,10 @@ public class VisConfig extends ConfigModule {
         set(USE_ANTI_ALIASING, "true");
     }
 
-    @Override
-		public boolean isComplete() {
-        return true; // don't need anything
-    }
+//    @Override
+//		public boolean isComplete() {
+//        return true; // don't need anything
+//    }
 
     // -------------------- CACHING --------------------
 

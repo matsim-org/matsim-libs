@@ -35,7 +35,6 @@ import org.matsim.utils.vis.netvis.config.IndexationConfig;
  * elements' states (i.e., all node and link states).
  * 
  * @author gunnar
- * 
  */
 public abstract class NetStateA implements StateI {
 
@@ -80,11 +79,11 @@ public abstract class NetStateA implements StateI {
         this.indexConfig = indexConfig;
     }
 
-    // -------------------- PROTECTED GETTERS --------------------
-
-    protected IndexationConfig getIndexationConfig() {
-        return indexConfig;
-    }
+//    // -------------------- PROTECTED GETTERS --------------------
+//
+//    protected IndexationConfig getIndexationConfig() {
+//        return indexConfig;
+//    }
 
     // -------------------- INTERFACE DEFINITION --------------------
 
