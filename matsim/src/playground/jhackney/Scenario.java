@@ -20,12 +20,8 @@
 
 package playground.jhackney;
 
-import java.io.IOException;
-
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
-import org.matsim.config.MatsimConfigReader;
-import org.matsim.config.Module;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
@@ -43,15 +39,12 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
-import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
-
-import playground.jhackney.scoring.TrackEventsOverlapII;
 
 public abstract class Scenario {
 
@@ -76,7 +69,7 @@ public abstract class Scenario {
 	private static final String out2 = "3_HC_4.out";
 	private static final String out1 = "AgentsAtActivities3_HC_4.out";
 	
-	private static final Config config= Gbl.createConfig(null);;
+	private static final Config config= Gbl.createConfig(null);
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -120,7 +113,6 @@ public abstract class Scenario {
 		config.counts().setOutputFile(output_directory + "output_counts.xml.gz");
 		
 		config.events().setInputFile("events.txt");
-		config.events().setOutputFile(output_directory + "output_events.txt");
 		
 		config.socnetmodule().setInDirName(input_directory);
 		config.socnetmodule().setOutDir(output_directory);
@@ -155,7 +147,6 @@ public abstract class Scenario {
 //		try {
 //			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //		System.out.println("  Done");

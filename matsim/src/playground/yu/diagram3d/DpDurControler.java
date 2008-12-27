@@ -39,13 +39,13 @@ public class DpDurControler {
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(args);
-		DpDurWriter ddw = new DpDurWriter(config.events().getOutputFile());
+		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
 		
 		Events events = new Events();
 		events.addHandler(ddw);// TODO...
 
 		System.out.println("@reading the eventsfile (TXTv1) ...");
-		new MatsimEventsReader(events).readFile(config.events().getInputFile());//Man can also use readFile("..../...txt") hier
+		new MatsimEventsReader(events).readFile(config.events().getInputFile());//One can also use readFile("..../...txt") hier
 		System.out.println("@done.");
 
 		ddw.writeMatrix();

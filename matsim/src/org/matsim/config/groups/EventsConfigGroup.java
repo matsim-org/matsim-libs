@@ -30,13 +30,12 @@ public class EventsConfigGroup extends Module {
 	public static final String GROUP_NAME = "events";
 
 	private static final String INPUT_FILE= "inputFile";
-	private static final String OUTPUT_FILE = "outputFile";
 
 	private static final String INPUT_FORMAT= "inputFormat";
 	private static final String OUTPUT_FORMAT = "outputFormat";
+	private static final String OUTPUT_FILE = "outputFile";
 
 	private String inputFile = null;
-	private String outputFile = null;
 
 	private static final Logger log = Logger.getLogger(EventsConfigGroup.class);
 
@@ -48,20 +47,15 @@ public class EventsConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (EventsConfigGroup.INPUT_FILE.equals(key)) {
 			return getInputFile();
-		} else if (EventsConfigGroup.OUTPUT_FILE.equals(key)) {
-			return getOutputFile();
-		} else {
-			throw new IllegalArgumentException(key);
 		}
+		throw new IllegalArgumentException(key);
 	}
 
 	@Override
 	public void addParam(final String key, final String value) {
 		if (EventsConfigGroup.INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
-		} else if (EventsConfigGroup.OUTPUT_FILE.equals(key)) {
-			setOutputFile(value.replace('\\', '/'));
-		} else if (EventsConfigGroup.OUTPUT_FORMAT.equals(key) || EventsConfigGroup.INPUT_FORMAT.equals(key)) {
+		} else if (EventsConfigGroup.OUTPUT_FORMAT.equals(key) || EventsConfigGroup.INPUT_FORMAT.equals(key) || EventsConfigGroup.OUTPUT_FILE.equals(key)) {
 			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
@@ -72,7 +66,6 @@ public class EventsConfigGroup extends Module {
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, INPUT_FILE);
-		addParameterToMap(map, OUTPUT_FILE);
 		return map;
 	}
 
@@ -83,13 +76,6 @@ public class EventsConfigGroup extends Module {
 	}
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
-	}
-
-	public String getOutputFile() {
-		return this.outputFile;
-	}
-	public void setOutputFile(final String outputFile) {
-		this.outputFile = outputFile;
 	}
 
 }
