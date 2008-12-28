@@ -71,6 +71,8 @@ public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	/*default*/ static class TestModule extends Module {
 
+		private static final long serialVersionUID = 1L;
+		
 		/*default*/ boolean param1set = false;
 		/*default*/ boolean param2set = false;
 		/*default*/ boolean param3set = false;
