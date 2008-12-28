@@ -39,8 +39,9 @@ public class PrimlocIO {
 	/* File format: Zone_ID	Zone_Attribute */
 	static double[] readZoneAttribute( final int numZ, final String filename, final Map<Integer,Integer> zonemap ){
 		double[] array = new double[ numZ ];
+		LineNumberReader lnr = null;
 		try{
-			LineNumberReader lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
+			lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
 			String line=null;
 			while( (line=lnr.readLine()) != null ){
 				StringTokenizer st = new StringTokenizer( line );
@@ -52,14 +53,20 @@ public class PrimlocIO {
 		catch( IOException xc){
 			xc.printStackTrace();
 		}
+		finally {
+			if (lnr != null) {
+				try { lnr.close(); } catch (IOException e) { e.printStackTrace(); }
+			}
+		}
 		return array;
 	}
 
 	/* File format: One record Cij per line */
 	static Matrix readMatrix( final String filename, final int nrow, final int ncol ){
 		Matrix cij = new Matrix( nrow, ncol );
+		LineNumberReader lnr = null;
 		try{
-			LineNumberReader lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
+			lnr = new LineNumberReader( IOUtils.getBufferedReader(filename) );
 			for( int i=0; i<nrow; i++ )
 				for( int j=0; j<ncol; j++ )
 					cij.set( i, j, Double.parseDouble(lnr.readLine()) );
@@ -68,20 +75,30 @@ public class PrimlocIO {
 		catch( IOException xc){
 			xc.printStackTrace();
 		}
+		finally {
+			if (lnr != null) {
+				try { lnr.close(); } catch (IOException e) { e.printStackTrace(); }
+			}
+		}
 		return cij;
 	}
 
 	static HashSet<Integer> readZoneIDs( final String zoneFileName ){
 		HashSet<Integer> zoneids = new HashSet<Integer>();
+		LineNumberReader lnr = null;
 		try{
-			LineNumberReader lnr = new LineNumberReader( IOUtils.getBufferedReader(zoneFileName) );
+			lnr = new LineNumberReader( IOUtils.getBufferedReader(zoneFileName) );
 			String line=null;
 			while( (line=lnr.readLine()) != null )
 				zoneids.add(Integer.valueOf(line) );
 		}
 		catch( IOException xc){
-			xc.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException(xc);
+		}
+		finally {
+			if (lnr != null) {
+				try { lnr.close(); } catch (IOException e) { e.printStackTrace(); }
+			}
 		}
 		return zoneids;
 	}
@@ -92,18 +109,23 @@ public class PrimlocIO {
 		for( int i=0; i<X.length; i++ )
 			if( X[i] < minix )
 				minix = X[i];
+		FileWriter out = null;
 		try{
-			FileWriter out = new FileWriter( filename );
+			out = new FileWriter( filename );
 			for( Map.Entry<Integer, Integer> entry : zonemap.entrySet() ){
 				Integer id = entry.getKey();
 				int zone = entry.getValue().intValue();
 				double rent = Math.abs( X[zone] - minix );
 				out.write( id + "\t" + rent + "\n");
 			}
-			out.close();
 		}
 		catch( IOException xc){
 			xc.printStackTrace();
+		}
+		finally {
+			if (out != null) {
+				try { out.close(); } catch (IOException e) { e.printStackTrace(); }
+			}
 		}
 	}
 
@@ -113,9 +135,9 @@ public class PrimlocIO {
 		String inputString = null, value= null;
 		int col = 0;
 		Matrix cij = new Matrix( nrow, ncol );
-
+		LineNumberReader lnr = null;
 		try{
-			LineNumberReader lnr = new LineNumberReader( IOUtils.getBufferedReader(costFileName) );
+			lnr = new LineNumberReader( IOUtils.getBufferedReader(costFileName) );
 			for (int i=0; i<nrow; i++)
 				for (int j=0;j<ncol;j++){
 					inputString = lnr.readLine();
@@ -139,8 +161,12 @@ public class PrimlocIO {
 			}
 		}
 		catch( IOException xc){
-			xc.printStackTrace();
-			System.exit(-1);
+			throw new RuntimeException(xc);
+		}
+		finally {
+			if (lnr != null) {
+				try { lnr.close(); } catch (IOException e) { e.printStackTrace(); }
+			}
 		}
 		return cij;
 	}
