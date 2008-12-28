@@ -40,11 +40,11 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.ShapeFileReader;
-import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
  * NetworkGenerator kann aus einem speziell aufbereiteten *.shp-File von 
- * LineStrings ein MATSim Netzwerk generieren. Insbesondere m�ssen die 
+ * LineStrings ein MATSim Netzwerk generieren. Insbesondere muessen die 
  * LineStrings in ihren Attributen fromNode und toNode ID haben. 
  * 
  * @author laemmel
@@ -96,13 +96,12 @@ public class NetworkGenerator {
 			final double permlanes = Math.max(avgWidth,minWidth) / 3.75;
 			final double flowcap = Math.max(minWidth / 3.75,1);
 
-			this.network.createLink(Integer.toString(id), Integer.toString(from), Integer.toString(to), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
-			
-			this.network.createLink(Integer.toString(id+1000000), Integer.toString(to), Integer.toString(from), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
-			
+			Node fromNode = this.network.getNode(new IdImpl(from));
+			Node toNode = this.network.getNode(new IdImpl(to));
+
+			this.network.createLink(new IdImpl(id), fromNode, toNode, length, 1.66, flowcap, permlanes, Integer.toString(id), null);
+			this.network.createLink(new IdImpl(id+1000000), toNode, fromNode, length, 1.66, flowcap, permlanes, Integer.toString(id), null);
 		}
-			
-		
 	}
 		
 	private void createNodes() {
@@ -124,7 +123,7 @@ public class NetworkGenerator {
 		
 	}
 
-	public static void main(final String [] args) throws FactoryRegistryException, IOException, FactoryException, SchemaException, IllegalAttributeException, Exception {
+	public static void main(final String [] args) throws FactoryRegistryException{
 		
 		
 

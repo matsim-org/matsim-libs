@@ -159,15 +159,15 @@ public class NetworkFromRawData {
 					int i = 0 ; i++;
 				}
 				if (oneWay.equals("B")) {
-					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-					this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+					this.network.createLink(new IdImpl(id), fromNode, toNode, length, freespeed, capacity, permlanes);
+					this.network.createLink(new IdImpl(1000000+id), toNode, fromNode, length, freespeed, capacity, permlanes);
 				} else if (oneWay.equals("FT")) {
-					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+					this.network.createLink(new IdImpl(id), fromNode, toNode, length, freespeed, capacity, permlanes);
 				} else if (oneWay.equals("TF")) {
-					this.network.createLink(id + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-				} else	if (oneWay.equals("N")) {
-					this.network.createLink(id + "", fromNode.getId().toString(), toNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
-					this.network.createLink((1000000+id) + "", toNode.getId().toString(), fromNode.getId().toString(), ""+length, ""+freespeed, ""+capacity, ""+permlanes, id + "", "");
+					this.network.createLink(new IdImpl(id), toNode, fromNode, length, freespeed, capacity, permlanes);
+				} else if (oneWay.equals("N")) {
+					this.network.createLink(new IdImpl(id), fromNode, toNode, length, freespeed, capacity, permlanes);
+					this.network.createLink(new IdImpl(1000000+id), toNode, fromNode, length, freespeed, capacity, permlanes);
 				} else {
 					throw new RuntimeException("Unknown directional information: " + oneWay);
 				}

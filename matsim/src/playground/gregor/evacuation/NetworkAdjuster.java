@@ -28,6 +28,7 @@ import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.utils.misc.Time;
 
 public class NetworkAdjuster {
 	
@@ -60,26 +61,20 @@ public class NetworkAdjuster {
 		
 		while (links.peek() != null) {
 			Link link = links.poll();
-			String id = link.getId().toString();
-			String from = link.getFromNode().getId().toString();
-			String to = link.getToNode().getId().toString();
-			String length = Double.toString(link.getLength());
-			String freespeed =  Double.toString(link.getFreespeed(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-			String capacity = Double.toString(link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+			double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
+			double capacity = link.getCapacity(Time.UNDEFINED_TIME);
 			String origid = link.getOrigId();
 			String type = link.getType();
 			
-			double min_width = link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) / this.flowCap;
+			double min_width = link.getCapacity(Time.UNDEFINED_TIME) / this.flowCap;
 			double storage = min_width * link.getLength() * this.storageCap;
 			double laneCap = this.network.getEffectiveLaneWidth() * link.getLength() * this.storageCap;
 			
-			double lanes = Math.max(storage/laneCap ,1.0 );
-			
-			String permlanes = Double.toString(lanes);
-			
+			double lanes = Math.max(storage/laneCap, 1.0);
+
 			this.network.removeLink(link);
-			this.network.createLink(id, from, to, length, freespeed, capacity, permlanes, origid, type);
-			
+			this.network.createLink(link.getId(), link.getFromNode(), link.getToNode(), link.getLength(), freespeed, capacity, lanes, origid, type);
+			// uhmm.... why not just using link.setLanes(), instead of deleting the link and adding it with again with slightly changed values?
 		}
 
 		return this.network;

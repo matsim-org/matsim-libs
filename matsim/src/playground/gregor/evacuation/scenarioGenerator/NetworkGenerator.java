@@ -40,6 +40,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.network.Node;
 import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.geotools.MGC;
@@ -92,13 +93,13 @@ public class NetworkGenerator {
 			final double permlanes = Math.max(avgWidth,minWidth) / 0.71;
 			final double flowcap = Math.max(minWidth / 0.71,1);
 
-			this.network.createLink(Integer.toString(id), Integer.toString(from), Integer.toString(to), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
+			Node fromNode = this.network.getNode(new IdImpl(from));
+			Node toNode = this.network.getNode(new IdImpl(to));
 			
-			this.network.createLink(Integer.toString(id+100000), Integer.toString(to), Integer.toString(from), Double.toString(length), "1.66", Double.toString(flowcap), Double.toString(permlanes), Integer.toString(id), "");
-			
+			this.network.createLink(new IdImpl(id), fromNode, toNode, length, 1.66, flowcap, permlanes, Integer.toString(id), null);
+			this.network.createLink(new IdImpl(id+100000), toNode, fromNode, length, 1.66, flowcap, permlanes, Integer.toString(id), null);
 		}
-			
-		
+
 	}
 
 	private void createNodes2() {
