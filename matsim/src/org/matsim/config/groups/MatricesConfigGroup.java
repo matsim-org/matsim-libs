@@ -27,6 +27,8 @@ import org.matsim.config.Module;
 
 public class MatricesConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "matrices";
 
 	private static final String INPUT_FILE= "inputMatricesFile";
@@ -39,7 +41,7 @@ public class MatricesConfigGroup extends Module {
 	private String inputFile = null;
 	private String outputFile = null;
 
-	private final Logger log = Logger.getLogger(MatricesConfigGroup.class);
+	private static final Logger log = Logger.getLogger(MatricesConfigGroup.class);
 
 	public MatricesConfigGroup() {
 		super(MatricesConfigGroup.GROUP_NAME);
@@ -63,7 +65,7 @@ public class MatricesConfigGroup extends Module {
 		} else if (OUTPUT_FILE.equals(key)) {
 			setOutputFile(value.replace('\\', '/'));
 		} else if (LOCAL_INPUT_DTD.equals(key) || INPUT_VERSION.equals(key) || OUTPUT_DTD.equals(key) || OUTPUT_VERSION.equals(key)) {
-			this.log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
+			log.info("The parameter " + key + " in module " + GROUP_NAME + " is no longer needed and should be removed from the configuration file.");
 		} else {
 			throw new IllegalArgumentException(key);
 		}

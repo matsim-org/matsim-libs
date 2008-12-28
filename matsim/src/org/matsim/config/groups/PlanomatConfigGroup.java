@@ -13,6 +13,8 @@ import org.matsim.router.util.TravelTime;
 
 public class PlanomatConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "planomat";
 
 	public static final String OPTIMIZATION_TOOLBOX = "optimizationToolbox";

@@ -26,6 +26,9 @@ import java.util.TreeMap;
 import org.matsim.config.Module;
 
 public class SocNetConfigGroup extends Module {
+
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "socialnetwork";
 	//public static final String SOCNET = "socialnetwork";
 	private static final String SOCNET_GRAPHALGO = "socnetalgorithm";

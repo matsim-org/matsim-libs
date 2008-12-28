@@ -21,11 +21,14 @@
 package org.matsim.config.groups;
 
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.config.Module;
 
 
 public class LocationChoiceConfigGroup extends Module {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "locationchoice";
 	

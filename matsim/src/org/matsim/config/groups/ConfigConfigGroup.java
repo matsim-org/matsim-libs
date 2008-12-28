@@ -27,6 +27,8 @@ import org.matsim.config.Module;
 
 public class ConfigConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "config";
 
 	private static final String OUTPUT_FILE = "outputConfigFile";

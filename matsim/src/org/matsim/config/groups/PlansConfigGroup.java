@@ -27,6 +27,8 @@ import org.matsim.config.Module;
 
 public class PlansConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "plans";
 
 	private static final String SWITCH_OFF_PLANS_STREAMING = "switchOffPlansStreaming";

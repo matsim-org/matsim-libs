@@ -28,6 +28,8 @@ import org.matsim.utils.misc.Time;
 
 public class SimulationConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "simulation";
 
 	private static final String START_TIME = "startTime";

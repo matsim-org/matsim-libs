@@ -27,6 +27,8 @@ import org.matsim.config.Module;
 
 public class EventsConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "events";
 
 	private static final String INPUT_FILE= "inputFile";

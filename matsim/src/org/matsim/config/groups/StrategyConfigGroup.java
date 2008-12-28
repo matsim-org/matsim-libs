@@ -36,6 +36,8 @@ import org.matsim.config.Module;
  */
 public class StrategyConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "strategy";
 	private static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
 	private static final String MODULE = "Module_";

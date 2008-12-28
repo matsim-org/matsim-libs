@@ -32,6 +32,8 @@ import org.matsim.utils.misc.Time;
 
 public class CharyparNagelScoringConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "planCalcScore"; // TODO [MR] switch to better name
 
 	private static final String LEARNING_RATE = "learningRate";

@@ -26,6 +26,8 @@ import org.matsim.config.Module;
 
 public class RoadPricingConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "roadpricing";
 
 	private static final String TOLL_LINKS_FILE = "tollLinksFile";

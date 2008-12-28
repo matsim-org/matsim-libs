@@ -33,6 +33,8 @@ import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
 
 public class ControlerConfigGroup extends Module {
 	
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger log = Logger.getLogger(ControlerConfigGroup.class);
 	
 	public static final String GROUP_NAME = "controler";

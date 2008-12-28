@@ -32,6 +32,8 @@ import org.matsim.config.Module;
  */
 public class WithindayConfigGroup extends Module {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String GROUP_NAME = "withinday";
 
 	private static final String WITHINDAYITERATION = "withindayIteration";
@@ -68,7 +70,7 @@ public class WithindayConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (WITHINDAYITERATION.equals(key)) {
-			this.withindayIterations.add(Integer.parseInt(value));
+			this.withindayIterations.add(Integer.valueOf(value));
 		}
 		else if (TRAFFICMANAGEMENTCONFIG.equals(key)) {
 			this.trafficManagementConfiguration = value.replace("\\", "/");
