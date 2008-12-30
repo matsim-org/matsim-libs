@@ -23,6 +23,7 @@ package playground.toronto.maneuvers;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
+import org.matsim.network.algorithms.NetworkCleaner;
 import org.matsim.network.algorithms.NetworkWriteAsTable;
 
 
@@ -35,7 +36,7 @@ public class ManeuverCreation {
 			System.out.println("       XMLnetwork:   MATSim xml network");
 			System.out.println("       TXTmaneuvers: tab separated text file of the maneuver restrictions from EMME");
 			System.out.println("       outputdir:  where to store the output");
-			System.out.println("       removeUTurns [boolean]: if 1, U-turns will be removed; if 0, U-turns will remain");
+			System.out.println("       removeUTurns [boolean]: if 'true', U-turns will be removed; if ''false, U-turns will remain");
 			System.out.println("       linkSeparation [double]>=0: offset between parallel links");
 			System.out.println("       expansionRadius [double]>=0: defines the size of the expanding intersection");
 			System.out.println();
@@ -61,6 +62,7 @@ public class ManeuverCreation {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkfile);
 		naemr.run(network);
+		new NetworkCleaner().run(network);
 
 		System.out.println("writing xml file...");
 		new NetworkWriter(network,outputdir+"/output_network.xml.gz").write();
