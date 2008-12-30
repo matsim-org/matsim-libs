@@ -2,24 +2,20 @@ package org.matsim.socialnetworks.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
-import org.matsim.events.BasicEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.facilities.Facility;
-import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
 
 	public HashMap<Person, ArrayList<ActStartEvent>> startMap = new HashMap<Person,ArrayList<ActStartEvent>>();
 	public HashMap<Person, ArrayList<ActEndEvent>> endMap = new HashMap<Person,ArrayList<ActEndEvent>>();
+	public double maxtime=0;
 	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
 
@@ -42,6 +38,7 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 		startList.add(event);
 		startMap.remove(person);
 		startMap.put(person,startList);
+		if(event.time>=maxtime) maxtime=event.time;
 	}
 
 	public void reset(int iteration) {
@@ -63,5 +60,9 @@ public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEvent
 		endList.add(event);
 		endMap.remove(person);
 		endMap.put(person,endList);
+		if(event.time>=maxtime) maxtime=event.time;
+	}
+	public double getMaxTime(){
+		return maxtime;
 	}
 }

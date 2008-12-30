@@ -58,28 +58,25 @@ public class MakeTimeWindowsFromEvents {
 			Plan plan =person.getSelectedPlan();
 			ArrayList<ActStartEvent> startEvents =startMap.get(person);
 			ArrayList<ActEndEvent> endEvents = endMap.get(person);
-			for (int j=0;j<endEvents.size()+1;j++){
+//30.12			for (int j=0;j<endEvents.size()+1;j++){
+			for (int j=0;j<endEvents.size();j++){
 				double startTime=0;
 				double endTime=0;
 				if(j==0){
 //					startTime=startEvents.get(startEvents.size()-1).time-86400.;
-					startTime=0;
+//30.12					startTime=0;
+					startTime=(startEvents.get(startEvents.size()-1).time+86400.)%86400.;
 					endTime=endEvents.get(j).time;
 				}
 				else if(j < endEvents.size()){
 					startTime=startEvents.get(j-1).time;
 					endTime=endEvents.get(j).time;
 				}
-				else if(j==endEvents.size()){
-					startTime=startEvents.get(j-1).time;
-					endTime=30.*3600.;
-				}
-//				endTime=endEvents.get(j).time;
+//30.12				else if(j==endEvents.size()){
+//30.12					startTime=startEvents.get(j-1).time;
+//30.12					endTime=30.*3600.;
+//30.12				}
 				
-				//DEBUG
-				if(j*2>plan.getActsLegs().size()){
-					System.out.println("stop");
-				}
 				Act act = (Act) plan.getActsLegs().get(j*2);
 				TimeWindow tw=new TimeWindow(startTime, endTime, person, act);
 				if(!(timeWindowMap.containsKey(act.getFacility()))){

@@ -60,8 +60,8 @@ public abstract class ScenarioConfig {
 //	private static final String input_directory = "D:/SocialNetsFolder/TRB/TRB5/";
 	
 	//For TRB run analyses of 500 iterations
-	private static final String output_directory = "D:/SocialNetsFolder/TRB/Config1/Analyses/";
-	private static final String input_directory = "D:/SocialNetsFolder/TRB/Config1/";
+	private static final String output_directory = "D:/SocialNetsFolder/FixedEd/TRB1/timecorr/";
+	private static final String input_directory = "D:/SocialNetsFolder/FixedEd/TRB1/";
 	private static String configFileName; 
 	private static String dtdFileName;
 //	private static final String output_directory="output/Analyses/TRB6/";//AnalyzeScores
@@ -73,8 +73,8 @@ public abstract class ScenarioConfig {
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
 //	private static final String output_directory="D:/SocialNetsFolder/Battery/22_HC/timecorr/";//AnalyzeTimeCorrelation
 //	private static final String input_directory="D:/SocialNetsFolder/Battery/22_HC/";//AnalyzeTimeCorrelation	
-	private static final String out2 = "22_HC.out";
-	private static final String out1 = "AgentsAtActivities22_HC.out";
+	private static final String out2 = "1.out";
+	private static final String out1 = "AgentsAtActivities1.out";
 	private static String eventsFileName=null;
 	private static String worldFileName=null;
 	private static String netFileName=null;

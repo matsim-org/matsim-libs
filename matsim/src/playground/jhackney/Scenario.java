@@ -64,10 +64,10 @@ public abstract class Scenario {
 
 //	private static final String output_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/timecorr/";
 //	private static final String input_directory="D:/eclipse_workspace/matsim/output/EventsInt5_10/";
-	private static final String output_directory="D:/SocialNetsFolder/SNController4/3_HC_4/timecorr/";//AnalyzeTimeCorrelation
-	private static final String input_directory="D:/SocialNetsFolder/SNController4/3_HC_4/";//AnalyzeTimeCorrelation	
-	private static final String out2 = "3_HC_4.out";
-	private static final String out1 = "AgentsAtActivities3_HC_4.out";
+	private static final String output_directory="D:/SocialNetsFolder/FixedEd/TRB1/timecorr/";//AnalyzeTimeCorrelation
+	private static final String input_directory="D:/SocialNetsFolder/FixedEd/TRB1/";//AnalyzeTimeCorrelation	
+	private static final String out2 = "1.out";
+	private static final String out1 = "AgentsAtActivities1.out";
 	
 	private static final Config config= Gbl.createConfig(null);
 	//////////////////////////////////////////////////////////////////////

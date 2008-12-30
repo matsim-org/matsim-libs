@@ -4,17 +4,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.MatsimRandom;
 import org.matsim.population.Act;
-import org.matsim.population.Person;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.socialnet.SocialNetwork;
 
 public class TimeWindowCalcTimeCorrelations {
 
@@ -39,7 +35,7 @@ public class TimeWindowCalcTimeCorrelations {
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
 		Vector<Double> tbins=new Vector<Double>();
-		int numbins=360;
+		int numbins=288;
 		double binwidth=300.;
 
 		BufferedWriter out2=null;
@@ -82,7 +78,9 @@ public class TimeWindowCalcTimeCorrelations {
 				double dist_egonet=tw1.act.getFacility().calcDistance(((Act)(tw1.person.getSelectedPlan().getActsLegs().get(0))).getFacility().getCenter());
 
 				double ti_act=tw1.startTime;
+				ti_act=(ti_act+numbins*binwidth)%(numbins*binwidth);
 				double tf_act=tw1.endTime;
+				tf_act=(tf_act+numbins*binwidth)%(numbins*binwidth);
 				double tdur_act=tf_act-ti_act;
 				int n_act=0;
 				double dist_act=dist_egonet;
@@ -103,8 +101,6 @@ public class TimeWindowCalcTimeCorrelations {
 					// Others there, not necessarily friends
 					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){										
 						n_act++;
-//						ti_act=ti_act+tw1.startTime;
-//						tf_act=tf_act+tw1.endTime;
 						tdur_act=tdur_act+(tw1.endTime-tw1.startTime);
 						dist_act=dist_act+dist_alter;
 					}
@@ -112,15 +108,14 @@ public class TimeWindowCalcTimeCorrelations {
 
 				ti_egonet=ti_egonet/((double) n_egonet+1);
 				tf_egonet=tf_egonet/((double) n_egonet+1);
+				ti_egonet=(ti_egonet+numbins*binwidth)%(numbins*binwidth);
+				tf_egonet=(tf_egonet+numbins*binwidth)%(numbins*binwidth);
 				tdur_egonet=tdur_egonet/((double) n_egonet+1);
 				dist_egonet=dist_egonet/((double) n_egonet+1);
 
-//				ti_act=ti_act/((double) n_act+1);
-//				tf_act=tf_act/((double) n_act+1);
 				tdur_act=tdur_act/((double) n_act+1);
 				dist_act=dist_act/((double) n_act+1);
 
-//				System.out.println(tw1.person.getId()+"\t"+tw1.act.getType()+"\t"+n_act+"\t"+ti_act+"\t"+tf_act+"\t"+tdur_act+"\t"+dist_act+"\t"+n_egonet+"\t"+ti_egonet+"\t"+tf_egonet+"\t"+tdur_egonet+"\t"+dist_egonet);
 				try {
 					out2.write(tw1.person.getId()+"\t"+tw1.act.getType()+"\t"+n_act+"\t"+ti_act+"\t"+tf_act+"\t"+tdur_act+"\t"+dist_act+"\t"+n_egonet+"\t"+ti_egonet+"\t"+tf_egonet+"\t"+tdur_egonet+"\t"+dist_egonet+"\r\n");
 				} catch (IOException e) {
@@ -131,6 +126,7 @@ public class TimeWindowCalcTimeCorrelations {
 				// Agents and egonets spending time between StartTime and EndTime
 				double tend=((tf_act+numbins*binwidth)%(numbins*binwidth));
 				double tstart=(ti_act+numbins*binwidth)%(numbins*binwidth);
+
 
 				if(tend>=tstart){
 					for(int j= (int) (tstart/binwidth); j< (int) (tend/binwidth); j++){
@@ -154,7 +150,7 @@ public class TimeWindowCalcTimeCorrelations {
 				}else if(tstart>tend){
 					// Agents and egonets spending time between 0 and EndTime
 					for(int j= (int) 0; j< (int) (tend/binwidth); j++){
-//						System.out.println(j+" "+(((ti_act+numbins*binwidth)%(numbins*binwidth))/300.));
+
 						if(tw1.act.getType().equals("home")){
 							hist[j][0]=hist[j][0]+1;					
 						}
@@ -171,8 +167,8 @@ public class TimeWindowCalcTimeCorrelations {
 							hist[j][4]=hist[j][4]+1;					
 						}
 					}
-					for(int j= (int) (tstart/binwidth); j< (int) numbins-1; j++){
-//						System.out.println(j+" "+tstart/300+" "+((numbins*binwidth)/binwidth-1));
+					for(int j= (int) (tstart/binwidth); j< (int) numbins; j++){
+
 						if(tw1.act.getType().equals("home")){
 							hist[j][0]=hist[j][0]+1;					
 						}
@@ -193,7 +189,6 @@ public class TimeWindowCalcTimeCorrelations {
 				//new definition of tstart/tend
 				tend=((tf_egonet+numbins*binwidth)%(numbins*binwidth));
 				tstart=(ti_egonet+numbins*binwidth)%(numbins*binwidth);
-
 					if(tend>=tstart){
 					for(int j = (int) (tstart/binwidth); j< (int) (tend/binwidth); j++){
 //						System.out.println(j+" "+tend+" "+tstart);
@@ -233,7 +228,7 @@ public class TimeWindowCalcTimeCorrelations {
 					}
 					// Agents and egonets spending time between StartTime and 90000
 
-					for(int j = (int) (tstart/binwidth); j< (int) numbins-1; j++){
+					for(int j = (int) (tstart/binwidth); j< (int) numbins; j++){
 						if(tw1.act.getType().equals("home")){
 							hist[j][5]=hist[j][5]+1;					
 						}
