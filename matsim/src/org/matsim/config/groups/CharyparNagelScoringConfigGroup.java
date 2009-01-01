@@ -22,7 +22,6 @@ package org.matsim.config.groups;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -78,8 +77,8 @@ public class CharyparNagelScoringConfigGroup extends Module {
 	private double marginalUtlOfDistance = 0.0;
 	private double waiting = -0.0;
 
-	private final Map<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
-	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
+	private final HashMap<String, ActivityParams> activityTypes = new HashMap<String, ActivityParams>();
+	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
 
 	/*package*/ static final Logger log = Logger.getLogger(CharyparNagelScoringConfigGroup.class);
 

@@ -53,7 +53,7 @@ public class StrategyConfigGroup extends Module {
 	private String externalExeTmpFileRootDir = null;
 	private long externalExeTimeOut = 3600;
 
-	private final Map<Id, StrategySettings> settings = new LinkedHashMap<Id, StrategySettings>();
+	private final LinkedHashMap<Id, StrategySettings> settings = new LinkedHashMap<Id, StrategySettings>();
 
 	public StrategyConfigGroup() {
 		super(GROUP_NAME);
