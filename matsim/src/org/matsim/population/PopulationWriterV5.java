@@ -65,10 +65,20 @@ public class PopulationWriterV5 extends MatsimXmlWriter  {
 		this.population = pop;
 	}
 
+	/**
+	 * Constructor for convenience calls with Population instance
+	 * @param pop
+	 */
+	public PopulationWriterV5(Population pop) {
+		this((BasicPopulation) pop);
+	}
+
+	
 	public PopulationWriterV5(final BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop, final Map<Id, BasicHousehold> hh) {
 		this.population = pop;
 		this.households = hh;
 	}
+
 
 	public void writeFile(final String filename) throws FileNotFoundException, IOException {
 		this.openFile(filename);
