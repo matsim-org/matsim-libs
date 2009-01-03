@@ -22,6 +22,7 @@ package org.matsim.population;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicAct;
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
@@ -47,6 +48,9 @@ import org.matsim.population.routes.LinkCarRoute;
  */
 public class PopulationBuilderImpl implements PopulationBuilder {
 
+	private static final Logger log = Logger
+			.getLogger(PopulationBuilderImpl.class);
+	
 	private Population population;
 	private NetworkLayer network;
 	private Facilities facilities;
@@ -64,16 +68,36 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 			if (currentlocation.getCenter() != null) {
 				act = ((Plan)basicPlan).createAct(currentActType, currentlocation.getCenter());
 			}
-			else if (currentlocation.getId() != null){
+			
+			if (currentlocation.getId() != null){
 				if (currentlocation.getLocationType() == LocationType.FACILITY) {
-					Facility fac = facilities.getFacilities().get(currentlocation.getId()); 
-					act = ((Plan)basicPlan).createAct(currentActType, fac);
+					Facility fac = facilities.getFacilities().get(currentlocation.getId());
+					if (act == null) {
+						act = ((Plan)basicPlan).createAct(currentActType, fac);
+					}
+					else {
+						act.setFacility(fac);
+					}
 				}
 				else if (currentlocation.getLocationType() == LocationType.LINK) {
 					Link link = this.network.getLink(currentlocation.getId());
-					act = ((Plan)basicPlan).createAct(currentActType, link);
+					if (act == null) {
+						act = ((Plan)basicPlan).createAct(currentActType, link);
+					}
+					else {
+						act.setLink(link);
+					}
 				}
 			}
+		}
+		else {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Act number: ");
+			builder.append(((Plan)basicPlan).getActsLegs().size());
+			builder.append(" of Person Id: " );
+			builder.append(((Plan)basicPlan).getPerson().getId());
+			builder.append(" has no location information. This is not possible to prevent by the XML Grammar used, however it should result in incorrect behaviour of the framework. Only use with expert knowledge!");
+			log.warn(builder.toString());
 		}
 		return act;
 	}
