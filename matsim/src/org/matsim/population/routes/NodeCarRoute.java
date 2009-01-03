@@ -290,9 +290,17 @@ public class NodeCarRoute extends AbstractRoute implements CarRoute {
 
 	@Override
 	public final String toString() {
-		return "[dist=" + this.getDist() + "]" +
-				"[trav_time=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[nof_nodes=" + this.route.size() + "]";
+		StringBuilder b = new StringBuilder();
+		b.append("NodeCarRoute: [dist=");
+		b.append(this.getDist());
+		b.append("]");
+		b.append("[trav_time=" );
+		b.append(Time.writeTime(this.getTravelTime()));
+		b.append("]");
+		b.append("[nof_nodes=");
+		b.append(this.route.size());
+		b.append("]");
+		return b.toString();		
 	}
 
 }
