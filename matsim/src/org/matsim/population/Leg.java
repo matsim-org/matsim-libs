@@ -44,6 +44,8 @@ public class Leg extends BasicLegImpl {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
+		//FIXME the copy of a leg should contain the same subtype
+		// of CarRoute as the original
 		if (leg.route instanceof NodeCarRoute) {
 			this.route = new NodeCarRoute((NodeCarRoute) leg.route);
 		} else {
