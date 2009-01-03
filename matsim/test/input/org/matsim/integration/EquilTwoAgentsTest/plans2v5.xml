@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<population xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.0.xsd">
+	<person id="1">
+		<plan selected="true">
+			<act type="h" endTime="06:45:00">
+				<location>
+					<coordinate>
+						<xCoord>-25000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+				<route distance="15000.0">
+					<startLink refId="1"/>
+					<link refId="6"/>
+					<link refId="15"/>
+					<endLink refId="20"/>
+				</route>
+			</leg>
+			<act type="w" duration="08:00:00">
+				<location>
+					<coordinate>
+						<xCoord>10000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="20"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+				<route distance="55000.0">
+					<startLink refId="20"/>
+					<link refId="21"/>
+					<link refId="22"/>
+					<link refId="23"/>
+					<endLink refId="1"/>
+				</route>
+			</leg>
+			<act type="h">
+				<location>
+					<coordinate>
+						<xCoord>-25000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+	</person>
+	<person id="2">
+		<plan selected="true">
+			<act type="h" endTime="06:42:02">
+				<location>
+					<coordinate>
+						<xCoord>-25000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="pt">
+			</leg>
+			<act type="w" duration="08:00:00">
+				<location>
+					<coordinate>
+						<xCoord>10000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="20"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="pt">
+			</leg>
+			<act type="h">
+				<location>
+					<coordinate>
+						<xCoord>-25000.0</xCoord>
+						<yCoord>0.0</yCoord>
+					</coordinate>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+	</person>
+</population>

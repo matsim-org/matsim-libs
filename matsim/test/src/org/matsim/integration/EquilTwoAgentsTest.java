@@ -19,6 +19,9 @@
 
 package org.matsim.integration;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
@@ -32,6 +35,10 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterV5;
+import org.matsim.population.algorithms.PlanCalcType;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.misc.Time;
@@ -58,7 +65,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	/*package*/ final static Id id22 = new IdImpl("22");
 	/*package*/ final static Id id23 = new IdImpl("23");
 
-	public void testSingleIteration() {
+	public void testSingleIterationPlansV4() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
 		String netFileName = "test/scenarios/equil/network.xml";
 		config.network().setInputFile(netFileName);
@@ -82,6 +89,65 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 		controler.run();
 	}
+	
+	/**
+	 * Same test as testSingleIterationPlansV4, only with V5 version of
+	 * population file format.
+	 */
+	public void testSingleIterationPlansV5() {
+		Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
+		String netFileName = "test/scenarios/equil/network.xml";
+		config.network().setInputFile(netFileName);
+//		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
+		config.plans().setInputFile("test/input/org/matsim/integration/EquilTwoAgentsTest/plans2v5.xml");
+
+		final Controler controler = new TestControler(config);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+
+		controler.addControlerListener(new StartupListener() {
+
+			public void notifyStartup(final StartupEvent event) {
+				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
+				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
+				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
+
+				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
+			}
+		});
+
+		controler.run();
+	}
+
+	
+	private class TestControler extends Controler {
+
+		public TestControler(Config config) {
+			super(config);
+		}
+		
+		@Override
+		protected Population loadPopulation() {
+			Population pop = super.loadPopulation();
+			pop.addAlgorithm(new PlanCalcType());
+			pop.runAlgorithms();
+			PopulationWriterV5 writer = new PopulationWriterV5(pop);
+			PopulationWriter writerOld = new PopulationWriter(pop, getOutputDirectory() + "loadedPlansV4.xml", "v4");
+			try {
+				writer.writeFile(getOutputDirectory() + "loadedPlansV5.xml");
+				writerOld.write();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return pop;
+		}		
+	}
+	
 
 	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActStartEventHandler, ActEndEventHandler {
 
