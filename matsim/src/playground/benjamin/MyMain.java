@@ -35,12 +35,12 @@ public class MyMain {
 		String equilExampleConfig = "examples/equil/configOTF.xml";
 		
 //		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
-		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
-//		String oneRouteTwoModeTest = "../studies/bkickhoefer/oneRouteTwoModeTest/config.xml";
+//		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+		String oneRouteTwoModeTest = "../studies/bkickhoefer/oneRouteTwoModeTest/config.xml";
 
 //		String config = equilExampleConfig;
-		String config = oneRouteNoModeTest;
-//		String config = oneRouteTwoModeTest;
+//		String config = oneRouteNoModeTest;
+		String config = oneRouteTwoModeTest;
 		
 		Controler c = new Controler(config);
 		c.setOverwriteFiles(true);
