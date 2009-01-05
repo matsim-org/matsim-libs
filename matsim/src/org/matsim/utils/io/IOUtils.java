@@ -33,6 +33,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -87,8 +89,21 @@ public class IOUtils {
 //		warnErrorAppender.addFilter(filter);
 		root.addAppender(warnErrorAppender);
 		if (logEvents != null) {
+			List<Appender> apps = new ArrayList<Appender>();
+			//get all file appenders
+			Enumeration appenders = root.getAllAppenders();
+			if (appenders != null) {
+				while (appenders.hasMoreElements()) {
+					Appender a = (Appender) appenders.nextElement();
+					if (a instanceof FileAppender) {
+						apps.add(a);
+					}
+				}
+			}
 			for (LoggingEvent e : logEvents) {
-				root.callAppenders(e);
+				for (Appender a : apps) {
+					a.doAppend(e);
+				}
 			}
 		}
 	}
