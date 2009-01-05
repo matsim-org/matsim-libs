@@ -91,6 +91,7 @@ public class BkTestPlansCreatorWithPt {
 			act2.setLinkId(id4);
 			act2.setStartTime(7.0 * 3600.0);
 			act2.setEndTime(15.0 * 3600.0);
+			act2.setDuration(8.0 * 3600.0);
 			plan.addAct(act2);
 			
 			BasicLeg leg2Car = new BasicLegImpl(BasicLeg.Mode.car);
@@ -118,20 +119,20 @@ public class BkTestPlansCreatorWithPt {
 			plan.addAct(act1);
 			
 			BasicLeg leg1Pt = new BasicLegImpl(BasicLeg.Mode.pt);
-			BasicRouteImpl routePt = new BasicRouteImpl(id1, id4);
+//			BasicRouteImpl routePt = new BasicRouteImpl(id1, id4);
 //			List<Id> linkidsPt = new ArrayList<Id>();
 //			routePt.setLinkIds(linkidsPt);
-			leg1Pt.setRoute(routePt);
+//			leg1Pt.setRoute(routePt);
 			plan.addLeg(leg1Pt);
 			
 
 			plan.addAct(act2);
 			
 			BasicLeg leg2Pt = new BasicLegImpl(BasicLeg.Mode.pt);
-			routePt = new BasicRouteImpl(id4, id1);
+//			routePt = new BasicRouteImpl(id4, id1);
 //			linkidsPt = new ArrayList<Id>();
 //			routePt.setLinkIds(linkidsPt);
-			leg2Pt.setRoute(routePt);
+//			leg2Pt.setRoute(routePt);
 			plan.addLeg(leg2Pt);
 			
 
