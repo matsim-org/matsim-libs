@@ -10,10 +10,12 @@ import org.matsim.world.Layer;
 
 /**
  * Simple interface so that ReadFromUrbansimCellModel and ReadFromUrbansimParcelModel can be called via the same syntax.
+ * Not used.
  * 
  * @author nagel
  *
  */
+@Deprecated
 public interface ReadFromUrbansim {
 	
 

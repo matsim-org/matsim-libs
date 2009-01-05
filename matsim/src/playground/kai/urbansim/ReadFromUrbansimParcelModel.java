@@ -54,23 +54,21 @@ public class ReadFromUrbansimParcelModel {
 	
 	private final String PATH_TO_OPUS_MATSIM = Matsim4Urbansim.PATH_TO_OPUS_MATSIM ;
 	
-	private final String parcelfile = "tmp/parcels-cleaned.tab" ;
+	private int year ;
 	
-	/* (non-Javadoc)
-	 * @see playground.kai.urbansim.ReadFromUrbansim#readFacilities(org.matsim.facilities.Facilities)
-	 */
-	public void readFacilities(Facilities facilities) {
+	public ReadFromUrbansimParcelModel ( int year ) {
+		this.year = year ;
+	}
+	
+	public void readFacilities(Facilities parcels, Facilities zones) {
 		// (these are simply defined as those entities that have x/y coordinates in urbansim)
-		try {
-			// FIXME: hack to remove unparsable ^M characters from urbansim output
-			log.error("My example of parcels.tab contains ^M characters, which screws up the java readline().") ;
-			log.error("The following attempts to run a hack to solve this problem.  But it has many hard-coded pathnames in it,");
-			log.error("and it probably only works on unix.") ;
-			ExeRunner.run("sh -e "+PATH_TO_OPUS_MATSIM+"bin/remove_weird_characters.sh", PATH_TO_OPUS_MATSIM+"tmp/remove_weird_characters.log", 3600) ;
+		String filename = PATH_TO_OPUS_MATSIM+"tmp/parcel__dataset_table__exported_indicators__" + year + ".tab" ;
+		log.info( "Starting to read urbansim parcels from " + filename ) ;
+		
+		// temporary data structure in order to get coordinates for zones:
+		Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>() ;
 
-			String filename = PATH_TO_OPUS_MATSIM+parcelfile ;
-			log.info( "Starting to read urbansim parcels from " + filename ) ;
-			
+		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
 
 			String line = reader.readLine() ;
@@ -78,21 +76,32 @@ public class ReadFromUrbansimParcelModel {
 
 			while ( (line = reader.readLine()) != null ) {
 				String[] parts = line.split("[\t]+");
+				
+				// Urbansim sometimes writes IDs as floats!
+				long parcelIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("parcel_id")] ) ;
+				Id parcelId = new IdImpl( parcelIdAsLong ) ;
 
-				Id id = new IdImpl( parts[idxFromKey.get("parcel_id:i4")] ) ;
+				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
 
-				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp:f4")],parts[idxFromKey.get("y_coord_sp:f4")] ) ;
-
-				Facility facility = facilities.createFacility(id,coord) ;
+				Facility facility = parcels.createFacility(parcelId,coord) ;
 				facility.setDesc("urbansim location") ;
+				
+				// Can't add info (in this case zone ID) to facilities, so put into separate data structure:
+				long zoneIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("zone_id")] ) ;
+				ZoneId zoneId = new ZoneId( zoneIdAsLong ) ;
+				zoneFromParcel.put( parcelId, zoneId ) ;
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		log.info( "DONE with reading urbansim parcels" ) ;
+
+		log.info( "Starting to construct urbansim zones (for the impedance matrix)" ) ;
+		constructZones ( parcels, zones, zoneFromParcel ) ;
+		log.info( "Done with constructing urbansim zones" ) ;
+		
 	}
 
 	class PseudoZone {
@@ -101,18 +110,16 @@ public class ReadFromUrbansimParcelModel {
 		long cnt = 0 ;
 	}
 	
-	public void readZones ( Facilities zones, Layer parcels ) {
-		Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>() ;
-		Utils.readKV( zoneFromParcel,"parcel_id:i4", new ParcelIdFactory(), "zone_id:i4", new ZoneIdFactory() ,
-				PATH_TO_OPUS_MATSIM+parcelfile ) ;
+	public void constructZones ( Facilities parcels, Facilities zones, Map<Id,Id> zoneFromParcel ) {
 		
 		// summing the coordinates of all participating parcels into the zones
 		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>() ;
 		for ( Entry<Id,Id> entry : zoneFromParcel.entrySet() ) {
-			ParcelId parcelId = (ParcelId) entry.getKey();
+			Id       parcelId =            entry.getKey();
 			ZoneId   zoneId   = (ZoneId)   entry.getValue() ;
 
 			Location parcel = parcels.getLocation(parcelId) ;
+			assert( parcel!= null ) ;
 			Coord coord = parcel.getCenter();
 			
 			PseudoZone pseudoZone = pseudoZones.get(zoneId) ;
@@ -135,169 +142,115 @@ public class ReadFromUrbansimParcelModel {
 		
 	}
 
-	private static long foundCnt = 0 ;
-	private static long notFoundCnt = 0 ;
-	/* (non-Javadoc)
-	 * @see playground.kai.urbansim.ReadFromUrbansim#readPersons(org.matsim.basic.v01.BasicPopulation, org.matsim.facilities.Facilities, double)
-	 */
-	public void readPersons(Population oldPop, Population newPop, Facilities facilities, NetworkLayer network, double fraction) {
-		// to get from buildings to locations (which have coordinates) ...
-		Map<Id,Id> locationFromBuilding = new HashMap<Id,Id>() ;
-		Utils.readKV( locationFromBuilding, "building_id:i4", new BldIdFactory(), "parcel_id:i4", new LocationIdFactory(), 
-				PATH_TO_OPUS_MATSIM+"tmp/buildings.tab" ) ;
+	public void readPersons(Population oldPop, Population newPop, Facilities facilities, NetworkLayer network, double samplingRate ) {
+		String filename = PATH_TO_OPUS_MATSIM+"tmp/person__dataset_table__exported_indicators__" + year + ".tab" ;
+		log.info( "Starting to read persons from " + filename ) ;
 
-		// to get from households to buildings ...
-		Map<Id,Id> buildingFromHousehold = new HashMap<Id,Id>() ;
-		Utils.readKV( buildingFromHousehold, "household_id:i4", new HHIdFactory(), "building_id:i4", new BldIdFactory(), 
-				PATH_TO_OPUS_MATSIM+"tmp/households.tab" ) ;
-		
-		// similarly, to get from jobs to buildings ...
-		Map<Id,Id> buildingFromJob = new HashMap<Id,Id>() ;
-		Utils.readKV( buildingFromJob, "job_id:i4", new JobIdFactory(), "building_id:i4", new BldIdFactory(), 
-				PATH_TO_OPUS_MATSIM+"tmp/jobs.tab" ) ;
-		
-//		MatsimRandom.random.setSeed(4711) ; // fix seed so that the persons are always the same (not really needed any more)
-
+		Population backupPop = new Population() ;
+		long NUrbansimPersons=0 ;
 		try {
-			String filename = PATH_TO_OPUS_MATSIM+"tmp/persons.tab" ;
-			log.info( "Starting to read persons from " + filename ) ;
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
 			String line = reader.readLine();
 			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line ) ;
 
 			// We consider two cases:
-			// (1) We have an old population.  Then we look for those people who have the same id.  We assume that the old pop 
-			//     has the correct size.
-			// (2) We do not have an old population.  Then we draw randomly.
+			// (1) We have an old population.  Then we look for those people who have the same id.  
+			// (2) We do not have an old population.  Then we construct a new one.
+			// In both cases we assume that the new population has the right size.
 
-			long homeParcelIdNullCnt = 0 ;
-			long jobBuildingIdNullCnt = 0 ;
+			long foundCnt = 0 ;
+			long notFoundCnt = 0 ;
+			long jobLocationIdNullCnt = 0 ;
 			boolean flag = false ;
 			while ( (line=reader.readLine()) != null ) {
-
-				// if there is no pre-existing population, check for the fraction:
-				if ( oldPop==null && MatsimRandom.random.nextDouble() > fraction && !flag ) {
+				NUrbansimPersons++ ;
+				String[] parts = line.split("[\t\n]+"); 
+				
+				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
+				Person newPerson = new PersonImpl( personId ) ;
+				
+				if ( !( flag || MatsimRandom.random.nextDouble() < samplingRate || (oldPop.getPerson( personId))!=null ) ) {
 					continue ;
 				}
 				flag = false ;
 
-				// construct the person id
-				String[] parts = line.split("[\t\n]+");
-
-				int idx = idxFromKey.get("person_id:i4") ;
-				Id personId = new IdImpl( parts[idx] ) ;
-
-				// if there is a pre-existing pop, check if the person is in there:
-				Person oldPerson = null ;
-				if ( oldPop!=null && (oldPerson=oldPop.getPerson(personId))==null ) {
-					if ( notFoundCnt == 0 ) {
-						notFoundCnt++ ; log.info("Person from urbansim NOT found in pre-exising pop file." 
-								+ " This is normal if you are running matsim on a sample. " + Gbl.ONLYONCE ) ;
-					}
-					continue ;
-				}
-				if ( oldPop!=null && foundCnt == 0 ) {
-					foundCnt++ ; log.info("Found person from urbansim in pre-existing pop file." + Gbl.ONLYONCE ) ;
-				}
-
-				// continue constructing the new person.  If there is a pre-existing pop, we need it to look for changes
-				Person person = new PersonImpl( personId ) ;
-
-				person.setAge( Integer.parseInt( parts[idxFromKey.get("age:i4")] ) ) ;
-
-				HHId hhId = new HHId( parts[idxFromKey.get("household_id:i4")] ) ; 
-				BldId buildingId = (BldId) buildingFromHousehold.get( hhId ) ;
-				assert( buildingId != null ) ;
-				LocationId homeParcelId = (LocationId) locationFromBuilding.get( buildingId ) ;
-				if ( homeParcelId==null ) {
-					if ( homeParcelIdNullCnt < 1 ) {
-						homeParcelIdNullCnt++ ; 
-						log.warn( "homeParcelId==null; personId: " + personId.toString() + " hhId: " + hhId.toString() 
-								+ " buildingId: " + buildingId.toString() + ' ' + this ) ; log.info(Gbl.ONLYONCE) ;
-					}
-					continue ;
-				}
+				Id homeParcelId = new IdImpl( parts[idxFromKey.get("parcel_id_home")] ) ;
 				Location homeLocation = facilities.getLocation( homeParcelId ) ;
 				if ( homeLocation==null ) {
-					log.warn( "homeLocation==null; personId: " + personId + " hhId: " + hhId 
-							+ " buildingId: " + buildingId + " parcelId: " + homeParcelId + ' ' + this ) ;
+					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
 				Coord homeCoord = homeLocation.getCenter() ;
 				if ( homeCoord==null ) {
-					log.warn( "homeCoord==null; personId: " + personId.toString() + " hhId: " + hhId.toString() 
-							+ " buildingId: " + buildingId.toString() + this ) ;
+					log.warn( "homeCoord==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
 					continue ;
 				}
-				
-				Plan plan = person.createPlan(true);
+
+				Plan plan = newPerson.createPlan(true);
 				plan.setSelected(true) ;
 				Utils.makeHomePlan(plan, homeCoord) ;
 
-				idx = idxFromKey.get("job_id:i4") ;
+				int idx = idxFromKey.get("parcel_id_work") ;
 				if ( parts[idx].equals("-1") ) {
-					person.setEmployed("no") ;
+					newPerson.setEmployed("no") ;
 				} else {
-					person.setEmployed("yes") ;
-					JobId jobId = new JobId( parts[idx] ) ;
-					buildingId = (BldId) buildingFromJob.get( jobId ) ;
-					if ( buildingId == null ) {
-						if ( jobBuildingIdNullCnt < 1 ) {
-							jobBuildingIdNullCnt++ ;
-							log.warn( "jobBuildingId==null, probably out of area. person_id: " + personId.toString() 
-									+ " job_id: " + jobId.toString() + Gbl.ONLYONCE ) ;
-							log.info("(Will re-try until I find someone whoose job is in the area.)") ;
+					newPerson.setEmployed("yes") ;
+					Id workParcelId = new IdImpl( parts[idx] ) ;
+					Location jobLocation = facilities.getLocation( workParcelId ) ;
+					if ( jobLocation == null ) {
+						if ( jobLocationIdNullCnt < 1 ) {
+							jobLocationIdNullCnt++ ;
+							log.warn( "jobLocationId==null, probably out of area. person_id: " + personId
+									+ " workp_prcl_id: " + workParcelId + Gbl.ONLYONCE ) ;
 						}
-						flag = true ; continue ;
+						flag = true ;
+						continue ;
 					}
-					assert( buildingId != null ) ;
-					LocationId jobParcelId = (LocationId) locationFromBuilding.get( buildingId ) ;
-					assert( jobParcelId != null ) ;
-					Location jobLocation = facilities.getLocation( jobParcelId ) ;
-					assert( jobLocation != null ) ;
 					Coord workCoord = jobLocation.getCenter() ;
-					
 					Utils.completePlanToHwh(plan, workCoord) ;
 				}
+				
+				// at this point, we have a full "new" person.  Now check against pre-existing population ...
 
-				// at this point, we have a full "new" person.  
-				if ( oldPop==null ) {
-					// W/o a pre-existing population, just add it:
-					newPop.addPerson(person) ;
-				} else {
-					// otherwise, compare if something has changed:
-					while ( true ) { // loop from which we can "break"
-						if ( !oldPerson.getEmployed().equals( person.getEmployed() ) ) {
-//							log.info("employment status changed") ;
-							break ;
-						}
-						Act oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();  // FIXME: awkward
-						Act newHomeAct =    person.getSelectedPlan().getFirstActivity() ; // FIXME: awkward
-						if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) {
-//							log.info( "something has changed with home act" ) ;
-							break ;
-						}
-						if ( oldPerson.getEmployed().equals("no") ) {
-							// nothing more to test; use old person
-							person = oldPerson ; // TODO: means that age does not increase
-							break ;
-						}
+				while ( true ) { // loop from which we can "break":
+					Person oldPerson ;
+					if ( oldPop==null ) { // no pre-existing population.  Accept:
+						newPop.addPerson(newPerson) ;
+						break ;
+					} else if ( (oldPerson=oldPop.getPerson(personId))==null ) { // did not find person.  Put in backup: 
+						backupPop.addPerson( newPerson) ;
+						notFoundCnt++ ;
+						break ;
+					} else if ( !oldPerson.getEmployed().equals( newPerson.getEmployed() ) ) { // employment status changed.  Accept new person:
+						newPop.addPerson(newPerson) ;
+						break ;
+					}
+					Act oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();  
+					Act newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ; 
+					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
+						newPop.addPerson(newPerson) ;
+						break ;
+					} 
 
-						Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getActsLegs().get(2) ; // FIXME: awkward
-						Act newWorkAct = (Act)    person.getSelectedPlan().getActsLegs().get(2) ; // FIXME: awkward
-						if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
-//							log.info( "something has changed with work act" ) ;
-							break ;
-						}
-
-						person = oldPerson ; // TODO: means that age does not increase
+					// check if new person works 
+					if ( newPerson.getEmployed().equals("no") ) { // person does not move; doesn't matter.  TODO fix this when other activities are considered
+						newPop.addPerson(newPerson) ;
 						break ;
 					}
 
-					// add person:
-//					log.info("adding person") ;
-					newPop.addPerson(person) ;
+					// check if work act has changed:
+					Act oldWorkAct = (Act) oldPerson.getSelectedPlan().getActsLegs().get(2) ; 
+					Act newWorkAct = (Act)    newPerson.getSelectedPlan().getActsLegs().get(2) ; 
+					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
+						newPop.addPerson(newPerson) ;
+						break ;
+					}
+
+					// no "break" up to here, so new person does the same as the old person.  Keep old person (including its 
+					// routes etc.)
+					newPop.addPerson(oldPerson) ;
+					break ;
 				}
 			}
 
@@ -307,6 +260,23 @@ public class ReadFromUrbansimParcelModel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.size() + " newPopSize: " + newPop.size()
+				+ " bakPopSize: " + backupPop.size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
+		log.warn("why is bakPopSize not approx as large as samplingRate*NUrbansimPersons?" ) ;
+
+		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
+		Collections.shuffle( bakPersons ) ;
+		for ( Person person : bakPersons ) {
+			if ( newPop.size() >= samplingRate*NUrbansimPersons ) {
+				break ;
+			}
+			newPop.addPerson( person ) ;
+		}
+
+		log.info(" samplingRate: " + samplingRate + " oldPopSize: " + oldPop.size() + " newPopSize: " + newPop.size()
+				+ " bakPopSize: " + backupPop.size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
+
 		log.info( "Done with reading persons." ) ;
 	}
 	

@@ -58,36 +58,34 @@ public class Matsim4Urbansim {
 	private static final Logger log = Logger.getLogger(Matsim4Urbansim.class);
 	
 	/**
-	 * This path has this weird level of indirection (../opus_matsim) so that the package can also be called from within
-	 * matsim if it is linked to the same hierarchy.  Useful for debugging. 
+	 * Note that OPUS_HOME needs to be set; in eclipse as part of the run dialog.  
+	 * When called from urbansim, this is hopefully always set.
 	 */
-	public static final String PATH_TO_OPUS_MATSIM = "../opus_matsim/" ;
+	public static final String PATH_TO_OPUS_MATSIM = System.getenv("OPUS_HOME")+'/' +"opus_matsim/" ;
 	
 	public static void main ( String[] args ) {
 		log.info("Starting the matsim run from the urbansim interface.  This looks a little rough initially since 'normal' matsim" ) ;
 		log.info("is not entered until later (after 'DONE with demand generation from urbansim')." ) ;
 		
-		try { 
-			Integer.parseInt( args[1] ) ;
-		} catch ( Exception ee ) {
-			log.fatal("Something wrong with second argument; should be a year; is: " + args[1] + " Aborting ..." ) ;
+		int year = 0 ;
+		double samplingRate = 0.01 ;
+		for ( int ii=1 ; ii<args.length ; ii++ ) { //args[0] is the config file
+			log.info( " ii: " + ii + " args[ii]: " + args[ii] ) ;
+			String[] parts = args[ii].split("=");
+			if ( parts[0].equals("--year") ) {
+				year = Integer.parseInt( parts[1] ) ;
+			} else if ( parts[0].equals("--samplingRate") ) {
+				samplingRate = Double.parseDouble( parts[1] ) ;
+			}
+		}
+		log.info("year: " + year + " samplingRate: " + samplingRate ) ;
+		for ( int ii=args.length-1 ; ii>=1 ; ii-- ) {
+			args[ii] = "" ;
 		}
 		
 		// parse the config arguments so we have a config.  generate scenario data from this
 		Config config = Gbl.createConfig(args);
 		ScenarioData scenarioData = new ScenarioData(config) ;
-		
-		log.warn("TODO: The following is a hack so that matsim calls at different urbansim years go into different iteration directories.");
-		log.warn("      This will almost certainly mess up the `ModuleDisableAfterIteration' settings, so best do not use them.") ;
-		log.warn("      (They don't make sense in that context anyways.  If you want to do detailed policy analysis, run matsim separate from urbansim.)") ;
-		// (Still, would be better to do something like "ITERS" -> "ITERS.year".)
-		int frstIt = config.controler().getFirstIteration();
-		int lastIt = config.controler().getLastIteration() ;
-		
-		int year = Integer.parseInt( args[1] ) ;
-		
-		config.controler().setFirstIteration( year*1000 + frstIt ) ;  
-		config.controler().setLastIteration( year*1000 + lastIt ) ;
 		
 		// get the network.  Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
@@ -100,22 +98,23 @@ public class Matsim4Urbansim {
 		log.info("... finished cleaning network.") ;
 		log.info("") ;
 
-		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel() ;
+		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( year ) ;
 		
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		Facilities facilities = new Facilities("urbansim locations (gridcells _or_ parcels _or_ ...)", Facilities.FACILITIES_NO_STREAMING) ;
-		readFromUrbansim.readFacilities( facilities ) ;
+		Facilities zones      = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
+		readFromUrbansim.readFacilities( facilities, zones ) ;
 
-//		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
-//		facWriter.write();
+		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
+		facWriter.write();
 		
 		Population oldPop ;
 		if ( config.plans().getInputFile() != null ) {
-			log.warn("Population specified in matsim config file; assuming WARM start.");
-			log.info("(I.e. keep only those agents from urbansim files that exist in pre-existing pop file.)");
+			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
+			log.info("Persons not found in pre-existing pop file are added; persons no longer in urbansim persons file are removed." ) ;
 			oldPop = scenarioData.getPopulation() ;
-			log.warn("In spite of 'warm' start this will NOT 'continue' the iterations from one urbansim call to the next. :-(") ;
-			log.warn("As of now, will ignore additions to the population (e.g. in-migration).") ;
+			log.info("Note that the `continuation of iterations' will only work if you set this up via different config files for") ;
+			log.info(" every year and know what you are doing.") ;
 		} else {
 			log.warn("No population specified in matsim config file; assuming COLD start.");
 			log.info("(I.e. generate new pop from urbansim files.)" );
@@ -123,25 +122,16 @@ public class Matsim4Urbansim {
 		}
 		
 		Population newPop = new Population(Population.NO_STREAMING);
-		// read urbansim persons (possibly indirectly, e.g. via households).  Generates hwh acts as side effect
-		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, 0.01 ) ;
+		// read urbansim persons.  Generates hwh acts as side effect
+		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;
 		System.gc() ;
 				
-//		PopulationWriter popWriter = new PopulationWriter(newPop,PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
-//		popWriter.write();
+		PopulationWriter popWriter = new PopulationWriter(newPop,PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
+		popWriter.write();
 		
-		log.info("BEGIN constructing urbansim zones.") ;
-		Facilities zones = new Facilities("urbansim zones", Facilities.FACILITIES_NO_STREAMING) ;
-		readFromUrbansim.readZones( zones, facilities ) ;
-		log.info("DONE with constructing urbansim zones.") ;
-
-		System.out.println("### DONE with demand generation from urbansim ###") ;
-		System.gc() ;
+		log.info("### DONE with demand generation from urbansim ###") ;
 		
-		config.controler().setOutputDirectory(PATH_TO_OPUS_MATSIM+"output") ;
-		log.warn("matsim output path set to fixed value to make sure that it is at correct place for feedback to urbansim");
-
 		Controler controler = new Controler(config,network,newPop) ;
 		controler.setOverwriteFiles(true) ;
 
@@ -149,7 +139,7 @@ public class Matsim4Urbansim {
 		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
 		controler.addControlerListener(myControlerListener);
 
-		// run the iterations, including the postprocessing:
+		// run the iterations, including the post-processing:
 		controler.run() ;
 
 	}
