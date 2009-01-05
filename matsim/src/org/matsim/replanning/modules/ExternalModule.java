@@ -21,11 +21,10 @@
 package org.matsim.replanning.modules;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.config.ConfigWriter;
@@ -44,15 +43,16 @@ import org.matsim.population.PopulationWriterHandler;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.ExeRunner;
 
 /**
- * Basic wrapper for any call to external "planstoplans" modules. As basic handling of
+ * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
  * such modules is alike for every module:
  * 1.) Write a plans header
  * 2.) dump every person with the selected plan only
  * 3.) close plans file and write a config file based on a config template file
- * 4.) Exe-cute the external program with this config file
+ * 4.) Execute the external program with this config file
  * 5.) Re-read plans and exchange selected plan by a new one or append new plan
  *
  * @author dstrippgen
@@ -60,6 +60,12 @@ import org.matsim.utils.misc.ExeRunner;
  */
 public class ExternalModule implements StrategyModule {
 
+	private static final String SCENARIO = "scenario";
+	private static final String SCENARIO_INPUT_PLANS_FILENAME = "inputPlansFilename";
+	private static final String SCENARIO_WORKING_PLANS_FILENAME = "workingPlansFilename";
+	private static final String SCENARIO_WORKING_EVENTS_TXT_FILENAME = "workingEventsTxtFilename";
+	private static final String SCENARIO_NETWORK_FILENAME = "networkFilename";
+	
 	protected static final String ExternalInFileName = "plans.in.xml";
 	protected static final String ExternalOutFileName = "plans.out.xml";
 	protected static final String ExternalConfigFileName = "config.xml";
@@ -77,7 +83,7 @@ public class ExternalModule implements StrategyModule {
 	public ExternalModule(final String exePath, final String moduleId) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
-		this.outFileRoot = Controler.getTempPath();
+		this.outFileRoot = Controler.getTempPath() + "/";
 	}
 
 	public void init() {
@@ -89,7 +95,7 @@ public class ExternalModule implements StrategyModule {
 	}
 
 	protected PopulationWriter getPlansWriterHandler() {
-		String filename = this.outFileRoot + "/" + this.moduleId + ExternalInFileName;
+		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
 		String version = "v4";
 		return new PopulationWriter(new Population(Population.USE_STREAMING), filename, version);
 	}
@@ -142,7 +148,7 @@ public class ExternalModule implements StrategyModule {
 			// Read back  plans file and change plans for persons in file
 			reReadPlans();
 		} else {
-			Logger.getLogger(this.getClass()).warn("External exe returned with an error. Plans were NOT altered!");
+			throw new RuntimeException("External Replanning failed! ");
 		}
 
 	}
@@ -156,15 +162,32 @@ public class ExternalModule implements StrategyModule {
 			MatsimConfigReader reader = new MatsimConfigReader(this.extConfig);
 			reader.readFile(configFileName);
 		}
+		
+		// Change scenario config according to given output- and input-filenames: events, plans, network
+		this.extConfig.setParam(SCENARIO, SCENARIO_INPUT_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalInFileName);
+		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_PLANS_FILENAME, this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
+		this.extConfig.setParam(SCENARIO, SCENARIO_WORKING_EVENTS_TXT_FILENAME, Controler.getIterationFilename("events.txt", Controler.getIteration() - 1));
+		String networkFilename = Gbl.getConfig().findParam("network", "inputNetworkFile");
+		this.extConfig.setParam(SCENARIO, SCENARIO_NETWORK_FILENAME, networkFilename);
 	}
 
-	public void writeExternalExeConfig() {
+	private void writeExternalExeConfig() {
+		BufferedWriter bWriter = null;
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(this.outFileRoot + "/" + this.moduleId + ExternalConfigFileName));
-			ConfigWriter configWriter = new ConfigWriter(this.extConfig, writer);
+			bWriter = IOUtils.getBufferedWriter(this.outFileRoot + this.moduleId + ExternalConfigFileName);
+			ConfigWriter configWriter = new ConfigWriter(this.extConfig, bWriter);
 			configWriter.write();
+			bWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (bWriter != null) {
+					bWriter.close();
+				}
+			} catch (IOException e2) {
+				Log.warn(e2.getMessage(), e2);
+			}
 		}
 	}
 
@@ -172,7 +195,7 @@ public class ExternalModule implements StrategyModule {
 		prepareExternalExeConfig();
 		writeExternalExeConfig();
 
-		String cmd = this.exePath + " " + this.outFileRoot + "/" + this.moduleId + ExternalConfigFileName;
+		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
 		String logfilename = Controler.getIterationFilename(this.moduleId + "stdout.log");
 
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
@@ -183,7 +206,7 @@ public class ExternalModule implements StrategyModule {
 		PopulationReader plansReader = getPlansReader(plans);
 		plans.addAlgorithm(new PersonCalcTimes());
 		plans.addAlgorithm(new UpdatePlansAlgo(this.persons));
-		plansReader.readFile(this.outFileRoot + "/" + this.moduleId + ExternalOutFileName);
+		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		plans.printPlansCount();
 		plans.runAlgorithms();
 	}
@@ -197,7 +220,7 @@ public class ExternalModule implements StrategyModule {
 
 		private final TreeMap<Id, Person> persons;
 
-		public UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
+		protected UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
 			this.persons = persons;
 		}
 
