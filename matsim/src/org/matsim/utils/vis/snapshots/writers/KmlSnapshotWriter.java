@@ -98,7 +98,8 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
 		carIconStyle.setIcon(iconLink);
 		carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-		carIconStyle.setScale(0.5);
+		carIconStyle.setScale(Double.valueOf(0.5));
+		this.carStyle.setIconStyle(carIconStyle);
 		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
 
 		this.mainFolder = kmlObjectFactory.createFolderType();
@@ -106,7 +107,6 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		
 		//set logo
 		try {
-//			ScreenOverlayType logo;
 			MatsimKMLLogo.writeMatsimKMLLogo(this.writer);
 		} catch (IOException e) {
 			log.warn("Cannot read matsim logo file! The logo will not be added to the kmz");
