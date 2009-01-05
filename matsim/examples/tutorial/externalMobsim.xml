@@ -27,9 +27,7 @@
 	</module>
 
 	<module name="simulation">
-		<param name="externalExe" value="java -jar ./external/mobsim.jar" />
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
+		<param name="externalExe" value="java -jar ./examples/external/mobsim.jar" />
 	</module>
 
 	<module name="planCalcScore">
