@@ -34,7 +34,6 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.LinkType;
@@ -61,6 +60,20 @@ public class KMZWriter {
 
 	private final Map<String, String> nonKmlFiles = new HashMap<String, String>();
 
+	private final static Marshaller marshaller;
+	
+	private final static ObjectFactory kmlObjectFactory = new ObjectFactory();
+
+	static {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
+			marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * Creates a new kmz-file and a writer for it and opens the file for writing.
 	 *
@@ -79,12 +92,11 @@ public class KMZWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		// generate the first KML entry in the zip file that links to the (later
 		// added) main-KML.
 		// this is required as GoogleEarth will only display the first-added KML in
 		// a kmz.
-		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KmlType docKML = kmlObjectFactory.createKmlType();
 		NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
 
@@ -121,7 +133,7 @@ public class KMZWriter {
 	/**
 	 * Writes the specified KML-object as the main kml into the file. The main kml
 	 * is the one Google Earth reads when the file is opened. It should contain
-	 * {@link NetworkLink NetworkLinks} to the other KMLs stored in the same file.
+	 * NetworkLinks to the other KMLs stored in the same file.
 	 *
 	 * @param kml
 	 *          the KML-object that will be read by Google Earth when opening the
@@ -144,6 +156,7 @@ public class KMZWriter {
 
 	/**
 	 * Adds a file to the kmz which is not a kml file.
+	 * 
 	 * @param filename the path to the file, relative or absolute
 	 * @param inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
@@ -160,6 +173,7 @@ public class KMZWriter {
 
 	/**
 	 * Adds some data as a file to the kmz.
+	 * 
 	 * @param data the data to add to the kmz
 	 * @param inZipFilename the filename used for the file in the kmz file
 	 * @throws IOException
@@ -179,9 +193,7 @@ public class KMZWriter {
 			}
 			log.debug(entry.getName() + " added to kmz.");
 		} finally {
-			if (data != null) {
-				data.close();
-			}
+			data.close();
 		}
 	}
 	
@@ -206,21 +218,13 @@ public class KMZWriter {
 	 * @param kml
 	 */
 	private void writeKml(final String filename, final KmlType kml) {
-
 		try {
-
 			ZipEntry ze = new ZipEntry(filename);
 			ze.setMethod(ZipEntry.DEFLATED);
 			this.zipOut.putNextEntry(ze);
 
 			try {
-				JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
-				ObjectFactory kmlObjectFactory = new ObjectFactory();
-				Marshaller marshaller = jaxbContext.createMarshaller();
-				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				marshaller.marshal(kmlObjectFactory.createKml(kml), out);
-			} catch (PropertyException e) {
-				e.printStackTrace();
 			} catch (JAXBException e) {
 				e.printStackTrace();
 			}
