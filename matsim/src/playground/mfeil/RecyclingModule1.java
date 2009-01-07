@@ -111,7 +111,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			}
 			this.coefficients.setPrimActsDistance(score[1][1]);
 			score[1][0] = this.calculate();
-				double tmpScore = Double.MIN_VALUE;
+			double tmpScore = -100000;
 			double x=0;
 			for (int j=0;j<score.length;j++){
 				if (score[j][0]>tmpScore){
@@ -122,7 +122,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			tmp[i][0]=tmpScore;
 			tmp[i][1]= x;
 		}
-		double tmpScoreFinal = Double.MIN_VALUE;
+		double tmpScoreFinal = -100000;
 		for (int i=0;i<this.iterations;i++){
 			if (tmp[i][0]>tmpScoreFinal){
 				tmpScoreFinal = tmp[i][0];
