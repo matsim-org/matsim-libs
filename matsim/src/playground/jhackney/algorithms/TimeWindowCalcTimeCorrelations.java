@@ -74,6 +74,7 @@ public class TimeWindowCalcTimeCorrelations {
 				double ti_egonet=tw1.startTime;
 				double tf_egonet=tw1.endTime;
 				double tdur_egonet=tf_egonet-ti_egonet;
+				tdur_egonet=(tdur_egonet+numbins*binwidth)%(numbins*binwidth);
 				int n_egonet=0;
 				double dist_egonet=tw1.act.getFacility().calcDistance(((Act)(tw1.person.getSelectedPlan().getActsLegs().get(0))).getFacility().getCenter());
 
@@ -82,6 +83,7 @@ public class TimeWindowCalcTimeCorrelations {
 				double tf_act=tw1.endTime;
 				tf_act=(tf_act+numbins*binwidth)%(numbins*binwidth);
 				double tdur_act=tf_act-ti_act;
+				tdur_act=(tdur_act+numbins*binwidth)%(numbins*binwidth);
 				int n_act=0;
 				double dist_act=dist_egonet;
 
@@ -94,14 +96,16 @@ public class TimeWindowCalcTimeCorrelations {
 						n_egonet++;
 						ti_egonet=ti_egonet+tw2.startTime;
 						tf_egonet=tf_egonet+tw2.endTime;
-						tdur_egonet=tdur_egonet+(tw2.endTime-tw2.startTime);
+						double tdurunfolded=(tw2.endTime-tw2.startTime+numbins*binwidth)%(numbins*binwidth);
+						tdur_egonet=tdur_egonet+tdurunfolded;
 						dist_egonet=dist_egonet+dist_alter;
 
 					}
 					// Others there, not necessarily friends
 					if(CompareTimeWindows.overlapTimePlaceType(tw1, tw2)){										
 						n_act++;
-						tdur_act=tdur_act+(tw1.endTime-tw1.startTime);
+						double tdurunfolded=(tw1.endTime-tw1.startTime+numbins*binwidth)%(numbins*binwidth);
+						tdur_act=tdur_act+tdurunfolded;
 						dist_act=dist_act+dist_alter;
 					}
 				}
