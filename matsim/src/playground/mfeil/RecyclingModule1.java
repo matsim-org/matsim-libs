@@ -25,6 +25,7 @@ import org.matsim.population.Act;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
+import java.util.ArrayList;
 
 
 /**
@@ -35,18 +36,30 @@ import org.matsim.replanning.modules.StrategyModule;
 
 public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		
-	private final int iterations, noOfAgents;
+	private final int iterations, noOfAgents, noOfCoefficients;
 	private final DistanceCoefficients coefficients;
 	private final MultithreadedModuleA assignmentModule;
-	
+	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
+	private final ArrayList<String> coef; 
+	                      
 	public RecyclingModule1 (ControlerMFeil controler) {
 		super(controler);
 		this.iterations 		= 20;
 		this.noOfAgents			= 10;
-		this.coefficients 		= new DistanceCoefficients (1, 1);		
+		this.primActsDistance = "yes";
+		this.homeLocationDistance = "yes";
+		this.sex = "no";
+		this.age = "no";
+		this.license = "no";
+		this.car_avail = "no";
+		this.employed = "no";
+		this.coef = this.detectNoOfCoefficients();
+		this.noOfCoefficients=this.coef.size();
+		this.coefficients 		= new DistanceCoefficients (new double []{1,1}, this.coef);	
 		this.assignmentModule	= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
 				this.locator, this.scorer, this.cleaner, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
+		
 	}
 	
 	
@@ -94,12 +107,72 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	private void detectCoefficients (){
 		
 		double offset = 0.5;
-		double basis = this.coefficients.getPrimActsDistance();
-		double [][] score = new double [2][2];
-		double [][] tmp = new double [this.iterations][3];
-		int inc=1;
+		double basis [] = new double [this.noOfCoefficients];
+		for (int i=0;i<basis.length;i++){
+			double aux = this.coefficients.getSingleCoef(i);
+			basis[i] = aux;
+		}
+		double [][] score = new double [(this.noOfCoefficients-1)][4];	// last coefficient remains fixed; {coef+;coef-;score+;score-}
+		double [][] tmp = new double [this.iterations][3]; //{value of coefficient, position of coefficient, score}
+		ArrayList<double[]> tabuList = new ArrayList<double[]>();
+		int best = -1;
 		
 		for (int i=0;i<this.iterations;i++){
+			for (int j=0;j<this.noOfCoefficients-1;j++){
+				if (best!=j*2+1){
+					score [j][0]= basis[j]+offset;
+					this.coefficients.setSingleCoef(score[j][0], j);
+					if (this.checkTabuList(tabuList)) {
+						score [j][2] = -100000;
+						System.out.println("Tabu!");
+					}
+					else {
+						score [j][2]= this.calculate();
+						System.out.println(score [j][2]);
+					}
+				}
+				if (best!=j*2){
+					if (basis[j]-offset>=0) score [j][1]= basis[j]-offset;
+					else score [j][1]= basis[j]+2*offset;
+					this.coefficients.setSingleCoef(score[j][1], j);
+					if (this.checkTabuList(tabuList)) {
+						score [j][3] = -100000;
+						System.out.println("Tabu!");
+					}
+					else {
+						score [j][3]= this.calculate();
+						System.out.println(score [j][3]);
+					}
+				}
+			}
+				
+			tmp[i][2] = -100000;
+			for (int j=0;j<score.length;j++){
+				if (score[j][2]>tmp[i][2]){
+					tmp[i][2] = score[j][2];
+					tmp[i][0] = score[j][0];
+					tmp[i][1] = j;
+					best=j*2;
+				}
+				if (score[j][3]>tmp[i][2]){
+					tmp[i][2] = score[j][3];
+					tmp[i][0] = score[j][1];
+					tmp[i][1] = j;
+					best=j*2+1;
+				}
+			}
+			double [] tmpSol = new double [(this.noOfCoefficients-1)];
+			for (int x=0;x<(this.noOfCoefficients-1);x++){
+				double aux = this.coefficients.getSingleCoef(x);
+				tmpSol[x]=aux;
+			}
+			tabuList.add(tmpSol);
+			double aux = tmp[i][0];
+			basis[(int)tmp[i][1]] = aux;
+			System.out.println(aux);
+		}
+		
+			/*
 			score[0][1]=basis+(i+1)*offset;
 			this.coefficients.setPrimActsDistance(score[0][1]);
 			score[0][0] = this.calculate();
@@ -121,14 +194,14 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			}
 			tmp[i][0]=tmpScore;
 			tmp[i][1]= x;
-		}
+			*/
+		
 		double tmpScoreFinal = -100000;
 		for (int i=0;i<this.iterations;i++){
-			if (tmp[i][0]>tmpScoreFinal){
-				tmpScoreFinal = tmp[i][0];
-				this.coefficients.setPrimActsDistance(tmp[i][1]);
-				System.out.println("PrimActsDistance = "+tmp[i][1]);
-				System.out.println("HomeLocationDistance = "+this.coefficients.gethomeLocationDistance());
+			if (tmp[i][2]>tmpScoreFinal){
+				tmpScoreFinal = tmp[i][2];
+				this.coefficients.setSingleCoef(tmp[i][0],(int)tmp[i][1]);
+				for (int j=0;j<this.noOfCoefficients;j++) System.out.println(coef.get(j)+" = "+this.coefficients.getCoef()[j]);
 				System.out.println("Score = "+tmpScoreFinal);
 				System.out.println();
 			}
@@ -146,6 +219,30 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			score += this.list[1].get(j).getScore(); 
 		}
 		return score;
+	}
+	
+	private ArrayList<String> detectNoOfCoefficients (){
+		ArrayList<String> coef = new ArrayList<String>();
+		if (this.primActsDistance=="yes") coef.add("primActsDistance");
+		if (this.homeLocationDistance=="yes") coef.add("homeLocationDistance");
+		if (this.sex=="yes") coef.add("sex");
+		if (this.age=="yes") coef.add("age");
+		if (this.license=="yes") coef.add("license");
+		if (this.car_avail=="yes") coef.add("car_avail");
+		if (this.employed=="yes") coef.add("employed");
+		
+		return coef;
+	}
+	
+	private boolean checkTabuList (ArrayList<double[]> tabuList){
+		OuterLoop:
+		for (int i=0;i<tabuList.size();i++){
+			for (int j=0;j<tabuList.get(i).length;j++){
+				if (tabuList.get(i)[j]!=this.coefficients.getCoef()[j]) continue OuterLoop;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }
