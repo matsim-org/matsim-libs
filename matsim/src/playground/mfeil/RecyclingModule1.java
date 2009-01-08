@@ -106,6 +106,67 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 	private void detectCoefficients (){
 		
+		/* Initialization */
+		double offset = 0.5;
+		double coefMatrix [][] = new double [this.iterations+1][this.noOfCoefficients];	// first solution is base solution, then 'this.iterations' iterations
+		for (int i=0;i<coefMatrix[0].length;i++){
+			double aux = this.coefficients.getSingleCoef(i);
+			coefMatrix[0][i] = aux;
+		}
+		double score [] = new double [this.iterations+1];
+		double scoreAux, coefAux;
+		int [] modified = new int [this.noOfCoefficients-1]; // last coefficient fixed
+		
+		/* Iteration 0 */
+		score [0]= this.calculate();
+		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;
+	
+		/* Further iterations */
+		for (int i=1;i<this.iterations+1;i++){
+			for (int j=0;j<this.noOfCoefficients-1;j++){
+				
+				if (coefMatrix[i-1][j]!=-1){
+					coefMatrix [i][j] = coefMatrix [i-1][j]+offset;
+					this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+					scoreAux = this.calculate();
+					if (scoreAux>score[i]) {
+						score[i] = scoreAux;
+						modified [j] = 1; // 1 means "increased by offset";
+						for (int x=0;x<j;x++){
+							modified [x]=0;	// set back the former index;
+							coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+						}
+					}
+					else {
+						coefMatrix [i][j] = coefMatrix [i-1][j];
+					}
+				}
+				
+				if (coefMatrix[i-1][j]!=1){
+					coefAux = coefMatrix [i][j];	// keep coef solution;
+					coefMatrix [i][j] = coefMatrix [i-1][j]-offset;
+					this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+					scoreAux = this.calculate();
+					if (scoreAux>score[i]) {
+						score[i] = scoreAux;
+						if (modified [j] == 1) modified [j] = -1; // -1 means "decreased by offset";
+						else {
+							for (int x=0;x<j;x++){
+								modified [x]=0;	// set back to former index;
+								coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+							}
+						}
+					}
+					else {
+						coefMatrix [i][j] = coefAux; // set back to former value;
+					}
+				}
+			}
+			coefMatrix[i][coefMatrix[i].length-1]=coefMatrix[i-1][coefMatrix[i].length-1];
+		}
+		
+		
+		/*
 		double offset = 0.5;
 		double basis [] = new double [this.noOfCoefficients];
 		for (int i=0;i<basis.length;i++){
@@ -151,6 +212,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				if (score[j][2]>tmp[i][2]){
 					tmp[i][2] = score[j][2];
 					tmp[i][0] = score[j][0];
+					System.out.println("tabu: "+tmp[i][0]+", "+tmp[i][2] );
 					tmp[i][1] = j;
 					best=j*2;
 				}
@@ -171,7 +233,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			basis[(int)tmp[i][1]] = aux;
 			System.out.println(aux);
 		}
-		
+		*/
 			/*
 			score[0][1]=basis+(i+1)*offset;
 			this.coefficients.setPrimActsDistance(score[0][1]);
@@ -195,12 +257,20 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			tmp[i][0]=tmpScore;
 			tmp[i][1]= x;
 			*/
+		for (int i=0;i<score.length;i++){
+			for (int j=0;j<coefMatrix[0].length-1;j++){
+				System.out.print(coefMatrix[i][j]+" ");
+			}
+			System.out.println(this.coefficients.getSingleCoef(coefMatrix[0].length-1)+" "+score[i]);
+			System.out.println();
+		}
+		
 		
 		double tmpScoreFinal = -100000;
-		for (int i=0;i<this.iterations;i++){
-			if (tmp[i][2]>tmpScoreFinal){
-				tmpScoreFinal = tmp[i][2];
-				this.coefficients.setSingleCoef(tmp[i][0],(int)tmp[i][1]);
+		for (int i=0;i<this.iterations+1;i++){
+			if (score[i]>tmpScoreFinal){
+				tmpScoreFinal = score[i];
+				this.coefficients.setCoef(coefMatrix[i]);
 				for (int j=0;j<this.noOfCoefficients;j++) System.out.println(coef.get(j)+" = "+this.coefficients.getCoef()[j]);
 				System.out.println("Score = "+tmpScoreFinal);
 				System.out.println();
