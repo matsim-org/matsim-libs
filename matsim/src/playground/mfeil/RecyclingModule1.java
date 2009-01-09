@@ -47,9 +47,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		this.iterations 		= 20;
 		this.noOfAgents			= 10;
 		this.primActsDistance = "yes";
-		this.homeLocationDistance = "yes";
+		this.homeLocationDistance = "no";
 		this.sex = "no";
-		this.age = "yes";
+		this.age = "no";
 		this.license = "no";
 		this.car_avail = "no";
 		this.employed = "no";
@@ -88,7 +88,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		agents = new OptimizedAgents (list[0]);
 		
 		Statistics.prt=false;
-		this.detectCoefficients();
+		if (this.noOfCoefficients>1) this.detectCoefficients();
 		Statistics.prt=true;
 		
 		assignmentModule.init();
