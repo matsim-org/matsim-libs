@@ -64,6 +64,7 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
+					 double ran = MatsimRandom.random.nextDouble();
 					 
 					 
 					 out.write("\t<person id=\""+personID+"\">\n");
@@ -73,10 +74,18 @@ public class PlansCreator {
 					 out.write("\t\t\t\t<location id=\""+i+"\" isPrimary=\"yes\"/>\n");
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"work\">\n");
-					 out.write("\t\t\t\t<location id=\""+(networkSize-1+j)+"\" isPrimary=\"yes\"/>\n");
-					 out.write("\t\t\t</activity>\n");
-					 out.write("\t\t\t<activity type=\"shopping\">\n");
-					 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 if (ran<0.5){
+						 out.write("\t\t\t\t<location id=\""+(networkSize-1+j)+"\" isPrimary=\"yes\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 }
+					 else {
+						 out.write("\t\t\t\t<location id=\""+(networkSize-1+j)+"\" isPrimary=\"no\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"yes\"/>\n"); 
+					 }
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"leisure\">\n");
 					 out.write("\t\t\t\t<location id=\""+locationIDLeisure+"\" isPrimary=\"no\"/>\n");
@@ -121,6 +130,9 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
+					 double ran = MatsimRandom.random.nextDouble();
+					 
+					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
@@ -128,10 +140,18 @@ public class PlansCreator {
 					 out.write("\t\t\t\t<location id=\""+(networkSize-1+i)+"\" isPrimary=\"yes\"/>\n");
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"work\">\n");
-					 out.write("\t\t\t\t<location id=\""+j+"\" isPrimary=\"yes\"/>\n");
-					 out.write("\t\t\t</activity>\n");
-					 out.write("\t\t\t<activity type=\"shopping\">\n");
-					 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 if (ran<0.5){
+						 out.write("\t\t\t\t<location id=\""+j+"\" isPrimary=\"yes\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 }
+					 else{
+						 out.write("\t\t\t\t<location id=\""+j+"\" isPrimary=\"no\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"yes\"/>\n"); 
+					 }
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"leisure\">\n");
 					 out.write("\t\t\t\t<location id=\""+locationIDLeisure+"\" isPrimary=\"no\"/>\n");
@@ -176,6 +196,8 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
+					 double ran = MatsimRandom.random.nextDouble();
+					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
@@ -183,10 +205,19 @@ public class PlansCreator {
 					 out.write("\t\t\t\t<location id=\""+(2*(networkSize-1)+i)+"\" isPrimary=\"yes\"/>\n");
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"work\">\n");
-					 out.write("\t\t\t\t<location id=\""+(3*(networkSize-1)+j)+"\" isPrimary=\"yes\"/>\n");
-					 out.write("\t\t\t</activity>\n");
-					 out.write("\t\t\t<activity type=\"shopping\">\n");
-					 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 if (ran<0.5){
+						 out.write("\t\t\t\t<location id=\""+(3*(networkSize-1)+j)+"\" isPrimary=\"yes\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 }
+					 else{
+						 out.write("\t\t\t\t<location id=\""+(3*(networkSize-1)+j)+"\" isPrimary=\"no\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"yes\"/>\n");
+						 
+					 }
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"leisure\">\n");
 					 out.write("\t\t\t\t<location id=\""+locationIDLeisure+"\" isPrimary=\"no\"/>\n");
@@ -231,6 +262,9 @@ public class PlansCreator {
 					 leisureX=IDs[1];
 					 leisureY=IDs[2];
 					 
+					 double ran = MatsimRandom.random.nextDouble();
+					 
+					 
 					 out.write("\t<person id=\""+personID+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
@@ -238,10 +272,18 @@ public class PlansCreator {
 					 out.write("\t\t\t\t<location id=\""+(3*(networkSize-1)+i)+"\" isPrimary=\"yes\"/>\n");
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"work\">\n");
-					 out.write("\t\t\t\t<location id=\""+(2*(networkSize-1)+j)+"\" isPrimary=\"yes\"/>\n");
-					 out.write("\t\t\t</activity>\n");
-					 out.write("\t\t\t<activity type=\"shopping\">\n");
-					 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 if (ran<0.5){
+						 out.write("\t\t\t\t<location id=\""+(2*(networkSize-1)+j)+"\" isPrimary=\"yes\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"no\"/>\n");
+					 }
+					 else{
+						 out.write("\t\t\t\t<location id=\""+(2*(networkSize-1)+j)+"\" isPrimary=\"no\"/>\n");
+						 out.write("\t\t\t</activity>\n");
+						 out.write("\t\t\t<activity type=\"shopping\">\n");
+						 out.write("\t\t\t\t<location id=\""+locationIDShopping+"\" isPrimary=\"yes\"/>\n");
+					 }
 					 out.write("\t\t\t</activity>\n");
 					 out.write("\t\t\t<activity type=\"leisure\">\n");
 					 out.write("\t\t\t\t<location id=\""+locationIDLeisure+"\" isPrimary=\"no\"/>\n");
