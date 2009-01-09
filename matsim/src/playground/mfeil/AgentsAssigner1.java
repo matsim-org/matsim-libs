@@ -24,7 +24,6 @@ package playground.mfeil;
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.scoring.PlanScorer;
@@ -95,19 +94,20 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			distanceAgent=0;
 			if (this.distance=="distance"){
 				distanceAgent += this.coefficients.getSingleCoef("primActsDistance")*plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
-				//distanceAgent += plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
-				}
+			}
 	
 			if (this.homeLocation=="homelocation"){
 			
 				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX();
 				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY();
 			
-				distanceAgent += this.coefficients.getSingleCoef((String)"homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
+				distanceAgent += this.coefficients.getSingleCoef("homeLocationDistance")*java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
 						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
-				//distanceAgent += java.lang.Math.sqrt(java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX()-homelocationAgentX),2)+
-					//	java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
 			}
+			if (this.age=="age"){
+				distanceAgent+= this.coefficients.getSingleCoef("age")* (plan.getPerson().getAge()-agents.getAgentPerson(j).getAge());
+			}
+			
 			if (distanceAgent<distance){
 				/*if (Statistics.prt==true){
 					if (agents.filling[j]>0){

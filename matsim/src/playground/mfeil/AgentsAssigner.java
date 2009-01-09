@@ -55,7 +55,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final RecyclingModule				module;
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
-	protected final String						distance, homeLocation;
+	protected final String						distance, homeLocation, age;
 	protected LinkedList<String>				nonassignedAgents;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
@@ -87,6 +87,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.minimumTime			= minimumTime;
 		this.distance				= "distance";
 		this.homeLocation			= "homelocation";
+		this.age					= "age";
 		this.nonassignedAgents		= nonassignedAgents;
 	}
 	
