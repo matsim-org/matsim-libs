@@ -33,9 +33,11 @@ class DESController extends Controler {
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
 		controler.events.printEventsCount();
-		ecHandler.printRecordedSOC();
 		
+		
+		ecHandler.printRecordedSOC();
 		//ecHandler.printEnergyConsumptionAtSelectedLink();
+		
 		
 		ecHandler.tidyup();
 	}

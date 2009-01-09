@@ -32,7 +32,7 @@ public class CreatePlans1 {
 		args=new String[1];
 		args[0]="C:/data/SandboxCVS/ivt/studies/triangle/config/config.xml";
 		Gbl.createConfig(args);
-		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/triangle/plans/10000plans/plans_hwsh.xml");
+		Gbl.getConfig().plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/triangle/plans/20Kplans/plans_hwsh.xml");
 		final World world = Gbl.getWorld();
 
 		// read facilities
@@ -65,7 +65,7 @@ public class CreatePlans1 {
 
 
 		// create persons
-		for (int i=0;i<10000;i++){
+		for (int i=0;i<20000;i++){
 			Person person = new PersonImpl(new IdImpl(i));
 			plans.addPerson(person);
 

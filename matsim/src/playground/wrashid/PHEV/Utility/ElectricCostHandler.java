@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.events.ActEndEvent;
@@ -51,8 +52,13 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	// write charging events to file
 	// String outputFilePath=null;
-	String outputFilePath = "C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\IAMF2009Paper\\10KExperiment\\chargingEvents.txt";
+	String outputFilePath = "C:\\data\\tempOutput\\chargingEvents.txt";
 	OutputStreamWriter chargingOutput;
+	
+	// for example, we can say in reset, which Iteration is relevant
+	// then only for that iteration the energy charging at a link will be recorded
+	// also used for state of charge
+	private boolean relevantIterationReached=false;
 
 	private void initOutputFile() {
 		if (outputFilePath == null) {
@@ -61,7 +67,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		try {
 			FileOutputStream fos = new FileOutputStream(outputFilePath);
 			chargingOutput = new OutputStreamWriter(fos, "UTF8");
-			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\n"); 
+			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\tSOC_start\tSOC_end\n"); 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -162,6 +168,11 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		averageTimeSpentAtWork = 0;
 		averageTimeSpentAtShop = 0;
 		energyLevel.clear();
+		
+		// only record the specified iteration results
+		if (iteration==1){
+			relevantIterationReached=true;
+		}
 	}
 
 	private class EnergyApplicatonSpecificState {
@@ -257,7 +268,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		recordSOCOfVehicle(event, eventTime);
 
 		// update energy consumption
-		if (event.linkId.equalsIgnoreCase(selectedLink)) {
+		if (event.linkId.equalsIgnoreCase(selectedLink) && relevantIterationReached) {
 			for (int i = (int) Math.round(state.startTimeOfLastAct); i < (int) Math
 					.round(state.startTimeOfLastAct + energyCharged
 							/ chargingPower); i++) {
@@ -268,11 +279,11 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// write output event
 		// do not write out events, which are caused by the first act end (leaving home)
 		if (chargingOutput != null && state.startTimeOfLastAct!=state.startTimeOfLastAct
-				+ energyCharged / chargingPower) {
+				+ energyCharged / chargingPower && relevantIterationReached) {
 			try {
 				chargingOutput.write(event.linkId + "\t" + event.agentId + "\t"
 						+ state.startTimeOfLastAct + "\t" + (state.startTimeOfLastAct
-						+ energyCharged / chargingPower) + "\n");
+						+ (energyCharged) / chargingPower) + "\t" + (state.energyLevel - energyCharged) + "\t" + (state.energyLevel) + "\n");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -301,7 +312,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	private void recordSOCOfVehicle(PersonEvent event, double time) {
-		if (event.agentId.toString().equalsIgnoreCase(observedVehicleId)) {
+		if (event.agentId.toString().equalsIgnoreCase(observedVehicleId) && relevantIterationReached) {
 			recordedStateOfCharge.add(time,
 					energyLevel.get(observedVehicleId).energyLevel);
 		}
