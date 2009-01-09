@@ -32,15 +32,21 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentEvent;
 import org.matsim.events.AgentStuckEvent;
+import org.matsim.events.Events;
+import org.matsim.events.MatsimEventsReader;
 import org.matsim.events.handler.AgentArrivalEventHandler;
 import org.matsim.events.handler.AgentDepartureEventHandler;
 import org.matsim.events.handler.AgentStuckEventHandler;
+import org.matsim.gbl.Gbl;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.charts.XYLineChart;
 import org.matsim.utils.io.IOUtils;
 import org.matsim.utils.misc.Time;
+import org.matsim.world.World;
 
 /**
  * @author ychen
@@ -249,5 +255,51 @@ public class TravelTimeModalSplit implements AgentDepartureEventHandler,
 				.addSeries("average traveltime of public transit Users", xs,
 						ptTravelTimes);
 		avgTravelTimeChart.saveAsPng(filename + "Avg.png", 1024, 768);
+	}
+	public static void main(final String[] args) {
+		final String netFilename = "../psrc/network/psrc-wo-3212.xml.gz";
+		final String plansFilename = "../runs/run668/it.1500/1500.plans.xml.gz";
+		final String eventsFilename = "../runs/run668/it.1500/1500.analysis/6760.txt";
+		final String chartFilename = "../runs/run668/it.1500/1500.analysis/6760.travelTime";
+		final String outFilename = "../runs/run668/it.1500/1500.analysis/6760.travelTime.txt.gz";
+
+		// final String netFilename = "./test/yu/test/input/equil_net.xml";
+		// final String plansFilename =
+		// "./test/yu/test/input/3k.100.plans.xml.gz";
+		// final String eventsFilename =
+		// "./test/yu/test/input/3k.100.events.txt.gz";
+		// // final String volumeTestFilename =
+		// "./test/yu/test/output/3kVolumeTest.txt.gz";
+		// final String chartFilename = "./test/yu/test/output/3kChart.png";
+		// final String outFilename = "./test/yu/test/output/3ktt.txt.gz";
+
+		Gbl.startMeasurement();
+		Gbl.createConfig(null);
+
+		World world = Gbl.getWorld();
+
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(netFilename);
+		world.setNetworkLayer(network);
+
+		Population population = new Population();
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPopulationReader(population).readFile(plansFilename);
+
+		Events events = new Events();
+
+		TravelTimeModalSplit ttms = new TravelTimeModalSplit(300, network,
+				population);
+		events.addHandler(ttms);
+
+		System.out.println("-->reading evetsfile: " + eventsFilename);
+		new MatsimEventsReader(events).readFile(eventsFilename);
+
+		ttms.write(outFilename);
+		ttms.writeCharts(chartFilename);
+
+		System.out.println("--> Done!");
+		Gbl.printElapsedTime();
+		System.exit(0);
 	}
 }
