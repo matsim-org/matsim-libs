@@ -116,6 +116,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		double score [] = new double [this.iterations+1];
 		double scoreAux, coefAux;
 		int [] modified = new int [this.noOfCoefficients-1]; // last coefficient fixed
+		int modifiedAux;
 		
 		/* Iteration 0 */
 		score [0]= this.calculate();
@@ -123,10 +124,13 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	
 		/* Further iterations */
 		for (int i=1;i<this.iterations+1;i++){
+			coefMatrix[i][coefMatrix[i].length-1]=coefMatrix[i-1][coefMatrix[i].length-1];
 			for (int j=0;j<this.noOfCoefficients-1;j++){
+				modifiedAux = modified[j];
 				
-				if (coefMatrix[i-1][j]!=-1){
+				if (modifiedAux!=-1){
 					coefMatrix [i][j] = coefMatrix [i-1][j]+offset;
+					coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);					
 					this.coefficients.setSingleCoef(coefMatrix[i][j], j);
 					scoreAux = this.calculate();
 					if (scoreAux>score[i]) {
@@ -142,27 +146,50 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 					}
 				}
 				
-				if (coefMatrix[i-1][j]!=1){
+				if (modifiedAux!=1){
 					coefAux = coefMatrix [i][j];	// keep coef solution;
-					coefMatrix [i][j] = coefMatrix [i-1][j]-offset;
-					this.coefficients.setSingleCoef(coefMatrix[i][j], j);
-					scoreAux = this.calculate();
-					if (scoreAux>score[i]) {
-						score[i] = scoreAux;
-						if (modified [j] == 1) modified [j] = -1; // -1 means "decreased by offset";
-						else {
-							for (int x=0;x<j;x++){
-								modified [x]=0;	// set back to former index;
-								coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+					
+					if (coefMatrix [i-1][j]-offset>=0){
+						coefMatrix [i][j] = coefMatrix [i-1][j]-offset;
+						coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);	
+						this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+						scoreAux = this.calculate();
+						if (scoreAux>score[i]) {
+							score[i] = scoreAux;
+							if (modified [j] == 1) modified [j] = -1; // -1 means "decreased by offset";
+							else {
+								for (int x=0;x<j;x++){
+									modified [x]=0;	// set back to former index;
+									coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+								}
+								modified [j] = -1;
 							}
+						}
+						else {
+							coefMatrix [i][j] = coefAux; // set back to former value;
 						}
 					}
 					else {
-						coefMatrix [i][j] = coefAux; // set back to former value;
+						coefMatrix [i][j] = coefMatrix [i-1][j]+2*offset;
+						coefMatrix [i][j] = this.checkTabuList(coefMatrix, i, j, offset);	
+						this.coefficients.setSingleCoef(coefMatrix[i][j], j);
+						scoreAux = this.calculate();
+						if (scoreAux>score[i]) {
+							score[i] = scoreAux;
+							if (modified [j] != 1) {
+								for (int x=0;x<j;x++){
+									modified [x]=0;	// set back to former index;
+									coefMatrix[i][x]=coefMatrix[i-1][x]; // set back the coef itself;
+								}
+								modified [j] = 1;
+							}
+						}
+						else {
+							coefMatrix [i][j] = coefAux; // set back to former value;
+						}
 					}
 				}
 			}
-			coefMatrix[i][coefMatrix[i].length-1]=coefMatrix[i-1][coefMatrix[i].length-1];
 		}
 		
 		
@@ -262,7 +289,6 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				System.out.print(coefMatrix[i][j]+" ");
 			}
 			System.out.println(this.coefficients.getSingleCoef(coefMatrix[0].length-1)+" "+score[i]);
-			System.out.println();
 		}
 		
 		
@@ -304,15 +330,21 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		return coef;
 	}
 	
-	private boolean checkTabuList (ArrayList<double[]> tabuList){
+	private double checkTabuList (double [][] coefMatrix, int i, int j, double offset){
 		OuterLoop:
-		for (int i=0;i<tabuList.size();i++){
-			for (int j=0;j<tabuList.get(i).length;j++){
-				if (tabuList.get(i)[j]!=this.coefficients.getCoef()[j]) continue OuterLoop;
+		for (int x=0;x<i;x++){
+			for (int y=0;y<coefMatrix[i].length;y++){
+				System.out.println(coefMatrix[x][y]+" "+coefMatrix[i][y]);
+				if (coefMatrix[x][y]!=coefMatrix[i][y]) continue OuterLoop;
 			}
-			return true;
+			System.out.println("Anschlag tabu!");
+			double coefAux = -1;
+			for (int z=0;z<i;z++){
+				if (coefMatrix[z][j]>coefAux)coefAux=coefMatrix[z][j];
+			}
+			return coefAux+offset;
 		}
-		return false;
+		return coefMatrix[i][j];
 	}
 
 }
