@@ -25,6 +25,7 @@ package playground.yu.utils.qgis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -34,6 +35,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -49,11 +51,16 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class Volume2PolygonGraph extends Network2PolygonGraph {
+	private Set<Id> linkIds;
+
+	public Volume2PolygonGraph() {
+	}
 
 	public Volume2PolygonGraph(NetworkLayer network,
-			CoordinateReferenceSystem crs) {
+			CoordinateReferenceSystem crs, Set<Id> linkIds) {
 		this.network = network;
 		this.crs = crs;
+		this.linkIds = linkIds;
 		this.geofac = new GeometryFactory();
 		features = new ArrayList<Feature>();
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
@@ -68,7 +75,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	@Override
 	protected double getLinkWidth(BasicLink link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
-		return ((double) i.intValue()) / 5.0;
+		return ((double) i.intValue()) / 2.0;
 	}
 
 	@Override
@@ -77,7 +84,8 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (Link link : network.getLinks().values()) {
+		for (Id linkId : linkIds) {
+			Link link = network.getLink(linkId);
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);

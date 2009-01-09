@@ -56,13 +56,13 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		// String netfile = "test/scenarios/berlin/network.xml.gz";
 		// String outputFileLs = "output/bvg/berlinLinks.shp";
 		// String outputFileP = "output/bvg/berlinPolygon.shp";
-		String netfile = "input/Toronto/toronto.xml";
-		String outputFileLs = "output/Toronto/Links.shp";
-		String outputFileP = "output/Toronto/Polygon.shp";
+		String netfile = "../psrc/network/psrc-wo-3212.xml.gz";
+		String outputFileLs = "../psrc/network/shp/psrc-wo-3212.Links.shp";
+		String outputFileP = "../psrc/network/shp/psrc-wo-3212.Polygon.shp";
 
 		// String coordinateSys = ch1903;
 		String coordinateSys = "DHDN_GK4";
-
+//		String coordinateSys = "Atlantis";
 		Gbl.createConfig(null);
 		Gbl.getConfig().global().setCoordinateSystem(coordinateSys);
 
@@ -80,7 +80,7 @@ public class MATSimNet2QGISDemo implements X2QGIS {
 		new Network2ESRIShape(network, outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSys);
-		builder.setWidthCoefficient(0.001);
+		builder.setWidthCoefficient(0.01);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);

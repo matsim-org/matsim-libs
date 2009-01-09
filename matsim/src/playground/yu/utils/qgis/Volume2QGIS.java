@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
@@ -61,9 +63,9 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public void setCrs(final String wkt, final NetworkLayer network,
-			final CoordinateReferenceSystem crs) {
+			final CoordinateReferenceSystem crs, Set<Id> linkIds) {
 		super.setCrs(wkt);
-		setN2g(new Volume2PolygonGraph(network, crs));
+		setN2g(new Volume2PolygonGraph(network, crs, linkIds));
 	}
 
 	/**
@@ -76,8 +78,9 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		// String netFilename =
 		// "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		String eventsFilename = "input/bse/760.events.txt.gz";
-		String shapeFilepath = "output/bse/";
+		String eventsFilenameA = "../runs/r153_10/it.1000/1000.events.txt.gz";
+		String eventsFilenameB = "../runs/run628/it.1000/1000.events.txt.gz";
+		String shapeFilepath = "../runs/run628/it.1000/";
 		// ////////////////////////////////////////
 		// MATSimNet2QGIS.setFlowCapFactor(0.1);
 		// //////////////////////////////////////
@@ -103,45 +106,61 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		 * /////////////////////////////////////////////////////////////
 		 */
 
-		// mn2q
-		// .readNetwork("../schweiz-ivtch/network/ivtch-osm-wu-flama.xml");
-		// mn2q.setCrs(ch1903);
-		// NetworkLayer net = mn2q.getNetwork();
-		// VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		// mn2q.readEvents("../runs/run468/500.events.txt.gz", vaA);
-		// List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
-		// VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
-		// mn2q.readEvents("../runs/run467/500.events.txt.gz", vaB);
-		// List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
-		// for (int i = 0; i < 24; i++) {
-		// Map<Id, Integer> diff = new TreeMap<Id, Integer>();
-		// for (Id linkId : volsB.get(i).keySet()) {
-		// diff.put(linkId, volsA.get(i).get(linkId).intValue()
-		// - volsB.get(i).get(linkId).intValue());
-		// }
-		// mn2q.addParameter("vol" + i + "-" + (i + 1) + "h", Integer.class,
-		// diff);
-		// }
-		// mn2q.writeShapeFile("test/yu/ivtch/468.500-467.500.shp");
+		mn2q.readNetwork(netFilename);
+		mn2q.setCrs(ch1903);
+		NetworkLayer net = mn2q.getNetwork();
+		VolumesAnalyzer vaA = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		mn2q.readEvents(eventsFilenameA, vaA);
+		List<Map<Id, Integer>> volsA = createVolumes(net, vaA);
+		VolumesAnalyzer vaB = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
+		mn2q.readEvents(eventsFilenameB, vaB);
+		List<Map<Id, Integer>> volsB = createVolumes(net, vaB);
+
+		for (int i = 0; i < 24; i++) {
+			Volume2QGIS v2q = new Volume2QGIS();
+
+			String index = i + "-" + (i + 1) + "h";
+			Map<Id, Integer> diff = new TreeMap<Id, Integer>();
+			Map<Id, Integer> sign = new TreeMap<Id, Integer>();
+
+			v2q.setCrs(ch1903, mn2q.network, mn2q.crs, diff.keySet());
+
+			for (Id linkId : volsB.get(i).keySet()) {
+				int volDiff = volsA.get(i).get(linkId).intValue()
+						- volsB.get(i).get(linkId).intValue();
+				if (volDiff < 0) {
+					diff.put(linkId, -volDiff);
+					sign.put(linkId, -1);
+				} else if (volDiff > 0) {
+					diff.put(linkId, volDiff);
+					sign.put(linkId, 1);
+				}
+			}
+			v2q.addParameter("vol" + index, Integer.class, diff);
+			v2q.addParameter("sign" + index, Integer.class, sign);
+			v2q.writeShapeFile(shapeFilepath + "628." + index + ".shp");
+		}
 		/*
 		 * /////////////////////////////////////////////////////////////////////
 		 * Shp-file with 25 Layers
 		 * //////////////////////////////////////////////
 		 * //////////////////////////
 		 */
-		mn2q.readNetwork(netFilename);
-		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile(shapeFilepath + "net.shp");
-		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
-				mn2q.network);
-		mn2q.readEvents(eventsFilename, va);
-		List<Map<Id, Integer>> vols = createVolumes(mn2q.network, va);
-		for (int i = 0; i < 24; i++) {
-			Volume2QGIS v2q = new Volume2QGIS();
-			v2q.setCrs(ch1903, mn2q.network, mn2q.crs);
-			String index = "vol" + i + "-" + (i + 1) + "h";
-			v2q.addParameter(index, Integer.class, vols.get(i));
-			v2q.writeShapeFile(shapeFilepath + "760." + index + ".shp");
-		}
+		// mn2q.readNetwork(netFilename);
+		// mn2q.setCrs(ch1903);
+		// mn2q.writeShapeFile(shapeFilepath + "net.shp");
+		// VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1,
+		// mn2q.network);
+		// mn2q.readEvents(eventsFilename, va);
+		// List<Map<Id, Integer>> vols = createVolumes(mn2q.network, va);
+		// for (int i = 0; i < 24; i++) {
+		// Volume2QGIS v2q = new Volume2QGIS();
+		// v2q.setCrs(ch1903, mn2q.network, mn2q.crs);
+		// String index = "vol" + i + "-" + (i + 1) + "h";
+		// v2q.addParameter(index, Integer.class, vols.get(i));
+		// v2q.writeShapeFile(shapeFilepath + "760." + index + ".shp");
+		// }
+		////////////////////////////////////////////////////////////////////////
+		// //
 	}
 }
