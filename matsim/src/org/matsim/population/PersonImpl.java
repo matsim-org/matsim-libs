@@ -172,15 +172,50 @@ public class PersonImpl implements Person{
 
 	@Override
 	public final String toString() {
-		return "[id=" + this.getId() + "]" +
-				"[sex=" + this.getSex() + "]" +
-				"[age=" + this.getAge() + "]" +
-				"[license=" + this.getLicense() + "]" +
-				"[car_avail=" + this.getCarAvail() + "]" +
-				"[employed=" + this.getEmployed() + "]" +
-				"[nof_travelcards=" + this.getTravelcards().size() + "]" +
-				"[knowledge=" + this.getKnowledge() + "]" +
-				"[nof_plans=" + this.delegate.getPlans().size() + "]";
+		StringBuilder b = new StringBuilder();
+		b.append("[id=");
+		b.append(this.getId() );
+		b.append("]");
+		b.append("[sex=");
+		b.append(this.getSex());
+		b.append("]");
+		b.append("[age=");
+		b.append(this.getAge());
+		b.append("]");
+		b.append("[license=");
+		b.append(this.getLicense());
+		b.append("]");
+		b.append("[car_avail=");
+		b.append(this.getCarAvail());
+		b.append("]");
+		b.append("[employed=");
+		b.append(this.getEmployed());
+		b.append("]");
+		b.append("[travelcards=");
+		if (this.getTravelcards() != null) {
+			b.append(this.getTravelcards().size());
+		}
+		else {
+			b.append("null");
+		}
+		b.append("]");
+		b.append("[knowledge=");
+		if (this.getKnowledge() != null){
+			b.append(this.getKnowledge());
+		}
+		else {
+			b.append("null");
+		}
+		b.append("]");
+		b.append("[nof_plans=");
+		if (this.getPlans() != null) {
+			b.append(this.getPlans().size());
+		}
+		else {
+			b.append("null");
+		}
+		b.append("]");
+	  return b.toString();
 	}
 
 	public boolean removePlan(final Plan plan) {
