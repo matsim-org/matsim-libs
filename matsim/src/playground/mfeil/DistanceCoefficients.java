@@ -4,40 +4,46 @@ import java.util.ArrayList;
 
 public class DistanceCoefficients {
 	
-	private double [] coef;
-	private final ArrayList<String> namesOfCoef;
+	private double [] softCoef;
+	private final ArrayList<String> namesOfSoftCoef;
+	private final ArrayList<String> namesOfAllCoef;
 	
-	public DistanceCoefficients (double [] coef, ArrayList<String> names){
-		this.coef = coef;
-		this.namesOfCoef = names;
-		for (int i=0;i<this.namesOfCoef.size();i++){
-			System.out.println(this.coef[i]);
-			System.out.println(this.namesOfCoef.get(i));
+	public DistanceCoefficients (double [] coef, ArrayList<String> softNames, ArrayList<String> allNames){
+		this.softCoef = coef;
+		this.namesOfSoftCoef = softNames;
+		this.namesOfAllCoef = allNames;
+		for (int i=0;i<this.namesOfSoftCoef.size();i++){
+			System.out.println(this.softCoef[i]);
+			System.out.println(this.namesOfSoftCoef.get(i));
 		}
 	}
 	
 	public double [] getCoef (){
-		return this.coef;
+		return this.softCoef;
 	}
 	
 	public double getSingleCoef (int pos){
-		return this.coef[pos];
+		return this.softCoef[pos];
 	}
 	
 	public double getSingleCoef (String nameOfCoef){
-		for (int i=0;i<this.coef.length;i++){
-			if (nameOfCoef.equals(this.namesOfCoef.get(i))) {
-				return this.coef[i];
+		for (int i=0;i<this.softCoef.length;i++){
+			if (nameOfCoef.equals(this.namesOfSoftCoef.get(i))) {
+				return this.softCoef[i];
 			}
 		}
 		return 0;
 	}
 	
+	public ArrayList<String> getNamesOfCoef (){
+		return this.namesOfAllCoef;
+	}
+	
 	public void setCoef (double []a){
-		this.coef = a;
+		this.softCoef = a;
 	}
 	
 	public void setSingleCoef (double a, int pos){
-		this.coef[pos] = a;
+		this.softCoef[pos] = a;
 	}
 }

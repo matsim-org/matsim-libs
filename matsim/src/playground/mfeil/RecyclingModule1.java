@@ -21,6 +21,7 @@
 package playground.mfeil;
 
 
+import org.apache.log4j.Logger;
 import org.matsim.population.Act;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.replanning.modules.MultithreadedModuleA;
@@ -36,28 +37,31 @@ import java.util.ArrayList;
 
 public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		
-	private final int iterations, noOfAgents, noOfCoefficients;
+	private final int iterations, noOfAgents, noOfSoftCoefficients;
 	private final DistanceCoefficients coefficients;
 	private final MultithreadedModuleA assignmentModule;
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
-	private final ArrayList<String> coef; 
+	private final ArrayList<String> softCoef; 
+	private final ArrayList<String> allCoef; 
+	private static final Logger log = Logger.getLogger(RecyclingModule1.class);
 	                      
 	public RecyclingModule1 (ControlerMFeil controler) {
 		super(controler);
 		this.iterations 		= 20;
 		this.noOfAgents			= 10;
 		this.primActsDistance = "yes";
-		this.homeLocationDistance = "no";
-		this.sex = "no";
-		this.age = "no";
+		this.homeLocationDistance = "yes";
+		this.sex = "yes";
+		this.age = "yes";
 		this.license = "no";
 		this.car_avail = "no";
 		this.employed = "no";
-		this.coef = this.detectNoOfCoefficients();
-		this.noOfCoefficients=this.coef.size();
-		double [] startCoefficients = new double [this.noOfCoefficients];
+		this.softCoef = this.detectSoftCoefficients();
+		this.allCoef = this.detectAllCoefficients();
+		this.noOfSoftCoefficients=this.softCoef.size();
+		double [] startCoefficients = new double [this.noOfSoftCoefficients];
 		for (int i=0;i<startCoefficients.length;i++) startCoefficients[i]=1;
-		this.coefficients 		= new DistanceCoefficients (startCoefficients, this.coef);	
+		this.coefficients 		= new DistanceCoefficients (startCoefficients, this.softCoef, this.allCoef);	
 		this.assignmentModule	= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
 				this.locator, this.scorer, this.cleaner, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
@@ -88,7 +92,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		agents = new OptimizedAgents (list[0]);
 		
 		Statistics.prt=false;
-		if (this.noOfCoefficients>1) this.detectCoefficients();
+		if (this.noOfSoftCoefficients>1) this.detectCoefficients();
 		Statistics.prt=true;
 		
 		assignmentModule.init();
@@ -103,21 +107,23 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			}
 			assignment.println();
 		}
+		if (Statistics.noSexAssignment) log.warn("There are agents that have no gender information. For these agents, the recycling attribute 'gender' has been de-activated.");
 		Statistics.list.clear();
+		Statistics.noSexAssignment=false;
 	}
 	
 	private void detectCoefficients (){
 		
 		/* Initialization */
 		double offset = 0.5;
-		double coefMatrix [][] = new double [this.iterations+1][this.noOfCoefficients];	// first solution is base solution, then 'this.iterations' iterations
+		double coefMatrix [][] = new double [this.iterations+1][this.noOfSoftCoefficients];	// first solution is base solution, then 'this.iterations' iterations
 		for (int i=0;i<coefMatrix[0].length;i++){
 			double aux = this.coefficients.getSingleCoef(i);
 			coefMatrix[0][i] = aux;
 		}
 		double score [] = new double [this.iterations+1];
 		double scoreAux, coefAux;
-		int [] modified = new int [this.noOfCoefficients-1]; // last coefficient fixed
+		int [] modified = new int [this.noOfSoftCoefficients-1]; // last coefficient fixed
 		int modifiedAux;
 		
 		/* Iteration 0 */
@@ -130,7 +136,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			for (int z=1;z<coefMatrix[0].length;z++){
 				coefMatrix[i][z]=coefMatrix[i-1][z];
 			}
-			for (int j=0;j<this.noOfCoefficients-1;j++){
+			for (int j=0;j<this.noOfSoftCoefficients-1;j++){
 				modifiedAux = modified[j];
 				//System.out.println("modifiedAux UP at i="+i+" and j="+j+": "+modifiedAux);
 				modified[j]=0;
@@ -304,7 +310,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			if (score[i]>tmpScoreFinal){
 				tmpScoreFinal = score[i];
 				this.coefficients.setCoef(coefMatrix[i]);
-				for (int j=0;j<this.noOfCoefficients;j++) System.out.println(coef.get(j)+" = "+this.coefficients.getCoef()[j]);
+				for (int j=0;j<this.noOfSoftCoefficients;j++) System.out.println(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
 				System.out.println("Score = "+tmpScoreFinal);
 				System.out.println();
 			}
@@ -324,18 +330,46 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		return score;
 	}
 	
-	private ArrayList<String> detectNoOfCoefficients (){
-		ArrayList<String> coef = new ArrayList<String>();
-		if (this.primActsDistance=="yes") coef.add("primActsDistance");
-		if (this.homeLocationDistance=="yes") coef.add("homeLocationDistance");
-		if (this.sex=="yes") coef.add("sex");
-		if (this.age=="yes") coef.add("age");
-		if (this.license=="yes") coef.add("license");
-		if (this.car_avail=="yes") coef.add("car_avail");
-		if (this.employed=="yes") coef.add("employed");
-		
-		return coef;
+	private ArrayList<String> detectSoftCoefficients (){
+		ArrayList<String> softCoef = new ArrayList<String>();
+		if (this.primActsDistance=="yes") {
+			softCoef.add("primActsDistance");
+		}
+		if (this.homeLocationDistance=="yes") {
+			softCoef.add("homeLocationDistance");
+		}
+		if (this.age=="yes") {
+			softCoef.add("age");
+		}
+		return softCoef;
 	}
+	
+	private ArrayList<String> detectAllCoefficients (){
+		ArrayList<String> allCoef = new ArrayList<String>();
+		if (this.primActsDistance=="yes") {
+			allCoef.add("primActsDistance");
+		}
+		if (this.homeLocationDistance=="yes") {
+			allCoef.add("homeLocationDistance");
+		}
+		if (this.sex=="yes") {
+			allCoef.add("sex");
+		}
+		if (this.age=="yes") {
+			allCoef.add("age");
+		}
+		if (this.license=="yes") {
+			allCoef.add("license");
+		}
+		if (this.car_avail=="yes") {
+			allCoef.add("car_avail");
+		}
+		if (this.employed=="yes") {
+			allCoef.add("employed");
+		}
+		return allCoef;
+	}
+	
 	
 	private double checkTabuList (double [][] coefMatrix, int i, int j, double offset){
 		OuterLoop:

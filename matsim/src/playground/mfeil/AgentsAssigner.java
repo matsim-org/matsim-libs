@@ -55,7 +55,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 	protected final RecyclingModule				module;
 	protected final ScheduleCleaner				cleaner;
 	protected final double						minimumTime;
-	protected final String						distance, homeLocation, age;
 	protected LinkedList<String>				nonassignedAgents;
 	protected static final Logger 				log = Logger.getLogger(AgentsAssigner.class);
 		
@@ -85,9 +84,6 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.cleaner				= cleaner;
 		this.module					= recyclingModule;
 		this.minimumTime			= minimumTime;
-		this.distance				= "distance";
-		this.homeLocation			= "homelocation";
-		this.age					= "age";
 		this.nonassignedAgents		= nonassignedAgents;
 	}
 	
@@ -95,7 +91,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	//////////////////////////////////////////////////////////////////////
 	// run() method
 	//////////////////////////////////////////////////////////////////////
-	
+	@Deprecated
 	public void run (Plan plan){
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
@@ -103,7 +99,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		double distance = Double.MAX_VALUE;
 		double distanceAgent;
 		int assignedAgent = -1;
-		
+		/*
 		for (int j=0;j<agents.getNumberOfAgents();j++){
 			distanceAgent=0;
 			if (this.distance=="distance"){
@@ -123,7 +119,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 				distance = distanceAgent;
 			}
 		}
-		
+		*/
 		
 		
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
