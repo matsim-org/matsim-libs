@@ -40,7 +40,41 @@
             <Xmaxwarns>1000</Xmaxwarns>
             <Xmaxerrs>100</Xmaxerrs>
           </compilerArguments>
+          <!-- Uncommenting the following lines can be used to in- or exclude
+          sources from compilation -->
+<!--          <includes>-->
+<!--            <include></include>-->
+<!--          </includes>-->
+<!--          <excludes>-->
+<!--            <exclude></exclude>-->
+<!--          </excludes>-->
+          <!-- Uncommenting the following lines can be used to in- or exclude
+          TEST sources from compilation -->
+<!--          <testExcludes>-->
+<!--            <exclude>org/matsim/testcases/TestDepth.java</exclude>-->
+<!--          </testExcludes>-->
+<!--          <testIncludes>-->
+<!--            <include>org/matsim/testcases/TestDepth</include>-->
+<!--          </testIncludes>-->
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.2</version>
+        <configuration>
+          <excludes>
+            <exclude>org/matsim/testcases/TestDepth.java</exclude>
+            <exclude>playground/mfeil/ControlerTest.java</exclude>    
+            <exclude>playground/yu/visum/test/NewPlansTest.java</exclude>
+            <exclude>playground/wrashid/test/**/*.java</exclude>
+            <exclude>playground/**/*.java</exclude>
+            <exclude>org/matsim/**/*AllTests*.java</exclude>
+            <exclude>org/matsim/**/*SimpleTests.java</exclude>
+            <!--TODO check this test, it should really run with the memory available -->
+            <exclude>org/matsim/integration/withinday/CoopersBerlinIntegrationTest.java</exclude>    
+          </excludes>
+        </configuration>      
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -98,14 +132,14 @@
       <artifactId>jogl</artifactId>
       <version>1.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.1/jogl.jar</systemPath>
+      <systemPath>${basedir}/libs/jogl-1.1.0/jogl.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>gluegen</groupId>
       <artifactId>jogl-gluegen</artifactId>
       <version>1.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.1/gluegen-rt.jar</systemPath>
+      <systemPath>${basedir}/libs/jogl-1.1.0/gluegen-rt.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>kml</groupId>
@@ -120,13 +154,6 @@
       <version>0.53</version>
       <scope>system</scope>
       <systemPath>${basedir}/libs/TimingFramework-0.53.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>truezip</groupId>
-      <artifactId>truezip</artifactId>
-      <version>6.6</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/truezip-6.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
