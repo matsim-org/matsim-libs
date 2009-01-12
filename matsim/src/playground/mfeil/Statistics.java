@@ -6,7 +6,7 @@ public class Statistics {
 	
 	public static ArrayList<ArrayList<String>> list; 
 	public static boolean prt = true;
-	public static boolean noSexAssignment;
+	public static boolean noSexAssignment, noLicenseAssignment, noCarAvailAssignment, noEmploymentAssignment;
 	
 	public Statistics (){
 		list = new ArrayList<ArrayList<String>>();

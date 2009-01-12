@@ -72,6 +72,8 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 
 	public void finish(){
 		
+		Statistics.noSexAssignment=false;
+		
 		for (int i=0;i<this.testAgentsNumber;i++) {
 			int pos = (int)MatsimRandom.random.nextDouble()*this.list[1].size();
 			list[0].add(list[1].get(pos));
@@ -109,7 +111,6 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		}
 		if (Statistics.noSexAssignment) log.warn("There are agents that have no gender information. For these agents, the recycling attribute 'gender' has been de-activated.");
 		Statistics.list.clear();
-		Statistics.noSexAssignment=false;
 	}
 	
 	private void detectCoefficients (){
@@ -299,9 +300,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			*/
 		for (int i=0;i<score.length;i++){
 			for (int j=0;j<coefMatrix[0].length-1;j++){
-				System.out.print(coefMatrix[i][j]+" ");
+				log.info(coefMatrix[i][j]+" ");
 			}
-			System.out.println(this.coefficients.getSingleCoef(coefMatrix[0].length-1)+" "+score[i]);
+			log.info(this.coefficients.getSingleCoef(coefMatrix[0].length-1)+" "+score[i]);
 		}
 		
 		
@@ -310,9 +311,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			if (score[i]>tmpScoreFinal){
 				tmpScoreFinal = score[i];
 				this.coefficients.setCoef(coefMatrix[i]);
-				for (int j=0;j<this.noOfSoftCoefficients;j++) System.out.println(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
-				System.out.println("Score = "+tmpScoreFinal);
-				System.out.println();
+				for (int j=0;j<this.noOfSoftCoefficients;j++) log.info(softCoef.get(j)+" = "+this.coefficients.getCoef()[j]);
+				log.info("Score = "+tmpScoreFinal);
+				log.info("");
 			}
 		}
 	}

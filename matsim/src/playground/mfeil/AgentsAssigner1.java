@@ -48,7 +48,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	//////////////////////////////////////////////////////////////////////
 		
 	private final DistanceCoefficients coefficients;
-	private String distance, homeLocation, age, sex, license, car_avail, employed;
+	private String primActsDistance, homeLocation, age, sex, license, car_avail, employed;
 	
 	public AgentsAssigner1 (Controler controler, PreProcessLandmarks preProcessRoutingData, 
 			LocationMutatorwChoiceSet locator, PlanScorer scorer, ScheduleCleaner cleaner, RecyclingModule recyclingModule,
@@ -57,15 +57,15 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		super(controler, preProcessRoutingData, locator, scorer,
 				cleaner, recyclingModule, minimumTime, nonassignedAgents);
 		this.coefficients = coefficients;
-		this.distance		="no";
-		this.homeLocation	="no";
-		this.age			="no";
-		this.sex			="no";
-		this.license		="no";
-		this.car_avail		="no";
-		this.employed		="no";
+		this.primActsDistance	="no";
+		this.homeLocation		="no";
+		this.age				="no";
+		this.sex				="no";
+		this.license			="no";
+		this.car_avail			="no";
+		this.employed			="no";
 		for (int i=0; i<this.coefficients.getNamesOfCoef().size();i++){
-			if (this.coefficients.getNamesOfCoef().get(i).equals("distance")) this.distance="yes";
+			if (this.coefficients.getNamesOfCoef().get(i).equals("primActsDistance")) this.primActsDistance="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("homeLocation")) this.homeLocation="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("age")) this.age="yes";
 			if (this.coefficients.getNamesOfCoef().get(i).equals("sex")) this.sex="yes";
@@ -82,8 +82,6 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 	//////////////////////////////////////////////////////////////////////
 	
 	public void run (Plan plan){
-		
-		boolean noSexAssignment = false;
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
@@ -119,33 +117,55 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 					if (!plan.getPerson().getSex().equals(agents.getAgentPerson(j).getSex())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e) {
-					noSexAssignment = true;
+					Statistics.noSexAssignment = true;
 				}
 			}
 			
 			// License
 			if (this.license=="yes"){
-				if (!plan.getPerson().getLicense().equals(agents.getAgentPerson(j).getLicense())) continue optimizedAgentsLoop;
+				try{
+					if (!plan.getPerson().getLicense().equals(agents.getAgentPerson(j).getLicense())) continue optimizedAgentsLoop;
+				}
+				catch (Exception e){
+					Statistics.noLicenseAssignment = true;
+				}
 			}
 			
 			// Car availability
 			if (this.car_avail=="yes"){
-				if (!plan.getPerson().getCarAvail().equals(agents.getAgentPerson(j).getCarAvail())) continue optimizedAgentsLoop;
+				try{
+					if (!plan.getPerson().getCarAvail().equals(agents.getAgentPerson(j).getCarAvail())) continue optimizedAgentsLoop;
+				}
+				catch (Exception e){
+					Statistics.noCarAvailAssignment = true;
+				}
 			}
 			
 			// Employment status
 			if (this.employed=="yes"){
-				if (!plan.getPerson().getEmployed().equals(agents.getAgentPerson(j).getEmployed())) continue optimizedAgentsLoop;
+				try{
+					if (!plan.getPerson().getEmployed().equals(agents.getAgentPerson(j).getEmployed())) continue optimizedAgentsLoop;
+				}
+				catch (Exception e){
+					Statistics.noEmploymentAssignment = true;
+				}
 			}
 						
 			
 			/* Distance (=soft) fitness */
 			
 			distanceAgent=0;
-			if (this.distance=="yes"){
-				distanceAgent += this.coefficients.getSingleCoef("primActsDistance")*plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+			// Distance between primary activities
+			if (this.primActsDistance=="yes"){
+				double tmpDistance=0;
+				for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
+					tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+				}
+				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*tmpDistance;		
 			}
 			
+			// Distance between home location of potential agent to copy from and home location of agent in question
 			if (this.homeLocation=="yes"){			
 				double homelocationAgentX = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getX();
 				double homelocationAgentY = plan.getPerson().getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY();
@@ -154,6 +174,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 						java.lang.Math.pow((agents.getAgentPerson(j).getKnowledge().getActivities("home", true).get(0).getFacility().getCenter().getY()-homelocationAgentY),2));
 			}
 			
+			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
 				distanceAgent+= this.coefficients.getSingleCoef("age")* (plan.getPerson().getAge()-agents.getAgentPerson(j).getAge());
 			}
@@ -192,7 +213,6 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			}
 			Statistics.list.add(prt);	
 		}	
-		if (noSexAssignment) Statistics.noSexAssignment=true;
 	}	
 }
 	
