@@ -26,6 +26,8 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
@@ -44,7 +46,6 @@ import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanTyp
 import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalSystemPlanType.XMLStop;
 import org.matsim.utils.io.IOUtils;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 
 /**
  * @author dgrether
@@ -56,7 +57,11 @@ public class MatsimLightSignalSystemConfigurationWriter {
 
 	public MatsimLightSignalSystemConfigurationWriter(List<BasicLightSignalSystemConfiguration> basiclssconfigs) {
 		this.blssconfs = basiclssconfigs;
-		this.xmllssconfig = convertBasicToXml();
+		try {
+			this.xmllssconfig = convertBasicToXml();
+		} catch (DatatypeConfigurationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -79,7 +84,7 @@ public class MatsimLightSignalSystemConfigurationWriter {
 		}
 	}
 	
-	private XMLLightSignalSystemConfig convertBasicToXml() {
+	private XMLLightSignalSystemConfig convertBasicToXml() throws DatatypeConfigurationException {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLightSignalSystemConfig xmllssconf = fac.createXMLLightSignalSystemConfig();
 		
@@ -155,8 +160,8 @@ public class MatsimLightSignalSystemConfigurationWriter {
 
 
 
-	private XMLGregorianCalendar getXmlGregorianCalendar(double seconds) {
-		XMLGregorianCalendar time = new XMLGregorianCalendarImpl();
+	private XMLGregorianCalendar getXmlGregorianCalendar(double seconds) throws DatatypeConfigurationException {
+		XMLGregorianCalendar time = DatatypeFactory.newInstance().newXMLGregorianCalendar();
 		int s = (int) seconds;
 		int h = (s / 3600);
 		s = s % 3600;
