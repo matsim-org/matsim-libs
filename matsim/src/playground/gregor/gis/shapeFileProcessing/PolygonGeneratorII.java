@@ -6,15 +6,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import javax.vecmath.Vector2d;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
@@ -31,12 +27,10 @@ import org.geotools.feature.SchemaException;
 import org.matsim.utils.collections.QuadTree;
 import org.matsim.utils.gis.ShapeFileWriter;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -226,7 +220,7 @@ public class PolygonGeneratorII {
 			this.collectionLineString = this.featureSourceLineString.getFeatures();
 			it = collectionLineString.features();
 			while (it.hasNext()) {
-				Feature feature = (Feature) it.next();
+				Feature feature = it.next();
 				int id = (Integer) feature.getAttribute(1);
 				MultiLineString multiLineString = (MultiLineString) feature.getDefaultGeometry();
 				
@@ -556,7 +550,7 @@ public class PolygonGeneratorII {
 //				log.info("poly touches point: "+ p.toString());
 //			}
 			
-			Geometry geo = (Geometry) poly.difference(b);
+			Geometry geo = poly.difference(b);
 			
 			
 			if (geo.getNumGeometries() == 1){
@@ -671,7 +665,7 @@ public class PolygonGeneratorII {
 		LineString ls1 = poly.getExteriorRing();
 		LineString ls2 =addVertexToLineString(ls1,v,0.1);
 		
-		if (lrs != null && ls1.getNumPoints() == ls2.getNumPoints()) { //No matching position found so far
+		if ((lrs != null) && (ls1.getNumPoints() == ls2.getNumPoints())) { //No matching position found so far
 			for (int i=0; i < lrs.length; i++){
 				LineString tmp = addVertexToLineString(lrs[i],v,0.1);
 
@@ -693,7 +687,7 @@ public class PolygonGeneratorII {
 		boolean notFound = true;
 		for (int i =1; i < ls.getNumPoints() ; i ++) {
 			LineString seg = this.geofac.createLineString(new Coordinate[] {ls.getPointN(i-1).getCoordinate(),ls.getPointN(i).getCoordinate() });
-			if (seg.distance(p) < min_dist && notFound) {
+			if ((seg.distance(p) < min_dist) && notFound) {
 				notFound = false;
 				coords[n++] = p.getCoordinate();
 			} 
