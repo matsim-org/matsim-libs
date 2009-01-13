@@ -93,7 +93,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
-		//this.timer		 			= new PlanOptimizeTimes (legTravelTimeEstimator, this.factory);
+		//this.timer		 			= new Planomat (legTravelTimeEstimator, this.factory);
 		this.locator				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 
@@ -119,6 +119,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				tDepDelayCalc, 
 				controler.getNetwork());
 		this.timer					= new TimeOptimizer14(legTravelTimeEstimator, this.scorer);
+		//this.timer		 			= new Planomat (legTravelTimeEstimator, this.factory);
 		this.locator 				= locator;
 		this.NEIGHBOURHOOD_SIZE 	= 10;				
 		this.WEIGHT_CHANGE_ORDER 	= 0.2; 

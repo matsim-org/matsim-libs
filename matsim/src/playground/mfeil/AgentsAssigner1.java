@@ -158,11 +158,13 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			// Distance between primary activities
 			if (this.primActsDistance=="yes"){
 				double tmpDistance=0;
-				for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
-					tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+				if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
+					for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
+						tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+					}
+					tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
 				}
-				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
-				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*tmpDistance;		
+				distanceAgent+=	this.coefficients.getSingleCoef("primActsDistance")*(java.lang.Math.abs(tmpDistance-this.module.getOptimizedAgents().getAgentDistance(j)));		
 			}
 			
 			// Distance between home location of potential agent to copy from and home location of agent in question

@@ -44,7 +44,14 @@ public class OptimizedAgents {
 	private void run (){
 		this.distancesTestAgents = new double [this.list.size()];
 		for (int i=0;i<this.distancesTestAgents.length;i++){
-			this.distancesTestAgents[i] = this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(1).getLocation().getCenter());
+			double tmpDistance=0;
+			if (this.list.get(i).getPerson().getKnowledge().getActivities(true).size()>1){
+				for (int k=0;k<this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1;k++){
+					tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+				}
+				tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+			}
+			this.distancesTestAgents[i]=tmpDistance;
 		}
 	}
 	
