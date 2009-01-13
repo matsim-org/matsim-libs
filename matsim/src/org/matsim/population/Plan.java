@@ -358,4 +358,8 @@ public class Plan extends BasicPlanImpl {
 		return (Act) this.actsLegs.get(0);
 	}
 
+	public Act getLastActivity() {
+		return (Act) this.actsLegs.get(this.actsLegs.size() - 1);
+	}
+	
 }

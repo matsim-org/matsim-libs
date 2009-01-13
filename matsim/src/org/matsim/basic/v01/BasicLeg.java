@@ -25,7 +25,47 @@ package org.matsim.basic.v01;
 */
 public interface BasicLeg {
 
-	public enum Mode {miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, undefined}
+	public enum Mode {
+		miv(true), 
+		car(true), 
+		ride(false), 
+		motorbike(true), 
+		pt(false), 
+		train(false), 
+		bus(false), 
+		tram(false), 
+		bike(true), 
+		walk(false), 
+		undefined(false), 
+		shoes(true); /* just for fun and illustration :-) */
+	
+		/**
+		 * This variable is used to differentiate chain-based and trip-based modes. 
+		 * It can be used to perform chain-based/tour-based mode choice analysis and simulation. 
+		 * If a car, bike or other individual means of transport is to be used on a tour, 
+		 * it must be used for the entire chain, since the car/bike must be 
+		 * returned home or to the respective anchor point at the end of the tour ("chain-based modes"). 
+		 * Furthermore, a chain-based mode cannot be used if it is not available at the anchor point
+		 * at the beginning of the tour.
+		 * No such constraints, however, exists with respect to other modes such as walk and public transport modes,
+		 * ("trip-based modes").
+		 * 
+		 * [TODO] One could discuss if "ride" is a trip-based or a chain-based mode.
+		 * 
+		 * See also: Miller, E. J., M. J. Roorda and J. A. Carrasco (2005) A tour-based model of travel mode choice,
+		 * Transportation, 32 (4) 399–422.
+		 */
+		private boolean isChainBased;
+
+		private Mode(boolean isChainBased) {
+			this.isChainBased = isChainBased;
+		}
+
+		public boolean isChainBased() {
+			return isChainBased;
+		} 
+	
+	}
 
 	public Mode getMode();
 
