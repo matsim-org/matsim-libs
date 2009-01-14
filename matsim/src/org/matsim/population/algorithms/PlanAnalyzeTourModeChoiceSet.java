@@ -20,9 +20,9 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
@@ -34,9 +34,9 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 
 	private EnumSet<BasicLeg.Mode> modeSet = null;
 
-	private HashSet<BasicLeg.Mode[]> result = null;
-
-	public HashSet<BasicLeg.Mode[]> getResult() {
+	private ArrayList<BasicLeg.Mode[]> result = null;
+	
+	public ArrayList<BasicLeg.Mode[]> getResult() {
 		return result;
 	}
 
@@ -54,11 +54,11 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		int numLegs = plan.getActsLegs().size() / 2;
 		
 		int numCombinations = (int) Math.pow(numLegs, this.modeSet.size());
-		System.out.println(Integer.toString(numCombinations));
-
-		System.out.println();
+//		System.out.println(Integer.toString(numCombinations));
+//
+//		System.out.println();
 		
-		this.result = new HashSet<BasicLeg.Mode[]>();
+		this.result = new ArrayList<BasicLeg.Mode[]>();
 
 		for (int numCombination = 0; numCombination < numCombinations; numCombination++) {
 

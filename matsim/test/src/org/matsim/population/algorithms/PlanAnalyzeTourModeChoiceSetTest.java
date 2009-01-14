@@ -20,9 +20,10 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -74,19 +75,19 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		Person person = new PersonImpl(new IdImpl("1000"));
 
 		// test different types of activity plans
-		HashMap<String, HashSet<BasicLeg.Mode[]>> testCases = new HashMap<String, HashSet<BasicLeg.Mode[]>>();
+		HashMap<String, ArrayList<BasicLeg.Mode[]>> testCases = new HashMap<String, ArrayList<BasicLeg.Mode[]>>();
 
 		String testedActChainLocations = "1 2 1";
-		HashSet<BasicLeg.Mode[]> expectedTourModeOptions = new HashSet<BasicLeg.Mode[]>();
+		ArrayList<BasicLeg.Mode[]> expectedTourModeOptions = new ArrayList<BasicLeg.Mode[]>();
 		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car});
 		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt});
-		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike});
-		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk});
 		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike});
 		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 		
-		for (Entry<String, HashSet<BasicLeg.Mode[]>> entry: testCases.entrySet()) {
+		for (Entry<String, ArrayList<BasicLeg.Mode[]>> entry : testCases.entrySet()) {
 			
 			String facString  = entry.getKey();
 			log.info("Testing location sequence: " + facString);
@@ -104,15 +105,10 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			}
 			testee.run(plan);
 
-			HashSet<BasicLeg.Mode[]> actual = testee.getResult();
-			assertEquals(entry.getValue().size(), actual.size());
-			System.out.println();
-			for (BasicLeg.Mode[] chain : actual) {
-				for (BasicLeg.Mode mode : chain) {
-					System.out.print(mode + " ");
-				}
-				System.out.println();
-			}
+			ArrayList<BasicLeg.Mode[]> actual = testee.getResult();
+			assertTrue(Arrays.deepEquals(
+					(BasicLeg.Mode[][]) entry.getValue().toArray(new BasicLeg.Mode[0][0]), 
+					(BasicLeg.Mode[][]) actual.toArray(new BasicLeg.Mode[0][0])));
 		}
 		
 	}

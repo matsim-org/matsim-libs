@@ -30,6 +30,7 @@ public class AllTests {
 		suite.addTestSuite(ChooseRandomLegModeTest.class);
 		suite.addTestSuite(ParallelPersonAlgorithmRunnerTest.class);
 		suite.addTestSuite(PlanAnalyzeSubtoursTest.class);
+		suite.addTestSuite(PlanAnalyzeTourModeChoiceSetTest.class);
 		return suite;
 	}
 
