@@ -30,7 +30,8 @@ public class MyVis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String otffile = "../studies/bkickhoefer/output/oneRouteTwoModeTest/ITERS/it.1000/1000.otfvis.mvi";
+//		String otffile = "../studies/bkickhoefer/output/oneRouteTwoModeTest_1000/ITERS/it.1000/1000.otfvis.mvi";
+		String otffile = "../studies/bkickhoefer/output/oneRouteTwoModeTest_2000/ITERS/it.2000/2000.otfvis.mvi";
 		OTFVis.main(new String[] {otffile});
 	}
 
