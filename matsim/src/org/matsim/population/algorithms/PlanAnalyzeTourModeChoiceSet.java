@@ -53,7 +53,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 		// how many mode combinations are possible?
 		int numLegs = plan.getActsLegs().size() / 2;
 		
-		int numCombinations = (int) Math.pow(numLegs, this.modeSet.size());
+		int numCombinations = (int) Math.pow(this.modeSet.size(), numLegs);
 //		System.out.println(Integer.toString(numCombinations));
 //
 //		System.out.println();
@@ -76,10 +76,10 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			BasicLeg.Mode[] candidate = new BasicLeg.Mode[numLegs]; 
 
 			String modeIndices = Integer.toString(numCombination, this.modeSet.size());
-			for (int ii=0; ii < (numLegs - modeIndices.length()); ii++) {
+			while (modeIndices.length() < numLegs) {
 				modeIndices = "0".concat(modeIndices);
 			}
-//			System.out.println(modeIndices);
+			System.out.println("Mode indices: " + modeIndices);
 			LegIterator legIterator = plan.getIteratorLeg();
 			boolean isFeasible = true;
 			int legNum = 0;
@@ -88,7 +88,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				Leg currentLeg = (Leg) legIterator.next();
 
 				BasicLeg.Mode legMode = (BasicLeg.Mode) this.modeSet.toArray()[Integer.parseInt(modeIndices.substring(legNum, legNum + 1))];
-//				System.out.println("Mode test for leg num " + Integer.toString(legNum) + ": " + legMode);
+				System.out.println("Mode test for leg num " + Integer.toString(legNum) + ": " + legMode);
 				if (legMode.isChainBased()) {
 					Location currentLocation = modeTracker.get(legMode);
 					Location requiredLocation = plan.getPreviousActivity(currentLeg).getFacility();
@@ -97,7 +97,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 						modeTracker.put(legMode, plan.getNextActivity(currentLeg).getFacility());
 
 					} else {
-//						System.out.println("Mode chain not fesible. Aborting...");
+						System.out.println("Mode chain not feasible. Aborting...");
 						isFeasible = false;
 					}
 					
@@ -107,11 +107,11 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				legNum++;
 			}
 			// chain-based modes must finish at the location of the last activity of the plan
-			// TODO this is not entirely correct: they must finish there IF theey were used. fix that tomorrow!
+			// TODO this is not entirely correct: they must finish there IF they were used.
 			for (BasicLeg.Mode mode : modeTracker.keySet()) {
 				Location currentLocation = modeTracker.get(mode);
-				Location requiredLocation = plan.getLastActivity().getFacility();
-				if (!currentLocation.equals(requiredLocation)) {
+				if (!currentLocation.equals(plan.getFirstActivity().getFacility()) && !currentLocation.equals(plan.getLastActivity().getFacility())) {
+					System.out.println("Mode " + mode + " is not at the location of either the first or the last activity.");
 					isFeasible = false;
 					continue;
 				}
@@ -119,7 +119,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 			if (isFeasible) {
 				this.result.add(candidate);
 			}
-//			System.out.println();
+			System.out.println();
 //			System.out.flush();
 
 		}

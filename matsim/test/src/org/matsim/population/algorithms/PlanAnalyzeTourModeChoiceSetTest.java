@@ -87,6 +87,128 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk});
 		testCases.put(testedActChainLocations, expectedTourModeOptions);
 		
+		testedActChainLocations = "1 2 20 1";
+		expectedTourModeOptions = new ArrayList<BasicLeg.Mode[]>();
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		testCases.put(testedActChainLocations, expectedTourModeOptions);
+
+		testedActChainLocations = "1 2 1 2 1";
+		expectedTourModeOptions = new ArrayList<BasicLeg.Mode[]>();
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.car});
+	
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.bike});
+
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		testCases.put(testedActChainLocations, expectedTourModeOptions);
+		
+		testedActChainLocations = "1 2 1 3 1";
+		expectedTourModeOptions = new ArrayList<BasicLeg.Mode[]>();
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+	
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		testCases.put(testedActChainLocations, expectedTourModeOptions);
+
+		testedActChainLocations = "1 2 3 4";
+		expectedTourModeOptions = new ArrayList<BasicLeg.Mode[]>();
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.car, BasicLeg.Mode.car});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.pt, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.bike, BasicLeg.Mode.bike, BasicLeg.Mode.bike});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.pt, BasicLeg.Mode.walk});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.pt});
+		expectedTourModeOptions.add(new BasicLeg.Mode[]{BasicLeg.Mode.walk, BasicLeg.Mode.walk, BasicLeg.Mode.walk});
+		testCases.put(testedActChainLocations, expectedTourModeOptions);
+
 		for (Entry<String, ArrayList<BasicLeg.Mode[]>> entry : testCases.entrySet()) {
 			
 			String facString  = entry.getKey();
@@ -106,6 +228,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 			testee.run(plan);
 
 			ArrayList<BasicLeg.Mode[]> actual = testee.getResult();
+			assertEquals(entry.getValue().size(), actual.size());
 			assertTrue(Arrays.deepEquals(
 					(BasicLeg.Mode[][]) entry.getValue().toArray(new BasicLeg.Mode[0][0]), 
 					(BasicLeg.Mode[][]) actual.toArray(new BasicLeg.Mode[0][0])));
