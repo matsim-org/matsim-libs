@@ -68,7 +68,7 @@ public class QSim extends QueueSimulation {
 		this.newLSADefCfg = newLSADefCfg;
 		this.useOTF = useOTF;
 	}
-
+  //dg jan 09 this method is never used
 	private void readSignalSystemControler(){
 		
 		BasicLightSignalSystems newSignalSystems = new BasicLightSignalSystems();
@@ -88,8 +88,8 @@ public class QSim extends QueueSimulation {
 		
 		HashMap<Id, NewSignalSystemControlerImpl> sortedLSAControlerMap = new HashMap<Id, NewSignalSystemControlerImpl>();
 
+		// Create a SignalSystemControler for every signal system configuration found
 		if (null != this.newLSADefCfg) {
-			// Create a SignalLightControler for every signal system configuration found
 			for (BasicLightSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
 				NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
 				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
@@ -141,7 +141,7 @@ public class QSim extends QueueSimulation {
 			}
 		}
 
-		if(this.newLSADef != null && this.newLSADefCfg != null){
+		if((this.newLSADef != null) && (this.newLSADefCfg != null)){
 			readSignalSystemControler();
 		}
 	}

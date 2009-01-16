@@ -42,7 +42,7 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
     @Override
     protected Collection<AgentOnLink> getAgentsOnLink(final BasicLink link) {
     		QueueLink qlink = this.queueNetwork.getQueueLink(link.getId());
-        return qlink.getDrawableCollection();
+        return qlink.getVisData().getDrawableCollection();
     }
 
     public QueueNetStateWriter(final QueueNetwork queueNetwork, final BasicNet network, final String networkFileName,
@@ -54,7 +54,7 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
     @Override
     protected double getLinkDisplValue(final BasicLink link, final int index) {
         QueueLink mylink = this.queueNetwork.getQueueLink(link.getId());
-        double value = writeSpaceCap ? mylink.getDisplayableSpaceCapValue() : mylink.getDisplayableTimeCapValue();
+        double value = writeSpaceCap ? mylink.getVisData().getDisplayableSpaceCapValue() : mylink.getVisData().getDisplayableTimeCapValue();
         return value;
     }
 

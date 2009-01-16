@@ -20,6 +20,7 @@ import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
+import org.matsim.mobsim.queuesim.VisData;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;
@@ -80,6 +81,8 @@ class CALink extends QueueLink {
 	public static int LINKLEN = 1000;
 	public static int LANECOUNT = 2;
 
+	private VisData visdata = this.new VisDataImpl();
+	
 	int VMAX=5 ;
 
 	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
@@ -110,22 +113,50 @@ class CALink extends QueueLink {
 		}
 	}
 
-	@Override
-	public Collection<PositionInfo> getVehiclePositions(Collection<PositionInfo> positions) {
-		for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
-			for ( int len=0 ; len<LINKLEN ; len++ ) {
-				if ( cells[lane][len] != null ) {
-					MyCAVeh veh = cells[lane][len] ;
-					double speed = 4.*veh.getSpeed() ;
-					if ( veh.isTruck() ) {
-						positions.add( new PositionInfo(new IdImpl("1"),this.getLink(), len, 5*lane+2, 500, VehicleState.Driving, ""));
-					} else {
-						positions.add( new PositionInfo(new IdImpl("0"),this.getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
+	class VisDataImpl implements VisData {
+
+		public Collection<PositionInfo> getVehiclePositions(Collection<PositionInfo> positions) {
+			for ( int lane=0 ; lane<LANECOUNT; lane++ ) {
+				for ( int len=0 ; len<LINKLEN ; len++ ) {
+					if ( cells[lane][len] != null ) {
+						MyCAVeh veh = cells[lane][len] ;
+						double speed = 4.*veh.getSpeed() ;
+						if ( veh.isTruck() ) {
+							positions.add( new PositionInfo(new IdImpl("1"), getLink(), len, 5*lane+2, 500, VehicleState.Driving, ""));
+						} else {
+							positions.add( new PositionInfo(new IdImpl("0"), getLink(), len, 5*lane+2, speed, VehicleState.Driving, ""));
+						}
 					}
 				}
 			}
+			return positions;
 		}
-		return positions;
+
+		public double getDisplayableSpaceCapValue() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");		}
+
+		public double getDisplayableTimeCapValue() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		public Collection<AgentOnLink> getDrawableCollection() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		public void getVehiclePositionsEquil(Collection<PositionInfo> positions) {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		public void getVehiclePositionsQueue(Collection<PositionInfo> positions) {
+			throw new UnsupportedOperationException("Method not implemented in draft class");			
+		}
+		
+	}
+	
+	
+	@Override
+	public VisData getVisData() {
+		return this.visdata;
 	}
 
 	int getGap ( int lane, int len, int speed ) {
@@ -170,11 +201,11 @@ class CALink extends QueueLink {
 					} else if ( MODE==1 ) {
 						int rightGap = getGap( 1, len, veh.getSpeed()+1 ) ;
 						int leftGap = getGap( 0, len, veh.getSpeed()+1 ) ;
-						if ( rightGap > leftGap && mainLane == 1 ) {
+						if ( (rightGap > leftGap) && (mainLane == 1) ) {
 							continue ;
 						} else if ( Math.random() < 0.5 ) {
 							continue ;
-						} else if ( ueberholverbot && mainLane!=0 && veh.isTruck() ) {
+						} else if ( ueberholverbot && (mainLane!=0) && veh.isTruck() ) {
 							continue ;
 						}
 					} else {
@@ -215,9 +246,9 @@ class CALink extends QueueLink {
 					if ( speed > gap ) { speed = gap ; }
 
 					if ( origSpeed==0 ) {
-						if ( speed >= 1 && Math.random() < 0.5 ) { speed -- ; }
+						if ( (speed >= 1) && (Math.random() < 0.5) ) { speed -- ; }
 					} else {
-						if ( speed >= 1 && Math.random() < 0.05*lane ) { speed -- ; }
+						if ( (speed >= 1) && (Math.random() < 0.05*lane) ) { speed -- ; }
 					}
 					veh.setSpeed(speed) ;
 				}

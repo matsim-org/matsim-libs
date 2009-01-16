@@ -53,7 +53,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader implements OTFDataQuad.
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)this.src.getDisplayableTimeCapValue());
+			out.putFloat((float)this.src.getVisData().getDisplayableTimeCapValue());
 		}
 
 		public OTFDataWriter<QueueLink> getWriter() {

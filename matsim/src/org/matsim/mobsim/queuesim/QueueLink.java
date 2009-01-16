@@ -58,6 +58,10 @@ public class QueueLink {
 
 	private static int spaceCapWarningCount = 0;
 
+//	private QueueLane originalLane;
+	
+	private VisData visdata = this.new VisDataImpl();
+	
 	// ////////////////////////////////////////////////////////////////////
 	// Queue Model specific stuff
 	// ////////////////////////////////////////////////////////////////////
@@ -405,6 +409,10 @@ public class QueueLink {
 	// getter / setter
 	// ////////////////////////////////////////////////////////////////////
 
+	public VisData getVisData() {
+		return this.visdata;
+	}
+	
 	/**
 	 * This method returns the normalized capacity of the link, i.e. the capacity
 	 * of vehicles per second. It is considering the capacity reduction factors
@@ -479,33 +487,6 @@ public class QueueLink {
 	}
 
 	/**
-	 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
-	 */
-	public double getDisplayableSpaceCapValue() {
-		return (this.buffer.size() + this.vehQueue.size()) / this.storageCapacity;
-	}
-
-	/**
-	 * Returns a measure for how many vehicles on the link have a travel time
-	 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
-	 * of the possible vehicles are delayed, the value 1 will be returned, which
-	 * depicts the worst case on a (traditional) scale from 0 to 1.
-	 *
-	 * @return A measure for the number of vehicles being delayed on this link.
-	 */
-	public double getDisplayableTimeCapValue() {
-		int count = this.buffer.size();
-		double now = SimulationTimer.getTime();
-		for (QueueVehicle veh : this.vehQueue) {
-			// Check if veh has reached destination
-			if (veh.getDepartureTime_s() <= now) {
-				count++;
-			}
-		}
-		return count * 2.0 / this.storageCapacity;
-	}
-
-	/**
 	 * @return Returns the maximum number of vehicles that can be placed on the
 	 *         link at a time.
 	 */
@@ -518,7 +499,6 @@ public class QueueLink {
 	 *         ...) on the link.
 	 */
 	public Collection<QueueVehicle> getAllVehicles() {
-
 		Collection<QueueVehicle> vehicles = new ArrayList<QueueVehicle>();
 
 		vehicles.addAll(this.waitingList);
@@ -529,192 +509,7 @@ public class QueueLink {
 		return vehicles;
 	}
 
-	public Collection<PositionInfo> getVehiclePositions(
-			final Collection<PositionInfo> positions) {
-		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
-		if ("queue".equals(snapshotStyle)) {
-			getVehiclePositionsQueue(positions);
-		} else if ("equiDist".equals(snapshotStyle)) {
-			getVehiclePositionsEquil(positions);
-		} else {
-			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-		}
-		return positions;
-	}
 
-	/**
-	 * Calculates the positions of all vehicles on this link according to the
-	 * queue-logic: Vehicles are placed on the link according to the ratio between
-	 * the free-travel time and the time the vehicles are already on the link. If
-	 * they could have left the link already (based on the time), the vehicles
-	 * start to build a traffic-jam (queue) at the end of the link.
-	 *
-	 * @param positions
-	 *          A collection where the calculated positions can be stored.
-	 */
-	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
-		double now = SimulationTimer.getTime();
-		double queueEnd = this.link.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
-		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
-		double vehLen = Math.min( // the length of a vehicle in visualization
-				this.link.getLength() / (this.storageCapacity + this.bufferStorageCapacity), // all vehicles must have place on the link
-				((NetworkLayer)this.link.getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
-
-		// put all cars in the buffer one after the other
-		for (QueueVehicle veh : this.buffer) {
-
-			int lane = 1 + (Integer.parseInt(veh.getId().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-
-			int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(Time.UNDEFINED_TIME);
-
-			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, queueEnd,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
-			positions.add(position);
-			queueEnd -= vehLen;
-		}
-
-		/*
-		 * place other driving cars according the following rule:
-		 * - calculate the time how long the vehicle is on the link already
-		 * - calculate the position where the vehicle should be if it could drive with freespeed
-		 * - if the position is already within the congestion queue, add it to the queue with slow speed
-		 * - if the position is not within the queue, just place the car 	with free speed at that place
-		 */
-		double lastDistance = Integer.MAX_VALUE;
-		for (QueueVehicle veh : this.vehQueue) {
-			double travelTime = now - (veh.getDepartureTime_s() - this.getLink().getFreespeedTravelTime(now));
-			double distanceOnLink = (this.getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
-					: ((travelTime / this.getLink().getFreespeedTravelTime(now)) * this.link.getLength()));
-			if (distanceOnLink > queueEnd) { // vehicle is already in queue
-				distanceOnLink = queueEnd;
-				queueEnd -= vehLen;
-			}
-			if (distanceOnLink >= lastDistance) {
-				/*
-				 * we have a queue, so it should not be possible that one vehicles
-				 * overtakes another. additionally, if two vehicles entered at the same
-				 * time, they would be drawn on top of each other. we don't allow this,
-				 * so in this case we put one after the other. Theoretically, this could
-				 * lead to vehicles placed at negative distance when a lot of vehicles
-				 * all enter at the same time on an empty link. not sure what to do
-				 * about this yet... just setting them to 0 currently.
-				 */
-				distanceOnLink = lastDistance - vehLen;
-				if (distanceOnLink < 0)
-					distanceOnLink = 0.0;
-			}
-			int cmp = (int) (veh.getDepartureTime_s()
-					+ this.inverseSimulatedFlowCapacity + 2.0);
-			double speed = (now > cmp) ? 0.0 : this.link.getFreespeed(now);
-			int lane = 1 + (Integer.parseInt(veh.getId().toString()) % this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
-			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link, distanceOnLink,
-					lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
-			positions.add(position);
-			lastDistance = distanceOnLink;
-		}
-
-		/*
-		 * Put the vehicles from the waiting list in positions. Their actual
-		 * position doesn't matter, so they are just placed to the coordinates of
-		 * the from node
-		 */
-		int lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
-		for (QueueVehicle veh : this.waitingList) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
-			positions.add(position);
-		}
-
-		/*
-		 * put the vehicles from the parking list in positions their actual position
-		 * doesn't matter, so they are just placed to the coordinates of the from
-		 * node
-		 */
-		lane = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
-		for (QueueVehicle veh : this.parkingList) {
-			PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-					((NetworkLayer) this.link.getLayer()).getEffectiveCellSize(), lane, 0.0,
-					PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
-			positions.add(position);
-		}
-	}
-
-	/**
-	 * Calculates the positions of all vehicles on this link so that there is
-	 * always the same distance between following cars. A single vehicle will be
-	 * placed at the middle (0.5) of the link, two cars will be placed at
-	 * positions 0.25 and 0.75, three cars at positions 0.16, 0.50, 0.83, and so
-	 * on.
-	 *
-	 * @param positions
-	 *          A collection where the calculated positions can be stored.
-	 */
-	public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
-		double time = SimulationTimer.getTime();
-		int cnt = this.buffer.size() + this.vehQueue.size();
-		int nLanes = this.link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-		if (cnt > 0) {
-			double cellSize = this.link.getLength() / cnt;
-			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-			double freespeed = this.link.getFreespeed(Time.UNDEFINED_TIME);
-
-			// the cars in the buffer
-			for (QueueVehicle veh : this.buffer) {
-				int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (time > cmp ? 0.0 : freespeed);
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
-				positions.add(position);
-				distFromFromNode -= cellSize;
-			}
-
-			// the cars in the drivingQueue
-			for (QueueVehicle veh : this.vehQueue) {
-				int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
-				int cmp = (int) (veh.getDepartureTime_s() + this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (time > cmp ? 0.0 : freespeed);
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-						distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
-				positions.add(position);
-				distFromFromNode -= cellSize;
-			}
-		}
-
-		// the cars in the waitingQueue
-		// the actual position doesn't matter, so they're just placed next to the
-		// link at the end
-		cnt = this.waitingList.size();
-		if (cnt > 0) {
-			int lane = nLanes + 2;
-			double cellSize = Math.min(7.5, this.link.getLength() / cnt);
-			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-			for (QueueVehicle veh : this.waitingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-				positions.add(position);
-				distFromFromNode -= cellSize;
-			}
-		}
-
-		// the cars in the parkingQueue
-		// the actual position doesn't matter, so they're distributed next to the
-		// link
-		cnt = this.parkingList.size();
-		if (cnt > 0) {
-			int lane = nLanes + 4;
-			double cellSize = this.link.getLength() / cnt;
-			double distFromFromNode = this.link.getLength() - cellSize / 2.0;
-			for (QueueVehicle veh : this.parkingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), this.link,
-						distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
-				positions.add(position);
-				distFromFromNode -= cellSize;
-			}
-		}
-	}
 
 	void clearVehicles() {
 		double now = SimulationTimer.getTime();
@@ -751,41 +546,8 @@ public class QueueLink {
 		Simulation.incLost(this.buffer.size());
 		this.buffer.clear();
 	}
+	
 
-	// //////////////////////////////////////////////////////////
-	// For NetStateWriter
-	// /////////////////////////////////////////////////////////
-
-	static public class AgentOnLink implements DrawableAgentI {
-
-		public double posInLink_m;
-
-		public int lane = 1;
-
-		public double getPosInLink_m() {
-			return this.posInLink_m;
-		}
-
-		public int getLane() {
-			return this.lane;
-		}
-	}
-
-	public Collection<AgentOnLink> getDrawableCollection() {
-		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
-		getVehiclePositions(positions);
-
-		List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
-		for (PositionInfo pos : positions) {
-			if (pos.getVehicleState() == PositionInfo.VehicleState.Driving) {
-				AgentOnLink veh = new AgentOnLink();
-				veh.posInLink_m = pos.getDistanceOnLink();
-				vehs.add(veh);
-			}
-		}
-
-		return vehs;
-	}
 
 	// search for vehicleId..
 	public QueueVehicle getVehicle(final Id id) {
@@ -819,4 +581,269 @@ public class QueueLink {
 	public boolean hasDrivingCars() {
 		return ((this.vehQueue.size() + this.waitingList.size() + this.buffer.size()) != 0);
 	}
+	
+
+	
+	/**
+	 * Inner class to capsulate visualization methods
+	 * @author dgrether
+	 *
+	 */
+	class VisDataImpl implements VisData {
+
+		/**
+		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
+		 */
+		public double getDisplayableSpaceCapValue() {
+			return (buffer.size() + vehQueue.size()) / storageCapacity;
+		}
+
+		/**
+		 * Returns a measure for how many vehicles on the link have a travel time
+		 * higher than freespeedTraveltime on a scale from 0 to 2. When more then half
+		 * of the possible vehicles are delayed, the value 1 will be returned, which
+		 * depicts the worst case on a (traditional) scale from 0 to 1.
+		 *
+		 * @return A measure for the number of vehicles being delayed on this link.
+		 */
+		public double getDisplayableTimeCapValue() {
+			int count = buffer.size();
+			double now = SimulationTimer.getTime();
+			for (QueueVehicle veh : vehQueue) {
+				// Check if veh has reached destination
+				if (veh.getDepartureTime_s() <= now) {
+					count++;
+				}
+			}
+			return count * 2.0 / storageCapacity;
+		}
+
+		
+		
+		public Collection<AgentOnLink> getDrawableCollection() {
+			Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
+			getVehiclePositions(positions);
+
+			List<AgentOnLink> vehs = new ArrayList<AgentOnLink>();
+			for (PositionInfo pos : positions) {
+				if (pos.getVehicleState() == PositionInfo.VehicleState.Driving) {
+					AgentOnLink veh = new AgentOnLink();
+					veh.posInLink_m = pos.getDistanceOnLink();
+					vehs.add(veh);
+				}
+			}
+
+			return vehs;
+		}
+		
+		public Collection<PositionInfo> getVehiclePositions(
+				final Collection<PositionInfo> positions) {
+			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+			if ("queue".equals(snapshotStyle)) {
+				getVehiclePositionsQueue(positions);
+			} else if ("equiDist".equals(snapshotStyle)) {
+				getVehiclePositionsEquil(positions);
+			} else {
+				log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+			}
+			return positions;
+		}
+		
+		/**
+		 * Calculates the positions of all vehicles on this link so that there is
+		 * always the same distance between following cars. A single vehicle will be
+		 * placed at the middle (0.5) of the link, two cars will be placed at
+		 * positions 0.25 and 0.75, three cars at positions 0.16, 0.50, 0.83, and so
+		 * on.
+		 *
+		 * @param positions
+		 *          A collection where the calculated positions can be stored.
+		 */
+		public void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
+			double time = SimulationTimer.getTime();
+			int cnt = buffer.size() + vehQueue.size();
+			int nLanes = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME);
+			if (cnt > 0) {
+				double cellSize = link.getLength() / cnt;
+				double distFromFromNode = link.getLength() - cellSize / 2.0;
+				double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
+
+				// the cars in the buffer
+				for (QueueVehicle veh : buffer) {
+					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
+					int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+					double speed = (time > cmp ? 0.0 : freespeed);
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+							distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+					positions.add(position);
+					distFromFromNode -= cellSize;
+				}
+
+				// the cars in the drivingQueue
+				for (QueueVehicle veh : vehQueue) {
+					int lane = 1 + Integer.parseInt(veh.getId().toString()) % nLanes;
+					int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+					double speed = (time > cmp ? 0.0 : freespeed);
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+							distFromFromNode, lane, speed, PositionInfo.VehicleState.Driving, null);
+					positions.add(position);
+					distFromFromNode -= cellSize;
+				}
+			}
+
+			// the cars in the waitingQueue
+			// the actual position doesn't matter, so they're just placed next to the
+			// link at the end
+			cnt = waitingList.size();
+			if (cnt > 0) {
+				int lane = nLanes + 2;
+				double cellSize = Math.min(7.5, link.getLength() / cnt);
+				double distFromFromNode = link.getLength() - cellSize / 2.0;
+				for (QueueVehicle veh : waitingList) {
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+					positions.add(position);
+					distFromFromNode -= cellSize;
+				}
+			}
+
+			// the cars in the parkingQueue
+			// the actual position doesn't matter, so they're distributed next to the
+			// link
+			cnt = parkingList.size();
+			if (cnt > 0) {
+				int lane = nLanes + 4;
+				double cellSize = link.getLength() / cnt;
+				double distFromFromNode = link.getLength() - cellSize / 2.0;
+				for (QueueVehicle veh : parkingList) {
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+					positions.add(position);
+					distFromFromNode -= cellSize;
+				}
+			}
+		}
+		
+		/**
+		 * Calculates the positions of all vehicles on this link according to the
+		 * queue-logic: Vehicles are placed on the link according to the ratio between
+		 * the free-travel time and the time the vehicles are already on the link. If
+		 * they could have left the link already (based on the time), the vehicles
+		 * start to build a traffic-jam (queue) at the end of the link.
+		 *
+		 * @param positions
+		 *          A collection where the calculated positions can be stored.
+		 */
+		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+			double now = SimulationTimer.getTime();
+			double queueEnd = link.getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
+			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+			double vehLen = Math.min( // the length of a vehicle in visualization
+					link.getLength() / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
+					((NetworkLayer)link.getLayer()).getEffectiveCellSize() / storageCapFactor); // a vehicle should not be larger than it's actual size
+
+			// put all cars in the buffer one after the other
+			for (QueueVehicle veh : buffer) {
+
+				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+
+				int cmp = (int) (veh.getDepartureTime_s() + inverseSimulatedFlowCapacity + 2.0);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
+
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link, queueEnd,
+						lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+				positions.add(position);
+				queueEnd -= vehLen;
+			}
+
+			/*
+			 * place other driving cars according the following rule:
+			 * - calculate the time how long the vehicle is on the link already
+			 * - calculate the position where the vehicle should be if it could drive with freespeed
+			 * - if the position is already within the congestion queue, add it to the queue with slow speed
+			 * - if the position is not within the queue, just place the car 	with free speed at that place
+			 */
+			double lastDistance = Integer.MAX_VALUE;
+			for (QueueVehicle veh : vehQueue) {
+				double travelTime = now - (veh.getDepartureTime_s() - getLink().getFreespeedTravelTime(now));
+				double distanceOnLink = (getLink().getFreespeedTravelTime(now) == 0.0 ? 0.0
+						: ((travelTime / getLink().getFreespeedTravelTime(now)) * link.getLength()));
+				if (distanceOnLink > queueEnd) { // vehicle is already in queue
+					distanceOnLink = queueEnd;
+					queueEnd -= vehLen;
+				}
+				if (distanceOnLink >= lastDistance) {
+					/*
+					 * we have a queue, so it should not be possible that one vehicles
+					 * overtakes another. additionally, if two vehicles entered at the same
+					 * time, they would be drawn on top of each other. we don't allow this,
+					 * so in this case we put one after the other. Theoretically, this could
+					 * lead to vehicles placed at negative distance when a lot of vehicles
+					 * all enter at the same time on an empty link. not sure what to do
+					 * about this yet... just setting them to 0 currently.
+					 */
+					distanceOnLink = lastDistance - vehLen;
+					if (distanceOnLink < 0)
+						distanceOnLink = 0.0;
+				}
+				int cmp = (int) (veh.getDepartureTime_s()
+						+ inverseSimulatedFlowCapacity + 2.0);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
+				int lane = 1 + (Integer.parseInt(veh.getId().toString()) % link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME));
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link, distanceOnLink,
+						lane, speed, PositionInfo.VehicleState.Driving, veh.getDriver().getPerson().getVisualizerData());
+				positions.add(position);
+				lastDistance = distanceOnLink;
+			}
+
+			/*
+			 * Put the vehicles from the waiting list in positions. Their actual
+			 * position doesn't matter, so they are just placed to the coordinates of
+			 * the from node
+			 */
+			int lane = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 1; // place them next to the link
+			for (QueueVehicle veh : waitingList) {
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+						((NetworkLayer) link.getLayer()).getEffectiveCellSize(), lane, 0.0,
+						PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+				positions.add(position);
+			}
+
+			/*
+			 * put the vehicles from the parking list in positions their actual position
+			 * doesn't matter, so they are just placed to the coordinates of the from
+			 * node
+			 */
+			lane = link.getLanesAsInt(org.matsim.utils.misc.Time.UNDEFINED_TIME) + 2; // place them next to the link
+			for (QueueVehicle veh : parkingList) {
+				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), link,
+						((NetworkLayer) link.getLayer()).getEffectiveCellSize(), lane, 0.0,
+						PositionInfo.VehicleState.Parking, veh.getDriver().getPerson().getVisualizerData());
+				positions.add(position);
+			}
+		}
+
+	};
+	
+	// //////////////////////////////////////////////////////////
+	// For NetStateWriter
+	// /////////////////////////////////////////////////////////
+
+	static public class AgentOnLink implements DrawableAgentI {
+
+		public double posInLink_m;
+
+		public int lane = 1;
+
+		public double getPosInLink_m() {
+			return this.posInLink_m;
+		}
+
+		public int getLane() {
+			return this.lane;
+		}
+	};
+
+
+	
 }

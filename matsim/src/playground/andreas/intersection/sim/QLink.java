@@ -17,8 +17,9 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.QueueVehicle;
+import org.matsim.mobsim.queuesim.SimulationTimer;
+import org.matsim.mobsim.queuesim.VisData;
 import org.matsim.network.Link;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -36,6 +37,8 @@ public class QLink extends QueueLink {
 	private ArrayList<PseudoLink> pseudoLinksList = new ArrayList<PseudoLink>();
 	private ArrayList<PseudoLink> nodePseudoLinksList;
 
+	private VisData visdata = this.new VisDataImpl();
+	
 	public QLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		super(l, queueNetwork, toNode);
 
@@ -107,7 +110,7 @@ public class QLink extends QueueLink {
 	}
 
 	public List<PseudoLink> getNodePseudoLinks(){
-		if (this.nodePseudoLinksList == null && this.pseudoLinksList.size() == 1){
+		if ((this.nodePseudoLinksList == null) && (this.pseudoLinksList.size() == 1)){
 			return this.pseudoLinksList;
 		}
 			return this.nodePseudoLinksList;
@@ -213,7 +216,7 @@ public class QLink extends QueueLink {
 				PseudoLink tempPseudoLink = null;
 				for (PseudoLink pseudoLink : this.pseudoLinksList) {
 
-					if( tempPseudoLink == null || (pseudoLink.visualizerLane == 1 && pseudoLink.getMeterFromLinkEnd() == 0)){
+					if( (tempPseudoLink == null) || ((pseudoLink.visualizerLane == 1) && (pseudoLink.getMeterFromLinkEnd() == 0))){
 						tempPseudoLink = pseudoLink;
 						tempPseudoLink.addDestLink(outLink);
 						this.originalLink.addDestLink(outLink);
@@ -237,33 +240,58 @@ public class QLink extends QueueLink {
 			}
 		}
 	}
-
+	
 	@Override
-	public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
-		String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
-		if ("queue".equals(snapshotStyle)) {
-			getVehiclePositionsQueue(positions);
-		} else {
-			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
-		}
-		return positions;
+	public VisData getVisData() {
+		return this.visdata;
 	}
+	
+	class VisDataImpl implements VisData {
 
-	/**
-	 * Calculates the positions of all vehicles on this link according to the
-	 * queue-logic: Vehicles are placed on the link according to the ratio between
-	 * the free-travel time and the time the vehicles are already on the link. If
-	 * they could have left the link already (based on the time), the vehicles
-	 * start to build a traffic-jam (queue) at the end of the link.
-	 *
-	 * @param positions
-	 *          A collection where the calculated positions can be stored.
-	 */
-	@Override
-	public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
-		for (PseudoLink pseudoLink : this.pseudoLinksList) {
-			pseudoLink.getVehPositions(positions);
+		public double getDisplayableSpaceCapValue() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
 		}
-	}
+
+		public double getDisplayableTimeCapValue() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		public Collection<AgentOnLink> getDrawableCollection() {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		public Collection<PositionInfo> getVehiclePositions(final Collection<PositionInfo> positions) {
+			String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
+			if ("queue".equals(snapshotStyle)) {
+				getVehiclePositionsQueue(positions);
+			} else {
+				log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported.");
+			}
+			return positions;
+		}
+
+		public void getVehiclePositionsEquil(Collection<PositionInfo> positions) {
+			throw new UnsupportedOperationException("Method not implemented in draft class");
+		}
+
+		/**
+		 * Calculates the positions of all vehicles on this link according to the
+		 * queue-logic: Vehicles are placed on the link according to the ratio between
+		 * the free-travel time and the time the vehicles are already on the link. If
+		 * they could have left the link already (based on the time), the vehicles
+		 * start to build a traffic-jam (queue) at the end of the link.
+		 *
+		 * @param positions
+		 *          A collection where the calculated positions can be stored.
+		 */
+		public void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
+			for (PseudoLink pseudoLink : pseudoLinksList) {
+				pseudoLink.getVehPositions(positions);
+			}
+		}
+		
+	};
+
+
 
 }

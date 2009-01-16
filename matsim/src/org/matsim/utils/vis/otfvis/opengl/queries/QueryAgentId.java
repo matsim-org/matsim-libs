@@ -65,10 +65,10 @@ public class QueryAgentId implements OTFQuery {
 		double dist = 0;
 		for( QueueLink qlink : net.getLinks().values()) {
 			List<PositionInfo> positions = new LinkedList<PositionInfo>();
-			qlink.getVehiclePositions(positions);
+			qlink.getVisData().getVehiclePositions(positions);
 			for(PositionInfo info : positions) {
 				
-				if (info.getVehicleState()== VehicleState.Parking && !OTFLinkAgentsHandler.showParked) continue;
+				if ((info.getVehicleState()== VehicleState.Parking) && !OTFLinkAgentsHandler.showParked) continue;
 
 				double xDist = info.getEasting() - this.x;
 				double yDist = info.getNorthing() - this.y;

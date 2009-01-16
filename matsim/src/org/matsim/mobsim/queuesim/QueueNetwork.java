@@ -192,7 +192,7 @@ public class QueueNetwork{
 	public Collection<PositionInfo> getVehiclePositions() {
 		Collection<PositionInfo> positions = new ArrayList<PositionInfo>();
 		for (QueueLink link : this.links.values()) {
-			link.getVehiclePositions(positions);
+			link.getVisData().getVehiclePositions(positions);
 		}
 		return positions;
 	}

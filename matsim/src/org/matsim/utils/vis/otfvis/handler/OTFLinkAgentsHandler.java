@@ -94,7 +94,7 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 			// Write additional agent data
 
 			positions.clear();
-			src.getVehiclePositions(positions);
+			src.getVisData().getVehiclePositions(positions);
 
 			if (showParked) {
 				out.putInt(positions.size());
