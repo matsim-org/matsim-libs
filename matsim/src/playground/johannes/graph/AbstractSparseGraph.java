@@ -99,11 +99,74 @@ public abstract class AbstractSparseGraph implements Graph {
 	}
 
 	/**
+	 * Removes an isolated vertex from the graph.
+	 * 
+	 * @param v
+	 *            the vertex to remove.
+	 * @return <tt>true</tt> if <tt>v</tt> has been successfully removed,
+	 *         <tt>false</tt> if <tt>v</tt> is not part of this graph.
+	 * @throws {@link RuntimeException} if <tt>v</tt> is still connected to
+	 *         other vertices.
+	 */
+	public boolean removeVertex(SparseVertex v) {
+		if(v.getEdges().isEmpty()) {
+			return vertices.remove(v);
+		} else {
+			throw new RuntimeException("Can only remove isolated vertices!");
+		}
+	}
+	
+	/**
+	 * Removes an edge from the graph.
+	 * 
+	 * @param e
+	 *            the edge to be removed.
+	 * @return <tt>true</tt> if <tt>e</tt> has been successfully removed,
+	 *         <tt>false</tt> if <tt>e</tt> is not part of this graph.
+	 */
+	public boolean removeEdge(SparseEdge e) {
+		SparseVertex v1 = e.getVertices().getFirst();
+		SparseVertex v2 = e.getVertices().getSecond();
+		boolean removedv1 = v1.removeEdge(e);
+		boolean removedv2 = v2.removeEdge(e);
+		if(removedv1 && removedv2)
+			return edges.remove(e);
+		else if(!removedv1 && !removedv2)
+			return false;
+		else
+			throw new RuntimeException("Grpah connectivity appears to be inconsistent!");
+	}
+	
+	/**
 	 * Optimizes the internal storage structure.
 	 */
 	public void optimize() {
 		for (SparseVertex v : vertices)
 			v.optimize();
+	}
+
+	/**
+	 * Returns the edge connecting vertex <tt>v1</tt> and <tt>v2</tt>.
+	 * 
+	 * @param v1
+	 *            a vertex.
+	 * @param v2
+	 *            a vertex.
+	 * @return the edge connecting vertex <tt>v1</tt> and <tt>v2</tt>, or
+	 *         <tt>null</tt> if <tt>v1</tt> and <tt>v2</tt> are not connected
+	 *         with each other.
+	 */
+	public SparseEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		SparseEdge e = null;
+		int cnt = v1.getEdges().size();
+		for(int i = 0; i < cnt; i++) {
+			e = v1.getEdges().get(i);
+			if(e.getOpposite(v1) == v2) {
+				return e;
+			}
+		}
+		
+		return null;
 	}
 
 	public String toString() {

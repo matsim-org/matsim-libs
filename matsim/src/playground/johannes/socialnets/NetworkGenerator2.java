@@ -51,6 +51,8 @@ import playground.johannes.graph.Edge;
 import playground.johannes.graph.GraphStatistics;
 import playground.johannes.graph.Vertex;
 import playground.johannes.graph.io.PajekVisWriter;
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
 import playground.johannes.statistics.WeightedStatistics;
 
 /**

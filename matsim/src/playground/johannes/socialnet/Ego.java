@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetwork.java
+ * Ego.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,41 +21,25 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
-
-import java.util.Set;
+package playground.johannes.socialnet;
 
 import org.matsim.population.Person;
 
-import playground.johannes.graph.AbstractSparseGraph;
-import playground.johannes.graph.Edge;
-import playground.johannes.graph.SparseEdge;
+import playground.johannes.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork extends AbstractSparseGraph {
-	
-	public Ego addEgo(Person person) {
-		Ego e = new Ego(person);
-		if(insertVertex(e))
-			return e;
-		else
-			return null;
-	}
-	
-	public Edge addEdge(Ego e1, Ego e2) {
-		SparseEdge e = new SparseEdge(e1, e2);
-		if(insertEdge(e, e1, e2))
-			return e;
-		else
-			return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Set<? extends Ego> getVertices() {
-		return (Set<? extends Ego>) super.getVertices();
-	}
+public class Ego extends SparseVertex {
 
+	private Person person;
+	
+	protected Ego(Person person) {
+		this.person = person;
+	}
+	
+	public Person getPerson() {
+		return person;
+	}
 }

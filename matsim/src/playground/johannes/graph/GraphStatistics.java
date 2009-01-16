@@ -38,9 +38,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+
+import playground.johannes.statistics.WeightedStatistics;
 
 /**
  * A collection of function to calculate statistical properties of graphs.
@@ -89,11 +90,14 @@ public class GraphStatistics {
 	 *            the graph to retrieve the degree distribution from.
 	 * @return the degree distribution.
 	 */
-	public static Frequency getDegreeDistribution(Graph g) {
-		Frequency freq = new Frequency();
+	public static WeightedStatistics getDegreeDistribution(Graph g) {
+//		Frequency freq = new Frequency();
+		WeightedStatistics stats = new WeightedStatistics();
 		for(Vertex v : g.getVertices())
-			freq.addValue(v.getEdges().size());
-		return freq;
+//			freq.addValue(v.getEdges().size());
+			stats.add(v.getEdges().size());
+//		return freq;
+		return stats;
 	}
 	
 	/**

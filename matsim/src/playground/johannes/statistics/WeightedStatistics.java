@@ -23,18 +23,16 @@
  */
 package playground.johannes.statistics;
 
+import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleFunction;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Locale;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.utils.io.IOUtils;
-
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleFunction;
 
 /**
  * @author illenberger

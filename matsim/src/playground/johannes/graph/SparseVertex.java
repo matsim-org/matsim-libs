@@ -81,6 +81,30 @@ public class SparseVertex implements Vertex {
 	}
 
 	/**
+	 * Disconnects this vertex from an edge.
+	 * 
+	 * @param e
+	 *            the edge from this vertex is to be disconnected.
+	 * @return <tt>true</tt> if this vertex has been disconnected from
+	 *         <tt>e</tt>, <tt>false</tt> if this vertex is not connected
+	 *         to edge <tt>e</tt>.
+	 */
+	boolean removeEdge(SparseEdge e) {
+		boolean removedEdge = edges.remove(e);
+		boolean removedNeighbour = neighbours.remove(e.getOpposite(this));
+		
+		if(removedEdge && removedNeighbour)
+			return true;
+		else if(!removedEdge && !removedNeighbour)
+			return false;
+		else
+			/*
+			 * Actually, this should never happen. Think about, if this is really necessary.
+			 */
+			throw new RuntimeException("Graph connectivity appears to be inconsitent!");
+	}
+	
+	/**
 	 * Calls {@link ArrayList#trimToSize()} on all internal list.
 	 */
 	void optimize() {

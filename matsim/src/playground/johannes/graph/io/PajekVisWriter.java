@@ -35,8 +35,8 @@ import org.matsim.utils.io.IOUtils;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Vertex;
-import playground.johannes.socialnets.Ego;
-import playground.johannes.socialnets.SocialNetwork;
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
 
 /**
  * @author illenberger

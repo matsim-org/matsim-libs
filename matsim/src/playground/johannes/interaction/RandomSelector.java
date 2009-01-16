@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * RandomSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,29 +21,42 @@
 /**
  * 
  */
-package playground.johannes.socialnets;
+package playground.johannes.interaction;
 
-import org.matsim.population.Person;
-
-import playground.johannes.graph.SparseVertex;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author illenberger
  *
  */
-public class Ego extends SparseVertex {
+public class RandomSelector implements InteractionSelector {
 
-	private Person person;
+	private int maxInteractions;
 	
-	protected Ego(Person person) {
-		this.person = person;
+	private Random random;
+
+	public RandomSelector(int maxInteractions, long randomSeed) {
+		this.maxInteractions = maxInteractions;
+		random = new Random(randomSeed);
 	}
 	
-	public Person getPerson() {
-		return person;
+	public Collection<Visitor> select(Visitor v, Collection<Visitor> choiceSet) {
+		List<Visitor> targets = new LinkedList<Visitor>();
+		
+		if(maxInteractions == 1)
+			targets.add(selectSingleTarget(v, choiceSet));
+		else if(maxInteractions > 1)
+			throw new UnsupportedOperationException("Not implemented yet!");
+		
+		return targets;
 	}
 	
-//	public void setPerson(Person person) {
-//		this.person = person;
-//	}
+	private Visitor selectSingleTarget(Visitor v, Collection<Visitor> choiceSet) {
+		List<Visitor> visitors = new LinkedList<Visitor>(choiceSet);
+		return visitors.get((int)(random.nextDouble() * (visitors.size() - 1)));
+	}
+
 }
