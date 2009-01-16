@@ -121,7 +121,10 @@ public class CMCFDemandWriter implements PopulationReader {
 		this.convert(null);
 	}
 	
-	
+	public void convert(int numberOfTimeSteps){
+		this.convert(null, numberOfTimeSteps);
+	}
+
 	/**
 	 * Converts the plans file into CMCF format and writes it to the specified Writer.
 	 * If null is given, output is being printed out to the console.
@@ -129,9 +132,12 @@ public class CMCFDemandWriter implements PopulationReader {
 	 * @param out the Writer where to write the output, or null
 	 */
 	public void convert(Writer out){
+		this.convert(out, 1);
+	}
+	public void convert(Writer out, int numberOfTimeSteps){
 		log("<demandgraph>\n", out);
 		this.convertHeader(out, (byte) 1);
-		this.convertDemands(out, (byte) 1);
+		this.convertDemands(out, (byte) 1, numberOfTimeSteps);
 		log("</demandgraph>", out);
 	}
 	
@@ -150,7 +156,7 @@ public class CMCFDemandWriter implements PopulationReader {
 	 * @param out
 	 * @param tabs
 	 */
-	private void convertHeader(Writer out, byte tabs){
+	protected void convertHeader(Writer out, byte tabs){
 		String tab="";
 		while(tabs-- > 0)
 			tab += '\t';
@@ -175,7 +181,17 @@ public class CMCFDemandWriter implements PopulationReader {
 	 * @param out
 	 * @param tabs
 	 */
-	private void convertDemands(Writer out, byte tabs){
+	protected void convertDemands(Writer out, byte tabs){
+		this.convertDemands(out, tabs, 1);
+	}
+	/**
+	 * To create time dependent solutions for MATSIM, the parameter divisor is introduced
+	 * For each commodity the demand value is divided by divisor. 
+	 * @param out
+	 * @param tabs
+	 * @param divisor
+	 */
+	protected void convertDemands(Writer out, byte tabs, int divisor){
 		String tab="";
 		while(tabs-- > 0)
 			tab += '\t';
@@ -200,7 +216,9 @@ public class CMCFDemandWriter implements PopulationReader {
 			log(tab+"\t<commodity id=\""+(counter++)+"\">\n", out);
 			log(tab+"\t\t<from>"+c.getOrigin().getId()+"</from>\n", out);
 			log(tab+"\t\t<to>"+c.getDestination().getId()+"</to>\n", out);
-			log(tab+"\t\t<demand>"+c.getDemand()+"</demand>\n", out);
+			log(tab+"\t\t<demand>"+
+					( divisor == 1 ? c.getDemand() : c.getDemand().doubleValue()/divisor )
+					+"</demand>\n", out);
 			log(tab+"\t</commodity>\n", out);
 		}
 		log(tab+"</demands>\n", out);
