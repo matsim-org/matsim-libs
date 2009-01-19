@@ -57,7 +57,7 @@ public class PTActWriter {
 		Population newPopulation = new org.matsim.population.Population(false);
 		int x=0;
 		
-//		PTPathValidator ptPathValidator = new PTPathValidator ();
+		PTPathValidator ptPathValidator = new PTPathValidator ();
 		int validas=0;
 		int noValidas=0;
 		
@@ -101,15 +101,15 @@ public class PTActWriter {
 			    						System.out.println(l.getType());
 			    					}
 			    					
-//			    					if (ptPathValidator.isValid(path)){
-//			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);			    	
-//			    						validas++;
-//			    						System.out.println("valida");
-//			    					}else{
-//			    						noValidas++;
-//			    						System.out.println("no valida");
-//			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-//			    					}
+			    					if (ptPathValidator.isValid(path)){
+			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);			    	
+			    						validas++;
+			    						System.out.println("valida");
+			    					}else{
+			    						noValidas++;
+			    						System.out.println("no valida");
+			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    					}
 			    							
 								//removeWlinks();
 			    				}else{
