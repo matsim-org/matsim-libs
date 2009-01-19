@@ -22,7 +22,6 @@ package playground.mfeil;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.Act;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.replanning.modules.MultithreadedModuleA;
@@ -30,6 +29,7 @@ import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import org.matsim.controler.Controler;
 
 
 /**
@@ -50,22 +50,22 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	                      
 	public RecyclingModule1 (ControlerMFeil controler) {
 		super(controler);
-		this.iterations 		= 20;
-		this.noOfAgents			= 10;
-		this.primActsDistance = "yes";
-		this.homeLocationDistance = "yes";
-		this.sex = "yes";
-		this.age = "yes";
-		this.license = "no";
-		this.car_avail = "no";
-		this.employed = "yes";
-		this.softCoef = this.detectSoftCoefficients();
-		this.allCoef = this.detectAllCoefficients();
-		this.noOfSoftCoefficients=this.softCoef.size();
+		this.iterations 			= 20;
+		this.noOfAgents				= 10;
+		this.primActsDistance 		= "yes";
+		this.homeLocationDistance 	= "yes";
+		this.sex 					= "yes";
+		this.age 					= "yes";
+		this.license 				= "yes";
+		this.car_avail 				= "no";
+		this.employed 				= "no";
+		this.softCoef 				= this.detectSoftCoefficients();
+		this.allCoef 				= this.detectAllCoefficients();
+		this.noOfSoftCoefficients	= this.softCoef.size();
 		double [] startCoefficients = new double [this.noOfSoftCoefficients];
 		for (int i=0;i<startCoefficients.length;i++) startCoefficients[i]=1;
-		this.coefficients 		= new DistanceCoefficients (startCoefficients, this.softCoef, this.allCoef);	
-		this.assignmentModule	= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
+		this.coefficients 			= new DistanceCoefficients (startCoefficients, this.softCoef, this.allCoef);	
+		this.assignmentModule		= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
 				this.locator, this.scorer, this.cleaner, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
 		
@@ -80,6 +80,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		Statistics.noEmploymentAssignment=false;
 		Statistics.noLicenseAssignment=false;
 		
+		/* Individual optimization of agents */
 		for (int i=0;i<this.testAgentsNumber;i++) {
 			int pos = (int)(MatsimRandom.random.nextDouble()*this.list[1].size());
 			list[0].add(list[1].get(pos));
@@ -88,33 +89,90 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		}
 		schedulingModule.finish();
 		
+		/* Fill Optimized Agents object */
+		agents = new OptimizedAgents (list[0]);
+		
+		/* Detect optimal coefficients metric */
+		Statistics.prt=false;
+		if (this.noOfSoftCoefficients>1) this.detectCoefficients();
+		Statistics.prt=true;
+		
+		/* Print statistics of individual optimization */
+		assignment.println("Iteration "+Controler.getIteration());
+		assignment.println("Individual optimization");
 		for (int i=0;i<list[0].size();i++){
 			assignment.print(list[0].get(i).getPerson().getId()+"\t\t"+list[0].get(i).getScore()+"\t");
 			for (int j=0;j<list[0].get(i).getActsLegs().size();j+=2){
 				assignment.print(((Act)(list[0].get(i).getActsLegs().get(j))).getType()+"\t");
 			}
 			assignment.println();
+			if (i==this.testAgentsNumber-1) {
+				assignment.println();
+				assignment.println("Individual optimization of non-assigend agents in metric detection phase");
+			}
 		}
 		assignment.println();
 		
-		agents = new OptimizedAgents (list[0]);
-		
-		Statistics.prt=false;
-		if (this.noOfSoftCoefficients>1) this.detectCoefficients();
-		Statistics.prt=true;
-		
+		/* Assign remaining agents */
 		assignmentModule.init();
-		
 		for (int i=0;i<list[1].size();i++){
 			assignmentModule.handlePlan(list[1].get(i));
 		}
 		assignmentModule.finish();
+		
+		/* Individually optimize all agents that couldn't be assigned */ 
+		if (this.nonassignedAgents.size()>0){
+			schedulingModule.init();
+			Iterator<String> naa = this.nonassignedAgents.iterator();
+			while (naa.hasNext()) {
+				String st = naa.next();
+				for (int x=0;x<this.list[1].size();x++){
+					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
+						schedulingModule.handlePlan(list[1].get(x));
+						break;
+					}
+				}
+			}
+			schedulingModule.finish();
+		}
+		
+		/* Print statistics of assignment */
+		assignment.println("Assignment");
+		for (int i=0;i<this.allCoef.size();i++){
+			assignment.print(this.allCoef.get(i)+"\t");
+			if (this.coefficients.getSingleCoef(this.allCoef.get(i))!=-1){
+				assignment.print(this.coefficients.getSingleCoef(this.allCoef.get(i)));
+			}
+			else assignment.print("Hard constraint");
+			assignment.println();
+		}
 		for (int i=0;i<Statistics.list.size();i++){
 			for (int j=0;j<Statistics.list.get(i).size();j++){
 				assignment.print(Statistics.list.get(i).get(j)+"\t");
 			}
 			assignment.println();
 		}
+		assignment.println();
+		if (this.nonassignedAgents.size()>0){
+			assignment.println("Individual optimization of non-assigend agents in assignment phase");
+			Iterator<String> naa = this.nonassignedAgents.iterator();
+			while (naa.hasNext()) {
+				String st = naa.next();
+				for (int x=0;x<this.list[1].size();x++){
+					if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
+						assignment.print(this.list[1].get(x).getPerson().getId()+"\t\t"+this.list[1].get(x).getScore()+"\t");
+						for (int j=0;j<this.list[1].get(x).getActsLegs().size();j+=2){
+							assignment.print(((Act)(this.list[1].get(x).getActsLegs().get(j))).getType()+"\t");
+						}
+						assignment.println();
+						break;
+					}
+				}
+			}
+			assignment.println();
+			this.nonassignedAgents.clear();
+		}
+		
 		if (Statistics.noSexAssignment) log.warn("There are agents that have no gender information."); 
 		if (Statistics.noCarAvailAssignment) log.warn("There are agents that have no car availabiity information."); 
 		if (Statistics.noEmploymentAssignment) log.warn("There are agents that have no employment information."); 
@@ -150,7 +208,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			String st = naa.next();
 			for (int x=0;x<this.list[1].size();x++){
 				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
-					log.warn("Anschlag!");
+					//log.warn("Anschlag!");
 					schedulingModule.handlePlan(list[1].get(x));
 					list1Pointer.add(x);
 					break;
@@ -169,7 +227,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		if (this.nonassignedAgents.size()>0){
 			this.nonassignedAgents.clear();
 			score [0]= this.calculate();// Do this again, now all agents must be assignable.
-			if (this.nonassignedAgents.size()>0) log.warn("nonAssignedAgents nicht leer!");
+			if (this.nonassignedAgents.size()>0) log.warn("Something went wrong when optimizing the non-assigned agents of the metric detection phase!");
 		}
 		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;	// set all other iterations' scores to minimum value
 	
@@ -325,13 +383,9 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	private double checkTabuList (double [][] coefMatrix, int i, int j, double offset){
 		OuterLoop:
 		for (int x=0;x<i;x++){
-			//System.out.println();
-			//System.out.print(x+". Zeile: ");
 			for (int y=0;y<coefMatrix[i].length-1;y++){
-				//System.out.print(coefMatrix[x][y]+" "+coefMatrix[i][y]+"; ");
 				if (coefMatrix[x][y]!=coefMatrix[i][y]) continue OuterLoop;
 			}
-			//System.out.println("Anschlag tabu!");
 			double coefAux = -1;
 			for (int z=0;z<i;z++){
 				if (coefMatrix[z][j]>coefAux)coefAux=coefMatrix[z][j];

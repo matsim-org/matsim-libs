@@ -12,10 +12,6 @@ public class DistanceCoefficients {
 		this.softCoef = coef;
 		this.namesOfSoftCoef = softNames;
 		this.namesOfAllCoef = allNames;
-		for (int i=0;i<this.namesOfSoftCoef.size();i++){
-			System.out.println(this.softCoef[i]);
-			System.out.println(this.namesOfSoftCoef.get(i));
-		}
 	}
 	
 	public double [] getCoef (){
@@ -32,7 +28,7 @@ public class DistanceCoefficients {
 				return this.softCoef[i];
 			}
 		}
-		return 0;
+		return -1;
 	}
 	
 	public ArrayList<String> getNamesOfCoef (){

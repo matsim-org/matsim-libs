@@ -81,7 +81,5 @@ public class OptimizedAgents {
 			tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
 		}
 		this.distancesTestAgents.add(tmpDistance);
-		System.out.println("Size of list = "+this.list.size());
-		System.out.println("Size of distancesTestAgents = "+this.distancesTestAgents.size());
 	}
 }
