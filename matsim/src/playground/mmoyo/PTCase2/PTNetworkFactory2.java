@@ -144,9 +144,9 @@ public class PTNetworkFactory2 {
 		// *Create Transfer Links
 		int maxLinkKey=0;
 
-		for (ArrayList chList : IntersectionMap.values()) {
-			List chList1 = chList;
-			List chList2 = chList;
+		for (ArrayList <String>chList : IntersectionMap.values()) {
+			List <String> chList1 = chList;
+			List <String> chList2 = chList;
 			if (chList1.size() > 1) {
 				for (Iterator<String> iter1 = chList1.iterator(); iter1.hasNext();) {
 					String idNode1 = iter1.next();

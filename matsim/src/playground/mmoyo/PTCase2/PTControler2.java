@@ -1,9 +1,5 @@
 package playground.mmoyo.PTCase2;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.utils.geometry.Coord;
@@ -34,7 +30,7 @@ public class PTControler2 {
 	    	case 1:
 	    		Coord coord1= new CoordImpl(708146,243607);
     			Coord coord2= new CoordImpl(709915,244793);
-	    		Path path = pt.getPtRouter2().forceRoute(coord1, coord2, 24060,400);
+	    		Path path = pt.getPtRouter2().findRoute(coord1, coord2, 24060,400);
 	    		//ptNetworkFactory.printLinks(ptNetworkLayer);
 	    		pt.getPtRouter2().PrintRoute(path);
 	    		break;
@@ -59,15 +55,5 @@ public class PTControler2 {
 	    		break;
 		}//switch
 	}//main
-	
-	public static void showMap(Map map) {
-		Iterator iter = map.entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			Link link= (Link)entry.getValue();
-			System.out.println(entry.getKey() + " = " + link.toString());
-		}
-		iter = null;
-	}
 	
 }//Class

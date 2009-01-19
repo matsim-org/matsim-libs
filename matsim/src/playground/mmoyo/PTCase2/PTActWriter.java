@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -55,55 +56,96 @@ public class PTActWriter {
 	public void writePTActsLegs(){
 		Population newPopulation = new org.matsim.population.Population(false);
 		int x=0;
+		
+		PTPathValidator ptPathValidator = new PTPathValidator ();
+		int validas=0;
+		int noValidas=0;
+		
 		for (Person person: this.population.getPersons().values()) {
 			//Person person = population.getPerson("1834734");
 			System.out.println(x + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 			
-			boolean val =false;
+			boolean first =true;
+			boolean addPerson= true;
 			Act lastAct = null;
 			Act thisAct= null;
 			int legNum=0;
-			
+
 			Plan newPlan = new Plan(person);
-			for (Iterator iter= plan.getIteratorAct(); iter.hasNext();) {
-		    	thisAct= (Act)iter.next();
-				
-		    	if (val) {
+			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();){
+				thisAct= (Act)iter.next();
+			
+				if (!first) {
+					System.out.println("====new plan");
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 
-		    		int distance = (int)lastActCoord.calcDistance(actCoord);
+		    		int distanceToDestination = (int)lastActCoord.calcDistance(actCoord);
 		    		int distToWalk= distToWalk(person.getAge());
-		    		if (distance<= distToWalk){
+		    		if (distanceToDestination<= distToWalk){
+		    			///System.out.println("addLeg 1");   ///
 		    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-		    		}else{	
-			    		Path path = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
-			    		if(path!=null){
-			    			if (path.nodes.size()>2){
+			    	}else{
+			    		Path path = this.pt.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+				    	if(path!=null){
+			    			if (path.nodes.size()>1){
 			    				createWlinks(lastActCoord, path, actCoord);
-			    				legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);
+			    				double dw1 = pt.getPtNetworkLayer().getLink("linkW1").getLength();
+			    				double dw2 = pt.getPtNetworkLayer().getLink("linkW2").getLength();
+			    				
+			    				if ((dw1+dw2)>=(distanceToDestination*2)){
+			    					///System.out.println("dw1+dw2"); ///
+
+			    					for (Link l : path.links) {
+			    						System.out.println(l.getType());
+			    					}
+			    					
+			    					if (ptPathValidator.isValid(path)){
+			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);			    	
+			    						validas++;
+			    						System.out.println("valida");
+			    					}else{
+			    						noValidas++;
+			    						System.out.println("no valida");
+			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    					}
+			    							
+								//removeWlinks();
+			    				}else{
+			    					///System.out.println("addLeg 2");   ///
+			    					newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+			    				}//if dw1+dw2
+			    							    			
 			    				removeWlinks();
-			    			}else{     // if router didn't find a PT connection then walk
+			    			}else{
+			    				///System.out.println("addLeg 3");   ///
 			    				newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    			}//legRoute.getRoute().size()>2
+			    				addPerson=false;				    				
+			    			}//if path.nodes
+			    			
 			    		}else{
+			    			///System.out.println("addLeg 4");   ///
 			    			newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    		}//if(legRoute!=null)
-		    		}//distance<= distToWalk
-				}//if val
+			    			addPerson=false;
+			    		}//path=null
+					}//distanceToDestination<= distToWalk
+				}//if !First
 				
 		    	//TODO: this must be read from the city network not from pt network!!! 
 		    	thisAct.setLink(this.pt.getPtNetworkLayer().getNearestLink(thisAct.getCoord()));
 				
+		    	///System.out.println("addAct ");   ///
 		    	newPlan.addAct(thisAct);
 				lastAct = thisAct;
-				val=true;
-			}
+				first=false;
+			}//Iterator<BasicActImpl>
 			
-			person.exchangeSelectedPlan(newPlan, true);
-			person.removeUnselectedPlans();
-			newPopulation.addPerson(person);
+			if (addPerson){
+				person.exchangeSelectedPlan(newPlan, true);
+				person.removeUnselectedPlans();
+				newPopulation.addPerson(person);
+			}
 			x++;
 		}//for person
 	
@@ -113,7 +155,10 @@ public class PTActWriter {
 		Gbl.getConfig().plans().setOutputVersion("v4");
 		new PopulationWriter(newPopulation).write();
 		System.out.println("Done");
+		
+		System.out.println("validas:" + validas +  " No validas:" + noValidas);
 	}//createPTActs
+
 
 	
 	private void createWlinks(Coord coord1, Path path, Coord coord2){

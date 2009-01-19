@@ -82,15 +82,6 @@ public class PTRouter2 {
 		return dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 	}
 	
-	public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-		Path path=null;
-		while (path==null && distToWalk<1300){
-			path= findRoute(coord1, coord2, time, distToWalk);
-			distToWalk= distToWalk+50;
-		}
-		return path;
-	}
-	
 	public List<Object> findLegActs(Path path, double depTime){
 		List<Object> actLegList = new ArrayList<Object>();
 		if (path!=null){
@@ -176,26 +167,6 @@ public class PTRouter2 {
 		return ptAct;
 	}
 		
-	private Leg createLeg(int num, CarRoute legRoute, double depTime, double travTime, double arrTime){
-		Leg leg = new Leg(Leg.Mode.pt);
-		leg.setNum(num);
-		leg.setRoute(legRoute);
-		leg.setArrivalTime(arrTime);
-		leg.setTravelTime(travTime);
-		leg.setDepartureTime(depTime);
-		return leg;
-	}
-	
-	private Link findLink(Node node1, Node node2){
-		Link link= null;
-		for (Link l: (node1.getInLinks().values())) {
-			if (l.getFromNode().equals(node2)){
-				return l;
-			}
-		}
-		return  link;
-	}
-	
 	public void PrintRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
@@ -222,6 +193,41 @@ public class PTRouter2 {
 	}//printroute
 
 }//class
+
+/*
+public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
+	Path path=null;
+	while (path==null && distToWalk<1300){
+		path= findRoute(coord1, coord2, time, distToWalk);
+		distToWalk= distToWalk+50;
+	}
+	return path;
+}
+*/
+
+/*
+private Leg createLeg(int num, CarRoute legRoute, double depTime, double travTime, double arrTime){
+	Leg leg = new Leg(Leg.Mode.pt);
+	leg.setNum(num);
+	leg.setRoute(legRoute);
+	leg.setArrivalTime(arrTime);
+	leg.setTravelTime(travTime);
+	leg.setDepartureTime(depTime);
+	return leg;
+}
+
+private Link findLink(Node node1, Node node2){
+	Link link= null;
+	for (Link l: (node1.getInLinks().values())) {
+		if (l.getFromNode().equals(node2)){
+			return l;
+		}
+	}
+	return  link;
+}
+*/
+
+
 
 /*
 for (Iterator<Node> iter = route.getRoute().iterator(); iter.hasNext();){

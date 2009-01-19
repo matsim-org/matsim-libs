@@ -4,7 +4,7 @@ import org.matsim.network.Link;
 import org.matsim.router.util.TravelTime;
 
 public class PTTravelTime implements TravelTime {
-	private final double WALKING_SPEED = 0.9; //      4 km/h  human speed 
+	private final double WALKING_SPEED = 0.836;  //   0.836 m/s [Al-Azzawi2007] ?      1.34 m/s [Antonini2004]? 
 	private PTTimeTable2 ptTimeTable;
 	
 	public PTTravelTime(PTTimeTable2 ptTimeTable) {

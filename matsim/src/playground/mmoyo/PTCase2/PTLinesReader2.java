@@ -130,7 +130,7 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		}
 		//System.out.println(stringBuffer);
 	}
-	*/
+	
 	
 	private List<String>bufferToList(StringBuffer strBuffer){
 		List<String> strList = new ArrayList <String>();
@@ -144,4 +144,5 @@ public class PTLinesReader2 extends MatsimXmlParser {
 		//System.out.println(strList);
 		return strList;
 	}
+	*/
 }// class

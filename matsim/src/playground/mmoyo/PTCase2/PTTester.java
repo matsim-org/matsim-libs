@@ -1,6 +1,8 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.Iterator;
+
+import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -36,13 +38,13 @@ public class PTTester {
 			Act lastAct = null;
 			Act thisAct= null;
 			
-			for (Iterator iter= plan.getIteratorAct(); iter.hasNext();) {
+			for (Iterator<BasicActImpl> iter= plan.getIteratorAct(); iter.hasNext();) {
 		    	thisAct= (Act)iter.next();
 		    	if (val) {
 					Coord lastActCoord = lastAct.getCoord();
 		    		Coord actCoord = thisAct.getCoord();
 		    		int distToWalk= distToWalk(person.getAge());
-		    		Path path = this.pt.getPtRouter2().forceRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+		    		Path path = this.pt.getPtRouter2().findRoute(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 		    		if(path!=null){
 		    			routes++;
 		    		}

@@ -32,6 +32,15 @@ public class PTNProximity {
 	 */
 	private void createCityQuadTree (NetworkLayer cityNetworkLayer, NetworkLayer ptNetworkLayer){
 		ArrayList<Node> FatherNodeList = new ArrayList<Node>();
+		
+		for (Node node: ptNetworkLayer.getNodes().values()) {
+			PTNode ptnode = (PTNode)node;
+			Node fatherNode= cityNetworkLayer.getNode(ptnode.getIdFather());
+			if (!FatherNodeList.contains(fatherNode)) {
+				FatherNodeList.add(fatherNode);
+			}
+		}
+		/*
 		Iterator iter = ptNetworkLayer.getNodes().entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry entry = (Map.Entry) iter.next();
@@ -41,6 +50,8 @@ public class PTNProximity {
 				FatherNodeList.add(node);
 			}	
 		}
+		*/
+		
 		createQuadTree (FatherNodeList);
 	}
 	
@@ -52,13 +63,21 @@ public class PTNProximity {
 	 */
 	private void createPTQuadTree (NetworkLayer ptNetworkLayer){
 		ArrayList<Node> nodeList = new ArrayList<Node>();
-		Iterator iter = ptNetworkLayer.getNodes().entrySet().iterator();
+		/*
+		Iterator <Map.Entry>iter = ptNetworkLayer.getNodes().entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			PTNode ptNode= (PTNode)entry.getValue();
 			if (!nodeList.contains(ptNode)) {
 				nodeList.add(ptNode);
 			}	
+		}
+		*/
+
+		for (Node node: ptNetworkLayer.getNodes().values()) {
+			if (!nodeList.contains(node)) {
+				nodeList.add(node);
+			}
 		}
 		createQuadTree (nodeList);
 	}

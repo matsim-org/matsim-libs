@@ -1,5 +1,9 @@
 package playground.mmoyo.PTCase2;
 
+import java.util.Iterator;
+import java.util.Map;
+
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
 public class PTOb {
@@ -57,4 +61,17 @@ public class PTOb {
 	public PTNetworkFactory2 getPtNetworkFactory() {
 		return ptNetworkFactory;
 	}	
+	
+	
+	public static void showMap(Map map) {
+		Iterator<Link> iter = map.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry entry = (Map.Entry) iter.next();
+			Link link= (Link)entry.getValue();
+			System.out.println(entry.getKey() + " = " + link.toString());
+		}
+		iter = null;
+		
+		}
+	
 }

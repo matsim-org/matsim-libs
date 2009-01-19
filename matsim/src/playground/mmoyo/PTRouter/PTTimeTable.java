@@ -54,6 +54,16 @@ public class PTTimeTable {
 	public int nextDeparture(IdImpl idNode, int time){//Core 
 		Map<IdImpl,int[]> map = timeTableMap.get(idNode); 
 		int x2 = Integer.MAX_VALUE;
+		
+		for (int[] tt : map.values()) {
+			int x = nextDeparture(time,tt);
+			if  (x < x2){
+				x2= x;
+			}
+		}
+		
+		
+		/*
 		for (Iterator iter =map.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			int[] tt = (int[])entry.getValue();
@@ -62,7 +72,10 @@ public class PTTimeTable {
 				x2= x;
 			}
 		}
+		*/
+		
 		return x2;
+		
 	}
 	
 	public int nextDeparture(int intTime,int[] arrDep){//,

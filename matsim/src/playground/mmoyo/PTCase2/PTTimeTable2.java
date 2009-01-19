@@ -106,25 +106,13 @@ public class PTTimeTable2{
 		return ptLineList;
 	}
 	
-	/*******************************
-	 * Time Methods
-	 */
 	
-	//Converts a string in format hh:mm into integer representing seconds after the midnight
-	private double strTimeToDbl(String strDeparture){
-		return time.parseTime(strDeparture);
-	}
-	
-	//Converts integers representing a time into format "hh:mm"
-	private String TimeToString(double dblDeparture){
-		return time.writeTime(dblDeparture, "HH:mm");
-	}
 	
 	//in minutes
 	public double nextDeparture(Id idPTNode,  double dblTime){//,
-		double[]arrDep= nodeDeparturesMap.get(idPTNode);
 		return dblTime +1;
 		/*
+		double[]arrDep= nodeDeparturesMap.get(idPTNode);
 		int x=0;
 		while (arrDep[x]<dblTime){
 			x++;
@@ -136,3 +124,19 @@ public class PTTimeTable2{
 		*/
 	}
 }
+
+/*
+/*******************************
+ * Time Methods
+
+
+//Converts a string in format hh:mm into integer representing seconds after the midnight
+private double strTimeToDbl(String strDeparture){
+	return time.parseTime(strDeparture);
+}
+
+//Converts integers representing a time into format "hh:mm"
+private String TimeToString(double dblDeparture){
+	return time.writeTime(dblDeparture, "HH:mm");
+}
+*/
