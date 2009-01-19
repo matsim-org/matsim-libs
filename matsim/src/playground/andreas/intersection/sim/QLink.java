@@ -20,6 +20,7 @@ import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.VisData;
+import org.matsim.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.network.Link;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
@@ -253,7 +254,7 @@ public class QLink extends QueueLink {
 		}
 
 		public double getDisplayableTimeCapValue() {
-			throw new UnsupportedOperationException("Method not implemented in draft class");
+			return 0.0;
 		}
 
 		public Collection<AgentOnLink> getDrawableCollection() {

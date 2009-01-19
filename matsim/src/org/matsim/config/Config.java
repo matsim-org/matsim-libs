@@ -31,17 +31,18 @@ import org.matsim.config.groups.EvacuationConfigGroup;
 import org.matsim.config.groups.EventsConfigGroup;
 import org.matsim.config.groups.FacilitiesConfigGroup;
 import org.matsim.config.groups.GlobalConfigGroup;
+import org.matsim.config.groups.LocationChoiceConfigGroup;
 import org.matsim.config.groups.MatricesConfigGroup;
 import org.matsim.config.groups.NetworkConfigGroup;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.config.groups.PlansConfigGroup;
 import org.matsim.config.groups.RoadPricingConfigGroup;
+import org.matsim.config.groups.SignalSystemConfigGroup;
 import org.matsim.config.groups.SimulationConfigGroup;
 import org.matsim.config.groups.SocNetConfigGroup;
 import org.matsim.config.groups.StrategyConfigGroup;
 import org.matsim.config.groups.WithindayConfigGroup;
 import org.matsim.config.groups.WorldConfigGroup;
-import org.matsim.config.groups.LocationChoiceConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file
@@ -79,6 +80,7 @@ public class Config {
 	private StrategyConfigGroup strategy = null;
 	private SocNetConfigGroup socnetmodule = null;
 	private LocationChoiceConfigGroup locationchoice = null;
+	private SignalSystemConfigGroup signalSystemConfigGroup = null;
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -153,6 +155,10 @@ public class Config {
 		
 		this.locationchoice = new LocationChoiceConfigGroup();
 		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
+		
+		this.signalSystemConfigGroup = new SignalSystemConfigGroup();
+		this.modules.put(SignalSystemConfigGroup.GROUPNAME, this.signalSystemConfigGroup);
+
 	}
 
 	/** Checks each module for consistency, e.g. if the parameters that are currently set make sense
@@ -376,6 +382,10 @@ public class Config {
 
 	public PlanomatConfigGroup planomat() {
 		return planomat;
+	}
+
+	public SignalSystemConfigGroup signalSystems() {
+		return this.signalSystemConfigGroup;
 	}
 	
 }

@@ -21,14 +21,20 @@
 package org.matsim.controler;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
+import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.lightsignalsystems.MatsimLightSignalSystemConfigurationReader;
+import org.matsim.lightsignalsystems.MatsimLightSignalSystemsReader;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
@@ -59,13 +65,16 @@ public class ScenarioData {
 	private boolean networkLoaded = false;
 	private boolean facilitiesLoaded = false;
 	private boolean populationLoaded = false;
-
+	
 	private World world = null;
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Population population = null;
-
+	private BasicLightSignalSystems signalSystems = null;
+	private List<BasicLightSignalSystemConfiguration> signalSystemConfigurations = null;
+	
 	private final NetworkFactory networkFactory;
+	private Config config;
 
 	private static final Logger log = Logger.getLogger(ScenarioData.class);
 
@@ -86,6 +95,7 @@ public class ScenarioData {
 		this.changEventsInputFile = config.network().getChangeEventsInputFile();
 		this.facilitiesFileName = config.facilities().getInputFile();
 		this.populationFileName = config.plans().getInputFile();
+		this.config = config;
 		if (factory == null) {
 			this.networkFactory = new NetworkFactory();
 			if (this.isTimeVariantNetwork){
@@ -137,7 +147,7 @@ public class ScenarioData {
 			this.world.setNetworkLayer(this.network);
 			this.world.complete();
 
-			if (this.changEventsInputFile != null && this.isTimeVariantNetwork){
+			if ((this.changEventsInputFile != null) && this.isTimeVariantNetwork){
 				log.info("loading network change events from " + this.changEventsInputFile);
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(this.network);
 				try {
@@ -197,4 +207,31 @@ public class ScenarioData {
 		}
 		return this.population;
 	}
+	
+	public BasicLightSignalSystems getSignalSystems() {
+		if ((this.config == null) || (this.config.signalSystems() == null)){
+			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
+		}
+		if (this.signalSystems == null) {
+			this.signalSystems = new BasicLightSignalSystems();
+			MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(this.signalSystems);
+			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
+			reader.readFile(this.config.signalSystems().getSignalSystemFile());
+		}
+		return this.signalSystems;
+	}
+	
+	public List<BasicLightSignalSystemConfiguration> getSignalSystemsConfiguration() {
+		if ((this.config == null) || (this.config.signalSystems() == null)){
+			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
+		}
+		if (this.signalSystemConfigurations == null){
+			this.signalSystemConfigurations = new ArrayList<BasicLightSignalSystemConfiguration>();
+			MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(this.signalSystemConfigurations);
+			log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
+			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
+		}
+		return this.signalSystemConfigurations;
+	}
+	
 }

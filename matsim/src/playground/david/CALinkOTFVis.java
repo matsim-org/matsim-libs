@@ -21,6 +21,7 @@ import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
 import org.matsim.mobsim.queuesim.VisData;
+import org.matsim.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.network.Link;
 import org.matsim.network.LinkImpl;
 import org.matsim.network.NetworkLayer;

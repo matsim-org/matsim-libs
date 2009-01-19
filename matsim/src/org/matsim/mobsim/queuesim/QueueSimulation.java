@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
+import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.events.AgentArrivalEvent;
@@ -96,7 +98,13 @@ public class QueueSimulation {
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory();
 	}
-
+	
+	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events, BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
+		this(network, plans, events);
+		//TODO fill in code for lss storage etc
+		
+	}
+	
 	public final void run() {
 		prepareSim();
 		//do iterations
@@ -226,7 +234,7 @@ public class QueueSimulation {
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-			if (this.networkLayer.getNetworkChangeEvents() != null && this.networkLayer.getNetworkChangeEvents().size() > 0) {
+			if ((this.networkLayer.getNetworkChangeEvents() != null) && (this.networkLayer.getNetworkChangeEvents().size() > 0)) {
 				this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(this.networkLayer.getNetworkChangeEvents());
 			}
 	}
@@ -288,7 +296,7 @@ public class QueueSimulation {
 	}
 
 	protected void beforeSimStep(final double time) {
-		if (this.networkChangeEventsQueue != null && this.networkChangeEventsQueue.size() > 0) {
+		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
 			handleNetworkChangeEvents(time);
 		}
 	}
@@ -372,7 +380,7 @@ public class QueueSimulation {
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
-		while (this.networkChangeEventsQueue.size() > 0 && this.networkChangeEventsQueue.peek().getStartTime() <= time){
+		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
 				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);

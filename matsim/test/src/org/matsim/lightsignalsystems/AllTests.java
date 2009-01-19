@@ -33,6 +33,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LightSignalSystemsReaderTest.class);
 		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
+//		suite.addTestSuite(TravelTimeTestOneWay.class);
 		//$JUnit-END$
 		return suite;
 	}

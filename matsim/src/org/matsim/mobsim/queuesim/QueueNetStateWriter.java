@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNet;
-import org.matsim.mobsim.queuesim.QueueLink.AgentOnLink;
 import org.matsim.utils.vis.netvis.DisplayNetStateWriter;
 import org.matsim.utils.vis.netvis.VisConfig;
 
@@ -40,7 +39,7 @@ public class QueueNetStateWriter extends DisplayNetStateWriter {
 	private QueueNetwork queueNetwork;
 
     @Override
-    protected Collection<AgentOnLink> getAgentsOnLink(final BasicLink link) {
+    protected Collection<org.matsim.mobsim.queuesim.QueueLane.AgentOnLink> getAgentsOnLink(final BasicLink link) {
     		QueueLink qlink = this.queueNetwork.getQueueLink(link.getId());
         return qlink.getVisData().getDrawableCollection();
     }
