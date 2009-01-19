@@ -41,8 +41,6 @@ import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.andreas.intersection.sim.QSim;
-
 
 /**
  * @author aneumann
@@ -111,7 +109,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		
 		int j = 1;
 		for (MeasurementPoint resMeasurePoint : results.values()) {
-			System.out.println(j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + this.beginningOfLink2.timeToStartMeasurement + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s + ", " + (resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ - j * 2000 / umlaufzeit));
+			log.debug(j + ", " + resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ + ", " + resMeasurePoint.numberOfVehPassed_ + ", " + this.beginningOfLink2.timeToStartMeasurement + ", " + resMeasurePoint.firstVehPassTime_s + ", " + resMeasurePoint.lastVehPassTime_s + ", " + (resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_ - j * 2000 / umlaufzeit));
 			assertEquals((j * 2000 / umlaufzeit), resMeasurePoint.numberOfVehPassedDuringTimeToMeasure_, 1);
 			j++;
 			assertEquals(5000.0, resMeasurePoint.numberOfVehPassed_, EPSILON);
@@ -119,27 +117,24 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 	}	
 	
 	public void testTrafficLightIntersection2arms_w_TrafficLight(){
-  		  	
-		System.setProperty("line.separator", "\n"); // Unix
-//		System.setProperty("line.separator", "\r\n"); // Win
-		
-		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
-
-		String newLSADef = this.getClassInputDirectory() + "lsa.xml";
-		String newLSADefCfg = this.getClassInputDirectory() + "lsa_config.xml";
+  	Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
+		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
+		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
+		conf.signalSystems().setSignalSystemFile(lsaDefinition);
+		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
-		
-		new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
-		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+		new QueueSimulation(data.getNetwork(), data.getPopulation(), events, data.getSignalSystems(), data.getSignalSystemsConfiguration()).run();
+//		new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
+		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		
 		MeasurementPoint qSim = this.beginningOfLink2;		
 		this.beginningOfLink2 = null;
 		
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-		System.out.println("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		MeasurementPoint queueSimulation = this.beginningOfLink2;
 				
 		// circle time is 60s, green 60s
