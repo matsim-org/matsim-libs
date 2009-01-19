@@ -55,7 +55,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		this.age = "yes";
 		this.license = "no";
 		this.car_avail = "no";
-		this.employed = "no";
+		this.employed = "yes";
 		this.softCoef = this.detectSoftCoefficients();
 		this.allCoef = this.detectAllCoefficients();
 		this.noOfSoftCoefficients=this.softCoef.size();
@@ -73,9 +73,12 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	public void finish(){
 		
 		Statistics.noSexAssignment=false;
+		Statistics.noCarAvailAssignment=false;
+		Statistics.noEmploymentAssignment=false;
+		Statistics.noLicenseAssignment=false;
 		
 		for (int i=0;i<this.testAgentsNumber;i++) {
-			int pos = (int)MatsimRandom.random.nextDouble()*this.list[1].size();
+			int pos = (int)(MatsimRandom.random.nextDouble()*this.list[1].size());
 			list[0].add(list[1].get(pos));
 			schedulingModule.handlePlan(list[1].get(pos));
 			list[1].remove(pos);
@@ -109,7 +112,14 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			}
 			assignment.println();
 		}
-		if (Statistics.noSexAssignment) log.warn("There are agents that have no gender information. For these agents, the recycling attribute 'gender' has been de-activated.");
+		if (Statistics.noSexAssignment) log.warn("There are agents that have no gender information."); 
+		if (Statistics.noCarAvailAssignment) log.warn("There are agents that have no car availabiity information."); 
+		if (Statistics.noEmploymentAssignment) log.warn("There are agents that have no employment information."); 
+		if (Statistics.noLicenseAssignment) log.warn("There are agents that have no license information."); 
+		if (Statistics.noSexAssignment ||
+				Statistics.noCarAvailAssignment ||
+				Statistics.noEmploymentAssignment ||
+				Statistics.noLicenseAssignment) log.warn("For these agents, recycling was conducted without the relevant attribute.");
 		Statistics.list.clear();
 	}
 	
