@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
@@ -57,7 +57,7 @@ public class PTActWriter {
 		Population newPopulation = new org.matsim.population.Population(false);
 		int x=0;
 		
-		PTPathValidator ptPathValidator = new PTPathValidator ();
+//		PTPathValidator ptPathValidator = new PTPathValidator ();
 		int validas=0;
 		int noValidas=0;
 		
@@ -101,15 +101,15 @@ public class PTActWriter {
 			    						System.out.println(l.getType());
 			    					}
 			    					
-			    					if (ptPathValidator.isValid(path)){
-			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);			    	
-			    						validas++;
-			    						System.out.println("valida");
-			    					}else{
-			    						noValidas++;
-			    						System.out.println("no valida");
-			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
-			    					}
+//			    					if (ptPathValidator.isValid(path)){
+//			    						legNum= insertLegActs(path, lastAct.getEndTime(), legNum, newPlan);			    	
+//			    						validas++;
+//			    						System.out.println("valida");
+//			    					}else{
+//			    						noValidas++;
+//			    						System.out.println("no valida");
+//			    						newPlan.addLeg(walkLeg(legNum++, lastAct,thisAct));
+//			    					}
 			    							
 								//removeWlinks();
 			    				}else{
@@ -181,15 +181,15 @@ public class PTActWriter {
 	private int distToWalk(int personAge){
 		int distance=0;
 		if (personAge>=60)distance=300; 
-		if (personAge>=40 || personAge<60)distance=400;
-		if (personAge>=18 || personAge<40)distance=600;
+		if ((personAge>=40) || (personAge<60))distance=400;
+		if ((personAge>=18) || (personAge<40))distance=600;
 		if (personAge<18)distance=300;
 		return distance;
 	}	
 
 	public Path forceRoute(Coord coord1, Coord coord2, double time, int distToWalk){
 		Path path=null;
-		while (path==null && distToWalk<1300){
+		while ((path==null) && (distToWalk<1300)){
 			path= findRoute(coord1, coord2, time, distToWalk);
 			distToWalk= distToWalk+50;
 		}
