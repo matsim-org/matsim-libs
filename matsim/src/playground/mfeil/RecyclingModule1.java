@@ -22,11 +22,14 @@ package playground.mfeil;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.Act;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.replanning.modules.MultithreadedModuleA;
 import org.matsim.replanning.modules.StrategyModule;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -136,20 +139,49 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		double scoreAux, coefAux;
 		int [] modified = new int [this.noOfSoftCoefficients-1]; // last coefficient fixed
 		int modifiedAux;
+		LinkedList<Integer> list1Pointer = new LinkedList<Integer>();
 		
 		/* Iteration 0 */
-		score [0]= this.calculate();
-		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;
+		score [0]= this.calculate();		// calculate score for initial vector
+		
+		this.schedulingModule.init();
+		Iterator<String> naa = this.nonassignedAgents.iterator();
+		while (naa.hasNext()) {
+			String st = naa.next();
+			for (int x=0;x<this.list[1].size();x++){
+				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
+					log.warn("Anschlag!");
+					schedulingModule.handlePlan(list[1].get(x));
+					list1Pointer.add(x);
+					break;
+				}
+			}
+		}
+		schedulingModule.finish();	
+		Iterator<Integer> l1P = list1Pointer.iterator();
+		while (l1P.hasNext()){
+			int x = l1P.next();
+			this.list[0].add(this.list[1].get(x));
+			this.list[1].remove(x);
+			this.agents.addAgent((this.list[0].get(this.list[0].size()-1)));
+			
+		}
+		if (this.nonassignedAgents.size()>0){
+			this.nonassignedAgents.clear();
+			score [0]= this.calculate();// Do this again, now all agents must be assignable.
+			if (this.nonassignedAgents.size()>0) log.warn("nonAssignedAgents nicht leer!");
+		}
+		for (int i=1;i<this.iterations+1;i++) score[i]=-100000;	// set all other iterations' scores to minimum value
 	
 		/* Further iterations */
 		for (int i=1;i<this.iterations+1;i++){
-			//System.out.println("Iteration "+i);
+			
 			for (int z=1;z<coefMatrix[0].length;z++){
 				coefMatrix[i][z]=coefMatrix[i-1][z];
 			}
 			for (int j=0;j<this.noOfSoftCoefficients-1;j++){
 				modifiedAux = modified[j];
-				//System.out.println("modifiedAux UP at i="+i+" and j="+j+": "+modifiedAux);
+				
 				modified[j]=0;
 				coefMatrix [i][j] = coefMatrix [i-1][j];
 				if (modifiedAux!=-1){
@@ -169,7 +201,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 						coefMatrix [i][j] = coefMatrix [i-1][j];
 					}
 				}
-				//System.out.println("modifiedAux DOWN at i="+i+" and j="+j+": "+modifiedAux);
+				
 				if (modifiedAux!=1){
 					coefAux = coefMatrix [i][j];	// keep coef solution temporarily;
 					
@@ -216,98 +248,6 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 			}
 		}
 		
-		
-		/*
-		double offset = 0.5;
-		double basis [] = new double [this.noOfCoefficients];
-		for (int i=0;i<basis.length;i++){
-			double aux = this.coefficients.getSingleCoef(i);
-			basis[i] = aux;
-		}
-		double [][] score = new double [(this.noOfCoefficients-1)][4];	// last coefficient remains fixed; {coef+;coef-;score+;score-}
-		double [][] tmp = new double [this.iterations][3]; //{value of coefficient, position of coefficient, score}
-		ArrayList<double[]> tabuList = new ArrayList<double[]>();
-		int best = -1;
-		
-		for (int i=0;i<this.iterations;i++){
-			for (int j=0;j<this.noOfCoefficients-1;j++){
-				if (best!=j*2+1){
-					score [j][0]= basis[j]+offset;
-					this.coefficients.setSingleCoef(score[j][0], j);
-					if (this.checkTabuList(tabuList)) {
-						score [j][2] = -100000;
-						System.out.println("Tabu!");
-					}
-					else {
-						score [j][2]= this.calculate();
-						System.out.println(score [j][2]);
-					}
-				}
-				if (best!=j*2){
-					if (basis[j]-offset>=0) score [j][1]= basis[j]-offset;
-					else score [j][1]= basis[j]+2*offset;
-					this.coefficients.setSingleCoef(score[j][1], j);
-					if (this.checkTabuList(tabuList)) {
-						score [j][3] = -100000;
-						System.out.println("Tabu!");
-					}
-					else {
-						score [j][3]= this.calculate();
-						System.out.println(score [j][3]);
-					}
-				}
-			}
-				
-			tmp[i][2] = -100000;
-			for (int j=0;j<score.length;j++){
-				if (score[j][2]>tmp[i][2]){
-					tmp[i][2] = score[j][2];
-					tmp[i][0] = score[j][0];
-					System.out.println("tabu: "+tmp[i][0]+", "+tmp[i][2] );
-					tmp[i][1] = j;
-					best=j*2;
-				}
-				if (score[j][3]>tmp[i][2]){
-					tmp[i][2] = score[j][3];
-					tmp[i][0] = score[j][1];
-					tmp[i][1] = j;
-					best=j*2+1;
-				}
-			}
-			double [] tmpSol = new double [(this.noOfCoefficients-1)];
-			for (int x=0;x<(this.noOfCoefficients-1);x++){
-				double aux = this.coefficients.getSingleCoef(x);
-				tmpSol[x]=aux;
-			}
-			tabuList.add(tmpSol);
-			double aux = tmp[i][0];
-			basis[(int)tmp[i][1]] = aux;
-			System.out.println(aux);
-		}
-		*/
-			/*
-			score[0][1]=basis+(i+1)*offset;
-			this.coefficients.setPrimActsDistance(score[0][1]);
-			score[0][0] = this.calculate();
-			
-			if (basis-(i+1)*offset>=0) score[1][1]=basis-(i+1)*offset;
-			else {
-				score [1][1] = basis+((this.iterations)+inc)*offset;
-				inc += 1;
-			}
-			this.coefficients.setPrimActsDistance(score[1][1]);
-			score[1][0] = this.calculate();
-			double tmpScore = -100000;
-			double x=0;
-			for (int j=0;j<score.length;j++){
-				if (score[j][0]>tmpScore){
-					tmpScore = score[j][0];
-					x = score[j][1];
-				}
-			}
-			tmp[i][0]=tmpScore;
-			tmp[i][1]= x;
-			*/
 		for (int i=0;i<score.length;i++){
 			for (int j=0;j<coefMatrix[0].length-1;j++){
 				log.info(coefMatrix[i][j]+" ");

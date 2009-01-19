@@ -203,7 +203,7 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 		this.writePlan(agents.getAgentPlan(assignedAgent), plan);
 		this.locator.handlePlan(plan);
 		this.router.run(plan);
-		this.timer.run(plan);
+		this.timer.run(plan);  // includes to write the new score to the plan
 		
 		if (Statistics.prt==true) {
 			ArrayList<String> prt = new ArrayList<String>();

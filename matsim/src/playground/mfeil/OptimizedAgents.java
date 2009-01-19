@@ -34,7 +34,7 @@ import org.matsim.population.Person;
 public class OptimizedAgents {
 	
 	private ArrayList<Plan> list;
-	double [] distancesTestAgents;
+	private ArrayList<Double> distancesTestAgents;
 	
 	public OptimizedAgents (ArrayList<Plan> list){
 		this.list = list;
@@ -42,8 +42,8 @@ public class OptimizedAgents {
 	}
 	
 	private void run (){
-		this.distancesTestAgents = new double [this.list.size()];
-		for (int i=0;i<this.distancesTestAgents.length;i++){
+		this.distancesTestAgents = new ArrayList<Double>();
+		for (int i=0;i<this.list.size();i++){
 			double tmpDistance=0;
 			if (this.list.get(i).getPerson().getKnowledge().getActivities(true).size()>1){
 				for (int k=0;k<this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1;k++){
@@ -51,12 +51,12 @@ public class OptimizedAgents {
 				}
 				tmpDistance+=this.list.get(i).getPerson().getKnowledge().getActivities(true).get(this.list.get(i).getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(this.list.get(i).getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
 			}
-			this.distancesTestAgents[i]=tmpDistance;
+			this.distancesTestAgents.add(tmpDistance);
 		}
 	}
 	
 	public double getAgentDistance (int agent){
-		return this.distancesTestAgents[agent];
+		return this.distancesTestAgents.get(agent);
 	}
 	
 	public int getNumberOfAgents (){
@@ -69,5 +69,19 @@ public class OptimizedAgents {
 	
 	public Person getAgentPerson (int agent){
 		return this.list.get(agent).getPerson();
+	}
+	
+	public void addAgent (Plan plan){
+		/* this.list.add(plan); */	// this is not necessary as there is a flat link to list[0] anyway.
+		double tmpDistance=0;
+		if (plan.getPerson().getKnowledge().getActivities(true).size()>1){
+			for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size()-1;k++){
+				tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(k).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(k+1).getLocation().getCenter());
+			}
+			tmpDistance+=plan.getPerson().getKnowledge().getActivities(true).get(plan.getPerson().getKnowledge().getActivities(true).size()-1).getLocation().getCenter().calcDistance(plan.getPerson().getKnowledge().getActivities(true).get(0).getLocation().getCenter());
+		}
+		this.distancesTestAgents.add(tmpDistance);
+		System.out.println("Size of list = "+this.list.size());
+		System.out.println("Size of distancesTestAgents = "+this.distancesTestAgents.size());
 	}
 }
