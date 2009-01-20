@@ -122,7 +122,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 		
-	/*	
+		/*
 		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
 		Counter.timeOptCounter++;
 		PrintStream stream;
@@ -143,7 +143,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
 		}
 		stream.println();
-	*/	
+		*/
 		
 		// Copy the plan into all fields of the array neighbourhood
 		for (int i = 0; i < initialNeighbourhood.length; i++){
@@ -231,6 +231,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				((Leg)al.get(i)).setTravelTime(((Leg)(bestSolution.get(i))).getTravelTime());
 				((Leg)al.get(i)).setDepartureTime(((Leg)(bestSolution.get(i))).getDepartureTime());
 				((Leg)al.get(i)).setArrivalTime(((Leg)(bestSolution.get(i))).getArrivalTime());
+				((Leg)al.get(i)).setMode(((Leg)(bestSolution.get(i))).getMode());
 			}
 		}
 		
@@ -254,6 +255,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				moves [pos][0]=outer;
 				moves [pos][1]=inner;
 				pos++;
+			//	if (plan.getPerson().getId().toString().equals("10")) log.info("Oben: "+1+" = "+((Leg)(neighbourhood[pos-1].get(1))).getMode()+" und score = "+score[pos-1]+" und leg = "+((Leg)(neighbourhood[pos-1].get(1))).getDepartureTime());
 				
 				score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, inner);
 				moves [pos][0]=inner;
@@ -422,6 +424,17 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						}
 					}
 				}
+				/*
+				if (plan.getPerson().getId().toString().equals("10")){
+					if (subtour1.toString()=="walk" || subtour2.toString()=="walk") log.info("Subtour walk!");
+					if (subtour1.toString()=="pt" || subtour2.toString()=="pt") log.info("Subtour pt!");
+				}
+				*/
+				for (int z=1;z<actslegs.size();z+=2){
+					((Leg)(actslegs.get(z))).setDepartureTime(((Leg)(actslegsResult.get(z))).getDepartureTime());
+					((Leg)(actslegs.get(z))).setTravelTime(((Leg)(actslegsResult.get(z))).getTravelTime());
+					((Leg)(actslegs.get(z))).setArrivalTime(((Leg)(actslegsResult.get(z))).getArrivalTime());
+				}
 				for (int x=0;x<((int)(actslegs.size()/2));x++){
 					if (planAnalyzeSubtours.getSubtourIndexation()[x]==planAnalyzeSubtours.getSubtourIndexation()[outer/2]){
 						((Leg)(actslegs.get(x*2+1))).setMode(subtour1);
@@ -433,13 +446,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						}
 					}
 				}
-				//log.info("Score = "+score);
-				for (int z=1;z<actslegs.size();z+=2){
-					((Leg)(actslegs.get(z))).setDepartureTime(((Leg)(actslegsResult.get(z))).getDepartureTime());
-					((Leg)(actslegs.get(z))).setTravelTime(((Leg)(actslegsResult.get(z))).getTravelTime());
-					((Leg)(actslegs.get(z))).setArrivalTime(((Leg)(actslegsResult.get(z))).getArrivalTime());
-				}
-				//if (plan.getPerson().getId().toString().equals("110")) log.info("Ende: "+1+" = "+((Leg)(actslegs.get(1))).getDepartureTime());
+			//	if (plan.getPerson().getId().toString().equals("10")) log.info("Ende: "+1+" = "+((Leg)(actslegs.get(1))).getMode()+" und score = "+score+" und leg = "+((Leg)(actslegsResult.get(1))).getDepartureTime());
 				return score;
 			}
 			else return this.setTimes(plan, actslegs, OFFSET, outer, inner, outer, inner);
@@ -487,15 +494,19 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				position[0]=moves[i][0];
 				position[1]=moves[i][1];
 			}
-			
-		//	stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
-		//	for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
-		//		stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepartureTime()-((Leg)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
-		//	}
-		//	stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
-		//	stream.println();
+			/*
+			stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
+			stream.print(((Leg)(neighbourhood[i].get(1))).getMode()+"\t");
+			for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
+				stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepartureTime()-((Leg)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
+				stream.print(((Leg)(neighbourhood[i].get(z+1))).getMode()+"\t");
+			}
+			stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
+			stream.println();
+			*/
 		}
-		//stream.println("Iteration's best score\t"+firstScore);
+	//	stream.println("Iteration's best score\t"+firstScore);
+		
 		// clean-up of plan (=bestIterSolution)
 		if (pointer!=-1) this.cleanActs(actslegs);
 		
