@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lightSignalSystems
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd/ http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd">
+
+	<lanesToLinkAssignment linkIdRef="6">
+		<lane id="1" >
+			<toLink refId="9"/>
+		</lane> 
+		<lane id="2">
+			<toLink refId="3" />
+			<representedLanes number="2" />
+			<length meter="45.0" />			
+		</lane>
+		<lane id="3">
+			<toLink refId="5"/>
+		</lane>
+	</lanesToLinkAssignment>
+	
+	<lanesToLinkAssignment linkIdRef="4">
+		<lane id="4">
+			<toLink refId="7"/>
+		</lane>
+		<lane id="56">
+			<toLink refId="9"/>
+			<toLink refId="3"/>
+		</lane>
+	</lanesToLinkAssignment>
+		
+	<lanesToLinkAssignment linkIdRef="2">
+		<lane id="7">
+			<toLink refId="5"/>
+		</lane>
+		<lane id="8">
+			<toLink refId="7"/>
+			<representedLanes number="2" />
+			<length meter="45.0" />
+		</lane>		
+		<lane id="9">
+			<toLink refId="9"/>
+		</lane>
+	</lanesToLinkAssignment>
+	
+	<lanesToLinkAssignment linkIdRef="8">	
+		<lane id="10">
+			<toLink refId="3"/>
+		</lane>
+		<lane id="1112">
+			<toLink refId="5"/>
+			<toLink refId="7"/>
+		</lane>		
+	</lanesToLinkAssignment>
+ 
+	<lightSignalSystemDefinition id="1">
+		<defaultCirculationTime seconds="57" />
+		<defaultSyncronizationOffset seconds="0" />
+		<defaultInterimTime seconds="3" />
+	</lightSignalSystemDefinition> 
+
+	<lightSignalGroupDefinition linkIdRef="6" id="1">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="1" />
+		<toLink refId="9" />
+	</lightSignalGroupDefinition>
+
+	<lightSignalGroupDefinition linkIdRef="6" id="2">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="2" />
+		<lane refId="3" />
+		<toLink refId="3"/>
+		<toLink refId="5"/>  
+	</lightSignalGroupDefinition>
+	
+	<lightSignalGroupDefinition linkIdRef="4" id="3">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="4" />
+		<lane refId="56"/>
+		<toLink refId="7"/>
+		<toLink refId="9"/>
+		<toLink refId="3"/>  
+	</lightSignalGroupDefinition>
+	
+	<lightSignalGroupDefinition linkIdRef="2" id="4">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="7" />
+		<toLink refId="5"/>  
+	</lightSignalGroupDefinition>
+	
+	<lightSignalGroupDefinition linkIdRef="2" id="5">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="8" />
+		<lane refId="9" />
+		<toLink refId="7"/>
+		<toLink refId="9"/>  
+	</lightSignalGroupDefinition>
+	
+	<lightSignalGroupDefinition linkIdRef="8" id="6">
+		<lightSignalSystemDefinition refId="1" />  
+		<lane refId="10" />
+		<lane refId="1112" />
+		<toLink refId="3"/>
+		<toLink refId="5" />
+		<toLink refId="7" />
+	</lightSignalGroupDefinition>
+	
+</lightSignalSystems>
