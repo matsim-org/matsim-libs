@@ -23,6 +23,8 @@
  */
 package playground.johannes.mcmc;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -30,12 +32,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.basic.v01.BasicPerson;
+import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPopulationImpl;
+import org.matsim.basic.v01.BasicPopulationReaderV5;
+import org.matsim.config.Config;
+import org.matsim.population.MatsimPopulationReader;
+import org.matsim.population.Population;
+import org.matsim.population.PopulationReader;
+import org.matsim.utils.geometry.Coord;
+
 import playground.johannes.graph.GraphStatistics;
-import playground.johannes.graph.PlainGraph;
 import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.Vertex;
 import playground.johannes.graph.generators.ErdosRenyiGenerator;
-import playground.johannes.graph.generators.PlainGraphFactory;
+import playground.johannes.socialnet.Ego;
+import playground.johannes.socialnet.SocialNetwork;
+import playground.johannes.socialnet.SocialNetworkFactory;
+import playground.johannes.socialnet.SocialNetworkStatistics;
+import playground.johannes.socialnet.SocialTie;
 import playground.johannes.statistics.WeightedStatistics;
 
 /**
@@ -44,23 +62,27 @@ import playground.johannes.statistics.WeightedStatistics;
  */
 public class GibbsNetworkGenerator {
 
-	private static double STEPS = 100000000;
+	private static double STEPS = 100000000;//Double.MAX_VALUE;
 	
 	private static double DUMP_INTERVAL = 1000;
 	
 	private static double LAMBDA = 2;
 	
-	private static int N = 100;
+	private static double THETA;
 	
-	private static PlainGraph g; 
+	private static int N = 5000;
+	
+	private static SocialNetwork<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> g; 
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException {
-		STEPS = Integer.parseInt(args[0]);
-		N = Integer.parseInt(args[1]);
+//		STEPS = Integer.parseInt(args[0]);
+//		N = Integer.parseInt(args[1]);
 		LAMBDA = Double.parseDouble(args[2]);
 		DUMP_INTERVAL = Integer.parseInt(args[3]);
 		String outputStats = args[4];
 		String outputHist = args[5];
+	
+		
 		
 		BufferedWriter meanDegreeWriter = new BufferedWriter(new FileWriter(outputStats));
 		meanDegreeWriter.write("it\tz\tP_Y\tn_p_1\tn_p_0\tn_edges");
@@ -68,14 +90,29 @@ public class GibbsNetworkGenerator {
 		/*
 		 * Initialize with a random graph.
 		 */
-		ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge>(new PlainGraphFactory());
-		g = generator.generate(N, 0.000001, 0);
-		System.out.println("Initial mean degree is " + GraphStatistics.getDegreeStatistics(g).getMean());
+		BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = new BasicPopulationImpl<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>();
+		PopulationReader reader = new BasicPopulationReaderV5(pop, null);
+		reader.readFile("/Users/fearonni/vsp-work/socialnets/devel/MCMC/plans.100km.1.xml");
+		ErdosRenyiGenerator<SocialNetwork<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>, Ego<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>, SocialTie> generator = 
+			new ErdosRenyiGenerator<SocialNetwork<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>, Ego<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>, SocialTie>(
+					new SocialNetworkFactory<BasicPerson<BasicPlan,BasicKnowledge<BasicActivity>>>(pop));
+		g = generator.generate(N, 0.001, 0);
+//		System.out.println("Initial mean degree is " + GraphStatistics.getDegreeStatistics(g).getMean());
+		
+		
+		
+		 
+//		Population pop = new Population(Population.NO_STREAMING);
+//		MatsimPopulationReader reader = new MatsimPopulationReader(pop);
+//		reader.readFile("/Users/fearonni/vsp-work/socialnets/devel/MCMC/plans.100km.1.xml");
+//		g = new SocialNetwork<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>(pop);		
+//		double alpha = 1000 / (double)(N*(N-1)) * 2;
+//		THETA = Math.log(alpha / (1 - alpha));
 		/*
 		 * Create a list of vertices.
 		 */
 		Random random = new Random(2);
-		ArrayList<SparseVertex> vertices = new ArrayList<SparseVertex>(g.getVertices());
+		ArrayList<Ego<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>> vertices = new ArrayList<Ego<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>>>(g.getVertices());
 		int size = vertices.size();
 
 		int sum_p1 = 0;
@@ -88,9 +125,9 @@ public class GibbsNetworkGenerator {
 			/*
 			 * Draw two random vertices.
 			 */
-			SparseVertex v1 = vertices.get((int)Math.round(random.nextDouble() * (size-1)));
+			Ego v1 = vertices.get((int)Math.round(random.nextDouble() * (size-1)));
 			random.nextDouble();
-			SparseVertex v2 = vertices.get((int)Math.round(random.nextDouble() * (size-1)));
+			Ego v2 = vertices.get((int)Math.round(random.nextDouble() * (size-1)));
 			
 			if(v1 != v2) {
 				
@@ -122,9 +159,31 @@ public class GibbsNetworkGenerator {
 				/*
 				 * Calc P_Y
 				 */
-				P_Y = P_Y_0 / (P_Y_0 + P_Y_1);
+//				P_Y = P_Y_1 / (P_Y_0 + P_Y_1);
+				Coord c1 = ((BasicPlan) v1.getPerson().getPlans().get(0)).getIteratorAct().next().getCoord();
+				Coord c2 = ((BasicPlan) v2.getPerson().getPlans().get(0)).getIteratorAct().next().getCoord();
+				
 					
+//				double dist = c1.calcDistance(c2)/1000.0;
+//				double alpha = 0.1* 1/(1+dist);
+				double k1 = Math.max(1, v1.getEdges().size());
+				double k2 = Math.max(1, v2.getEdges().size());
+				
+				double alpha = 0.5 * Math.pow(k1, - LAMBDA) * Math.pow(k2, - LAMBDA);
+				THETA = Math.log(alpha / (1 - alpha));
+				P_Y = Math.exp(THETA) / (1 + Math.exp(THETA));
+				if(Double.isNaN(P_Y))
+					throw new IllegalArgumentException();
+//				double logit0 = Math.log(P_Y_0/(1-P_Y_0));
+//				double logit1 = Math.log(P_Y_1/(1-P_Y_1));
+//				P_Y = logit0/(logit0 + logit1);
+				
 				if(random.nextDouble() <= P_Y) {
+					/*
+					 * Leave the edge switched on.
+					 */
+					sum_p1++;
+				} else {
 					/*
 					 * Remove the edge.
 					 */
@@ -132,16 +191,14 @@ public class GibbsNetworkGenerator {
 						throw new RuntimeException();
 					
 					sum_p0++;
-				} else {
-					/*
-					 * Leave the edge switched on.
-					 */
-					sum_p1++;
+					
 				}
 
 				sum_P_Y_0 += P_Y_0;
 				sum_P_Y_1 += P_Y_1;
 				sum_P_Y += P_Y;
+				
+			
 				
 				if(i % DUMP_INTERVAL == 0) {
 					double z = GraphStatistics.getDegreeStatistics(g).getMean();
@@ -159,6 +216,7 @@ public class GibbsNetworkGenerator {
 					sum_p1 = 0;
 					sum_p0 = 0;
 				}
+			
 			} else {
 //				System.err.println("Selected same vertices...");
 			}
@@ -166,12 +224,18 @@ public class GibbsNetworkGenerator {
 		meanDegreeWriter.close();
 		
 		System.out.println("Mean degree is " + GraphStatistics.getDegreeStatistics(g).getMean());
+		System.out.println("Clustering is " + GraphStatistics.getClusteringStatistics(g).getMean());
+		System.out.println("Degree correlation is " + GraphStatistics.getDegreeCorrelation(g));
 		WeightedStatistics stats = GraphStatistics.getDegreeDistribution(g);
-		WeightedStatistics.writeHistogram(stats.absoluteDistribution(), outputHist);
+		WeightedStatistics.writeHistogram(stats.absoluteDistribution(), outputHist);	
+		WeightedStatistics.writeHistogram(SocialNetworkStatistics.getEdgeLengthDistribution(g, true, 1000).absoluteDistribution(1000), "/Users/fearonni/vsp-work/socialnets/devel/MCMC/edgelength.txt");
 	}
 	
 	private static double calcP_Y(int k1, int k2) {
 //		return Math.exp(-LAMBDA * (k1 + k2) / N);
-		return Math.pow(k1, - LAMBDA) * Math.pow(k2, - LAMBDA); 
+//		return Math.pow(k1, - LAMBDA) * Math.pow(k2, - LAMBDA); 
+//		return Math.exp(1 * (- Math.abs(4000 - g.getEdges().size())));
+//		return 1/(double)(1+Math.abs(3500 - g.getEdges().size()));
+		return Math.exp(THETA*g.getEdges().size());
 	}
 }

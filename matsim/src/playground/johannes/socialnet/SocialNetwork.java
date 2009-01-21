@@ -27,8 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.population.Person;
-import org.matsim.population.Population;
+import org.matsim.basic.v01.BasicActivity;
+import org.matsim.basic.v01.BasicKnowledge;
+import org.matsim.basic.v01.BasicPerson;
+import org.matsim.basic.v01.BasicPlan;
+import org.matsim.basic.v01.BasicPopulation;
 
 import playground.johannes.graph.AbstractSparseGraph;
 import playground.johannes.graph.SparseVertex;
@@ -37,22 +40,22 @@ import playground.johannes.graph.SparseVertex;
  * @author illenberger
  *
  */
-public class SocialNetwork extends AbstractSparseGraph {
+public class SocialNetwork<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> extends AbstractSparseGraph {
 	
-	private Map<Person, Ego> personEgoMapping = new HashMap<Person, Ego>();
+	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	
 	public SocialNetwork() {
 		super();
 	}
 	
-	public SocialNetwork(Population pop) {
+	public SocialNetwork(BasicPopulation<P> pop) {
 		this();
-		for(Person p : pop.getPersons().values())
+		for(P p : pop.getPersons().values())
 			addEgo(p);
 	}
 	
-	public Ego addEgo(Person person) {
-		Ego e = new Ego(person);
+	public Ego<P> addEgo(P person) {
+		Ego<P> e = new Ego<P>(person);
 		if(insertVertex(e)) {
 			personEgoMapping.put(person, e);
 			return e;
@@ -60,11 +63,11 @@ public class SocialNetwork extends AbstractSparseGraph {
 			return null;
 	}
 	
-	public SocialTie addEdge(Ego e1, Ego e2) {
+	public SocialTie addEdge(Ego<P> e1, Ego<P> e2) {
 		return this.addEdge(e1, e2, 0);
 	}
 	
-	public SocialTie addEdge(Ego e1, Ego e2, int created) {
+	public SocialTie addEdge(Ego<P> e1, Ego<P> e2, int created) {
 		SocialTie e = new SocialTie(e1, e2, created);
 		if(insertEdge(e, e1, e2))
 			return e;
@@ -73,11 +76,11 @@ public class SocialNetwork extends AbstractSparseGraph {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Set<? extends Ego> getVertices() {
-		return (Set<? extends Ego>) super.getVertices();
+	public Set<? extends Ego<P>> getVertices() {
+		return (Set<? extends Ego<P>>) super.getVertices();
 	}
 	
-	public Ego getEgo(Person p) {
+	public Ego<P> getEgo(P p) {
 		return personEgoMapping.get(p);
 	}
 

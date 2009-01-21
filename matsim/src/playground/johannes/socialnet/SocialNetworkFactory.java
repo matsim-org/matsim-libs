@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Ego.java
+ * SocialNetworkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,39 +23,44 @@
  */
 package playground.johannes.socialnet;
 
-import java.util.List;
+import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.basic.v01.BasicPerson;
 import org.matsim.basic.v01.BasicPlan;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.basic.v01.BasicPopulation;
 
-import playground.johannes.graph.SparseVertex;
+import playground.johannes.graph.generators.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> extends SparseVertex {
+public class SocialNetworkFactory<P extends BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
 
-	private P person;
+	private BasicPopulation<P> population;
 	
-	protected Ego(P person) {
-		this.person = person;
+	private Iterator<P> popIterator;
+	
+	public SocialNetworkFactory(BasicPopulation<P> population) {
+		this.population = population;
 	}
 	
-	public P getPerson() {
-		return person;
-	}
-	
-	public Coord getCoord() {
-		return person.getPlans().get(0).getIteratorAct().next().getCoord();
+	public SocialTie addEdge(SocialNetwork<P> g, Ego<P> v1, Ego<P> v2) {
+		return g.addEdge(v1, v2);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends Ego<P>> getNeighbours() {
-		return (List<? extends Ego<P>>) super.getNeighbours();
+	public Ego<P> addVertex(SocialNetwork<P> g) {
+		if(popIterator.hasNext())
+			return g.addEgo(popIterator.next());
+		else
+			return null;
 	}
+
+	public SocialNetwork<P> createGraph() {
+		popIterator = population.getPersons().values().iterator();
+		return new SocialNetwork<P>();
+	}
+
 }
