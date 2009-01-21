@@ -46,6 +46,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 	private final String primActsDistance, homeLocationDistance, sex, age, license, car_avail, employed; 
 	private final ArrayList<String> softCoef; 
 	private final ArrayList<String> allCoef; 
+	private ArrayList<Integer> list1Pointer; 
 	private static final Logger log = Logger.getLogger(RecyclingModule1.class);
 	                      
 	public RecyclingModule1 (ControlerMFeil controler) {
@@ -68,7 +69,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		this.assignmentModule		= new AgentsAssignmentInitialiser1 (controler, this.preProcessRoutingData, 
 				this.locator, this.scorer, this.cleaner, this, 
 				this.minimumTime, this.coefficients, this.nonassignedAgents);
-		
+		this.list1Pointer 			= new ArrayList<Integer>();
 	}
 	
 	
@@ -115,8 +116,19 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		
 		/* Assign remaining agents */
 		assignmentModule.init();
-		for (int i=0;i<list[1].size();i++){
-			assignmentModule.handlePlan(list[1].get(i));
+		if (this.list1Pointer.size()>0){
+			int pointer = 0;
+			for (int i=0;i<list[1].size();i++){
+				if (i!=this.list1Pointer.get(pointer)){
+					assignmentModule.handlePlan(list[1].get(i));
+				}
+				else pointer=java.lang.Math.min(pointer+1, this.list1Pointer.size()-1);
+			}
+		}
+		else {
+			for (int i=0;i<list[1].size();i++){
+				assignmentModule.handlePlan(list[1].get(i));
+			}
 		}
 		assignmentModule.finish();
 		
@@ -197,7 +209,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		double scoreAux, coefAux;
 		int [] modified = new int [this.noOfSoftCoefficients-1]; // last coefficient fixed
 		int modifiedAux;
-		LinkedList<Integer> list1Pointer = new LinkedList<Integer>();
+		list1Pointer.clear();
 		
 		/* Iteration 0 */
 		score [0]= this.calculate();		// calculate score for initial vector
@@ -210,17 +222,16 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 				if (this.list[1].get(x).getPerson().getId().toString().equals(st)){
 					//log.warn("Anschlag!");
 					schedulingModule.handlePlan(list[1].get(x));
-					list1Pointer.add(x);
+					this.list1Pointer.add(x);
 					break;
 				}
 			}
 		}
 		schedulingModule.finish();	
-		Iterator<Integer> l1P = list1Pointer.iterator();
-		while (l1P.hasNext()){
-			int x = l1P.next();
-			this.list[0].add(this.list[1].get(x));
-			this.list[1].remove(x);
+		java.util.Collections.sort(this.list1Pointer);
+		for (int x=list1Pointer.size()-1;x>=0;x--){
+			this.list[0].add(this.list[1].get(list1Pointer.get(x)));
+			//this.list[1].remove(list1Pointer.get(x));
 			this.agents.addAgent((this.list[0].get(this.list[0].size()-1)));
 			
 		}

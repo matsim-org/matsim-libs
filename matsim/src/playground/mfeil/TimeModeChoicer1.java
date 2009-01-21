@@ -378,10 +378,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		double time = OFFSET+this.minimumTime;
 		if (outer==0) time = OFFSET+1;
 		if (((Act)(actslegs.get(outer))).getDuration()>=time){
-			if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+			/*if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 				return this.chooseMode(plan, actslegs, (-1)*this.OFFSET, outer, inner, planAnalyzeSubtours);
 			}
-			else return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
+			else*/ return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 		}
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 		else return this.swapDurations(plan, actslegs, outer, inner, planAnalyzeSubtours);
@@ -390,11 +390,11 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	public double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner, PlanAnalyzeSubtours planAnalyzeSubtours){
 		
 		double swaptime= java.lang.Math.max(((Act)(actslegs.get(inner))).getDuration(), this.minimumTime)-((Act)(actslegs.get(outer))).getDuration();
-		
+		/*
 		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 			return this.chooseMode(plan, actslegs, swaptime, outer, inner, planAnalyzeSubtours);
 		}
-		else return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
+		else */return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 	}
 	
 	
