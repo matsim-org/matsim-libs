@@ -30,6 +30,8 @@ import java.util.ListIterator;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 
+import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
+
 /**
  * Class representing a path with flow over time on an network
  * @author Manuel Schneider
@@ -51,6 +53,12 @@ public class TimeExpandedPath {
 	 * arrivaltime of a path
 	 */
 	private int _arrival;
+	
+	/**
+	 * time, that the path wait in the source
+	 */
+	private int _wait;
+	
 	
 	/**
 	 * class variable to turn on debug mode, default is off
@@ -250,6 +258,108 @@ public class TimeExpandedPath {
 	}
 	
 	/**
+	 * returns a subpath of the path from "from" to "to"
+	 * @param fromNode from
+	 * @param toNode to
+	 * @return subpath
+	 */
+	public TimeExpandedPath getSubPath(int from, int to){
+		TimeExpandedPath result = null;
+		if(from <= to){
+			if((from < this._edges.size()) && (from >= 0)){
+				if((to < this._edges.size()) && (to >= 0)){
+					result = new TimeExpandedPath();
+					for(int i = from; i <= to; i++){
+						result.append(this._edges.get(i).edge, this._edges.get(i).time, this._edges.get(i).isForward());
+					}
+				}
+			}
+		}
+		if(result == null){
+			System.out.println("Indices doesn't match");
+		}
+		return result;
+	}
+	
+	/**
+	 * Method to indicate, if link is in a path
+	 * @param PathEdge edge
+	 * @return boolean 
+	 */
+	public boolean containsForwardLink(PathEdge edge){
+		if(edge.isForward()){
+			System.out.println("Error: Try to find forward link of an forward link.");
+			return false;
+		}
+		boolean result = false;
+		for(PathEdge pathEdge : this._edges){
+			if(pathEdge.getEdge().equals(edge.getEdge())){
+				if(pathEdge.getTime() == edge.getTime()){
+					result = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Method to find the forward link of an backward link in a path
+	 * @param PathEdge edge
+	 * @return PathEdge 
+	 */
+	public PathEdge getForwardLink(PathEdge edge){
+		if(edge.isForward()){
+			System.out.println("Error: Try to find forward link of an forward link.");
+			return null;
+		}
+		if(!containsForwardLink(edge)){
+			System.out.println("Error: Forward link is not contained in this path.");
+			return null;
+		}
+		PathEdge result = null;
+		for(PathEdge pathEdge : this._edges){
+			if(pathEdge.getEdge().equals(edge.getEdge())){
+				if(pathEdge.getTime() == edge.getTime()){
+					result = pathEdge;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Method to find the index of the forward link of an backward link in a path
+	 * @param PathEdge edge
+	 * @return index of forward link 
+	 */
+	public Integer getIndexOfForwardLink(PathEdge edge){
+		if(edge.isForward()){
+			System.out.println("Error: Try to find forward link of an forward link.");
+			return null;
+		}
+		if(!containsForwardLink(edge)){
+			System.out.println("Error: Forward link is not contained in this path.");
+			return null;
+		}
+		Integer result = 0;
+		for(PathEdge pathEdge : this._edges){
+			if(pathEdge.getEdge().equals(edge.getEdge())){
+				if(pathEdge.getTime() == edge.getTime()){
+					break;
+				}
+			}
+			result++;
+		}
+		if(result >= this._edges.size()){
+			System.out.println("Error: No index found!");
+			return null;
+		}
+		return result;
+	}
+	
+	/**
 	 * returns a String representation of the Path
 	 */
 	public String toString(){
@@ -304,6 +414,30 @@ public class TimeExpandedPath {
 	 */
 	public int getArrival(){
 		return this._arrival;
+	}
+	
+	/**
+	 * setting the time the path wait in the source
+	 * @param time
+	 */
+	public void setWait(int time){
+		this._wait = time;
+	}
+	
+	/**
+	 * getter for time, the path wait in the source, if it is set
+	 * @return wait time
+	 */
+	public int getWait(){
+		return this._wait;
+	}
+	
+	/**
+	 * getter for length of the path
+	 * @return length
+	 */
+	public int length(){
+		return this._edges.size();
 	}
 	
 	/**
