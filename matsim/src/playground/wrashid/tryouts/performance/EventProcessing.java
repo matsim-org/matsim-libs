@@ -1,48 +1,51 @@
 package playground.wrashid.tryouts.performance;
 
+import org.matsim.basic.v01.BasicNodeImpl;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.network.Link;
+import org.matsim.network.LinkImpl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.Node;
 
 import playground.wrashid.DES.ParallelEvents;
 import playground.wrashid.PHEV.co2emissions.AllLinkHandler;
 import playground.wrashid.PHEV.co2emissions.AllLinkOneIntervalHandler;
 import playground.wrashid.PHEV.co2emissions.OneLinkHandler;
+import org.matsim.population.Person;
+import org.matsim.population.PersonImpl;
+import org.matsim.utils.geometry.CoordImpl;
 
+// this events processing relies on creating artifical events, intead of reading them
 public class EventProcessing {
 	public static void main(String[] args) {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
-		String eventsFilePath = "C:\\data\\SandboxCVS\\ivt\\studies\\wrashid\\IAMF2009Paper\\CO2Experiment\\56.events.txt";
-		args=new String[1];
-		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
-		
-		Config config = Gbl.createConfig(args);
-
-		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(config.network()
-				.getInputFile());
-		System.out.println("  done.");
-		
-		Events events = new ParallelEvents(2);
-		//Events events = new Events();
+		//Events events = new ParallelEvents(2);
+		Events events = new Events();
 
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-		reader.readFile(eventsFilePath);
+		
+		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, "", "", 0);
+		
+		for (int i=0;i<1000000;i++){
+				events.processEvent(linkLeaveEvent);
+		}
+		
+		
+		
 		// This is very important!!!
 		if (events instanceof ParallelEvents){
 			((ParallelEvents) events).awaitHandlerThreads();
@@ -56,7 +59,7 @@ public class EventProcessing {
 	private class Handler1 implements LinkLeaveEventHandler {
 
 		public void handleEvent(LinkLeaveEvent event) {
-			for (int i = 0; i < 1000000; i++) {
+			for (int i = 0; i < 3000; i++) {
 
 			}
 		}
