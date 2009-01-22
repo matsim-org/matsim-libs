@@ -95,8 +95,8 @@ public class PlotsSlideShow implements AgentArrivalEventHandler  {
 
 	public void createXYLineChart(final String filename, final double [] x, final double [] y) {
 		XYLineChartFixedRange chart = new XYLineChartFixedRange("Evacuation curve", "time", "# evacuees",this.maxX,this.maxY);
-		chart.addSeries("serie 1", x, y);
-		chart.saveAsPng(filename, 800, 600);
+		chart.addSeries("", x, y);
+		chart.saveAsPng(filename, 400, 300);
 	}
 	
 	
@@ -128,7 +128,7 @@ public class PlotsSlideShow implements AgentArrivalEventHandler  {
 	}
 	
 	public static void main(final String [] args) {
-		new PlotsSlideShow("../outputs/output/ITERS/it.150/150.events.txt.gz", "./tmp/").run();
+		new PlotsSlideShow("../outputs/output/ITERS/it.0/0.events.txt.gz", "./tmp/").run();
 	}
 
 

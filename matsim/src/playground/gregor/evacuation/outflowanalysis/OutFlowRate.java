@@ -40,7 +40,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	private BufferedWriter out = null;
 	private int offset;	
 
-	public OutFlowRate(String input, String output) {
+	public OutFlowRate(final String input, final String output) {
 		this.events = input;
 		try {
 			this.out = IOUtils.getBufferedWriter(output, false);
@@ -58,18 +58,18 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	}
 	
 	
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.evacuated++;
-		if (time == 0) {
+		if (this.time == 0) {
 			this.offset = (int)event.time;
-			time = 1;
-			writeLine(new String[] {time/60+"",this.evacuated+""});
+			this.time = 1;
+			writeLine(new String[] {this.time/60+"",this.evacuated+""});
 		}
 		
 		
-		if ((event.time -this.offset)> time && ((int)(event.time-this.offset) % 60 == 0)){
-			time = (int) event.time - this.offset;
-			writeLine(new String[] {time/60+"",this.evacuated+""});
+		if ((event.time -this.offset)> this.time && ((int)(event.time-this.offset) % 60 == 0)){
+			this.time = (int) event.time - this.offset;
+			writeLine(new String[] {this.time/60+"",this.evacuated+""});
 		}
 	}
 	
@@ -93,20 +93,20 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	public void finish() {
 		if (this.out != null) {
 			try {
-				out.close();
+				this.out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public static void main(String [] args) {
+	public static void main(final String [] args) {
 		
-		String baseDir = "./output/ITERS";
-		String baseOutput = "./output/analysis";
+		String baseDir = "../outputs/output/ITERS";
+		String baseOutput = "../outputs/output/analysis";
 		ArrayList<Integer> its = new ArrayList<Integer>();
-		its.add(0); its.add(1); its.add(10); its.add(50); its.add(100); its.add(200);
-//		its.add(200);
+//		its.add(0); its.add(1); its.add(10); its.add(50); its.add(100); its.add(200);
+		its.add(0);
 				
 		
 		for (int it : its) {
@@ -122,7 +122,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	}
 
 
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 		
 	}

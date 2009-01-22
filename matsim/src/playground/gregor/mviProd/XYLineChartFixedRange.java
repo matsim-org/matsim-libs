@@ -20,6 +20,8 @@
 
 package playground.gregor.mviProd;
 
+import java.awt.Color;
+
 import org.matsim.utils.charts.XYLineChart;
 
 public class XYLineChartFixedRange extends XYLineChart {
@@ -36,6 +38,14 @@ public class XYLineChartFixedRange extends XYLineChart {
 
 		this.chart.getXYPlot().getRangeAxis().setRange(0, maxY);
 		this.chart.getXYPlot().getDomainAxis().setRange(0, maxX);
+		Color paint = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+		this.chart.setBackgroundPaint(paint);
+		this.chart.setBorderPaint(paint);
+		this.chart.getXYPlot().setBackgroundPaint(paint);
+		this.chart.getLegend().setBackgroundPaint(paint);
+		this.chart.getPlot().setBackgroundPaint(paint);
+		this.chart.getTitle().setBackgroundPaint(paint);
+		this.chart.removeLegend();
 	}
 
 }

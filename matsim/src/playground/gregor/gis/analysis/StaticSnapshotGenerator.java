@@ -62,7 +62,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	
 	private static final String CVSROOT = "../vsp-cvs";
 	private final static Logger log = Logger.getLogger(StaticSnapshotGenerator.class);
-	private final static double SNAPSHOT_PERIOD = 5 * 60;
+	private final static double SNAPSHOT_PERIOD = 15 * 60;
 	
 	private final static double MAX_X = 657313;
 	private final static double MAX_Y = 9901062;
@@ -197,7 +197,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 		String config = args[0];
 		Gbl.createConfig(new String [] {config});
 		
-		final String shapeFilePrefix =  CVSROOT + "/runs/run313/qgis/evacProgress";
+		final String shapeFilePrefix =  CVSROOT + "/runs/run314/qgis/evacProgress";
 		
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());

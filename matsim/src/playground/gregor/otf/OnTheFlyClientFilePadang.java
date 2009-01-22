@@ -30,7 +30,7 @@ import org.matsim.utils.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 	
-	private static final String CVSROOT = "../vsp-cvs";
+	public static final String CVSROOT = "../vsp-cvs";
 	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/";
 	final String BUILDINGS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_buildings.shp";
 	final String LINKS_FILE =  CVSROOT + "/studies/padang/imagery/GIS/convex_links.shp";
@@ -111,7 +111,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		OTFGLOverlay overlay = new OTFGLOverlay();
 //		drawer2.addOverlay(overlay)
 //		loadSlicedBackgroundLayer(660000, 9915000, 4, 5, 5000, "low_res");
-//		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
+		loadSlicedBackgroundLayer(655000, 9900000, 3, 4, 2500, "high_res");
 		try {
 			loadFeatureLayer(this.BUILDINGS_FILE,buildingsColor);
 			loadFeatureLayer(this.NODES_FILE,linksColor);
@@ -131,9 +131,9 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
-//		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.200/200.movie.mvi";
+//		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../outputs/output/ITERS/it.80/80.movie.mvi";
+		final String filename =  "../outputs/output/ITERS/it.0/0.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
@@ -141,43 +141,45 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect1.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
 		connect1.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect1.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
 		connect1.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
-		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect1.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect1.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect1.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect1.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
 		//connect1.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		
 		
 		connect2.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect2.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect2.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect2.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
 		connect2.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect2.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangRegionDrawer.class);
 		connect2.add(OGLAgentPointLayer.AgentPadangRegionDrawer.class, OGLAgentPointLayer.class);		
-		connect2.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		connect2.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect2.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect2.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		connect2.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
 		//connect2.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 //	
 		//main2(args);
 		
 //		OTFOGLDrawer.linkWidth =2;
 		
-		Gbl.createConfig(null);
-		final OTFVisConfig conf = new OTFVisConfig();
-//		conf.setLinkWidth(10);
-		Gbl.getConfig().addModule("otfvis", conf);
-		
+//		Gbl.createConfig(null);
+//		final OTFVisConfig conf = new OTFVisConfig();
+////		conf.setLinkWidth(10);
+//		Gbl.getConfig().addModule("otfvis", conf);
+//		
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
-		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
+//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(false);
+		
 		
 		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
 		

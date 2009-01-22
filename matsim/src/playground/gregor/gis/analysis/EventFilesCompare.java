@@ -76,17 +76,21 @@ public class EventFilesCompare {
 	private ArrayList<Feature> features;
 
 	private FeatureType ftRunCompare;
+
+	private final String outfile;
 	final static Envelope ENVELOPE = new Envelope(648815,655804,9888424,9902468);
 	final static double LENGTH = 250;
 	
 	
 	public EventFilesCompare(final String eventsFile1, final String eventsFile2,
-			final CoordinateReferenceSystem crs, final NetworkLayer network) {
+			final CoordinateReferenceSystem crs, final NetworkLayer network, final String outfile) {
 		
 		this.eventsFile1 = eventsFile1;
 		this.eventsFile2 = eventsFile2;
 		this.crs = crs;
 		this.network = network;
+		this.outfile = outfile;
+		
 		this.geofac = new GeometryFactory();
 		initFeatures();
 		
@@ -123,7 +127,7 @@ public class EventFilesCompare {
 	
 	private void writeFeatures() {
 		try {
-			ShapeFileWriter.writeGeometries(this.features, "./tmp/runComp.shp");
+			ShapeFileWriter.writeGeometries(this.features, this.outfile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -196,15 +200,16 @@ public class EventFilesCompare {
 	}
 	
 	public static void main(final String [] args) {
-		String eventsFile1 = "../outputs/output_nash_wave/ITERS/it.150/150.events.txt.gz";
+//		String eventsFile1 = "../outputs/output_nash_wave/ITERS/it.150/150.events.txt.gz";
+		String eventsFile1 = "../outputs/output_sysopt_wave_drown_only/ITERS/it.150/150.events.txt.gz";
 		String eventsFile2 = "../outputs/output_sysopt_wave/ITERS/it.150/150.events.txt.gz";
 		String network = "../inputs/networks/padang_net_evac_v20080618.xml";
-		
+		String outfile = "./tmp/runComp.shp";
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(network);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		new EventFilesCompare(eventsFile1, eventsFile2, crs, net).run();
+		new EventFilesCompare(eventsFile1, eventsFile2, crs, net, outfile).run();
 	}
 
 	
@@ -240,7 +245,6 @@ public class EventFilesCompare {
 			Link link = EventFilesCompare.this.network.getLink(event.linkId);
 			ai.c = new Coordinate(link.getCenter().getX(),link.getCenter().getY());
 			this.ttimes.put(event.agentId, ai);
-			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}
 
@@ -252,6 +256,7 @@ public class EventFilesCompare {
 		public void handleEvent(final AgentArrivalEvent event) {
 			AgentInfo ai = this.ttimes.get(event.agentId);
 			ai.time = event.time - ai.time;
+			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}
 
