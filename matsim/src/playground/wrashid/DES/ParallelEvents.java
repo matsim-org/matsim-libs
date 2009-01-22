@@ -21,7 +21,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 
-	// TODO: this is not thread safe yet:
+	// this is thread safe yet, also it seems that
 	// even though, we set the handler, it might be, that the processing
 	// thread does not see this
 	// probably this is ok: because the synchronization happens, when 
