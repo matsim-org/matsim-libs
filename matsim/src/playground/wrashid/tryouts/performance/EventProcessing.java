@@ -36,6 +36,10 @@ public class EventProcessing {
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
+		events.addHandler(ep.new Handler1());
 
 		
 		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, "", "", 0);
