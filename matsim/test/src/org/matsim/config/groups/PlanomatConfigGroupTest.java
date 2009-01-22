@@ -54,7 +54,7 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 			assertEquals(expectedModes[ii], actualModes[ii]);
 		}
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
-		
+		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );
 	}
 	
 }

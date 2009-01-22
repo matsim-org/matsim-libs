@@ -75,6 +75,8 @@ public class PlanomatConfigGroup extends Module {
 			}
 		} else if (PlanomatConfigGroup.LEG_TRAVEL_TIME_ESTIMATOR_NAME.equals(param_name)) {
 			this.legTravelTimeEstimatorName = value;
+		} else if (PlanomatConfigGroup.JGAP_MAX_GENERATIONS.equals(param_name)) {
+			this.setJgapMaxGenerations(Integer.parseInt(value));
 		}
 
 		// TODO add remaining config parameters to test
