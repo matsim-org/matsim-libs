@@ -39,5 +39,20 @@ Using the class: tryouts.performance.EventProcessing (using 1 million iterations
 - 14.751 seconds, 3 threads, 3 handlers
 - 18.063 seconds, 2 threads, 3 handlers
 - 19.095 seconds, 2 threads, 4 handlers
-- 19.079 seconds, 4 threads, 4 handlers
+- 19.079 seconds, 4 threads, 4 handlers 
 - 32.892 seconds, 1 threads, 4 handlers
+
+
+
+22. Januar 2008
+===============
+Using the updated class: tryouts.performance.EventProcessing on satawal.
+configuration: 100 (with sinus and list operations) iterations each handling of event, 
+1 million events, 8 handler
+
+- old events handler: 110.689 s
+- new events handler, 1 cpu: 113.513 s
+- new events handler, 2 cpu: 57.589 s
+- new events handler, 4 cpu: 31.205 s
+- new events handler, 8 cpu: cpus not available on satawal currently
+- new events handler, 16 cpu: cpus not available on satawal currently
