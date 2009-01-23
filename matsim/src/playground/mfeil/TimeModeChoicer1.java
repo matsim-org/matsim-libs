@@ -162,7 +162,11 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.createInitialNeighbourhood((PlanomatXPlan)plan, initialNeighbourhood, score, moves, planAnalyzeSubtours);
 		
 		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
-				
+		
+		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
+		//score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
+		score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+		
 		if (score[pointer]>bestScore){
 			bestSolution = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
 			bestScore=score[pointer];
@@ -188,6 +192,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				log.info("No valid solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
 				break;
 			}
+			
+			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
+			//score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
+			score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
 		
 			if (score[pointer]>bestScore){
 				bestSolution = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
@@ -209,7 +217,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				for (int i = 0;i<neighbourhood.length; i++){
 					neighbourhood[i] = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
 				}
-			}				
+			}		
 		}
 	
 		// Update the plan with the final solution 		
@@ -251,7 +259,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				moves [pos][0]=outer;
 				moves [pos][1]=inner;
 				pos++;
-			//	if (plan.getPerson().getId().toString().equals("10")) log.info("Oben: "+1+" = "+((Leg)(neighbourhood[pos-1].get(1))).getMode()+" und score = "+score[pos-1]+" und leg = "+((Leg)(neighbourhood[pos-1].get(1))).getDepartureTime());
 				
 				score[pos]=this.decreaseTime(plan, neighbourhood[pos], outer, inner, planAnalyzeSubtours);
 				moves [pos][0]=inner;
@@ -362,10 +369,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				(86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>OFFSET+this.minimumTime){
 			
 			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-			if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+			/*if (Gbl.getConfig().planomat().getPossibleModes().length>0){
 				return this.chooseMode(plan, actslegs, this.OFFSET, outer, inner, planAnalyzeSubtours);
 			}
-			else return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
+			else */return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 		}
 		else return this.swapDurations (plan, actslegs, outer, inner, planAnalyzeSubtours);
 	}
@@ -483,6 +490,54 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	return score;
 	}
 
+	private double chooseModeAllChains (PlanomatXPlan plan, ArrayList<?> actslegsBase, PlanAnalyzeSubtours planAnalyzeSubtours){
+		ArrayList<?> actslegsResult = this.copyActsLegs(actslegsBase);
+		double score=-100000;
+		//BasicLeg.Mode [][] subtours = new BasicLeg.Mode [2][planAnalyzeSubtours.getNumSubtours()];
+		int [] subtours = new int [planAnalyzeSubtours.getNumSubtours()];
+		for (int i=0;i<subtours.length;i++){
+			subtours[i]=0;
+		}
+		/* loop */
+		int index=subtours.length-1;
+		for (int i=0; i<java.lang.Math.pow(subtours.length, subtours.length);i++){
+			boolean tour=false;
+			for (int k=0;k<subtours.length;k++){
+				if (Gbl.getConfig().planomat().getPossibleModes()[subtours[k]].toString()=="walk"){
+					if (this.checkWalkingDistance(actslegsBase, planAnalyzeSubtours, k)){
+						tour=true;
+						break;
+					}
+				}
+			}
+			if (!tour){
+				ArrayList<?> actslegs = this.copyActsLegs(actslegsBase);
+				for (int x=1;x<actslegs.size();x+=2){
+					((Leg)(actslegs.get(x))).setMode(Gbl.getConfig().planomat().getPossibleModes()[subtours[planAnalyzeSubtours.getSubtourIndexation()[(int)(x/2)]]]);
+				}
+				double tmpscore = this.setTimes(plan, actslegs, 0, 0, actslegs.size()-1, 0, actslegs.size()-1);
+				if (tmpscore>score) {
+					score = tmpscore;
+					actslegsResult = this.copyActsLegs(actslegs);
+				}
+			}
+			while (subtours[index]==Gbl.getConfig().planomat().getPossibleModes().length-1){
+				subtours[index]=0;
+				if (index!=0) index--;
+			}
+			subtours[index]++;
+			if (index!=subtours.length-1)index++;
+			log.info("Iteration "+i);
+		}
+	
+		for (int z=1;z<actslegsBase.size();z+=2){
+			((Leg)(actslegsBase.get(z))).setDepartureTime(((Leg)(actslegsResult.get(z))).getDepartureTime());
+			((Leg)(actslegsBase.get(z))).setTravelTime(((Leg)(actslegsResult.get(z))).getTravelTime());
+			((Leg)(actslegsBase.get(z))).setArrivalTime(((Leg)(actslegsResult.get(z))).getArrivalTime());
+			((Leg)(actslegsBase.get(z))).setMode(((Leg)(actslegsResult.get(z))).getMode());
+		}
+	return score;
+	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// Help methods 
@@ -734,6 +789,19 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		double distance = 0;
 		for (int k=0;k<((int)(actslegs.size()/2));k++){
 			if (planAnalyzeSubtours.getSubtourIndexation()[k]==planAnalyzeSubtours.getSubtourIndexation()[pos]){
+				distance+=((Act)(actslegs.get(k*2))).getCoord().calcDistance(((Act)(actslegs.get(k*2+2))).getCoord());
+				if (distance>this.maxWalkingDistance) {
+					return true;
+				}
+			}
+		}
+		return false;	
+	}
+	
+	private boolean checkWalkingDistance2 (ArrayList<?> actslegs, PlanAnalyzeSubtours planAnalyzeSubtours, int pos){
+		double distance = 0;
+		for (int k=0;k<((int)(actslegs.size()/2));k++){
+			if (planAnalyzeSubtours.getSubtourIndexation()[k]==pos){
 				distance+=((Act)(actslegs.get(k*2))).getCoord().calcDistance(((Act)(actslegs.get(k*2+2))).getCoord());
 				if (distance>this.maxWalkingDistance) {
 					return true;
