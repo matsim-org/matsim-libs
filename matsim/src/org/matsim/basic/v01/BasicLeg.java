@@ -36,8 +36,7 @@ public interface BasicLeg {
 		tram(false), 
 		bike(true), 
 		walk(false), 
-		undefined(false), 
-		shoes(true); /* just for fun and illustration :-) */
+		undefined(false);
 	
 		/**
 		 * This variable is used to differentiate chain-based and trip-based modes. 
