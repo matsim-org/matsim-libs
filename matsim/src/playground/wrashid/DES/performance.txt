@@ -44,15 +44,67 @@ Using the class: tryouts.performance.EventProcessing (using 1 million iterations
 
 
 
-22. Januar 2008
+23. Januar 2008
 ===============
 Using the updated class: tryouts.performance.EventProcessing on satawal.
 configuration: 100 (with sinus and list operations) iterations each handling of event, 
 1 million events, 8 handler
 
-- old events handler: 110.689 s
-- new events handler, 1 cpu: 113.513 s
-- new events handler, 2 cpu: 57.589 s
-- new events handler, 4 cpu: 31.205 s
-- new events handler, 8 cpu: cpus not available on satawal currently
+- old events handler: 109.452 s
+- new events handler, 1 cpu: 110.894 s
+- new events handler, 2 cpu: 56.145 s
+- new events handler, 4 cpu: 33.652
+- new events handler, 8 cpu: 29.552
 - new events handler, 16 cpu: cpus not available on satawal currently
+
+
+Another measurement: assign one handler to each cpu and run it. It should be the same all the time, but 
+it is not. This shows the scalling factor.
+- old events handler, 1 handler, 1 cpu: 14.878 s
+- old events handler, 2 handler, 1 cpu: 27.328 s
+- old events handler, 3 handler, 1 cpu: 41.695 s
+- old events handler, 4 handler, 1 cpu: 54.625 s
+
+- new events handler, 1 handler, 1 cpu: 16.934 s
+- new events handler, 2 handler, 2 cpu: 16.636 s
+- new events handler, 4 handler, 4 cpu: 21.888 s
+- new events handler, 8 handler, 8 cpu: 25.621 s
+- new events handler, 12 handler, 12 cpu: 33.487 s
+(do this measurement again, satawal is free, because these measurements are not really good)
+
+26.01.2008
+===========
+- Satawal, almost empty, only one or two cpus were used.
+- old events handler, 1 handler, 1 cpu: 13.874 s
+- old events handler, 2 handler, 1 cpu: 27.327 s
+- old events handler, 4 handler, 1 cpu: 53.926 s
+- old events handler, 8 handler, 1 cpu: 106.158 s
+- old events handler, 16 handler, 1 cpu: 209.868 s
+
+- new events handler, 1 handler, 2 cpu: 19.038 s
+- new events handler, 2 handler, 2 cpu: 15.711 s
+- new events handler, 4 handler, 2 cpu: 29.521 s
+- new events handler, 8 handler, 2 cpu: 56.757 s
+- new events handler, 16 handler, 2 cpu: 110.35 s
+
+- new events handler, 1 handler, 4 cpu: 18.699 s
+- new events handler, 2 handler, 4 cpu: 16.108 s
+- new events handler, 4 handler, 4 cpu: 17.067 s
+- new events handler, 8 handler, 4 cpu: 30.604 s
+- new events handler, 16 handler, 4 cpu: 60.605 s
+
+- new events handler, 1 handler, 8 cpu: 16.319 s
+- new events handler, 2 handler, 8 cpu: 16.389 s
+- new events handler, 4 handler, 8 cpu: 17.227 s
+- new events handler, 8 handler, 8 cpu: 20.577 s
+- new events handler, 16 handler, 8 cpu: 42.968 s
+
+- new events handler, 1 handler, 16 cpu: 16.329 s
+- new events handler, 2 handler, 16 cpu: 16.932 s
+- new events handler, 4 handler, 16 cpu: 18.182 s
+- new events handler, 8 handler, 16 cpu: 22.973 s
+- new events handler, 16 handler, 16 cpu: 38.911 s
+
+note: There are some variations in the results, if we re-run the experiments, which could be because
+of different reasons. These variations have been as high as 20%. In this case the least timing was taken,
+because this reflects the case most closely, that satawal is really empty.
