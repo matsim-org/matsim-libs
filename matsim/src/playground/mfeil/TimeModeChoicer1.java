@@ -51,6 +51,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private final LegTravelTimeEstimator	estimator;
 	private static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	private final double					maxWalkingDistance;
+	private final String					modeChoice;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
@@ -66,6 +67,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime			= 3600;
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		this.maxWalkingDistance		= 2000;
+		this.modeChoice				= "extended_3";
 		
 		//TODO @MF: constants to be configured externally
 	}
@@ -110,7 +112,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(plan);
 		
-		// Initializing 
+		/* Initializing */ 
 		int neighbourhood_size = 0;
 		for (int i = plan.getActsLegs().size()-1;i>0;i=i-2){
 			neighbourhood_size += i;
@@ -148,24 +150,28 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		stream.println();
 		*/
 		
-		// Copy the plan into all fields of the array neighbourhood
+		/* Copy the plan into all fields of the array neighbourhood */
 		for (int i = 0; i < initialNeighbourhood.length; i++){
 			initialNeighbourhood[i] = this.copyActsLegs(plan.getActsLegs());
 		}
 		
-		//Set the given plan as bestSolution
+		/* Set the given plan as bestSolution */
 		bestSolution = this.copyActsLegs(plan.getActsLegs());
 		double bestScore = plan.getScore();
 		
-		// Iteration 1
+		/* Iteration 1 */
 	//	stream.println("Iteration "+1);
 		this.createInitialNeighbourhood((PlanomatXPlan)plan, initialNeighbourhood, score, moves, planAnalyzeSubtours);
 		
 		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
 		
-		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
-		//score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
-		score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+		/* mode choice */ 
+		if (this.modeChoice=="standard"){
+			score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+		}
+		else if (this.modeChoice=="extended_1"){
+			score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
+		}
 		
 		if (score[pointer]>bestScore){
 			bestSolution = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
@@ -180,7 +186,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 		
 		
-		// Do Tabu Search iterations
+		/* Do Tabu Search iterations */
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
 	//		stream.println("Iteration "+currentIteration);
@@ -193,10 +199,14 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				break;
 			}
 			
-			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
-			//score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
-			score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
-		
+			/* mode choice */ 
+			if (this.modeChoice=="standard"){
+				score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+			}
+			if (this.modeChoice=="extended_1"){
+				score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
+			}
+			
 			if (score[pointer]>bestScore){
 				bestSolution = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
 				bestScore=score[pointer];
@@ -205,22 +215,17 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			else {
 				lastImprovement++;
 				if (lastImprovement > STOP_CRITERION) break;
-				// NEW NEW NEW NEW NEW
-				//if (changeInOffset)	break;
-				//else {
-				//	this.OFFSET /=2;
-				//	changeInOffset = true;
-				//}
 			}
 			
 			if (this.MAX_ITERATIONS!=currentIteration){			
 				for (int i = 0;i<neighbourhood.length; i++){
 					neighbourhood[i] = this.copyActsLegs((ArrayList<?>)neighbourhood[pointer]);
 				}
-			}		
+			}
+			this.estimator.reset();
 		}
 	
-		// Update the plan with the final solution 		
+		/* Update the plan with the final solution */ 		
 	//	stream.println("Selected solution\t"+bestScore);
 		ArrayList<Object> al = basePlan.getActsLegs();
 		basePlan.setScore(bestScore);
@@ -239,9 +244,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 		}
 		
-		// NEW NEW
+		/* reset legEstimator (clear hash map) */
 		this.estimator.reset();
-		
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -368,11 +372,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				(outer==0	&&	inner==actslegs.size()-1)	||
 				(86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>OFFSET+this.minimumTime){
 			
-			// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-			/*if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-				return this.chooseMode(plan, actslegs, this.OFFSET, outer, inner, planAnalyzeSubtours);
+			if (this.modeChoice=="extended_2"	|| this.modeChoice=="extended_3"){
+				if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+					return this.chooseMode(plan, actslegs, this.OFFSET, outer, inner, planAnalyzeSubtours);
+				}
+				else return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 			}
-			else */return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
+			else return this.setTimes(plan, actslegs, this.OFFSET, outer, inner, outer, inner);
 		}
 		else return this.swapDurations (plan, actslegs, outer, inner, planAnalyzeSubtours);
 	}
@@ -385,23 +391,28 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		double time = OFFSET+this.minimumTime;
 		if (outer==0) time = OFFSET+1;
 		if (((Act)(actslegs.get(outer))).getDuration()>=time){
-			/*if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-				return this.chooseMode(plan, actslegs, (-1)*this.OFFSET, outer, inner, planAnalyzeSubtours);
+			if (this.modeChoice=="extended_3"){
+				if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+					return this.chooseMode(plan, actslegs, (-1)*this.OFFSET, outer, inner, planAnalyzeSubtours);
+				}
+				else return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 			}
-			else*/ return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
+			else return this.setTimes(plan, actslegs, (-1)*this.OFFSET, outer, inner, outer, inner);
 		}
-		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 		else return this.swapDurations(plan, actslegs, outer, inner, planAnalyzeSubtours);
 	}
+	
 	
 	public double swapDurations (PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner, PlanAnalyzeSubtours planAnalyzeSubtours){
 		
 		double swaptime= java.lang.Math.max(((Act)(actslegs.get(inner))).getDuration(), this.minimumTime)-((Act)(actslegs.get(outer))).getDuration();
-		/*
-		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
-			return this.chooseMode(plan, actslegs, swaptime, outer, inner, planAnalyzeSubtours);
+		if (this.modeChoice=="extended_3"){
+			if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+				return this.chooseMode(plan, actslegs, swaptime, outer, inner, planAnalyzeSubtours);
+			}
+			else return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 		}
-		else */return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
+		else return this.setTimes(plan, actslegs, swaptime, outer, inner, outer, inner);
 	}
 	
 	
@@ -493,18 +504,18 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private double chooseModeAllChains (PlanomatXPlan plan, ArrayList<?> actslegsBase, PlanAnalyzeSubtours planAnalyzeSubtours){
 		ArrayList<?> actslegsResult = this.copyActsLegs(actslegsBase);
 		double score=-100000;
-		//BasicLeg.Mode [][] subtours = new BasicLeg.Mode [2][planAnalyzeSubtours.getNumSubtours()];
 		int [] subtours = new int [planAnalyzeSubtours.getNumSubtours()];
 		for (int i=0;i<subtours.length;i++){
 			subtours[i]=0;
 		}
-		/* loop */
+		/* loop as many times as there are possible combinations of subtours */
 		int index=subtours.length-1;
-		for (int i=0; i<java.lang.Math.pow(subtours.length, subtours.length);i++){
+		//boolean iter = false;
+		for (int i=0; i<java.lang.Math.pow(Gbl.getConfig().planomat().getPossibleModes().length, subtours.length);i++){
 			boolean tour=false;
 			for (int k=0;k<subtours.length;k++){
 				if (Gbl.getConfig().planomat().getPossibleModes()[subtours[k]].toString()=="walk"){
-					if (this.checkWalkingDistance(actslegsBase, planAnalyzeSubtours, k)){
+					if (this.checkWalkingDistance2(actslegsBase, planAnalyzeSubtours, k)){
 						tour=true;
 						break;
 					}
@@ -527,7 +538,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 			subtours[index]++;
 			if (index!=subtours.length-1)index++;
-			log.info("Iteration "+i);
+		/*	if (i>81 && iter==false){
+				log.info("Iteration "+i);
+				System.out.println(planAnalyzeSubtours.getNumSubtours()+" und "+java.lang.Math.pow(Gbl.getConfig().planomat().getPossibleModes().length, subtours.length));
+				for (int p=0;p<actslegsBase.size();p+=2) System.out.print(((Act)(actslegsBase.get(p))).getType()+" ");
+				System.out.println();
+				iter=true;
+			}*/
 		}
 	
 		for (int z=1;z<actslegsBase.size();z+=2){
@@ -570,7 +587,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 	//	stream.println("Iteration's best score\t"+firstScore);
 		
-		// clean-up of plan (=bestIterSolution)
+		/* clean-up acts of plan (=bestIterSolution) */
 		if (pointer!=-1) this.cleanActs(actslegs);
 		
 		return pointer;
