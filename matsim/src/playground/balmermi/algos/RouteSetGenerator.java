@@ -121,8 +121,8 @@ public class RouteSetGenerator {
 			Path path = this.router.calcLeastCostPath(o,d,time);
 			CarRoute route = null;
 			if (path != null) {
-				route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()));
-				route.setNodes(path.links.get(0),path.nodes,path.links.get(path.links.size()));
+				route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()-1));
+				route.setNodes(path.links.get(0),path.nodes,path.links.get(path.links.size()-1));
 			}
 
 			//first check if route is local route (i.e. contains only local road links) 
@@ -203,8 +203,8 @@ public class RouteSetGenerator {
 			nonLocalRoutes.remove(MatsimRandom.random.nextInt(nonLocalRoutes.size()));
 		}
 		// add the least cost path at the beginning of the route
-		CarRoute route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()));
-		route.setNodes(path.links.get(0), path.nodes, path.links.get(path.links.size()));
+		CarRoute route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()-1));
+		route.setNodes(path.links.get(0), path.nodes, path.links.get(path.links.size()-1));
 		routes.addFirst(route);	
 
 		// joining the resulting routes in one linked list which is returned by the algorithm
