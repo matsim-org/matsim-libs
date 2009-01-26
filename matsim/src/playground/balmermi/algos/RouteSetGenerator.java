@@ -133,7 +133,7 @@ public class RouteSetGenerator {
 			//Also, create the link sets for the next level (d+1) of the tree for the current link set
 
 			if(route != null) {	
-				
+
 				boolean newLinkSet = false;
 				if (this.isLocalRoute(route) && !this.containsRoute(route, localRoutes)) {
 					localRoutes.add(route);
@@ -142,11 +142,11 @@ public class RouteSetGenerator {
 					nonLocalRoutes.add(route);
 					newLinkSet = true;
 				}
-				
+
 				// for each link of the calc route create a new link set with the
 				// other links of the current link set				
 				if (newLinkSet) {					
-//					
+
 					for (Link link : route.getLinks()) {
 						Link[] new_ls = new Link[ls.length+1];
 						for (int jj=0; jj<ls.length; jj++) { new_ls[jj] = ls[jj]; }
@@ -210,10 +210,13 @@ public class RouteSetGenerator {
 		routes.addFirst(route);	
 
 		// joining the resulting routes in one linked list which is returned by the algorithm
-		for(CarRoute localRoute : localRoutes){
-			routes.add(localRoute);
+
+		if (!localRoutes.isEmpty()) {
+			for (CarRoute localRoute : localRoutes){
+				routes.add(localRoute);
+			}
 		}
-		for(CarRoute nonLocalRoute : nonLocalRoutes){
+		for (CarRoute nonLocalRoute : nonLocalRoutes){
 			routes.add(nonLocalRoute);
 		}
 		System.out.println("--- done. ---");
