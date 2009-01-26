@@ -94,11 +94,13 @@ public class RouteSetGenerator {
 	private boolean isLocalRoute(CarRoute route) {
 		boolean isLocal = true;
 		for (Link routeLink : route.getLinks()) {
+			System.out.print(routeLink.getType()+", ");
 			if (!routeLink.getType().equals("39") && !routeLink.getType().equals("83") && !routeLink.getType().equals("90")) {
 				isLocal = false;
 				break;
 			}
 		}
+		System.out.println();
 		return isLocal;
 	}
 
