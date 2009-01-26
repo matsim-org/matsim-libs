@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground;
+package playground.meisterk;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,21 +26,12 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for playground.meisterk");
 
-	
+		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
 
-		TestSuite suite = new TestSuite("All tests for MATSim-playground");
-		//$JUnit-BEGIN$
-
-		// run unit tests
-		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
-		suite.addTest(playground.johannes.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
-		suite.addTest(playground.meisterk.AllTests.suite());
-		suite.addTest(playground.wrashid.AllTests.suite());
-		
-		//$JUnit-END$
 		return suite;
 	}
+
 
 }
