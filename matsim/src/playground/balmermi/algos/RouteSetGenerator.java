@@ -108,7 +108,7 @@ public class RouteSetGenerator {
 		LinkedList<Link[]> new_links = new LinkedList<Link[]>();
 
 		System.out.println("--- start a level of the tree ---");
-//		System.out.println("  links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
+		System.out.println("  links.size = " + links.size() + ", localRoutes.size = " + localRoutes.size() + ", nonLocalRoutes.size = " + nonLocalRoutes.size()  + ", new_links.size = " + new_links.size());
 
 		// go through all given lists at this level (level d) of the tree
 		while (!links.isEmpty()) {
@@ -151,7 +151,7 @@ public class RouteSetGenerator {
 						new_ls[new_ls.length-1] = link;
 						new_links.addLast(new_ls);
 					}
-//					System.out.println("    -> links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
+					System.out.println("    -> links.size = " + links.size() + ", localRoutes.size = " + localRoutes.size() + ", nonLocalRoutes.size = " + nonLocalRoutes.size() + ", new_links.size = " + new_links.size());
 				}
 			}
 
