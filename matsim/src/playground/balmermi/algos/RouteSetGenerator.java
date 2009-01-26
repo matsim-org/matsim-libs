@@ -91,7 +91,18 @@ public class RouteSetGenerator {
 		return false;
 	}
 
-	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int time, final LinkedList<Link[]> links, final LinkedList<CarRoute> routes) {
+	private boolean isLocalRoute(CarRoute route) {
+		boolean isLocal = true;
+		for (Link routeLink : route.getLinks()) {
+			if (!routeLink.getType().equals("39") && !routeLink.getType().equals("83") && !routeLink.getType().equals("90")) {
+				isLocal = false;
+				break;
+			}
+		}
+		return isLocal;
+	}
+
+	private final void calcRouteOnSubNet(final Node o, final Node d, final int k, final int l, final int time, final LinkedList<Link[]> links, final LinkedList<CarRoute> nonLocalRoutes, final LinkedList<CarRoute> localRoutes) {
 
 		// the list to handle for the next level (level d+1) of the tree
 		LinkedList<Link[]> new_links = new LinkedList<Link[]>();
@@ -110,26 +121,38 @@ public class RouteSetGenerator {
 			Path path = this.router.calcLeastCostPath(o,d,time);
 			CarRoute route = null;
 			if (path != null) {
-				route = new NodeCarRoute();
-				route.setNodes(path.nodes);
+				route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()));
+				route.setNodes(path.links.get(0),path.nodes,path.links.get(path.links.size()));
 			}
-			
-			// add it to the resulting list of routes if exists. Also, create the link sets for
-			// the next level (d+1) of the tree for the current link set
-			// TODO: add the route only if not already exists!!!
-			if ((route != null) && !this.containsRoute(route,routes)) {
-				routes.add(route);
-//				System.out.println("    -> route found with " + route.getLinkRoute().length + " links");
 
-				// for each link of the calc route create a new link set with the
-				// other links of the current link set
-				for (Link link : route.getLinks()) {
-					Link[] new_ls = new Link[ls.length+1];
-					for (int jj=0; jj<ls.length; jj++) { new_ls[jj] = ls[jj]; }
-					new_ls[new_ls.length-1] = link;
-					new_links.addLast(new_ls);
+			//first check if route is local route (i.e. contains only local road links) 
+			//if so, add it to the list of local route (unless already included)
+			//else add it to the list of non local routes (unless already included)
+			//Also, create the link sets for the next level (d+1) of the tree for the current link set
+
+			if(route != null) {	
+				
+				boolean newLinkSet = false;
+				if (this.isLocalRoute(route) && !this.containsRoute(route, localRoutes)) {
+					localRoutes.add(route);
+					newLinkSet = true;
+				} else if (!this.isLocalRoute(route) && !this.containsRoute(route, nonLocalRoutes)){
+					nonLocalRoutes.add(route);
+					newLinkSet = true;
 				}
-//				System.out.println("    -> links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
+				
+				// for each link of the calc route create a new link set with the
+				// other links of the current link set				
+				if (newLinkSet) {					
+//					
+					for (Link link : route.getLinks()) {
+						Link[] new_ls = new Link[ls.length+1];
+						for (int jj=0; jj<ls.length; jj++) { new_ls[jj] = ls[jj]; }
+						new_ls[new_ls.length-1] = link;
+						new_links.addLast(new_ls);
+					}
+//					System.out.println("    -> links.size = " + links.size() + ", routes.size = " + routes.size() + ", new_links.size = " + new_links.size());
+				}
 			}
 
 			// restore the full network
@@ -140,18 +163,22 @@ public class RouteSetGenerator {
 
 		System.out.println("---  end a level of the tree  ---");
 		// go to the next level (d+1) of the tree, if not already enough routes are found
-		if ((routes.size() < k) && !new_links.isEmpty()) { this.calcRouteOnSubNet(o,d,k,time,new_links,routes); }
+		if (((nonLocalRoutes.size() < k) || (localRoutes.size()< l)) && !new_links.isEmpty()) { 
+			this.calcRouteOnSubNet(o,d,k,l,time,new_links,nonLocalRoutes,localRoutes);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final LinkedList<CarRoute> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor) {
+	public final LinkedList<CarRoute> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor, final float localRoute_factor) {
 		if (o.getId().toString().equals(d.getId().toString())) { Gbl.errorMsg("O == D not alloed!"); }
 		if (k < 1) { Gbl.errorMsg("k < 1 not allowed!"); }
 
 		LinkedList<CarRoute> routes = new LinkedList<CarRoute>(); // resulting k least cost routes
+		LinkedList<CarRoute> localRoutes = new LinkedList<CarRoute>(); // routes containing only local streets
+		LinkedList<CarRoute> nonLocalRoutes = new LinkedList<CarRoute>(); // all other routes
 		LinkedList<Link[]> links = new LinkedList<Link[]>(); // removed links
 		Path path = this.router.calcLeastCostPath(o,d,time);
 		if (path == null) { Gbl.errorMsg("There is no route from " + o.getId() + " to " + d.getId() + "!"); }
@@ -160,21 +187,33 @@ public class RouteSetGenerator {
 		for (Link link : path.links) {
 			Link[] lls = new Link[1];
 			lls[0] = link;
-			links.add(lls);
+			links.add(lls);	
 		}
 		// creating a route set with the minimum of k*var_factor routes
-		this.calcRouteOnSubNet(o,d,k*var_factor,time,links,routes);
+		this.calcRouteOnSubNet(o,d,Math.round(k*var_factor*(1-localRoute_factor)), Math.round(k*var_factor*localRoute_factor),time,links,nonLocalRoutes, localRoutes);
 
 		System.out.println("--- Number of created routes = " + routes.size() + " ---");
 		System.out.println("--- Randomly removing routes until " + k + " routes left... ---");
-		// Remove randomly some routes until it contains k-1 elements
-		// TODO [balmermi]: Inform Gianluca
-//		while (k-1 < routes.size()) { routes.remove((int)Math.random()*routes.size()); }
-		while (k-1 < routes.size()) { routes.remove(MatsimRandom.random.nextInt(routes.size())); }
+		// Remove randomly some routes from the localRoutes until it contains k*(localRouteFactor) elements
+		while (k*localRoute_factor < localRoutes.size()) { 
+			localRoutes.remove(MatsimRandom.random.nextInt(localRoutes.size()));
+		}
+		// Remove randomly some routes from the nonLocalRoutes until it contains k*(1-localRouteFactor)-1 elements
+		while (k*(1-localRoute_factor)-1 < nonLocalRoutes.size()) { 
+			nonLocalRoutes.remove(MatsimRandom.random.nextInt(nonLocalRoutes.size()));
+		}
 		// add the least cost path at the beginning of the route
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(path.nodes);
-		routes.addFirst(route);
+		CarRoute route = new NodeCarRoute(path.links.get(0),path.links.get(path.links.size()));
+		route.setNodes(path.links.get(0), path.nodes, path.links.get(path.links.size()));
+		routes.addFirst(route);	
+
+		// joining the resulting routes in one linked list which is returned by the algorithm
+		for(CarRoute localRoute : localRoutes){
+			routes.add(localRoute);
+		}
+		for(CarRoute nonLocalRoute : nonLocalRoutes){
+			routes.add(nonLocalRoute);
+		}
 		System.out.println("--- done. ---");
 
 		return routes;

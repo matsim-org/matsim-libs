@@ -60,11 +60,12 @@ public class CalcRouteSets {
 		int time = 0;
 		int nof_routes = 20;
 		int var_factor = 3;
+		float localRoutes_factor = 0.1F;
 
 		if (o.getId().equals(d.getId())) { return; }
 
 		System.out.println("  create route set...");
-		LinkedList<CarRoute> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor);
+		LinkedList<CarRoute> routes = gen.calcRouteSet(o,d,nof_routes,time,var_factor, localRoutes_factor);
 		System.out.println("  done.");
 
 		System.out.println("  write route set file...");
