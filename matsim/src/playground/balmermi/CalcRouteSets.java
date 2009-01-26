@@ -60,7 +60,7 @@ public class CalcRouteSets {
 		int time = 0;
 		int nof_routes = 20;
 		int var_factor = 3;
-		float localRoutes_factor = 0.1F;
+		float localRoutes_factor = 0F;
 
 		if (o.getId().equals(d.getId())) { return; }
 
