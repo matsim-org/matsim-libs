@@ -29,20 +29,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 
-import org.matsim.network.Link;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.network.Node;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
-
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 
 /**
  * @author Manuel Schneider
@@ -87,9 +81,9 @@ public class MultiSourceEAF {
 	 * @return 
 	 */
 	private static HashMap<Node,Integer> readPopulation(NetworkLayer network, String filename){
-		Population population = new Population();
-		MatsimPopulationReader reader = new MatsimPopulationReader(population);
-		reader.readFile(filename);
+		Population population = new Population(Population.NO_STREAMING);
+		new MatsimPopulationReader(population,network).readFile(filename);
+		network.connect();
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 		for(Person person : population.getPersons().values() ){
 			Plan plan = person.getPlans().get(0);
@@ -118,7 +112,7 @@ public class MultiSourceEAF {
 		 
 		 //read network
 		 NetworkLayer network = new NetworkLayer();
-		 NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(network);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		 networkReader.readFile("/Users/manuel/Documents/meine_EA/manu/manu2.xml");
 		//networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
 		
