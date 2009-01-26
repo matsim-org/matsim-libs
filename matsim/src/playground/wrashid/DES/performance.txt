@@ -74,37 +74,57 @@ it is not. This shows the scalling factor.
 
 26.01.2008
 ===========
+playground.wrashid.tryouts.performance.EventsProcessing used.
 - Satawal, almost empty, only one or two cpus were used.
+
 - old events handler, 1 handler, 1 cpu: 13.874 s
 - old events handler, 2 handler, 1 cpu: 27.327 s
 - old events handler, 4 handler, 1 cpu: 53.926 s
 - old events handler, 8 handler, 1 cpu: 106.158 s
 - old events handler, 16 handler, 1 cpu: 209.868 s
+- old events handler, 32 handler, 1 cpu: 426.55 s
 
 - new events handler, 1 handler, 2 cpu: 19.038 s
 - new events handler, 2 handler, 2 cpu: 15.711 s
 - new events handler, 4 handler, 2 cpu: 29.521 s
 - new events handler, 8 handler, 2 cpu: 56.757 s
 - new events handler, 16 handler, 2 cpu: 110.35 s
+- new events handler, 32 handler, 2 cpu: 220.452 s
 
 - new events handler, 1 handler, 4 cpu: 18.699 s
 - new events handler, 2 handler, 4 cpu: 16.108 s
 - new events handler, 4 handler, 4 cpu: 17.067 s
 - new events handler, 8 handler, 4 cpu: 30.604 s
 - new events handler, 16 handler, 4 cpu: 60.605 s
+- new events handler, 32 handler, 4 cpu: 125.182 s
 
 - new events handler, 1 handler, 8 cpu: 16.319 s
 - new events handler, 2 handler, 8 cpu: 16.389 s
 - new events handler, 4 handler, 8 cpu: 17.227 s
-- new events handler, 8 handler, 8 cpu: 20.577 s
+- new events handler, 8 handler, 8 cpu: 22.477 s
 - new events handler, 16 handler, 8 cpu: 42.968 s
+- new events handler, 32 handler, 8 cpu: 85.491 s
+
+- new events handler, 1 handler, 12 cpu: 17.173 s
+- new events handler, 2 handler, 12 cpu: 16.7 s
+- new events handler, 4 handler, 12 cpu: 17.909 s
+- new events handler, 8 handler, 12 cpu: 24.521 s
+- new events handler, 12 handler, 12 cpu: 30.316 s
+- new events handler, 24 handler, 12 cpu: 56.642 s
+- new events handler, 36 handler, 12 cpu: 82.635 s
 
 - new events handler, 1 handler, 16 cpu: 16.329 s
 - new events handler, 2 handler, 16 cpu: 16.932 s
 - new events handler, 4 handler, 16 cpu: 18.182 s
 - new events handler, 8 handler, 16 cpu: 22.973 s
 - new events handler, 16 handler, 16 cpu: 38.911 s
+- new events handler, 32 handler, 16 cpu: 79.452 s
 
 note: There are some variations in the results, if we re-run the experiments, which could be because
 of different reasons. These variations have been as high as 20%. In this case the least timing was taken,
 because this reflects the case most closely, that satawal is really empty.
+
+- the 16 cpu experiments are a bit wrong, because the machine did not have 16 cpus free, so it is slowed down
+  and just is similar to 8 cpu
+
+// find excel sheet at: C:\data\Projekte\MatSim\parallelisieren
