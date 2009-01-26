@@ -94,13 +94,13 @@ public class RouteSetGenerator {
 	private boolean isLocalRoute(CarRoute route) {
 		boolean isLocal = true;
 		for (Link routeLink : route.getLinks()) {
-			System.out.print(routeLink.getType()+", ");
+//			System.out.print(routeLink.getType()+", ");
 			if (!routeLink.getType().equals("39") && !routeLink.getType().equals("83") && !routeLink.getType().equals("90")) {
 				isLocal = false;
 				break;
 			}
 		}
-		System.out.println();
+//		System.out.println();
 		return isLocal;
 	}
 
@@ -165,7 +165,7 @@ public class RouteSetGenerator {
 
 		System.out.println("---  end a level of the tree  ---");
 		// go to the next level (d+1) of the tree, if not already enough routes are found
-		if (((nonLocalRoutes.size() < k) || (localRoutes.size()< l)) && !new_links.isEmpty()) { 
+		if (((nonLocalRoutes.size() < k) || ((localRoutes.size()< l) && (nonLocalRoutes.size() < k*5))) && !new_links.isEmpty()) { 
 			this.calcRouteOnSubNet(o,d,k,l,time,new_links,nonLocalRoutes,localRoutes);
 		}
 	}
