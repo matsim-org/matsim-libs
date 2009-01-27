@@ -53,8 +53,12 @@ public class BKickControler extends Controler {
 	 public static void main(String[] args){
 			String equilExampleConfig = "examples/equil/configOTF.xml";
 			String oneRouteTwoModeTest = "../studies/bkickhoefer/oneRouteTwoModeTest/config.xml";
+			String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
+			String oneRouteNoModeTestOld = "../studies/bkickhoefer/oneRouteNoModeTest/configOldUtlFctn.xml";
 //			String config = equilExampleConfig;
-			String config = oneRouteTwoModeTest;
+//			String config = oneRouteTwoModeTest;
+//			String config = oneRouteNoModeTest;
+			String config = oneRouteNoModeTestOld;
 			
 			BKickControler c = new BKickControler(config);
 			c.setOverwriteFiles(true);
