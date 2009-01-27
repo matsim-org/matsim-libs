@@ -64,7 +64,8 @@ public class BKickControler2Test extends MatsimTestCase {
 		controler.run();
 		this.planScorer.finish();
 		//this score is calculated as follows:
-		//
+		//U_total_car = 0                          -(0.2*0.12/1000m)*50000m      +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
+		//U_total_pt  = -(0.1/3600s)*(120min*60)   -(0.0535*0.28/1000m)*50000m   +2.26*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +2.26*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
 		assertEquals(48.54542805141843, this.planScorer.getAgentScore(id2), EPSILON);
 		
