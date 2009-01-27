@@ -76,7 +76,7 @@ public class BKickScoringFunction implements ScoringFunction {
 	protected static double marginalUtilityOfPerforming = Double.NaN;
 	private static double marginalUtilityOfFuel = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
-  private static double marginalUtilityOfPtFare = 0.0535d;
+  private static double marginalUtilityOfPtFare = - 0.0535d;
 
 	
 	
@@ -149,7 +149,7 @@ public class BKickScoringFunction implements ScoringFunction {
 		marginalUtilityOfTravelingWalk = configGroup.getTravelingWalk() / 3600.0;
 		marginalUtilityOfPerforming = configGroup.getPerforming() / 3600.0;
 
-		marginalUtilityOfPtFare = marginalUtilityOfPtFare / 1000.0d;
+//		marginalUtilityOfPtFare = marginalUtilityOfPtFare;
 		
 		marginalUtilityOfFuel = configGroup.getMarginalUtlOfDistance();
 
@@ -316,7 +316,7 @@ public class BKickScoringFunction implements ScoringFunction {
 				Route route = leg.getRoute();
 				dist = route.getDist();
 			}
-			tmpScore += travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;
+			tmpScore = tmpScore + travelTime * marginalUtilityOfTravelingPT + marginalUtilityOfPtFare * 0.28d/1000.0d * dist;
 		} 
 		else if (BasicLeg.Mode.walk.equals(leg.getMode())) {
 			tmpScore += travelTime * marginalUtilityOfTravelingWalk;
