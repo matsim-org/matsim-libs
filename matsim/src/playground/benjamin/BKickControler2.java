@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin;
 
+import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.PlanCalcType;
@@ -34,6 +35,10 @@ public class BKickControler2 extends Controler {
 
 	public BKickControler2(String configFileName) {
 		super(configFileName);
+	}
+	
+	public BKickControler2(Config conf){
+		super(conf);
 	}
 
 	@Override
