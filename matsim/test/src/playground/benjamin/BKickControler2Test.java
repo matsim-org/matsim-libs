@@ -62,8 +62,11 @@ public class BKickControler2Test extends MatsimTestCase {
 		});
 
 		controler.run();
-		assertEquals(0.0, this.planScorer.getAgentScore(id1));
-		assertEquals(0.0, this.planScorer.getAgentScore(id2));
+		this.planScorer.finish();
+		//this score is calculated as follows:
+		//
+		assertEquals(50.23165311164136, this.planScorer.getAgentScore(id1), EPSILON);
+		assertEquals(48.54542805141843, this.planScorer.getAgentScore(id2), EPSILON);
 		
 	}
 	

@@ -33,6 +33,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 
 		// run unit tests
+		suite.addTest(playground.benjamin.AllTests.suite());
 		suite.addTest(playground.gregor.withindayevac.AllTests.suite());
 		suite.addTest(playground.johannes.AllTests.suite());
 		suite.addTest(playground.marcel.AllTests.suite());
