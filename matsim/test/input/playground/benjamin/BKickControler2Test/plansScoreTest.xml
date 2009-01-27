@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<population xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.0.xsd">
+	<person id="1">
+		<plan selected="true">
+			<act type="h" endTime="06:39:00">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+				<route>
+					<startLink refId="1"/>
+					<link refId="2"/>
+					<link refId="3"/>
+					<endLink refId="4"/>
+				</route>
+			</leg>
+			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="4"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+				<route>
+					<startLink refId="4"/>
+					<link refId="5"/>
+					<link refId="6"/>
+					<link refId="7"/>
+					<endLink refId="1"/>
+				</route>
+			</leg>
+			<act type="h">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+<!--		<plan selected="false">-->
+<!--			<act type="h" endTime="06:00:00">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="1"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--			<leg mode="pt">-->
+<!--			</leg>-->
+<!--			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="4"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--			<leg mode="pt">-->
+<!--			</leg>-->
+<!--			<act type="h">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="1"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--		</plan>-->
+	</person>
+	
+	<person id="2">
+<!--		<plan selected="false">-->
+<!--			<act type="h" endTime="06:00:00">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="1"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--			<leg mode="car">-->
+<!--				<route>-->
+<!--					<startLink refId="1"/>-->
+<!--					<link refId="2"/>-->
+<!--					<link refId="3"/>-->
+<!--					<endLink refId="4"/>-->
+<!--				</route>-->
+<!--			</leg>-->
+<!--			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="4"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--			<leg mode="car">-->
+<!--				<route>-->
+<!--					<startLink refId="4"/>-->
+<!--					<link refId="5"/>-->
+<!--					<link refId="6"/>-->
+<!--					<link refId="7"/>-->
+<!--					<endLink refId="1"/>-->
+<!--				</route>-->
+<!--			</leg>-->
+<!--			<act type="h">-->
+<!--				<location>-->
+<!--					<actLocation>-->
+<!--						<linkId refId="1"/>-->
+<!--					</actLocation>-->
+<!--				</location>-->
+<!--			</act>-->
+<!--		</plan>-->
+		<plan selected="true">
+			<act type="h" endTime="06:18:00">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="pt">
+			</leg>
+			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="4"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="pt">
+			</leg>
+			<act type="h">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+	</person>
+	
+</population>
