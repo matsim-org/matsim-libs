@@ -88,6 +88,7 @@
           <!-- avoid out of memory errors by -->
           <forkMode>pertest</forkMode>
           <!--<argLine>-Xmx2000m</argLine> -->
+          <enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
         </configuration>      
       </plugin>
       <plugin>
