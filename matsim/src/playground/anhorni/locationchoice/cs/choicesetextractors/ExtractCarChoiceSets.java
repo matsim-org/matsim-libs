@@ -139,7 +139,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 		toAct.setDuration(choiceSet.getTrip().getAfterShoppingAct().getDuration());
 		toAct.setLinkId(controler.getNetwork().getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getCoord()).getId());
 		
-		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, choiceSet.getTrip().getAfterShoppingAct(), controler);	
+		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, toAct, controler);	
 		
 				
 		return travelTimeShop2AfterShopAct; 		
