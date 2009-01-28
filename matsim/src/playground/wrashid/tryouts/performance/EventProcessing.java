@@ -17,10 +17,11 @@ import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 
-import playground.wrashid.DES.ParallelEvents;
 import playground.wrashid.PHEV.co2emissions.AllLinkHandler;
 import playground.wrashid.PHEV.co2emissions.AllLinkOneIntervalHandler;
 import playground.wrashid.PHEV.co2emissions.OneLinkHandler;
+import playground.wrashid.parallelEventsHandler.ParallelEvents;
+
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.utils.geometry.CoordImpl;
@@ -31,13 +32,9 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		//Events events = new ParallelEvents(2);
-		Events events = new Events();
+		Events events = new ParallelEvents(2);
+		//Events events = new Events();
 
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
-		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
