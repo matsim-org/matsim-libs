@@ -80,7 +80,7 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String eventsFilenameA = "../runs/r153_10/it.1000/1000.events.txt.gz";
 		String eventsFilenameB = "../runs/run628/it.1000/1000.events.txt.gz";
-		String shapeFilepath = "../runs/run628/it.1000/";
+		String shapeFilepath = "../runs/r153_10/vsRun628/";
 		// ////////////////////////////////////////
 		// MATSimNet2QGIS.setFlowCapFactor(0.1);
 		// //////////////////////////////////////
@@ -138,7 +138,7 @@ public class Volume2QGIS extends MATSimNet2QGIS implements X2QGIS {
 			}
 			v2q.addParameter("vol" + index, Integer.class, diff);
 			v2q.addParameter("sign" + index, Integer.class, sign);
-			v2q.writeShapeFile(shapeFilepath + "628." + index + ".shp");
+			v2q.writeShapeFile(shapeFilepath + index + ".shp");
 		}
 		/*
 		 * /////////////////////////////////////////////////////////////////////
