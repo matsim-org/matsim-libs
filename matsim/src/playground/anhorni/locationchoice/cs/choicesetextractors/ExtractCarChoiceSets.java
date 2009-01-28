@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
@@ -124,7 +123,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 	double getTravelTime(Link link, double usedTravelTime, 
 			Controler controler, ChoiceSet choiceSet) {
 		
-		BasicActImpl fromAct = new BasicActImpl("shop");
+		Act fromAct = new Act("shop", link);
 		fromAct.setCoord(link.getCenter());		
 		double startTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + usedTravelTime;
 		fromAct.setStartTime(startTime);	
@@ -133,7 +132,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 		fromAct.setDuration(shopDuration);
 		fromAct.setLinkId(link.getId());
 		
-		double travelTimeShop2AfterShopAct = this.computeTravelTime((Act)fromAct, choiceSet.getTrip().getAfterShoppingAct(), controler);	
+		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, choiceSet.getTrip().getAfterShoppingAct(), controler);	
 		
 				
 		return travelTimeShop2AfterShopAct; 		
