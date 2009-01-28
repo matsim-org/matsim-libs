@@ -79,17 +79,24 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		while (choiceSets_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets_it.next();
 			
-			Coord coord = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
+			Coord coordBefore = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
-			Feature feature = this.createFeature(coord, choiceSet.getPersonId(), choiceSet.getTrip().getTripNr());
-			features.add(feature);
+			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getPersonId(), choiceSet.getTrip().getTripNr());
+			features.add(featureBefore);
 			
 			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
 			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getPersonId(), choiceSet.getTrip().getTripNr());
-			features.add(featureShopping);		
+			features.add(featureShopping);
+			
+			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
+					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
+			
+			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getPersonId(), choiceSet.getTrip().getTripNr());
+			features.add(featureAfter);
+			
 		}			
 		try {
 			if (!features.isEmpty()) {
