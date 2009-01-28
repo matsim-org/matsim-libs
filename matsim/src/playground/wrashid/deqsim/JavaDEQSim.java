@@ -34,14 +34,14 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
-import playground.wrashid.DES.DummyEvent;
-import playground.wrashid.DES.ParallelEvents;
-import playground.wrashid.DES.ProcessEventThread;
 import playground.wrashid.DES.Road;
 import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.Vehicle;
 import playground.wrashid.DES.util.Timer;
+import playground.wrashid.parallelEventsHandler.DummyEvent;
+import playground.wrashid.parallelEventsHandler.ParallelEvents;
+import playground.wrashid.parallelEventsHandler.ProcessEventThread;
 
 public class JavaDEQSim {
 

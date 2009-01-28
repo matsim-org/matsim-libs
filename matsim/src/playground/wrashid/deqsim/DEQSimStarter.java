@@ -30,7 +30,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 
-import playground.wrashid.DES.ParallelEvents;
+import playground.wrashid.parallelEventsHandler.ParallelEvents;
 
 public class DEQSimStarter {
 
