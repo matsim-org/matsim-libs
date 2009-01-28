@@ -123,30 +123,25 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 	double getTravelTime(Link link, double usedTravelTime, 
 			Controler controler, ChoiceSet choiceSet) {
 		
-		Act fromAct = new Act("shop", link);
-		fromAct.setCoord(link.getCenter());		
+		Act fromAct = new Act("shop", link);	
 		double startTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + usedTravelTime;
 		fromAct.setStartTime(startTime);	
 		double shopDuration = choiceSet.getTrip().getShoppingAct().getDuration();
 		fromAct.setEndTime(startTime + shopDuration);
 		fromAct.setDuration(shopDuration);
-		fromAct.setLinkId(link.getId());
 		
-		Act toAct = new Act("aftershop", controler.getNetwork().getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getCoord()));
-		toAct.setCoord(choiceSet.getTrip().getAfterShoppingAct().getCoord());		
+		Act toAct = new Act("aftershop", controler.getNetwork().getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getCoord()));		
 		toAct.setStartTime(choiceSet.getTrip().getAfterShoppingAct().getStartTime());	
 		toAct.setEndTime(choiceSet.getTrip().getAfterShoppingAct().getEndTime());
 		toAct.setDuration(choiceSet.getTrip().getAfterShoppingAct().getDuration());
-		toAct.setLinkId(controler.getNetwork().getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getCoord()).getId());
 		
-		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, toAct, controler);	
-		
-				
+		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, toAct, controler);			
 		return travelTimeShop2AfterShopAct; 		
 	}
 	
 	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = new Leg(BasicLeg.Mode.car);
+		leg.setNum(0);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
