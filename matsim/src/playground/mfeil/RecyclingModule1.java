@@ -95,7 +95,7 @@ public class RecyclingModule1 extends RecyclingModule implements StrategyModule{
 		
 		/* Detect optimal coefficients metric */
 		Statistics.prt=false;
-		if (this.noOfSoftCoefficients>1) this.detectCoefficients();
+		if (/*Controler.getIteration()==1	&&	*/this.noOfSoftCoefficients>1) this.detectCoefficients();
 		Statistics.prt=true;
 		
 		/* Print statistics of individual optimization */
