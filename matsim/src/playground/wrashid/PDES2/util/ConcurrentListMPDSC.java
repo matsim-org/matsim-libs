@@ -1,21 +1,14 @@
 package playground.wrashid.PDES2.util;
 
-import java.util.AbstractCollection;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import playground.wrashid.DES.util.Timer;
 // the producer decides, when the his inputBuffer should be emptied
 // the parameter maxInputPutListSize can be set large for allowing high cuncurrency, if
 // the application allows for this case
 // optimized for ZoneMessageQueue
 import playground.wrashid.PDES2.Message;
-import playground.wrashid.PDES2.MessageExecutor;
-import playground.wrashid.PDES2.SimulationParameters;
-import playground.wrashid.PDES2.util.ConcurrentListSPSC.ARunnable;
-import playground.wrashid.PDES2.util.ConcurrentListSPSC.BRunnable;
+
 
 public class ConcurrentListMPDSC {
 	private MyPriorityQueue[] inputBuffer;
