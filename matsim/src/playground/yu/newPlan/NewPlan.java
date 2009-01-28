@@ -43,6 +43,7 @@ public abstract class NewPlan extends AbstractPersonAlgorithm {
 
 	public NewPlan(final Population population, final String filename) {
 		this.pw = new PopulationWriter(population, filename, "v4");
+		this.pw.writeStartPlans();
 	}
 
 
