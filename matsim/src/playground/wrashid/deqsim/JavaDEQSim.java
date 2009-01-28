@@ -59,7 +59,9 @@ public class JavaDEQSim {
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
 		//SimulationParameters.events = events;
 		// the thread for processing the events
-		SimulationParameters.processEventThread= (ParallelEvents) events;
+		SimulationParameters.processEventThread= events;
+
+		
 		
 		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
@@ -116,7 +118,11 @@ public class JavaDEQSim {
 
 		// the main thread (microsimulation) is finished - await the event processing
 		// TODO: remove this after integration into core
-		SimulationParameters.processEventThread.awaitHandlerThreads();
+		if (SimulationParameters.processEventThread instanceof ParallelEvents){
+			ParallelEvents pe= (ParallelEvents) SimulationParameters.processEventThread;
+			pe.awaitHandlerThreads();
+		}
+		
 		
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
