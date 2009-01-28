@@ -27,20 +27,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.matsim.gbl.Gbl;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.network.NetworkReader;
 import org.matsim.network.Node;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationWriter;
+import org.matsim.population.PopulationWriterHandlerImplV4;
+import org.xml.sax.SAXException;
 
-import playground.dgrether.utils.MatsimIo;
+import playground.dgrether.cmcf.CMCFScenarioGenerator;
 import playground.msieg.structure.HashPathFlow;
 import playground.msieg.structure.PathFlow;
 
-public abstract class CMCFRouter {
+public abstract class CMCFRouter implements NetworkReader{
 
+	private static final Logger log = Logger.getLogger(CMCFRouter.class);
+	
 	private final String networkFile, plansFile, cmcfFile;
 	
 	protected NetworkLayer network;
@@ -55,6 +63,12 @@ public abstract class CMCFRouter {
 		this.cmcfFile = cmcfFile;
 	}
 
+	public void read() throws IOException{
+		this.loadNetwork();
+		this.loadPopulation();
+		this.loadCMCFSolution();
+	}
+	
 	public void loadEverything(){
 		this.loadNetwork();
 		this.loadPopulation();
@@ -68,8 +82,22 @@ public abstract class CMCFRouter {
 	}
 	
 	protected void loadNetwork(){
-		this.network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(networkFile);
+		//this.network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		//new MatsimNetworkReader(network).readFile(networkFile);
+		this.network = new NetworkLayer();
+		MatsimNetworkReader reader = null;
+		try {
+			reader = new MatsimNetworkReader( this.network );
+			reader.parse(this.networkFile);
+			this.network.connect();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			//throw e;
+			e.printStackTrace();
+		}
 	}
 	
 	protected void loadPopulation(){
@@ -107,7 +135,10 @@ public abstract class CMCFRouter {
 	}
 	
 	public void writePlans(String outPlansFile){
-		MatsimIo.writePlans(this.population, outPlansFile);
+		//MatsimIo.writePlans(this.population, outPlansFile);
+		PopulationWriter pwriter = new PopulationWriter(this.population, outPlansFile, "v4", 1.0);
+		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
+		pwriter.write();
 	}
 	
 	abstract public void route();

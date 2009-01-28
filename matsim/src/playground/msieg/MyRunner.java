@@ -21,7 +21,6 @@
 package playground.msieg;
 
 import org.matsim.controler.Controler;
-import org.matsim.run.OTFVis;
 
 public class MyRunner {
 
@@ -30,7 +29,7 @@ public class MyRunner {
 	 */
 	public static void main(String[] args) {
 
-		String config = "./examples/test/config.xml";
+		String config = "./examples/test/sioux/config.xml";
 		if(args.length > 0)
 			config = args[0];
 		

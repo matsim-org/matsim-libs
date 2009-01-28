@@ -24,6 +24,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.basic.v01.Id;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
@@ -35,19 +37,20 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
-import org.matsim.world.MatsimWorldReader;
+import org.xml.sax.SAXException;
 
 import playground.msieg.structure.Commodities;
 import playground.msieg.structure.Commodity;
 
-public class CMCFDemandWriter implements PopulationReader {
+public class CMCFDemandWriter{
 
+	private final NetworkLayer network;
 	private final Population plans;
 	private final PopulationReader popReader;
 	//The input tag has to be specified before converting starts,
 	//it must equal the network name, otherwise CMCF won't run.
 	private String inputNetwork = "notspecified";
-	private String plansPath;
+	private String networkPath, plansPath;
 	
 //	public CMCFDemandWriter(){
 //		this.plans = new Population(Population.NO_STREAMING);
@@ -55,62 +58,45 @@ public class CMCFDemandWriter implements PopulationReader {
 //	}
 	
 	public CMCFDemandWriter(String configPath){
-		this(configPath, null);
+		this( 	Gbl.createConfig(new String[] { configPath, "config_v1.dtd" }).network().getInputFile(),
+				Gbl.getConfig().plans().getInputFile()
+			);
 	}
 	
-	public CMCFDemandWriter(String configPath, String plansPath){
-		if (Gbl.getConfig() == null) {
-			Gbl.createConfig(new String[] { configPath, "config_v1.dtd" });
-		}
-		this.loadWorld();
+	public CMCFDemandWriter(String networkPath, String plansPath){
+		this.networkPath = networkPath == null ? Gbl.getConfig().network().getInputFile(): networkPath;
 		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
-		this.setInputNetwork(Gbl.getConfig().network().getInputFile());
 		
+		this.network = new NetworkLayer();
 		this.plans = new Population(Population.NO_STREAMING);
-		this.popReader = new MatsimPopulationReader(this.plans, this.loadNetwork());
+		this.popReader = new MatsimPopulationReader(this.plans, this.network);
+		
+		this.init();
 	}
 	
-	public void readFile(){
-		System.out.println("\t<!--- trying to load file: "+plansPath+" -->");
-		this.popReader.readFile(this.plansPath);
+	private void init(){
+		try {
+			new MatsimNetworkReader(this.network).parse(this.networkPath);
+			this.network.connect();
+			this.popReader.readFile(this.plansPath);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void readFile(String filename) {
-		this.popReader.readFile(filename);
+	@Deprecated
+	public void readFile()
+	{
+		this.init();
 	}
 	
-
+	
 	public void setInputNetwork(String inputNetwork) {
 		this.inputNetwork = inputNetwork;
-	}
-	
-	/**
-	 * load the world
-	 *
-	 */
-	protected boolean loadWorld() {
-		if (Gbl.getConfig().world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-			worldReader.readFile(Gbl.getConfig().world().getInputFile());
-			return true;
-		}
-		else {
-			System.out.println("No World input file given in config.xml!");
-			return false;
-		}
-	}
-
-	/**
-	 * load the network
-	 *
-	 * @return the network layer
-	 */
-	protected NetworkLayer loadNetwork() {
-		// - read network: which buildertype??
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(
-				NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		return network;
 	}
 	
 
@@ -213,6 +199,10 @@ public class CMCFDemandWriter implements PopulationReader {
 		log(tab+"<demands>\n", out);
 		int counter = 1;
 		for(Commodity<Node> c: com){
+			if(c.getOrigin() == c.getDestination()){
+				log(tab+"\t<!--- Skipping commodity, because start node equals target --->", out);
+				continue;
+			}
 			log(tab+"\t<commodity id=\""+(counter++)+"\">\n", out);
 			log(tab+"\t\t<from>"+c.getOrigin().getId()+"</from>\n", out);
 			log(tab+"\t\t<to>"+c.getDestination().getId()+"</to>\n", out);
@@ -240,7 +230,7 @@ public class CMCFDemandWriter implements PopulationReader {
 	
 	public static void main(String[] args) {
 		if(args.length==0){
-			System.out.println("Usage: java CMCFDemandWriter config.xml [matsimPlansFile.xml] [outputFile] [input] \n" +
+			System.out.println("Usage: java CMCFDemandWriter config.xml \n\tOR: java CMCFDemandWriter network.xml plans.xml [outputFile] [input] \n" +
 					"\t second argument is the plansFile to convert, if not given, then the plans file in the config is used." +
 					"\t third argument is optional if not given, then output is written to console.\n" +
 					"\t fourth argument is also optional, if not given then its set to 'unspecified'," +
@@ -270,5 +260,4 @@ public class CMCFDemandWriter implements PopulationReader {
 		cdw.readFile();
 		cdw.convert(out);
 	}
-	
 }

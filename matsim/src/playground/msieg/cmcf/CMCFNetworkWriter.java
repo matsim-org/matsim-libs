@@ -26,6 +26,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 	private final String netFile;
 	private final MatsimNetworkReader netReader;
 	private final NetworkLayer netLayer;
+	private String netName;
 	
 	/**
 	 * @param netFile path to the file which should be converted
@@ -35,12 +36,14 @@ public class CMCFNetworkWriter implements NetworkReader {
 		this.netFile = netFile;
 		this.netLayer = new NetworkLayer();
 		this.netReader = new MatsimNetworkReader( this.netLayer );
+		this.netName = "unspecified";
 	}
 
 	public void read() throws IOException {
 		try {
 			this.netReader.parse(this.netFile);
 			this.netLayer.connect();
+			this.netName = this.netLayer.getName();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -49,6 +52,12 @@ public class CMCFNetworkWriter implements NetworkReader {
 			throw e;
 		}
 	}
+	
+	
+	public void setNetName(String netName) {
+		this.netName = netName;
+	}
+
 	/**
 	 * Converts file and prints out to console, equivalent to call convert(null)
 	 */
@@ -86,7 +95,7 @@ public class CMCFNetworkWriter implements NetworkReader {
 		while(tabs-- > 0)
 			tab += '\t';
 		log(tab+"<header>\n", out);
-		log(tab+"\t<name>"+this.netLayer.getName()+"</name>\n", out);
+		log(tab+"\t<name>"+this.netName+"</name>\n", out);
 		log(tab+"\t<date>"+System.currentTimeMillis()+"</date>\n", out);
 		log(tab+"\t<creator>"+this.getClass().getSimpleName()+"</creator>\n", out);
 		log(tab+"</header>\n", out);
