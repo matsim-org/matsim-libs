@@ -67,7 +67,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.minimumTime			= 3600;
 		this.NEIGHBOURHOOD_SIZE		= 10;
 		this.maxWalkingDistance		= 2000;
-		this.modeChoice				= "extended_3";
+		this.modeChoice				= "standard";
 		
 		//TODO @MF: constants to be configured externally
 	}
@@ -78,39 +78,52 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	//////////////////////////////////////////////////////////////////////
 	
 	public void run (Plan basePlan){
-		// moved this piece of code to the very beginning
 		if (basePlan.getActsLegs().size()==1) return;
 		
-		/* TODO: just as long as PlanomatXPlan exists. Needs then to be removed!!! */ 
-		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
-		plan.copyPlan(basePlan);
+		/* Analysis of subtours */
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(basePlan);
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
-		double move = this.cleanSchedule (((Act)(plan.getActsLegs().get(0))).getEndTime(), plan);
+		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
 		int loops=1;
 		while (move!=0.0){
 			loops++;
-			move = this.cleanSchedule(java.lang.Math.max(((Act)(plan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), plan);
+			move = this.cleanSchedule(java.lang.Math.max(((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), basePlan);
 			if (loops>3) {
-				for (int i=2;i<plan.getActsLegs().size()-4;i+=2){
-					((Act)plan.getActsLegs().get(i)).setDuration(this.minimumTime);
+				for (int i=2;i<basePlan.getActsLegs().size()-4;i+=2){
+					((Act)basePlan.getActsLegs().get(i)).setDuration(this.minimumTime);
 				}
-				move = this.cleanSchedule(this.minimumTime, plan);
+				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (move!=0.0){
-					// TODO Was soll im finalen Zustand hier passieren?
-					log.warn("No valid initial solution found for "+plan.getPerson().getId()+"!");
-					plan.setScore(-10000);
-					return;
+					// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
+					//log.warn("No valid initial solution found for "+basePlan.getPerson().getId()+"!");
+					double tmpScore = this.chooseModeAllChains((PlanomatXPlan)basePlan, basePlan.getActsLegs(), planAnalyzeSubtours);
+					if (tmpScore!=-100000) {
+						log.warn("Valid initial solution found by first mode choice re-factoring.");
+						break;
+					}
+					else {
+						/*
+						while(tmpScore==-100000){
+							for (int k=basePlan.getActsLegs().size()-3;k>=2;k-=2){
+								// remove acts if not primary -> requires reference to PlanomatX
+							}
+						}
+						*/
+						// TODO Check whether allowed?
+						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
+						return;
+					}
 				}
 			}
 		}
 		// TODO Check whether allowed?
-		plan.setScore(this.scorer.getScore(plan));	
+		basePlan.setScore(this.scorer.getScore(basePlan));	
 		
-		/* Analysis of subtours */
-		// analyze plan: how many activities and subtours do we have?
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.run(plan);
+		/* TODO: just as long as PlanomatXPlan exists. Needs then to be removed!!! */
+		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
+		plan.copyPlan(basePlan);
 		
 		/* Initializing */ 
 		int neighbourhood_size = 0;
