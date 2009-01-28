@@ -100,10 +100,28 @@ public class AgentsAssigner1 extends AgentsAssigner implements PlanAlgorithm{
 			// All prim acts in potential agent's plan
 			for (int i=0;i<plan.getPerson().getKnowledge().getActivities(true).size();i++){
 				boolean in = false;
-				for (int x=0;x<agents.getAgentPlan(j).getActsLegs().size()-2;x+=2){
+				for (int x=0;x<agents.getAgentPlan(j).getActsLegs().size()-2;x=x+2){
+					// try statement with print block to analyze some strange exceptions in Zurich scenario
+					try {
 					if (((Act)(agents.getAgentPlan(j).getActsLegs().get(x))).getType().equals(plan.getPerson().getKnowledge().getActivities(true).get(i).getType())){
 						in = true;
 						break;
+					}
+					} catch (Exception e){
+						log.warn(e);
+						System.out.println("Acts im Plan des schon optimierten Agenten:");
+						for (int k=0;k<agents.getAgentPlan(j).getActsLegs().size();k++) {
+							if (agents.getAgentPlan(j).getActsLegs().get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(((Act)(agents.getAgentPlan(j).getActsLegs().get(k))).getType()+" ");
+							else System.out.print(((Leg)(agents.getAgentPlan(j).getActsLegs().get(k))).getMode()+" ");
+						}
+						System.out.println();
+						System.out.println("Primacts im Knowledge des zuzuordnenden Agenten:");
+						for (int k=0;k<plan.getPerson().getKnowledge().getActivities(true).size();k++){
+							if (plan.getPerson().getKnowledge().getActivities(true).get(k).getClass().getName().equals("org.matsim.population.Act")) System.out.print(plan.getPerson().getKnowledge().getActivities(true).get(k).getType()+" ");
+							else System.out.print("Leg but undefined. ");
+						}
+						System.out.println();
+						continue optimizedAgentsLoop;	// if exception occurs go to next agent whatsoever the exception is.
 					}
 				}
 				if (!in) {
