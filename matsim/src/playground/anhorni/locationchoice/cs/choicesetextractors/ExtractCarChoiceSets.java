@@ -82,8 +82,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 	
 		NetworkLayer network = controler.getNetwork();
 				
-		Node referenceNode = network.getNearestNode(choiceSet.getReferencePoint());
-		spanningTree.setOrigin(referenceNode);
+		spanningTree.setOrigin(network.getNearestNode(choiceSet.getTrip().getBeforeShoppingAct().getCoord()));
 		spanningTree.setDepartureTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		spanningTree.run(network);
 		List<Node> nodesList = new Vector<Node>();
