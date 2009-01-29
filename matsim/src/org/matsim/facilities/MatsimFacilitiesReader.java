@@ -36,6 +36,8 @@ import org.xml.sax.SAXException;
  * @author mrieser
  */
 public class MatsimFacilitiesReader extends MatsimXmlParser {
+	// FIXME: Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
+	// naming conventions?  kai, jan09
 
 	private final static String FACILITIES_V1 = "facilities_v1.dtd";
 
