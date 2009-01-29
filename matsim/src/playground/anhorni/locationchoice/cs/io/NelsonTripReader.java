@@ -133,10 +133,12 @@ public class NelsonTripReader {
 								
 				String[] entries = curr_line.split("\t", -1);
 				
+				/*
 				String m = entries[53].trim();
 				boolean walk = m.equals("15") && mode.equals("walk");
 				boolean car = m.equals("9") && mode.equals("car");				
 				if (!(walk || car )) continue;
+				*/
 				
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
