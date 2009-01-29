@@ -37,7 +37,7 @@ public class NelsonTripReader {
 		this.mzTrips = new TreeMap<Id, MZTrip>();
 		this.choiceSets = new Vector<ChoiceSet>();
 		
-		read0(file0, mode);
+		read0(file0);
 		read1(file1, mode);
 		log.info("Number of " + mode + " trips : " + this.choiceSets.size());
 		return this.choiceSets;
@@ -114,15 +114,20 @@ public class NelsonTripReader {
 	}
 	
 	// add F58, F514 for after shopping act (E_X and E_Y)
-	private void read0(String file, String mode) {
+	private void read0(String file) {
 				
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			String curr_line = bufferedReader.readLine(); // Skip header
 						
-			while ((curr_line = bufferedReader.readLine()) != null) {	
+			while ((curr_line = bufferedReader.readLine()) != null) {
+								
 				String[] entries = curr_line.split("\t", -1);
+				
+				String mode = entries[53].trim();
+				
+				if (!(mode.endsWith("Fuss") || mode.equals("Auto"))) continue;
 				
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
@@ -135,7 +140,14 @@ public class NelsonTripReader {
 						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
 				
 				double startTime = 60* Double.parseDouble(entries[5].trim());
-				double endTime = 60* Double.parseDouble(entries[41].trim());
+				
+				double endTime = startTime;
+				if (entries[41].trim().length() > 0) {
+					endTime = 60* Double.parseDouble(entries[41].trim());
+				}
+				else {
+					log.info("No end time found for " +id);
+				}
 				
 				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
 				this.mzTrips.put(id, mzTrip);
