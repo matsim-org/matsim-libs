@@ -75,8 +75,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 		log.info("computing car choice sets...:");
 		super.computeChoiceSets();
 	}
-	
-		
+			
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
 			Controler controler) {
 	
@@ -140,7 +139,6 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 	
 	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setNum(0);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
