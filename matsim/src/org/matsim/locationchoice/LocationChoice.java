@@ -53,6 +53,9 @@ public class LocationChoice extends MultithreadedModuleA {
 	public LocationChoice(
 			final NetworkLayer network,
 			Controler controler) {
+		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
+		// when you use it in demandmodelling where you don't really need a control(l)er.
+		// kai, jan09
 
 		this.initLocal(network, controler);
 	}
@@ -61,6 +64,7 @@ public class LocationChoice extends MultithreadedModuleA {
 	private void initLocal(
 			final NetworkLayer network,
 			final Controler controler) {
+		// TODO: see above (why do you need the control(l)er as argument?)
 		
 		log.info("adding FacilitiesLoadCalculator");
 		controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
