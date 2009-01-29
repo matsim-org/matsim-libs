@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+                <param name="numberOfThreads" value="1" />
+	</module>
+
+	<module name="network">
+            	<param name="inputNetworkFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/network/net.xml" />
+	</module>
+
+	<module name="facilities">
+            	<param name="inputFacilitiesFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/facilities/facilities.xml.gz" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/plans/plans.xml.gz" />
+		<param name="outputPlansFile" value="/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/plans/output-plans.xml.gz" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="travelingPt" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="home" /> <!-- home -->
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+	
+		<param name="activityType_1"            value="work" /> <!-- work -->
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+<!-- 		<param name="activityClosingTime_1"     value="18:00:00" /> -->
+<!-- 		<param name="activityEarliestEndTime_1" value="" /> -->
+	</module>
+	
+	
+       <module name="locationchoice">
+<!--                 <param name="constrained" value="False"/> -->
+<!--                 <param name="restraintFcnFactor" value="1."/> -->
+<!--                 <param name="restraintFcnExp" value="1."/> -->
+<!--                 <param name="scaleFactor" value="1" /> -->
+<!--                 <param name="recursionTravelSpeedChange" value="1."/> -->
+<!--                 <param name="recursionTravelSpeed" value="1."/> -->
+<!--                 <param name="maxRecursions" value="1"/> -->
+<!--                 <param name="fixByActType" value="True"/> -->
+        </module>
+
+</config>
