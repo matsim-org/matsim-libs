@@ -54,10 +54,11 @@ public class NelsonTripReader {
 			while ((curr_line = bufferedReader.readLine()) != null) {	
 				String[] entries = curr_line.split("\t", -1);
 				
-				String m = entries[70].trim();
+				String wmittel = entries[70].trim();
+				String ausmittel = entries[59].trim();
 				
-				boolean walk = m.equals("15") && mode.equals("walk");
-				boolean car = m.equals("9") && mode.equals("car");
+				boolean walk = wmittel.equals("15") && ausmittel.equals("15") && mode.equals("walk") ;
+				boolean car = wmittel.equals("9") && ausmittel.equals("9") && mode.equals("car");
 				
 				if (!(walk || car )) continue;
 				
