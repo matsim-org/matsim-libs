@@ -4,7 +4,11 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
+                <!-- (leave as is) -->
+
 		<param name="coordinateSystem" value="Atlantis" />
+                <!-- (leave as is except if you want to use google earth) -->
+
                 <param name="numberOfThreads" value="1" />
 	</module>
 
@@ -27,11 +31,13 @@
 		<param name="startTime" value="00:00:00" />
    		<param name="endTime" value="36:00:00" />
 
-		<param name="flowCapacityFactor" value="0.015" />
+		<param name="flowCapacityFactor" value="0.01" />
 		<param name="storageCapacityFactor" value="0.01" />
+                <!-- (adjust the above if you are using different sample sizes) -->
 
 		<param name="removeStuckVehicles" value="false" />
 		<param name="stuckTime" value="10" />
+                <!-- (leave as is) -->
 	
  		<param name = "snapshotperiod"	value = "00:15:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims, otfvis -->
@@ -68,16 +74,17 @@
 		<param name="maxAgentPlanMemorySize" value="2" /> <!-- 0 means unlimited -->
 		<!-- "2" is at the low end -->
 
-		<param name="ModuleProbability_1" value="0.1" />
-		<param name="Module_1" value="TimeAllocationMutator" />
-                <param name="ModuleDisableAfterIteration_1" value="80" />
+		<param name="ModuleProbability_1" value="0.8" />
+		<param name="Module_1" value="ChangeExpBeta" />
+                <!-- (don't touch) -->
 
-		<param name="ModuleProbability_2" value="0.9" />
-		<param name="Module_2" value="ChangeExpBeta" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="TimeAllocationMutator" />
+                <param name="ModuleDisableAfterIteration_2" value="80" />
 
 		<param name="ModuleProbability_3" value="0.1" />
 		<param name="Module_3" value="ReRoute_Dijkstra" />
-                <param name="ModuleDisableAfterIteration_1" value="80" />
+                <param name="ModuleDisableAfterIteration_3" value="80" />
 
                 <!-- (It is called "probability" in the config file, but it behaves like a weight, i.e. it is renormalized in the code.) -->
         </module>	

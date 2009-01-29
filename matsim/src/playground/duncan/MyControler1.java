@@ -32,11 +32,7 @@ public class MyControler1 {
 	public static void main(final String[] args) {
 
 		if ( args.length==0 ) {
-//			Gbl.createConfig(new String[] {"../studies/schweiz/6-9SepFmaZurichOnly_rad=26000m-hwh/config-10pct.xml"});
-//			Gbl.createConfig(new String[] {"./examples/roundabout/config.xml"});
-			Gbl.createConfig(new String[] {"./examples/equil/myconfig.xml"});
-//			Gbl.createConfig(new String[] {"../padang/dlr-network/pconfig.xml"});
-//			Gbl.createConfig(new String[] {"/home/nagel/vsp-cvs/studies/ivtch-schweiz/plans/kaiconfig.xml"});
+			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
 		} else {
 			Gbl.createConfig(args) ;
 		}
@@ -45,9 +41,6 @@ public class MyControler1 {
 		controler.setOverwriteFiles(true);
 		controler.run();
 
-//		// Visualize
-//		String[] visargs = {"./output/ITERS/it.100/Snapshot"};
-//		NetVis.main(visargs);
 
 	}
 

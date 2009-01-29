@@ -45,63 +45,27 @@ import org.matsim.utils.vis.netvis.NetVis;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 
-public class ConnectHomesAndWorkplaces {
+public class ConnectHomesAndWorkplacesSimple {
 	
-	Config config ;
-
 	public void run(final String[] args) {
-
-		// create/read the config:
-		if ( args.length==0 ) {
-			this.config = Gbl.createConfig(new String[] {"./src/playground/duncan/h2w-config.xml"});
-		} else {
-			this.config = Gbl.createConfig(args) ;
-		}
-		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
-		configwriter.write();
-
-		// create the control(l)er:
-		final Controler controler = new Controler(Gbl.getConfig());
-		controler.loadData() ;
-		// (I think that the control(l)er is only needed to make the locationchoice module happy;
-		// there is no logical reason why it is necessary. Kai)
-		
-		// create/read the network:
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-
-		// create/read the world (probably empty input file)
-		final World world = Gbl.getWorld();
-		if (this.config.world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-			worldReader.readFile(this.config.world().getInputFile());
-		}
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Facilities facilities = new Facilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
-		fr.readFile( this.config.facilities().getInputFile() ) ;
-
-		// create the locachoice object:
-		LocationMutator locachoice = new RandomLocationMutator( controler.getNetwork(),controler) ;
-
-		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(locachoice);
-		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
+		fr.readFile( "lsfd" ) ;
 		
-		// I don't know why this works:
-		plansReader.readFile(this.config.plans().getInputFile());
-		plans.printPlansCount();
-		plansWriter.write();
+		Population population = new Population() ;
+		MatsimPopulationReader pr = new MatsimPopulationReader ( population ) ;
+		pr.readFile( "lsdkjf" ) ;
 
-		System.out.println("done.");
+		// program locachoice here
+		
+		PopulationWriter popWriter = new PopulationWriter(population,"newfilename","v4",1 ) ;
+		popWriter.write();
+
 	}
 
 	public static void main(final String[] args) {
-		ConnectHomesAndWorkplaces app = new ConnectHomesAndWorkplaces();
+		ConnectHomesAndWorkplacesSimple app = new ConnectHomesAndWorkplacesSimple();
 		app.run(args);
 	}
 

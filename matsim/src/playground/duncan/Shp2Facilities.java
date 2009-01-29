@@ -25,7 +25,7 @@ public class Shp2Facilities {
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		Facilities facilities = new Facilities() ;
+		Facilities facilities = new Facilities("workplaces",false) ;
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;
@@ -73,7 +73,7 @@ public class Shp2Facilities {
 	}
 	
 	public static void main(final String [] args) {
-		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/landuse/shp/landuse.shp";
+		final String shpFile = "/Users/nagel/shared-svn/studies/north-america/ca/metro-vancouver/facilities/shp/landuse.shp";
 		
 		Gbl.createWorld();
 		Gbl.createConfig(null);
