@@ -144,9 +144,10 @@ public class AgentsAssigner implements PlanAlgorithm{
 		// NEW NEW NEW NEW NEW NEW NEW
 		ArrayList<Activity> primActs = new ArrayList<Activity>(out.getPerson().getKnowledge().getActivities(true));
 		
-		// Condition that home activity is always first and last activity in day plan
+		// TODO Check what is better! Condition that home activity is always first and last activity in day plan
 		for (int i=0;i<primActs.size();i++){
-			if (primActs.get(i).getType().equals(((Act)(bestPlan.getActsLegs().get(0))).getType())) primActs.remove(i);
+			//if (primActs.get(i).getType().equals(((Act)(bestPlan.getActsLegs().get(0))).getType())) primActs.remove(i);
+			if (primActs.get(i).getType().toString().equals("home")) primActs.remove(i);
 		}
 		
 		for (int i=2;i<bestPlan.getActsLegs().size()-2;i+=2){
@@ -155,6 +156,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 					if (((Act)(bestPlan.getActsLegs().get(i))).getType().equals(primActs.get(j).getType())){
 						Facility fac = (Facility) this.controler.getFacilities().getLocation(primActs.get(j).getFacility().getId());
 						((Act)(bestPlan.getActsLegs().get(i))).setFacility(fac);
+						// not only update of fac required but also coord and link; data inconsistencies otherwise
+						((Act)(bestPlan.getActsLegs().get(i))).setCoord(fac.getCenter());
+						((Act)(bestPlan.getActsLegs().get(i))).setLink(fac.getLink());
 						primActs.remove(j);
 						break;
 					}
