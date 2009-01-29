@@ -90,7 +90,8 @@ public class Facilities extends Layer implements Iterable<Facility> {
 
 		return f;
 	}
-
+	
+	@Deprecated // String arguments in creational patterns are deprecated.  kai, jan09
 	public final Facility createFacility(final String id, final String x, final String y) {
 		return this.createFacility(new IdImpl(id),new CoordImpl(x,y));
 	}
