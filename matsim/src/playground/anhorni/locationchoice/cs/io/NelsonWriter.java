@@ -13,7 +13,7 @@ public class NelsonWriter {
 
 public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
 		
-		String outfile = "nelson" + name +".txt";
+		String outfile = outdir + "nelson" + name +".txt";
 		
 		try {		
 			final String header="Id\tTrip_nr\tTTB\tS_X\tS_Y\tEnd_S\tZ_X\tZ_Y\tStart_Z\tEnd_Z\tE_X\tE_Y\tStart_E";

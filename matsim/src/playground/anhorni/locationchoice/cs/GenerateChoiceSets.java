@@ -164,6 +164,8 @@ public class GenerateChoiceSets {
 			NelsonWriter nelsonWriter = new NelsonWriter();
 			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
 			nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
+			
+			log.info("Wriiiting to" + this.outdir);
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
