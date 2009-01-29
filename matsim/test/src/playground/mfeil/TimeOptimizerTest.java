@@ -170,6 +170,9 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
 		
+		this.router.run(plan);	// conducts routing and sets travel times
+		this.testee.cleanActs(plan.getActsLegs());	// adjusts the act durations according to travel times
+		
 		ArrayList<Object> alIn = this.testee.copyActsLegs(plan.getActsLegs()); 
 		ArrayList<Object> alCheck = this.testee.copyActsLegs(plan.getActsLegs()); 
 		
@@ -194,6 +197,9 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
 		
+		this.router.run(plan);	// conducts routing and sets travel times
+		this.testee.cleanActs(plan.getActsLegs());	// adjusts the act durations according to travel times
+		
 		ArrayList<Object> alIn = this.testee.copyActsLegs(plan.getActsLegs()); 
 		ArrayList<Object> alCheck = this.testee.copyActsLegs(plan.getActsLegs()); 
 		
@@ -207,6 +213,11 @@ public class TimeOptimizerTest extends MatsimTestCase{
 		((Act)(alCheck.get(4))).setDuration(((Act)(alCheck.get(4))).getEndTime()-(((Act)(alCheck.get(2))).getEndTime()+((Leg)(alCheck.get(3))).getTravelTime()));
 	
 		for (int i=0;i<alIn.size();i+=2){
+			log.info(((Act)(alCheck.get(i))).getDuration());
+		}
+		
+		for (int i=0;i<alIn.size();i+=2){
+			log.warn("Iteration "+i);
 			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
 		}
 	}
@@ -214,6 +225,8 @@ public class TimeOptimizerTest extends MatsimTestCase{
 	public void testRun (){
 		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
 		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		
+		this.router.run(plan);
 		
 		log.info("Reading output plan xml file...");
 		Population popTest = new Population(Population.NO_STREAMING);
