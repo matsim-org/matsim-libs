@@ -87,6 +87,7 @@ public abstract class AbstractLocation implements Location {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public final void addUpMapping(final Location other) {
 		if (this.layer.getUpRule() == null) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has no up_rule]");
@@ -103,6 +104,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#addDownMapping(org.matsim.world.Location)
 	 */
+	@Deprecated
 	public final void addDownMapping(final Location other) {
 		if (this.layer.getDownRule() == null) {
 			Gbl.errorMsg(this.toString() + "[other=" + other + " has no down_rule]");
@@ -120,6 +122,7 @@ public abstract class AbstractLocation implements Location {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	protected final boolean removeUpMapping(final Id other_id) {
 		if (this.up_mapping.get(other_id) == null) { return true; }
 		AbstractLocation other = (AbstractLocation) this.up_mapping.get(other_id);
@@ -128,6 +131,7 @@ public abstract class AbstractLocation implements Location {
 		return true;
 	}
 
+	@Deprecated
 	protected final boolean removeDownMapping(final Id other_id) {
 		if (this.down_mapping.get(other_id) == null) { return true; }
 		AbstractLocation other = (AbstractLocation) this.down_mapping.get(other_id);
@@ -139,6 +143,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#removeAllUpMappings()
 	 */
+	@Deprecated
 	public final boolean removeAllUpMappings() {
 		ArrayList<Id> other_ids = new ArrayList<Id>(this.up_mapping.keySet());
 		for (int i=0; i<other_ids.size(); i++) { this.removeUpMapping(other_ids.get(i)); }
@@ -148,6 +153,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#removeAllDownMappings()
 	 */
+	@Deprecated
 	public final boolean removeAllDownMappings() {
 		ArrayList<Id> other_ids = new ArrayList<Id>(this.down_mapping.keySet());
 		for (int i=0; i<other_ids.size(); i++) { this.removeDownMapping(other_ids.get(i)); }
@@ -194,6 +200,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpLocation(org.matsim.utils.identifiers.IdI)
 	 */
+	@Deprecated
 	public final Location getUpLocation(final Id id) {
 		return this.up_mapping.get(id);
 	}
@@ -201,6 +208,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#downLocation(org.matsim.utils.identifiers.IdI)
 	 */
+	@Deprecated
 	public final Location downLocation(final Id id) {
 		return this.down_mapping.get(id);
 	}
@@ -208,6 +216,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getUpMapping()
 	 */
+	@Deprecated
 	public final TreeMap<Id,Location> getUpMapping() {
 		return this.up_mapping;
 	}
@@ -215,6 +224,7 @@ public abstract class AbstractLocation implements Location {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getDownMapping()
 	 */
+	@Deprecated
 	public final TreeMap<Id, Location> getDownMapping() {
 		return this.down_mapping;
 	}

@@ -22,6 +22,7 @@ public interface Location extends BasicLocation {
 	 * the one this location belongs to.
 	 * @param other
 	 */
+	@Deprecated
 	public abstract void addUpMapping(final Location other);
 
 	/**
@@ -30,10 +31,13 @@ public interface Location extends BasicLocation {
 	 * the one this location belongs to.
 	 * @param other
 	 */
+	@Deprecated
 	public abstract void addDownMapping(final Location other);
 
+	@Deprecated
 	public abstract boolean removeAllUpMappings();
 
+	@Deprecated
 	public abstract boolean removeAllDownMappings();
 
 	// TODO [balmermi] I do not like that (see above why)
@@ -41,12 +45,16 @@ public interface Location extends BasicLocation {
 
 	public abstract Layer getLayer();
 
+	@Deprecated
 	public abstract Location getUpLocation(Id id);
 
+	@Deprecated
 	public abstract Location downLocation(Id id);
 
+	@Deprecated
 	public abstract TreeMap<Id, Location> getUpMapping();
 
+	@Deprecated
 	public abstract TreeMap<Id, Location> getDownMapping();
 
 	public abstract String toString();
