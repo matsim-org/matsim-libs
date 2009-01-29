@@ -244,11 +244,11 @@ public class ChoiceSet {
 	}
 	
 	// -------------------------------------------------------------------------------------
-	public Id getPersonId() {
+	public Id getId() {
 		return id;
 	}
-	public void setPersonId(Id personId) {
-		this.id = personId;
+	public void setId(Id id) {
+		this.id = id;
 	}
 	public Trip getTrip() {
 		return trip;

@@ -34,7 +34,7 @@ public abstract class ChoiceSetExtractor {
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();			
 			
-			this.budgets.add(new TravelTimeBudget(choiceSet.getPersonId(), choiceSet.getTravelTimeBudget(), 
+			this.budgets.add(new TravelTimeBudget(choiceSet.getId(), choiceSet.getTravelTimeBudget(), 
 					choiceSet.getTrip().getTripNr()));
 							
 			this.computeChoiceSet(choiceSet, spanningTree, type, controler);

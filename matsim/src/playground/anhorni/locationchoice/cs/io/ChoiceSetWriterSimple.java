@@ -44,7 +44,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 						facility.getCenter().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
 						facility.getExactPosition().getY();
 					
-					out.write(choiceSet.getPersonId() +"\t" + choiceSet.getTrip().getTripNr() + "\t" + location);
+					out.write(choiceSet.getId() +"\t" + choiceSet.getTrip().getTripNr() + "\t" + location);
 					out.newLine();
 				}					
 				out.flush();

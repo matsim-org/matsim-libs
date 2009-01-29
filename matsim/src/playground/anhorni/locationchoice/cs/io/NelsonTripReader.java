@@ -56,8 +56,10 @@ public class NelsonTripReader {
 				
 				String m = entries[70].trim();
 				
-				if (m.endsWith("Fuss") && !mode.equals("walk")) continue;
-				if (m.endsWith("Auto") && !mode.equals("car")) continue;
+				boolean walk = m.endsWith("15") && mode.equals("walk");
+				boolean car = m.endsWith("9") && mode.equals("car");
+				
+				if (!(walk || car)) continue;
 				
 				String recordID = entries[0].trim();
 				// TODO:
@@ -73,6 +75,11 @@ public class NelsonTripReader {
 				// get the after shopping trip:	
 				String key = HHNR + ZIELPNR + Integer.toString(tripNr+1);
 				MZTrip mzTrip = this.mzTrips.get(new IdImpl(key));
+				
+				// mode change: e.g. auto -> velo 43179022
+				if (mzTrip == null) {
+					continue;
+				}
 				
 				//----------------------------------------------------------------------------------------
 				
@@ -126,13 +133,12 @@ public class NelsonTripReader {
 				String[] entries = curr_line.split("\t", -1);
 				
 				String mode = entries[53].trim();
-				
-				if (!(mode.endsWith("Fuss") || mode.equals("Auto"))) continue;
+				if (!(mode.equals("9") || mode.equals("15"))) continue;
 				
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
-				String tripNr = entries[2].trim();
+				String tripNr = entries[3].trim();
 				
 				Id id = new IdImpl(HHNR + ZIELPNR + tripNr);
 				
