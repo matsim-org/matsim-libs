@@ -57,8 +57,8 @@ public class NelsonTripReader {
 				String wmittel = entries[70].trim();
 				String ausmittel = entries[59].trim();
 				
-				boolean walk = wmittel.equals("15") && ausmittel.equals("15") && mode.equals("walk") ;
-				boolean car = wmittel.equals("9") && ausmittel.equals("9") && mode.equals("car");
+				boolean walk = wmittel.equals("15") && ausmittel.equals("10") && mode.equals("walk") ;
+				boolean car = wmittel.equals("9") && ausmittel.equals("6") && mode.equals("car");
 				
 				if (!(walk || car )) continue;
 				
