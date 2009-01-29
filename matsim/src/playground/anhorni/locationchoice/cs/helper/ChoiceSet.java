@@ -14,14 +14,15 @@ import playground.anhorni.locationchoice.cs.GenerateChoiceSets;
 
 
 public class ChoiceSet {
-	Id personId = null;
+
+	private Id id = null;
 	double travelTimeBudget = -1.0;
 	Trip trip;
 	ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
 	ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
 		
-	public ChoiceSet(Id personId, Trip trip) {
-		this.personId = personId;
+	public ChoiceSet(Id id, Trip trip) {
+		this.id = id;
 		this.trip = trip;		
 	}
 	
@@ -244,10 +245,10 @@ public class ChoiceSet {
 	
 	// -------------------------------------------------------------------------------------
 	public Id getPersonId() {
-		return personId;
+		return id;
 	}
 	public void setPersonId(Id personId) {
-		this.personId = personId;
+		this.id = personId;
 	}
 	public Trip getTrip() {
 		return trip;
