@@ -37,7 +37,7 @@ public class NelsonTripReader {
 		this.mzTrips = new TreeMap<Id, MZTrip>();
 		this.choiceSets = new Vector<ChoiceSet>();
 		
-		read0(file0);
+		read0(file0, mode);
 		read1(file1, mode);
 		log.info("Number of " + mode + " trips : " + this.choiceSets.size());
 		return this.choiceSets;
@@ -56,10 +56,10 @@ public class NelsonTripReader {
 				
 				String m = entries[70].trim();
 				
-				boolean walk = m.endsWith("15") && mode.equals("walk");
-				boolean car = m.endsWith("9") && mode.equals("car");
+				boolean walk = m.equals("15") && mode.equals("walk");
+				boolean car = m.equals("9") && mode.equals("car");
 				
-				if (!(walk || car)) continue;
+				if (!(walk || car )) continue;
 				
 				String recordID = entries[0].trim();
 				// TODO:
@@ -121,7 +121,7 @@ public class NelsonTripReader {
 	}
 	
 	// add F58, F514 for after shopping act (E_X and E_Y)
-	private void read0(String file) {
+	private void read0(String file, String mode) {
 				
 		try {
 			FileReader fileReader = new FileReader(file);
@@ -132,8 +132,10 @@ public class NelsonTripReader {
 								
 				String[] entries = curr_line.split("\t", -1);
 				
-				String mode = entries[53].trim();
-				if (!(mode.equals("9") || mode.equals("15"))) continue;
+				String m = entries[53].trim();
+				boolean walk = m.equals("15") && mode.equals("walk");
+				boolean car = m.equals("9") && mode.equals("car");				
+				if (!(walk || car )) continue;
 				
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
