@@ -12,6 +12,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
@@ -29,8 +30,10 @@ public class NelsonTripReader {
 	private List<ChoiceSet> choiceSets;
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
 	private TreeMap<Id, MZTrip> mzTrips = null; 
+	private NetworkLayer network = null;
 		
-	public NelsonTripReader() {
+	public NelsonTripReader(NetworkLayer network) {
+		this.network = network;
 	}
 	
 	public List<ChoiceSet> readFiles(final String file0, final String file1, String mode)  {
@@ -90,10 +93,12 @@ public class NelsonTripReader {
 				// in seconds after midnight
 				double endTimeBeforeShoppingAct = 60.0 * Double.parseDouble(entries[12].trim());
 				beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
+				beforeShoppingAct.setLink(network.getNearestLink(beforeShoppingCoord));
 				
 				Coord shoppingCoord= new CoordImpl(
 						Double.parseDouble(entries[50].trim()), Double.parseDouble(entries[51].trim()));
 				Act shoppingAct = new Act("shop", shoppingCoord);
+				shoppingAct.setLink(network.getNearestLink(shoppingCoord));
 				
 				double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
 				shoppingAct.setStartTime(startTimeShoppingAct);
@@ -102,6 +107,7 @@ public class NelsonTripReader {
 						
 				Coord afterShoppingCoord = mzTrip.getCoord();
 				Act afterShoppingAct = new Act("end", afterShoppingCoord);
+				afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 				
 				double startTimeAfterShoppingAct = mzTrip.getEndTime(); 			
 				afterShoppingAct.setStartTime(startTimeAfterShoppingAct);

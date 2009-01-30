@@ -85,7 +85,7 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 			
 			Link link = network.getLink(linkId);
 			
-			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();			
+			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();
 			Act toAct = new Act("shop", link);	
 			
 			double travelTimeBeforeShopping = computeTravelTime(fromAct, toAct, controler);
