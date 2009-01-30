@@ -39,7 +39,7 @@ import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.Vehicle;
 import playground.wrashid.DES.util.Timer;
-import playground.wrashid.parallelEventsHandler.DummyEvent;
+import playground.wrashid.parallelEventsHandler.LastEventOfIteration;
 import playground.wrashid.parallelEventsHandler.ParallelEvents;
 import playground.wrashid.parallelEventsHandler.ProcessEventThread;
 
