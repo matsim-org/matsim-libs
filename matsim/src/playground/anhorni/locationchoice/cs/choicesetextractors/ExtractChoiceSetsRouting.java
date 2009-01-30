@@ -115,9 +115,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		else if (this.mode.equals("walk")) {
 			leg = new Leg(BasicLeg.Mode.walk);
 		}
+		/*
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
+		*/
 		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());

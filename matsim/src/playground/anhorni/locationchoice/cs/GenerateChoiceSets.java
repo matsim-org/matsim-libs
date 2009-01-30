@@ -165,8 +165,6 @@ public class GenerateChoiceSets {
 			NelsonWriter nelsonWriter = new NelsonWriter();
 			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
 			nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
-			
-			log.info("Wriiiting to" + this.outdir);
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
@@ -180,11 +178,11 @@ public class GenerateChoiceSets {
 		this.controler = new Controler(this.matsimRunConfigFile);
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.carChoiceSets, "car");
-		//controler.addControlerListener(listenerCar);
+		controler.addControlerListener(listenerCar);
 		
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.walkChoiceSets, "walk");
-		controler.addControlerListener(listenerWalk);
+		//controler.addControlerListener(listenerWalk);
 		
 		controler.run();
 		
