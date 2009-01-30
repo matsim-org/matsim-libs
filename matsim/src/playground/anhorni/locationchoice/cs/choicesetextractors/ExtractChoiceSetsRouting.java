@@ -77,9 +77,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
 			Controler controler) {
-	
+			
 		NetworkLayer network = controler.getNetwork();
-					
+		
 		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
@@ -96,7 +96,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 					choiceSet.getTrip().getShoppingAct().getDuration());
 			toAct = choiceSet.getTrip().getAfterShoppingAct();	
 			
-			double travelTimeAfterShopping = computeTravelTime(fromAct, toAct, controler);
+			double travelTimeAfterShopping = computeTravelTime(fromAct, toAct, controler);			
 			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;
 			
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
