@@ -48,12 +48,14 @@ import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements AfterMobsimListener  {
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
+	private String mode;
 
 	public ExtractChoiceSetsRouting(Controler controler, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
-			List<ChoiceSet> choiceSets) {
+			List<ChoiceSet> choiceSets, String mode) {
 		
 		super(controler, choiceSets);
 		super.zhFacilitiesByLink = zhFacilitiesByLink;
+		this.mode = mode;
 		
 	}
 	
@@ -69,7 +71,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			numberOfFacilities += it.next().size();
 		}
 		log.info("Number of ZH facilities " + numberOfFacilities);
-		log.info("computing car choice sets...:");
+		log.info("computing choice sets...:");
 		super.computeChoiceSets();
 	}
 			
@@ -77,8 +79,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			Controler controler) {
 	
 		NetworkLayer network = controler.getNetwork();
-				
-		
+					
 		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
@@ -98,8 +99,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			double travelTimeAfterShopping = computeTravelTime(fromAct, toAct, controler);
 			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;
 			
-			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {
-				
+			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
 				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime);
 			}
 			
@@ -108,7 +108,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	
 	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
-		Leg leg = new Leg(BasicLeg.Mode.car);
+		Leg leg = null;
+		if (this.mode.equals("car")) {
+			leg = new Leg(BasicLeg.Mode.car);
+		}
+		else if (this.mode.equals("walk")) {
+			leg = new Leg(BasicLeg.Mode.walk);
+		}
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);

@@ -13,15 +13,15 @@ import playground.anhorni.locationchoice.cs.helper.TravelTimeBudget;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 public abstract class ChoiceSetExtractor {
-	
-	protected List<ChoiceSet> choiceSets;	
+		
 	protected TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = null;
 	private Controler controler = null;
 	private List<TravelTimeBudget> budgets =  new Vector<TravelTimeBudget>();
+	private List<ChoiceSet> choiceSets;
 	
 	public ChoiceSetExtractor(Controler controler, List<ChoiceSet> choiceSets) {
-		this.choiceSets = choiceSets;
 		this.controler = controler;
+		this.choiceSets = choiceSets;
 	} 
 	
 	
@@ -30,31 +30,33 @@ public abstract class ChoiceSetExtractor {
 		SpanningTree spanningTree = new SpanningTree(this.controler.getLinkTravelTimes(), this.controler.getTravelCostCalculator());
 		String type ="s";
 			
-		Iterator<ChoiceSet> choiceSet_it = this.choiceSets.iterator();
+		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();			
 			
 			this.budgets.add(new TravelTimeBudget(choiceSet.getId(), choiceSet.getTravelTimeBudget(), 
 					choiceSet.getTrip().getTripNr()));
 							
-			this.computeChoiceSet(choiceSet, spanningTree, type, controler);
+			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler);
 		}		
 	}
 	
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
 			Controler controler);
 		
-	public List<ChoiceSet> getChoiceSets() {
-		return this.choiceSets;
-	}
-	public void setChoiceSets(List<ChoiceSet> choiceSets) {
-		this.choiceSets = choiceSets;
-	}
 	public List<TravelTimeBudget> getBudgets() {
 		return budgets;
 	}
 	public void setBudgets(List<TravelTimeBudget> budgets) {
 		this.budgets = budgets;
+	}
+
+	public List<ChoiceSet> getChoiceSets() {
+		return choiceSets;
+	}
+
+	public void setChoiceSets(List<ChoiceSet> choiceSets) {
+		this.choiceSets = choiceSets;
 	}
 
 }

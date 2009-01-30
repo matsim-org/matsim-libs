@@ -178,14 +178,19 @@ public class GenerateChoiceSets {
 		}
 				
 		this.controler = new Controler(this.matsimRunConfigFile);
-		ExtractChoiceSetsRouting listener = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, this.carChoiceSets);
-		controler.addControlerListener(listener);
+		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
+				this.carChoiceSets, "car");
+		//controler.addControlerListener(listenerCar);
+		
+		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
+				this.walkChoiceSets, "walk");
+		controler.addControlerListener(listenerWalk);
+		
 		controler.run();
 		
-		this.extractCarChoiceSets(listener);
+		//this.extractCarChoiceSets(listenerCar);
 		//this.extractWalkChoiceSets(this.walkChoiceSets);
 					
-		
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
 		shpWriter.writeChoiceSets(this.outdir, "carBeforeSampling", this.carChoiceSets);
 		shpWriter.writeChoiceSets(this.outdir, "walkBeforeSampling", this.walkChoiceSets);
@@ -216,27 +221,7 @@ public class GenerateChoiceSets {
 		
 		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilitiesByLink);
 	}
-			
-	private void extractCarChoiceSets(ExtractChoiceSetsRouting listener) {
-		BudgetWriter writer = new BudgetWriter();
-		writer.write(this.outdir + "carBudgets.txt", listener.getBudgets());
-	}
-	
-	private void extractWalkChoiceSets(List<ChoiceSet> choiceSets) {	
-		// create a list of all zhFacilities to give to ExtractWalkChoiceSets()
-		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();		
-		Iterator<ArrayList<ZHFacility>> zhFacilitiesList_it = this.zhFacilitiesByLink.values().iterator();
-		while (zhFacilitiesList_it.hasNext()) {
-			List<ZHFacility> list = zhFacilitiesList_it.next();
-			zhFacilities.addAll(list);
-		}		
-		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(this.controler, zhFacilities, this.walkingSpeed, choiceSets);
-		extractor.run();
-		
-		BudgetWriter writer = new BudgetWriter();
-		writer.write(this.outdir + "walkBudgets.txt", extractor.getBudgets());
-	}
-			
+						
 	private void output() {			
 		Iterator<ChoiceSetWriter> writer_it = this.writers.iterator();
 		while (writer_it.hasNext()) {
@@ -309,3 +294,30 @@ public class GenerateChoiceSets {
 		this.isSetup = isSetup;
 	}
 }
+
+
+/*
+ * unused for the moment:
+ * 
+ * private void extractCarChoiceSets(ExtractChoiceSetsRouting listener) {
+		BudgetWriter writer = new BudgetWriter();
+		writer.write(this.outdir + "carBudgets.txt", listener.getBudgets());
+	}
+	
+	private void extractWalkChoiceSets(List<ChoiceSet> choiceSets) {	
+		// create a list of all zhFacilities to give to ExtractWalkChoiceSets()
+		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();		
+		Iterator<ArrayList<ZHFacility>> zhFacilitiesList_it = this.zhFacilitiesByLink.values().iterator();
+		while (zhFacilitiesList_it.hasNext()) {
+			List<ZHFacility> list = zhFacilitiesList_it.next();
+			zhFacilities.addAll(list);
+		}		
+		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(this.controler, zhFacilities, this.walkingSpeed, choiceSets);
+		extractor.run();
+		
+		BudgetWriter writer = new BudgetWriter();
+		writer.write(this.outdir + "walkBudgets.txt", extractor.getBudgets());
+	}
+ */
+
+
