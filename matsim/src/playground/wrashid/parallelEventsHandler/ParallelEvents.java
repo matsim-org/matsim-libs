@@ -34,6 +34,12 @@ public class ParallelEvents extends Events {
 	private ProcessEventThread[] eventsProcessThread = null;
 	private int numberOfAddedEventsHandler = 0;
 	private CyclicBarrier barrier=null;
+	// this number should be set in the following way:
+	// if the number of events is estimated as x, than this number
+	// could be set to x/10
+	// the higher this parameter, the less locks are used, but
+	// the more the asynchronity between the simulation and events handling
+	private int preInputBufferMaxLength=100000;
 
 	public void processEvent(final BasicEvent event) {
 		for (int i=0;i<eventsProcessThread.length;i++){
@@ -57,6 +63,20 @@ public class ParallelEvents extends Events {
 	 * @param numberOfThreads - specify the number of threads used for the events handler
 	 */
 	public ParallelEvents(int numberOfThreads) {
+		init(numberOfThreads);
+	}
+	
+	/**
+	 * 
+	 * @param numberOfThreads
+	 * @param expectedNumberOfEvents
+	 */
+	public ParallelEvents(int numberOfThreads,int expectedNumberOfEvents) {
+		preInputBufferMaxLength=expectedNumberOfEvents/10;
+		init(numberOfThreads);
+	}
+	
+	public void init(int numberOfThreads){
 		this.numberOfThreads = numberOfThreads;
 		this.events = new Events[numberOfThreads];
 		this.eventsProcessThread = new ProcessEventThread[numberOfThreads];
@@ -64,9 +84,13 @@ public class ParallelEvents extends Events {
 		barrier = new CyclicBarrier(numberOfThreads+1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			events[i] = new Events();
-			eventsProcessThread[i] = new ProcessEventThread(events[i],100000,barrier);
+			eventsProcessThread[i] = new ProcessEventThread(events[i],preInputBufferMaxLength,barrier);
 		}
 	}
+	
+	
+	
+	
 	
 	// When the main method is finish, it must await this barrier
 	public void awaitHandlerThreads(){
@@ -83,6 +107,11 @@ public class ParallelEvents extends Events {
 		} catch (BrokenBarrierException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		// reset this class, so that it can be reused for the next iteration
+		for (int i = 0; i < numberOfThreads; i++) {
+			eventsProcessThread[i] = new ProcessEventThread(events[i],preInputBufferMaxLength,barrier);
 		}
 	} 
 }

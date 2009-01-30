@@ -35,15 +35,7 @@ public class ProcessEventThread implements Runnable {
 	CyclicBarrier cb=null;
 	private int preInputBufferMaxLength;
 
-	public ProcessEventThread(Events events, int preInputBufferMaxLength) {
-		this.events = events;
-		this.preInputBufferMaxLength= preInputBufferMaxLength;
-		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-		preInputBuffer= new ArrayList<BasicEvent>();
-		cb=new CyclicBarrier(2);
-		Thread t = new Thread(this);
-		t.start();
-	}
+	
 	
 	
 	public ProcessEventThread(Events events, int preInputBufferMaxLength, CyclicBarrier cb) {
