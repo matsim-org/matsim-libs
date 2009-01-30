@@ -62,7 +62,7 @@ public class ConnectHomesAndWorkplaces {
 
 		// create the control(l)er:
 		final Controler controler = new Controler(Gbl.getConfig());
-		controler.loadData() ;
+//		controler.loadData() ;
 		// (I think that the control(l)er is only needed to make the locationchoice module happy;
 		// there is no logical reason why it is necessary. Kai)
 		
