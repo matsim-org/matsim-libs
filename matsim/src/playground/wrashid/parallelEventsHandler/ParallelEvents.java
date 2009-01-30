@@ -69,9 +69,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void addHandler(final EventHandler handler) {
 		synchronized (this) {
 			events[numberOfAddedEventsHandler].addHandler(handler);
@@ -80,9 +78,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 	
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void resetHandlers(final int iteration) {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -91,9 +87,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 	
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void resetCounter() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -102,9 +96,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 	
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void removeHandler(final EventHandler handler) {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -113,9 +105,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 	
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void clearHandlers() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -124,9 +114,7 @@ public class ParallelEvents extends Events {
 		}
 	}
 	
-	/**
-	 * for documentation see in super class
-	 */
+	
 	public void printEventHandlers() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
