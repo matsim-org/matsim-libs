@@ -11,9 +11,8 @@ import playground.wrashid.tryouts.performance.EventProcessing;
 
 public class ParallelEventsTest extends MatsimTestCase {
 
-	// tests, if the right number of events were received
-	// for different number of threads and handlers and number of iterations
-	// and different constructors
+	// tests, if the right number of events were processed by the handler(s)
+	// for different number of threads, events, handlers and different constructors
 	public void testEventCount() {
 		processEvents(new ParallelEvents(1), 100, 1, 1);
 		processEvents(new ParallelEvents(2), 100, 10, 2);
@@ -103,7 +102,6 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 		public void reset(int iteration) {
 			// TODO Auto-generated method stub
-
 		}
 
 		public Handler1() {
