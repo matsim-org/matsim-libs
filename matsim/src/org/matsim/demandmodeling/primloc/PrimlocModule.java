@@ -109,6 +109,8 @@ public class PrimlocModule  implements PersonAlgorithm {
 	private final static Logger log = Logger.getLogger(PrimlocModule.class);
 	Random random;
 	
+	public PrimlocModule () { }
+	
 	public void run(Person guy){
 
 		// Modify the plans of the agents accordingly to the Primloc model 
