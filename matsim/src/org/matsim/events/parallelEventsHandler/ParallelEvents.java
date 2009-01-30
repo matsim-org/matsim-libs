@@ -67,11 +67,11 @@ public class ParallelEvents extends Events {
 	/**
 	 * 
 	 * @param numberOfThreads
-	 * @param expectedNumberOfEvents
+	 * @param estimatedNumberOfEvents
 	 * Only use this constructor for larger simulations (20M+ events).
 	 */
-	public ParallelEvents(int numberOfThreads, int expectedNumberOfEvents) {
-		preInputBufferMaxLength = expectedNumberOfEvents / 10;
+	public ParallelEvents(int numberOfThreads, int estimatedNumberOfEvents) {
+		preInputBufferMaxLength = estimatedNumberOfEvents / 10;
 		init(numberOfThreads);
 	}
 	
