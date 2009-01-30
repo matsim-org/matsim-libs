@@ -32,9 +32,16 @@ import org.matsim.events.handler.EventHandler;
  * ParallelEvents allows parallelisation for events handling.
  * Usage: First create an object of this class. Before each iteration, call initProcessing.
  * After each iteration, call finishProcessing. This has already been incorporated into
- * the Controler.
+ * the Controller.
  * 
- * Usage via config.xml: 
+   Usage via config.xml: 
+   <module name="parallelEventHandling">
+		<param name="numberOfThreads"        value="2" />
+   </module>
+	
+	optionally you can also specify the estimated number of events per iteration:
+    <param name="estimatedNumberOfEvents"        value="10000000" />
+    (not really needed, but can make performance slightly faster in larger simulations).
  * 
  * @author rashid_waraich
  * 

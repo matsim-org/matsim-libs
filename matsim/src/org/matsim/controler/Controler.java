@@ -73,6 +73,7 @@ import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
@@ -151,7 +152,7 @@ public class Controler {
 	private final String configFileName;
 	private final String dtdFileName;
 
-	protected final Events events = new Events();
+	protected Events events = null;
 	protected NetworkLayer network = null;
 	protected Population population = null;
 	private Counts counts = null;
@@ -293,12 +294,37 @@ public class Controler {
 	private void init() {
 		loadConfig();
 		setupOutputDir();
+		initEvents();
 		initLogging();
 		loadData();
 		setup();
 		loadCoreListeners();
 		loadControlerListeners();
 		fireControlerStartupEvent();
+	}
+
+	/**
+	 * select if single cpu handler to use or parallel
+	 */
+	private void initEvents() {
+		final String PARALLEL_EVENT_HANDLING="parallelEventHandling";
+		final String NUMBER_OF_THREADS="numberOfThreads";
+		final String ESTIMATED_NUMBER_OF_EVENTS="estimatedNumberOfEvents";
+		String numberOfThreads = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
+		String estimatedNumberOfEvents = Gbl.getConfig().findParam(ESTIMATED_NUMBER_OF_EVENTS, NUMBER_OF_THREADS);
+		
+		if (numberOfThreads!=null){
+			int numOfThreads=Integer.parseInt(numberOfThreads);
+			// the user wants to user parallel events handling
+			if (estimatedNumberOfEvents!=null){
+				int estNumberOfEvents=Integer.parseInt(estimatedNumberOfEvents);
+				events=new ParallelEvents(numOfThreads,estNumberOfEvents);
+			} else {
+				events=new ParallelEvents(numOfThreads);
+			}
+		} else {
+			events=new Events();
+		}
 	}
 
 	private void doIterations() {
@@ -1196,12 +1222,18 @@ public class Controler {
 				controler.volumes.reset(event.getIteration());
 				controler.events.addHandler(controler.volumes);
 			}
+			
+			// init for event processing of new iteration
+			controler.events.initProcessing();
 		}
 
 		public void notifyAfterMobsim(final AfterMobsimEvent event) {
 			Controler controler = event.getControler();
 			int iteration = event.getIteration();
 
+			// prepare for finishing iteration
+			controler.events.finishProcessing();
+			
 			if (this.eventWriter != null) {
 				this.eventWriter.closeFile();
 				event.getControler().getEvents().removeHandler(this.eventWriter);
