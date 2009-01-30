@@ -35,6 +35,7 @@ import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
 import playground.anhorni.locationchoice.cs.io.NelsonTripReader;
 import playground.anhorni.locationchoice.cs.io.NelsonWriter;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesReader;
+import playground.anhorni.locationchoice.cs.io.ZHFacilitiesWriter;
 import playground.balmermi.mz.PlansCreateFromMZ;
 
 public class GenerateChoiceSets {
@@ -178,11 +179,11 @@ public class GenerateChoiceSets {
 				
 		this.controler = new Controler(this.matsimRunConfigFile);
 		ExtractCarChoiceSets listener = new ExtractCarChoiceSets(this.controler, this.zhFacilitiesByLink, this.carChoiceSets);
-		controler.addControlerListener(listener);
+		//controler.addControlerListener(listener);
 		controler.run();
 		
 		this.extractCarChoiceSets(listener);
-		this.extractWalkChoiceSets(this.walkChoiceSets);
+		//this.extractWalkChoiceSets(this.walkChoiceSets);
 					
 		
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
@@ -212,6 +213,8 @@ public class GenerateChoiceSets {
 				
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);
 		zhFacilitiesReader.readFile(this.zhFacilitiesFile, zhFacilitiesByLink);
+		
+		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilitiesByLink);
 	}
 			
 	private void extractCarChoiceSets(ExtractCarChoiceSets listener) {

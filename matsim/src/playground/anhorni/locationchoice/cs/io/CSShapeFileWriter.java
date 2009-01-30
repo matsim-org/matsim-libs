@@ -36,7 +36,6 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 
 		
 	public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
-		
 		this.writeTrips(outdir, name, choiceSets);
 		if (!super.checkBeforeWriting(choiceSets)) {
 			log.warn("No trip shape files created");
