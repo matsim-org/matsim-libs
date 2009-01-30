@@ -63,7 +63,7 @@ public class ConcurrentListSPSC<T> {
 	
 	
 	
-	// this experiment effectivly demonstrates, why reimplement ConcurrentList
+	// this experiment effectivly demonstrates, why reimplement ConcurrentLinkedQueue
 	// ------------
 	// consumed Items:10000
 	// time required for ConcurrentList (consumer): 27031
@@ -131,7 +131,6 @@ static class BRunnable implements Runnable{
 			try {
 				Thread.currentThread().sleep(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

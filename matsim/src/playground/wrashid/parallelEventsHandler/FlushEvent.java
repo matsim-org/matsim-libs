@@ -2,9 +2,9 @@ package playground.wrashid.parallelEventsHandler;
 
 import org.matsim.events.BasicEvent;
 
-public class DummyEvent extends BasicEvent {
+public class FlushEvent extends BasicEvent {
 
-	public DummyEvent(double time) {
+	public FlushEvent(double time) {
 		super(time);
 	}
 	

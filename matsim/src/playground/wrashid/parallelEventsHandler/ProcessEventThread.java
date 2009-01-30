@@ -78,12 +78,12 @@ public class ProcessEventThread implements Runnable {
 	}
 
 	public void run() {
-		// process events, until DummyEvent arrives
+		// process events, until flush event arrives
 		BasicEvent nextEvent = null;
 		while (true) {
 			nextEvent = eventQueue.remove();
 			if (nextEvent != null) {
-				if (nextEvent instanceof DummyEvent) {
+				if (nextEvent instanceof FlushEvent) {
 					break;
 				} else {
 					events.processEvent(nextEvent);
@@ -102,9 +102,9 @@ public class ProcessEventThread implements Runnable {
 		}
 	}
 	
-	// schedule dummy event and flush buffered events
+	// schedule flush event and flush buffered events
 	public void close(){
-		processEvent(new DummyEvent(0.0));
+		processEvent(new FlushEvent(0.0));
 		eventQueue.add(preInputBuffer);
 		preInputBuffer.clear();
 	}
