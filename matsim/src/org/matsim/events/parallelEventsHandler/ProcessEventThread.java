@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parallelEventsHandler;
+package org.matsim.events.parallelEventsHandler;
 
 import java.util.ArrayList;
 import java.util.concurrent.BrokenBarrierException;

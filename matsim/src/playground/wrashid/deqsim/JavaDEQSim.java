@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.concurrent.BrokenBarrierException;
 
 import org.matsim.events.Events;
+import org.matsim.events.parallelEventsHandler.LastEventOfIteration;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
+import org.matsim.events.parallelEventsHandler.ProcessEventThread;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -39,9 +42,6 @@ import playground.wrashid.DES.Scheduler;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.Vehicle;
 import playground.wrashid.DES.util.Timer;
-import playground.wrashid.parallelEventsHandler.LastEventOfIteration;
-import playground.wrashid.parallelEventsHandler.ParallelEvents;
-import playground.wrashid.parallelEventsHandler.ProcessEventThread;
 
 public class JavaDEQSim {
 

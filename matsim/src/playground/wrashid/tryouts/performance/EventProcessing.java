@@ -9,6 +9,7 @@ import org.matsim.events.Events;
 import org.matsim.events.EventsReaderTXTv1;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicNode;
 import org.matsim.network.Link;
@@ -20,7 +21,6 @@ import org.matsim.network.Node;
 import playground.wrashid.PHEV.co2emissions.AllLinkHandler;
 import playground.wrashid.PHEV.co2emissions.AllLinkOneIntervalHandler;
 import playground.wrashid.PHEV.co2emissions.OneLinkHandler;
-import playground.wrashid.parallelEventsHandler.ParallelEvents;
 
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;

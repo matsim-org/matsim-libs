@@ -1,10 +1,11 @@
-package playground.wrashid.parallelEventsHandler;
+package org.matsim.events.parallelEventsHandler;
 
 import java.util.LinkedList;
 
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.tryouts.performance.EventProcessing;

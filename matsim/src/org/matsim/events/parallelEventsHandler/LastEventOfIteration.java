@@ -18,45 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parallelEventsHandler;
+package org.matsim.events.parallelEventsHandler;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import org.matsim.events.BasicEvent;
 
-// optimized for single producer, single consumer
-// it can be used by multiple producers, but it is not optimized for that case
-public class ConcurrentListSPSC<T> {
-	private LinkedList<T> inputBuffer = new LinkedList<T>();
-	private LinkedList<T> outputBuffer = new LinkedList<T>();
+public class LastEventOfIteration extends BasicEvent {
 
-	public void add(T element) {
-		synchronized (inputBuffer) {
-			inputBuffer.add(element);
-		}
+	public LastEventOfIteration(double time) {
+		super(time);
 	}
-
-	// the input list will be emptied
-	public void add(ArrayList<T> list) {
-		synchronized (inputBuffer) {
-			inputBuffer.addAll(list);
-		}
-	}
-
-	// returns null, if empty, else the first element
-	public T remove() {
-		if (outputBuffer.size() > 0) {
-			return outputBuffer.poll();
-		}
-		if (inputBuffer.size() > 0) {
-			synchronized (inputBuffer) {
-				// swap buffers
-				LinkedList<T> tempList = null;
-				tempList = inputBuffer;
-				inputBuffer = outputBuffer;
-				outputBuffer = tempList;
-			}
-			return outputBuffer.poll();
-		}
+	
+	@Override
+	public String getEventType() {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

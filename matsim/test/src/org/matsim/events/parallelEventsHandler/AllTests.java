@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DEQSimStarter.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,54 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.deqsim;
-
-import java.io.IOException;
-
-import org.matsim.config.Config;
-import org.matsim.config.MatsimConfigReader;
-import org.matsim.controler.ScenarioData;
-import org.matsim.events.Events;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.gbl.Gbl;
-import org.matsim.network.NetworkLayer;
-import org.matsim.population.Population;
+package org.matsim.events.parallelEventsHandler;
 
 
-public class DEQSimStarter {
 
-	public static void main(String[] args) {
-		if (args.length == 0) {
-			System.out.println("Usage: DEQSimStarter configfile.xml [config_v1.dtd]");
-			return;
-		}
-		
-		// read, prepare configuration
-		Config config = Gbl.createConfig(null);
-		if (args.length > 1 && args[1].toLowerCase().endsWith(".dtd")) {
-			try {
-				new MatsimConfigReader(config).readFile(args[0], args[1]);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-		} else {
-			new MatsimConfigReader(config).readFile(args[0]);
-		}
-		
-		// prepare data
-		ScenarioData data = new ScenarioData(config);
-		NetworkLayer network = data.getNetwork();
-		Population population = data.getPopulation();
-		// TODO: remove this after integration into core.
-		Events events = new ParallelEvents(2);
-		
-		// run simulation
-		JavaDEQSim client = new JavaDEQSim(network, population, events);
-		client.run();
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-		// finish
-		return;
+public class AllTests {
+
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Test for org.matsim.events.parallelEventsHandler");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(ParallelEventsTest.class);
+		//$JUnit-END$
+		return suite;
 	}
 
 }
