@@ -44,7 +44,7 @@ Using the class: tryouts.performance.EventProcessing (using 1 million iterations
 
 
 
-23. Januar 2008
+23. Januar 2009
 ===============
 Using the updated class: tryouts.performance.EventProcessing on satawal.
 configuration: 100 (with sinus and list operations) iterations each handling of event, 
@@ -72,7 +72,7 @@ it is not. This shows the scalling factor.
 - new events handler, 12 handler, 12 cpu: 33.487 s
 (do this measurement again, satawal is free, because these measurements are not really good)
 
-26.01.2008
+26.01.2009
 ===========
 playground.wrashid.tryouts.performance.EventsProcessing used.
 - Satawal, almost empty, only one or two cpus were used.
@@ -128,3 +128,14 @@ because this reflects the case most closely, that satawal is really empty.
   and just is similar to 8 cpu
 
 // find excel sheet at: C:\data\Projekte\MatSim\parallelisieren
+
+30.01.2009
+==========
+Running test 12 with mobsim (on local computer with dual core) 
+- old events handler: 177 seconds
+- new events handler, 1 thread: 157 seconds
+- new events handler, 2 thread: 457 seconds 
+=> makes actually the simulation slower, because 3 cpus would be needed for this case
+- same simulation with single cpu JDEQSim: 
+- new events handler, 1 thread: 47 seconds
+- new events handler, 2 thread: 50 seconds
