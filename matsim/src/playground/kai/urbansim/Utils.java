@@ -130,7 +130,7 @@ public class Utils {
 	 * @param plan
 	 * @param homeCoord
 	 */
-	static void makeHomePlan( Plan plan, Coord homeCoord ) {
+	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
 		plan.createAct(ACT_HOME, homeCoord) ;
 	}
 	/**
@@ -139,7 +139,7 @@ public class Utils {
 	 * @param plan
 	 * @param workCoord
 	 */
-	static void completePlanToHwh ( Plan plan, Coord workCoord ) {
+	public static void completePlanToHwh ( Plan plan, Coord workCoord ) {
 		Act act = plan.getFirstActivity();
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
