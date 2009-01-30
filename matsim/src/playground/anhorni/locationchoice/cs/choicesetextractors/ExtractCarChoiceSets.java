@@ -23,9 +23,7 @@ package playground.anhorni.locationchoice.cs.choicesetextractors;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
@@ -36,7 +34,6 @@ import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
@@ -81,6 +78,55 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 	
 		NetworkLayer network = controler.getNetwork();
 				
+		
+		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
+		while (link_it.hasNext()) {		
+			Id linkId = link_it.next();
+			
+			Link link = network.getLink(linkId);
+			
+			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();			
+			Act toAct = new Act("shop", link);	
+			
+			double travelTimeBeforeShopping = computeTravelTime(fromAct, toAct, controler);
+			
+			fromAct = toAct;
+			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + travelTimeBeforeShopping +
+					choiceSet.getTrip().getShoppingAct().getDuration());
+			toAct = choiceSet.getTrip().getAfterShoppingAct();	
+			
+			double travelTimeAfterShopping = computeTravelTime(fromAct, toAct, controler);
+			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;
+			
+			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {
+				
+				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime);
+			}
+			
+		}		
+	}
+	
+	
+	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
+		Leg leg = new Leg(BasicLeg.Mode.car);
+		leg.setDepartureTime(0.0);
+		leg.setTravelTime(0.0);
+		leg.setArrivalTime(0.0);
+		
+		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
+		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
+		return leg.getTravelTime();
+	}	
+}
+
+
+/* not using spanning tree at the moment: 
+ * 
+ * protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
+			Controler controler) {
+	
+		NetworkLayer network = controler.getNetwork();
+				
 		spanningTree.setOrigin(network.getNearestNode(choiceSet.getTrip().getBeforeShoppingAct().getCoord()));
 		spanningTree.setDepartureTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 		spanningTree.run(network);
@@ -117,34 +163,4 @@ public class ExtractCarChoiceSets extends ChoiceSetExtractor implements AfterMob
 			index++;
 		}		
 	}
-	
-	double getTravelTime(Link link, double usedTravelTime, 
-			Controler controler, ChoiceSet choiceSet) {
-		
-		Act fromAct = new Act("shop", link);	
-		double startTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + usedTravelTime;
-		fromAct.setStartTime(startTime);	
-		double shopDuration = choiceSet.getTrip().getShoppingAct().getDuration();
-		fromAct.setEndTime(startTime + shopDuration);
-		//fromAct.setDuration(shopDuration);
-		
-		Act toAct = new Act("aftershop", controler.getNetwork().getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getCoord()));		
-		//toAct.setStartTime(choiceSet.getTrip().getAfterShoppingAct().getStartTime());	
-		//toAct.setEndTime(choiceSet.getTrip().getAfterShoppingAct().getEndTime());
-		//toAct.setDuration(choiceSet.getTrip().getAfterShoppingAct().getDuration());
-		
-		double travelTimeShop2AfterShopAct = this.computeTravelTime(fromAct, toAct, controler);			
-		return travelTimeShop2AfterShopAct; 		
-	}
-	
-	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
-		Leg leg = new Leg(BasicLeg.Mode.car);
-		leg.setDepartureTime(0.0);
-		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
-		
-		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
-		return leg.getTravelTime();
-	}	
-}
+ */
