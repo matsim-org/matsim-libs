@@ -21,12 +21,15 @@ import playground.wrashid.util.TestHandlerDetailedEventChecker;
 public class TestPDESStarter2_equilPlans100 extends MatsimTestCase {
 	
 	public void test_equilPlans100_TestHandlerDetailedEventChecker() {
+		// TODO: Test "frozen", the parallel version development has been stopped. 
+		/*
 		Gbl.reset();
 		
 		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
 		detailedChecker.startTestPDES2("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans100.xml",
 				null);
+				*/
 	}
 	
 	/* 
@@ -46,12 +49,15 @@ public class TestPDESStarter2_equilPlans100 extends MatsimTestCase {
 	*/
 	
 	public void test_equilPlans100_DEQSimEventFileTravelTimeComparator() {
+		// TODO: Test "frozen", the parallel version development has been stopped. 
+		/*
 		Gbl.reset();
 
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events100.txt",1);
 		deqSimTravelTimeComparator.startTestPDES2("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans100.xml",
 				null);
+				*/
 	}
 
 }
