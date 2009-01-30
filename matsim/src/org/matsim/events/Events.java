@@ -131,7 +131,7 @@ public class Events {
 		this.cacheHandlers.clear();
 	}
 
-	public final void removeHandler(final EventHandler handler) {
+	public void removeHandler(final EventHandler handler) {
 		log.info("removing Event-Handler: " + handler.getClass().getName());
 		for (HandlerData handlerList : this.handlerData) {
 			handlerList.removeHandler(handler);
@@ -139,7 +139,7 @@ public class Events {
 		this.cacheHandlers.clear();
 	}
 
-	public final void clearHandlers() {
+	public void clearHandlers() {
 		log.info("clearing Event-Handlers");
 		for (HandlerData handler : this.handlerData) {
 			handler.handlerList.clear();
