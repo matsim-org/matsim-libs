@@ -106,7 +106,7 @@ public class LocationModifier extends Modifier {
 				if (act.getType().startsWith(type)) {
 
 					Facility facility=exchange_facilities.get(
-							MatsimRandom.random.nextInt(exchange_facilities.size()-1));
+							MatsimRandom.random.nextInt(exchange_facilities.size()));
 
 					act.setFacility(facility);
 					act.setLink(facility.getLink());
