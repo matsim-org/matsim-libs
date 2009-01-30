@@ -24,8 +24,30 @@ package org.matsim.demandmodeling.primloc;
  * This Module adapts the MATSIM-independent Primary Location Choice Model (PrimlocEngine), 
  * to the MATSIM Plans, Population, Persons, Layers, etc.
  * 
- * This Module modifies the Person by adding know Facilities to the Knowledge of the Person 
+ * This Module modifies the Person by adding know Facilities to the Knowledge of the Person
  * 
+ * The following came from Fabrice in an email:
+ * 
+ * No documentation except the paper in NSE.
+ *
+ * The CumulativeDistribution is in the same unit as the O-D Travel penalties
+ * so if the input is travel time in minutes -> trip distribution as a function of time in minutes.
+ * 
+ * There is some config file in
+ * test/input/org/matsim/demandmodeling/primloc
+ * 
+ * you can use the module without any distribution but then you cannot
+ * calibrate it automatically against anything. If you need , say a rough start, you can :
+ * - use free flow travel times between O-D as a proxy for travel costs
+ * - put a "mu" value of the same order of magnitude as the average travel cost
+ * 
+ * ... this makes sure that exp(-cost / mu) doesnt go over the edge
+ * 
+ * ... eventually you get a trip matrix which might make sense or not^^
+ * 
+ * I think (not sure), Waddell/de Palma/Picard have even generalised the problem and
+ * there maybe even a python code in urbansim to do that also ...
+ *
  * @author Fabrice Marchal
  */
 
