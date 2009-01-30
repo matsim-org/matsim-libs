@@ -33,72 +33,124 @@ public class ParallelEvents extends Events {
 	private Events[] events = null;
 	private ProcessEventThread[] eventsProcessThread = null;
 	private int numberOfAddedEventsHandler = 0;
-	private CyclicBarrier barrier=null;
+	private CyclicBarrier barrier = null;
 	// this number should be set in the following way:
 	// if the number of events is estimated as x, than this number
 	// could be set to x/10
 	// the higher this parameter, the less locks are used, but
 	// the more the asynchronity between the simulation and events handling
-	private int preInputBufferMaxLength=100000;
+	private int preInputBufferMaxLength = 100000;
 
 	public void processEvent(final BasicEvent event) {
-		for (int i=0;i<eventsProcessThread.length;i++){
+		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].processEvent(event);
 		}
 	}
 
-	// this is thread safe yet, also it seems that
-	// even though, we set the handler, it might be, that the processing
-	// thread does not see this
-	// probably this is ok: because the synchronization happens, when 
-	// processEvent is invoked by the main thread
-	// + the tests pass...
+	/**
+	 * for documentation see in super class
+	 */
 	public void addHandler(final EventHandler handler) {
-		events[numberOfAddedEventsHandler].addHandler(handler);
-		numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1)
-				% numberOfThreads;
+		synchronized (this) {
+			events[numberOfAddedEventsHandler].addHandler(handler);
+			numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1)
+					% numberOfThreads;
+		}
 	}
+	
+	/**
+	 * for documentation see in super class
+	 */
+	public void resetHandlers(final int iteration) {
+		synchronized (this) {
+			for (int i=0;i<events.length;i++){
+				events[i].resetHandlers(iteration);
+			}
+		}
+	}
+	
+	/**
+	 * for documentation see in super class
+	 */
+	public void resetCounter() {
+		synchronized (this) {
+			for (int i=0;i<events.length;i++){
+				events[i].resetCounter();
+			}
+		}
+	}
+	
+	/**
+	 * for documentation see in super class
+	 */
+	public void removeHandler(final EventHandler handler) {
+		synchronized (this) {
+			for (int i=0;i<events.length;i++){
+				events[i].removeHandler(handler);
+			}
+		}
+	}
+	
+	/**
+	 * for documentation see in super class
+	 */
+	public void clearHandlers() {
+		synchronized (this) {
+			for (int i=0;i<events.length;i++){
+				events[i].clearHandlers();
+			}
+		}
+	}
+	
+	/**
+	 * for documentation see in super class
+	 */
+	public void printEventHandlers() {
+		synchronized (this) {
+			for (int i=0;i<events.length;i++){
+				events[i].printEventHandlers();
+			}
+		}
+	}
+	
 
 	/**
-	 * @param numberOfThreads - specify the number of threads used for the events handler
+	 * @param numberOfThreads -
+	 *            specify the number of threads used for the events handler
 	 */
 	public ParallelEvents(int numberOfThreads) {
 		init(numberOfThreads);
 	}
-	
+
 	/**
 	 * 
 	 * @param numberOfThreads
 	 * @param expectedNumberOfEvents
 	 */
-	public ParallelEvents(int numberOfThreads,int expectedNumberOfEvents) {
-		preInputBufferMaxLength=expectedNumberOfEvents/10;
+	public ParallelEvents(int numberOfThreads, int expectedNumberOfEvents) {
+		preInputBufferMaxLength = expectedNumberOfEvents / 10;
 		init(numberOfThreads);
 	}
-	
-	public void init(int numberOfThreads){
+
+	public void init(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 		this.events = new Events[numberOfThreads];
 		this.eventsProcessThread = new ProcessEventThread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
-		barrier = new CyclicBarrier(numberOfThreads+1);
+		barrier = new CyclicBarrier(numberOfThreads + 1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			events[i] = new Events();
-			eventsProcessThread[i] = new ProcessEventThread(events[i],preInputBufferMaxLength,barrier);
+			eventsProcessThread[i] = new ProcessEventThread(events[i],
+					preInputBufferMaxLength, barrier);
 		}
 	}
-	
-	
-	
-	
-	
+
 	// When the main method is finish, it must await this barrier
-	public void awaitHandlerThreads(){
-		for (int i=0;i<eventsProcessThread.length;i++){
+	public void awaitHandlerThreads() {
+		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].close();
 		}
-		
-		
+
 		try {
 			barrier.await();
 		} catch (InterruptedException e) {
@@ -108,10 +160,11 @@ public class ParallelEvents extends Events {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// reset this class, so that it can be reused for the next iteration
 		for (int i = 0; i < numberOfThreads; i++) {
-			eventsProcessThread[i] = new ProcessEventThread(events[i],preInputBufferMaxLength,barrier);
+			eventsProcessThread[i] = new ProcessEventThread(events[i],
+					preInputBufferMaxLength, barrier);
 		}
-	} 
+	}
 }
