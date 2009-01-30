@@ -25,8 +25,31 @@ public class ParallelEventsTest extends MatsimTestCase {
 		processEvents(new ParallelEvents(1,1000), 100, 1, 1);
 		processEvents(new ParallelEvents(2,100), 100, 1, 1);
 		processEvents(new ParallelEvents(2,100), 1000, 2, 1);
-		processEvents(new ParallelEvents(2,1000), 100, 3, 1);
+		processEvents(new ParallelEvents(2,1000), 1000, 2, 1);
+		processEvents(new ParallelEvents(2,5000), 100, 3, 1);
 	}
+	
+	// test, if adding and removing a handler works
+	public void testAddAndRemoveHandler(){
+		Events events=new ParallelEvents(2);
+		
+		Handler1 handler = new Handler1();
+		events.addHandler(handler);
+		events.removeHandler(handler);
+		
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, "", "", 0);
+		
+		for (int i = 0; i < 100; i++) {
+			events.processEvent(linkLeaveEvent);
+		}
+		
+		if (events instanceof ParallelEvents) {
+			((ParallelEvents) events).awaitHandlerThreads();
+		}
+		
+		assertEquals(0, handler.getNumberOfProcessedMessages());		
+	}
+	
 
 	public void processEvents(Events events, int eventCount,
 			int numberOfHandlers, int numberOfIterations ) {
