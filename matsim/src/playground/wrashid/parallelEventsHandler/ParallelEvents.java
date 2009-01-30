@@ -38,9 +38,31 @@ public class ParallelEvents extends Events {
 	// if the number of events is estimated as x, than this number
 	// could be set to x/10
 	// the higher this parameter, the less locks are used, but
-	// the more the asynchronity between the simulation and events handling
+	// the more the time gab between the simulation and events handling
+	// for small simulations, the default value is ok and it even works
+	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
 
+	
+	/**
+	 * @param numberOfThreads -
+	 *            specify the number of threads used for the events handler
+	 */
+	public ParallelEvents(int numberOfThreads) {
+		init(numberOfThreads);
+	}
+
+	/**
+	 * 
+	 * @param numberOfThreads
+	 * @param expectedNumberOfEvents
+	 * Only use this constructor for larger simulations (20M+ events).
+	 */
+	public ParallelEvents(int numberOfThreads, int expectedNumberOfEvents) {
+		preInputBufferMaxLength = expectedNumberOfEvents / 10;
+		init(numberOfThreads);
+	}
+	
 	public void processEvent(final BasicEvent event) {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].processEvent(event);
@@ -112,27 +134,8 @@ public class ParallelEvents extends Events {
 			}
 		}
 	}
-	
 
-	/**
-	 * @param numberOfThreads -
-	 *            specify the number of threads used for the events handler
-	 */
-	public ParallelEvents(int numberOfThreads) {
-		init(numberOfThreads);
-	}
-
-	/**
-	 * 
-	 * @param numberOfThreads
-	 * @param expectedNumberOfEvents
-	 */
-	public ParallelEvents(int numberOfThreads, int expectedNumberOfEvents) {
-		preInputBufferMaxLength = expectedNumberOfEvents / 10;
-		init(numberOfThreads);
-	}
-
-	public void init(int numberOfThreads) {
+	private void init(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 		this.events = new Events[numberOfThreads];
 		this.eventsProcessThread = new ProcessEventThread[numberOfThreads];
@@ -145,7 +148,9 @@ public class ParallelEvents extends Events {
 		}
 	}
 
-	// When the main method is finish, it must await this barrier
+	// When one simulation iteration is finish, it must call this method,
+	// so that it can communicate to the threads, that the simulation is 
+	// finished and so that it can await the event handler threads
 	public void awaitHandlerThreads() {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].close();
@@ -154,10 +159,8 @@ public class ParallelEvents extends Events {
 		try {
 			barrier.await();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
