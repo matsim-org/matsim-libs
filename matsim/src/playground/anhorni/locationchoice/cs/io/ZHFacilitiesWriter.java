@@ -36,14 +36,14 @@ public class ZHFacilitiesWriter {
 			Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();			
 			while (facilitiesList_it.hasNext()) {
 				ZHFacility facility = facilitiesList_it.next();	
-				Coord coord = facility.getExactPosition();
+				Coord coord = facility.getCenter();
 				Feature feature = this.createFeature(coord);
 				features.add(feature);
 			}
 		}
 		try {
 			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir + "_facilities.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir + "facilitiesMapped2Net.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
