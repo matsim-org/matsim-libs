@@ -39,8 +39,9 @@ import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.util.testable.PopulationModifier;
 import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.PDES2.Road;
-import playground.wrashid.deqsim.DEQSimStarter;
+import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.deqsim.PDESStarter2;
+
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		TestHandler, ActEndEventHandler, ActStartEventHandler,
@@ -289,7 +290,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 			SimulationParameters.testPopulationModifier = new DummyPopulationModifier();
 		}
 
-		DEQSimStarter.main(args);
+		DEQSimStarterWithoutController.main(args);
 		this
 				.calculateExpectedNumberOfEvents(SimulationParameters.testPopulationModifier
 						.getPopulation());

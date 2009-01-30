@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 
 import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.SimulationParameters;
-import playground.wrashid.deqsim.DEQSimStarter;
+import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 import playground.wrashid.tryouts.starting.PCppEventFileParser;
 
@@ -37,7 +37,7 @@ public class SimTest extends TestCase {
 		
 			
 		args[0]= baseDir + "config.xml";
-		DEQSimStarter.main(args);
+		DEQSimStarterWithoutController.main(args);
 		
 		//args[0]= baseDir + "deq_events.txt";
 		//CppEventFileParser.main(args);

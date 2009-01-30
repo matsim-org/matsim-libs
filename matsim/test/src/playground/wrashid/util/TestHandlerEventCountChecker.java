@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.DES.util.testable.PopulationModifier;
 import playground.wrashid.DES.util.testable.TestHandler;
-import playground.wrashid.deqsim.DEQSimStarter;
+import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerEventCountChecker extends MatsimTestCase implements
@@ -169,7 +169,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			SimulationParameters.testPopulationModifier=new DummyPopulationModifier();
 		}		
 		
-		DEQSimStarter.main(args);
+		DEQSimStarterWithoutController.main(args);
 		this.estimateExpectedNumberOfEvents(SimulationParameters.testPopulationModifier.getPopulation());
 		SimulationParameters.testEventHandler.checkAssertions();
 	}
