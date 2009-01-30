@@ -33,8 +33,7 @@ public class ZHFacilitiesWriter {
 		while (facilities_it.hasNext()) {
 			ArrayList<ZHFacility> facilitiesList = facilities_it.next();
 			
-			Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();
-			
+			Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();			
 			while (facilitiesList_it.hasNext()) {
 				ZHFacility facility = facilitiesList_it.next();	
 				Coord coord = facility.getExactPosition();
@@ -53,7 +52,7 @@ public class ZHFacilitiesWriter {
 
 
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[3];
+		AttributeType [] attr = new AttributeType[1];
 		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
 		
 		try {
