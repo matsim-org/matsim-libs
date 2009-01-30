@@ -13,17 +13,17 @@
 	</module>
 
 	<module name="network">
-            	<param name="inputNetworkFile" value="../opus_matsim/data/psrc/network/psrc.xml.gz" />
+            	<param name="inputNetworkFile" value="../shared-svn/studies/north-america/ca/vancouver/network/net.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../opus_matsim/data/psrc/plans/psrc-1pct-plans.xml.gz" />
+<!-- 		<param name="inputPlansFile" value="../opus_matsim/data/psrc/plans/psrc-1pct-plans.xml.gz" /> -->
 	</module>
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
-		<param name="outputDirectory" value="2dec-output" />
+		<param name="lastIteration" value="0" />
+		<param name="outputDirectory" value="2myoutput" />
 	</module>
 
 	<module name="simulation">
