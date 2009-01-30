@@ -27,6 +27,18 @@ import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
 
+/**
+ * 
+ * ParallelEvents allows parallelisation for events handling.
+ * Usage: First create an object of this class. Before each iteration, call initProcessing.
+ * After each iteration, call finishProcessing. This has already been incorporated into
+ * the Controler.
+ * 
+ * Usage via config.xml: 
+ * 
+ * @author rashid_waraich
+ * 
+ */
 public class ParallelEvents extends Events {
 
 	private int numberOfThreads;
@@ -35,10 +47,10 @@ public class ParallelEvents extends Events {
 	private int numberOfAddedEventsHandler = 0;
 	private CyclicBarrier barrier = null;
 	// this number should be set in the following way:
-	// if the number of events is estimated as x, than this number
+	// if the number of events is estimated as x, then this number
 	// could be set to x/10
 	// the higher this parameter, the less locks are used, but
-	// the more the time gab between the simulation and events handling
+	// the more the time buffer between the simulation and events handling
 	// for small simulations, the default value is ok and it even works
 	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
@@ -131,15 +143,13 @@ public class ParallelEvents extends Events {
 		barrier = new CyclicBarrier(numberOfThreads + 1);
 		for (int i = 0; i < numberOfThreads; i++) {
 			events[i] = new Events();
-			eventsProcessThread[i] = new ProcessEventThread(events[i],
-					preInputBufferMaxLength, barrier);
 		}
 	}
 
 	// When one simulation iteration is finish, it must call this method,
 	// so that it can communicate to the threads, that the simulation is 
-	// finished and so that it can await the event handler threads
-	public void awaitHandlerThreads() {
+	// finished and that it can await the event handler threads.
+	public void finishProcessing() {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].close();
 		}
@@ -151,11 +161,16 @@ public class ParallelEvents extends Events {
 		} catch (BrokenBarrierException e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	// create event handler threads
+	// prepare for next iteration
+	public void initProcessing(){
 		// reset this class, so that it can be reused for the next iteration
 		for (int i = 0; i < numberOfThreads; i++) {
 			eventsProcessThread[i] = new ProcessEventThread(events[i],
 					preInputBufferMaxLength, barrier);
 		}
 	}
+	
 }

@@ -34,6 +34,9 @@ public class EventProcessing {
 		
 		Events events = new ParallelEvents(2);
 		//Events events = new Events();
+		
+		// start iteration
+		events.initProcessing();
 
 		events.addHandler(ep.new Handler1());
 		events.addHandler(ep.new Handler1());
@@ -50,9 +53,7 @@ public class EventProcessing {
 		
 		
 		// This is very important!!!
-		if (events instanceof ParallelEvents){
-			((ParallelEvents) events).awaitHandlerThreads();
-		}
+		events.finishProcessing();
 		
 		System.out.println("time needed in [s]:" + (System.currentTimeMillis() -  timer)/1000);
 		

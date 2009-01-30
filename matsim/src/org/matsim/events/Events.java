@@ -171,6 +171,24 @@ public class Events {
 		this.nextCounterMsg = 1;
 	}
 
+	/**
+	 * This method should be invoked at the beginning of an iteration.
+	 * It can be overwritten by parallel variants of the Events class. 
+	 */
+	public void initProcessing(){
+		
+	}
+	
+	/**
+	 * This method should be invoked at the end of an iteration.
+	 * It can be overwritten by parallel variants of the Events class. 
+	 */
+	public void finishProcessing(){
+		
+	}
+	
+	
+	
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
