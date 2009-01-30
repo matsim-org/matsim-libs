@@ -37,8 +37,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.router.util.TravelCost;
-import org.matsim.router.util.TravelTime;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
@@ -123,12 +121,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		leg.setArrivalTime(0.0);
 		*/
 		
-		//PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-			
-		PlansCalcRoute router = new PlansCalcRoute(controler.getNetwork(), 
-				controler.getTravelCostCalculator(),
-				controler.getTravelTimeCalculator());
-		
+		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());		
 		return leg.getTravelTime();
 	}	
