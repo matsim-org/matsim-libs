@@ -19,8 +19,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 
-import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractCarChoiceSets;
-import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSets;
+import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
+import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
 import playground.anhorni.locationchoice.cs.filters.ActTypeAndAreaTripFilter;
 import playground.anhorni.locationchoice.cs.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
@@ -178,8 +178,8 @@ public class GenerateChoiceSets {
 		}
 				
 		this.controler = new Controler(this.matsimRunConfigFile);
-		ExtractCarChoiceSets listener = new ExtractCarChoiceSets(this.controler, this.zhFacilitiesByLink, this.carChoiceSets);
-		//controler.addControlerListener(listener);
+		ExtractChoiceSetsRouting listener = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, this.carChoiceSets);
+		controler.addControlerListener(listener);
 		controler.run();
 		
 		this.extractCarChoiceSets(listener);
@@ -217,7 +217,7 @@ public class GenerateChoiceSets {
 		new ZHFacilitiesWriter().write(this.outdir, this.zhFacilitiesByLink);
 	}
 			
-	private void extractCarChoiceSets(ExtractCarChoiceSets listener) {
+	private void extractCarChoiceSets(ExtractChoiceSetsRouting listener) {
 		BudgetWriter writer = new BudgetWriter();
 		writer.write(this.outdir + "carBudgets.txt", listener.getBudgets());
 	}
@@ -230,7 +230,7 @@ public class GenerateChoiceSets {
 			List<ZHFacility> list = zhFacilitiesList_it.next();
 			zhFacilities.addAll(list);
 		}		
-		ExtractWalkChoiceSets extractor = new ExtractWalkChoiceSets(this.controler, zhFacilities, this.walkingSpeed, choiceSets);
+		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(this.controler, zhFacilities, this.walkingSpeed, choiceSets);
 		extractor.run();
 		
 		BudgetWriter writer = new BudgetWriter();
