@@ -158,8 +158,8 @@ public class GenerateChoiceSets {
 		this.createChoiceSetFacilities();
 				
 		if (this.readNelson.equals("true")) {
-			this.carChoiceSets = new NelsonTripReader().readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
-			this.walkChoiceSets = new NelsonTripReader().readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");
+			this.carChoiceSets = new NelsonTripReader(this.network).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
+			this.walkChoiceSets = new NelsonTripReader(this.network).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");
 			
 			NelsonWriter nelsonWriter = new NelsonWriter();
 			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
