@@ -63,7 +63,8 @@ public class JavaDEQSim {
 
 		// start iteration
 		// TODO: remove this when in core, because it is already in controller
-		SimulationParameters.processEventThread.initProcessing();
+		// this is now in the controler
+		//SimulationParameters.processEventThread.initProcessing();
 		
 		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
@@ -120,7 +121,9 @@ public class JavaDEQSim {
 
 		// the main thread (microsimulation) is finished - await the event processing
 		// TODO: remove this after integration into core
-		SimulationParameters.processEventThread.finishProcessing();
+		// this is now in the controler
+		// if this is removed, the tests do not work anymore
+		//SimulationParameters.processEventThread.finishProcessing();
 		
 		
 		t.endTimer();

@@ -4,13 +4,12 @@ import org.matsim.controler.Controler;
 
 import playground.wrashid.DES.util.Timer;
 
-class DESController extends Controler {
+public class DESController extends Controler {
 	public DESController(final String[] args) {
 	    super(args);
 	  }
 
 	protected void runMobSim() {
-		
 		new JavaDEQSim(this.network, this.population, this.events).run();
 	}
 
