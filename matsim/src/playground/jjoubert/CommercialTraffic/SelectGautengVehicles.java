@@ -51,16 +51,16 @@ public class SelectGautengVehicles {
 					outFiles++;
 				}
 				
-				// Report on progress
-				if(((int)(i/100)) == Math.round(((float)i)/100) ){
-					float progress = ((float) i/(files-2)*100);
-					System.out.printf("Progress: %3.0f %% \t%d of a possible %d files already identified\n", 
-							progress, inFiles, (files-2) );		
-				}
+			}
+			// Report on progress
+			if( i%1000 == 0){
+				float progress = ((float) i/(files-2)*100);
+				System.out.printf("Progress: %3.0f %% \t%d of %d files checked; %d moved.\n", 
+						progress, (inFiles + outFiles), (files-2), inFiles );		
 			}
 		}
 		long endTime = System.currentTimeMillis();
-		long seconds = 1000*(endTime - startTime);
+		long seconds = ((long)(endTime - startTime)/1000);
 		System.out.println("\nDone");
 		System.out.println("           Total number of files: " + (inFiles + outFiles) );
 		System.out.println("Total number of files in Gauteng: " + inFiles );
@@ -75,13 +75,15 @@ public class SelectGautengVehicles {
 			
 			while((input.hasNextLine() ) & !(inStatus) ){
 				String [] inputString = input.nextLine().split(" ");
-				double x = Double.valueOf(inputString[2]).doubleValue();
-				double y = Float.valueOf(inputString[3]).doubleValue();
-				Coordinate coord = new Coordinate(x,y);
-				GeometryFactory gf = new GeometryFactory();
-				Point p = gf.createPoint(coord);
-				
-				inStatus = testPolygon(polygon, p);				
+				if(inputString.length > 5){
+					double x = Double.valueOf(inputString[2]).doubleValue();
+					double y = Double.valueOf(inputString[3]).doubleValue();
+					Coordinate coord = new Coordinate(x,y);
+					GeometryFactory gf = new GeometryFactory();
+					Point p = gf.createPoint(coord);
+
+					inStatus = testPolygon(polygon, p);
+				}
 			}		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
