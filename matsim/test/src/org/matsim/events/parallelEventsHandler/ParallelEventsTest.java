@@ -1,14 +1,9 @@
 package org.matsim.events.parallelEventsHandler;
 
-import java.util.LinkedList;
-
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.wrashid.tryouts.performance.EventProcessing;
 
 public class ParallelEventsTest extends MatsimTestCase {
 
@@ -52,7 +47,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	public void processEvents(Events events, int eventCount,
+	private void processEvents(Events events, int eventCount,
 			int numberOfHandlers, int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];
@@ -105,7 +100,6 @@ public class ParallelEventsTest extends MatsimTestCase {
 		}
 
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
 		}
 
 		public Handler1() {
