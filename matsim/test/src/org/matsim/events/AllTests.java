@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for org.matsim.events");
 
 		suite.addTest(org.matsim.events.algorithms.AllTests.suite());
+		suite.addTest(org.matsim.events.parallelEventsHandler.AllTests.suite());
 		suite.addTestSuite(ActEndEventTest.class);
 		suite.addTestSuite(ActStartEventTest.class);
 		suite.addTestSuite(AgentArrivalEventTest.class);
