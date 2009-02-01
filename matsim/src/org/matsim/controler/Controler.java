@@ -111,7 +111,6 @@ import org.matsim.utils.misc.Time;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
-
 /**
  * The Controler is responsible for complete simulation runs, including
  * the initialization of all required data, running the iterations and
@@ -133,7 +132,7 @@ public class Controler {
 	private static String outputPath = null;
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
-	
+
 	private int traveltimeBinSize = 15*60; // use default of 15mins
 	private boolean overwriteFiles = false;
 	private static int iteration = -1;
@@ -165,7 +164,7 @@ public class Controler {
 
 	/** Stores data commonly used by all router instances. */
 	private PreProcessLandmarks commonRoutingData = null;
-	
+
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is in every iteration,
 	 * <tt>2</tt> in every second, <tt>10</tt> in every 10th, and so forth. <tt>0</tt> disables the writing
@@ -188,12 +187,12 @@ public class Controler {
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
 	/**
-	 * This variable is used to store the log4j output before it can be written to 
+	 * This variable is used to store the log4j output before it can be written to
 	 * a file. This is needed to set the output directory before logging.
 	 */
 	private CollectLogMessagesAppender collectLogMessagesAppender = null;
-	
-	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
+
+	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -311,19 +310,19 @@ public class Controler {
 		final String NUMBER_OF_THREADS="numberOfThreads";
 		final String ESTIMATED_NUMBER_OF_EVENTS="estimatedNumberOfEvents";
 		String numberOfThreads = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-		String estimatedNumberOfEvents = Gbl.getConfig().findParam(ESTIMATED_NUMBER_OF_EVENTS, NUMBER_OF_THREADS);
-		
+		String estimatedNumberOfEvents = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
+
 		if (numberOfThreads!=null){
 			int numOfThreads=Integer.parseInt(numberOfThreads);
 			// the user wants to user parallel events handling
 			if (estimatedNumberOfEvents!=null){
 				int estNumberOfEvents=Integer.parseInt(estimatedNumberOfEvents);
-				events=new ParallelEvents(numOfThreads,estNumberOfEvents);
+				this.events=new ParallelEvents(numOfThreads,estNumberOfEvents);
 			} else {
-				events=new ParallelEvents(numOfThreads);
+				this.events=new ParallelEvents(numOfThreads);
 			}
 		} else {
-			events=new Events();
+			this.events=new Events();
 		}
 	}
 
@@ -449,8 +448,8 @@ public class Controler {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Loads the configuration object with the correct settings.
 	 */
@@ -469,7 +468,7 @@ public class Controler {
 		configwriter.write();
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
-		
+
 		if (this.config.network().isTimeVariantNetwork()) {
 			log.info("setting TimeVariantLinkImpl as link prototype in NetworkFactory.");
 			this.networkFactory.setLinkPrototype(TimeVariantLinkImpl.class);
@@ -1171,10 +1170,10 @@ public class Controler {
 	}
 
 	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
-		return facilityPenalties;
+		return this.facilityPenalties;
 	}
 
-	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	public void setFacilityPenalties(final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		this.facilityPenalties = facilityPenalties;
 	}
 
@@ -1222,7 +1221,7 @@ public class Controler {
 				controler.volumes.reset(event.getIteration());
 				controler.events.addHandler(controler.volumes);
 			}
-			
+
 			// init for event processing of new iteration
 			controler.events.initProcessing();
 		}
@@ -1233,7 +1232,7 @@ public class Controler {
 
 			// prepare for finishing iteration
 			controler.events.finishProcessing();
-			
+
 			if (this.eventWriter != null) {
 				this.eventWriter.closeFile();
 				event.getControler().getEvents().removeHandler(this.eventWriter);
