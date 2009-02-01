@@ -4,8 +4,7 @@ import org.matsim.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
-import playground.jhackney.controler.SNController2;
-import playground.jhackney.controler.SNControllerListener2;
+//import playground.jhackney.controler.SNControllerListener2;
 
 public class SocialNetworksTest extends MatsimTestCase{
 	
@@ -20,8 +19,8 @@ public class SocialNetworksTest extends MatsimTestCase{
 		String plansFile = getOutputDirectory() + "/output_plans.xml.gz";
 		String socNetFile = getOutputDirectory() + "/socialnets/stats/edge.txt";
 
-		final Controler controler = new SNController2(new String[] {config});
-		controler.addControlerListener(new SNControllerListener2());
+		final Controler controler = new Controler(new String[] {config});
+//		controler.addControlerListener(new SNControllerListener2()); // had to comment this line out because SNControllerListener2 is in the playground, but this class is in core
 		controler.setOverwriteFiles(true);
 		controler.run();
 
