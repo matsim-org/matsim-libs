@@ -20,7 +20,7 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
-import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
+//import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
 import playground.anhorni.locationchoice.cs.filters.ActTypeAndAreaTripFilter;
 import playground.anhorni.locationchoice.cs.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
@@ -28,7 +28,7 @@ import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
-import playground.anhorni.locationchoice.cs.io.BudgetWriter;
+//import playground.anhorni.locationchoice.cs.io.BudgetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
@@ -179,11 +179,12 @@ public class GenerateChoiceSets {
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.carChoiceSets, "car");
 		controler.addControlerListener(listenerCar);
-		
+				
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.walkChoiceSets, "walk");
-		//controler.addControlerListener(listenerWalk);
+		controler.addControlerListener(listenerWalk);
 		
+		log.info("Running controler: ...");
 		controler.run();
 		
 		//this.extractCarChoiceSets(listenerCar);
@@ -194,7 +195,11 @@ public class GenerateChoiceSets {
 		shpWriter.writeChoiceSets(this.outdir, "walkBeforeSampling", this.walkChoiceSets);
 		
 		// sample the choice sets
+		
+		log.info("sampling: ...");
 		this.drawSample();
+		
+		log.info("output: ...");
 		this.output();	
 	}
 		
