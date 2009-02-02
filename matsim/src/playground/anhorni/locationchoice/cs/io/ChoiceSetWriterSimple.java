@@ -26,7 +26,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 		}
 		
 		try {		
-			final String header="Person_id\tTrip_nr\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time\tTravel_Distance";
+			final String header="Person_id\tTrip_nr\tTTB\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time\tTravel_Distance";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
@@ -47,7 +47,10 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 						choiceSet.getTravelTime(facility) + "\t" +
 						choiceSet.getTravelDistance(facility);
 					
-					out.write(choiceSet.getId() +"\t" + choiceSet.getTrip().getTripNr() + "\t" + location);
+					out.write(choiceSet.getId() +"\t" + 
+							choiceSet.getTrip().getTripNr() + "\t" + 
+							choiceSet.getTravelTimeBudget() + "\t" +
+							location);
 					out.newLine();
 				}					
 				out.flush();
