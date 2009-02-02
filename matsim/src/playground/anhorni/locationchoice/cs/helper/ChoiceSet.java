@@ -20,6 +20,7 @@ public class ChoiceSet {
 	Trip trip;
 	ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
 	ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
+	ArrayList<Double> travelDistances2Facilities = new ArrayList<Double>();
 		
 	public ChoiceSet(Id id, Trip trip) {
 		this.id = id;
@@ -61,13 +62,14 @@ public class ChoiceSet {
 	}
 
 
-	public void addFacility(ZHFacility facility, double traveltime) {
+	public void addFacility(ZHFacility facility, double traveltime, double traveldistance) {
 		if (!this.facilities.contains(facility)) {
 			this.facilities.add(facility);
-			this.travelTimes2Facilities.add(traveltime);			
+			this.travelTimes2Facilities.add(traveltime);
+			this.travelDistances2Facilities.add(traveldistance);
 		}		
 	}
-	public void addFacilities(ArrayList<ZHFacility> facilities, ArrayList<Double> traveltimes) {
+	public void addFacilities(ArrayList<ZHFacility> facilities, ArrayList<Double> traveltimes, ArrayList<Double> traveldistances) {
 		
 		int index = 0;
 		Iterator<ZHFacility> it = facilities.iterator();
@@ -80,15 +82,23 @@ public class ChoiceSet {
 			else {
 				this.travelTimes2Facilities.add(0.0);
 			}
+			if (traveldistances != null) {
+				this.travelDistances2Facilities.add(traveldistances.get(index));
+			}
+			else {
+				this.travelDistances2Facilities.add(0.0);
+			}
 			index++;
 		}
 	}
-	public void addFacilities(ArrayList<ZHFacility> facilities, double traveltime) {		
+	public void addFacilities(ArrayList<ZHFacility> facilities, double traveltime, double traveldistance) {		
 		ArrayList<Double> traveltimes = new ArrayList<Double>();
+		ArrayList<Double> traveldistances = new ArrayList<Double>();
 		for (int i = 0; i < facilities.size(); i++) {
-			traveltimes.add(traveltime);			
+			traveltimes.add(traveltime);	
+			traveldistances.add(traveldistance);
 		}
-		this.addFacilities(facilities, traveltimes);
+		this.addFacilities(facilities, traveltimes, traveldistances);
 	}
 	
 	public void removeFacility(int index) {
@@ -97,6 +107,9 @@ public class ChoiceSet {
 			this.facilities.remove(index);
 			if (!travelTimes2Facilities.isEmpty()) {
 				this.travelTimes2Facilities.remove(index);
+			}
+			if (!travelDistances2Facilities.isEmpty()) {
+				this.travelDistances2Facilities.remove(index);
 			}
 		}
 		else {
@@ -256,8 +269,15 @@ public class ChoiceSet {
 	public void setTrip(Trip trip) {
 		this.trip = trip;
 	}
-
 	public void setTravelTimeBudget(double travelTimeBudget) {
 		this.travelTimeBudget = travelTimeBudget;
+	}
+	public double getTravelTime(ZHFacility facility) {
+		int facilityIndex = this.facilities.indexOf(facility);
+		return this.travelTimes2Facilities.get(facilityIndex);
+	}
+	public double getTravelDistance(ZHFacility facility) {
+		int facilityIndex = this.facilities.indexOf(facility);
+		return this.travelDistances2Facilities.get(facilityIndex);
 	}
 }

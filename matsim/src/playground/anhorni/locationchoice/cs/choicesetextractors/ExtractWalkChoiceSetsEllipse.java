@@ -51,7 +51,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 			}
 		}
 		if (facilities != null) {
-			choiceSet.addFacilities(facilities, null);
+			choiceSet.addFacilities(facilities, null, null);
 		}
 	}
 	

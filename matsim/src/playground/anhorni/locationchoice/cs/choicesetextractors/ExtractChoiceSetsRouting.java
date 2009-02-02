@@ -86,28 +86,32 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			
 			Link link = network.getLink(linkId);
 			
+			//--------------------------------------------------
 			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();
-			Act toAct = new Act("shop", link);	
+			Act toAct = new Act("shop", link);		
+			Leg legBefore = computeLeg(fromAct, toAct, controler);				
+			double travelTimeBeforeShopping = legBefore.getTravelTime();
 			
-			double travelTimeBeforeShopping = computeTravelTime(fromAct, toAct, controler);
-			
-			fromAct = toAct;
+			//--------------------------------------------------			
+			fromAct = new Act(toAct.getType(), toAct.getLink());
 			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + travelTimeBeforeShopping +
 					choiceSet.getTrip().getShoppingAct().getDuration());
 			toAct = choiceSet.getTrip().getAfterShoppingAct();	
+			Leg legAfter = computeLeg(fromAct, toAct, controler);	
+			double travelTimeAfterShopping = legAfter.getTravelTime();
+			//--------------------------------------------------
 			
-			double travelTimeAfterShopping = computeTravelTime(fromAct, toAct, controler);			
 			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;
 			
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
-				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime);
-			}
-			
+				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, 
+						legBefore.getRoute().getDist() + legAfter.getRoute().getDist());
+			}		
 		}		
 	}
 	
 	
-	private double computeTravelTime(Act fromAct, Act toAct, Controler controler) {	
+	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = null;
 		if (this.mode.equals("car")) {
 			leg = new Leg(BasicLeg.Mode.car);
@@ -123,7 +127,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());		
-		return leg.getTravelTime();
+		return leg;
 	}	
 }
 
