@@ -90,18 +90,19 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId(), choiceSet.getTrip().getTripNr());
 			features.add(featureShopping);
 			
-			
+			/*
 			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
 			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId(), choiceSet.getTrip().getTripNr());
 			features.add(featureAfter);
+			*/
 			
 			
 		}			
 		try {
 			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_trips.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_Trips.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
