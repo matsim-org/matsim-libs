@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration;
+package org.matsim.integration.controler;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,16 +27,10 @@ public class AllTests {
 
 	public static Test suite() {
 
-		TestSuite suite = new TestSuite("Integration Tests for MATSim");
-
-		suite.addTestSuite(EquilTwoAgentsTest.class);
-		suite.addTest(org.matsim.integration.controler.AllTests.suite());
-		suite.addTest(org.matsim.integration.events.AllTests.suite());
-		suite.addTest(org.matsim.integration.population.AllTests.suite());
-		suite.addTest(org.matsim.integration.withinday.AllTests.suite());
-		suite.addTest(org.matsim.integration.replanning.AllTests.suite());
-		suite.addTest(org.matsim.integration.timevariantnetworks.AllTests.suite());
-
+		TestSuite suite = new TestSuite("Integration Tests for MATSim's Controler");
+		//$JUnit-BEGIN$
+		suite.addTestSuite(ParallelEventsTest.class);
+		//$JUnit-END$
 		return suite;
 	}
 
