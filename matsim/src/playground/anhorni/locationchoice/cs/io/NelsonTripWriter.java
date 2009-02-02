@@ -13,10 +13,10 @@ public class NelsonTripWriter {
 
 public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
 		
-		String outfile = outdir + "trips" + name +".txt";
+		String outfile = outdir + name +"_Trips.txt";
 		
 		try {		
-			final String header="Id\tTrip_nr\tTTB\tS_X\tS_Y\tEnd_S\tZ_X\tZ_Y\tStart_Z\tEnd_Z\tE_X\tE_Y\tStart_E";
+			final String header="Id\tTrip_nr\tTTB (s)\tS_X\tS_Y\tEnd_S\tZ_X\tZ_Y\tStart_Z\tEnd_Z\tE_X\tE_Y\tStart_E";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
