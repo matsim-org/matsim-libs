@@ -19,14 +19,14 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 	
 	public void write(String outdir, String name,List<ChoiceSet> choiceSets)  {
 		
-		String outfile = outdir + name + ".txt";
+		String outfile = outdir + name + "_ChoiceSets.txt";
 		if (!super.checkBeforeWriting(choiceSets)) {
 			log.warn(outfile +" not created");
 			return;
 		}
 		
 		try {		
-			final String header="Person_id\tTrip_nr\tTTB\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time\tTravel_Distance";
+			final String header="id\tTrip_nr\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
