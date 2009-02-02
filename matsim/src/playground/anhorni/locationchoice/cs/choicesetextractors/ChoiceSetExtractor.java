@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
@@ -19,6 +21,8 @@ public abstract class ChoiceSetExtractor {
 	private List<TravelTimeBudget> budgets =  new Vector<TravelTimeBudget>();
 	private List<ChoiceSet> choiceSets;
 	
+	private final static Logger log = Logger.getLogger(ChoiceSetExtractor.class);
+	
 	public ChoiceSetExtractor(Controler controler, List<ChoiceSet> choiceSets) {
 		this.controler = controler;
 		this.choiceSets = choiceSets;
@@ -32,7 +36,9 @@ public abstract class ChoiceSetExtractor {
 			
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
-			ChoiceSet choiceSet = choiceSet_it.next();			
+			ChoiceSet choiceSet = choiceSet_it.next();	
+			
+			log.info("Computing choice set: " + choiceSet.getId().toString());
 			
 			this.budgets.add(new TravelTimeBudget(choiceSet.getId(), choiceSet.getTravelTimeBudget(), 
 					choiceSet.getTrip().getTripNr()));
