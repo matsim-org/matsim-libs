@@ -36,8 +36,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.utils.geometry.CoordImpl;
-
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
@@ -134,42 +132,6 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		
 		return leg;
-	}
-	
-	protected void computeChoiceSet2(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
-			Controler controler) {	
-		
-		log.info("computing choice sets 2 ...");
-		
-		NetworkLayer network = controler.getNetwork();
-		
-		Link linkBefore = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
-		Act fromAct = new Act("home", linkBefore);
-		fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
-		//fromAct.setEndTime(5.0);
-		
-		Link linkShop = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
-		Act toAct = new Act("shop", linkShop);
-	
-		Leg legBefore = computeLeg(fromAct, toAct, controler);	
-		log.info(legBefore.getTravelTime());
-	
-		//--------------------------------------------------			
-		//Link linkAfter = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
-		//Link linkAfter = choiceSet.getTrip().getAfterShoppingAct().getLink();
-		Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
-		
-		log.info("After shoping: " + linkAfter.getCenter().toString());
-		
-		fromAct = new Act("shop", linkShop);
-		fromAct.setEndTime(300.0);
-		toAct = new Act("home", linkAfter);
-		
-		Leg legAfter = computeLeg(fromAct, toAct, controler);
-		log.info(legAfter.getTravelTime());
-		//--------------------------------------------------
-		
-		log.info("computing choice sets 2 done.");
 	}
 }
 
