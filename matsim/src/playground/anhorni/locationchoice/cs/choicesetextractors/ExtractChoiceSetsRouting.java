@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
@@ -37,7 +36,6 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
-
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
@@ -74,7 +72,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		log.info("computing choice sets...:");
 		super.computeChoiceSets();
 	}
-			
+				
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
 			Controler controler) {
 			
@@ -83,31 +81,46 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
-			
 			Link link = network.getLink(linkId);
 			
 			//--------------------------------------------------
 			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();
-			Act toAct = new Act("shop", link);		
+			Act toAct = new Act("shop", link);
+			toAct.setCoord(link.getCenter());
+			
+			/*
+			Iterator<ZHFacility> fac_it = this.zhFacilitiesByLink.get(linkId).iterator();
+			while (fac_it.hasNext()) {		
+				ZHFacility fac = fac_it.next();
+				log.info(fac.getShopID());
+				log.info(fac.getExactPosition().toString());
+				log.info(fac.getCenter().toString());
+				
+			}
+			*/
+			
 			Leg legBefore = computeLeg(fromAct, toAct, controler);				
 			double travelTimeBeforeShopping = legBefore.getTravelTime();
 			
 			//--------------------------------------------------			
 			fromAct = new Act(toAct.getType(), toAct.getLink());
+			fromAct.setCoord(toAct.getCoord());
+			
 			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + travelTimeBeforeShopping +
 					choiceSet.getTrip().getShoppingAct().getDuration());
 			toAct = choiceSet.getTrip().getAfterShoppingAct();	
+						
 			Leg legAfter = computeLeg(fromAct, toAct, controler);	
 			double travelTimeAfterShopping = legAfter.getTravelTime();
 			//--------------------------------------------------
 			
-			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;
+			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;			
 			
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
 				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, 
 						legBefore.getRoute().getDist() + legAfter.getRoute().getDist());
-			}		
-		}		
+			}	
+		}	
 	}
 	
 	
@@ -126,7 +139,8 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		*/
 		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());		
+		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
+		
 		return leg;
 	}	
 }
@@ -175,4 +189,37 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			index++;
 		}		
 	}
+	
+	
+	
+	
+	private void computeChoiceSet2(Controler controler) {	
+		NetworkLayer network = controler.getNetwork();
+		
+		Link link0 = network.getNearestLink(new CoordImpl(681740.0, 251920.0));
+		Act fromAct = new Act("home", link0);
+		
+		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
+		Act toAct = new Act("shop", link1);
+		fromAct.setStartTime(0.0);
+		fromAct.setEndTime(5.0);
+		toAct.setStartTime(100.0);
+		toAct.setEndTime(150.0);
+		
+		Leg legBefore = computeLeg(fromAct, toAct, controler);	
+		log.info(legBefore.getTravelTime());
+	
+		//--------------------------------------------------			
+		fromAct = new Act("shop", link1);
+		toAct = new Act("shop", link0);
+		fromAct.setStartTime(200.0);
+		fromAct.setEndTime(300.0);
+		toAct.setStartTime(1000.0);
+		toAct.setEndTime(1200.0);
+		
+		Leg legAfter = computeLeg(fromAct, toAct, controler);
+		log.info(legAfter.getTravelTime());
+		//--------------------------------------------------
+	}
+	
  */
