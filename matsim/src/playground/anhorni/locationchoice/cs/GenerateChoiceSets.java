@@ -33,7 +33,7 @@ import playground.anhorni.locationchoice.cs.io.ChoiceSetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
 import playground.anhorni.locationchoice.cs.io.NelsonTripReader;
-import playground.anhorni.locationchoice.cs.io.NelsonWriter;
+import playground.anhorni.locationchoice.cs.io.NelsonTripWriter;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesReader;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesWriter;
 import playground.balmermi.mz.PlansCreateFromMZ;
@@ -162,7 +162,7 @@ public class GenerateChoiceSets {
 			this.carChoiceSets = new NelsonTripReader(this.network).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
 			this.walkChoiceSets = new NelsonTripReader(this.network).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");
 			
-			NelsonWriter nelsonWriter = new NelsonWriter();
+			NelsonTripWriter nelsonWriter = new NelsonTripWriter();
 			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
 			nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
 		}
