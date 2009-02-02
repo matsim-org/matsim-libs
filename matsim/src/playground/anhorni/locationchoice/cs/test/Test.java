@@ -41,7 +41,7 @@ import org.matsim.gbl.Gbl;
 			String configArgs [] = {this.matsimRunConfigFile};	
 			Gbl.createConfig(configArgs);												
 			this.controler = new Controler(this.matsimRunConfigFile);
-			ExtractChoiceSetsRoutingTest listenerCar = new ExtractChoiceSetsRoutingTest();
+			ExtractChoiceSetsRoutingTest listenerCar = new ExtractChoiceSetsRoutingTest(this.controler);
 			controler.addControlerListener(listenerCar);
 			controler.run();
 		}

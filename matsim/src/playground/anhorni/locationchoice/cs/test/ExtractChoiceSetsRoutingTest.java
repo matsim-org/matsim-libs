@@ -17,10 +17,17 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRoutingTest.class);
 
+	private Controler controler = null;
+	public ExtractChoiceSetsRoutingTest(Controler controler) {
+		
+		this.controler = controler;
+		
+	}
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {	
 		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
 			return;
 		}
+		computeChoiceSet(this.controler);
 	}
 			
 	protected void computeChoiceSet(Controler controler) {
