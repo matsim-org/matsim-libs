@@ -36,6 +36,8 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
+import org.matsim.utils.geometry.CoordImpl;
+
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
@@ -53,8 +55,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		
 		super(controler, choiceSets);
 		super.zhFacilitiesByLink = zhFacilitiesByLink;
-		this.mode = mode;
-		
+		this.mode = mode;	
 	}
 	
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
@@ -81,34 +82,32 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		Iterator<Id> link_it = this.zhFacilitiesByLink.keySet().iterator();
 		while (link_it.hasNext()) {		
 			Id linkId = link_it.next();
-			Link link = network.getLink(linkId);
+			
 			
 			//--------------------------------------------------
-			Act fromAct = choiceSet.getTrip().getBeforeShoppingAct();
-			Act toAct = new Act("shop", link);
-			toAct.setCoord(link.getCenter());
-			
 			/*
-			Iterator<ZHFacility> fac_it = this.zhFacilitiesByLink.get(linkId).iterator();
-			while (fac_it.hasNext()) {		
-				ZHFacility fac = fac_it.next();
-				log.info(fac.getShopID());
-				log.info(fac.getExactPosition().toString());
-				log.info(fac.getCenter().toString());
-				
-			}
-			*/
-			
+			 * this is NOT working: 
+			 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
+			 */
+			Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
+			Act fromAct = new Act("beforeShop", linkBefore);
+			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
+						
+			Link link = network.getLink(linkId);
+			Act toAct = new Act("shop", link);
+						
 			Leg legBefore = computeLeg(fromAct, toAct, controler);				
 			double travelTimeBeforeShopping = legBefore.getTravelTime();
 			
 			//--------------------------------------------------			
 			fromAct = new Act(toAct.getType(), toAct.getLink());
-			fromAct.setCoord(toAct.getCoord());
-			
-			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + travelTimeBeforeShopping +
-					choiceSet.getTrip().getShoppingAct().getDuration());
-			toAct = choiceSet.getTrip().getAfterShoppingAct();	
+			double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + 
+			travelTimeBeforeShopping +
+			choiceSet.getTrip().getShoppingAct().calculateDuration();			
+			fromAct.setEndTime(endTime);
+						
+			Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
+			toAct = new Act("afterShop", linkAfter);
 						
 			Leg legAfter = computeLeg(fromAct, toAct, controler);	
 			double travelTimeAfterShopping = legAfter.getTravelTime();
@@ -123,7 +122,6 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		}	
 	}
 	
-	
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = null;
 		if (this.mode.equals("car")) {
@@ -131,18 +129,48 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		}
 		else if (this.mode.equals("walk")) {
 			leg = new Leg(BasicLeg.Mode.walk);
-		}
-		/*
-		leg.setDepartureTime(0.0);
-		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
-		*/
-		
+		}		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		
 		return leg;
-	}	
+	}
+	
+	protected void computeChoiceSet2(ChoiceSet choiceSet, SpanningTree spanningTree, String type, 
+			Controler controler) {	
+		
+		log.info("computing choice sets 2 ...");
+		
+		NetworkLayer network = controler.getNetwork();
+		
+		Link linkBefore = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
+		Act fromAct = new Act("home", linkBefore);
+		fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
+		//fromAct.setEndTime(5.0);
+		
+		Link linkShop = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
+		Act toAct = new Act("shop", linkShop);
+	
+		Leg legBefore = computeLeg(fromAct, toAct, controler);	
+		log.info(legBefore.getTravelTime());
+	
+		//--------------------------------------------------			
+		//Link linkAfter = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
+		//Link linkAfter = choiceSet.getTrip().getAfterShoppingAct().getLink();
+		Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
+		
+		log.info("After shoping: " + linkAfter.getCenter().toString());
+		
+		fromAct = new Act("shop", linkShop);
+		fromAct.setEndTime(300.0);
+		toAct = new Act("home", linkAfter);
+		
+		Leg legAfter = computeLeg(fromAct, toAct, controler);
+		log.info(legAfter.getTravelTime());
+		//--------------------------------------------------
+		
+		log.info("computing choice sets 2 done.");
+	}
 }
 
 
@@ -190,36 +218,5 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		}		
 	}
 	
-	
-	
-	
-	private void computeChoiceSet2(Controler controler) {	
-		NetworkLayer network = controler.getNetwork();
-		
-		Link link0 = network.getNearestLink(new CoordImpl(681740.0, 251920.0));
-		Act fromAct = new Act("home", link0);
-		
-		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
-		Act toAct = new Act("shop", link1);
-		fromAct.setStartTime(0.0);
-		fromAct.setEndTime(5.0);
-		toAct.setStartTime(100.0);
-		toAct.setEndTime(150.0);
-		
-		Leg legBefore = computeLeg(fromAct, toAct, controler);	
-		log.info(legBefore.getTravelTime());
-	
-		//--------------------------------------------------			
-		fromAct = new Act("shop", link1);
-		toAct = new Act("shop", link0);
-		fromAct.setStartTime(200.0);
-		fromAct.setEndTime(300.0);
-		toAct.setStartTime(1000.0);
-		toAct.setEndTime(1200.0);
-		
-		Leg legAfter = computeLeg(fromAct, toAct, controler);
-		log.info(legAfter.getTravelTime());
-		//--------------------------------------------------
-	}
 	
  */

@@ -34,15 +34,12 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 			
 		NetworkLayer network = controler.getNetwork();
 		
-		Link link0 = network.getNearestLink(new CoordImpl(681740.0, 251920.0));
+		Link link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
 		Act fromAct = new Act("home", link0);
 		
-		Link link1 = network.getNearestLink(new CoordImpl(682040.0, 251720.0));
+		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
 		Act toAct = new Act("shop", link1);
-		fromAct.setStartTime(0.0);
-		fromAct.setEndTime(5.0);
-		toAct.setStartTime(100.0);
-		toAct.setEndTime(150.0);
+		fromAct.setEndTime(0.0);
 		
 		Leg legBefore = computeLeg(fromAct, toAct, controler);	
 		log.info(legBefore.getTravelTime());
@@ -50,10 +47,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 		//--------------------------------------------------			
 		fromAct = new Act("shop", link1);
 		toAct = new Act("shop", link0);
-		fromAct.setStartTime(200.0);
 		fromAct.setEndTime(300.0);
-		toAct.setStartTime(1000.0);
-		toAct.setEndTime(1200.0);
 		
 		Leg legAfter = computeLeg(fromAct, toAct, controler);
 		log.info(legAfter.getTravelTime());

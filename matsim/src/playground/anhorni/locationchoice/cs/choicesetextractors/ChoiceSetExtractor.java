@@ -41,6 +41,9 @@ public abstract class ChoiceSetExtractor {
 		}		
 	}
 	
+	protected abstract void computeChoiceSet2(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
+			Controler controler);
+	
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
 			Controler controler);
 		

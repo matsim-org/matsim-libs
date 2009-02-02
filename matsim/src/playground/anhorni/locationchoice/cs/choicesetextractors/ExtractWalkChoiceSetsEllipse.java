@@ -101,5 +101,13 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 		log.info("    done");
 		Gbl.printRoundTime();
 		return quadtree;
+	}
+	
+	
+	@Override
+	protected void computeChoiceSet2(ChoiceSet choiceSet,
+			SpanningTree spanningTree, String type, Controler controler) {
+		// TODO Auto-generated method stub
+		
 	}	
 }
