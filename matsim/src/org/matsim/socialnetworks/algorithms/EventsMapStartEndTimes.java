@@ -1,7 +1,7 @@
 package org.matsim.socialnetworks.algorithms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
@@ -13,8 +13,8 @@ import org.matsim.population.Population;
 
 public class EventsMapStartEndTimes implements ActStartEventHandler, ActEndEventHandler {
 
-	public HashMap<Person, ArrayList<ActStartEvent>> startMap = new HashMap<Person,ArrayList<ActStartEvent>>();
-	public HashMap<Person, ArrayList<ActEndEvent>> endMap = new HashMap<Person,ArrayList<ActEndEvent>>();
+	public LinkedHashMap<Person, ArrayList<ActStartEvent>> startMap = new LinkedHashMap<Person,ArrayList<ActStartEvent>>();
+	public LinkedHashMap<Person, ArrayList<ActEndEvent>> endMap = new LinkedHashMap<Person,ArrayList<ActEndEvent>>();
 	public double maxtime=0;
 	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);

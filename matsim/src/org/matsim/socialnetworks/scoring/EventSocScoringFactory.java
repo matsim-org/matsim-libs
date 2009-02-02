@@ -1,7 +1,7 @@
 package org.matsim.socialnetworks.scoring;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.matsim.population.Act;
 import org.matsim.population.Plan;
@@ -13,10 +13,10 @@ import org.matsim.scoring.ScoringFunctionFactory;
 public class EventSocScoringFactory implements ScoringFunctionFactory {
 
 	private String factype;
-	private Hashtable<Act,ArrayList<Double>> actStats;
+	private LinkedHashMap<Act,ArrayList<Double>> actStats;
 	private ScoringFunctionFactory factory;
 
-	public EventSocScoringFactory(String factype, ScoringFunctionFactory sf, Hashtable<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFactory(String factype, ScoringFunctionFactory sf, LinkedHashMap<Act,ArrayList<Double>> actStats) {
 		this.factype=factype;
 		this.actStats=actStats;
 		this.factory=sf;

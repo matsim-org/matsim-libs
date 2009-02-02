@@ -73,21 +73,21 @@ public class PersonExchangeKnowledge {
 	}
 
 	/**
-	 * This method is exactly the same as Fabrice's
-	 * and the method in the old "knowledge"-based version.
+	 * Takes a Link from p1 to p2. Introduces a friend of p1's to p2
+	 * if one exists.
+	 * 
 	 * @param myLink
 	 * @param iteration
 	 */  
 	public void randomlyIntroduceBtoCviaA(SocialNetEdge myLink, int iteration) {
 
-		Person myEgo = myLink.getPersonFrom();
-		Knowledge k0 = myEgo.getKnowledge();
+		Person p1 = myLink.getPersonFrom();
+		Person p2 = myLink.getPersonTo();
+		Knowledge k1 = p1.getKnowledge();
 
-		Person friend1 = k0.getEgoNet().getRandomPerson(myEgo);
-		Person friend2 = k0.getEgoNet().getRandomPerson(myEgo);
-		if ((friend1 != null) && (friend2 != null)) {
-
-			net.makeSocialContact(friend1, friend2, iteration, "fof");
+		Person newFriend = k1.getEgoNet().getRandomPerson();
+		if ((newFriend != null) && (p2 != null)) {
+			net.makeSocialContact(newFriend, p2, iteration, "fof");
 		}
 	}
 }

@@ -1,8 +1,7 @@
 package org.matsim.socialnetworks.interactions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
@@ -30,9 +29,9 @@ public class SpatialInteractorEvents {
 
 	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
 
-//	Hashtable<Activity,ArrayList<Person>> activityMap;
-//	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
-	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap;
+//	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
+//	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
+	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap;
 //	TrackEventsOverlap teo;
 	MakeTimeWindowsFromEvents teo;
 	private final Logger log = Logger.getLogger(SpatialInteractorEvents.class);
@@ -44,8 +43,8 @@ public class SpatialInteractorEvents {
 		log.warn("Methods are only for Undirected social interactions");
 	}
 
-	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration,
-			Hashtable<Facility,ArrayList<TimeWindow>> twm) {
+	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration,
+			LinkedHashMap<Facility,ArrayList<TimeWindow>> twm) {
 
 		this.log.info(" Looking through plans and tracking which Persons could interact "+iteration);
 
@@ -89,7 +88,7 @@ public class SpatialInteractorEvents {
 	 * and find the agent whose arrival time is closest to and less than that of p1
 	 * Subject to the likelihood of a meeting taking place in a given facility type
 	 */
-	private void makeSocialLinkBetweenLastTwo(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void makeSocialLinkBetweenLastTwo(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
 
 //		Person nextInQueue=null;
@@ -141,7 +140,7 @@ public class SpatialInteractorEvents {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void makeSocialLinkToAll(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void makeSocialLinkToAll(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 		Object[] facs = timeWindowMap.keySet().toArray();
 		for(int i=0;i<facs.length;i++){
 			Object[] visits= timeWindowMap.get(facs[i]).toArray();
@@ -201,7 +200,7 @@ public class SpatialInteractorEvents {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterOnePersonRandomlyPerActivity(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void encounterOnePersonRandomlyPerActivity(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 		Object[] facs = timeWindowMap.keySet().toArray();
 		for(int i=0;i<facs.length;i++){
 			Object[] visits= timeWindowMap.get(facs[i]).toArray();
@@ -247,14 +246,14 @@ public class SpatialInteractorEvents {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
 		for(int i=0;i<facs.length;i++){
 			Object[] visits= timeWindowMap.get(facs[i]).toArray();
 			for(int ii=0;ii<visits.length;ii++){
-				HashMap<String,ArrayList<Person>> othersMap = new HashMap<String,ArrayList<Person>>();
+				LinkedHashMap<String,ArrayList<Person>> othersMap = new LinkedHashMap<String,ArrayList<Person>>();
 				TimeWindow tw1 = (TimeWindow) visits[ii];
 				Person p1 = tw1.person;
 				for (int iii=ii;iii<visits.length;iii++){
@@ -323,7 +322,7 @@ public class SpatialInteractorEvents {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterAllPersonsFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability,
+	private void encounterAllPersonsFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability,
 			int iteration) {
 
 		Object[] facs = timeWindowMap.keySet().toArray();
@@ -340,7 +339,6 @@ public class SpatialInteractorEvents {
 					if(CompareTimeWindows.overlapTimePlaceType(tw1,tw2)&& !p1.equals(p2)){
 						//agents encoutner and may befriend
 						if(MatsimRandom.random.nextDouble() <rndEncounterProbability.get(actType2)){
-
 							// If they know each other, probability is 1.0 that the relationship is reinforced
 							if (p1.getKnowledge().getEgoNet().knows(p2)) {
 								net.makeSocialContact(p1,p2,iteration,"renew_"+actType2);

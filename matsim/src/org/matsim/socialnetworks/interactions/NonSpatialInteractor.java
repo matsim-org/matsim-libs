@@ -102,15 +102,16 @@ public class NonSpatialInteractor{
 	 *
 	 * @author jhackney
 	 * @param iteration
-	 * @param pctMeet TODO
 	 */
-	public void exchangeSocialNetKnowledge(int iteration, double pctMeet) {
+	public void exchangeSocialNetKnowledge(int iteration) {
 
-		if(!(pctMeet>0)){
+		if(!(fract_intro>0)){
 			this.log.info("No friends introduced");
 			return;
 		}
 		
+		this.log.info("FOF algorithm for Iteration "+iteration+". "+fract_intro*100.+"% of links will be tested.");
+		this.log.info(" For each there is the opportunity to close "+numInteractionsPerLink+" triangles.");
 //		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
 		links = net.getLinks().toArray();
 		final List<Object> list = (List<Object>) Arrays.asList( links );

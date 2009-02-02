@@ -1,8 +1,7 @@
 package org.matsim.socialnetworks.statistics;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.matsim.facilities.Facility;
 import org.matsim.population.Person;
@@ -30,9 +29,9 @@ public class GeoStatistics {
 	Graph gg;
 	Population plans;
 	SocialNetwork snet;
-	HashMap<Location, Vertex> locVertex = new HashMap<Location, Vertex>();
-	HashMap<Vertex, Location> vertexLoc = new HashMap<Vertex,Location>();
-	HashMap<Edge, Double> edgeStrength = new HashMap<Edge,Double>();
+	LinkedHashMap<Location, Vertex> locVertex = new LinkedHashMap<Location, Vertex>();
+	LinkedHashMap<Vertex, Location> vertexLoc = new LinkedHashMap<Vertex,Location>();
+	LinkedHashMap<Edge, Double> edgeStrength = new LinkedHashMap<Edge,Double>();
 //	Collection<Location> locations;
 
 	public GeoStatistics(Population plans, SocialNetwork snet) {
@@ -125,13 +124,13 @@ public class GeoStatistics {
 		return g;
 	}
 
-	public HashMap<Location,Vertex> getLocVertex(){
+	public LinkedHashMap<Location,Vertex> getLocVertex(){
 		return this.locVertex;
 	}
-	public HashMap<Vertex, Location> getVertexLoc(){
+	public LinkedHashMap<Vertex, Location> getVertexLoc(){
 		return this.vertexLoc;
 	}
-	public HashMap<Edge,Double> getEdgeStrength(){
+	public LinkedHashMap<Edge,Double> getEdgeStrength(){
 		return this.edgeStrength;
 	}
 }

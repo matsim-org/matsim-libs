@@ -3,7 +3,7 @@ package org.matsim.socialnetworks.algorithms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,8 +13,8 @@ public class SortHashtableByValue {
 		// make this a static class, which cannot be instantiated
 	}
 
-	public static Hashtable makeSortedMap (Hashtable m) {
-		Hashtable sortedMap=new Hashtable();
+	public static LinkedHashMap makeSortedMap (LinkedHashMap m) {
+		LinkedHashMap sortedMap=new LinkedHashMap();
 		ArrayList outputList = sortMap(m);
 //		int count = 0;
 //		count = outputList.size();

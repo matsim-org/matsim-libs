@@ -1,7 +1,7 @@
 package org.matsim.socialnetworks.scoring;
 /**
  * 
- * This class takes a log (Hashmap) of Person and its Startevents and Endevents,
+ * This class takes a log (LinkedHashMap) of Person and its Startevents and Endevents,
  * which is an instance of the EventHandler "EventsMapStartEndTimes".
  * 
  * It converts the log to TimeWindows, which are maps of who was
@@ -26,8 +26,7 @@ package org.matsim.socialnetworks.scoring;
  * @author jhackney
  */
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.events.ActEndEvent;
@@ -41,14 +40,14 @@ import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
 public class MakeTimeWindowsFromEvents {
 
-	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap=new Hashtable<Facility,ArrayList<TimeWindow>>();
+	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Facility,ArrayList<TimeWindow>>();
 	static final private Logger log = Logger.getLogger(MakeTimeWindowsFromEvents.class);
 	
 	public MakeTimeWindowsFromEvents(){
 	}
 	public void makeTimeWindows(EventsMapStartEndTimes epp){
-		HashMap<Person, ArrayList<ActStartEvent>> startMap = epp.startMap;
-		HashMap<Person, ArrayList<ActEndEvent>> endMap = epp.endMap;
+		LinkedHashMap<Person, ArrayList<ActStartEvent>> startMap = epp.startMap;
+		LinkedHashMap<Person, ArrayList<ActEndEvent>> endMap = epp.endMap;
 		Object[] persons = startMap.keySet().toArray();
 		for (int i=0;i<persons.length;i++){
 			//for each startEvent and endEvent
@@ -95,7 +94,7 @@ public class MakeTimeWindowsFromEvents {
 		this.timeWindowMap.clear();
 	}
 
-	public Hashtable<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
 }

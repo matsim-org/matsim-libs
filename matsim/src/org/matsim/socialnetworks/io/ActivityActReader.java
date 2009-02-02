@@ -3,13 +3,11 @@ package org.matsim.socialnetworks.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.socialnetworks.mentalmap.MentalMap;
 
 public class ActivityActReader {
 	private String fileName;

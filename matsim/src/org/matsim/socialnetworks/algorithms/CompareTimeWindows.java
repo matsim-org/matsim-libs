@@ -1,16 +1,14 @@
 package org.matsim.socialnetworks.algorithms;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.PlanSocScoringFunction;
 import org.matsim.socialnetworks.socialnet.EgoNet;
 
 
@@ -30,9 +28,9 @@ public class CompareTimeWindows {
 	 * @param plan
 	 * @return
 	 */
-	public static Hashtable<Act,ArrayList<Double>> calculateTimeWindowEventActStats(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap) {
+	public static LinkedHashMap<Act,ArrayList<Double>> calculateTimeWindowEventActStats(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap) {
 
-		Hashtable<Act,ArrayList<Double>> actStats = new Hashtable<Act,ArrayList<Double>>();
+		LinkedHashMap<Act,ArrayList<Double>> actStats = new LinkedHashMap<Act,ArrayList<Double>>();
 		int count=0;
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends

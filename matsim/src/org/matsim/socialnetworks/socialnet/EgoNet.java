@@ -84,14 +84,27 @@ public class EgoNet {
 	return this.getEgoLinks().size();
     }
 
-    public Person getRandomPerson( Person me ) {
+//    public Person getRandomPerson( Person me ) {
+//    	// Returns a random socially-linked person independent of link direction
+//    	// Gets a random link in which Ego could be
+//    	// the origin or target.
+//    	// If Ego is the origin, return the target Person 
+//    	// Else if Ego is the target, return the origin Person
+//	int size = egoLinks.size();
+//	if( size == 0 )
+//	    return null;
+//	SocialNetEdge edge = egoLinks.get( MatsimRandom.random.nextInt(size));
+//	if( edge.getPersonFrom().equals(me) )
+//	    return edge.getPersonTo();
+//	return edge.getPersonFrom();
+//    }
+    public Person getRandomPerson() {
+
 	int size = egoLinks.size();
 	if( size == 0 )
 	    return null;
 	SocialNetEdge edge = egoLinks.get( MatsimRandom.random.nextInt(size));
-	if( edge.getPersonFrom().equals(me) )
-	    return edge.getPersonTo();
-	return edge.getPersonFrom();
+    return edge.getPersonTo();
     }
 
     public ArrayList<SocialNetEdge> getEgoLinks() {
@@ -106,7 +119,7 @@ public class EgoNet {
 	ArrayList<Person> alterList= new ArrayList<Person>();
 	for (SocialNetEdge myEdge : egoLinks) {
 	    Person me = myEdge.getPersonTo();
-	    alterList.add(me);
+	    alterList.add(me);// TODO JH check if we want Ego on the Alters list ?!
 	}
 	return alterList;
     }

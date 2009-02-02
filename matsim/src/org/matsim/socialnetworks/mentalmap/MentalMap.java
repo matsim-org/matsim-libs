@@ -23,11 +23,10 @@ package org.matsim.socialnetworks.mentalmap;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -68,15 +67,15 @@ public class MentalMap {
 	// Its mapping to the Activity is stored so it can be found again
 
 //	Map of activities and acts: this is like a memory of having been someplace
-//	private Hashtable<Activity,Act> mapActivityAct = new Hashtable<Activity,Act>();
-//	private Hashtable<Integer, Act> actIdAct = new Hashtable<Integer, Act>();
+//	private LinkedHashMap<Activity,Act> mapActivityAct = new LinkedHashMap<Activity,Act>();
+//	private LinkedHashMap<Integer, Act> actIdAct = new LinkedHashMap<Integer, Act>();
 
 //	Map of act and activity ID numbers. Reverse of above. Acts change so we use Id's
-//	private Hashtable<Act,Id> mapActActivityId = new Hashtable<Act,Id>();
+//	private LinkedHashMap<Act,Id> mapActActivityId = new LinkedHashMap<Act,Id>();
 
 
 //	The activity score
-	private Hashtable<Activity, Double> activityScore = new Hashtable<Activity, Double>();
+	private LinkedHashMap<Activity, Double> activityScore = new LinkedHashMap<Activity, Double>();
 
 //	Total maximum number of activities (locations + action) an agent can remember
 
@@ -224,7 +223,7 @@ public class MentalMap {
 
 //			Sort the activities by score so that they can be managed
 
-			Hashtable sortedScores = SortHashtableByValue.makeSortedMap(this.activityScore);
+			LinkedHashMap<Activity, ?> sortedScores = SortHashtableByValue.makeSortedMap(this.activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act in the current plan. Iterator goes by score.
@@ -237,8 +236,12 @@ public class MentalMap {
 			int counter=0;
 
 			// If there are too many activities 
-			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
-				Activity myactivity=e.nextElement();
+//			for (Enumeration<Activity> e = sortedScores.keys() ; e.hasMoreElements() ;) {
+//				Activity myactivity=e.nextElement();
+				Set<Activity> myActivities=sortedScores.keySet();
+				Iterator<Activity> ait= myActivities.iterator();
+				while(ait.hasNext()) {
+					Activity myactivity=(Activity) ait.next();
 //				double score=(Double) sortedScores.get(myactivity);
 				// note which activity to forget
 

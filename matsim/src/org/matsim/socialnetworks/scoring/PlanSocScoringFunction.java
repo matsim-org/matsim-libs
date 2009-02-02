@@ -20,7 +20,7 @@
 package org.matsim.socialnetworks.scoring;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -78,7 +78,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 
 		ActIterator ait = this.plan.getIteratorAct();
 
-		Hashtable<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
+		LinkedHashMap<Act,ArrayList<Double>> actStats = this.spatialScorer.calculateTimeWindowActStats(plan);
 //		ArrayList<Double> stats = this.spatialScorer.calculateTimeWindowStats(plan);
 		while(ait.hasNext()){
 			Act act = (Act)ait.next();

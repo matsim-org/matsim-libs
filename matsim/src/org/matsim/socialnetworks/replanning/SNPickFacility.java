@@ -1,8 +1,8 @@
 package org.matsim.socialnetworks.replanning;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -127,7 +127,7 @@ public class SNPickFacility implements PlanAlgorithm {
 //			Get agent's knowledge
 			Knowledge k = person.getKnowledge();
 
-			Hashtable<Activity,Integer> facMap=new Hashtable<Activity,Integer>();
+			LinkedHashMap<Activity,Integer> facMap=new LinkedHashMap<Activity,Integer>();
 			ArrayList<Activity> facList=k.getActivities(factype);
 			Iterator<Activity> fIt=facList.iterator();
 			while(fIt.hasNext()){
@@ -225,7 +225,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		}
 	}
 
-	private Facility getFacByLogit(Hashtable<Activity, Integer> facMap) {
+	private Facility getFacByLogit(LinkedHashMap<Activity, Integer> facMap) {
 		Facility fac=null;
 		Object[] nums=facMap.values().toArray();
 		Double[] p= new Double[nums.length];

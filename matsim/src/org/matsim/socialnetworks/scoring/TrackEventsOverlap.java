@@ -21,28 +21,17 @@ package org.matsim.socialnetworks.scoring;
  * *********************************************************************** */
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
-import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.handler.ActEndEventHandler;
 import org.matsim.events.handler.ActStartEventHandler;
-import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
-import org.matsim.population.Plan;
-import org.matsim.socialnetworks.algorithms.CompareActs;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.socialnet.EgoNet;
 
 
 /**
@@ -53,9 +42,9 @@ import org.matsim.socialnetworks.socialnet.EgoNet;
  */
 public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHandler {
 
-	Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap=new Hashtable<Facility,ArrayList<TimeWindow>>();
-	HashMap<Act,Double> startMap = new HashMap<Act,Double>();
-	HashMap<Act,Double> endMap = new HashMap<Act,Double>();
+	LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<Facility,ArrayList<TimeWindow>>();
+	LinkedHashMap<Act,Double> startMap = new LinkedHashMap<Act,Double>();
+	LinkedHashMap<Act,Double> endMap = new LinkedHashMap<Act,Double>();
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlap.class);
 
@@ -133,7 +122,7 @@ public class TrackEventsOverlap implements ActStartEventHandler, ActEndEventHand
 		this.timeWindowMap.clear();
 	}
 
-	public Hashtable<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
 

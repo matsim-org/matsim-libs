@@ -21,9 +21,8 @@ package org.matsim.socialnetworks.scoring;
  * *********************************************************************** */
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -42,7 +41,7 @@ public class TrackActsOverlap {
 
 	SocialNetwork net;
 
-	Hashtable<Activity,ArrayList<Person>> activityMap;
+	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
 	static final private Logger log = Logger.getLogger(TrackActsOverlap.class);
 
 	/**
@@ -72,7 +71,7 @@ public class TrackActsOverlap {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
-		activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
+		activityMap = new LinkedHashMap<Activity,ArrayList<Person>>(); 
 		activityMap= makeActivityMap(plans);
 
 		log.info("...finished");
@@ -91,9 +90,9 @@ public class TrackActsOverlap {
 	 * @param plans
 	 * @return activityMap
 	 */
-	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Population plans){
+	private LinkedHashMap<Activity,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
-//		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
+//		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
@@ -274,9 +273,9 @@ public class TrackActsOverlap {
 	 * @param plan
 	 * @return
 	 */
-	public Hashtable<Act,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
+	public LinkedHashMap<Act,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
 
-		Hashtable<Act,ArrayList<Double>> actStats = new Hashtable<Act,ArrayList<Double>>();
+		LinkedHashMap<Act,ArrayList<Double>> actStats = new LinkedHashMap<Act,ArrayList<Double>>();
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends

@@ -24,8 +24,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -185,7 +185,7 @@ public class PajekWriter {
 			pjnet.write("*Vertices " + numVertices+"\r\n");
 
 			Iterator<Vertex> iVert = g.getVertices().iterator();
-			HashMap<Vertex,Location> vertLoc = gstat.getVertexLoc();
+			LinkedHashMap<Vertex,Location> vertLoc = gstat.getVertexLoc();
 
 			int vertexcounter = 1;
 			while (iVert.hasNext()) {

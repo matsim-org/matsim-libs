@@ -21,16 +21,10 @@
 package org.matsim.socialnetworks.interactions;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
-import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
@@ -53,8 +47,8 @@ public class SpatialInteractorActs {
 
 	String interaction_type = Gbl.getConfig().socnetmodule().getSocNetInteractor2();
 
-	Hashtable<Activity,ArrayList<Person>> activityMap;
-	Hashtable<Act,ArrayList<Person>> actMap=new Hashtable<Act,ArrayList<Person>>();
+	LinkedHashMap<Activity,ArrayList<Person>> activityMap;
+	LinkedHashMap<Act,ArrayList<Person>> actMap=new LinkedHashMap<Act,ArrayList<Person>>();
 
 	public SpatialInteractorActs(SocialNetwork snet) {
 		this.net = snet;
@@ -82,11 +76,11 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProb
 	 * @param iteration
 	 */
-	public void interact(Population plans, HashMap<String, Double> rndEncounterProb, int iteration) {
+	public void interact(Population plans, LinkedHashMap<String, Double> rndEncounterProb, int iteration) {
 
 		System.out.println(" "+ this.getClass()+" Looking through plans and tracking which Persons could interact "+iteration);
 
-			activityMap = new Hashtable<Activity,ArrayList<Person>>(); 
+			activityMap = new LinkedHashMap<Activity,ArrayList<Person>>(); 
 			activityMap= makeActivityMap(plans);
 
 		// Activity-(facility)-based interactions
@@ -124,9 +118,9 @@ public class SpatialInteractorActs {
 	 * @param plans
 	 * @return
 	 */
-	private Hashtable<Activity,ArrayList<Person>> makeActivityMap(Population plans){
+	private LinkedHashMap<Activity,ArrayList<Person>> makeActivityMap(Population plans){
 		System.out.println("Making a new activity map for spatial interactions");
-		Hashtable<Activity,ArrayList<Person>> activityMap=new Hashtable<Activity,ArrayList<Person>>();
+		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
 		Iterator<Person> p1Iter=plans.iterator();
 		while(p1Iter.hasNext()){
 			Plan plan1= ((Person) p1Iter.next()).getSelectedPlan();
@@ -157,7 +151,7 @@ public class SpatialInteractorActs {
 	 * and find the agent whose arrival time is closest to and less than that of p1
 	 * Subject to the likelihood of a meeting taking place in a given facility type
 	 */
-	private void makeSocialLinkBetweenLastTwo(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void makeSocialLinkBetweenLastTwo(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
 
 //		Person nextInQueue=null;
@@ -208,9 +202,13 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void makeSocialLinkToAll(HashMap<String, Double> rndEncounterProbability, int iteration) {
-		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
-			Activity myActivity=myActivities.nextElement();
+	private void makeSocialLinkToAll(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
+//		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+//			Activity myActivity=myActivities.nextElement();
+			Set<Activity> myActivities=activityMap.keySet();
+			Iterator<Activity> ait= myActivities.iterator();
+			while(ait.hasNext()) {
+				Activity myActivity=(Activity) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
@@ -263,13 +261,18 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterOnePersonRandomlyPerActivity(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void encounterOnePersonRandomlyPerActivity(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
 //		Enumeration<Activity> myActivities=pList.keys();
 
-		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
-			Activity myActivity=myActivities.nextElement();
+//		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+//			Activity myActivity=myActivities.nextElement();
+			Set<Activity> myActivities=activityMap.keySet();
+			Iterator<Activity> ait= myActivities.iterator();
+			while(ait.hasNext()) {
+				Activity myActivity=(Activity) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
+			
 			// Go through the list of Persons and for each one pick one friend randomly
 			// Must be double loop
 			Iterator<Person> vIt1=visitors.iterator();
@@ -309,15 +312,19 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability, int iteration) {
+	private void encounterOnePersonRandomlyFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability, int iteration) {
 
-//		Hashtable<Person,Act> personList=new Hashtable<Person,Act>();
-//		Hashtable<Person,ArrayList<Person>> othersList = new Hashtable<Person,ArrayList<Person>>();
+//		LinkedHashMap<Person,Act> personList=new LinkedHashMap<Person,Act>();
+//		LinkedHashMap<Person,ArrayList<Person>> othersList = new LinkedHashMap<Person,ArrayList<Person>>();
 
 		// First identify the overlapping Acts and the Persons involved
 		
-		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
-			Activity myActivity=myActivities.nextElement();
+//		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+//			Activity myActivity=myActivities.nextElement();
+			Set<Activity> myActivities=activityMap.keySet();
+			Iterator<Activity> ait= myActivities.iterator();
+			while(ait.hasNext()) {
+				Activity myActivity=(Activity) ait.next();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			Iterator<Person> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
@@ -409,11 +416,15 @@ public class SpatialInteractorActs {
 	 * @param rndEncounterProbability
 	 * @param iteration
 	 */
-	private void encounterAllPersonsFaceToFaceInTimeWindow(HashMap<String, Double> rndEncounterProbability,
+	private void encounterAllPersonsFaceToFaceInTimeWindow(LinkedHashMap<String, Double> rndEncounterProbability,
 			int iteration) {
 
-		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
-			Activity myActivity=myActivities.nextElement();
+//		for (Enumeration<Activity> myActivities=activityMap.keys(); myActivities.hasMoreElements() ;) {
+		Set<Activity> myActivities=activityMap.keySet();
+		Iterator<Activity> ait= myActivities.iterator();
+		while(ait.hasNext()) {
+			Activity myActivity=(Activity) ait.next();
+//			Activity myActivity=myActivities.nextElement();
 			ArrayList<Person> visitors=activityMap.get(myActivity);
 			Iterator<Person> vIt1=visitors.iterator();
 			while(vIt1.hasNext()){
