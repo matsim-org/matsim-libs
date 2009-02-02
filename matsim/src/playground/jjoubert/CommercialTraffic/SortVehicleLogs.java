@@ -18,8 +18,8 @@ import java.util.Scanner;
  */
 
 public class SortVehicleLogs {
-	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/Temp/";
-	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/Temp/Sorted";
+	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/";
+	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted/";
 
 	public static void main (String args[] ){
 		int progress = 0;
@@ -38,7 +38,9 @@ public class SortVehicleLogs {
 					ArrayList<GPSPoint> log = new ArrayList<GPSPoint>();
 					try {
 						int maxNumber = readVehicleFileToArray(theFile, log);
-				
+						
+						// turns out the RADIX is much slower, probably due to the length
+						// of the sorting field: the 10-digit time stamp
 //						long startRadix = System.currentTimeMillis();
 //						ArrayList<GPSPoint> sortedArray1 = sortTimeRadix(maxNumber, log);
 //						long endRadix = System.currentTimeMillis();
@@ -52,10 +54,6 @@ public class SortVehicleLogs {
 						}
 						
 						writeSortedArray(DESTFOLDER, theFile, sortedArray2);
-						
-//						System.out.println("File " + theFile.getName() + " has " + sortedArray2.size() + 
-//								" log entries. Radix: " + ((int) (endRadix - startRadix )) + " ms. Merge: " + 
-//								((int)(endMerge - startMerge)) + " ms.");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -117,34 +115,34 @@ public class SortVehicleLogs {
 		output.close();
 	}
 
-	private static ArrayList<GPSPoint> sortTimeRadix(int maxT, ArrayList<GPSPoint> log) {
-		final int RUNS = (int)Math.ceil(Math.log10(maxT-1));;
-		final int RADIX = 10;
-		
-		ArrayList<ArrayList<GPSPoint>> buckets = new ArrayList<ArrayList<GPSPoint>>(RADIX);	
-
-		for (int i = 0 ; i < RADIX ; i++ ) {
-			buckets.add(i, new ArrayList<GPSPoint>() );
-		}
-		
-		for(int r = 1 ; r <= RUNS ; r++ ){
-			ArrayList<GPSPoint> sortedLog = new ArrayList<GPSPoint>();
-			int mod = (int)Math.pow(RADIX, r);
-			int div = (int)Math.pow(RADIX, r-1);
-			
-			for(int j = 0 ; j < log.size() ; j++){
-				int bucketNum = (log.get(j).getTime()%mod)/div;
-				buckets.get(bucketNum).add(log.get(j) );			
-			}
-					
-			for(int k = 0 ; k < buckets.size() ; k++ ){
-				sortedLog.addAll(buckets.get(k) );
-				buckets.set(k, new ArrayList<GPSPoint>() );
-			}
-			log = sortedLog;
-		}
-		return log;
-	}
+//	private static ArrayList<GPSPoint> sortTimeRadix(int maxT, ArrayList<GPSPoint> log) {
+//		final int RUNS = (int)Math.ceil(Math.log10(maxT-1));;
+//		final int RADIX = 10;
+//		
+//		ArrayList<ArrayList<GPSPoint>> buckets = new ArrayList<ArrayList<GPSPoint>>(RADIX);	
+//
+//		for (int i = 0 ; i < RADIX ; i++ ) {
+//			buckets.add(i, new ArrayList<GPSPoint>() );
+//		}
+//		
+//		for(int r = 1 ; r <= RUNS ; r++ ){
+//			ArrayList<GPSPoint> sortedLog = new ArrayList<GPSPoint>();
+//			int mod = (int)Math.pow(RADIX, r);
+//			int div = (int)Math.pow(RADIX, r-1);
+//			
+//			for(int j = 0 ; j < log.size() ; j++){
+//				int bucketNum = (log.get(j).getTime()%mod)/div;
+//				buckets.get(bucketNum).add(log.get(j) );			
+//			}
+//					
+//			for(int k = 0 ; k < buckets.size() ; k++ ){
+//				sortedLog.addAll(buckets.get(k) );
+//				buckets.set(k, new ArrayList<GPSPoint>() );
+//			}
+//			log = sortedLog;
+//		}
+//		return log;
+//	}
 
 	private static ArrayList<GPSPoint> sortTimeMerge(int maxNumber,
 			ArrayList<GPSPoint> log) {
