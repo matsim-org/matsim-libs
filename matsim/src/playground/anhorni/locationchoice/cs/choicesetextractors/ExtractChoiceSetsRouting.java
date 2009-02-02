@@ -90,9 +90,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
 			Act fromAct = new Act("beforeShop", linkBefore);
 			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
+			fromAct.setCoord(linkBefore.getCenter());
 						
 			Link link = network.getLink(linkId);
 			Act toAct = new Act("shop", link);
+			toAct.setCoord(link.getCenter());
 						
 			Leg legBefore = computeLeg(fromAct, toAct, controler);				
 			double travelTimeBeforeShopping = legBefore.getTravelTime();
@@ -103,9 +105,11 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			travelTimeBeforeShopping +
 			choiceSet.getTrip().getShoppingAct().calculateDuration();			
 			fromAct.setEndTime(endTime);
+			fromAct.setCoord(toAct.getCoord());
 						
 			Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
 			toAct = new Act("afterShop", linkAfter);
+			toAct.setCoord(linkAfter.getCenter());
 						
 			Leg legAfter = computeLeg(fromAct, toAct, controler);	
 			double travelTimeAfterShopping = legAfter.getTravelTime();
