@@ -172,23 +172,23 @@ public class Events {
 	}
 
 	/**
-	 * This method should be invoked at the beginning of an iteration.
-	 * It can be overwritten by parallel variants of the Events class. 
+	 * Called before the first event is sent for processing. Allows to initialize internal
+	 * data structures used to process events.
 	 */
-	public void initProcessing(){
-		
+	public void initProcessing() {
+		// nothing to do in this implementation
 	}
-	
+
 	/**
-	 * This method should be invoked at the end of an iteration.
-	 * It can be overwritten by parallel variants of the Events class. 
+	 * Called after the last event is sent for processing. The method must only return when all
+	 * events are completely processing (in case they are not directly processed in
+	 * {@link #processEvent(BasicEvent)}). Can be used to clean up internal data structures used
+	 * to process events.
 	 */
-	public void finishProcessing(){
-		
+	public void finishProcessing() {
+		// nothing to do in this implementation
 	}
-	
-	
-	
+
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
