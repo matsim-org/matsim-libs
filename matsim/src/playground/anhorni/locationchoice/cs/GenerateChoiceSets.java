@@ -21,7 +21,6 @@ import org.matsim.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
-//import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
 import playground.anhorni.locationchoice.cs.filters.ActTypeAndAreaTripFilter;
 import playground.anhorni.locationchoice.cs.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
@@ -29,7 +28,6 @@ import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
-//import playground.anhorni.locationchoice.cs.io.BudgetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
