@@ -41,17 +41,8 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 		Act toAct = new Act("shop", link1);
 		fromAct.setEndTime(0.0);
 		
-		Leg legBefore = computeLeg(fromAct, toAct, controler);	
-		log.info(legBefore.getTravelTime());
-	
-		//--------------------------------------------------			
-		fromAct = new Act("shop", link1);
-		toAct = new Act("shop", link0);
-		fromAct.setEndTime(300.0);
-		
-		Leg legAfter = computeLeg(fromAct, toAct, controler);
-		log.info(legAfter.getTravelTime());
-		//--------------------------------------------------					
+		Leg leg = computeLeg(fromAct, toAct, controler);	
+		log.info(leg.getTravelTime());					
 	}
 	
 	
