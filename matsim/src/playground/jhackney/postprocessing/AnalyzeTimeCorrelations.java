@@ -81,7 +81,7 @@ public class AnalyzeTimeCorrelations {
 //		double totaliterationscore=0;
 //		int numplans=0;
 
-//		Hashtable<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
+//		LinkedHashMap<Act,ArrayList<Double>> actStats = CompareTimeWindows.calculateTimeWindowEventActStats(teo.getTimeWindowMap());
 // loop through timeWindowMap
 		// for each Activity 
 //		new MakeTimeWindowsFromEvents(epp);

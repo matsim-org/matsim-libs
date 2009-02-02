@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import org.matsim.facilities.Facility;
@@ -31,7 +31,7 @@ public class TimeWindowCalcTimeCorrelations {
 	 * @param out1name
 	 * @author jhackney
 	 */
-	public TimeWindowCalcTimeCorrelations(Hashtable<Facility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
+	public TimeWindowCalcTimeCorrelations(LinkedHashMap<Facility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
 		Vector<Double> tbins=new Vector<Double>();

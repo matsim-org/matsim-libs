@@ -22,8 +22,7 @@ package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -99,10 +98,10 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 
 	private EventsMapStartEndTimes epp=null;//static? I just need one
 	private MakeTimeWindowsFromEvents teo=null;// static? I just need one
-	private Hashtable<Act,ArrayList<Double>> actStats=null;// static? I just need one
-	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;// static? I just need one
+	private LinkedHashMap<Act,ArrayList<Double>> actStats=null;// static? I just need one
+	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;// static? I just need one
 	//
-	private HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();// static? I just need one
+	private LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();// static? I just need one
 	//
 	private String [] infoToExchange;
 
@@ -167,7 +166,7 @@ public class SNSimpleControllerListener implements StartupListener, BeforeMobsim
 			this.log.info("Introducing people");
 			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
 			this.log.info("  Knowledge about other people is being exchanged ...");
-			this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, fract_intro);
+			this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 			this.log.info("  ... introducing people done");
 
 //			forget knowledge

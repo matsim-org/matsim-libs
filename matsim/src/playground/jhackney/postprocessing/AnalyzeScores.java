@@ -20,7 +20,7 @@ package playground.jhackney.postprocessing;
  * *********************************************************************** */
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.matsim.config.Config;
 import org.matsim.events.Events;
@@ -42,8 +42,8 @@ public class AnalyzeScores {
 
 //	private static EventsPostProcess epp=null;
 //	private static MakeTimeWindowsFromEvents teo=null;
-//	private static Hashtable<Act,ArrayList<Double>> actStats=null;
-//	private static Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+//	private static LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+//	private static LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 //	private static EventsToScore scoring =null;
 
 	//////////////////////////////////////////////////////////////////////
@@ -77,8 +77,8 @@ public class AnalyzeScores {
 		Events events = new Events();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
-		Hashtable<Act,ArrayList<Double>> actStats=null;
-		Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+		LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+		LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 		
 		//Register scoring function and other events handlers
@@ -141,7 +141,7 @@ public class AnalyzeScores {
 //				ActIterator ait = plan.getIteratorAct();
 //				double friendscore=0;
 //				double nFriends=0;
-//				Hashtable<Act,ArrayList<Double>> actStats = scorer.calculateTimeWindowActStats(plan);
+//				LinkedHashMap<Act,ArrayList<Double>> actStats = scorer.calculateTimeWindowActStats(plan);
 //				while(ait.hasNext()){
 //					Act act = (Act)ait.next();
 //					if(act.getType().equals("leisure")){

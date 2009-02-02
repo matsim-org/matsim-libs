@@ -1,7 +1,7 @@
 package playground.jhackney.replanning;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -56,7 +56,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		person.setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(Act act) {
-		Hashtable<Facility,ArrayList<TimeWindow>> twm = controler.getTwm();
+		LinkedHashMap<Facility,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;
 		TimeWindow tw1 = null;

@@ -1,7 +1,7 @@
 package playground.jhackney.controler;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -20,7 +20,7 @@ import org.matsim.socialnetworks.replanning.SNPickFacilityFromAlter;
 public class SNController4 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController4.class);
-	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
+	protected LinkedHashMap<Facility,ArrayList<TimeWindow>> twm;
 	protected SNControllerListener4 snControllerListener;
 		
 	public SNController4(String args[]){
@@ -70,10 +70,10 @@ public class SNController4 extends Controler {
 		return manager;
 	}
 	
-	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
+	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTwm() {
 		return this.twm;
 	}
-	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
+	public void setTwm(LinkedHashMap<Facility,ArrayList<TimeWindow>> twm){
 		this.twm=twm;
 	}
 }

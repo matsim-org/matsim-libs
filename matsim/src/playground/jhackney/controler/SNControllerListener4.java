@@ -22,10 +22,7 @@ package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -40,10 +37,6 @@ import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
-import org.matsim.population.Knowledge;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
-import org.matsim.population.Population;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
@@ -114,13 +107,13 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
-	private Hashtable<Act,ArrayList<Double>> actStats=null;
-//	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+	private LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+//	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring = null;
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
-	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
+	LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();
 //	New variables for replanning
 	int interact_interval;
 
@@ -214,7 +207,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, 0);
+				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 			}
 			else{
 				this.log.info("  No introductions");
@@ -431,10 +424,10 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 		}
 		return w;
 	}
-	private HashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
+	private LinkedHashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
 		String patternStr = ",";
 		String[] s;
-		HashMap<String,Double> map = new HashMap<String,Double>();
+		LinkedHashMap<String,Double> map = new LinkedHashMap<String,Double>();
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
 		double sum = 0.;

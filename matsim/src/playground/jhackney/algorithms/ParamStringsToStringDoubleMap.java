@@ -1,11 +1,11 @@
 package playground.jhackney.algorithms;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.matsim.gbl.Gbl;
 
 public class ParamStringsToStringDoubleMap {
-	HashMap<String,Double> map= new HashMap<String, Double>();
+	LinkedHashMap<String,Double> map= new LinkedHashMap<String, Double>();
 	
 	public ParamStringsToStringDoubleMap(final String types, final String longString) {
 		String patternStr = ",";
@@ -34,7 +34,7 @@ public class ParamStringsToStringDoubleMap {
 		}
 	}
 	
-	public HashMap<String,Double> getMap(){
+	public LinkedHashMap<String,Double> getMap(){
 		return map;
 	}
 }

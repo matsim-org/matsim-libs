@@ -1,12 +1,9 @@
 package playground.jhackney.controler;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.replanning.PlanStrategy;
@@ -17,7 +14,6 @@ import org.matsim.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.replanning.selectors.KeepSelected;
 import org.matsim.replanning.selectors.RandomPlanSelector;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
 
@@ -26,7 +22,7 @@ import playground.jhackney.replanning.SNCoordinateArrivalTimes;
 public class SNController3 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController3.class);
-	protected Hashtable<Facility,ArrayList<TimeWindow>> twm;
+	protected LinkedHashMap<Facility,ArrayList<TimeWindow>> twm;
 	protected SNControllerListener3 snControllerListener;
 		
 	public SNController3(String args[]){
@@ -74,10 +70,10 @@ public class SNController3 extends Controler {
 		return manager;
 	}
 //	JH
-	public Hashtable<Facility,ArrayList<TimeWindow>> getTwm() {
+	public LinkedHashMap<Facility,ArrayList<TimeWindow>> getTwm() {
 		return this.twm;
 	}
-	public void setTwm(Hashtable<Facility,ArrayList<TimeWindow>> twm){
+	public void setTwm(LinkedHashMap<Facility,ArrayList<TimeWindow>> twm){
 		this.twm=twm;
 	}
 // JH end

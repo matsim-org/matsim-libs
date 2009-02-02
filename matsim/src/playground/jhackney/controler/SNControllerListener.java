@@ -23,9 +23,8 @@ package playground.jhackney.controler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.controler.Controler;
@@ -49,21 +48,18 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 import org.matsim.socialnetworks.algorithms.EventsMapStartEndTimes;
 import org.matsim.socialnetworks.interactions.NonSpatialInteractor;
-import org.matsim.socialnetworks.interactions.SpatialInteractorActs;
 import org.matsim.socialnetworks.interactions.SpatialInteractorEvents;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.socialnetworks.io.ActivityActWriter;
 import org.matsim.socialnetworks.io.PajekWriter;
 import org.matsim.socialnetworks.mentalmap.TimeWindow;
-import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.scoring.EventSocScoringFactory;
-import org.matsim.socialnetworks.scoring.TrackEventsOverlap;
+import org.matsim.socialnetworks.scoring.MakeTimeWindowsFromEvents;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.SocialNetworkStatistics;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
-import playground.jhackney.scoring.TrackEventsOverlapII;
 
 
 
@@ -124,15 +120,15 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //	private TrackEventsOverlap teo=null;
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
-	private Hashtable<Act,ArrayList<Double>> actStats=null;
-	private Hashtable<Facility,ArrayList<TimeWindow>> twm=null;
+	private LinkedHashMap<Act,ArrayList<Double>> actStats=null;
+	private LinkedHashMap<Facility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
 
 //	Variables for allocating the spatial meetings among different types of activities
 	double fractionS[];
-	HashMap<String,Double> rndEncounterProbs= new HashMap<String,Double>();
+	LinkedHashMap<String,Double> rndEncounterProbs= new LinkedHashMap<String,Double>();
 //	New variables for replanning
 	int replan_interval;
 
@@ -325,7 +321,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 			double fract_intro=Double.parseDouble(this.controler.getConfig().socnetmodule().getFriendIntroProb());
 			if (fract_intro > 0) {
 				this.log.info("  Knowledge about other people is being exchanged ...");
-				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter, 0);
+				this.plansInteractorNS.exchangeSocialNetKnowledge(snIter);
 			}
 
 			this.log.info("  ... done");
@@ -514,10 +510,10 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		}
 		return w;
 	}
-	private HashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
+	private LinkedHashMap<String,Double> mapActivityWeights(final String[] types, final String longString) {
 		String patternStr = ",";
 		String[] s;
-		HashMap<String,Double> map = new HashMap<String,Double>();
+		LinkedHashMap<String,Double> map = new LinkedHashMap<String,Double>();
 		s = longString.split(patternStr);
 		double[] w = new double[s.length];
 		double sum = 0.;

@@ -21,7 +21,7 @@ package playground.jhackney.scoring;
  * *********************************************************************** */
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
@@ -31,7 +31,6 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.scoring.ScoringFunction;
-import org.matsim.socialnetworks.algorithms.CompareTimeWindows;
 
 
 /**
@@ -46,7 +45,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 //	private final playground.jhackney.scoring.CharyparNagelScoringFunctiosuperon;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final Hashtable<Act,ArrayList<Double>> actStats;
+	private final LinkedHashMap<Act,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -59,11 +58,11 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	private double betaNFriends= Double.parseDouble(socnetConfig.getBeta2());
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
-	Hashtable<Act,Double> usoc=new Hashtable<Act,Double>();
-	Hashtable<Act,Double> dusoc=new Hashtable<Act,Double>();
+	LinkedHashMap<Act,Double> usoc=new LinkedHashMap<Act,Double>();
+	LinkedHashMap<Act,Double> dusoc=new LinkedHashMap<Act,Double>();
 
-//	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
-	public EventSocScoringFunction(final Plan plan, String factype, final Hashtable<Act,ArrayList<Double>> actStats) {
+//	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		super(plan);
 		this.plan = plan;
