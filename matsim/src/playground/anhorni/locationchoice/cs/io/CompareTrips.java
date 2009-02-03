@@ -46,13 +46,32 @@ public class CompareTrips {
 					if (choiceSetIdList.contains(tripId)) {
 						choiceSetIdList.remove(tripId);
 					}
-					else {
+					else {					
+						String wmittel = null;
+						String ausmittel = null;				
 						if (this.mode.equals("car")) {
-							out.write(tripId + "\t" + "0" + "\t" + entries[28].trim() +"\t" + entries[15].trim());
+							wmittel = entries[28].trim();
+							ausmittel = entries[15].trim();	
 						}
 						else {
-							out.write(tripId + "\t" + "0" + "\t" + entries[30].trim() +"\t" + entries[17].trim());
+							wmittel = entries[30].trim();
+							ausmittel = entries[17].trim();
 						}
+						String wmittelOut = "undefined";
+						String ausmittelOut = "undefined";
+						if (wmittel.equals("9")) {
+							wmittelOut = "car";
+						}
+						else if (wmittel.equals("15")) {
+							wmittelOut = "walk";
+						}
+						if (ausmittel.equals("6")) {
+							ausmittelOut = "car";
+						}
+						else if (ausmittel.equals("10")) {
+							ausmittelOut = "walk";
+						}						
+						out.write(tripId + "\t" + "0" + "\t" + wmittelOut +"\t" + ausmittelOut);
 						out.newLine();
 					}
 				}
@@ -61,7 +80,7 @@ public class CompareTrips {
 				choiceSet_it = choiceSets.iterator();
 				while (choiceSet_it.hasNext()) {
 					ChoiceSet choiceSet = choiceSet_it.next();
-					out.write(choiceSet.getId().toString() + "\t" + "1" + this.mode +"\t" + "?");
+					out.write(choiceSet.getId().toString() + "\t" + "1" + "\t" + this.mode +"\t" + "?");
 					out.newLine();
 				}	
 				out.flush();
