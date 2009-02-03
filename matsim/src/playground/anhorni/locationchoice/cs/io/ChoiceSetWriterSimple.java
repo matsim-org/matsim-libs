@@ -26,7 +26,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 		}
 		
 		try {		
-			final String header="id\tTrip_nr\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)";
+			final String header="id\tTrip_nr\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)\tChosen";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
@@ -40,12 +40,21 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 				Iterator<ZHFacility> fac_it = choiceSet.getFacilities().iterator();
 				while (fac_it.hasNext()) {
 					ZHFacility facility = fac_it.next();
+					
+					String chosen;
+					if (facility.getId() == choiceSet.getTrip().getShoppingAct().getFacilityId()) {
+						chosen = "1";
+					}
+					else {
+						chosen = "0";
+					}
 										
 					location = facility.getId() + "\t" + facility.getCenter().getX() +"\t" + 
 						facility.getCenter().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
 						facility.getExactPosition().getY() + "\t" +
 						choiceSet.getTravelTime(facility) + "\t" +
-						choiceSet.getTravelDistance(facility);
+						choiceSet.getTravelDistance(facility) + "\t" +
+						chosen;
 					
 					out.write(choiceSet.getId() +"\t" + 
 							choiceSet.getTrip().getTripNr() + "\t" + 
