@@ -21,7 +21,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 
 import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractChoiceSetsRouting;
-import playground.anhorni.locationchoice.cs.choicesetextractors.ExtractWalkChoiceSetsEllipse;
 import playground.anhorni.locationchoice.cs.filters.ActTypeAndAreaTripFilter;
 import playground.anhorni.locationchoice.cs.filters.TripFilter;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawer;
@@ -65,7 +64,7 @@ public class GenerateChoiceSets {
 	private String outdir = null;
 	private String sampling;
 	private String readNelson;
-	private String walkEllipse;
+	private String walkCrowFly;
 	
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
 	
@@ -107,7 +106,7 @@ public class GenerateChoiceSets {
 			this.choiceSetSize = Integer.parseInt(bufferedReader.readLine().trim());
 			this.sampling = bufferedReader.readLine();
 			this.readNelson = bufferedReader.readLine();
-			this.walkEllipse = bufferedReader.readLine();
+			this.walkCrowFly = bufferedReader.readLine();
 			
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
@@ -118,7 +117,7 @@ public class GenerateChoiceSets {
 			log.info("choice set size: " + this.choiceSetSize);
 			log.info("Sampling :" + this.sampling);
 			log.info("readNelson: " + this.readNelson);
-			log.info("walkEllipse: " + this.walkEllipse);
+			log.info("walkEllipse: " + this.walkCrowFly);
 
 			bufferedReader.close();
 			fileReader.close();
@@ -182,17 +181,14 @@ public class GenerateChoiceSets {
 				
 		this.controler = new Controler(this.matsimRunConfigFile);
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
-				this.carChoiceSets, "car", this.walkingSpeed);
-		controler.addControlerListener(listenerCar);
+				this.carChoiceSets, "car", this.walkingSpeed, "false");
 				
-		if (this.walkEllipse.equals("true")) {
-			this.extractWalkChoiceSetsEllipse(this.walkChoiceSets);
-		}
-		else {
-			ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
-					this.walkChoiceSets, "walk", this.walkingSpeed);
-			controler.addControlerListener(listenerWalk);
-		}
+		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
+					this.walkChoiceSets, "walk", this.walkingSpeed, this.walkCrowFly);
+		
+		
+		controler.addControlerListener(listenerWalk);
+		controler.addControlerListener(listenerCar);
 		
 		log.info("Running controler: ...");
 		controler.run();
@@ -246,19 +242,6 @@ public class GenerateChoiceSets {
 			sampleDrawer.drawSample(this.carChoiceSets);
 			sampleDrawer.drawSample(this.walkChoiceSets);
 		}
-	}
-	
-	private void extractWalkChoiceSetsEllipse(List<ChoiceSet> choiceSets) {	
-		// create a list of all zhFacilities to give to ExtractWalkChoiceSets()
-		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();		
-		Iterator<ArrayList<ZHFacility>> zhFacilitiesList_it = this.zhFacilitiesByLink.values().iterator();
-		while (zhFacilitiesList_it.hasNext()) {
-			List<ZHFacility> list = zhFacilitiesList_it.next();
-			zhFacilities.addAll(list);
-		}		
-		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(
-				this.controler, zhFacilities, this.walkingSpeed, choiceSets);
-		extractor.run();
 	}
 	
 	
@@ -319,5 +302,23 @@ public class GenerateChoiceSets {
 		this.isSetup = isSetup;
 	}
 }
+
+
+/* unused:
+ * 
+ * private void extractWalkChoiceSetsEllipse(List<ChoiceSet> choiceSets) {	
+		// create a list of all zhFacilities to give to ExtractWalkChoiceSets()
+		List<ZHFacility> zhFacilities = new Vector<ZHFacility>();		
+		Iterator<ArrayList<ZHFacility>> zhFacilitiesList_it = this.zhFacilitiesByLink.values().iterator();
+		while (zhFacilitiesList_it.hasNext()) {
+			List<ZHFacility> list = zhFacilitiesList_it.next();
+			zhFacilities.addAll(list);
+		}		
+		ExtractWalkChoiceSetsEllipse extractor = new ExtractWalkChoiceSetsEllipse(
+				this.controler, zhFacilities, this.walkingSpeed, choiceSets);
+		extractor.run();
+	}
+ * 
+ */
 
 

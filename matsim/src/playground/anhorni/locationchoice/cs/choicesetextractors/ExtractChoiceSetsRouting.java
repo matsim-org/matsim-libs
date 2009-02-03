@@ -48,14 +48,16 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
 	private String mode;
 	private double walkingSpeed;
+	private String crowFly;
 
 	public ExtractChoiceSetsRouting(Controler controler, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
-			List<ChoiceSet> choiceSets, String mode, double walkingSpeed) {
+			List<ChoiceSet> choiceSets, String mode, double walkingSpeed, String crowFly) {
 		
 		super(controler, choiceSets);
 		super.zhFacilitiesByLink = zhFacilitiesByLink;
 		this.mode = mode;	
 		this.walkingSpeed = walkingSpeed;
+		this.crowFly = crowFly;
 	}
 	
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
@@ -82,7 +84,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			numberOfFacilities += it.next().size();
 		}
 		log.info("Number of ZH facilities " + numberOfFacilities);
-		log.info("computing " + this.mode + "choice sets...:");
+		log.info("computing " + this.mode + " choice sets...:");
 		super.computeChoiceSets();
 	}
 				
@@ -103,31 +105,31 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			 */
 			//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
 			Link linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
-			Act fromAct = new Act("beforeShop", linkBefore);
-			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
-			fromAct.setCoord(linkBefore.getCenter());
+			Act fromAct0 = new Act("beforeShop", linkBefore);
+			fromAct0.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
+			fromAct0.setCoord(linkBefore.getCenter());
 						
 			Link link = network.getLink(linkId);
-			Act toAct = new Act("shop", link);
-			toAct.setCoord(link.getCenter());
+			Act toAct0 = new Act("shop", link);
+			toAct0.setCoord(link.getCenter());
 						
-			Leg legBefore = computeLeg(fromAct, toAct, controler);				
+			Leg legBefore = computeLeg(fromAct0, toAct0, controler);				
 			double travelTimeBeforeShopping = legBefore.getTravelTime();
 			
 			//--------------------------------------------------			
-			fromAct = new Act(toAct.getType(), toAct.getLink());
+			Act fromAct1 = new Act(toAct0.getType(), toAct0.getLink());
 			double endTime = choiceSet.getTrip().getBeforeShoppingAct().getEndTime() + 
 			travelTimeBeforeShopping +
 			choiceSet.getTrip().getShoppingAct().calculateDuration();			
-			fromAct.setEndTime(endTime);
-			fromAct.setCoord(toAct.getCoord());
+			fromAct1.setEndTime(endTime);
+			fromAct1.setCoord(toAct0.getCoord());
 						
 			//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
 			Link linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
-			toAct = new Act("afterShop", linkAfter);
-			toAct.setCoord(linkAfter.getCenter());
+			Act toAct1 = new Act("afterShop", linkAfter);
+			toAct1.setCoord(linkAfter.getCenter());
 						
-			Leg legAfter = computeLeg(fromAct, toAct, controler);	
+			Leg legAfter = computeLeg(fromAct1, toAct1, controler);	
 			double travelTimeAfterShopping = legAfter.getTravelTime();
 			//--------------------------------------------------
 			
@@ -137,19 +139,26 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			 * This is NOT working: legBefore.getRoute().getDist() + legAfter.getRoute().getDist()
 			 */
 			double travelDist = 0.0;
-			Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
-			while (routeLinkBefore_it.hasNext()) {		
-				Id lId = routeLinkBefore_it.next();
-				travelDist += network.getLink(lId).getLength();
+			
+			
+			if (this.crowFly.equals("true") && this.mode.equals("walk")) {
+				travelDist = fromAct0.getCoord().calcDistance(toAct0.getCoord()) +
+					fromAct1.getCoord().calcDistance(toAct1.getCoord());
 			}
-			
-			Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
-			while (routeLinkAfter_it.hasNext()) {		
-				Id lId = routeLinkAfter_it.next();
-				travelDist += network.getLink(lId).getLength();
+			else {
+				Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
+				while (routeLinkBefore_it.hasNext()) {		
+					Id lId = routeLinkBefore_it.next();
+					travelDist += network.getLink(lId).getLength();
+				}
+				
+				Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
+				while (routeLinkAfter_it.hasNext()) {		
+					Id lId = routeLinkAfter_it.next();
+					travelDist += network.getLink(lId).getLength();
+				}
 			}
-			
-			
+						
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
 				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, travelDist);
 			}	
@@ -159,20 +168,12 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = null;
 		
-		/*
-		 * This does not work:
-		 * 
-		 * if (this.mode.equals("car")) {
-				leg = new Leg(BasicLeg.Mode.car);
-			}
-			else if (this.mode.equals("walk")) {
+		if (this.crowFly.equals("true")) {
 				leg = new Leg(BasicLeg.Mode.walk);
 			}
-		 * 
-		 * (// create an empty route, but with realistic traveltime)
-		 */
-		
-		leg = new Leg(BasicLeg.Mode.car);
+			else {
+				leg = new Leg(BasicLeg.Mode.car);
+		}
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		return leg;
