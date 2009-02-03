@@ -56,7 +56,7 @@ public class CompareTrips {
 				choiceSet_it = choiceSets.iterator();
 				while (choiceSet_it.hasNext()) {
 					ChoiceSet choiceSet = choiceSet_it.next();
-					out.write(choiceSet.getId().toString() + "\t" + "1" + this.mode +"\t" + this.mode);
+					out.write(choiceSet.getId().toString() + "\t" + "1" + this.mode +"\t" + "?");
 					out.newLine();
 				}	
 				out.flush();
