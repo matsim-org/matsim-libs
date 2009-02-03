@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
-import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
@@ -184,6 +183,9 @@ public class GenerateChoiceSets {
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.carChoiceSets, "car", "false");
 		
+		/*
+		 * This does NOT work at the moment:
+		 *
 		// set free speed to walking speed
 		if (this.walkingSpeed > 0.0) {	
 			Iterator<Link> link_it = this.network.getLinks().values().iterator();
@@ -191,6 +193,7 @@ public class GenerateChoiceSets {
 				link_it.next().setFreespeed(this.walkingSpeed);
 			}
 		}
+		*/
 				
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 					this.walkChoiceSets, "walk", this.walkCrowFly);
