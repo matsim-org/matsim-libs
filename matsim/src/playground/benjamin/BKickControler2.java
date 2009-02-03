@@ -41,6 +41,10 @@ public class BKickControler2 extends Controler {
 		super(conf);
 	}
 
+	public BKickControler2(String[] args) {
+		super(args);
+	}
+
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
@@ -60,7 +64,7 @@ public class BKickControler2 extends Controler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new Controler(args);
+			final Controler controler = new BKickControler2(args);
 			controler.run();
 		}
 		System.exit(0);
