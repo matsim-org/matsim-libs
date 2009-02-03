@@ -25,7 +25,8 @@ public class RetailersControler {
 	
     public static void main (final String[] args) { 
     	Controler controler = new Controler(args);
-    	controler.addControlerListener(new RetailersLocationListener("../../output/output_retailers.txt"));
+    	//controler.addControlerListener(new RetailersLocationListener("../../output/output_retailers.txt"));
+    	controler.addControlerListener(new RetailersLocationListener("output/triangle/output_retailers.txt"));
     	controler.run();
     }
 }

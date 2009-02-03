@@ -14,6 +14,7 @@ public class RetailersSummaryWriter {
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
 	private Retailers retailers;
+	private int iter = 0;
 			
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -57,8 +58,9 @@ public class RetailersSummaryWriter {
 	public void write(Retailers retailers) {
 		try {
 			this.retailers = retailers;
+			iter = iter+1;
 			System.out.println("retailers "+ this.retailers.getRetailers().values());
-			out.write("NEXT ITERATION\n");
+			out.write("ITERATION N." + iter +"\n");
 			for (Retailer r : retailers.getRetailers().values()) {
 				for (Facility f : r.getFacilities().values()) {
 					out.write(f.getId()+"\t");

@@ -46,17 +46,18 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
-
 public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
 
 	private Retailers retailers;
 	private final RetailersSummaryWriter rs;
+	private final PlansSummaryTable pst;
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRouteLandmarks pcrl = null;
 
 	public RetailersLocationListener(final String retailerSummaryFileName) {
 		rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
+		pst = new PlansSummaryTable ("output/triangle/output_Persons.txt");
 	}
 
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -78,9 +79,11 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 			movedFacilities.putAll(facs);
 		}
 		this.rs.write(this.retailers);
-		
+				
 		for (Person p : controler.getPopulation().getPersons().values()) {
+			pst.run(p);
 			for (Plan plan : p.getPlans()) {
+				
 				boolean routeIt = false;
 				Iterator<?> actIter = plan.getIteratorAct();
 				while (actIter.hasNext()) {
