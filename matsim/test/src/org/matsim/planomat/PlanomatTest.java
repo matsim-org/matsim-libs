@@ -62,10 +62,11 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	private static NetworkLayer network = null;
-	private static Facilities facilities = null;
-	private static Population population = null;
+	private NetworkLayer network = null;
+	private Facilities facilities = null;
+	private Population population = null;
 
+	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();
@@ -97,19 +98,19 @@ public class PlanomatTest extends MatsimTestCase {
 	public void testRunDefaultWithEvents() {
 		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR);
 	}
-	
+
 	public void testRunCarPt() {
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
-	
+
 	public void testRunCarPtWithEvents() {
 		this.runATestRun(PlanomatTestRun.WITHEVENTS_CAR_PT);
 	}
-	
+
 	public void testRunDefaultManyModes() {
 
 		Gbl.getConfig().plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
-		
+
 		log.info("Reading plans xml file...");
 		population = new Population(Population.NO_STREAMING);
 		PopulationReader plansReader = new MatsimPopulationReader(population);
@@ -119,8 +120,8 @@ public class PlanomatTest extends MatsimTestCase {
 
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
 	}
-	
-	private void runATestRun(PlanomatTestRun testRun) {
+
+	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(network, 900);
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator);
@@ -139,7 +140,7 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Testing " + testRun.toString() + "...");
 
 		if (
-				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) || 
+				PlanomatTestRun.NOEVENTS_CAR_PT.equals(testRun) ||
 				PlanomatTestRun.WITHEVENTS_CAR_PT.equals(testRun)) {
 
 			Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
@@ -233,7 +234,7 @@ public class PlanomatTest extends MatsimTestCase {
 		// init IChromosome (from JGAP)
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(testPlan);
-		int numActs = planAnalyzeSubtours.getSubtourIndexation().length;		
+		int numActs = planAnalyzeSubtours.getSubtourIndexation().length;
 
 		Configuration jgapConfiguration = new Configuration();
 
@@ -300,7 +301,7 @@ public class PlanomatTest extends MatsimTestCase {
 		// the planomat can be used to generate random demand with respect to the dimensions that are optimized by it
 		// in the following way:
 		// - set the number of generations to 0 (so only the random initialization, and no optimization takes place), and
-		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of 
+		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of
 		Gbl.getConfig().planomat().setPopSize(1);
 		Gbl.getConfig().planomat().setJgapMaxGenerations(0);
 		Gbl.getConfig().planomat().setPossibleModes(new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt});
@@ -337,9 +338,9 @@ public class PlanomatTest extends MatsimTestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		PlanomatTest.population = null;
-		PlanomatTest.network = null;
-		PlanomatTest.facilities = null;
+		this.population = null;
+		this.network = null;
+		this.facilities = null;
 	}
 
 }
