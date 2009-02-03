@@ -43,7 +43,7 @@ public class ZHFacilitiesWriter {
 		}
 		try {
 			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir + "facilitiesMapped2Net.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/facilitiesMapped2Net.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

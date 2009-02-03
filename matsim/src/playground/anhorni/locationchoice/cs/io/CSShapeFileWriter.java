@@ -1,6 +1,5 @@
 package playground.anhorni.locationchoice.cs.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +22,6 @@ import com.vividsolutions.jts.geom.Point;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
-
 public class CSShapeFileWriter extends ChoiceSetWriter {
 
 	private final static Logger log = Logger.getLogger(CSShapeFileWriter.class);
@@ -31,7 +29,6 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 	private FeatureType featureType;
 	
 	public CSShapeFileWriter(String outdir) {	
-		new File(outdir +"shapefiles").mkdir();
 	}
 
 		

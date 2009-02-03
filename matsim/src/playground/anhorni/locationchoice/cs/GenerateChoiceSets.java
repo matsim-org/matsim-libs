@@ -2,6 +2,7 @@ package playground.anhorni.locationchoice.cs;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -137,6 +138,8 @@ public class GenerateChoiceSets {
 		this.filter = filterAreaAndType;
 		
 		//writers
+		new File(this.outdir +"shapefiles").mkdir();
+		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple();
 		this.writers.add(writer);	
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);

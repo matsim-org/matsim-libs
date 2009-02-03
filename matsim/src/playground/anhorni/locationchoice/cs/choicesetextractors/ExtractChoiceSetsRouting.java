@@ -82,7 +82,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			numberOfFacilities += it.next().size();
 		}
 		log.info("Number of ZH facilities " + numberOfFacilities);
-		log.info("computing choice sets...:");
+		log.info("computing " + this.mode + "choice sets...:");
 		super.computeChoiceSets();
 	}
 				
