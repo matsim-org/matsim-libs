@@ -146,22 +146,28 @@ public class CompareTrips {
 				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
 				
 				String wmittelIn = entries[53].trim();
-				String wmittel = "undefined";
+				String wmittel;
 				if (wmittelIn.equals("15")) {
 					wmittel = "walk";
 				}
 				else if (wmittelIn.equals("9")) {
 					wmittel = "car";
 				}
+				else {
+					wmittel = wmittelIn;
+				}
 				mzTrip.setWmittel(wmittel);
 				
 				String ausmittelIn = entries[59].trim();
-				String ausmittel = "undefined";
+				String ausmittel;
 				if (ausmittelIn.equals("10")) {
 					ausmittel = "walk";
 				}
-				else if (wmittelIn.equals("6")) {
+				else if (ausmittelIn.equals("6")) {
 					ausmittel = "car";
+				}
+				else {
+					ausmittel = ausmittelIn;
 				}
 				mzTrip.setAusmittel(ausmittel);
 				
