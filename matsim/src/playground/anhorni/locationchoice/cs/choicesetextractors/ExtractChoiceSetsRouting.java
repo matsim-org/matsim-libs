@@ -47,16 +47,14 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
 	private String mode;
-	private double walkingSpeed;
 	private String crowFly;
 
 	public ExtractChoiceSetsRouting(Controler controler, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
-			List<ChoiceSet> choiceSets, String mode, double walkingSpeed, String crowFly) {
+			List<ChoiceSet> choiceSets, String mode, String crowFly) {
 		
 		super(controler, choiceSets);
 		super.zhFacilitiesByLink = zhFacilitiesByLink;
 		this.mode = mode;	
-		this.walkingSpeed = walkingSpeed;
 		this.crowFly = crowFly;
 	}
 	
@@ -65,19 +63,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
 			return;
 		}
-		
-		// set free speed to walking speed
-		if (this.mode.equals("walk")) {
-			NetworkLayer network = super.controler.getNetwork();
-			
-			Iterator<Link> link_it = network.getLinks().values().iterator();
-			while (link_it.hasNext()) {		
-				Link link = link_it.next();
-				link.setFreespeed(walkingSpeed);
-			}
-		}
-		
-		
+				
 		int numberOfFacilities = 0;
 		Iterator<ArrayList<ZHFacility>> it = super.zhFacilitiesByLink.values().iterator();
 		while (it.hasNext()) {
