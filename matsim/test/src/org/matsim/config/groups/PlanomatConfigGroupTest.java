@@ -30,8 +30,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		
 		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
 		
-		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
-		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
+//		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
+//		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
 		BasicLeg.Mode[] expectedModes = PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES;
 		BasicLeg.Mode[] actualModes = Gbl.getConfig().planomat().getPossibleModes();
@@ -40,6 +40,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 			assertEquals(expectedModes[ii], actualModes[ii]);
 		}
 		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
+		assertEquals( PlanomatConfigGroup.DEFAULT_LEVEL_OF_TIME_RESOLUTION, Gbl.getConfig().planomat().getLevelOfTimeResolution());
+		assertEquals( PlanomatConfigGroup.DEFAULT_DO_LOGGING, Gbl.getConfig().planomat().isDoLogging() );
 	}
 
 	public void testAddParam() {
@@ -55,6 +57,8 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		}
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );
+		assertEquals( 6, Gbl.getConfig().planomat().getLevelOfTimeResolution() );
+		assertEquals( true, Gbl.getConfig().planomat().isDoLogging() );
 	}
 	
 }

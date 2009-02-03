@@ -26,7 +26,6 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.events.Events;
@@ -56,7 +55,6 @@ import org.matsim.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.CRCChecksum;
-import org.matsim.utils.misc.Time;
 
 public class PlanomatTest extends MatsimTestCase {
 
@@ -64,9 +62,9 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	private NetworkLayer network = null;
-	private Facilities facilities = null;
-	private Population population = null;
+	private static NetworkLayer network = null;
+	private static Facilities facilities = null;
+	private static Population population = null;
 
 	protected void setUp() throws Exception {
 
@@ -211,8 +209,8 @@ public class PlanomatTest extends MatsimTestCase {
 
 		testChromosome = testee.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 		assertEquals(2, testChromosome.getGenes().length);
-		assertEquals(DoubleGene.class, testChromosome.getGenes()[0].getClass());
-		assertEquals(DoubleGene.class, testChromosome.getGenes()[1].getClass());
+		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
+		assertEquals(IntegerGene.class, testChromosome.getGenes()[1].getClass());
 
 	}
 
@@ -245,12 +243,12 @@ public class PlanomatTest extends MatsimTestCase {
 			for (int ii=0; ii < testGenes.length; ii++) {
 				switch(ii) {
 				case 0:
-					testGenes[ii] = new DoubleGene(jgapConfiguration);
-					testGenes[ii].setAllele(Time.parseTime("07:45:00"));
+					testGenes[ii] = new IntegerGene(jgapConfiguration);
+					testGenes[ii].setAllele(31);
 					break;
 				case 1:
-					testGenes[ii] = new DoubleGene(jgapConfiguration);
-					testGenes[ii].setAllele(Time.parseTime("8:00:01"));
+					testGenes[ii] = new IntegerGene(jgapConfiguration);
+					testGenes[ii].setAllele(32);
 					break;
 				case 2:
 					testGenes[ii] = new IntegerGene(jgapConfiguration);
@@ -334,6 +332,14 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Actual checksum: " + Long.toString(actualChecksum));
 		assertEquals(expectedChecksum, actualChecksum);
 
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		PlanomatTest.population = null;
+		PlanomatTest.network = null;
+		PlanomatTest.facilities = null;
 	}
 
 }

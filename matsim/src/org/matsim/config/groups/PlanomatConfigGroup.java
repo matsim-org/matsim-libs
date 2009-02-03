@@ -34,6 +34,10 @@ public class PlanomatConfigGroup extends Module {
 	static final BasicLeg.Mode[] DEFAULT_POSSIBLE_MODES = new BasicLeg.Mode[]{};
 	private BasicLeg.Mode[] possibleModes;
 
+	public static final String LEVEL_OF_TIME_RESOLUTION = "levelOfTimeResolution";
+	static final int DEFAULT_LEVEL_OF_TIME_RESOLUTION = 7;
+	private int levelOfTimeResolution;
+
 	public static final String LEG_TRAVEL_TIME_ESTIMATOR_NAME = "legTravelTimeEstimator";
 	public static final String CETIN_COMPATIBLE = "org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator";
 	public static final String CHARYPAR_ET_AL_COMPATIBLE = "org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator";
@@ -41,16 +45,11 @@ public class PlanomatConfigGroup extends Module {
 	public static final String DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME = CETIN_COMPATIBLE;
 	private String legTravelTimeEstimatorName;
 
-	public static final String INDIFFERENCE = "indifference";
-	public static final String BE_VERBOSE = "beVerbose";
+	public static final String DO_LOGGING = "doLogging";
+	public static final boolean DEFAULT_DO_LOGGING = false;
+	private boolean doLogging;
 
-	/**
-	 * TODO [meisterk, Sep 2, 2008] keep the use of this parameter as a controler for efficiency of the algorithm
-	 * e.g. when changing to integer coded times, use it to control size of time slices
-	 */
-	//private double indifference = -1.0;
-
-	private final static Logger log = Logger.getLogger(PlanomatConfigGroup.class);
+	private final static Logger logger = Logger.getLogger(PlanomatConfigGroup.class);
 
 	public PlanomatConfigGroup() {
 		super(PlanomatConfigGroup.GROUP_NAME);
@@ -61,6 +60,8 @@ public class PlanomatConfigGroup extends Module {
 		this.jgapMaxGenerations = PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS;
 		this.possibleModes = PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES;
 		this.legTravelTimeEstimatorName = PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME;
+		this.levelOfTimeResolution = PlanomatConfigGroup.DEFAULT_LEVEL_OF_TIME_RESOLUTION;
+		this.doLogging = PlanomatConfigGroup.DEFAULT_DO_LOGGING;
 
 	}
 
@@ -77,16 +78,18 @@ public class PlanomatConfigGroup extends Module {
 			this.legTravelTimeEstimatorName = value;
 		} else if (PlanomatConfigGroup.JGAP_MAX_GENERATIONS.equals(param_name)) {
 			this.setJgapMaxGenerations(Integer.parseInt(value));
+		} else if (PlanomatConfigGroup.LEVEL_OF_TIME_RESOLUTION.equals(param_name)) {
+			this.setLevelOfTimeResolution(Integer.parseInt(value));
+		} else if (PlanomatConfigGroup.DO_LOGGING.equals(param_name)) {
+			this.setDoLogging(Boolean.parseBoolean(value));
+		} else {
+			logger.warn("Unknown parameter name in module " + PlanomatConfigGroup.GROUP_NAME + ": \"" + param_name + "\". It is ignored.");
 		}
 
 		// TODO add remaining config parameters to test
 
-//		} else if (LEG_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
-//		this.setLegTravelTimeEstimatorName(value);
-////		} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
-////		this.setLinkTravelTimeEstimatorName(value);
-//		} else if (JGAP_MAX_GENERATIONS.equals(param_name)) {
-//		this.setJgapMaxGenerations(Integer.parseInt(value));
+//		} else if (LINK_TRAVEL_TIME_ESTIMATOR.equals(param_name)) {
+//		this.setLinkTravelTimeEstimatorName(value);
 //		} else if (OPTIMIZATION_TOOLBOX.equals(param_name)) {
 //		if (OPTIMIZATION_TOOLBOX_JGAP.equals(value)) {
 //		this.setOptimizationToolbox(value);
@@ -155,6 +158,22 @@ public class PlanomatConfigGroup extends Module {
 
 	public void setJgapMaxGenerations(int jgapMaxGenerations) {
 		this.jgapMaxGenerations = jgapMaxGenerations;
+	}
+
+	public int getLevelOfTimeResolution() {
+		return levelOfTimeResolution;
+	}
+
+	public void setLevelOfTimeResolution(int levelOfTimeResolution) {
+		this.levelOfTimeResolution = levelOfTimeResolution;
+	}
+
+	public boolean isDoLogging() {
+		return doLogging;
+	}
+
+	public void setDoLogging(boolean doLogging) {
+		this.doLogging = doLogging;
 	}
 
 }

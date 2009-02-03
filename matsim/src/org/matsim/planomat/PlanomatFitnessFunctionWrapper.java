@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
-import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
@@ -76,7 +75,6 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		BasicLeg.Mode mode = null;
 		Act origin = null, destination = null;
 		Leg legIntermediate = null;
-//		HashMap<Leg, CarRoute> originalRoutes = PlanOptimizeTimes.getLegsRoutes(plan);
 		Route tempRoute = null;
 		
 		sf.reset();
@@ -88,7 +86,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 		for (int ii=0; ii < numActs; ii++) {
 
-			now += ((DoubleGene) a_subject.getGene(ii)).doubleValue();
+			now += (((IntegerGene) a_subject.getGene(ii)).intValue() + 0.5) * Planomat.TIME_INTERVAL_SIZE;
 
 			sf.startLeg(now, null);
 

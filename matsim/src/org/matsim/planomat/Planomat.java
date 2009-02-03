@@ -23,6 +23,7 @@ package org.matsim.planomat;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -30,7 +31,6 @@ import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.basic.v01.BasicLeg;
@@ -66,19 +66,23 @@ public class Planomat implements PlanAlgorithm {
 	/**
 	 * Maximum possible activity duration. Serves as upper limit for double encoding of activity durations in GA plan chromosome. 
 	 */
-	private static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
-	
+	protected static final double MAX_ACTIVITY_DURATION = 24.0 * 3600;
+	protected static final int NUM_TIME_INTERVALS = (int) Math.pow(2, Gbl.getConfig().planomat().getLevelOfTimeResolution());
+	protected static final double TIME_INTERVAL_SIZE = Planomat.MAX_ACTIVITY_DURATION / Planomat.NUM_TIME_INTERVALS;
+
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
 	private Random seedGenerator = null;
-	
+
+	private final static Logger logger = Logger.getLogger(Planomat.class);
+
 	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory) {
 
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.seedGenerator = MatsimRandom.getLocalInstance();
-		
+
 	}
 
 	public void run(final Plan plan) {
@@ -94,7 +98,7 @@ public class Planomat implements PlanAlgorithm {
 			org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
 
 			org.jgap.Configuration.reset();
-			
+
 			IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 			try {
 				jgapConfiguration.setSampleChromosome(sampleChromosome);
@@ -114,8 +118,20 @@ public class Planomat implements PlanAlgorithm {
 			} catch (InvalidConfigurationException e) {
 				e.printStackTrace();
 			}
-			population.evolve( Gbl.getConfig().planomat().getJgapMaxGenerations() );
-			IChromosome fittest = population.getFittestChromosome();
+			IChromosome fittest = null;
+			String logMessage = null;
+			for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
+				population.evolve();
+				if (Gbl.getConfig().planomat().isDoLogging()) {
+					logMessage = "";
+					fittest = population.getFittestChromosome();
+					for (Gene gene : fittest.getGenes()) {
+						logMessage = logMessage.concat(gene.toString() + " ");
+					}
+					logger.info(logMessage);
+				}
+			}
+			fittest = population.getFittestChromosome();
 			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
 
 		}
@@ -135,7 +151,7 @@ public class Planomat implements PlanAlgorithm {
 			long seed = this.seedGenerator.nextLong();
 			//System.out.println("Seed: " + Long.toString(seed));
 			((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
-			
+
 			// elitist selection (DeJong, 1975)
 			jgapConfiguration.setPreservFittestIndividual(true);
 			jgapConfiguration.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
@@ -153,7 +169,7 @@ public class Planomat implements PlanAlgorithm {
 		try {
 
 			for (int ii=0; ii < planAnalyzeSubtours.getSubtourIndexation().length; ii++) {
-				sampleGenes.add(new DoubleGene(jgapConfiguration, 0.0, Planomat.MAX_ACTIVITY_DURATION));
+				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
 
 			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
@@ -192,8 +208,6 @@ public class Planomat implements PlanAlgorithm {
 		Leg leg = null;
 
 		Route tempRoute = null;
-		
-		Gene[] fittestGenes = individual.getGenes();
 
 		int max = plan.getActsLegs().size();
 		double now = 0.0;
@@ -210,7 +224,8 @@ public class Planomat implements PlanAlgorithm {
 				if (ii < (max - 1)) {
 
 					activity.setStartTime(now);
-					activity.setDuration(((DoubleGene) fittestGenes[ii / 2]).doubleValue());
+					activity.setDuration((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE);
+//					activity.setDuration(((DoubleGene) individual.getGenes()[ii / 2]).doubleValue());
 					now += activity.getDuration();
 					activity.setEndTime(now);
 
@@ -257,7 +272,7 @@ public class Planomat implements PlanAlgorithm {
 						leg);
 
 				leg.setTravelTime(travelTimeEstimation);
-				
+
 				if (!leg.getMode().equals(BasicLeg.Mode.car)) {
 					// restore original routes, because planomat must not alter routes at all
 					leg.setRoute(tempRoute);
@@ -276,7 +291,7 @@ public class Planomat implements PlanAlgorithm {
 
 		// reset leg travel time estimator
 		this.legTravelTimeEstimator.reset();
-		
+
 	}
 
 	public void setSeedGenerator(Random seedGenerator) {
@@ -286,5 +301,5 @@ public class Planomat implements PlanAlgorithm {
 	public Random getSeedGenerator() {
 		return seedGenerator;
 	}
-	
+
 }

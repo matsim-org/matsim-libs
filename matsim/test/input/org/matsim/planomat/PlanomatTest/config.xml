@@ -45,4 +45,8 @@
 		<param name="activityClosingTime_1"     value="24:00:00" />
 	</module>
 	
+	<module name="planomat">
+		<param name="doLogging" value="true" />
+	</module>
+	
 </config>
