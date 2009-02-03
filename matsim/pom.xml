@@ -152,9 +152,9 @@
     <dependency>
       <groupId>org.jgap</groupId>
       <artifactId>jgap</artifactId>
-      <version>3.1</version>
+      <version>3.4.1</version>
       <scope>system</scope>
-      <systemPath>${basedir}/libs/jgap-3.1.jar</systemPath>
+      <systemPath>${basedir}/libs/jgap-3.4.1.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>jogl</groupId>
