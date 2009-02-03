@@ -57,10 +57,10 @@ public class BKickControler extends Controler {
 			String oneRouteNoModeTestOld = "../studies/bkickhoefer/oneRouteNoModeTest/configOldUtlFctn.xml";
 			String scoreTest = "../studies/bkickhoefer/scoreTest/configScoreTest.xml";
 //			String config = equilExampleConfig;
-//			String config = oneRouteTwoModeTest;
+			String config = oneRouteTwoModeTest;
 //			String config = oneRouteNoModeTest;
 //			String config = oneRouteNoModeTestOld;
-			String config = scoreTest;
+//			String config = scoreTest;
 			
 			BKickControler c = new BKickControler(config);
 			c.setOverwriteFiles(true);
