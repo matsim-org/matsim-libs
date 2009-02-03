@@ -122,6 +122,9 @@ public class NelsonTripReader {
 				Act afterShoppingAct = new Act("end", afterShoppingCoord);
 				afterShoppingAct.setLink(network.getNearestLink(afterShoppingCoord));
 				
+				if (!(mzTrip.getEndTime() > 0.0)) {
+					log.error("No end time found for MZ trip : " + mzTrip.getId());
+				}
 				double startTimeAfterShoppingAct = mzTrip.getEndTime(); 			
 				afterShoppingAct.setStartTime(startTimeAfterShoppingAct);
 								
@@ -134,7 +137,6 @@ public class NelsonTripReader {
 					ZHFacility facility = fac_it.next();
 					if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
 						choiceSet.setChosenZHFacility(facility);
-						log.info(facility.getId());
 					}
 				}
 				
@@ -166,8 +168,7 @@ public class NelsonTripReader {
 				boolean walk = m.equals("15") && mode.equals("walk");
 				boolean car = m.equals("9") && mode.equals("car");				
 				if (!(walk || car )) continue;
-				
-				
+								
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
@@ -184,10 +185,7 @@ public class NelsonTripReader {
 				if (entries[41].trim().length() > 0) {
 					endTime = 60* Double.parseDouble(entries[41].trim());
 				}
-				else {
-					log.info("No end time found for " +id);
-				}
-				
+					
 				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
 				this.mzTrips.put(id, mzTrip);
 			}

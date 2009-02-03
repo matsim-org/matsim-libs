@@ -36,6 +36,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
 				
+				boolean oneIsChosen = false;
 				String location;
 				Iterator<ZHFacility> fac_it = choiceSet.getFacilities().iterator();
 				while (fac_it.hasNext()) {
@@ -44,6 +45,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 					String chosen;
 					if (facility.getId().compareTo(choiceSet.getChosenZHFacility().getId()) == 0) {
 						chosen = "1";
+						oneIsChosen = true;
 					}
 					else {
 						chosen = "0";
@@ -63,6 +65,10 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 					out.newLine();
 				}					
 				out.flush();
+				
+				if (!oneIsChosen) {
+					log.error("Problem with choice set " + choiceSet.getId());
+				}
 			}
 			out.flush();
 			out.close();
