@@ -28,7 +28,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 	// test, if adding and removing a handler works
 	public void testAddAndRemoveHandler() {
 		Events events = new ParallelEvents(2);
-		
+
 		// start iteration
 		events.initProcessing();
 
@@ -47,8 +47,8 @@ public class ParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	private void processEvents(Events events, int eventCount,
-			int numberOfHandlers, int numberOfIterations) {
+	private void processEvents(final Events events, final int eventCount,
+			final int numberOfHandlers, final int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];
 
@@ -63,8 +63,8 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 			// initialize events handling for new iteration
 			events.initProcessing();
-			
-			
+
+
 			for (int i = 0; i < eventCount; i++) {
 				events.processEvent(linkLeaveEvent);
 			}
@@ -83,23 +83,23 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 	}
 
-	private class Handler1 implements LinkLeaveEventHandler {
+	private static class Handler1 implements LinkLeaveEventHandler {
 
 		private int numberOfProcessedMessages = 0;
 
 		public int getNumberOfProcessedMessages() {
-			return numberOfProcessedMessages;
+			return this.numberOfProcessedMessages;
 		}
 
 		public void resetNumberOfProcessedMessages() {
-			numberOfProcessedMessages = 0;
+			this.numberOfProcessedMessages = 0;
 		}
 
-		public void handleEvent(LinkLeaveEvent event) {
-			numberOfProcessedMessages++;
+		public void handleEvent(final LinkLeaveEvent event) {
+			this.numberOfProcessedMessages++;
 		}
 
-		public void reset(int iteration) {
+		public void reset(final int iteration) {
 		}
 
 		public Handler1() {
