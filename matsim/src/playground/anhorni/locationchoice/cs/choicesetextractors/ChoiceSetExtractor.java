@@ -14,7 +14,7 @@ import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 public abstract class ChoiceSetExtractor {
 		
 	protected TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = null;
-	private Controler controler = null;
+	protected Controler controler = null;
 	private List<ChoiceSet> choiceSets;
 	
 	private final static Logger log = Logger.getLogger(ChoiceSetExtractor.class);

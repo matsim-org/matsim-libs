@@ -64,6 +64,7 @@ public class GenerateChoiceSets {
 	private String outdir = null;
 	private String sampling;
 	private String readNelson;
+	private String walkEllipse;
 	
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
 	
@@ -105,6 +106,7 @@ public class GenerateChoiceSets {
 			this.choiceSetSize = Integer.parseInt(bufferedReader.readLine().trim());
 			this.sampling = bufferedReader.readLine();
 			this.readNelson = bufferedReader.readLine();
+			this.walkEllipse = bufferedReader.readLine();
 			
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
@@ -115,6 +117,7 @@ public class GenerateChoiceSets {
 			log.info("choice set size: " + this.choiceSetSize);
 			log.info("Sampling :" + this.sampling);
 			log.info("readNelson: " + this.readNelson);
+			log.info("walkEllipse: " + this.walkEllipse);
 
 			bufferedReader.close();
 			fileReader.close();
@@ -176,15 +179,15 @@ public class GenerateChoiceSets {
 				
 		this.controler = new Controler(this.matsimRunConfigFile);
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
-				this.carChoiceSets, "car");
+				this.carChoiceSets, "car", this.walkingSpeed);
 		controler.addControlerListener(listenerCar);
 				
-		if (this.walkingSpeed > 0.0) {
+		if (this.walkEllipse.equals("true")) {
 			this.extractWalkChoiceSetsEllipse(this.walkChoiceSets);
 		}
 		else {
 			ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
-					this.walkChoiceSets, "walk");
+					this.walkChoiceSets, "walk", this.walkingSpeed);
 			controler.addControlerListener(listenerWalk);
 		}
 		

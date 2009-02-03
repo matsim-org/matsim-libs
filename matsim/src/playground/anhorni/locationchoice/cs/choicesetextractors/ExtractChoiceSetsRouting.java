@@ -47,13 +47,15 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
 	private String mode;
+	private double walkingSpeed;
 
 	public ExtractChoiceSetsRouting(Controler controler, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink, 
-			List<ChoiceSet> choiceSets, String mode) {
+			List<ChoiceSet> choiceSets, String mode, double walkingSpeed) {
 		
 		super(controler, choiceSets);
 		super.zhFacilitiesByLink = zhFacilitiesByLink;
 		this.mode = mode;	
+		this.walkingSpeed = walkingSpeed;
 	}
 	
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
@@ -61,6 +63,18 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		if (event.getIteration() < Gbl.getConfig().controler().getLastIteration()) {
 			return;
 		}
+		
+		// set free speed to walking speed
+		if (this.mode.equals("walk")) {
+			NetworkLayer network = super.controler.getNetwork();
+			
+			Iterator<Link> link_it = network.getLinks().values().iterator();
+			while (link_it.hasNext()) {		
+				Link link = link_it.next();
+				link.setFreespeed(walkingSpeed);
+			}
+		}
+		
 		
 		int numberOfFacilities = 0;
 		Iterator<ArrayList<ZHFacility>> it = super.zhFacilitiesByLink.values().iterator();
@@ -144,12 +158,21 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = null;
-		if (this.mode.equals("car")) {
-			leg = new Leg(BasicLeg.Mode.car);
-		}
-		else if (this.mode.equals("walk")) {
-			leg = new Leg(BasicLeg.Mode.walk);
-		}		
+		
+		/*
+		 * This does not work:
+		 * 
+		 * if (this.mode.equals("car")) {
+				leg = new Leg(BasicLeg.Mode.car);
+			}
+			else if (this.mode.equals("walk")) {
+				leg = new Leg(BasicLeg.Mode.walk);
+			}
+		 * 
+		 * (// create an empty route, but with realistic traveltime)
+		 */
+		
+		leg = new Leg(BasicLeg.Mode.car);
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		return leg;
