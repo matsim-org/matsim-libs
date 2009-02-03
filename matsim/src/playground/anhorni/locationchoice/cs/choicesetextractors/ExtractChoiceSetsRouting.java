@@ -87,7 +87,8 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			 * this is NOT working: 
 			 * Link linkBefore = choiceSet.getTrip().getBeforeShoppingAct().getLink(); ...
 			 */
-			Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
+			//Link linkBefore = network.getNearestLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getCenter());
+			Link linkBefore = network.getLink(choiceSet.getTrip().getBeforeShoppingAct().getLink().getId());
 			Act fromAct = new Act("beforeShop", linkBefore);
 			fromAct.setEndTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
 			fromAct.setCoord(linkBefore.getCenter());
@@ -107,7 +108,8 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			fromAct.setEndTime(endTime);
 			fromAct.setCoord(toAct.getCoord());
 						
-			Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
+			//Link linkAfter = network.getNearestLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getCenter());
+			Link linkAfter = network.getLink(choiceSet.getTrip().getAfterShoppingAct().getLink().getId());
 			toAct = new Act("afterShop", linkAfter);
 			toAct.setCoord(linkAfter.getCenter());
 						
@@ -115,11 +117,27 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			double travelTimeAfterShopping = legAfter.getTravelTime();
 			//--------------------------------------------------
 			
-			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;			
+			double totalTravelTime = travelTimeBeforeShopping + travelTimeAfterShopping;	
+			
+			/*
+			 * This is NOT working: legBefore.getRoute().getDist() + legAfter.getRoute().getDist()
+			 */
+			double travelDist = 0.0;
+			Iterator<Id> routeLinkBefore_it = legBefore.getRoute().getLinkIds().iterator();
+			while (routeLinkBefore_it.hasNext()) {		
+				Id lId = routeLinkBefore_it.next();
+				travelDist += network.getLink(lId).getLength();
+			}
+			
+			Iterator<Id> routeLinkAfter_it = legAfter.getRoute().getLinkIds().iterator();
+			while (routeLinkAfter_it.hasNext()) {		
+				Id lId = routeLinkAfter_it.next();
+				travelDist += network.getLink(lId).getLength();
+			}
+			
 			
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
-				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, 
-						legBefore.getRoute().getDist() + legAfter.getRoute().getDist());
+				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, travelDist);
 			}	
 		}	
 	}
@@ -134,7 +152,6 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		}		
 		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
 		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
-		
 		return leg;
 	}
 }
