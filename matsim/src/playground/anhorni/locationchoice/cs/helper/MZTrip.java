@@ -15,6 +15,9 @@ public class MZTrip {
 	
 	// F514
 	private double endTime = 0.0;
+	
+	private String wmittel;
+	private String ausmittel;
 
 	
 	public MZTrip(Id id, Coord coord, double startTime, double endTime) {
@@ -58,5 +61,25 @@ public class MZTrip {
 
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
+	}
+
+
+	public String getWmittel() {
+		return wmittel;
+	}
+
+
+	public void setWmittel(String wmittel) {
+		this.wmittel = wmittel;
+	}
+
+
+	public String getAusmittel() {
+		return ausmittel;
+	}
+
+
+	public void setAusmittel(String ausmittel) {
+		this.ausmittel = ausmittel;
 	}
 }
