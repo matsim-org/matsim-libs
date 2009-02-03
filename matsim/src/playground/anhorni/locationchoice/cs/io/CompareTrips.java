@@ -47,7 +47,12 @@ public class CompareTrips {
 						choiceSetIdList.remove(tripId);
 					}
 					else {
-						out.write(tripId + "\t" + "0" + entries[23].trim() +"\t" + entries[8].trim());
+						if (this.mode.equals("car")) {
+							out.write(tripId + "\t" + "0" + "\t" + entries[28].trim() +"\t" + entries[15].trim());
+						}
+						else {
+							out.write(tripId + "\t" + "0" + "\t" + entries[30].trim() +"\t" + entries[17].trim());
+						}
 						out.newLine();
 					}
 				}
