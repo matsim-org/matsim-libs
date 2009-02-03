@@ -24,7 +24,7 @@ public class CompareTrips {
 	private String outdir;
 	private String mode;
 	
-	private TreeMap<Id, MZTrip> mzTrips = null;
+	private TreeMap<Id, MZTrip> mzTrips = new TreeMap<Id, MZTrip>();;
 	
 	public CompareTrips(String outdir, String mode) {
 		this.outdir = outdir;
@@ -126,8 +126,6 @@ public class CompareTrips {
 								
 				String[] entries = curr_line.split("\t", -1);
 				
-				
-								
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
