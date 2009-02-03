@@ -134,6 +134,7 @@ public class NelsonTripReader {
 					ZHFacility facility = fac_it.next();
 					if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
 						choiceSet.setChosenZHFacility(facility);
+						log.info(facility.getId());
 					}
 				}
 				

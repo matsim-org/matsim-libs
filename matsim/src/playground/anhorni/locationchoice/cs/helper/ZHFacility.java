@@ -5,25 +5,15 @@ import org.matsim.utils.geometry.Coord;
 
 public class ZHFacility  {
 	
-	private String shopID = null;
 	private Id id = null;
-	private Coord center = null;
-	
+	private Coord center = null;	
 	private Coord exactPosition = null;
 	
 	
-	public ZHFacility(final Id id, Coord coord, String shopID, Coord exactPosition) {
-		this.shopID = shopID;
+	public ZHFacility(final Id id, Coord coord, Coord exactPosition) {
 		this.id = id;
 		this.center = coord;
 		this.exactPosition = exactPosition;
-	}
-
-	public String getShopID() {
-		return shopID;
-	}
-	public void setShopID(String shopID) {
-		this.shopID = shopID;
 	}
 
 	public Id getId() {
