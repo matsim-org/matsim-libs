@@ -31,6 +31,7 @@ import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
+import playground.anhorni.locationchoice.cs.io.CompareTrips;
 import playground.anhorni.locationchoice.cs.io.NelsonTripReader;
 import playground.anhorni.locationchoice.cs.io.NelsonTripWriter;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesReader;
@@ -169,6 +170,14 @@ public class GenerateChoiceSets {
 			NelsonTripWriter nelsonWriter = new NelsonTripWriter();
 			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
 			nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
+			
+			
+			CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
+			compareTripsCar.compare(".input/ttbcar.dat", this.carChoiceSets);
+			
+			CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
+			compareTripsWalk.compare(".input/ttwalk.dat", this.walkChoiceSets);
+				
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
