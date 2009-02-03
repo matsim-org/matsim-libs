@@ -39,7 +39,11 @@ public class CompareTrips {
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			choiceSetIdList.add(choiceSet_it.next().getId().toString());
-		}		
+		}
+		
+		List<String> inChoiceSetList = new Vector<String>();
+		
+		
 		String outfile = outdir + this.mode +"_CompareTrips.txt";	
 		try {
 			FileReader fileReader = new FileReader(file);
@@ -55,7 +59,13 @@ public class CompareTrips {
 					String[] entries = curr_line.split("\t", -1);					
 					String tripId = entries[0].trim();					
 					if (choiceSetIdList.contains(tripId)) {
+						
+						inChoiceSetList.add(tripId);
+						/*
+						 * This does NOT work:
+						 
 						choiceSetIdList.remove(tripId);
+						*/
 					}
 					else {					
 						String wmittel = null;
@@ -68,19 +78,25 @@ public class CompareTrips {
 							wmittel = entries[30].trim();
 							ausmittel = entries[17].trim();
 						}
-						String wmittelOut = "undefined";
-						String ausmittelOut = "undefined";
+						String wmittelOut;
+						String ausmittelOut;
 						if (wmittel.equals("9")) {
 							wmittelOut = "car";
 						}
 						else if (wmittel.equals("15")) {
 							wmittelOut = "walk";
 						}
+						else {
+							wmittelOut = wmittel;
+						}
 						if (ausmittel.equals("6")) {
 							ausmittelOut = "car";
 						}
 						else if (ausmittel.equals("10")) {
 							ausmittelOut = "walk";
+						}
+						else {
+							ausmittelOut = ausmittel;
 						}
 
 						String followingTrip = String.valueOf(Integer.parseInt(tripId) + 1);
@@ -96,7 +112,7 @@ public class CompareTrips {
 				choiceSet_it = choiceSets.iterator();
 				while (choiceSet_it.hasNext()) {
 					ChoiceSet choiceSet = choiceSet_it.next();					
-					if (!choiceSetIdList.contains(choiceSet.getId().toString())) {
+					if (!inChoiceSetList.contains(choiceSet.getId().toString())) {
 						out.write(choiceSet.getId().toString() + "\t" + "1" + "\t" + this.mode +"\t" + "?" +"\t" +
 								this.mode +"\t" + "?");
 						out.newLine();
