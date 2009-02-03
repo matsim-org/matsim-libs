@@ -104,6 +104,7 @@ public class NelsonTripReader {
 						Double.parseDouble(entries[50].trim()), Double.parseDouble(entries[51].trim()));
 				Act shoppingAct = new Act("shop", shoppingCoord);
 				shoppingAct.setLink(network.getNearestLink(shoppingCoord));
+				shoppingAct.setFacilityId(new IdImpl(entries[2].trim()));
 				
 				double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
 				shoppingAct.setStartTime(startTimeShoppingAct);
