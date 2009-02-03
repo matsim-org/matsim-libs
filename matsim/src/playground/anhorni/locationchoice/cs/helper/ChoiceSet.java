@@ -21,6 +21,7 @@ public class ChoiceSet {
 	ArrayList<ZHFacility> facilities = new ArrayList<ZHFacility>();
 	ArrayList<Double> travelTimes2Facilities = new ArrayList<Double>();
 	ArrayList<Double> travelDistances2Facilities = new ArrayList<Double>();
+	ZHFacility chosenZHFacility;
 		
 	public ChoiceSet(Id id, Trip trip) {
 		this.id = id;
@@ -279,5 +280,13 @@ public class ChoiceSet {
 	public double getTravelDistance(ZHFacility facility) {
 		int facilityIndex = this.facilities.indexOf(facility);
 		return this.travelDistances2Facilities.get(facilityIndex);
+	}
+
+	public ZHFacility getChosenZHFacility() {
+		return chosenZHFacility;
+	}
+
+	public void setChosenZHFacility(ZHFacility chosenZHFacility) {
+		this.chosenZHFacility = chosenZHFacility;
 	}
 }

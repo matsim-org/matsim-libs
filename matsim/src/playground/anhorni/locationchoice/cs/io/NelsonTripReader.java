@@ -3,6 +3,8 @@ package playground.anhorni.locationchoice.cs.io;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -12,11 +14,13 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.MZTrip;
 import playground.anhorni.locationchoice.cs.helper.Trip;
+import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
 /*	  0			1		2			3			4			5		6		7			8				9
  * ---------------------------------------------------------------------------------------------------------		
@@ -31,9 +35,11 @@ public class NelsonTripReader {
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
 	private TreeMap<Id, MZTrip> mzTrips = null; 
 	private NetworkLayer network = null;
+	private TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<ZHFacility>>();
 		
-	public NelsonTripReader(NetworkLayer network) {
+	public NelsonTripReader(NetworkLayer network, TreeMap<Id, ArrayList<ZHFacility>> zhFacilitiesByLink) {
 		this.network = network;
+		this.zhFacilitiesByLink = zhFacilitiesByLink;
 	}
 	
 	public List<ChoiceSet> readFiles(final String file0, final String file1, String mode)  {
@@ -103,8 +109,9 @@ public class NelsonTripReader {
 				Coord shoppingCoord= new CoordImpl(
 						Double.parseDouble(entries[50].trim()), Double.parseDouble(entries[51].trim()));
 				Act shoppingAct = new Act("shop", shoppingCoord);
-				shoppingAct.setLink(network.getNearestLink(shoppingCoord));
-				shoppingAct.setFacilityId(new IdImpl(entries[2].trim()));
+				
+				Link link = network.getNearestLink(shoppingCoord);
+				shoppingAct.setLink(link);
 				
 				double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
 				shoppingAct.setStartTime(startTimeShoppingAct);
@@ -121,6 +128,15 @@ public class NelsonTripReader {
 				Trip trip = new Trip(tripNr, beforeShoppingAct, shoppingAct, afterShoppingAct);
 				
 				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(trip3ID), trip);
+				
+				Iterator<ZHFacility> fac_it = this.zhFacilitiesByLink.get(link.getId()).iterator();
+				while (fac_it.hasNext()) {		
+					ZHFacility facility = fac_it.next();
+					if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
+						choiceSet.setChosenZHFacility(facility);
+					}
+				}
+				
 				double travelTimeBudget = (startTimeAfterShoppingAct- endTimeBeforeShoppingAct) - (endTimeShoppingAct - startTimeShoppingAct);
 				choiceSet.setTravelTimeBudget(travelTimeBudget);
 				this.choiceSets.add(choiceSet);			
