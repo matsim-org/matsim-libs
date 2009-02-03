@@ -60,6 +60,7 @@ public class CompareTrips {
 					out.newLine();
 				}	
 				out.flush();
+				out.close();
 				
 			} catch (final IOException e) {
 				Gbl.errorMsg(e);
