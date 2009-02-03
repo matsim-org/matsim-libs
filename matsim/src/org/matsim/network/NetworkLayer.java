@@ -428,6 +428,7 @@ public class NetworkLayer extends Layer implements BasicNet<Node, Link> {
 	 * @return all nodes within distance to <code>coord</code>
 	 */
 	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
 	}
 
