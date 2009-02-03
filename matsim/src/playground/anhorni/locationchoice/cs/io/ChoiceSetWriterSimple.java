@@ -42,7 +42,7 @@ public class ChoiceSetWriterSimple extends ChoiceSetWriter {
 					ZHFacility facility = fac_it.next();
 					
 					String chosen;
-					if (facility.getId() == choiceSet.getTrip().getShoppingAct().getFacilityId()) {
+					if (facility.getId().compareTo(choiceSet.getTrip().getShoppingAct().getFacilityId()) == 0) {
 						chosen = "1";
 					}
 					else {
