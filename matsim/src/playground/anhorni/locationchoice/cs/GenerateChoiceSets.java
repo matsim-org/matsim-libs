@@ -188,8 +188,7 @@ public class GenerateChoiceSets {
 		if (this.walkingSpeed > 0.0) {	
 			Iterator<Link> link_it = this.network.getLinks().values().iterator();
 			while (link_it.hasNext()) {		
-				Link link = link_it.next();
-				link.setFreespeed(walkingSpeed);
+				link_it.next().setFreespeed(this.walkingSpeed);
 			}
 		}
 				
