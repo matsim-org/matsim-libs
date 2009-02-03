@@ -173,10 +173,10 @@ public class GenerateChoiceSets {
 			
 			
 			CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
-			compareTripsCar.compare(".input/ttbcar.dat", this.carChoiceSets);
+			compareTripsCar.compare("input/ttbcar.dat", this.carChoiceSets);
 			
 			CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
-			compareTripsWalk.compare(".input/ttwalk.dat", this.walkChoiceSets);
+			compareTripsWalk.compare("input/ttwalk.dat", this.walkChoiceSets);
 				
 		}
 		else {
