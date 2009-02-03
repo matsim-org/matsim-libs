@@ -106,12 +106,25 @@ public class NelsonTripReader {
 				beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
 				beforeShoppingAct.setLink(network.getNearestLink(beforeShoppingCoord));
 				
-				Coord shoppingCoord= new CoordImpl(
-						Double.parseDouble(entries[50].trim()), Double.parseDouble(entries[51].trim()));
-				Act shoppingAct = new Act("shop", shoppingCoord);
 				
-				Link link = network.getNearestLink(shoppingCoord);
-				shoppingAct.setLink(link);
+				Link link = null;
+				ZHFacility chosenZHFacility = null;
+				Iterator<ArrayList<ZHFacility>> fac0_it = this.zhFacilitiesByLink.values().iterator();
+				while (fac0_it.hasNext()) {		
+					ArrayList<ZHFacility> fac_list = fac0_it.next();
+					
+					Iterator<ZHFacility> fac1_it = fac_list.iterator();
+					while (fac1_it.hasNext()) {		
+						ZHFacility facility = fac1_it.next();
+					
+						if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
+							link = network.getLink(facility.getLinkId());
+							chosenZHFacility = facility;
+						}
+					}
+				}
+				Act shoppingAct = new Act("shop", link);
+				shoppingAct.setCoord(link.getCenter());
 				
 				double startTimeShoppingAct = 60.0 * Double.parseDouble(entries[15].trim());
 				shoppingAct.setStartTime(startTimeShoppingAct);
@@ -131,14 +144,7 @@ public class NelsonTripReader {
 				Trip trip = new Trip(tripNr, beforeShoppingAct, shoppingAct, afterShoppingAct);
 				
 				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(trip3ID), trip);
-				
-				Iterator<ZHFacility> fac_it = this.zhFacilitiesByLink.get(link.getId()).iterator();
-				while (fac_it.hasNext()) {		
-					ZHFacility facility = fac_it.next();
-					if (facility.getId().compareTo(new IdImpl(entries[2].trim())) == 0) {
-						choiceSet.setChosenZHFacility(facility);
-					}
-				}
+				choiceSet.setChosenZHFacility(chosenZHFacility);
 				
 				double travelTimeBudget = (startTimeAfterShoppingAct- endTimeBeforeShoppingAct) - (endTimeShoppingAct - startTimeShoppingAct);
 				choiceSet.setTravelTimeBudget(travelTimeBudget);

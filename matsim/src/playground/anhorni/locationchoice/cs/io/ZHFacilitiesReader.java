@@ -63,11 +63,11 @@ public class ZHFacilitiesReader {
 								
 				if (zhFacilitiesByLink.containsKey(closestLink.getId())) {
 					zhFacilitiesByLink.get(closestLink.getId()).add(
-							new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition));
+							new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition, closestLink.getId()));
 				}
 				else {
 					ArrayList<ZHFacility> list = new ArrayList<ZHFacility>();
-					list.add(new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition));
+					list.add(new ZHFacility(new IdImpl(shopID), closestLink.getCenter(), exactPosition, closestLink.getId()));
 					zhFacilitiesByLink.put(
 							closestLink.getId(),list);
 				}	

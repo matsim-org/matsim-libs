@@ -8,12 +8,14 @@ public class ZHFacility  {
 	private Id id = null;
 	private Coord center = null;	
 	private Coord exactPosition = null;
+	private Id linkId;
 	
 	
-	public ZHFacility(final Id id, Coord coord, Coord exactPosition) {
+	public ZHFacility(final Id id, Coord coord, Coord exactPosition, Id linkId) {
 		this.id = id;
 		this.center = coord;
 		this.exactPosition = exactPosition;
+		this.linkId = linkId;
 	}
 
 	public Id getId() {
@@ -42,5 +44,13 @@ public class ZHFacility  {
 
 	public void setExactPosition(Coord exactPosition) {
 		this.exactPosition = exactPosition;
+	}
+
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	public void setLinkId(Id linkId) {
+		this.linkId = linkId;
 	}
 }
