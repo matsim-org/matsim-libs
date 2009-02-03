@@ -24,20 +24,18 @@ import org.matsim.events.BasicEvent;
 
 public class LastEventOfIteration extends BasicEvent {
 
-	public LastEventOfIteration(double time) {
+	public LastEventOfIteration(final double time) {
 		super(time);
 	}
-	
+
 	@Override
 	public String getEventType() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 }
