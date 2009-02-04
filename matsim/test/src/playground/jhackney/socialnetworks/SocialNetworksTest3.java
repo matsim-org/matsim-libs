@@ -1,6 +1,7 @@
 package playground.jhackney.socialnetworks;
 
 import org.matsim.controler.Controler;
+import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 
@@ -48,4 +49,10 @@ public class SocialNetworksTest3 extends MatsimTestCase{
 
 		System.out.println("\nTest Succeeded");
 	}
+	protected void tearDown() throws Exception {
+        super.tearDown();
+        Gbl.reset();
+        // 
+    }
+
 }
