@@ -1,6 +1,7 @@
 package playground.wrashid.deqsim;
 
 import org.matsim.controler.Controler;
+import org.matsim.mobsim.deqsim.DEQSimulation;
 import org.matsim.mobsim.deqsim.util.Timer;
 
 
@@ -10,7 +11,7 @@ public class DESController extends Controler {
 	  }
 
 	protected void runMobSim() {
-		new JavaDEQSim(this.network, this.population, this.events).run();
+		new DEQSimulation(this.network, this.population, this.events).run();
 	}
 
 	public static void main(final String[] args) {

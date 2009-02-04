@@ -18,16 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.deqsim;
+package org.matsim.mobsim.deqsim;
 
 import java.util.HashMap;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.Road;
-import org.matsim.mobsim.deqsim.Scheduler;
-import org.matsim.mobsim.deqsim.SimulationParameters;
-import org.matsim.mobsim.deqsim.Vehicle;
 import org.matsim.mobsim.deqsim.util.Timer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -39,12 +35,12 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
 
-public class JavaDEQSim {
+public class DEQSimulation {
 
 	Population population;
 	NetworkLayer network;
 
-	public JavaDEQSim(final NetworkLayer network, final Population population,
+	public DEQSimulation(final NetworkLayer network, final Population population,
 			final Events events) {
 		// constructor
 
