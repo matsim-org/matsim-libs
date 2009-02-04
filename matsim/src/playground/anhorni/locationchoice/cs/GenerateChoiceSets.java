@@ -68,6 +68,7 @@ public class GenerateChoiceSets {
 	private String readNelson;
 	private String walkCrowFly;
 	private String DEQSim;
+	private String mode;
 	
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
 	
@@ -111,6 +112,7 @@ public class GenerateChoiceSets {
 			this.readNelson = bufferedReader.readLine();
 			this.walkCrowFly = bufferedReader.readLine();
 			this.DEQSim = bufferedReader.readLine();
+			this.mode = bufferedReader.readLine();
 			
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
@@ -123,6 +125,7 @@ public class GenerateChoiceSets {
 			log.info("readNelson: " + this.readNelson);
 			log.info("walkEllipse: " + this.walkCrowFly);
 			log.info("DEQSim : " + this.DEQSim);
+			log.info("mode : " + this.mode);
 
 			bufferedReader.close();
 			fileReader.close();
@@ -218,9 +221,16 @@ public class GenerateChoiceSets {
 		ExtractChoiceSetsRouting listenerWalk = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 					this.walkChoiceSets, "walk", this.walkCrowFly);
 		
+		if (this.mode.equals("car")) {
+			controler.addControlerListener(listenerCar);
+		}
+		else if (this.mode.equals("walk")) {
+			controler.addControlerListener(listenerWalk);
+		}
+		else {
+			log.error("No mode chosen");
+		}
 		
-		controler.addControlerListener(listenerWalk);
-		controler.addControlerListener(listenerCar);
 		
 		log.info("Running controler: ...");
 		controler.run();
