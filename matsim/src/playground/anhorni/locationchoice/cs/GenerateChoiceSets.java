@@ -67,6 +67,7 @@ public class GenerateChoiceSets {
 	private String sampling;
 	private String readNelson;
 	private String walkCrowFly;
+	private String DEQSim;
 	
 	private final static Logger log = Logger.getLogger(GenerateChoiceSets.class);
 	
@@ -109,6 +110,7 @@ public class GenerateChoiceSets {
 			this.sampling = bufferedReader.readLine();
 			this.readNelson = bufferedReader.readLine();
 			this.walkCrowFly = bufferedReader.readLine();
+			this.DEQSim = bufferedReader.readLine();
 			
 			log.info("MATSim config file: " + this.matsimRunConfigFile);
 			log.info("choice set population file: " + this.choiceSetPopulationFile);
@@ -120,6 +122,7 @@ public class GenerateChoiceSets {
 			log.info("Sampling :" + this.sampling);
 			log.info("readNelson: " + this.readNelson);
 			log.info("walkEllipse: " + this.walkCrowFly);
+			log.info("DEQSim : " + this.DEQSim);
 
 			bufferedReader.close();
 			fileReader.close();
@@ -188,10 +191,14 @@ public class GenerateChoiceSets {
 			this.carChoiceSets = this.filter.apply(this.choiceSetPopulation, "car");
 			this.walkChoiceSets = this.filter.apply(this.choiceSetPopulation, "walk");	
 		}
-				
-		// this.controler = new Controler(this.matsimRunConfigFile);
-		String [] args = {this.matsimRunConfigFile};
-		this.controler = new DEQSimControler(args);
+		
+		if (this.DEQSim.equals("true")) {
+			String [] args = {this.matsimRunConfigFile};
+			this.controler = new DEQSimControler(args);
+		}
+		else {
+			this.controler = new Controler(this.matsimRunConfigFile);
+		}		
 		
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.carChoiceSets, "car", "false");
