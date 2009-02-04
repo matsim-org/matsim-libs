@@ -46,7 +46,9 @@ public class ShapeFileWriter {
 
 	public static void writeGeometries(final Collection<Feature> features, final String filename) throws IOException {
 
-		log.info("writing features to: " + filename);
+		// removed log statement as I call the method > 600 times (ah 04.02.2009)
+		//log.info("writing features to: " + filename);
+		
 		URL fileURL = (new File(filename)).toURL();
 		ShapefileDataStore datastore = new ShapefileDataStore(fileURL);
 		Feature feature = features.iterator().next();
@@ -58,6 +60,8 @@ public class ShapeFileWriter {
 		FeatureReader aReader = DataUtilities.reader(features);
 
 		featureStore.addFeatures( aReader);
-		log.info("done");
+		
+		// removed log statement as I call the method > 600 times (ah 04.02.2009)
+		//log.info("done");
 	}
 }
