@@ -22,7 +22,7 @@ import com.vividsolutions.jts.geom.Point;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
-public class CSShapeFileWriter extends ChoiceSetWriter {
+public class CSShapeFileWriter extends CSWriter {
 
 	private final static Logger log = Logger.getLogger(CSShapeFileWriter.class);
 	

@@ -29,12 +29,13 @@ import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.locationchoice.cs.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
-import playground.anhorni.locationchoice.cs.io.ChoiceSetWriter;
+import playground.anhorni.locationchoice.cs.io.CSWriter;
 import playground.anhorni.locationchoice.cs.io.ChoiceSetWriterSimple;
 import playground.anhorni.locationchoice.cs.io.CSShapeFileWriter;
 import playground.anhorni.locationchoice.cs.io.CompareTrips;
 import playground.anhorni.locationchoice.cs.io.NelsonTripReader;
 import playground.anhorni.locationchoice.cs.io.NelsonTripWriter;
+import playground.anhorni.locationchoice.cs.io.TripStats;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesReader;
 import playground.anhorni.locationchoice.cs.io.ZHFacilitiesWriter;
 import playground.balmermi.mz.PlansCreateFromMZ;
@@ -50,7 +51,7 @@ public class GenerateChoiceSets {
 	
 	private List<ChoiceSet> carChoiceSets = null;
 	private List<ChoiceSet> walkChoiceSets = null;
-	private List<ChoiceSetWriter> writers = new Vector<ChoiceSetWriter>();
+	private List<CSWriter> writers = new Vector<CSWriter>();
 	private TripFilter filter;
 	private SampleDrawer sampleDrawer = null;
 	private boolean isSetup = false;
@@ -153,6 +154,11 @@ public class GenerateChoiceSets {
 		this.writers.add(writer);	
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
 		this.writers.add(shpWriter);
+		
+		TripStats tripStats = new TripStats();
+		this.writers.add(tripStats);
+		
+		
 		
 		// sampler
 		SampleDrawer sampleDrawer;
@@ -275,9 +281,9 @@ public class GenerateChoiceSets {
 	}
 						
 	private void output() {			
-		Iterator<ChoiceSetWriter> writer_it = this.writers.iterator();
+		Iterator<CSWriter> writer_it = this.writers.iterator();
 		while (writer_it.hasNext()) {
-			ChoiceSetWriter writer = writer_it.next();
+			CSWriter writer = writer_it.next();
 			if (this.mode.equals("car")) {
 				writer.write(this.outdir, "car", this.carChoiceSets);
 			}
