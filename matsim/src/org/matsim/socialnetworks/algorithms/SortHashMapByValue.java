@@ -9,11 +9,12 @@ import java.util.Set;
 
 public class SortHashMapByValue {
 	
-	private SortHashMapByValue() {
+	public SortHashMapByValue() {
 		// make this a static class, which cannot be instantiated
 	}
 
-	public static LinkedHashMap makeSortedMap (LinkedHashMap m) {
+//	public static LinkedHashMap makeSortedMap (LinkedHashMap m) {
+	public LinkedHashMap makeSortedMap (LinkedHashMap m) {
 		LinkedHashMap sortedMap=new LinkedHashMap();
 		ArrayList outputList = sortMap(m);
 //		int count = 0;

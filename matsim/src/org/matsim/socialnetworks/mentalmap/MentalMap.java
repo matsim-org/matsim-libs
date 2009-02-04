@@ -223,7 +223,9 @@ public class MentalMap {
 
 //			Sort the activities by score so that they can be managed
 
-			LinkedHashMap<Activity, ?> sortedScores = SortHashMapByValue.makeSortedMap(this.activityScore);
+			SortHashMapByValue shmbv = new SortHashMapByValue();
+//			LinkedHashMap<Activity, ?> sortedScores = SortHashMapByValue.makeSortedMap(this.activityScore);
+			LinkedHashMap<Activity, ?> sortedScores = shmbv.makeSortedMap(this.activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act in the current plan. Iterator goes by score.
