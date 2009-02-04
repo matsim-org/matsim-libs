@@ -7,11 +7,11 @@ import org.matsim.utils.CRCChecksum;
 
 import playground.jhackney.controler.SNControllerListener2;
 
-public class SocialNetworksTest2  extends MatsimTestCase{
+public class SocialNetworksTest4 extends MatsimTestCase{
 
-	public final void test2EvolvingNetwork(){
+	public final void test4EvolvingNetwork(){
 
-		String config = getInputDirectory() + "config_triangle2.xml";
+		String config = getInputDirectory() + "config_triangle4.xml";
 
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "output_plans.xml.gz";
@@ -54,4 +54,5 @@ public class SocialNetworksTest2  extends MatsimTestCase{
         Gbl.reset();
         // 
     }
+
 }

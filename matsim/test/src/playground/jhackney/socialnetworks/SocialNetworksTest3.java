@@ -15,15 +15,15 @@ public class SocialNetworksTest3 extends MatsimTestCase{
 
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "output_plans.xml.gz";
-		String referenceSocNetFile = getInputDirectory() + "graph.txt";
+		String referenceSocNetFile = getInputDirectory() + "edge.txt";
 
 		String eventsFile = getOutputDirectory() + "ITERS/it.5/5.events.txt.gz";
 		String plansFile = getOutputDirectory() + "output_plans.xml.gz";
-		String socNetFile = getOutputDirectory() + "socialnets/stats/graph.txt";
+		String socNetFile = getOutputDirectory() + "socialnets/stats/edge.txt";
 
 		final Controler controler = new Controler(new String[] {config});
 		controler.addControlerListener(new SNControllerListener2()); // had to comment this line out because SNControllerListener2 is in the playground, but this class is in core
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 		controler.run();
 
 		long checksum1 = 0;
