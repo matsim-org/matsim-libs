@@ -42,7 +42,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.socialnetworks.algorithms.SortHashtableByValue;
+import org.matsim.socialnetworks.algorithms.SortHashMapByValue;
 import org.matsim.socialnetworks.io.ActivityActReader;
 import org.matsim.world.Location;
 
@@ -223,7 +223,7 @@ public class MentalMap {
 
 //			Sort the activities by score so that they can be managed
 
-			LinkedHashMap<Activity, ?> sortedScores = SortHashtableByValue.makeSortedMap(this.activityScore);
+			LinkedHashMap<Activity, ?> sortedScores = SortHashMapByValue.makeSortedMap(this.activityScore);
 
 			// Remove activities if there are too many, but keep one activity
 			// for each act in the current plan. Iterator goes by score.
