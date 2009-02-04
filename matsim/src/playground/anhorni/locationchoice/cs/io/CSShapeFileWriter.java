@@ -60,7 +60,7 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 				singleFeatures.add(feature);
 			}
 			try {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singleChoiceSets/" + 
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/" + 
 						name + choiceSet.getId()+ "_choiceSet.shp");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -111,7 +111,7 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 			singleFeatures.add(featureAfter);
 			
 			try {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singleTrips/" + name + 
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/" + name + 
 						choiceSet.getId()+"_Trip.shp");
 			} catch (IOException e) {
 				e.printStackTrace();
