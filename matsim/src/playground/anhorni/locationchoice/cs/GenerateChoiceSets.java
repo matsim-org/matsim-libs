@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
@@ -188,7 +189,10 @@ public class GenerateChoiceSets {
 			this.walkChoiceSets = this.filter.apply(this.choiceSetPopulation, "walk");	
 		}
 				
-		this.controler = new Controler(this.matsimRunConfigFile);
+		// this.controler = new Controler(this.matsimRunConfigFile);
+		String [] args = {this.matsimRunConfigFile};
+		this.controler = new DEQSimControler(args);
+		
 		ExtractChoiceSetsRouting listenerCar = new ExtractChoiceSetsRouting(this.controler, this.zhFacilitiesByLink, 
 				this.carChoiceSets, "car", "false");
 		
