@@ -31,6 +31,11 @@ public interface BasicActivity {
 	
 	public BasicLocation getLocation();
 	
+	/**
+	 * FIXME [kai] what is the "frequency"?  kai, feb09
+	 * 
+	 * @return ... what?
+	 */
 	public Integer getFrequency();
 	
 	public void setFrequency(Integer freq);

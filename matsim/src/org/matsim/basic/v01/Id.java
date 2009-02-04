@@ -22,7 +22,8 @@ package org.matsim.basic.v01;
 
 
 /**
- * Represents a unique identifier.
+ * Represents a unique identifier.  This is essentially a c++ typedef, except that
+ * typedefs don't exist in Java.
  */
 public interface Id extends Comparable<Id> {
 

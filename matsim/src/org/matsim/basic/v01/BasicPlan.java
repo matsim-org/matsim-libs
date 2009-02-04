@@ -35,6 +35,11 @@ public interface BasicPlan {
 	 * instead to test if a plan has an undefined score.
 	 */
 	public static final double UNDEF_SCORE = Double.NaN;
+	// TODO [kai] Eigentlich ist Double.NaN besonders fehleranfällig, weil jeder Vergleich falsch ist.  Möglichkeiten
+	// *  -Double.INFINITY
+	// *  -99999999
+	// *  diese Konstante "private" machen
+	// In der jetzigen Form erscheint es mir auf jeden Fall maximal unrobust.  
 
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
 	

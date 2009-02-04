@@ -36,7 +36,11 @@ public class BasicNodeImpl implements BasicNode {
 	 * defined some geographical information (coords). These are defined
 	 * by its from- and to-node. Therefore, the BasicNode MUST have a coordinate
 	 * defined. See also BasicLink. If this is not O.K., then the BasicLink must
-	 * not extend Location. */
+	 * not extend Location. 
+	 * 
+	 * This is an area where a traffic deviates from a generalized network simulation (see, e.g., how repast does it).  
+	 * Not sure what is the reasonable approach.  kai, feb09
+	 * */
 	protected final Coord coord;
 	protected final Id id;
 

@@ -32,6 +32,11 @@ public interface BasicAct {
 
 	public void setEndTime(final double seconds);
 
+	/**
+	 * Activity type is, until further notice, defined via the config file.
+	 * 
+	 * @return
+	 */
 	public String getType();
 
 	public void setType(final String type);
@@ -47,6 +52,7 @@ public interface BasicAct {
 	public Id getLinkId();
 
 	public Id getFacilityId();
+
 	@Deprecated
 	public double getDuration();
 	@Deprecated
