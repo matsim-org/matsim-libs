@@ -39,6 +39,7 @@ public class AllTests {
 		suite.addTest(playground.marcel.AllTests.suite());
 		suite.addTest(playground.meisterk.AllTests.suite());
 		suite.addTest(playground.wrashid.AllTests.suite());
+		suite.addTest(playground.jhackney.socialnetworks.AllTests.suite());
 		
 		//$JUnit-END$
 		return suite;
