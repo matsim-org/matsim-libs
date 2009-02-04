@@ -147,7 +147,10 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 						
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
 				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, travelDist);
-			}	
+			}
+			else if (this.zhFacilitiesByLink.get(linkId).contains(choiceSet.getChosenZHFacility())) {
+				choiceSet.addFacility(choiceSet.getChosenZHFacility(), totalTravelTime, travelDist);
+			}
 		}	
 	}
 	
