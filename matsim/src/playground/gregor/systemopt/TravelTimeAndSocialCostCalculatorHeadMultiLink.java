@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeAndSocialCostCalculatorII.java
+ * TravelTimeAndSocialCostCalculatorHeadMultiLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,9 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentMoneyEvent;
@@ -35,6 +33,7 @@ import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.AgentDepartureEventHandler;
+import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -42,46 +41,42 @@ import org.matsim.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.utils.misc.Time;
 
-
-
-
-public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator implements IterationStartsListener, AfterMobsimListener, AgentDepartureEventHandler{
+public class TravelTimeAndSocialCostCalculatorHeadMultiLink extends TravelTimeCalculator implements IterationStartsListener, AgentDepartureEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
 	private final NetworkLayer network;
+
+	
+	private final HashMap<String,AgentInfo> agentInfos = new HashMap<String, AgentInfo>();
 	private final HashMap<String,LinkInfo> linkInfos = new HashMap<String, LinkInfo>();
 	private final HashMap<String,SocialCostRole> socCosts = new HashMap<String, SocialCostRole>();
-	
-//	private HashSet<String> old = new HashSet<String>();
-//	private HashSet<String> current = new HashSet<String>();
 	
 	private final static int MSA_OFFSET = 20;
 	
 	static double oldCoef = 0;
 	static double newCoef = 1;
 	static int iteration = 0;
-
-	public TravelTimeAndSocialCostCalculator(final NetworkLayer network) {
+	
+	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network) {
 		this(network, 15*60, 30*3600);	// default timeslot-duration: 15 minutes
 	}
 
-	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice) {
+	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice) {
 		this(network, timeslice, 30*3600); // default: 30 hours at most
 	}
 
-	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice,	final int maxTime) {
+	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice,	final int maxTime) {
 		this(network, timeslice, maxTime, new TravelTimeCalculatorFactory());
 	}
 	
-	public TravelTimeAndSocialCostCalculator(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeCalculatorFactory factory) {
+	public TravelTimeAndSocialCostCalculatorHeadMultiLink(final NetworkLayer network, final int timeslice, final int maxTime, final TravelTimeCalculatorFactory factory) {
 		super(network,timeslice,maxTime,factory);
 		this.travelTimeBinSize = timeslice;
 		this.numSlots = (maxTime / this.travelTimeBinSize) + 1;
 		this.network = network;
 
 	}
-
 	public double getSocialCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
@@ -94,6 +89,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		iteration = event.getIteration();
 		this.linkInfos.clear();
+		this.agentInfos.clear();
 		updateSocCosts();
 //		this.socCosts.clear();
 		if (event.getIteration() > MSA_OFFSET) {
@@ -110,30 +106,37 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		}
 	}
 
-	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-//		this.old = this.current;
-//		this.current = new HashSet<String>();
-//		
-//		double time = Gbl.getConfig().simulation().getEndTime();
-//		for (Entry<String, LinkInfo> e : this.linkInfos.entrySet()) {
-//			if (e.getValue().agentsLeftLink.size() > 0) {
-////				applySocCostToRouterOnly(e.getValue(), e.getKey(),time);
-//			}
-//		}
-		
-	}
 	
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		super.handleEvent(event);
 
 		LinkInfo info = getLinkInfo(event.linkId);
-		AgentInfo aol = new AgentInfo();
+		AgentInfo aol = this.agentInfos.get(event.agentId);
+		if (aol == null) {
+			aol = new AgentInfo();
+			this.agentInfos.put(event.agentId, aol);
+		} else if (!info.isCongested || info.storageCap > info.agentsOnLink.size()){ //no spill back from downstream link
+			
+			String oldLinkId = aol.currentLink;
+			LinkInfo oldInfo = this.linkInfos.get(oldLinkId);
+			if (oldInfo.isCongested){
+				AgentInfo oldAol = new AgentInfo();
+				oldAol.id = aol.id;
+				oldAol.enterTime = aol.enterTime;
+				oldAol.exitTime = aol.exitTime;
+				oldInfo.agentsLeftLink.add(oldAol);
+			}
+			
+		}
+		
+		aol.currentLink = event.linkId;
 		aol.enterTime = event.time;
 		aol.id = event.agentId;
 		info.agentsOnLink.add(aol);
 	}
-
+	
+	
 	public void handleEvent(final AgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.linkId);
 		AgentInfo aol = new AgentInfo();
@@ -154,9 +157,10 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 			if (info.agentsLeftLink.size() > 0){
 				computeSocCost(info,event.linkId,event.time);
 			}
+			info.isCongested = false;
 			info.lastFSSlice = getTimeSlotIndex(event.time);
 		} else {
-			info.agentsLeftLink.add(aol);
+			info.isCongested = true;
 		}
 		
 	}
@@ -176,56 +180,11 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 			this.socCosts.put(linkId, sc);
 		}
 		
-//		int lB = Math.max(info.lastFSSlice + 1,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
-		int lB = Math.max(info.lastFSSlice ,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
+		int lB = Math.max(info.lastFSSlice,getTimeSlotIndex(info.agentsLeftLink.peek().enterTime));
 		int uB = getTimeSlotIndex(eventTime) - 1;
-//		int uB = getTimeSlotIndex(eventTime);
-
-//		if (uB < lB) {
-//			info.agentsLeftLink.clear();
-//			return;
-//		}
-		
-//		//compute soc costs
-//		int [][] agents = new int [(uB-lB)+1][2]; 
-//		
-////		ConcurrentLinkedQueue<AgentInfo> ais = new ConcurrentLinkedQueue<AgentInfo>(); 
-//		
-//		for (AgentInfo ai : info.agentsLeftLink) {
-//			int idx = getTimeSlotIndex(ai.enterTime) -lB;
-//			if (idx < 0) {
-//				continue;
-//			}
-//			if (idx > (uB-lB)){
-//				continue;
-////				ais.add(ai);
-//			}
-//				
-//			
-//			try {
-//				agents[idx][0]++;
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			if (this.old.contains(ai.id)){
-//				agents[idx][1]++;
-//			}			
-//			
-//		}
-		
-		
-
-		
-
-
 
 		double socCost = 0;
 		for (int i = uB; i >= lB; i--) {
-//			int idx = i - lB;
-//			double w = (double)agents[idx][1]/agents[idx][0];
-//			if (Double.isNaN(w)) {
-//				w = 0;
-//			}
 			socCost += this.travelTimeBinSize;
 //			sc.setSocCost(i,w * (socCost-this.travelTimeBinSize/2));
 			sc.setSocCost(i, Math.max(0,socCost-this.travelTimeBinSize/2 - info.t_free));
@@ -243,7 +202,8 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 			double cost =  tmp / -600;
 			Id id = new IdImpl(ai.id);
 			AgentMoneyEvent e = new AgentMoneyEvent(eventTime,id,cost);
-			QueueSimulation.getEvents().processEvent(e);	
+			QueueSimulation.getEvents().processEvent(e);
+			
 		}
 		
 		
@@ -262,6 +222,9 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		if (ret == null) {
 			ret = new LinkInfo();
 			ret.t_free = Math.ceil(this.network.getLink(id).getFreespeedTravelTime(Time.UNDEFINED_TIME)); //TODO make this dynamic, since we have time variant networks
+			Link link = this.network.getLink(id);
+			ret.storageCap = calcCapacity(link);
+			
 			this.linkInfos.put(id, ret);
 		}
 		return ret;
@@ -269,7 +232,29 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 
 	
 	
+	private int calcCapacity(final Link link) {
+		if (link.getId().toString().contains("el")){
+			int i = 0;
+			i++;
+		}
+		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
+		double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
+
+//		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
+//		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
+//		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+
+		// first guess at storageCapacity:
+		double storageCapacity = (link.getLength() * link.getLanes(Time.UNDEFINED_TIME))
+				/ ((NetworkLayer) link.getLayer()).getEffectiveCellSize() * storageCapFactor;
+		
+		return (int) Math.floor(storageCapacity);
+	}
+	
+	
 	private static class LinkInfo {
+		public int storageCap;
+		public boolean isCongested = false;
 		ConcurrentLinkedQueue<AgentInfo> agentsOnLink = new ConcurrentLinkedQueue<AgentInfo>();
 		ConcurrentLinkedQueue<AgentInfo> agentsLeftLink = new ConcurrentLinkedQueue<AgentInfo>();
 		double t_free;
@@ -282,6 +267,7 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 		public double exitTime;
 		String id;
 		double enterTime;
+		String currentLink;
 		
 	}
 	
@@ -325,8 +311,6 @@ public class TravelTimeAndSocialCostCalculator extends TravelTimeCalculator impl
 
 
 
-
-
-
+	
+	
 }
-

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SystemOptEvacControler.java
+ * MarginalCostControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,12 +26,11 @@ import org.matsim.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.trafficmonitoring.TravelTimeRoleHashMap;
 
-
-public class SystemOptEvacControler extends EvacuationQSimControler{
-
+public class MarginalCostControler extends EvacuationQSimControler{
 
 
-	public SystemOptEvacControler(final String[] args) {
+
+	public MarginalCostControler(final String[] args) {
 		super(args);
 	}
 
@@ -44,15 +43,15 @@ public class SystemOptEvacControler extends EvacuationQSimControler{
 		factory.setTravelTimeRolePrototype(TravelTimeRoleHashMap.class);
 		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
 		double endTime = this.config.simulation().getEndTime() > 0 ? this.config.simulation().getEndTime() : 30*3600;
-//		SocialCostCalculator sc = new SocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize());
+		SocialCostCalculator sc = new SocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize());
 		
-		TravelTimeAndSocialCostCalculator t = new TravelTimeAndSocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize(),(int)endTime,factory);
-		this.events.removeHandler(this.travelTimeCalculator);
-		this.travelTimeCalculator = t;
-		this.events.addHandler(t);
-		this.travelCostCalculator = new MarginalTravelCostCalculator(t);
+//		TravelTimeAndSocialCostCalculator t = new TravelTimeAndSocialCostCalculator(this.network,this.config.controler().getTraveltimeBinSize(),(int)endTime,factory);
+//		this.events.removeHandler(this.travelTimeCalculator);
+//		this.travelTimeCalculator = t;
+		this.events.addHandler(sc);
+		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);
 		this.strategyManager = loadStrategyManager();
-		this.addControlerListener(t);
+		this.addControlerListener(sc);
 	}
 
 	public static void main(final String[] args) {

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarginalTravelCostCalculator.java
+ * MarginalTravelCostCalculatorII.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,36 +20,27 @@
 
 package playground.gregor.systemopt;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.router.util.TravelCost;
+import org.matsim.trafficmonitoring.TravelTimeCalculator;
 
-
-public class MarginalTravelCostCalculator implements TravelCost {
+public class MarginalTravelCostCalculatorII implements TravelCost {
 
 	
-	
-	private final TravelTimeAndSocialCostCalculator timeCostCalculator;
-	private final double travelCostFactor;
-//	private final SocialCostCalculator sc;
-//	private final TravelTimeCalculator tc;
 
-	public MarginalTravelCostCalculator(final TravelTimeAndSocialCostCalculator t) {
-		this.timeCostCalculator = t;
-//		this.tc = tc;
-//		this.sc = sc;
-		/* Usually, the travel-utility should be negative (it's a disutility)
-		 * but the cost should be positive. Thus negate the utility.
-		 */
-		this.travelCostFactor = -Gbl.getConfig().charyparNagelScoring().getTraveling() / 3600.0;
+
+	private final SocialCostCalculator sc;
+	private final TravelTimeCalculator tc;
+
+	public MarginalTravelCostCalculatorII(final TravelTimeCalculator tc, final SocialCostCalculator sc) {
+		this.tc = tc;
+		this.sc = sc;
 	}
 	
 
 	public double getLinkTravelCost(final Link link, final double time) {
-		double t = this.timeCostCalculator.getLinkTravelTime(link, time);
-		double s = this.timeCostCalculator.getSocialCost(link, time);
-//		double t = this.tc.getLinkTravelTime(link, time);
-//		double s = this.sc.getSocialCost(link, time);
+		double t = this.tc.getLinkTravelTime(link, time);
+		double s = this.sc.getSocialCost(link, time);
 		return t + s;
 	}
 	
