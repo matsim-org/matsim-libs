@@ -7,8 +7,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-
-public class ProcessVehicles {
+/**
+ * @author johanwjoubert
+ */
+public class SplitMainVehicleFile {
 	
 	// main method
 	public static void main( String[] args) throws IOException{
@@ -29,8 +31,8 @@ public class ProcessVehicles {
 			// Write the record to the associated file
 			String outputString = 	inputString[0] + " " + // vehID
 									inputString[1] + " " + // time
-									inputString[2] + " " + // xCoord 
-									inputString[3] + " " + // yCoord 
+									inputString[2] + " " + // xCoord, longitude
+									inputString[3] + " " + // yCoord, latitude 
 									inputString[4] + " " + // status 
 									inputString[5];        // speed
 			output.write(outputString);

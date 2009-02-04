@@ -20,6 +20,7 @@ import java.util.Scanner;
 public class SortVehicleLogs {
 	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/";
 	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted/";
+	final static String DELIMITER = ","; // this could be "," or "\t" 
 
 	public static void main (String args[] ){
 		int progress = 0;
@@ -53,12 +54,12 @@ public class SortVehicleLogs {
 							maxFile = theFile;
 						}
 						
-						writeSortedArray(DESTFOLDER, theFile, sortedArray2);
+						writeSortedArray(DESTFOLDER, theFile, sortedArray2, true);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}	
-				if(++progress%100 == 0){
+				if(++progress%500 == 0){
 					System.out.println(progress + " of " + numFiles + " files sorted.");
 				}
 			}
@@ -89,28 +90,32 @@ public class SortVehicleLogs {
 	}
 
 	private static void writeSortedArray(final String destFolder, File theFile,
-			ArrayList<GPSPoint> sortedArray) throws IOException {
+			ArrayList<GPSPoint> sortedArray, boolean header) throws IOException {
 		BufferedWriter output = new BufferedWriter(
 				new FileWriter(
 						new File(destFolder + "/" + theFile.getName() ) ) );
-		
+		// Write the header, if required, for ArcGIS inclusion
+		if (header){
+			output.write("VehicleID" + DELIMITER + "TIME" + DELIMITER + "LONG" + DELIMITER + "LAT" + DELIMITER + "STATUS" + DELIMITER + "SPEED");
+			output.newLine();
+		}
 		// write all points, except the last, with a newLine
 		for (int i = 0; i <= (sortedArray.size()-2); i++){
-			output.write(sortedArray.get(i).getVehID() + " " + 
-						 sortedArray.get(i).getTime() + " " +
-						 sortedArray.get(i).getX() + " " + 
-						 sortedArray.get(i).getY() + " " +
-						 sortedArray.get(i).getStatus() + " " +
+			output.write(sortedArray.get(i).getVehID() + DELIMITER + 
+						 sortedArray.get(i).getTime() + DELIMITER +
+						 sortedArray.get(i).getX() + DELIMITER + 
+						 sortedArray.get(i).getY() + DELIMITER +
+						 sortedArray.get(i).getStatus() + DELIMITER +
 						 sortedArray.get(i).getSpeed() );
 			output.newLine();
 		}
 		
 		// write the last element
-		output.write(sortedArray.get(sortedArray.size()-1).getVehID() + " " + 
-				 sortedArray.get(sortedArray.size()-1).getTime() + " " +
-				 sortedArray.get(sortedArray.size()-1).getX() + " " + 
-				 sortedArray.get(sortedArray.size()-1).getY() + " " +
-				 sortedArray.get(sortedArray.size()-1).getStatus() + " " +
+		output.write(sortedArray.get(sortedArray.size()-1).getVehID() + DELIMITER + 
+				 sortedArray.get(sortedArray.size()-1).getTime() + DELIMITER +
+				 sortedArray.get(sortedArray.size()-1).getX() + DELIMITER + 
+				 sortedArray.get(sortedArray.size()-1).getY() + DELIMITER +
+				 sortedArray.get(sortedArray.size()-1).getStatus() + DELIMITER +
 				 sortedArray.get(sortedArray.size()-1).getSpeed() );					
 		output.close();
 	}
