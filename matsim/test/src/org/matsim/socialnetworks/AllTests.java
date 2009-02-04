@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for org.matsim.socialnetworks");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(SocialNetworksTest.class);
+		suite.addTestSuite(SocialNetworksTest1.class);
 		//$JUnit-END$
 		return suite;
 	}
