@@ -104,6 +104,8 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
+	
+	private static int firstLastActWarning = 0;
 
 	/* TODO [MR] the following field should not be public, but I need a way to reset the initialized state
 	 * for the test cases.  Once we have the better config-objects, where we do not need to parse the
@@ -414,7 +416,14 @@ public class CharyparNagelScoringFunction implements ScoringFunction {
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
 				if (scoreActs) {
-					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+				    if (firstLastActWarning <= 10) {
+				    	log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+				        if (firstLastActWarning == 10) {
+				            log.warn("Additional warnings of this type are suppressed.");
+				        }
+				        firstLastActWarning++;
+				    }					
+					
 					// score first activity
 					Act firstAct = (Act)this.plan.getActsLegs().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
