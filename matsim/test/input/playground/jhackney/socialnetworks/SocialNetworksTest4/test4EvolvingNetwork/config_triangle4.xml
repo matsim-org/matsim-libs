@@ -1,0 +1,236 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY PROJBASE     ".">
+		<!ENTITY STUDYBASE    "test/scenarios/triangle/complete">
+		<!-- ENTITY STUDYBASE    "input" -->
+		<!ENTITY RUNSBASE     "runs">
+		<!ENTITY OUTPUTBASE   "test/output/playground/jhackney/socialnetworks/SocialNetworksTest4/test4EvolvingNetwork">
+		<!-- ENTITY OUTPUTBASE   "C:/Documents and Settings/jhackney/My Documents/sandbox00/ivt/studies/jhackney/output" -->
+		<!ENTITY INPUTBASE    "input">
+		<!ENTITY ANALYSISBASE "analysis">
+		<!ENTITY LOCALDTDBASE "dtd">
+		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
+	]
+>
+<config xml:lang="de-CH">
+
+<!-- ====================================================================== -->
+<!-- Test Case for random social network generation, friends made face to   -->
+<!-- face meetall, io, statistics, scoring, random link removal,            -->
+<!-- and secondary relocation.                         -->
+<!-- Use playground.jhackney.controler.SNControler2 as main                 -->
+<!-- ====================================================================== -->
+
+	<module name="config">
+		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="localDTDBase" value="&LOCALDTDBASE;/" />
+		<param name="numberOfThreads" value = "1" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="world">
+		<param name="inputWorldFile" value="&STUDYBASE;/world.xml" />
+		<param name="outputWorldFile" value="&OUTPUTBASE;/output_world.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
+		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml" />
+	</module> <!-- network -->
+
+<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities.xml" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml" />
+		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml" />
+		<param name="outputVersion" value="v4" />
+		<param name="outputSample" value="1.00" />
+		<param name="switchOffPlansStreaming" value="yes" />
+	</module> <!-- plans -->
+	
+<!-- ====================================================================== -->
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	 
+		<!-- capdivider gets multiplied with this value: If you use only a percentage of vehicles flow cap must be modified by this to get reasonable behaviour -->
+		<param name = "flowCapacityFactor"	value = "0.01"/>
+		<param name = "storageCapacityFactor"	value = "1.0"/>
+
+		<!-- "stuckTime" after how many seconds in buffer shall we call a vehicle stuck -->
+		<param name="stuckTime" value="100" />
+		<param name="removeStuckVehicles" value="no" />
+	</module> <!-- simulation -->
+
+<!-- ====================================================================== -->
+	<module name="strategy">
+		<!-- how many plans agents maintain in memory during an iteration where the agent creates a new plan -->
+		<!-- it may contain 1 more than this number of plans, but the excess will be deleted at the next iter. (worst plan is deleted) -->
+		<!-- size of 0 means unlimited (except by memory!) -->
+		<param name="maxAgentPlanMemorySize" value="3" />
+			
+		<!-- Add Modules here, Probability values get all summed up and normalized to 1.0 -->
+				<param name="Module_1" value="SelectExpBeta" />
+				<param name="ModuleProbability_1" value="0.7" />
+				<param name="Module_2" value="ReRoute" />
+				<param name="ModuleProbability_2" value="0.1" />
+				<param name="Module_3" value="TimeAllocationMutator7200_ReRouteLandmarks" />
+				<param name="ModuleProbability_3" value="0.1" />
+				<param name="Module_4" value="KSecLoc" />
+				<param name="ModuleProbability_4" value="0.1" />
+		</module> <!-- strategy -->	
+	
+<!-- ====================================================================== -->
+	<module name="planCalcScore">
+		<!-- learningRate (lR): used for score-averaging: score = lR*newScore + (1-lR)*oldScore -->
+		<param name="learningRate" value="1.0" />
+	
+		<param name="BrainExpBeta" value="2.0" />
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<!-- Activity types and their parameters 
+		 The only required parameters are:
+	
+		      * activityType_# (must be unique as well)
+		      * activityPriority_#
+		      * activityTypicalDuration_#
+	
+		     The rest are optional.
+		     
+		?? superceded by Factivities ?? -->	
+		
+		<param name="activityType_0"            value="home" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />	
+		
+		<param name="activityType_1"            value="work" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+			
+		<param name="activityType_2"            value="education" /> <!-- edu -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="06:00:00" />
+		<param name="activityMinimalDuration_2" value="04:00:00" />
+		<param name="activityOpeningTime_2"     value="07:00:00" />
+		<param name="activityLatestStartTime_2" value="09:00:00" />
+		<param name="activityEarliestEndTime_2" value="" />
+		<param name="activityClosingTime_2"     value="18:00:00" />
+			
+		<param name="activityType_3"            value="shop" /> <!-- shop -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="02:00:00" />
+		<param name="activityMinimalDuration_3" value="01:00:00" />
+		<param name="activityOpeningTime_3"     value="08:00:00" />
+		<param name="activityLatestStartTime_3" value="" />
+		<param name="activityEarliestEndTime_3" value="" />
+		<param name="activityClosingTime_3"     value="20:00:00" />
+	
+		<param name="activityType_4"            value="leisure" /> <!-- leisure -->
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="02:00:00" />
+		<param name="activityMinimalDuration_4" value="01:00:00" />
+		<param name="activityOpeningTime_4"     value="06:00:00" />
+		<param name="activityLatestStartTime_4" value="" />
+		<param name="activityEarliestEndTime_4" value="" />
+		<param name="activityClosingTime_4"     value="24:00:00" />
+	</module>
+<!-- ====================================================================== -->
+
+	<module name="controler">
+		<param name="outputDirectory" value="&OUTPUTBASE;" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="5" />
+	</module>
+<!-- ====================================================================== -->
+
+	<module name="socialnetwork" >
+		
+		<!-- How many replanning iterations occur before letting agents socially interact again -->
+		<param name="replanning_interval" value="1" />
+		<param name="reporting_interval" value="1" />
+
+		<!-- OUTPUT DIRECTORY -->
+		<param name="outputDirSocialNets" value="&OUTPUTBASE;/socialnets" />
+		
+		<!-- INITIALIZE THE SOCIAL TIES -->
+		<param name="socnetalgorithm" value="random" />
+		<param name="kbar" value="12" />
+		<param name="edge_type" value="UNDIRECTED" />
+		<param name="inputSocNetDir" value="&INPUTBASE;/socialnets" />
+		<param name="inputIter" value = "0" />
+		<param name="euclid_alpha" value ="-1.5" />
+		<param name="euclid_rmin" value ="1000" />
+		
+		<!-- SOCIAL NETWORK DYNAMICS -->
+		<param name="socnetlinkremovalage" value="0" />
+		<param name="socnetlinkremovalalgorithm" value="random" />
+		<param name="socnetlinkremovalp" value="0.05" />
+		<param name="socnetlinkstrengthalgorithm" value="constant" />
+		
+		<param name="prob_befriend" value="1." />
+		<param name="degree_saturation_rate" value="-.5" />		
+		
+		<!-- INFORMATION EXCHANGES IN SOCIAL SPACE -->
+		<param name="factype_ns" value="home,leisure,shop,education,work" />
+		<param name="fract_introduce_friends" value="0" />
+		<param name="fract_ns_interact" value="1.0" />
+		<param name="num_ns_interactions" value="1" />
+		<param name="memSize" value="0" />
+		
+		<!-- INFORMATION EXCHANGES IN GEOGRAPHICAL SPACE-->
+		<param name="spatial_interactor_type" value="meetall" />
+		<param name="s_weights" value="1.,1.,1.,1.,1." />
+		<param name="act_types" value="home,work,shop,education,leisure" />
+
+		<!-- SCORING -->
+		<param name="betafriendfoe" value = "0" />
+		<param name="betanfriends" value = "0" />
+		<param name="betalognfriends" value = "10" />
+		<param name="betatimewithfriends" value = "0" />
+		
+		<!-- REPLANNING -->
+		<param name="switch_weights" value=".0,.0,1.0,.0,1.0" />
+
+	</module>
+
+
+
+<!-- ====================================================================== -->
+	<module name="kml21">
+		<param name="outputDirectory" value ="&OUTPUTBASE;" />
+		<param name="outputEgoNetPlansKMLMainFile" value="egoNetKML" />
+		<param name="outputKMLDemoColoredLinkFile" value="egoNetLinkColorFile" />
+		<param name="useCompression" value="true" />
+	</module>
+<!-- ====================================================================== -->
+
+</config>
