@@ -78,29 +78,9 @@ public class CompareTrips {
 							wmittel = entries[30].trim();
 							ausmittel = entries[17].trim();
 						}
-						String wmittelOut;
-						String ausmittelOut;
-						if (wmittel.equals("9")) {
-							wmittelOut = "car";
-						}
-						else if (wmittel.equals("15")) {
-							wmittelOut = "walk";
-						}
-						else {
-							wmittelOut = wmittel;
-						}
-						if (ausmittel.equals("6")) {
-							ausmittelOut = "car";
-						}
-						else if (ausmittel.equals("10")) {
-							ausmittelOut = "walk";
-						}
-						else {
-							ausmittelOut = ausmittel;
-						}
-
-						String followingTrip = String.valueOf(Integer.parseInt(tripId) + 1);
-						MZTrip followingTripMZ = this.mzTrips.get(new IdImpl(followingTrip)); 
+						String wmittelOut = this.getWmittel(wmittel);
+						String ausmittelOut = this.getAusmittel(ausmittel);
+						MZTrip followingTripMZ = this.getNextTrip(tripId); 
 						
 						out.write(tripId + "\t" + "0" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
 								followingTripMZ.getWmittel() + "\t" + followingTripMZ.getAusmittel());
@@ -113,8 +93,13 @@ public class CompareTrips {
 				while (choiceSet_it.hasNext()) {
 					ChoiceSet choiceSet = choiceSet_it.next();					
 					if (!inChoiceSetList.contains(choiceSet.getId().toString())) {
-						out.write(choiceSet.getId().toString() + "\t" + "1" + "\t" + this.mode +"\t" + "?" +"\t" +
-								this.mode +"\t" + "?");
+						
+						String wmittelOut = this.mzTrips.get(choiceSet.getId()).getWmittel();
+						String ausmittelOut = this.mzTrips.get(choiceSet.getId()).getAusmittel();
+						MZTrip followingTripMZ = this.getNextTrip(choiceSet.getId().toString()); 
+						
+						out.write(choiceSet.getId().toString() + "\t" + "1" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
+								followingTripMZ.getWmittel() +"\t" + followingTripMZ.getAusmittel());
 						out.newLine();
 					}
 				}	
@@ -128,8 +113,6 @@ public class CompareTrips {
 				Gbl.errorMsg(e);
 		}
 	}
-	
-	
 	
 	private void read0(String file, String mode) {
 		
@@ -161,38 +144,50 @@ public class CompareTrips {
 					
 				MZTrip mzTrip = new MZTrip(id, coord, startTime, endTime);
 				
-				String wmittelIn = entries[53].trim();
-				String wmittel;
-				if (wmittelIn.equals("15")) {
-					wmittel = "walk";
-				}
-				else if (wmittelIn.equals("9")) {
-					wmittel = "car";
-				}
-				else {
-					wmittel = wmittelIn;
-				}
-				mzTrip.setWmittel(wmittel);
+				String wmittel = entries[53].trim();
+				mzTrip.setWmittel(this.getWmittel(wmittel));
 				
-				String ausmittelIn = entries[59].trim();
-				String ausmittel;
-				if (ausmittelIn.equals("10")) {
-					ausmittel = "walk";
-				}
-				else if (ausmittelIn.equals("6")) {
-					ausmittel = "car";
-				}
-				else {
-					ausmittel = ausmittelIn;
-				}
-				mzTrip.setAusmittel(ausmittel);
-				
-				
+				String ausmittel = entries[59].trim();
+				mzTrip.setAusmittel(this.getAusmittel(ausmittel));
+							
 				this.mzTrips.put(id, mzTrip);
 			}
 		} catch (IOException e) {
 				Gbl.errorMsg(e);
 		}
+	}
+	
+	private String getWmittel(String inString) {
+		
+		String outString = inString;
+		if (inString.equals("9")) {
+			outString = "car";
+		}
+		else if (inString.equals("15")) {
+			outString = "walk";
+		}
+		else if (inString.equals("14")){
+			outString = "bike";
+		}
+		return outString;
+	}
+	
+	
+	private String getAusmittel(String inString) {
+		
+		String outString = inString;
+		if (inString.equals("6")) {
+			outString = "car";
+		}
+		else if (inString.equals("10")) {
+			outString = "walk";
+		}
+		return outString;
+	}
+	
+	private MZTrip getNextTrip(String tripId) {
+		String followingTrip = String.valueOf(Integer.parseInt(tripId) + 1);
+		return this.mzTrips.get(new IdImpl(followingTrip)); 
 	}
 	
 }
