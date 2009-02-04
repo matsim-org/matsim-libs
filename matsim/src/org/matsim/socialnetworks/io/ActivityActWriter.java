@@ -1,16 +1,14 @@
 package org.matsim.socialnetworks.io;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.matsim.facilities.Activity;
-import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
-import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
@@ -36,7 +34,8 @@ public class ActivityActWriter {
 		try{
 			out = new BufferedWriter(new FileWriter(outFileName));
 			out.write("iter id facilityid acttype");
-			out.newLine();
+			out.write("\r\n");
+//			out.newLine();
 
 		}catch (IOException ex ){
 			ex.printStackTrace();

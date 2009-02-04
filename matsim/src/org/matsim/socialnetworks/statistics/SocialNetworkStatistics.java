@@ -225,7 +225,8 @@ public class SocialNetworkStatistics {
 							+ pFrom.getId() + " " + pTo.getId() + " "
 							+ myEdge.getUserDatum("type") + " "
 							+ myEdge.getUserDatum("visitNum"));
-					eout.newLine();
+					eout.write("\r\n");
+//					eout.newLine();
 					eout.flush();
 				} catch (IOException ex) {
 				}
@@ -234,7 +235,8 @@ public class SocialNetworkStatistics {
 		try {
 			gout.write(" " + smDD.average() + " " + smDur.average() + " "
 					+ smNum.average() / (iter));
-			gout.newLine();
+			gout.write("\r\n");
+//			gout.newLine();
 			gout.flush();
 		} catch (IOException ex) {
 		}
