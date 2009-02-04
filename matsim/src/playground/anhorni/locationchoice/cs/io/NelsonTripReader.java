@@ -148,7 +148,11 @@ public class NelsonTripReader {
 				
 				double travelTimeBudget = (startTimeAfterShoppingAct- endTimeBeforeShoppingAct) - (endTimeShoppingAct - startTimeShoppingAct);
 				choiceSet.setTravelTimeBudget(travelTimeBudget);
-				this.choiceSets.add(choiceSet);			
+				
+				// filter trips 55534012 and 56751011 (fehlende Geodaten)
+				if (!(trip3ID.equals("55534012") || trip3ID.equals("56751011"))) {
+					this.choiceSets.add(choiceSet);		
+				}
 			}
 			bufferedReader.close();
 			fileReader.close();
