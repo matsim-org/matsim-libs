@@ -40,7 +40,7 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		}				
 		this.writeChoiceSets(outdir, name, choiceSets);		
 	}
-	
+		
 	public void writeChoiceSets(String outdir, String name, List<ChoiceSet> choiceSets) {
 				
 		this.initGeometries();
@@ -70,7 +70,10 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 	private void writeTrips(String outdir, String name, List<ChoiceSet> choiceSets) {
 	
 		this.initGeometries();
-		ArrayList<Feature> features = new ArrayList<Feature>();			
+		ArrayList<Feature> featuresBefore = new ArrayList<Feature>();
+		ArrayList<Feature> featuresShop = new ArrayList<Feature>();
+		ArrayList<Feature> featuresAfter = new ArrayList<Feature>();
+		
 		Iterator<ChoiceSet> choiceSets_it = choiceSets.iterator();
 		while (choiceSets_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets_it.next();
@@ -79,27 +82,31 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
 			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getId(), choiceSet.getTrip().getTripNr());
-			features.add(featureBefore);
+			featuresBefore.add(featureBefore);
 			
 			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
 			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId(), choiceSet.getTrip().getTripNr());
-			features.add(featureShopping);
+			featuresShop.add(featureShopping);
 			
-			/*
+			
 			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
 			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId(), choiceSet.getTrip().getTripNr());
-			features.add(featureAfter);
-			*/
-			
-			
+			featuresAfter.add(featureAfter);
+				
 		}			
 		try {
-			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/" + name + "_Trips.shp");
+			if (!featuresBefore.isEmpty()) {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripBeforeLocations.shp");
+			}
+			if (!featuresShop.isEmpty()) {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
+			}
+			if (!featuresAfter.isEmpty()) {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripAfterLocations.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -109,7 +116,7 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 	private void initGeometries() {
 		AttributeType [] attr = new AttributeType[3];
 		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
-		attr[1] = AttributeTypeFactory.newAttributeType("PERSON_ID", String.class);
+		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attr[2] = AttributeTypeFactory.newAttributeType("TRIP_NR", String.class);
 		
 		try {
