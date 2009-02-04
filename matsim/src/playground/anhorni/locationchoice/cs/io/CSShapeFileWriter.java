@@ -54,7 +54,7 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 			for (int i = 0; i < facilities.size(); i++) {
 				Coord coord = new CoordImpl(facilities.get(i).getCenter().getX(), facilities.get(i).getCenter().getY());
 				
-				Feature feature = this.createFeature(coord, choiceSet.getId(), choiceSet.getTrip().getTripNr());
+				Feature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);
 			}
 		}
@@ -81,20 +81,20 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 			Coord coordBefore = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
-			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getId(), choiceSet.getTrip().getTripNr());
+			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getId());
 			featuresBefore.add(featureBefore);
 			
 			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
-			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId(), choiceSet.getTrip().getTripNr());
+			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId());
 			featuresShop.add(featureShopping);
 			
 			
 			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
-			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId(), choiceSet.getTrip().getTripNr());
+			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId());
 			featuresAfter.add(featureAfter);
 				
 		}			
@@ -114,10 +114,9 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 	}
 	
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[3];
+		AttributeType [] attr = new AttributeType[2];
 		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
 		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attr[2] = AttributeTypeFactory.newAttributeType("TRIP_NR", String.class);
 		
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
@@ -126,12 +125,12 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		}
 	}
 	
-	private Feature createFeature(Coord coord, Id id, Integer tripNr) {
+	private Feature createFeature(Coord coord, Id id) {
 		
 		Feature feature = null;
 		
 		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString(), tripNr.toString()});
+			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString()});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
