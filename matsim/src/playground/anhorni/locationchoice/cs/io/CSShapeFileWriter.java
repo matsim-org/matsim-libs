@@ -46,17 +46,26 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		this.initGeometries();
 		ArrayList<Feature> features = new ArrayList<Feature>();	
 		
-		Iterator<ChoiceSet> facilities_it = choiceSets.iterator();
-		while (facilities_it.hasNext()) {
-			ChoiceSet choiceSet = facilities_it.next();
+		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
+		while (choiceSet_it.hasNext()) {
+			ChoiceSet choiceSet = choiceSet_it.next();
 			ArrayList<ZHFacility> facilities = choiceSet.getFacilities();
 			
+			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
 			for (int i = 0; i < facilities.size(); i++) {
 				Coord coord = new CoordImpl(facilities.get(i).getCenter().getX(), facilities.get(i).getCenter().getY());
 				
 				Feature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);
+				singleFeatures.add(feature);
 			}
+			try {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singleChoiceSets/" + 
+						name + choiceSet.getId()+ "_choiceSet.shp");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 		}
 		try {
 			if (!features.isEmpty()) {
@@ -78,25 +87,35 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		while (choiceSets_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets_it.next();
 			
+			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
+			
 			Coord coordBefore = new CoordImpl(choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY());
 			
 			Feature featureBefore = this.createFeature(coordBefore, choiceSet.getId());
 			featuresBefore.add(featureBefore);
+			singleFeatures.add(featureBefore);
 			
 			Coord coordShopping = new CoordImpl(choiceSet.getTrip().getShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getShoppingAct().getCoord().getY());
 			
 			Feature featureShopping = this.createFeature(coordShopping, choiceSet.getId());
 			featuresShop.add(featureShopping);
-			
+			singleFeatures.add(featureShopping);
 			
 			Coord coordAfter = new CoordImpl(choiceSet.getTrip().getAfterShoppingAct().getCoord().getX(), 
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().getY());
 			
 			Feature featureAfter = this.createFeature(coordAfter, choiceSet.getId());
 			featuresAfter.add(featureAfter);
-				
+			singleFeatures.add(featureAfter);
+			
+			try {
+				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singleTrips/" + name + 
+						choiceSet.getId()+"_Trip.shp");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}		
 		}			
 		try {
 			if (!featuresBefore.isEmpty()) {
