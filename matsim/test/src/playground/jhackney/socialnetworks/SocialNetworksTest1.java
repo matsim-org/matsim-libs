@@ -9,11 +9,7 @@ import playground.jhackney.controler.SNControllerListener2;
 //import playground.jhackney.controler.SNControllerListener2;
 
 public class SocialNetworksTest1 extends MatsimTestCase{
-//	protected void setUp() throws Exception {
-//		super.setUp();
-//		QueueNetwork.setSimulateAllLinks(true);
-//		QueueNetwork.setSimulateAllNodes(true);
-//	}
+
 	public final void test1EvolvingNetwork(){
 		String config = getInputDirectory() + "config_triangle1.xml";
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";

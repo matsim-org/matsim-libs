@@ -7,11 +7,7 @@ import org.matsim.utils.CRCChecksum;
 import playground.jhackney.controler.SNControllerListener2;
 
 public class SocialNetworksTest3 extends MatsimTestCase{
-//	protected void setUp() throws Exception {
-//		super.setUp();
-//		QueueNetwork.setSimulateAllLinks(true);
-//		QueueNetwork.setSimulateAllNodes(true);
-//	}
+
 	public final void test3EvolvingNetwork(){
 
 		String config = getInputDirectory() + "config_triangle3.xml";
