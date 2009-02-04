@@ -1,6 +1,6 @@
 package playground.wrashid.DES.utils;
 
-import playground.wrashid.DES.Message;
+import org.matsim.mobsim.deqsim.Message;
 
 public class DummyMessage extends Message {
 

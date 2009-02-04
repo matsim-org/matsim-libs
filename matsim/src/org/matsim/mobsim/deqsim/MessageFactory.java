@@ -17,17 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import java.util.LinkedList;
 
 public class MessageFactory {
 
-	protected static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
-	protected static LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
-	protected static LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
-	protected static LinkedList<LeaveRoadMessage> leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
-	protected static LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
+	public static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
+	public static LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
+	public static LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
+	public static LinkedList<LeaveRoadMessage> leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
+	public static LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
 	private static LinkedList<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
 

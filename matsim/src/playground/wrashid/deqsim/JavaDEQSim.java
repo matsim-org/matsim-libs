@@ -21,13 +21,14 @@
 package playground.wrashid.deqsim;
 
 import java.util.HashMap;
-import java.util.concurrent.BrokenBarrierException;
 
 import org.matsim.events.Events;
-import org.matsim.events.parallelEventsHandler.LastEventOfIteration;
-import org.matsim.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.events.parallelEventsHandler.ProcessEventThread;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.deqsim.Road;
+import org.matsim.mobsim.deqsim.Scheduler;
+import org.matsim.mobsim.deqsim.SimulationParameters;
+import org.matsim.mobsim.deqsim.Vehicle;
+import org.matsim.mobsim.deqsim.util.Timer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 
@@ -37,11 +38,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
-import playground.wrashid.DES.Road;
-import playground.wrashid.DES.Scheduler;
-import playground.wrashid.DES.SimulationParameters;
-import playground.wrashid.DES.Vehicle;
-import playground.wrashid.DES.util.Timer;
 
 public class JavaDEQSim {
 
@@ -61,12 +57,6 @@ public class JavaDEQSim {
 		// the thread for processing the events
 		SimulationParameters.processEventThread= events;
 
-		// start iteration
-		// TODO: remove this when in core, because it is already in controller
-		// this is now in the controler
-		//SimulationParameters.processEventThread.initProcessing();
-		
-		
 		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
 				.getParam("simulation", "stuckTime"));
 		SimulationParameters.flowCapacityFactor = Double.parseDouble(Gbl
@@ -118,12 +108,6 @@ public class JavaDEQSim {
 		}
 
 		scheduler.startSimulation();
-
-		// the main thread (microsimulation) is finished - await the event processing
-		// TODO: remove this after integration into core
-		// this is now in the controler
-		// if this is removed, the tests do not work anymore
-		//SimulationParameters.processEventThread.finishProcessing();
 		
 		
 		t.endTimer();

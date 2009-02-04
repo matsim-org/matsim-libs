@@ -1,9 +1,9 @@
 package playground.wrashid.PDES3;
 
+import org.matsim.mobsim.deqsim.Road;
+import org.matsim.mobsim.deqsim.Scheduler;
 import org.matsim.network.Link;
 
-import playground.wrashid.DES.Road;
-import playground.wrashid.DES.Scheduler;
 
 public class NormalRoad extends Road {
 

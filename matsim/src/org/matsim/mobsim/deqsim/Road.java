@@ -17,10 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import java.util.LinkedList;
-
 import org.matsim.network.Link;
 
 public class Road extends SimUnit {

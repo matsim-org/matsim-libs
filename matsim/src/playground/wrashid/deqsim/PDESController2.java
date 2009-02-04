@@ -1,8 +1,8 @@
 package playground.wrashid.deqsim;
 
 import org.matsim.controler.Controler;
+import org.matsim.mobsim.deqsim.util.Timer;
 
-import playground.wrashid.DES.util.Timer;
 
 public class PDESController2 extends Controler {
 	public PDESController2(final String[] args) {

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 public abstract class Message implements Comparable<Message> {
 

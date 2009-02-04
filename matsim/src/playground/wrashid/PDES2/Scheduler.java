@@ -11,11 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.matsim.mobsim.deqsim.util.Timer;
 import org.matsim.network.Link;
 
 import org.matsim.gbl.Gbl;
 
-import playground.wrashid.DES.util.Timer;
 
 public class Scheduler {
 	private double simTime=0;

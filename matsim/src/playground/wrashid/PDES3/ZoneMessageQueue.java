@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import playground.wrashid.DES.Message;
+import org.matsim.mobsim.deqsim.Message;
+
 
 public class ZoneMessageQueue {
 

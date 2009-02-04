@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.deqsim.util.Timer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
@@ -37,7 +38,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.routes.CarRoute;
 
-import playground.wrashid.DES.util.Timer;
 import playground.wrashid.PDES2.Road;
 import playground.wrashid.PDES2.Scheduler;
 import playground.wrashid.PDES2.SimulationParameters;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import java.util.ArrayList;
 

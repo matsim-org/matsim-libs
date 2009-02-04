@@ -20,6 +20,9 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.mobsim.deqsim.SimulationParameters;
+import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
+import org.matsim.mobsim.deqsim.util.testable.TestHandler;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -27,9 +30,6 @@ import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.DES.SimulationParameters;
-import playground.wrashid.DES.util.testable.PopulationModifier;
-import playground.wrashid.DES.util.testable.TestHandler;
 import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.deqsim.PDESStarter2;
 

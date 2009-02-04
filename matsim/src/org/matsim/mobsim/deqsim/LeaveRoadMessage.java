@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkLeaveEvent;

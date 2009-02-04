@@ -17,54 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
-import org.matsim.basic.v01.BasicLeg;
-import org.matsim.events.ActEndEvent;
-import org.matsim.events.AgentDepartureEvent;
+import org.matsim.events.AgentWait2LinkEvent;
 import org.matsim.events.BasicEvent;
+import org.matsim.events.LinkEnterEvent;
 
-public class StartingLegMessage extends EventMessage {
-
-	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_DEPARTUARE_MESSAGE;
-	}
+public class EnterRoadMessage extends EventMessage {
 
 	@Override
 	public void handleMessage() {
-		// if current leg is in car mode, then enter request in first road
-		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
-					.toString());
-			road.enterRequest(vehicle,getMessageArrivalTime());
-		} else {
-			// move to first link in next leg and schedule an end leg message
-			vehicle.moveToFirstLinkInNextLeg();
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
-					.toString());
+		// enter the next road
+		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+		road.enterRoad(vehicle, getMessageArrivalTime());
+	}
 
-			vehicle.scheduleEndLegMessage(getMessageArrivalTime()
-					+ vehicle.getCurrentLeg().getTravelTime(), road);
-		}
+	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
+		super(scheduler, vehicle);
+		priority = SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
 	public void processEvent() {
 		BasicEvent event = null;
 
-		// schedule ActEndEvent
-		event = new ActEndEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
-				.getId().toString(), vehicle.getPreviousActivity().getType());
-		SimulationParameters.processEventThread.processEvent(event);
-		
-		// schedule AgentDepartureEvent
-		event = new AgentDepartureEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
-				.getId().toString(), vehicle.getLegIndex() - 1);
+		// the first EnterLink in a leg is a Wait2LinkEvent
+		if (vehicle.getLinkIndex() == -1) {
+			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(),
+					vehicle.getOwnerPerson().getId().toString(), vehicle
+							.getCurrentLink().getId().toString(), vehicle
+							.getLegIndex() - 1);
+		} else {
 
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
+					.getOwnerPerson().getId().toString(), vehicle
+					.getCurrentLink().getId().toString(),
+					vehicle.getLegIndex() - 1);
+		}
 		SimulationParameters.processEventThread.processEvent(event);
-		
 	}
 
 }

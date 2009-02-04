@@ -17,55 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
-import org.matsim.gbl.Gbl;
+public class DeadlockPreventionMessage extends EventMessage {
 
-public class Scheduler {
-	private double simTime = 0;
-	private MessageQueue queue = new MessageQueue();
-	private double simulationStartTime = System.currentTimeMillis();
-	private double hourlyLogTime = 3600;
-
-	public void schedule(Message m) {
-		queue.putMessage(m);
+	@Override
+	// let enter the car into the road immediatly
+	public void handleMessage() {
+		
+		Road road=(Road)this.getReceivingUnit();
+		
+		road.incrementPromisedToEnterRoad(); // this will be decremented in enter road
+		road.setTimeOfLastEnteringVehicle(getMessageArrivalTime());
+		road.removeFirstDeadlockPreventionMessage(this);
+		road.removeFromInterestedInEnteringRoad();
+		
+		vehicle.scheduleEnterRoadMessage(getMessageArrivalTime(), road);
 	}
 
-	public void unschedule(Message m) {
-		queue.removeMessage(m);
+
+
+	public DeadlockPreventionMessage(Scheduler scheduler,Vehicle vehicle) {
+		super(scheduler,vehicle);
 	}
-
-	public void startSimulation() {
-		Message m;
-		while (!queue.isEmpty()
-				&& simTime < SimulationParameters.maxSimulationLength) {
-			m = queue.getNextMessage();
-			if (m!=null){
-				simTime = m.getMessageArrivalTime();
-				m.processEvent();
-				m.handleMessage();
-			}
-			printLog();
-		}
-	}
-
-	public double getSimTime() {
-		return simTime;
-	}
-
-	private void printLog() {
-
-		// print output each hour
-		if (simTime / hourlyLogTime > 1) {
-			hourlyLogTime = simTime + 3600;
-			System.out.print("Simulation at " + simTime / 3600 + "[h]; ");
-			System.out
-					.println("s/r:"
-							+ simTime
-							/ (System.currentTimeMillis() - simulationStartTime)
-							* 1000);
-			Gbl.printMemoryUsage();
-		}
+	
+	public void processEvent() {
+		// don't do anything
 	}
 
 }

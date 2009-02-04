@@ -1,8 +1,8 @@
 package playground.wrashid.DES.utils;
 
-import playground.wrashid.DES.Message;
-import playground.wrashid.DES.Scheduler;
-import playground.wrashid.DES.SimUnit;
+import org.matsim.mobsim.deqsim.Message;
+import org.matsim.mobsim.deqsim.Scheduler;
+import org.matsim.mobsim.deqsim.SimUnit;
 
 public class DummySimUnit extends SimUnit{
 

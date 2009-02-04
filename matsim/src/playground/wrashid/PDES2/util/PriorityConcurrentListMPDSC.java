@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
+import org.matsim.mobsim.deqsim.util.Timer;
 
-import playground.wrashid.DES.util.Timer;
 import playground.wrashid.deqsim.PDESStarter2;
 // optimized for multiple producer, single consumer
 // the producer decides, when the his inputBuffer should be emptied

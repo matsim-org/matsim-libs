@@ -2,12 +2,13 @@ package playground.wrashid.oldtests;
 
 import java.util.ArrayList;
 
+import org.matsim.mobsim.deqsim.EventLog;
+import org.matsim.mobsim.deqsim.SimulationParameters;
+
 import junit.framework.TestCase;
 
 
 
-import playground.wrashid.DES.EventLog;
-import playground.wrashid.DES.SimulationParameters;
 import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 import playground.wrashid.tryouts.starting.PCppEventFileParser;

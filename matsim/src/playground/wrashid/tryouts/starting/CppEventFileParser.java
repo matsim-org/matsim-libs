@@ -16,9 +16,9 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.PersonEvent;
+import org.matsim.mobsim.deqsim.EventLog;
+import org.matsim.mobsim.deqsim.SimulationParameters;
 
-import playground.wrashid.DES.EventLog;
-import playground.wrashid.DES.SimulationParameters;
 
 
 public class CppEventFileParser {

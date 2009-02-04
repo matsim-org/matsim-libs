@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.events.PersonEvent;
+import org.matsim.mobsim.deqsim.EventLog;
 
-import playground.wrashid.DES.EventLog;
 import playground.wrashid.DES.util.EventLibrary;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 

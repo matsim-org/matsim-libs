@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import java.util.HashMap;
 import org.matsim.events.Events;
-import playground.wrashid.DES.util.testable.PopulationModifier;
-import playground.wrashid.DES.util.testable.TestHandler;
+import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
+import org.matsim.mobsim.deqsim.util.testable.TestHandler;
+
 
 public class SimulationParameters {
 

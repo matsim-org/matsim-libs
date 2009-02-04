@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * JavaDEQSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim.util;
 
-import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.BasicEvent;
-import org.matsim.events.LinkEnterEvent;
+public class Timer {
+	private long startTime = 0;
+	private long endTime = 0;
 
-public class EnterRoadMessage extends EventMessage {
-
-	@Override
-	public void handleMessage() {
-		// enter the next road
-		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
-		road.enterRoad(vehicle, getMessageArrivalTime());
+	public void startTimer() {
+		startTime = System.currentTimeMillis();
 	}
 
-	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
+	public void endTimer() {
+		endTime = System.currentTimeMillis();
 	}
 
-	public void processEvent() {
-		BasicEvent event = null;
-
-		// the first EnterLink in a leg is a Wait2LinkEvent
-		if (vehicle.getLinkIndex() == -1) {
-			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(),
-					vehicle.getOwnerPerson().getId().toString(), vehicle
-							.getCurrentLink().getId().toString(), vehicle
-							.getLegIndex() - 1);
-		} else {
-
-			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
-					.getOwnerPerson().getId().toString(), vehicle
-					.getCurrentLink().getId().toString(),
-					vehicle.getLegIndex() - 1);
-		}
-		SimulationParameters.processEventThread.processEvent(event);
+	public void resetTimer() {
+		startTime = 0;
+		endTime = 0;
 	}
 
+	public long getMeasuredTime() {
+		return endTime - startTime;
+	}
+
+	public void printMeasuredTime(String label) {
+		System.out.println(label + getMeasuredTime());
+	}
 }

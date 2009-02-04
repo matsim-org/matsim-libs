@@ -5,8 +5,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import playground.wrashid.DES.Message;
-import playground.wrashid.DES.SimulationParameters;
+import org.matsim.mobsim.deqsim.Message;
+import org.matsim.mobsim.deqsim.SimulationParameters;
+
 import playground.wrashid.PDES2.SelfhandleMessage;
 
 public class MessageExecutor extends Thread {

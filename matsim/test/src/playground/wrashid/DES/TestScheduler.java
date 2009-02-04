@@ -1,5 +1,8 @@
 package playground.wrashid.DES;
 
+import org.matsim.mobsim.deqsim.Message;
+import org.matsim.mobsim.deqsim.Scheduler;
+import org.matsim.mobsim.deqsim.SimUnit;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.DES.utils.DummyMessage;

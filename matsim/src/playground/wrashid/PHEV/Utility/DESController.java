@@ -2,9 +2,9 @@ package playground.wrashid.PHEV.Utility;
 
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
+import org.matsim.mobsim.deqsim.util.Timer;
 
 
-import playground.wrashid.DES.util.Timer;
 import playground.wrashid.deqsim.JavaDEQSim;
 
 class DESController extends Controler {

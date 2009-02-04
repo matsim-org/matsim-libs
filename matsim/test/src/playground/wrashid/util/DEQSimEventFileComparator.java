@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import org.matsim.events.ActEndEvent;
 import org.matsim.events.ActStartEvent;
 import org.matsim.events.PersonEvent;
+import org.matsim.mobsim.deqsim.EventLog;
 
-import playground.wrashid.DES.EventLog;
 import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class DEQSimEventFileComparator extends TestHandlerDetailedEventChecker {

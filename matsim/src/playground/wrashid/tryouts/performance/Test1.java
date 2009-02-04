@@ -1,6 +1,6 @@
 package playground.wrashid.tryouts.performance;
 
-import playground.wrashid.DES.util.Timer;
+import org.matsim.mobsim.deqsim.util.Timer;
 
 public class Test1 {
 

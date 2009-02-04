@@ -2,12 +2,12 @@ package playground.wrashid.scenarios;
 
 import java.util.ArrayList;
 
+import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 
-import playground.wrashid.DES.util.testable.PopulationModifier;
 
 public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 

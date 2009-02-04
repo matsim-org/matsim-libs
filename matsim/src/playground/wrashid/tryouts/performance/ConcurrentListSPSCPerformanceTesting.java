@@ -3,8 +3,8 @@ package playground.wrashid.tryouts.performance;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.events.parallelEventsHandler.ConcurrentListSPSC;
+import org.matsim.mobsim.deqsim.util.Timer;
 
-import playground.wrashid.DES.util.Timer;
 
 public class ConcurrentListSPSCPerformanceTesting {
 	// this experiment effectivly demonstrates, why reimplement

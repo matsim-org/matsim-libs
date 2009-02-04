@@ -1,6 +1,16 @@
 package playground.wrashid.DES;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.mobsim.deqsim.DeadlockPreventionMessage;
+import org.matsim.mobsim.deqsim.EndLegMessage;
+import org.matsim.mobsim.deqsim.EndRoadMessage;
+import org.matsim.mobsim.deqsim.EnterRoadMessage;
+import org.matsim.mobsim.deqsim.LeaveRoadMessage;
+import org.matsim.mobsim.deqsim.MessageFactory;
+import org.matsim.mobsim.deqsim.Scheduler;
+import org.matsim.mobsim.deqsim.SimulationParameters;
+import org.matsim.mobsim.deqsim.StartingLegMessage;
+import org.matsim.mobsim.deqsim.Vehicle;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
