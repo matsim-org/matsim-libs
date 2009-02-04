@@ -60,8 +60,13 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 				singleFeatures.add(feature);
 			}
 			try {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/" + 
+				if (!singleFeatures.isEmpty()) {
+					ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singlechoicesets/" + 
 						name + choiceSet.getId()+ "_choiceSet.shp");
+				}
+				else {
+					log.error("Empty choice set: " + choiceSet.getId());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -111,8 +116,13 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 			singleFeatures.add(featureAfter);
 			
 			try {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/" + name + 
+				if (!singleFeatures.isEmpty()) {
+					ShapeFileWriter.writeGeometries((Collection<Feature>)singleFeatures, outdir +"/shapefiles/singletrips/" + name + 
 						choiceSet.getId()+"_Trip.shp");
+				}
+				else {
+					log.error("Empty trip : " + choiceSet.getId());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		

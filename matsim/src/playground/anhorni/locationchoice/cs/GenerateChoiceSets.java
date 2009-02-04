@@ -146,8 +146,8 @@ public class GenerateChoiceSets {
 		
 		//writers
 		new File(this.outdir +"shapefiles").mkdir();
-		//new File(this.outdir +"shapefiles/singleTrips").mkdir();
-		//new File(this.outdir +"shapefiles/singleChoiceSets").mkdir();
+		new File(this.outdir +"shapefiles/singleTrips").mkdir();
+		new File(this.outdir +"shapefiles/singleChoiceSets").mkdir();
 		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple();
 		this.writers.add(writer);	
@@ -236,10 +236,12 @@ public class GenerateChoiceSets {
 		
 		log.info("Running controler: ...");
 		controler.run();
-					
+		
+		/*
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
 		shpWriter.writeChoiceSets(this.outdir, "carBeforeSampling", this.carChoiceSets);
 		shpWriter.writeChoiceSets(this.outdir, "walkBeforeSampling", this.walkChoiceSets);
+		*/
 		
 		// sample the choice sets
 		
