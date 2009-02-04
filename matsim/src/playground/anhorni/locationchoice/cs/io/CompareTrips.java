@@ -182,6 +182,15 @@ public class CompareTrips {
 		else if (inString.equals("10")) {
 			outString = "walk";
 		}
+		else if (inString.equals("2")) {
+			outString = "train";
+		}
+		else if (inString.equals("4")) {
+			outString = "Tram";
+		}
+		else if (inString.equals("-97")) {
+			outString = "unvollständiger Ausgang";
+		}
 		return outString;
 	}
 	
