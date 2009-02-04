@@ -25,6 +25,7 @@ package org.matsim.interfaces.basic.v01;
 public interface BasicIncome {
 	
 	public enum IncomePeriod {year, month, day, hour, second};
+	// TODO [kai] Dann gerne auch noch "week".
 
 	public String getCurrency();
 	

@@ -33,6 +33,7 @@ public interface BasicHousehold {
 	public List<Id> getMemberIds();
 	
 	public BasicLocation getBasicLocation();
+	// TODO: Nicht "getLocation"??
 	
 	public BasicIncome getIncome();
 	
