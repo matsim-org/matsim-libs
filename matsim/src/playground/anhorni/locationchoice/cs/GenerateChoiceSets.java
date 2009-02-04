@@ -146,8 +146,8 @@ public class GenerateChoiceSets {
 		
 		//writers
 		new File(this.outdir +"shapefiles").mkdir();
-		new File(this.outdir +"shapefiles/singleTrips").mkdir();
-		new File(this.outdir +"shapefiles/singleChoiceSets").mkdir();
+		new File(this.outdir +"shapefiles/singletrips").mkdir();
+		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
 		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple();
 		this.writers.add(writer);	
@@ -278,8 +278,12 @@ public class GenerateChoiceSets {
 		Iterator<ChoiceSetWriter> writer_it = this.writers.iterator();
 		while (writer_it.hasNext()) {
 			ChoiceSetWriter writer = writer_it.next();
-			writer.write(this.outdir, "car", this.carChoiceSets);
-			writer.write(this.outdir, "walk", this.walkChoiceSets);
+			if (this.mode.equals("car")) {
+				writer.write(this.outdir, "car", this.carChoiceSets);
+			}
+			else if (this.mode.equals("walk")) {
+				writer.write(this.outdir, "walk", this.walkChoiceSets);
+			}	
 		}
 	}
 	
