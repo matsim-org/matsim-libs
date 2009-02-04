@@ -29,12 +29,14 @@ public abstract class ChoiceSetExtractor {
 
 		SpanningTree spanningTree = new SpanningTree(this.controler.getLinkTravelTimes(), this.controler.getTravelCostCalculator());
 		String type ="s";
-			
+		
+		int index = 0;
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();										
 			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler);
-			log.info("Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
+			log.info(index + "Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
+			index++;
 		}		
 	}
 		
