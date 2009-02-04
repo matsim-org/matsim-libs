@@ -35,7 +35,7 @@ public abstract class ChoiceSetExtractor {
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();										
 			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler);
-			log.info(index + "Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
+			log.info(index + ": Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
 			index++;
 		}		
 	}
