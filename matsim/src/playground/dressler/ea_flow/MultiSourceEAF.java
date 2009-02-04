@@ -85,9 +85,14 @@ public class MultiSourceEAF {
 		new MatsimPopulationReader(population,network).readFile(filename);
 		network.connect();
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
+		
 		for(Person person : population.getPersons().values() ){
+			
 			Plan plan = person.getPlans().get(0);
-			plan.getFirstActivity();
+			if(plan.getFirstActivity().getLinkId()==null){
+				continue;
+			}
+			
 			Node node = network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
@@ -113,23 +118,25 @@ public class MultiSourceEAF {
 		 //read network
 		 NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-		 networkReader.readFile("/Users/manuel/Documents/meine_EA/manu/manu2.xml");
+		 //networkReader.readFile("/Users/manuel/Documents/meine_EA/manu/manu2.xml");
 		//networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
+		networkReader.readFile("/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml");
 		
 		 //read demands 
 		 HashMap<Node, Integer> demands;
 		 try {
-				demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu/manu2.dem");
-			} catch (IOException e) {
+				//demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu/manu2.dem");
+				demands = readPopulation(network, "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz");
+			} catch (Exception e) {
 				e.printStackTrace();
 				return;
 			}
-
+			
 		//set parameters
-		int timeHorizon = 90;
-		Node sink = network.getNode("5");
+		int timeHorizon = 2000000;
+		Node sink = network.getNode("en2");
 		TimeExpandedPath result = null;
-		int rounds = 2000;
+		int rounds = 1000;
 		
 		//check if demands and sink are set 
 		if (demands.isEmpty() || sink == null) {
@@ -141,7 +148,7 @@ public class MultiSourceEAF {
 			//Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
 			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
-			BellmanFordVertexIntervalls.debug(true);
+			BellmanFordVertexIntervalls.debug(false);
 			for (int i=0; i<rounds; i++){
 				result = routingAlgo.doCalculations();
 				if (result==null){
@@ -149,15 +156,15 @@ public class MultiSourceEAF {
 				}
 				System.out.println("TimeExpandedPath: " +  result);
 				fluss.augment(result);
-				System.out.println(fluss);
+				//System.out.println(fluss);
 			}
 			System.out.println(fluss.arrivalsToString());
 			System.out.println(fluss.arrivalPatternToString());
 		}
-		System.out.println("demands:");
+		/*System.out.println("demands:");
 		for (Node node : demands.keySet()){
 			System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
-		}
+		}*/
    	    System.out.println("... immer noch!\n");
 	}
 

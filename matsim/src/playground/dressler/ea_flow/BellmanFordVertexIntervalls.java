@@ -229,6 +229,9 @@ public class BellmanFordVertexIntervalls {
 				if(_debug){
 					System.out.println("wir kommen los:"+ from.getId());
 				}	//TODO cast to int capacity handling!!!
+				if((int)over.getCapacity(1.)==0){
+					continue;
+				}
 				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
 				if(!arrive.isEmpty()){
 					if(_debug){
@@ -243,8 +246,11 @@ public class BellmanFordVertexIntervalls {
 						changed = true;
 					}
 				}else{
-					System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
+					if(_debug){
+						System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
+					}	
 				}
+					
 			}
 		}while(!labelfrom.isLast(i));
 		return changed;
@@ -293,8 +299,8 @@ public class BellmanFordVertexIntervalls {
 				printStatus();
 			}
 		}
-		System.out.println("finale labels: \n");
-		printStatus();
+		//System.out.println("finale labels: \n");
+		//printStatus();
 		TimeExpandedPath TimeExpandedPath = null;
 		try{ 
 			TimeExpandedPath = constructRoute();
