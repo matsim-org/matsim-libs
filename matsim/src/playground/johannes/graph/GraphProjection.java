@@ -65,7 +65,7 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 	public void decorate() {
 		
 		for(Vertex v : delegate.getVertices()) {
-			vMapping.put((V)v, addVertex((V)v));
+			addVertex((V) v);
 		}
 		
 		for(Edge e : delegate.getEdges()) {
@@ -124,17 +124,25 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 	 *         projection of vertex <tt>delegate</tt>.
 	 */
 	public VertexDecorator<V> addVertex(V delegate) {
-		if (getVertex(delegate) == null) {
+//		if (getVertex(delegate) == null) {
 			VertexDecorator<V> v = new VertexDecorator<V>(delegate);
-			if (insertVertex(v))
-				return v;
-			else
-				return null;
-		} else {
-			return null;
-		}
+			return addVertex(v);
+//		} else {
+//			return null;
+//		}
 	}
 	
+	protected VertexDecorator<V> addVertex(VertexDecorator<V> v) {
+		if (getVertex(v.getDelegate()) == null) {
+			if (insertVertex(v)) {
+				vMapping.put(v.getDelegate(), v);
+				return v;
+			} else
+				return null;
+		} else
+			return null;
+	}
+
 	/**
 	 * @see {@link Graph#getEdges()}.
 	 */

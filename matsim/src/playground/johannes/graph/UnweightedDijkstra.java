@@ -187,10 +187,7 @@ public class UnweightedDijkstra<V extends Vertex> {
 		@Override
 		public VertexDecorator<V> addVertex(V delegate) {
 			VertexDecorator<V> v = new DijkstraVertex(delegate);
-			if(insertVertex(v))
-				return v;
-			else 
-				return null;
+			return addVertex(v);
 		}
 
 		/**

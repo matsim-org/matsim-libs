@@ -70,12 +70,23 @@ public class GraphAnalyser {
 		double numComponents = GraphStatistics.getComponents(g).size();
 		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
 		
-		GraphDistance gDistance = GraphStatistics.getCentrality(g);
-		logger.info(String.format("Betweenness centrality is %1$s.", gDistance.getGraphBetweenness()));
-		logger.info(String.format("Normalized betweenness centrality is %1$s.", gDistance.getGraphBetweennessNormalized()));
-		logger.info(String.format("Closeness centrality is %1$s.", gDistance.getGraphCloseness()));
-		logger.info(String.format("Diameter is %1$s.", gDistance.getDiameter()));
-		logger.info(String.format("Radius is %1$s.", gDistance.getRadius()));
+		boolean extended = false;
+		for(String arg : args) {
+			if(arg.equalsIgnoreCase("-e")) {
+				extended = true;
+				break;
+			}
+		}
+		
+		GraphDistance gDistance = new GraphStatistics.GraphDistance();
+		if(extended) {
+			gDistance = GraphStatistics.getCentrality(g);
+			logger.info(String.format("Betweenness centrality is %1$s.", gDistance.getGraphBetweenness()));
+			logger.info(String.format("Normalized betweenness centrality is %1$s.", gDistance.getGraphBetweennessNormalized()));
+			logger.info(String.format("Closeness centrality is %1$s.", gDistance.getGraphCloseness()));
+			logger.info(String.format("Diameter is %1$s.", gDistance.getDiameter()));
+			logger.info(String.format("Radius is %1$s.", gDistance.getRadius()));
+		}
 		
 		if(args.length > 1) {
 			BufferedWriter writer = IOUtils.getBufferedWriter(args[1]);

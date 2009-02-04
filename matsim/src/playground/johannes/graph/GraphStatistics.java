@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.matsim.utils.collections.Tuple;
 
 import playground.johannes.statistics.WeightedStatistics;
 
@@ -124,8 +125,12 @@ public class GraphStatistics {
 			} else {
 				int edgecount = 0;
 				Set<Vertex> n1s = new HashSet<Vertex>(v.getNeighbours());
-				for(Vertex n1 : v.getNeighbours()) {
-					for(Vertex n2 : n1.getNeighbours()) {
+				int n_Neighbours1 = v.getNeighbours().size();
+				for(int i1 = 0; i1 < n_Neighbours1; i1++) {
+					Vertex n1 = v.getNeighbours().get(i1);
+					int n_Neighbours2 = n1.getNeighbours().size();
+					for(int i2 = 0; i2 < n_Neighbours2; i2++) {
+						Vertex n2 = n1.getNeighbours().get(i2);
 						if (n2 != v) {
 							if (n1s.contains(n2))
 								edgecount++;
@@ -173,8 +178,12 @@ public class GraphStatistics {
 		for (Vertex v : g.getVertices()) {
 			List<? extends Vertex> n1List = v.getNeighbours();
 			Set<Vertex> n2Set = new HashSet<Vertex>();
-			for (Vertex n1 : n1List) {
-				for (Vertex n2 : n1.getNeighbours()) {
+			int n_Neighbours1 = n1List.size();
+			for(int i1 = 0; i1 < n_Neighbours1; i1++) {
+				Vertex n1 = n1List.get(i1);
+				int n_Neighbours2 = n1.getNeighbours().size();
+				for(int i2 = 0; i2 < n_Neighbours2; i2++) {
+					Vertex n2 = n1.getNeighbours().get(i2);
 					if (n2 != v && !n1List.contains(n2)) {
 						n2Set.add(n2);
 						len2Paths++;
@@ -234,6 +243,10 @@ public class GraphStatistics {
 					if(o1 == o2)
 						return 0;
 					else
+						/*
+						 * Does not work for empty collections, but is
+						 * ok for the purpose here.
+						 */
 						return o2.hashCode() - o1.hashCode();
 				} else
 					return result;
@@ -243,13 +256,58 @@ public class GraphStatistics {
 		Vertex v;
 		while((v = vertices.poll()) != null) {
 			List<? extends VertexDecorator<Vertex>> component = dijkstra.run(v);
+			Set<Vertex> componentPlain = new HashSet<Vertex>();
 			int cnt = component.size();
-			for(int i = 0; i < cnt; i++)
+			for(int i = 0; i < cnt; i++) {
 				vertices.remove(component.get(i).getDelegate());
-			components.add(new HashSet<Vertex>(component));
+				componentPlain.add(component.get(i).getDelegate());
+			}
+			componentPlain.add(v);
+			components.add(new HashSet<Vertex>(componentPlain));
 		}
 		
 		return components;
+	}
+	
+	public static SortedSet<Graph> getSubGraphs(Graph g) {
+		SortedSet<Graph> subGraphs = new TreeSet<Graph>(new Comparator<Graph>() {
+			public int compare(Graph g1, Graph g2) {
+				int result = g2.getVertices().size() - g1.getVertices().size();
+				if(result == 0) {
+					if(g1 == g2)
+						return 0;
+					else
+						return g2.hashCode() - g1.hashCode();
+				} else
+					return result;
+			}
+		});
+	
+		SortedSet<Set<Vertex>> components = getComponents(g);
+		for(Set<Vertex> component : components) {
+			GraphProjection<Graph, Vertex, Edge> proj = new GraphProjection<Graph, Vertex, Edge>(g);
+			/*
+			 * Add all vertices...
+			 */
+			for(Vertex v : component)
+				proj.addVertex(v);
+			
+			/*
+			 * Loop through all vertices and add edges...
+			 */
+			for(Vertex v : component) {
+				int n = v.getEdges().size();
+				for(int i = 0; i < n; i++) {
+					Edge e = v.getEdges().get(i);
+					Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
+					proj.addEdge(proj.getVertex(p.getFirst()), proj.getVertex(p.getSecond()), e);
+				}
+			}
+			
+			subGraphs.add(proj);
+		}
+		
+		return subGraphs;
 	}
 	
 	/**
@@ -354,10 +412,11 @@ public class GraphStatistics {
 		@Override
 		public VertexDecorator<V> addVertex(V delegate) {
 			VertexDecorator<V> v = new CentralityVertex<V>(delegate);
-			if(insertVertex(v))
-				return v;
-			else
-				return null;
+//			if(insertVertex(v))
+//				return v;
+//			else
+//				return null;
+			return addVertex(v);
 		}
 
 		@SuppressWarnings("unchecked")

@@ -25,7 +25,6 @@ package playground.johannes.snowball;
 
 import java.util.List;
 
-import playground.johannes.ArraySet;
 import playground.johannes.graph.SparseVertex;
 import playground.johannes.graph.VertexDecorator;
 

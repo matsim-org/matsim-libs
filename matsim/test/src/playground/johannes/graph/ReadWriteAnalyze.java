@@ -54,7 +54,7 @@ public class ReadWriteAnalyze extends MatsimTestCase {
 	
 	private static final double DEGREECORRELATION = 0.4700814025944884;
 	
-	private static final int NUM_COMPONENTS = 17;
+	private static final int NUM_COMPONENTS = 156;
 	
 	private static final double CLOSENESS = 4.2462339222975505;
 	

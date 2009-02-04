@@ -23,12 +23,19 @@
  */
 package playground.johannes.graph.generators;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Graph;
+import playground.johannes.graph.GraphStatistics;
+import playground.johannes.graph.PlainGraph;
+import playground.johannes.graph.SparseEdge;
+import playground.johannes.graph.SparseVertex;
 import playground.johannes.graph.Vertex;
+import playground.johannes.graph.io.GraphMLWriter;
 
 /**
  * @author illenberger
@@ -59,5 +66,26 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		}
 
 		return g;
+	}
+	
+	public static void main(String args[]) throws FileNotFoundException, IOException {
+		int N = Integer.parseInt(args[1]);
+		double p = Double.parseDouble(args[2]);
+		long seed = (long)(Math.random() * 1000);
+		if(args.length > 3)
+			seed = Long.parseLong(args[3]);
+		
+		ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<PlainGraph, SparseVertex, SparseEdge>(new PlainGraphFactory());
+		Graph g = generator.generate(N, p, seed);
+		
+		for(String arg : args) {
+			if(arg.equalsIgnoreCase("-e")) {
+				g = GraphStatistics.getSubGraphs(g).first();
+				break;
+			}
+		}
+		
+		GraphMLWriter writer = new GraphMLWriter();
+		writer.write(g, args[0]);
 	}
 }

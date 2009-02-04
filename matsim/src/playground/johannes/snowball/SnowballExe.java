@@ -62,6 +62,8 @@ public class SnowballExe {
 	
 	private int maxNumSamples;
 	
+	private boolean useEstimator2;
+	
 	private static final String DEGREE_KEY = "degree";
 	
 	private static final String CLUSTERING_KEY = "clustering";
@@ -100,6 +102,7 @@ public class SnowballExe {
 		exe.randomSeed = config.global().getRandomSeed();
 		exe.maxSamplingFraction = Double.parseDouble(config.getParam(MODULE_NAME, "maxSamplingFraction"));
 		exe.maxNumSamples = Integer.parseInt(config.getParam(MODULE_NAME, "maxNumSamples"));
+		exe.useEstimator2 = Boolean.parseBoolean(config.findParam(MODULE_NAME, "useEstimator2"));
 		
 		String str = config.getParam(MODULE_NAME, "statistics");
 		String[] tokens = str.split(",");
@@ -122,6 +125,7 @@ public class SnowballExe {
 		 */
 		Sampler sampler = new Sampler(graph, randomSeed);
 		sampler.setResponseRate(responseRate);
+		sampler.setUseEstimator2(useEstimator2);
 		/*
 		 * (3) Draw initial respondents...
 		 */

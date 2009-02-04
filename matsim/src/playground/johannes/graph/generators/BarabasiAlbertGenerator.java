@@ -29,20 +29,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import playground.johannes.graph.Edge;
 import playground.johannes.graph.Graph;
-import playground.johannes.graph.GraphStatistics;
 import playground.johannes.graph.PlainGraph;
 import playground.johannes.graph.SparseEdge;
 import playground.johannes.graph.SparseVertex;
 import playground.johannes.graph.Vertex;
-import playground.johannes.statistics.WeightedStatistics;
+import playground.johannes.graph.io.GraphMLWriter;
 
 /**
  * @author illenberger
  *
  */
 public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extends Edge> {
+	
+	public static final Logger logger = Logger.getLogger(BarabasiAlbertGenerator.class);
 
 	private GraphFactory<G, V, E> factory;
 	
@@ -50,13 +53,13 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		this.factory = factory;
 	}
 	
-	public Graph genertate(int m_0, int m, int t, long randomSeed) {
+	public Graph generate(int m_0, int m, int t, long randomSeed) {
 		if(m_0 < 1)
 			throw new IllegalArgumentException("Number of initial nodes (m_0) must be m_0 >= 2!");
 		if(m > m_0)
 			throw new IllegalArgumentException("Number of edges to attach per time step (m) must not be greater the number of initial nodes (m_0)!");
 		
-		Random random = new Random();
+		Random random = new Random(randomSeed);
 		/*
 		 * Initialize graph.
 		 */
@@ -124,10 +127,16 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 	}
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException {
+		int m_0 = Integer.parseInt(args[1]);
+		int m = Integer.parseInt(args[2]);
+		int t = Integer.parseInt(args[3]);
+		long seed = (long)(Math.random() * 1000);
+		if(args.length > 4)
+			seed = Long.parseLong(args[4]);
+		
 		BarabasiAlbertGenerator<PlainGraph, SparseVertex, SparseEdge> generator = new BarabasiAlbertGenerator<PlainGraph, SparseVertex, SparseEdge>(new PlainGraphFactory());
-		Graph g = generator.genertate(10, 3, 1000, 0);
-		WeightedStatistics stats = GraphStatistics.getDegreeDistribution(g);
-		System.out.println("Graph has " + g.getVertices().size() + " vertices, " + g.getEdges().size() + " edges. <k> = " + GraphStatistics.getDegreeStatistics(g).getMean());
-		WeightedStatistics.writeHistogram(stats.absoluteDistribution(), "/Users/fearonni/Desktop/hist.txt");
+		Graph g = generator.generate(m_0, m, t, seed);
+		GraphMLWriter writer = new GraphMLWriter();
+		writer.write(g, args[0]);
 	}
 }

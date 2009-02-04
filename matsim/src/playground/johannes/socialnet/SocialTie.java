@@ -38,11 +38,11 @@ public class SocialTie extends SparseEdge {
 	
 	private int lastUsed;
 	
-	protected SocialTie(Ego v1, Ego v2) {
+	protected SocialTie(Ego<?> v1, Ego<?> v2) {
 		this(v1, v2, 0);
 	}
 	
-	protected SocialTie(Ego v1, Ego v2, int created) {
+	protected SocialTie(Ego<?> v1, Ego<?> v2, int created) {
 		super(v1, v2);
 		this.created = created;
 		usage = new TIntArrayList();
