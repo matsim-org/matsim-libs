@@ -122,7 +122,9 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 						final String azimuth = result[14];
 						//String type = result[7];
 						final ExtendedPositionInfo position = new ExtendedPositionInfo(new IdImpl(agent), easting, northing,
-								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, Integer.parseInt(result[7]), Integer.parseInt(result[15]));
+								Double.parseDouble(elevation), Double.parseDouble(azimuth), Double.parseDouble(speed), PositionInfo.VehicleState.Driving, 
+								Integer.parseInt(result[7]), 
+								Integer.parseInt(result[15]));
 						addVehicle(Double.parseDouble(time), position);
 					}
 				}
@@ -187,7 +189,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer{
 		final String vehFileName = "../outputs/output/colorizedT.veh.txt.gz";
 //		
 //		String vehFileName = "../runs/run301/output/100.T.veh.gz";
-		final String outFileName = "../outputs/output/ITERS/it.0/0.movie.mvi";
+		final String outFileName = "../outputs/output/ITERS/it.200/200.movie.mvi";
 		final int intervall_s = 60;
 
 		Gbl.createConfig(null);

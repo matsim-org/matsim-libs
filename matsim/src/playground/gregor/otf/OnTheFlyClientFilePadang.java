@@ -1,5 +1,6 @@
 package playground.gregor.otf;
 
+import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 
@@ -133,7 +134,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/testPadabang1.4.mvi"; //Flooding.mvi";
 //		final String filename =  CVSROOT + "/runs/run314/output/ITERS/it.100/100.movie.mvi";
 //		final String filename =  CVSROOT + "/runs/run313/output/ITERS/it.201/201.movie.mvi";
-		final String filename =  "../outputs/output/ITERS/it.0/0.movie.mvi";
+		final String filename =  "../outputs/output/ITERS/it.200/200.movie.mvi";
 		
 //		String filename = "./jam/jam.mvi";
 		
@@ -169,16 +170,16 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		
 //		OTFOGLDrawer.linkWidth =2;
 		
-//		Gbl.createConfig(null);
-//		final OTFVisConfig conf = new OTFVisConfig();
-////		conf.setLinkWidth(10);
-//		Gbl.getConfig().addModule("otfvis", conf);
-//		
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
-//		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(false);
+		Gbl.createConfig(null);
+		final OTFVisConfig conf = new OTFVisConfig();
+//		conf.setLinkWidth(10);
+		Gbl.getConfig().addModule("otfvis", conf);
+		
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50,255));
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setAgentSize(200.f);
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawTime(true);
+		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setDrawOverlays(false);
 		
 		
 		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);

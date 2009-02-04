@@ -68,10 +68,16 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //	}
 
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (event.linkId.contains("el")) {
+		if (event.linkId.contains("shelter")) {
+			this.destNodeMapping.put(event.agentId,event.linkId.replace("shelter", ""));
+		} else if (event.linkId.contains("rev_el")) {
+			this.destNodeMapping.put(event.agentId,event.linkId.replace("rev_el", ""));
+		} else if (event.linkId.contains("el")) {
 			this.destNodeMapping.put(event.agentId,event.linkId.replace("el", ""));
+		}  else if (event.linkId.contains("rev_")) {
+			this.destNodeMapping.put(event.agentId,event.linkId.replace("rev_", ""));
 		}
-		
+
 		
 		
 	}

@@ -28,6 +28,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.utils.geometry.geotools.MGC;
+import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -40,13 +42,13 @@ public class GeoTransformation {
 
 
 	public static void main(final String [] args) throws Exception {
-		final String filename = "F:\\Pieter Fourie\\workspace\\matsim\\southafrica\\GP_Input_shapes\\gt_str_h.shp";
+		final String filename = "../inputs/padang/network_v20080618/shelters.shp";
 		final FeatureSource fs = ShapeFileReader.readDataFile(filename);
 	    final String SourceWKT = fs.getSchema().getDefaultGeometry().getCoordinateSystem().toString();
 	    System.out.println("Source WKT:\n" + SourceWKT);
 	    final CoordinateReferenceSystem sourceCRS = CRS.parseWKT(SourceWKT);
-	    System.out.println("Target WKT:\n" + WGS84_UTM34S);
-	    final CoordinateReferenceSystem targetCRS = CRS.parseWKT( WGS84_UTM34S);
+//	    System.out.println("Target WKT:\n" + WGS84_UTM34S);
+	    final CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
 
 	    final MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		final Collection<Feature> transformed = new ArrayList<Feature>();
@@ -57,7 +59,7 @@ public class GeoTransformation {
 			ft.setDefaultGeometry(targetGeometry);
 			transformed.add(ft);
 		}
-		ShapeFileWriter.writeGeometries(transformed, "./southafrica/gt_str_h_transformed.shp");
+		ShapeFileWriter.writeGeometries(transformed, "../inputs/padang/network_v20080618/shelters.shp");
 	}
 
 }

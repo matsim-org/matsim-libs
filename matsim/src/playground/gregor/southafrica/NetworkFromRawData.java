@@ -70,7 +70,7 @@ public class NetworkFromRawData {
 
 	private Integer nodeID = 0;
 
-	public NetworkFromRawData(final Collection<Feature> l, final NetworkLayer network, Envelope e) {
+	public NetworkFromRawData(final Collection<Feature> l, final NetworkLayer network, final Envelope e) {
 		this.el1 = new QuadTree<Node>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 		this.el2 = new QuadTree<Node>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 		this.el3 = new QuadTree<Node>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
@@ -175,7 +175,7 @@ public class NetworkFromRawData {
 		}
 	}
 
-	private Node getNode(Coordinate c, int ele) {
+	private Node getNode(final Coordinate c, final int ele) {
 
 		Node node = null;
 		if (ele  == 0) {

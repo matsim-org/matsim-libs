@@ -95,7 +95,6 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	
 	private void initFeatureCollection() {
 
-
 		AttributeType geom = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.targetCRS);
 		AttributeType dblTime = AttributeTypeFactory.newAttributeType("dblTime", Double.class);
 		AttributeType strgTime = AttributeTypeFactory.newAttributeType("strgTime", String.class);
