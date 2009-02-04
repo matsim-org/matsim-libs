@@ -103,10 +103,10 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripBeforeLocations.shp");
 			}
 			if (!featuresShop.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
 			}
 			if (!featuresAfter.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripAfterLocations.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripAfterLocations.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -126,12 +126,12 @@ public class CSShapeFileWriter extends ChoiceSetWriter {
 		}
 	}
 	
-	private Feature createFeature(Coord coord, Id personId, Integer tripNr) {
+	private Feature createFeature(Coord coord, Id id, Integer tripNr) {
 		
 		Feature feature = null;
 		
 		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), personId.toString(), tripNr.toString()});
+			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord), id.toString(), tripNr.toString()});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
