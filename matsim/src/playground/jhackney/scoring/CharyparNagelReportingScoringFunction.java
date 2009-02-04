@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 package playground.jhackney.scoring;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -298,22 +298,22 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	private static double marginalUtilityOfDistance = Double.NaN;
 	private static double abortedPlanScore = Double.NaN;
 	
-	private Hashtable<Act,Double> udur=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> uw=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> us=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> ula=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> ued=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> uld=new Hashtable<Act,Double>();
-	private Hashtable<Leg,Double> ulegt=new Hashtable<Leg,Double>();
-	private Hashtable<Leg,Double> ulegd = new Hashtable<Leg,Double>();
-	private Hashtable<Act,Double> dudur=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> duw=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> dus=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> dula=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> dued=new Hashtable<Act,Double>();
-	private Hashtable<Act,Double> duld=new Hashtable<Act,Double>();
-	private Hashtable<Leg,Double> dulegt=new Hashtable<Leg,Double>();
-	private Hashtable<Leg,Double> dulegd = new Hashtable<Leg,Double>();
+	private LinkedHashMap<Act,Double> udur=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> uw=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> us=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> ula=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> ued=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> uld=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Leg,Double> ulegt=new LinkedHashMap<Leg,Double>();
+	private LinkedHashMap<Leg,Double> ulegd = new LinkedHashMap<Leg,Double>();
+	private LinkedHashMap<Act,Double> dudur=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> duw=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> dus=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> dula=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> dued=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Act,Double> duld=new LinkedHashMap<Act,Double>();
+	private LinkedHashMap<Leg,Double> dulegt=new LinkedHashMap<Leg,Double>();
+	private LinkedHashMap<Leg,Double> dulegd = new LinkedHashMap<Leg,Double>();
 	
 	private static void init() {
 		if (initialized) return;

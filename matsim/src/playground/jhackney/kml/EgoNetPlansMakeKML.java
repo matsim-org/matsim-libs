@@ -23,8 +23,8 @@ package playground.jhackney.kml;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.ListIterator;
 
 import javax.xml.bind.JAXBContext;
@@ -90,7 +90,7 @@ public class EgoNetPlansMakeKML {
 
 	private static StyleType workStyle, leisureStyle, blueLineStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
-	private static HashMap<String,StyleType> facStyle= new HashMap<String,StyleType>();
+	private static LinkedHashMap<String,StyleType> facStyle= new LinkedHashMap<String,StyleType>();
 	private static CoordinateTransformation trafo;
 	private static Config config = null;
 

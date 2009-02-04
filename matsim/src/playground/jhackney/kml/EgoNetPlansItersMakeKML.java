@@ -22,8 +22,8 @@ package playground.jhackney.kml;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.TreeMap;
 
@@ -98,7 +98,7 @@ public class EgoNetPlansItersMakeKML {
 
 	private static StyleType workStyle, leisureStyle,
 	educStyle, shopStyle, homeStyle;//, agentLinkStyle;
-	private static HashMap<String,StyleType> facStyle= new HashMap<String,StyleType>();
+	private static LinkedHashMap<String,StyleType> facStyle= new LinkedHashMap<String,StyleType>();
 	private static CoordinateTransformation trafo;
 	private static Config config = null;
 	private static final Logger log = Logger.getLogger(EgoNetPlansItersMakeKML.class);
