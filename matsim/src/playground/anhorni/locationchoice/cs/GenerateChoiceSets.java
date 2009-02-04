@@ -152,7 +152,7 @@ public class GenerateChoiceSets {
 		
 		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple();
 		this.writers.add(writer);	
-		CSShapeFileWriter shpWriter = new CSShapeFileWriter(this.outdir);
+		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
 		
 		TripStats tripStats = new TripStats();

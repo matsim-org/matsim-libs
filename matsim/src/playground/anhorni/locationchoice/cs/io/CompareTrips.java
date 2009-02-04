@@ -33,7 +33,7 @@ public class CompareTrips {
 
 	public void compare(String file, List<ChoiceSet> choiceSets) {
 		
-		this.read0("input/MZ2005_Wege.dat", this.mode);
+		this.read0("input/MZ2005_Wege.dat");
 		
 		List<String> choiceSetIdList = new Vector<String>();	
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
@@ -114,7 +114,7 @@ public class CompareTrips {
 		}
 	}
 	
-	private void read0(String file, String mode) {
+	private void read0(String file) {
 		
 		try {
 			FileReader fileReader = new FileReader(file);

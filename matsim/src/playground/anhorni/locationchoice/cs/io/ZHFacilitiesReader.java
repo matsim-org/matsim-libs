@@ -49,7 +49,6 @@ public class ZHFacilitiesReader {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			String curr_line = bufferedReader.readLine(); // Skip header
-			int line_nr = 0;
 			
 			while ((curr_line = bufferedReader.readLine()) != null) {	
 				String[] entries = curr_line.split("\t", -1);
@@ -71,7 +70,6 @@ public class ZHFacilitiesReader {
 					zhFacilitiesByLink.put(
 							closestLink.getId(),list);
 				}	
-				line_nr++;
 			}
 			bufferedReader.close();
 			fileReader.close();

@@ -28,7 +28,7 @@ public class CSShapeFileWriter extends CSWriter {
 	
 	private FeatureType featureType;
 	
-	public CSShapeFileWriter(String outdir) {	
+	public CSShapeFileWriter() {	
 	}
 
 		

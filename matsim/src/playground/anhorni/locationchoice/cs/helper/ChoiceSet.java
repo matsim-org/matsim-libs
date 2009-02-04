@@ -114,6 +114,7 @@ public class ChoiceSet {
 			}
 		}
 		else {
+			log.info("Index out of range: " + index);
 		}
 	}
 	
