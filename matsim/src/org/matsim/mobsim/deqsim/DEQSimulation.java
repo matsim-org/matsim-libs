@@ -46,34 +46,34 @@ public class DEQSimulation {
 		this.network = network;
 
 		// initialize Simulation parameters
-		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
+		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		// the thread for processing the events
-		SimulationParameters.processEventThread = events;
+		SimulationParameters.setProcessEventThread( events);
 
-		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"stuckTime"));
-		SimulationParameters.flowCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"flowCapacityFactor"));
-		SimulationParameters.storageCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam(
-				"simulation", "storageCapacityFactor"));
+		SimulationParameters.setStuckTime (Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"stuckTime")));
+		SimulationParameters.setFlowCapacityFactor( Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"flowCapacityFactor")));
+		SimulationParameters.setStorageCapacityFactor ( Double.parseDouble(Gbl.getConfig().getParam(
+				"simulation", "storageCapacityFactor")));
 
 		// allowed testing to hook in here
-		if (SimulationParameters.testEventHandler != null) {
-			SimulationParameters.processEventThread.addHandler(SimulationParameters.testEventHandler);
+		if (SimulationParameters.getTestEventHandler() != null) {
+			SimulationParameters.getProcessEventThread().addHandler(SimulationParameters.getTestEventHandler());
 		}
 
-		if (SimulationParameters.testPlanPath != null) {
+		if (SimulationParameters.getTestPlanPath() != null) {
 			// read population
 			Population pop = new Population(Population.NO_STREAMING);
 			PopulationReader plansReader = new MatsimPopulationReader(pop);
-			plansReader.readFile(SimulationParameters.testPlanPath);
+			plansReader.readFile(SimulationParameters.getTestPlanPath());
 
 			this.population = pop;
 
 		}
 
-		if (SimulationParameters.testPopulationModifier != null) {
-			this.population = SimulationParameters.testPopulationModifier.modifyPopulation(this.population);
+		if (SimulationParameters.getTestPopulationModifier() != null) {
+			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
 		}
 
 	}
@@ -83,13 +83,13 @@ public class DEQSimulation {
 		t.startTimer();
 
 		Scheduler scheduler = new Scheduler();
-		SimulationParameters.allRoads = new HashMap<String, Road>();
+		SimulationParameters.setAllRoads (new HashMap<String, Road>());
 
 		// initialize network
 		Road road = null;
 		for (Link link : network.getLinks().values()) {
 			road = new Road(scheduler, link);
-			SimulationParameters.allRoads.put(link.getId().toString(), road);
+			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
 		}
 
 		// initialize vehicles

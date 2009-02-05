@@ -80,8 +80,8 @@ public class Road extends SimUnit {
 		 * same time
 		 */
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
-				* SimulationParameters.storageCapacityFactor / SimulationParameters.carSize);
+				* link.getLanesAsInt(SimulationParameters.getLinkCapacityPeriod())
+				* SimulationParameters.getStorageCapacityFactor() / SimulationParameters.getCarSize());
 
 		/**
 		 * it is assured here, that a road must have the space of at least one
@@ -91,11 +91,11 @@ public class Road extends SimUnit {
 			maxNumberOfCarsOnRoad = 1;
 		}
 
-		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.minimumInFlowCapacity
-				* SimulationParameters.flowCapacityFactor * link
-				.getLanesAsInt(SimulationParameters.linkCapacityPeriod));
+		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
+				* SimulationParameters.getFlowCapacityFactor() * link
+				.getLanesAsInt(SimulationParameters.getLinkCapacityPeriod()));
 
-		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(SimulationParameters.linkCapacityPeriod) * SimulationParameters.flowCapacityFactor);
+		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(SimulationParameters.getLinkCapacityPeriod()) * SimulationParameters.getFlowCapacityFactor());
 
 		if (inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			inverseInFlowCapacity = maxInverseInFlowCapacity;
@@ -103,7 +103,7 @@ public class Road extends SimUnit {
 			inverseInFlowCapacity = inverseOutFlowCapacity;
 		}
 
-		gapTravelTime = link.getLength() / SimulationParameters.gapTravelSpeed;
+		gapTravelTime = link.getLength() / SimulationParameters.getGapTravelSpeed();
 
 		// gap must be initialized to null because of the application logic
 		gap = null;
@@ -169,7 +169,7 @@ public class Road extends SimUnit {
 		// calculate time, when the car reaches the end of the road
 		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
 		nextAvailableTimeForLeavingStreet = simTime + link.getLength()
-				/ link.getFreespeed(SimulationParameters.linkCapacityPeriod);
+				/ link.getFreespeed(SimulationParameters.getLinkCapacityPeriod());
 
 		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);
@@ -270,11 +270,11 @@ public class Road extends SimUnit {
 			if (deadlockPreventionMessages.size() > 0) {
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
 						deadlockPreventionMessages.getLast().getMessageArrivalTime()
-								+ SimulationParameters.stuckTime, this));
+								+ SimulationParameters.getStuckTime(), this));
 
 			} else {
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
-						+ SimulationParameters.stuckTime, this));
+						+ SimulationParameters.getStuckTime(), this));
 			}
 
 		}
@@ -307,7 +307,7 @@ public class Road extends SimUnit {
 	}
 
 	public static Road getRoad(String linkId) {
-		return SimulationParameters.allRoads.get(linkId);
+		return SimulationParameters.getAllRoads().get(linkId);
 	}
 
 }

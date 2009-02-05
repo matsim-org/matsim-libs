@@ -48,23 +48,23 @@ public class SimulationParameters {
 
 	// INPUT
 	private static long maxSimulationLength = 800000; // in s
-	public static long linkCapacityPeriod = 0; // 
-	public static double gapTravelSpeed = 15.0; // in m/s
-	public static double flowCapacityFactor = 1.0;
-	public static double storageCapacityFactor = 1.0;
-	public static double carSize = 7.5; // in meter
+	private static long linkCapacityPeriod = 0; // 
+	private static double gapTravelSpeed = 15.0; // in m/s
+	private static double flowCapacityFactor = 1.0;
+	private static double storageCapacityFactor = 1.0;
+	private static double carSize = 7.5; // in meter
 	// in [vehicles/hour] per lane, can be scaled with flow capacity factor
-	public static double minimumInFlowCapacity = 1800;
+	private static double minimumInFlowCapacity = 1800;
 	/**
 	 * stuckTime is used for deadlock prevention. when a car waits for more than
 	 * 'stuckTime' for entering next road, it will enter the next
 	 */
-	public static double stuckTime = Double.MAX_VALUE;
+	private static double stuckTime = Double.MAX_VALUE;
 	/**
 	 * this must be initialized before starting the simulation! mapping:
 	 * key=linkId used to find a road corresponding to a link
 	 */
-	public static HashMap<String, Road> allRoads = null;
+	private static HashMap<String, Road> allRoads = null;
 
 	// SETTINGS
 	// should garbage collection of messages be activated
@@ -72,13 +72,13 @@ public class SimulationParameters {
 
 	// OUTPUT
 	// The thread for processing the events
-	public static Events processEventThread = null;
+	private static Events processEventThread = null;
 
 	// TESTING
 	// test injection variables
-	public static TestHandler testEventHandler = null;
-	public static String testPlanPath = null;
-	public static PopulationModifier testPopulationModifier = null;
+	private static TestHandler testEventHandler = null;
+	private static String testPlanPath = null;
+	private static PopulationModifier testPopulationModifier = null;
 
 	/**
 	 * how far can the average usage of links differ for a unit test to pass in
@@ -101,6 +101,102 @@ public class SimulationParameters {
 
 	public static void setMaxSimulationLength(long maxSimulationLength) {
 		SimulationParameters.maxSimulationLength = maxSimulationLength;
+	}
+
+	public static long getLinkCapacityPeriod() {
+		return linkCapacityPeriod;
+	}
+
+	public static void setLinkCapacityPeriod(long linkCapacityPeriod) {
+		SimulationParameters.linkCapacityPeriod = linkCapacityPeriod;
+	}
+
+	public static double getGapTravelSpeed() {
+		return gapTravelSpeed;
+	}
+
+	public static void setGapTravelSpeed(double gapTravelSpeed) {
+		SimulationParameters.gapTravelSpeed = gapTravelSpeed;
+	}
+
+	public static double getFlowCapacityFactor() {
+		return flowCapacityFactor;
+	}
+
+	public static void setFlowCapacityFactor(double flowCapacityFactor) {
+		SimulationParameters.flowCapacityFactor = flowCapacityFactor;
+	}
+
+	public static double getStorageCapacityFactor() {
+		return storageCapacityFactor;
+	}
+
+	public static void setStorageCapacityFactor(double storageCapacityFactor) {
+		SimulationParameters.storageCapacityFactor = storageCapacityFactor;
+	}
+
+	public static double getCarSize() {
+		return carSize;
+	}
+
+	public static void setCarSize(double carSize) {
+		SimulationParameters.carSize = carSize;
+	}
+
+	public static double getMinimumInFlowCapacity() {
+		return minimumInFlowCapacity;
+	}
+
+	public static void setMinimumInFlowCapacity(double minimumInFlowCapacity) {
+		SimulationParameters.minimumInFlowCapacity = minimumInFlowCapacity;
+	}
+
+	public static double getStuckTime() {
+		return stuckTime;
+	}
+
+	public static void setStuckTime(double stuckTime) {
+		SimulationParameters.stuckTime = stuckTime;
+	}
+
+	public static Events getProcessEventThread() {
+		return processEventThread;
+	}
+
+	public static void setProcessEventThread(Events processEventThread) {
+		SimulationParameters.processEventThread = processEventThread;
+	}
+
+	public static TestHandler getTestEventHandler() {
+		return testEventHandler;
+	}
+
+	public static void setTestEventHandler(TestHandler testEventHandler) {
+		SimulationParameters.testEventHandler = testEventHandler;
+	}
+
+	public static String getTestPlanPath() {
+		return testPlanPath;
+	}
+
+	public static void setTestPlanPath(String testPlanPath) {
+		SimulationParameters.testPlanPath = testPlanPath;
+	}
+
+	public static PopulationModifier getTestPopulationModifier() {
+		return testPopulationModifier;
+	}
+
+	public static void setTestPopulationModifier(PopulationModifier testPopulationModifier) {
+		SimulationParameters.testPopulationModifier = testPopulationModifier;
+	}
+
+	public static HashMap<String, Road> getAllRoads() {
+		return allRoads;
+	}
+
+	public static void setAllRoads(HashMap<String, Road> allRoads) {
+		SimulationParameters.allRoads = allRoads;
 	}
 
 }

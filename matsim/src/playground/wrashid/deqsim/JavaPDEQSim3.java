@@ -52,42 +52,40 @@ public class JavaPDEQSim3 {
 	
 	public JavaPDEQSim3(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
-		
 
-
-		
 		this.population = population;
 		this.network = network;
-		
-		
-		
+
 		// initialize Simulation parameters
-		SimulationParameters.linkCapacityPeriod=network.getCapacityPeriod();
-		SimulationParameters.processEventThread=events;
-		SimulationParameters.stuckTime= Gbl.getConfig().simulation().getStuckTime();//getParam("simulation", "stuckTime"));
-		SimulationParameters.flowCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "flowCapacityFactor"));
-		SimulationParameters.storageCapacityFactor= Double.parseDouble(Gbl.getConfig().getParam("simulation", "storageCapacityFactor"));
-		
-		
+		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
+		// the thread for processing the events
+		SimulationParameters.setProcessEventThread( events);
+
+		SimulationParameters.setStuckTime (Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"stuckTime")));
+		SimulationParameters.setFlowCapacityFactor( Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"flowCapacityFactor")));
+		SimulationParameters.setStorageCapacityFactor ( Double.parseDouble(Gbl.getConfig().getParam(
+				"simulation", "storageCapacityFactor")));
+
 		// allowed testing to hook in here
-		if (SimulationParameters.testEventHandler!=null){
-			events.addHandler(SimulationParameters.testEventHandler);
+		if (SimulationParameters.getTestEventHandler() != null) {
+			SimulationParameters.getProcessEventThread().addHandler(SimulationParameters.getTestEventHandler());
 		}
-		
-		if (SimulationParameters.testPlanPath!=null){
+
+		if (SimulationParameters.getTestPlanPath() != null) {
 			// read population
-			Population pop=new Population(Population.NO_STREAMING);;
+			Population pop = new Population(Population.NO_STREAMING);
 			PopulationReader plansReader = new MatsimPopulationReader(pop);
-			plansReader.readFile(SimulationParameters.testPlanPath);
-			
-			this.population=pop;
-			
+			plansReader.readFile(SimulationParameters.getTestPlanPath());
+
+			this.population = pop;
+
 		}
-		
-		if (SimulationParameters.testPopulationModifier!=null){
-			this.population=SimulationParameters.testPopulationModifier.modifyPopulation(this.population);
+
+		if (SimulationParameters.getTestPopulationModifier() != null) {
+			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
 		}
-		
 	}
 	
 	public void run() {
@@ -106,7 +104,7 @@ public class JavaPDEQSim3 {
 		
 		
 		// initialize network (roads)
-		SimulationParameters.allRoads=new HashMap<String,Road>();
+		SimulationParameters.setAllRoads(new HashMap<String,Road>());
 
 		
 		
@@ -174,7 +172,7 @@ public class JavaPDEQSim3 {
 		for (Link link: network.getLinks().values()){
 			
 			
-			SimulationParameters.allRoads.put(link.getId().toString(), road);
+			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
 		}
 		
 				

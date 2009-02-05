@@ -79,7 +79,7 @@ public class EndLegMessage extends EventMessage {
 		event = new AgentArrivalEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
 				.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 
-		SimulationParameters.processEventThread.processEvent(event);
+		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule ActStartEvent
 		Act nextAct = vehicle.getNextActivity();
@@ -91,7 +91,7 @@ public class EndLegMessage extends EventMessage {
 
 		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson().getId().toString(), vehicle
 				.getCurrentLink().getId().toString(), nextAct.getType());
-		SimulationParameters.processEventThread.processEvent(event);
+		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}
 

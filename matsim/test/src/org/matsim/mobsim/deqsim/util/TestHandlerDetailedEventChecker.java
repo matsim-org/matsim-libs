@@ -274,25 +274,25 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		String[] args = new String[1];
 		args[0] = configFilePath;
 		this.printEvent = printEvent;
-		SimulationParameters.testEventHandler = this;
+		SimulationParameters.setTestEventHandler ( this);
 
 		if (planFilePath != null) {
-			SimulationParameters.testPlanPath = planFilePath;
+			SimulationParameters.setTestPlanPath ( planFilePath);
 		} else {
-			SimulationParameters.testPlanPath = null;
+			SimulationParameters.setTestPlanPath ( null);
 		}
 
 		if (populationModifier != null) {
-			SimulationParameters.testPopulationModifier = populationModifier;
+			SimulationParameters.setTestPopulationModifier ( populationModifier);
 		} else {
-			SimulationParameters.testPopulationModifier = new DummyPopulationModifier();
+			SimulationParameters.setTestPopulationModifier ( new DummyPopulationModifier());
 		}
 
 		DEQSimStarterWithoutController.main(args);
 		this
-				.calculateExpectedNumberOfEvents(SimulationParameters.testPopulationModifier
+				.calculateExpectedNumberOfEvents(SimulationParameters.getTestPopulationModifier()
 						.getPopulation());
-		SimulationParameters.testEventHandler.checkAssertions();
+		SimulationParameters.getTestEventHandler().checkAssertions();
 	}
 
 	public void calculateExpectedNumberOfEvents(Population population) {

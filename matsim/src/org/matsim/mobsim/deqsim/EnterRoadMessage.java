@@ -49,7 +49,7 @@ public class EnterRoadMessage extends EventMessage {
 			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
 					.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 		}
-		SimulationParameters.processEventThread.processEvent(event);
+		SimulationParameters.getProcessEventThread().processEvent(event);
 	}
 
 }
