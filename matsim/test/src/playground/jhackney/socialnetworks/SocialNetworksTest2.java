@@ -45,7 +45,7 @@ public class SocialNetworksTest2  extends MatsimTestCase{
 		checksum1 = CRCChecksum.getCRCFromFile(referenceSocNetFile);
 		checksum2 = CRCChecksum.getCRCFromFile(socNetFile);
 		System.out.println(socNetFile+" checksum = " + checksum2 + " should be: " + referenceSocNetFile + checksum1);
-//		assertEquals("different socnet files", checksum1, checksum2);
+		assertEquals("different socnet files", checksum1, checksum2);
 
 		System.out.println("\nTest Succeeded");
 	}
