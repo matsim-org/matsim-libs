@@ -95,8 +95,8 @@
 				<param name="ModuleProbability_2" value="0.1" />
 				<param name="Module_3" value="TimeAllocationMutator7200_ReRouteLandmarks" />
 				<param name="ModuleProbability_3" value="0.1" />
-				<param name="Module_4" value="KSecLoc" />
-				<param name="ModuleProbability_4" value="0.1" />
+				<!-- param name="Module_4" value="KSecLoc" / -->
+				<!-- param name="ModuleProbability_4" value="0.1" / -->
 		</module> <!-- strategy -->	
 	
 <!-- ====================================================================== -->
@@ -192,29 +192,29 @@
 		
 		<!-- SOCIAL NETWORK DYNAMICS -->
 		<param name="socnetlinkremovalage" value="0" />
-		<param name="socnetlinkremovalalgorithm" value="random" />
+		<param name="socnetlinkremovalalgorithm" value="none" />
 		<param name="socnetlinkremovalp" value="0.05" />
 		<param name="socnetlinkstrengthalgorithm" value="constant" />
 		
-		<param name="prob_befriend" value="1." />
-		<param name="degree_saturation_rate" value="-.5" />		
+		<param name="prob_befriend" value="0." />
+		<param name="degree_saturation_rate" value="0." />		
 		
 		<!-- INFORMATION EXCHANGES IN SOCIAL SPACE -->
 		<param name="factype_ns" value="home,leisure,shop,education,work" />
 		<param name="fract_introduce_friends" value="0" />
-		<param name="fract_ns_interact" value="1.0" />
+		<param name="fract_ns_interact" value="0.1" />
 		<param name="num_ns_interactions" value="1" />
-		<param name="memSize" value="1.5" />
+		<param name="memSize" value="0" />
 		
 		<!-- INFORMATION EXCHANGES IN GEOGRAPHICAL SPACE-->
 		<param name="spatial_interactor_type" value="meetall" />
-		<param name="s_weights" value="1.,1.,1.,1.,1." />
+		<param name="s_weights" value="0.,0.,0.,0.,0." />
 		<param name="act_types" value="home,work,shop,education,leisure" />
 
 		<!-- SCORING -->
 		<param name="betafriendfoe" value = "0" />
 		<param name="betanfriends" value = "0" />
-		<param name="betalognfriends" value = "10" />
+		<param name="betalognfriends" value = "0" />
 		<param name="betatimewithfriends" value = "0" />
 		
 		<!-- REPLANNING -->
