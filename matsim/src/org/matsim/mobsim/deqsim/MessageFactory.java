@@ -23,11 +23,11 @@ import java.util.LinkedList;
 
 public class MessageFactory {
 
-	public static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
-	public static LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
-	public static LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
-	public static LinkedList<LeaveRoadMessage> leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
-	public static LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
+	private static LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
+	private static LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
+	private static LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
+	private static LinkedList<LeaveRoadMessage> leaveRoadMessageQueue = new LinkedList<LeaveRoadMessage>();
+	private static LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
 	private static LinkedList<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
 
@@ -143,6 +143,30 @@ public class MessageFactory {
 		endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
 		deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
+	}
+
+	public static LinkedList<EndLegMessage> getEndLegMessageQueue() {
+		return endLegMessageQueue;
+	}
+
+	public static LinkedList<EnterRoadMessage> getEnterRoadMessageQueue() {
+		return enterRoadMessageQueue;
+	}
+
+	public static LinkedList<StartingLegMessage> getStartingLegMessageQueue() {
+		return startingLegMessageQueue;
+	}
+
+	public static LinkedList<LeaveRoadMessage> getLeaveRoadMessageQueue() {
+		return leaveRoadMessageQueue;
+	}
+
+	public static LinkedList<EndRoadMessage> getEndRoadMessageQueue() {
+		return endRoadMessageQueue;
+	}
+
+	public static LinkedList<DeadlockPreventionMessage> getDeadlockPreventionMessageQueue() {
+		return deadlockPreventionMessageQueue;
 	}
 
 }

@@ -28,12 +28,12 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.disposeEndRoadMessage(new EndRoadMessage(null,null));
 		MessageFactory.disposeDeadlockPreventionMessage(new DeadlockPreventionMessage(null,null));
 		
-		assertEquals(0, MessageFactory.endLegMessageQueue.size());
-		assertEquals(0, MessageFactory.enterRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.startingLegMessageQueue.size());
-		assertEquals(0, MessageFactory.leaveRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.endRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.endLegMessageQueue.size());
+		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
+		assertEquals(0, MessageFactory.getEnterRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getStartingLegMessageQueue().size());
+		assertEquals(0, MessageFactory.getLeaveRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getEndRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
 	}
 	
 	// check when gc turned off
@@ -47,12 +47,12 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.disposeEndRoadMessage(new EndRoadMessage(null,null));
 		MessageFactory.disposeDeadlockPreventionMessage(new DeadlockPreventionMessage(null,null));
 		
-		assertEquals(1, MessageFactory.endLegMessageQueue.size());
-		assertEquals(1, MessageFactory.enterRoadMessageQueue.size());
-		assertEquals(1, MessageFactory.startingLegMessageQueue.size());
-		assertEquals(1, MessageFactory.leaveRoadMessageQueue.size());
-		assertEquals(1, MessageFactory.endRoadMessageQueue.size());
-		assertEquals(1, MessageFactory.endLegMessageQueue.size());
+		assertEquals(1, MessageFactory.getEndLegMessageQueue().size());
+		assertEquals(1, MessageFactory.getEnterRoadMessageQueue().size());
+		assertEquals(1, MessageFactory.getStartingLegMessageQueue().size());
+		assertEquals(1, MessageFactory.getLeaveRoadMessageQueue().size());
+		assertEquals(1, MessageFactory.getEndRoadMessageQueue().size());
+		assertEquals(1, MessageFactory.getEndLegMessageQueue().size());
 	}
 	
 	// check check use of Message factory
@@ -73,12 +73,12 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.getEndRoadMessage(null, null);
 		MessageFactory.getDeadlockPreventionMessage(null, null);
 		
-		assertEquals(0, MessageFactory.endLegMessageQueue.size());
-		assertEquals(0, MessageFactory.enterRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.startingLegMessageQueue.size());
-		assertEquals(0, MessageFactory.leaveRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.endRoadMessageQueue.size());
-		assertEquals(0, MessageFactory.endLegMessageQueue.size());
+		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
+		assertEquals(0, MessageFactory.getEnterRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getStartingLegMessageQueue().size());
+		assertEquals(0, MessageFactory.getLeaveRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getEndRoadMessageQueue().size());
+		assertEquals(0, MessageFactory.getEndLegMessageQueue().size());
 	}
 	
 	// check initialization using constructer
