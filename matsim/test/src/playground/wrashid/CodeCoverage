@@ -1,4 +1,4 @@
 Package coverage
 =================
-- playground.wrashid.DES.*
+- playground.wrashid.DES.* => moved to core tests.
 
