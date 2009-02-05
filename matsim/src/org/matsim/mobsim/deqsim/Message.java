@@ -40,7 +40,8 @@ public abstract class Message implements Comparable<Message> {
 
 	public abstract void processEvent();
 
-	/*
+	/**
+	 * 
 	 * The comparison is done according to the message arrival Time. If the time
 	 * is equal of two messages, then the priority of the messages is compared
 	 */

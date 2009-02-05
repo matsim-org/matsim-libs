@@ -37,8 +37,10 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void handleMessage() {
-		// start next leg
-		// assumption: actions and legs are alternating in plans file
+		/*
+		 * start next leg. assumption: actions and legs are alternating in plans
+		 * file
+		 */
 		vehicle.setLegIndex(vehicle.getLegIndex() + 2);
 		// reset link index
 		vehicle.setLinkIndex(-1);
@@ -50,11 +52,12 @@ public class EndLegMessage extends EventMessage {
 			// the leg the agent performs
 			double departureTime = vehicle.getCurrentLeg().getDepartureTime();
 
-			// if the departureTime for the leg is in the past (this means we
-			// arrived late),
-			// then set the departure time to the current simulation time
-			// this avoids that messages in the past are put into the scheduler
-			// (which makes no sense anyway)
+			/*
+			 * if the departureTime for the leg is in the past (this means we
+			 * arrived late), then set the departure time to the current
+			 * simulation time this avoids that messages in the past are put
+			 * into the scheduler (which makes no sense anyway)
+			 */
 			if (departureTime < getMessageArrivalTime()) {
 				departureTime = getMessageArrivalTime();
 			}

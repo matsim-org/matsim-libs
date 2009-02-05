@@ -134,11 +134,17 @@ public class EventLog {
 		return true;
 	}
 
+	/**
+	 * the time must be the same (compared up to 4 digits after the floating
+	 * point) and the link the event type is ignored for the moment, because in
+	 * the beginning it might be different
+	 * 
+	 * @param eventLog1
+	 * @param eventLog2
+	 * @return
+	 */
 	public static boolean equals(EventLog eventLog1, EventLog eventLog2) {
-		// the time must be the same (compared up to 4 digits after the floating
-		// point) and the link
-		// the event type is ignored for the moment, because in the beginning it
-		// might be different
+
 		if (Math.rint(eventLog1.getTime() * 10000) == Math.rint(eventLog2.getTime() * 10000)
 				&& eventLog1.getLinkId() == eventLog2.getLinkId()) {
 			return true;
@@ -155,19 +161,25 @@ public class EventLog {
 		for (int i = 0; i < eventLog.size(); i++) {
 			eventLog.get(i).print();
 		}
+		// 
 	}
 
-	// For each link in the event list, find out how long a car has been on that
-	// link
-	// Then compare the usage time of each link for the two different Event logs
-	// print the average(absolute difference): absSumLink
-	// and the sum (absolute difference) in seconds: absAverageLinkDiff
+	/**
+	 * For each link in the event list, find out how long a car has been on that
+	 * link. Then compare the usage time of each link for the two different
+	 * Event logs. Print the average(absolute difference): absSumLink and the
+	 * sum (absolute difference) in seconds: absAverageLinkDiff
+	 * 
+	 * @param eventLog1
+	 * @param eventLog2
+	 * @return
+	 */
 	public static double absAverageLinkDiff(ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2) {
-		HashMap<Integer, Double[]> hm = new HashMap<Integer, Double[]>(); // key:
-		// int
-		// (linkId)
-		// value: double[4]
-		// (startCurrentLink1,totalUsageDurationLink1,startCurrentLink2,totalUsageDurationLink2)
+		HashMap<Integer, Double[]> hm = new HashMap<Integer, Double[]>();
+		/*
+		 * key: int (linkId), value: double[4], array contains:
+		 * (startCurrentLink1,totalUsageDurationLink1,startCurrentLink2,totalUsageDurationLink2)
+		 */
 
 		assert eventLog1.size() == eventLog2.size() : "The size of both eventLogs must be the same!"
 				+ eventLog1.size() + " - " + eventLog2.size();
@@ -196,14 +208,11 @@ public class EventLog {
 			}
 			hm.get(link2)[3] = eventLog2.get(i).time - hm.get(link2)[2];
 
-			// System.out.println("link:" + link2 + "; diff" +
-			// (hm.get(link2)[1]-hm.get(link2)[3]));
 		}
 
 		double absSum = 0;
 		double absAverage = 0;
 		for (Double[] d : hm.values()) {
-			// System.out.println("eventLog1-eventLog2:" + (d[1]-d[3]));
 			absSum += Math.abs(d[1] - d[3]);
 		}
 
@@ -230,18 +239,20 @@ public class EventLog {
 		int noOfDifferentTimes = 0;
 		for (int i = 0; i < list1.size(); i++) {
 			if (list1.get(i).time != list2.get(i).time) {
-				// System.out.println("1.time:" + list1.get(i).time + "2.time:"
-				// + list2.get(i).time + "1.type:" + list1.get(i).type +
-				// "2.type:" + list2.get(i).type);
 				noOfDifferentTimes++;
 			}
 		}
 		System.out.println("noOfDifferentTimes:" + noOfDifferentTimes);
 	}
 
-	/*
+	/**
+	 * 
 	 * Get the travel time of one person. This means the time, between starting
 	 * each leg end its end.
+	 * 
+	 * @param eventLog1
+	 * @param vehicleId
+	 * @return
 	 */
 	public static double getTravelTime(ArrayList<EventLog> eventLog1, int vehicleId) {
 		double travelTime = 0;
@@ -260,9 +271,13 @@ public class EventLog {
 		return travelTime;
 	}
 
-	/*
+	/**
+	 * 
 	 * Get sum of Travel time of all vehicles. This means the sum of all leg
 	 * times.
+	 * 
+	 * @param eventLog1
+	 * @return
 	 */
 	public static double getSumTravelTime(ArrayList<EventLog> eventLog1) {
 		double travelTime = 0;

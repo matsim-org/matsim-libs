@@ -77,8 +77,12 @@ public class Vehicle extends SimUnit {
 		scheduleStartingLegMessage(departureTime, road);
 	}
 
-	// based on the current Leg, the previous activity is computed
-	// this could be implemented more efficiently... (TODO).
+	/**
+	 * based on the current Leg, the previous activity is computed; this could
+	 * be implemented more efficiently in future.
+	 * 
+	 * @return
+	 */
 	public Act getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
@@ -91,8 +95,12 @@ public class Vehicle extends SimUnit {
 		return null;
 	}
 
-	// based on the current Leg, the next activity is computed
-	// this could be implemented more efficiently... (TODO).
+	/**
+	 * based on the current Leg, the next activity is computed; this could be
+	 * implemented more efficiently in future.
+	 * 
+	 * @return
+	 */
 	public Act getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
@@ -151,9 +159,11 @@ public class Vehicle extends SimUnit {
 		return getCurrentLinkRoute().length == getLinkIndex() + 1;
 	}
 
-	// updates both the currentLink and link index variables
-	// with the next link in the link route of the current leg
-	// attention: only applicable, if isCurrentLegFinished==false
+	/**
+	 * updates both the currentLink and link index variables with the next link
+	 * in the link route of the current leg attention: only applicable, if
+	 * isCurrentLegFinished==false
+	 */
 	public void moveToNextLinkInLeg() {
 		setLinkIndex(getLinkIndex() + 1);
 		setCurrentLink(getCurrentLinkRoute()[getLinkIndex()]);
@@ -166,9 +176,13 @@ public class Vehicle extends SimUnit {
 		setCurrentLink(((Act) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
 
-	// find out, if the vehicle is in endingLegMode
-	// this means, that the vehicle is just waiting until it can enter the
-	// last link (without entering it) and then ends the leg
+	/**
+	 * find out, if the vehicle is in endingLegMode this means, that the vehicle
+	 * is just waiting until it can enter the last link (without entering it)
+	 * and then ends the leg
+	 * 
+	 * @return
+	 */
 	public boolean isEndingLegMode() {
 		if (getCurrentLinkRoute().length == getLinkIndex()) {
 			return true;
