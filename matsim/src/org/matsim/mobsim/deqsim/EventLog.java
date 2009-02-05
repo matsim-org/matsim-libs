@@ -123,14 +123,14 @@ public class EventLog {
 			// System.out.println("=========");
 
 			if (!equals(eventLog1.get(i), eventLog2.get(i))) {
-				// return false; // TODO: uncomment this, when bug is fixed!
-				NoOfNotEqualEvents++;
+				// NoOfNotEqualEvents++;
+				return false;
 			}
 		}
 
-			System.out.println("# Events Java: " + eventLog1.size());
-			System.out.println("# Events C++: " + eventLog2.size());
-			System.out.println("NoOfNotEqualEvents: " + NoOfNotEqualEvents);
+		System.out.println("# Events Java: " + eventLog1.size());
+		System.out.println("# Events C++: " + eventLog2.size());
+		System.out.println("NoOfNotEqualEvents: " + NoOfNotEqualEvents);
 
 		return true;
 	}
@@ -268,7 +268,8 @@ public class EventLog {
 	}
 
 	/*
-	 * Get sum of Travel time of all vehicles. This means the sum of all leg times.
+	 * Get sum of Travel time of all vehicles. This means the sum of all leg
+	 * times.
 	 */
 	public static double getSumTravelTime(ArrayList<EventLog> eventLog1) {
 		double travelTime = 0;
@@ -278,10 +279,12 @@ public class EventLog {
 		for (int i = 0; i < eventLog1.size(); i++) {
 			if (eventLog1.get(i).type
 					.equalsIgnoreCase(SimulationParameters.START_LEG)) {
-				startingTime.put(eventLog1.get(i).vehicleId, eventLog1.get(i).time);
+				startingTime.put(eventLog1.get(i).vehicleId,
+						eventLog1.get(i).time);
 			} else if (eventLog1.get(i).type
 					.equalsIgnoreCase(SimulationParameters.END_LEG)) {
-				travelTime += eventLog1.get(i).time - startingTime.get(eventLog1.get(i).vehicleId);
+				travelTime += eventLog1.get(i).time
+						- startingTime.get(eventLog1.get(i).vehicleId);
 			}
 		}
 
