@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
