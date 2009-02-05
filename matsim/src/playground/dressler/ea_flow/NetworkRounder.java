@@ -63,6 +63,7 @@ public class NetworkRounder {
 			link.setCapacity(newcapacity);
 			//link.setCapacity(Math.round(link.getCapacity(1.)/divisor));
 		}
+		network.setCapacityPeriod(newcap);
 	}
 	
 	public static NetworkLayer roundNetwork(String filename, int newcap){
