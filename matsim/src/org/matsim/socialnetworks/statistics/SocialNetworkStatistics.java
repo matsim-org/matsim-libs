@@ -78,7 +78,7 @@ import edu.uci.ics.jung.utils.UserData;
  */
 public class SocialNetworkStatistics {
 
-	private final int writeInterval=1;
+	private final int writeInterval=50;
 	private final Logger log = Logger.getLogger(SocialNetworkStatistics.class);
 	private String statsoutdir;
 
@@ -104,7 +104,6 @@ public class SocialNetworkStatistics {
 
 		// statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
 		statsoutdir = dir + "/stats/";
-		this.log.warn("Edges written out each iteration change to 50 before checking in!!!!!!");
 	}
 
 	public void openFiles() {
