@@ -184,11 +184,7 @@ public class Vehicle extends SimUnit {
 	 * @return
 	 */
 	public boolean isEndingLegMode() {
-		if (getCurrentLinkRoute().length == getLinkIndex()) {
-			return true;
-		} else {
-			return false;
-		}
+		return (getCurrentLinkRoute().length == getLinkIndex());
 	}
 
 	// invoking this method causes the "isEndingLegMode" method to return true
