@@ -30,6 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.BasicPopulation;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -37,6 +38,11 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
+import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
+import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
 /**
  * @author Manuel Schneider
@@ -49,6 +55,10 @@ public class MultiSourceEAF {
 	 */
 	private static boolean _debug = false;
 	
+	
+	public static void debug(boolean debug){
+		_debug=debug;
+	}
 	
 	/**
 	 * A method to read a file containing the information on demands in an evacuation scenario for a given network
@@ -112,60 +122,106 @@ public class MultiSourceEAF {
 	 * 
 	 */
 	public static void main(String[] args) {
-		 System.out.println("Ich lebe");
-		 
-		 
-		 //read network
-		 NetworkLayer network = new NetworkLayer();
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-		 //networkReader.readFile("/Users/manuel/Documents/meine_EA/manu/manu2.xml");
-		//networkReader.readFile("/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml");
-		networkReader.readFile("/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml");
+			
+			//set debuging modes
+			MultiSourceEAF.debug(true);
+			BellmanFordVertexIntervalls.debug(false);
+			VertexIntervalls.debug(false);
+			//VertexIntervall.debug(false);
+			EdgeIntervalls.debug(false);
+			//EdgeIntervall.debug(false);
+			Flow.debug(0);
+			
 		
-		 //read demands 
-		 HashMap<Node, Integer> demands;
-		 try {
-				//demands = readDemands(network, "/Users/manuel/Documents/meine_EA/manu/manu2.dem");
-				demands = readPopulation(network, "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz");
-			} catch (Exception e) {
+		if(_debug){
+			System.out.println("starting to read input");
+		}
+		
+		String networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
+		//String networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
+		//String networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml";
+		
+		
+		String plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//String plansfile = null;
+		
+		
+		String demandsfile = null;
+		//String demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
+		
+		String outputplansfile = null;
+		 
+		
+		//set parameters
+		int timeHorizon = 2000000;
+		int rounds = 1000;
+		String sinkid = "en2";
+		
+		//read network
+		NetworkLayer network = new NetworkLayer();
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+		networkReader.readFile(networkfile);
+		Node sink = network.getNode(sinkid);
+		
+		//read demands 
+		HashMap<Node, Integer> demands;
+		if(plansfile!=null){
+			demands = readPopulation(network, plansfile);
+		}else{
+			try {
+				demands = readDemands(network,demandsfile);
+			} catch (IOException e) {
 				e.printStackTrace();
 				return;
 			}
-			
-		//set parameters
-		int timeHorizon = 2000000;
-		Node sink = network.getNode("en2");
-		TimeExpandedPath result = null;
-		int rounds = 1000;
+		}
 		
 		//check if demands and sink are set 
-		if (demands.isEmpty() || sink == null) {
-			System.out.println("nicht da");
-		} else {
+		if (demands.isEmpty() ) {
+			System.out.println("demands not found");
+		}
+		if (sink == null){
+			System.out.println("sink not found");
+		}
+		if(_debug){
+			System.out.println("reading input done");
+		}
+		
+		if(!demands.isEmpty() && sink != null) {
+			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
-			
-
-			//Flow fluss = new Flow(network, flow, sources, demands, sink, timeHorizon);
 			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
 			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
-			BellmanFordVertexIntervalls.debug(false);
+			if(_debug){
+				System.out.println("starting calculations");
+			}
+			//main loop for calculations
 			for (int i=0; i<rounds; i++){
 				result = routingAlgo.doCalculations();
 				if (result==null){
 					break;
 				}
-				System.out.println("TimeExpandedPath: " +  result);
+				if(_debug){
+					System.out.println("found path: " +  result);
+				}
 				fluss.augment(result);
-				//System.out.println(fluss);
 			}
-			System.out.println(fluss.arrivalsToString());
-			System.out.println(fluss.arrivalPatternToString());
+			if(_debug){
+				System.out.println(fluss.arrivalsToString());
+				System.out.println(fluss.arrivalPatternToString());
+				System.out.println("demands:");
+				for (Node node : demands.keySet()){
+					System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+				}
+			}
+			if(outputplansfile!=null){
+				BasicPopulation output = fluss.createPoulation();
+				//TODO write Population
+			}
 		}
-		/*System.out.println("demands:");
-		for (Node node : demands.keySet()){
-			System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
-		}*/
-   	    System.out.println("... immer noch!\n");
+		if(_debug){
+			System.out.println("done");
+		}
 	}
 
 }
