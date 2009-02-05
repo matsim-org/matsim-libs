@@ -45,7 +45,7 @@ public class MessageExecutor extends Thread {
 				message.processEvent();
 				message.handleMessage();
 
-				if (message.getMessageArrivalTime() > SimulationParameters.maxSimulationLength) {
+				if (message.getMessageArrivalTime() > SimulationParameters.getMaxSimulationLength()) {
 					break;
 				}
 
