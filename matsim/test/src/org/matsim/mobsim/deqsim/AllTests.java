@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.mobsim;
+package org.matsim.mobsim.deqsim;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -26,10 +26,17 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim");
+		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim.queuesim");
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.mobsim.queuesim.AllTests.suite());
-		suite.addTest(org.matsim.mobsim.deqsim.AllTests.suite());
+		
+		suite.addTestSuite(TestDESStarter_EquilPopulationPlans1Modified1.class);
+		suite.addTestSuite(TestDESStarter_equilPlans100.class);
+		suite.addTestSuite(TestDESStarter_Berlin.class);
+		
+		suite.addTestSuite(TestEventLog.class);
+		suite.addTestSuite(TestMessageFactory.class);
+		suite.addTestSuite(TestMessageQueue.class);
+		suite.addTestSuite(TestScheduler.class);
 		//$JUnit-END$
 		return suite;
 	}

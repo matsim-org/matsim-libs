@@ -1,22 +1,13 @@
-package playground.wrashid.deqsim;
+package org.matsim.mobsim.deqsim;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 
-import org.matsim.events.AgentArrivalEvent;
-import org.matsim.events.AgentDepartureEvent;
-import org.matsim.events.LinkEnterEvent;
-import org.matsim.events.LinkLeaveEvent;
-import org.matsim.events.PersonEvent;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.EventLog;
+import org.matsim.mobsim.deqsim.util.DEQSimEventFileTravelTimeComparator;
+import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
+
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.scenarios.EquilPopulationPlans1Modified1;
-import playground.wrashid.tryouts.starting.CppEventFileParser;
-import playground.wrashid.util.DEQSimEventFileComparator;
-import playground.wrashid.util.DEQSimEventFileTravelTimeComparator;
-import playground.wrashid.util.TestHandlerDetailedEventChecker;
+
 
 public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 	

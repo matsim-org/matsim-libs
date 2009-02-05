@@ -1,4 +1,4 @@
-package playground.wrashid.util;
+package org.matsim.mobsim.deqsim.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.mobsim.deqsim.DEQSimStarterWithoutController;
 import org.matsim.mobsim.deqsim.SimulationParameters;
 import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
 import org.matsim.mobsim.deqsim.util.testable.TestHandler;
@@ -38,9 +39,6 @@ import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.PDES2.Road;
-import playground.wrashid.deqsim.DEQSimStarterWithoutController;
-import playground.wrashid.deqsim.PDESStarter2;
 
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
@@ -52,8 +50,8 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	private HashMap<String, ExpectedNumberOfEvents> expectedNumberOfMessages = new HashMap<String, ExpectedNumberOfEvents>();
-	private boolean printEvent = true;
-	private Population population;
+	protected boolean printEvent = true;
+	protected Population population;
 
 	public TestHandlerDetailedEventChecker() {
 
@@ -297,36 +295,6 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		SimulationParameters.testEventHandler.checkAssertions();
 	}
 
-	// if populationModifier == null, then the DummyPopulationModifier is used
-	// if planFilePath == null, then the plan specified in the config file is
-	// used
-	public void startTestPDES2(String configFilePath, boolean printEvent,
-			String planFilePath, PopulationModifier populationModifier) {
-		String[] args = new String[1];
-		args[0] = configFilePath;
-		this.printEvent = printEvent;
-		playground.wrashid.PDES2.SimulationParameters.testEventHandler = this;
-
-		if (planFilePath != null) {
-			playground.wrashid.PDES2.SimulationParameters.testPlanPath = planFilePath;
-		} else {
-			playground.wrashid.PDES2.SimulationParameters.testPlanPath = null;
-		}
-
-		if (populationModifier != null) {
-			playground.wrashid.PDES2.SimulationParameters.testPopulationModifier = populationModifier;
-		} else {
-			playground.wrashid.PDES2.SimulationParameters.testPopulationModifier = new DummyPopulationModifier();
-		}
-
-		PDESStarter2.main(args);
-		this
-				.calculateExpectedNumberOfEvents(playground.wrashid.PDES2.SimulationParameters.testPopulationModifier
-						.getPopulation());
-		playground.wrashid.PDES2.SimulationParameters.testEventHandler
-				.checkAssertions();
-	}
-
 	public void calculateExpectedNumberOfEvents(Population population) {
 		this.population = population;
 
@@ -364,38 +332,6 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		public int expectedLinkLeaveEvents;
 		public int expectedDepartureEvents;
 		public int expectedArrivalEvents;
-	}
-
-	private void printPlanPDES2(Plan plan) {
-		LegIterator iter = plan.getIteratorLeg();
-		while (iter.hasNext()) {
-			Leg leg = (Leg) iter.next();
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
-				System.out.print(link.getId()
-						+ "("
-						+ Road.allRoads.get(link.getId().toString())
-								.getZoneId() + ")" + "-");
-			}
-			System.out.println();
-		}
-	}
-	
-	private void printPlanDES(Plan plan) {
-		LegIterator iter = plan.getIteratorLeg();
-		while (iter.hasNext()) {
-			Leg leg = (Leg) iter.next();
-			for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
-				System.out.print(link.getId()+ "-");
-			}
-			System.out.println();
-		}
-	}
-
-	private void printEvents(String personId) {
-		LinkedList<PersonEvent> list = events.get(personId);
-		for (int i = 0; i < list.size(); i++) {
-			System.out.println(list.get(i).toString());
-		}
 	}
 
 }

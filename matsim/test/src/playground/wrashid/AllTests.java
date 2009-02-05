@@ -13,7 +13,6 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite(
 				"Test for playground.wrashid");
-		suite.addTest(playground.wrashid.deqsim.AllDESTests.suite());
 		suite.addTest(playground.wrashid.deqsim.AllPDES2Tests.suite());
 		suite.addTest(playground.wrashid.PDES2.util.AllTests.suite());
 		suite.addTest(playground.wrashid.PDES2.AllTests.suite());

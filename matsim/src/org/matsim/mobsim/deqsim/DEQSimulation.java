@@ -99,6 +99,9 @@ public class DEQSimulation {
 		for (Person person : this.population.getPersons().values()) {
 			vehicle = new Vehicle(scheduler, person);
 		}
+		
+		// just inserted to remove message in bug analysis, that vehicle variable is never read
+		vehicle.toString();
 
 		scheduler.startSimulation();
 

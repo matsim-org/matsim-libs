@@ -1,11 +1,11 @@
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import java.util.ArrayList;
 
 import org.matsim.mobsim.deqsim.EventLog;
+import org.matsim.mobsim.deqsim.util.CppEventFileParser;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class TestEventLog extends MatsimTestCase {
 

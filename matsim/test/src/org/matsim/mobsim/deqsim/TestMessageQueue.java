@@ -1,10 +1,10 @@
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import org.matsim.mobsim.deqsim.Message;
 import org.matsim.mobsim.deqsim.MessageQueue;
+import org.matsim.mobsim.deqsim.util.DummyMessage;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.DES.utils.DummyMessage;
 
 public class TestMessageQueue extends MatsimTestCase {
 	public void testPutMessage1(){

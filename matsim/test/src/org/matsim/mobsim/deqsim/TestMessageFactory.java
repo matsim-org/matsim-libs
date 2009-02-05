@@ -1,4 +1,4 @@
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.mobsim.deqsim.DeadlockPreventionMessage;

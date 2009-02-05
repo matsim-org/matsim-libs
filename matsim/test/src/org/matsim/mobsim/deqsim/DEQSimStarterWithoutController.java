@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.deqsim;
+package org.matsim.mobsim.deqsim;
 
 import java.io.IOException;
 

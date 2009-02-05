@@ -1,9 +1,9 @@
 package playground.wrashid.deqsim.local;
 
 import org.matsim.gbl.Gbl;
+import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.util.TestHandlerDetailedEventChecker;
 
 public class TestDESStarter_LocalCVS_Test6 extends MatsimTestCase {
 	// enable assertion flag allowed

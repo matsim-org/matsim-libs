@@ -20,7 +20,9 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
+import org.matsim.mobsim.deqsim.DEQSimStarterWithoutController;
 import org.matsim.mobsim.deqsim.SimulationParameters;
+import org.matsim.mobsim.deqsim.util.DummyPopulationModifier;
 import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
 import org.matsim.mobsim.deqsim.util.testable.TestHandler;
 import org.matsim.population.Leg;
@@ -30,7 +32,6 @@ import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.deqsim.DEQSimStarterWithoutController;
 import playground.wrashid.deqsim.PDESStarter2;
 
 public class TestHandlerEventCountChecker extends MatsimTestCase implements

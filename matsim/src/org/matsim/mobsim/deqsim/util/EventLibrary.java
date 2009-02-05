@@ -1,4 +1,4 @@
-package playground.wrashid.DES.util;
+package org.matsim.mobsim.deqsim.util;
 
 import java.util.HashMap;
 import java.util.LinkedList;

@@ -1,13 +1,13 @@
-package playground.wrashid.DES;
+package org.matsim.mobsim.deqsim;
 
 import org.matsim.mobsim.deqsim.Message;
 import org.matsim.mobsim.deqsim.Scheduler;
 import org.matsim.mobsim.deqsim.SimUnit;
+import org.matsim.mobsim.deqsim.util.DummyMessage;
+import org.matsim.mobsim.deqsim.util.DummyMessage1;
+import org.matsim.mobsim.deqsim.util.DummySimUnit;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.DES.utils.DummyMessage;
-import playground.wrashid.DES.utils.DummyMessage1;
-import playground.wrashid.DES.utils.DummySimUnit;
 
 public class TestScheduler extends MatsimTestCase {
 

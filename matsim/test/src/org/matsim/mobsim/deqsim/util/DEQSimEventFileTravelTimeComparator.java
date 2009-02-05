@@ -1,13 +1,9 @@
-package playground.wrashid.util;
+package org.matsim.mobsim.deqsim.util;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import org.matsim.events.PersonEvent;
 import org.matsim.mobsim.deqsim.EventLog;
+import org.matsim.mobsim.deqsim.util.CppEventFileParser;
 
-import playground.wrashid.DES.util.EventLibrary;
-import playground.wrashid.tryouts.starting.CppEventFileParser;
 
 public class DEQSimEventFileTravelTimeComparator extends
 TestHandlerDetailedEventChecker {
