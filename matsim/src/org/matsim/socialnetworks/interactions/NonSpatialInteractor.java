@@ -62,9 +62,10 @@ public class NonSpatialInteractor{
 		this.log.info("  |Exchanging knowledge about "+facType+" activity");
 
 
-//		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
 		links = net.getLinks().toArray();
 		final List<Object> list = (List<Object>) Arrays.asList( links );
+		
+		
 		java.util.Collections.shuffle(list, MatsimRandom.random);
 		links=list.toArray();
 		
@@ -112,7 +113,7 @@ public class NonSpatialInteractor{
 		
 		this.log.info("FOF algorithm for Iteration "+iteration+". "+fract_intro*100.+"% of links will be tested.");
 		this.log.info(" For each there is the opportunity to close "+numInteractionsPerLink+" triangles.");
-//		java.util.Collections.shuffle(net.getLinks(), MatsimRandom.random);
+
 		links = net.getLinks().toArray();
 		final List<Object> list = (List<Object>) Arrays.asList( links );
 		java.util.Collections.shuffle(list, MatsimRandom.random);
