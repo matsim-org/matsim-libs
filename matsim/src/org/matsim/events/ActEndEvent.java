@@ -32,7 +32,6 @@ public class ActEndEvent extends ActEvent {
 		super(time, agent, link, act);
 	}
 
-	@Deprecated // String-based ctors discouraged
 	public ActEndEvent(final double time, final String agentId, final String linkId, final String acttype) {
 		super(time, agentId, linkId, acttype);
 	}
