@@ -29,15 +29,40 @@ import org.matsim.network.*;
  */
 public class NetworkRounder {
 	
+	public static boolean _debug =false;
 	
+
+	public static void debug(boolean debug){
+		_debug=debug;
+	}  
+	
+	/**
+	 * rounds networ will change the instance of network!!!!!
+	 * @param network
+	 * @param newcap
+	 */
 	public static void roundNetwork(NetworkLayer network,int newcap){
 		double oldcap = network.getCapacityPeriod();
+		if(_debug){
+			System.out.println(oldcap);
+		}
 		double divisor = oldcap/newcap;
+		if(_debug){
+			System.out.println(divisor);
+		}
 		for (Link link : network.getLinks().values()){
-			link.setFreespeed(Math.round(link.getFreespeed(0.)*newcap));
-			link.setCapacity(Math.ceil(link.getCapacity(1.)/divisor));
-			//link.setCapacity(Math.round(link.getCapacity(1.)/divisor));
+			double newspeed = Math.round(link.getFreespeed(0.)*newcap);
+			if(_debug){
+				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
 			}
+			link.setFreespeed(newspeed);
+			double newcapacity =Math.ceil(link.getCapacity(1.)/divisor);
+			if(_debug){
+				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
+			}
+			link.setCapacity(newcapacity);
+			//link.setCapacity(Math.round(link.getCapacity(1.)/divisor));
+		}
 	}
 	
 	public static NetworkLayer roundNetwork(String filename, int newcap){
@@ -55,9 +80,9 @@ public class NetworkRounder {
 			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 			return;
 		}
-		int cap = 1;
+		int cap =30;
 		String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
-		String outputfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_rounded_1.xml";
+		String outputfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_rounded_30.xml";
 		if(args.length==3){
 			inputfile  = args[0];
 			outputfile = args[1];
