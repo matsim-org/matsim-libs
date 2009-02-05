@@ -47,23 +47,24 @@ public class Vehicle extends SimUnit {
 	// put the first start leg event into the message queue
 	public void initialize() {
 
-		// we must start with linkIndex=-1, because the first link on which the
-		// start activity resides is not
-		// in the Leg. So, for being consistent with the rest of the simulation,
-		// we start with linkIndex=-1
+		/*
+		 * we must start with linkIndex=-1, because the first link on which the
+		 * start activity resides is not in the Leg. So, for being consistent
+		 * with the rest of the simulation, we start with linkIndex=-1
+		 */
 		linkIndex = -1;
 
-		// return at this position, if we are just testing using a dummy
-		// person/plan
-		// (to avoid null pointer exception)
+		/*
+		 * return at this position, if we are just testing using a dummy
+		 * person/plan (to avoid null pointer exception)
+		 */
 		if (ownerPerson.getSelectedPlan() == null) {
 			return;
 		}
 
 		Plan plan = ownerPerson.getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
-		// actsLegs(0) is the first activity,
-		// actsLegs(1) is the first leg
+		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		// an agent starts for a leg (earliest) at the departure time of the leg
@@ -193,18 +194,22 @@ public class Vehicle extends SimUnit {
 	}
 
 	public void scheduleEnterRoadMessage(double scheduleTime, Road road) {
-		// before entering the new road, we must leave the previous road (if
-		// there is a previous road)
-		// the first link does not need to be left (which has index -1)
+		/*
+		 * before entering the new road, we must leave the previous road (if
+		 * there is a previous road) the first link does not need to be left
+		 * (which has index -1)
+		 */
 		if (this.getLinkIndex() >= 0) {
 			scheduleLeavePreviousRoadMessage(scheduleTime);
 		}
 
 		if (isEndingLegMode()) {
-			// attention: as we are not actually entering the road, we need to
-			// give back the promised space to the road
-			// else a precondition of the enterRequest would not be correct any
-			// more (which involves the noOfCarsPromisedToEnterRoad variable)
+			/*
+			 * attention: as we are not actually entering the road, we need to
+			 * give back the promised space to the road else a precondition of
+			 * the enterRequest would not be correct any more (which involves
+			 * the noOfCarsPromisedToEnterRoad variable)
+			 */
 			road.giveBackPromisedSpaceToRoad(); // next road
 			scheduleEndLegMessage(scheduleTime, road);
 		} else {
@@ -215,9 +220,10 @@ public class Vehicle extends SimUnit {
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
 		Road previousRoad = null;
 		Link previousLink = null;
-		// we need to handle the first road in a leg specially, because
-		// the load to be left is accessed over the last act performed instead
-		// of the leg
+		/*
+		 * we need to handle the first road in a leg specially, because the load
+		 * to be left is accessed over the last act performed instead of the leg
+		 */
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			ArrayList<Object> actsLegs = plan.getActsLegs();
