@@ -22,6 +22,7 @@ package org.matsim.mobsim.deqsim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -31,6 +32,7 @@ import org.matsim.population.routes.CarRoute;
 
 public class Vehicle extends SimUnit {
 
+	private static final Logger log = Logger.getLogger(Vehicle.class);
 	private Person ownerPerson = null;
 	private Leg currentLeg = null;
 	private int legIndex;
@@ -120,7 +122,7 @@ public class Vehicle extends SimUnit {
 		currentLinkRoute = links.toArray(new Link[links.size()]);
 	}
 
-	public Link[] getCurrentLinkRoute() {
+	private Link[] getCurrentLinkRoute() {
 		return currentLinkRoute;
 	}
 
@@ -232,6 +234,8 @@ public class Vehicle extends SimUnit {
 		} else if (this.getLinkIndex() >= 1) {
 			previousLink = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];
 			previousRoad = Road.getRoad(previousLink.getId().toString());
+		} else {
+			log.error("Some thing is wrong with the simulation: Why is this.getLinkIndex() negative");
 		}
 
 		scheduleLeaveRoadMessage(scheduleTime, previousRoad);

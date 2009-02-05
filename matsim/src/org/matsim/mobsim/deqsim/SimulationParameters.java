@@ -47,7 +47,7 @@ public class SimulationParameters {
 	public static final int PRIORITY_ENTER_ROAD_MESSAGE = 100;
 
 	// INPUT
-	public static long maxSimulationLength = 800000; // in s
+	private static long maxSimulationLength = 800000; // in s
 	public static long linkCapacityPeriod = 0; // 
 	public static double gapTravelSpeed = 15.0; // in m/s
 	public static double flowCapacityFactor = 1.0;
@@ -93,6 +93,14 @@ public class SimulationParameters {
 
 	public static void setGC_MESSAGES(boolean gc_messages) {
 		GC_MESSAGES = gc_messages;
+	}
+
+	public static long getMaxSimulationLength() {
+		return maxSimulationLength;
+	}
+
+	public static void setMaxSimulationLength(long maxSimulationLength) {
+		SimulationParameters.maxSimulationLength = maxSimulationLength;
 	}
 
 }

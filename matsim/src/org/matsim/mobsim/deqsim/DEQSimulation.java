@@ -47,7 +47,6 @@ public class DEQSimulation {
 
 		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
-		// SimulationParameters.events = events;
 		// the thread for processing the events
 		SimulationParameters.processEventThread = events;
 
