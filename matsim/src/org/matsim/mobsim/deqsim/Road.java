@@ -68,8 +68,7 @@ public class Road extends SimUnit {
 		// same time
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* link.getLanesAsInt(SimulationParameters.linkCapacityPeriod)
-				* SimulationParameters.storageCapacityFactor
-				/ SimulationParameters.carSize);
+				* SimulationParameters.storageCapacityFactor / SimulationParameters.carSize);
 
 		// it is assured here, that a road must have the space of at least one
 		// car
@@ -81,8 +80,7 @@ public class Road extends SimUnit {
 				* SimulationParameters.flowCapacityFactor * link
 				.getLanesAsInt(SimulationParameters.linkCapacityPeriod));
 
-		inverseOutFlowCapacity = 1 / (link
-				.getFlowCapacity(SimulationParameters.linkCapacityPeriod) * SimulationParameters.flowCapacityFactor);
+		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(SimulationParameters.linkCapacityPeriod) * SimulationParameters.flowCapacityFactor);
 
 		if (inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			inverseInFlowCapacity = maxInverseInFlowCapacity;
@@ -96,7 +94,6 @@ public class Road extends SimUnit {
 		gap = null;
 	}
 
-
 	public void leaveRoad(Vehicle vehicle, double simTime) {
 		assert (carsOnTheRoad.getFirst() == vehicle);
 
@@ -108,19 +105,16 @@ public class Road extends SimUnit {
 		// time for entering the road
 		if (interestedInEnteringRoad.size() > 0) {
 			Vehicle nextVehicle = interestedInEnteringRoad.removeFirst();
-			DeadlockPreventionMessage m = deadlockPreventionMessages
-					.removeFirst();
+			DeadlockPreventionMessage m = deadlockPreventionMessages.removeFirst();
 			assert (m.vehicle == nextVehicle);
 			scheduler.unschedule(m);
 
-			double nextAvailableTimeForEnteringStreet = Math.max(
-					timeOfLastEnteringVehicle + inverseInFlowCapacity, simTime
-							+ gapTravelTime);
+			double nextAvailableTimeForEnteringStreet = Math.max(timeOfLastEnteringVehicle
+					+ inverseInFlowCapacity, simTime + gapTravelTime);
 
 			noOfCarsPromisedToEnterRoad++;
 
-			nextVehicle.scheduleEnterRoadMessage(
-					nextAvailableTimeForEnteringStreet, this);
+			nextVehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
 		} else {
 			if (gap != null) {
 				// as long as the road is not full once, there is no need to
@@ -140,11 +134,9 @@ public class Road extends SimUnit {
 		// it reaches the end of the read
 		if (carsOnTheRoad.size() > 0) {
 			Vehicle nextVehicle = carsOnTheRoad.getFirst();
-			double nextAvailableTimeForLeavingStreet = Math.max(
-					earliestDepartureTimeOfCar.getFirst(),
+			double nextAvailableTimeForLeavingStreet = Math.max(earliestDepartureTimeOfCar.getFirst(),
 					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
-			nextVehicle.scheduleEndRoadMessage(
-					nextAvailableTimeForLeavingStreet, this);
+			nextVehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
 		}
 
 	}
@@ -168,11 +160,9 @@ public class Road extends SimUnit {
 		// speed to the front and have to have at least inverseFlowCapacity
 		// time-distance to the previous car
 		if (carsOnTheRoad.size() == 1) {
-			nextAvailableTimeForLeavingStreet = Math.max(
-					nextAvailableTimeForLeavingStreet, timeOfLastLeavingVehicle
-							+ inverseOutFlowCapacity);
-			vehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet,
-					this);
+			nextAvailableTimeForLeavingStreet = Math.max(nextAvailableTimeForLeavingStreet,
+					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
+			vehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
 		} else {
 			// this car is not the front car in the street queue
 			// when the cars infront of the current car leave the street and
@@ -209,13 +199,11 @@ public class Road extends SimUnit {
 			}
 
 			noOfCarsPromisedToEnterRoad++;
-			nextAvailableTimeForEnteringStreet = Math.max(
-					Math.max(timeOfLastEnteringVehicle + inverseInFlowCapacity,
-							simTime), arrivalTimeOfGap);
+			nextAvailableTimeForEnteringStreet = Math.max(Math.max(timeOfLastEnteringVehicle
+					+ inverseInFlowCapacity, simTime), arrivalTimeOfGap);
 
 			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
-			vehicle.scheduleEnterRoadMessage(
-					nextAvailableTimeForEnteringStreet, this);
+			vehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
 		} else {
 			// - if the road was empty then create a new queue else empty the
 			// old queue
@@ -251,16 +239,13 @@ public class Road extends SimUnit {
 				// .getSimTime()) {
 				// System.out.println();
 				// }
-				deadlockPreventionMessages
-						.add(vehicle.scheduleDeadlockPreventionMessage(
-								deadlockPreventionMessages.getLast()
-										.getMessageArrivalTime()
-										+ SimulationParameters.stuckTime, this));
+				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
+						deadlockPreventionMessages.getLast().getMessageArrivalTime()
+								+ SimulationParameters.stuckTime, this));
 
 			} else {
-				deadlockPreventionMessages.add(vehicle
-						.scheduleDeadlockPreventionMessage(simTime
-								+ SimulationParameters.stuckTime, this));
+				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
+						+ SimulationParameters.stuckTime, this));
 			}
 
 		}
@@ -282,8 +267,7 @@ public class Road extends SimUnit {
 		this.timeOfLastEnteringVehicle = timeOfLastEnteringVehicle;
 	}
 
-	public void removeFirstDeadlockPreventionMessage(
-			DeadlockPreventionMessage dpMessage) {
+	public void removeFirstDeadlockPreventionMessage(DeadlockPreventionMessage dpMessage) {
 
 		assert (deadlockPreventionMessages.getFirst() == dpMessage) : "Inconsitency in logic!!! => this should only be invoked from the handler of this message";
 		deadlockPreventionMessages.removeFirst();

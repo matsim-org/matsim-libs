@@ -76,35 +76,34 @@ public class Vehicle extends SimUnit {
 		// schedule start leg message
 		scheduleStartingLegMessage(departureTime, road);
 	}
-	
+
 	// based on the current Leg, the previous activity is computed
 	// this could be implemented more efficiently... (TODO).
-	public Act getPreviousActivity(){
+	public Act getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
-		
-		for (int i=0;i<actsLegs.size();i++){
-			if (actsLegs.get(i)==currentLeg){
-				return ((Act)actsLegs.get(i-1));
+
+		for (int i = 0; i < actsLegs.size(); i++) {
+			if (actsLegs.get(i) == currentLeg) {
+				return ((Act) actsLegs.get(i - 1));
 			}
 		}
 		return null;
 	}
-	
+
 	// based on the current Leg, the next activity is computed
 	// this could be implemented more efficiently... (TODO).
-	public Act getNextActivity(){
+	public Act getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
-		
-		for (int i=0;i<actsLegs.size();i++){
-			if (actsLegs.get(i)==currentLeg){
-				return ((Act)actsLegs.get(i+1));
+
+		for (int i = 0; i < actsLegs.size(); i++) {
+			if (actsLegs.get(i) == currentLeg) {
+				return ((Act) actsLegs.get(i + 1));
 			}
 		}
 		return null;
 	}
-	
 
 	public void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
@@ -148,26 +147,24 @@ public class Vehicle extends SimUnit {
 		this.linkIndex = linkIndex;
 	}
 
-	public boolean isCurrentLegFinished(){
-		return getCurrentLinkRoute().length==getLinkIndex()+1;
+	public boolean isCurrentLegFinished() {
+		return getCurrentLinkRoute().length == getLinkIndex() + 1;
 	}
-	
+
 	// updates both the currentLink and link index variables
 	// with the next link in the link route of the current leg
 	// attention: only applicable, if isCurrentLegFinished==false
-	public void moveToNextLinkInLeg(){
-		setLinkIndex(getLinkIndex()+1);
+	public void moveToNextLinkInLeg() {
+		setLinkIndex(getLinkIndex() + 1);
 		setCurrentLink(getCurrentLinkRoute()[getLinkIndex()]);
 	}
-	
+
 	// note: does not affect the link index
-	public void moveToFirstLinkInNextLeg(){
+	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		setCurrentLink(((Act) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
-
-
 
 	// find out, if the vehicle is in endingLegMode
 	// this means, that the vehicle is just waiting until it can enter the
@@ -201,7 +198,7 @@ public class Vehicle extends SimUnit {
 			road.giveBackPromisedSpaceToRoad(); // next road
 			scheduleEndLegMessage(scheduleTime, road);
 		} else {
-			_scheduleEnterRoadMessage(scheduleTime,road);
+			_scheduleEnterRoadMessage(scheduleTime, road);
 		}
 	}
 
@@ -209,7 +206,8 @@ public class Vehicle extends SimUnit {
 		Road previousRoad = null;
 		Link previousLink = null;
 		// we need to handle the first road in a leg specially, because
-		// the load to be left is accessed over the last act performed instead of the leg
+		// the load to be left is accessed over the last act performed instead
+		// of the leg
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
 			ArrayList<Object> actsLegs = plan.getActsLegs();
@@ -222,37 +220,30 @@ public class Vehicle extends SimUnit {
 
 		scheduleLeaveRoadMessage(scheduleTime, previousRoad);
 	}
-	
+
 	protected void _scheduleEnterRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory
-				.getEnterRoadMessage(road.scheduler, this), road,
-				scheduleTime);
+		sendMessage(MessageFactory.getEnterRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleEndRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndRoadMessage(road.scheduler, this),
-				road, scheduleTime);
+		sendMessage(MessageFactory.getEndRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleLeaveRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getLeaveRoadMessage(road.scheduler, this),
-				road, scheduleTime);
+		sendMessage(MessageFactory.getLeaveRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleEndLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this),
-				road, scheduleTime);
+		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getStartingLegMessage(road.scheduler, this),
-				road, scheduleTime);
+		sendMessage(MessageFactory.getStartingLegMessage(road.scheduler, this), road, scheduleTime);
 	}
 
-	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(
-			double scheduleTime, Road road) {
-		DeadlockPreventionMessage dpMessage = MessageFactory
-				.getDeadlockPreventionMessage(road.scheduler, this);
+	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {
+		DeadlockPreventionMessage dpMessage = MessageFactory.getDeadlockPreventionMessage(road.scheduler,
+				this);
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
 	}

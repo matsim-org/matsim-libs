@@ -35,17 +35,15 @@ public class StartingLegMessage extends EventMessage {
 	public void handleMessage() {
 		// if current leg is in car mode, then enter request in first road
 		if (vehicle.getCurrentLeg().getMode().equals(BasicLeg.Mode.car)) {
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
-					.toString());
-			road.enterRequest(vehicle,getMessageArrivalTime());
+			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+			road.enterRequest(vehicle, getMessageArrivalTime());
 		} else {
 			// move to first link in next leg and schedule an end leg message
 			vehicle.moveToFirstLinkInNextLeg();
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId()
-					.toString());
+			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
 
-			vehicle.scheduleEndLegMessage(getMessageArrivalTime()
-					+ vehicle.getCurrentLeg().getTravelTime(), road);
+			vehicle.scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime(),
+					road);
 		}
 	}
 
@@ -53,18 +51,16 @@ public class StartingLegMessage extends EventMessage {
 		BasicEvent event = null;
 
 		// schedule ActEndEvent
-		event = new ActEndEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
-				.getId().toString(), vehicle.getPreviousActivity().getType());
+		event = new ActEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId().toString(),
+				vehicle.getCurrentLink().getId().toString(), vehicle.getPreviousActivity().getType());
 		SimulationParameters.processEventThread.processEvent(event);
-		
+
 		// schedule AgentDepartureEvent
-		event = new AgentDepartureEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), vehicle.getCurrentLink()
-				.getId().toString(), vehicle.getLegIndex() - 1);
+		event = new AgentDepartureEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
+				.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 
 		SimulationParameters.processEventThread.processEvent(event);
-		
+
 	}
 
 }

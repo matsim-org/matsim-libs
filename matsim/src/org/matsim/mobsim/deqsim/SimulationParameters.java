@@ -24,7 +24,6 @@ import org.matsim.events.Events;
 import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
 import org.matsim.mobsim.deqsim.util.testable.TestHandler;
 
-
 public class SimulationParameters {
 
 	// CONSTANTS
@@ -67,7 +66,7 @@ public class SimulationParameters {
 
 	// OUTPUT
 	// this is the simulation events object
-	//public static Events processEventThread = null;
+	// public static Events processEventThread = null;
 	// The thread for processing the events
 	public static Events processEventThread = null;
 
@@ -88,8 +87,5 @@ public class SimulationParameters {
 	public static void setGC_MESSAGES(boolean gc_messages) {
 		GC_MESSAGES = gc_messages;
 	}
-	
-
-
 
 }

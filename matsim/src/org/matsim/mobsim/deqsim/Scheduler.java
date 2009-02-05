@@ -37,10 +37,9 @@ public class Scheduler {
 
 	public void startSimulation() {
 		Message m;
-		while (!queue.isEmpty()
-				&& simTime < SimulationParameters.maxSimulationLength) {
+		while (!queue.isEmpty() && simTime < SimulationParameters.maxSimulationLength) {
 			m = queue.getNextMessage();
-			if (m!=null){
+			if (m != null) {
 				simTime = m.getMessageArrivalTime();
 				m.processEvent();
 				m.handleMessage();
@@ -59,11 +58,7 @@ public class Scheduler {
 		if (simTime / hourlyLogTime > 1) {
 			hourlyLogTime = simTime + 3600;
 			System.out.print("Simulation at " + simTime / 3600 + "[h]; ");
-			System.out
-					.println("s/r:"
-							+ simTime
-							/ (System.currentTimeMillis() - simulationStartTime)
-							* 1000);
+			System.out.println("s/r:" + simTime / (System.currentTimeMillis() - simulationStartTime) * 1000);
 			Gbl.printMemoryUsage();
 		}
 	}

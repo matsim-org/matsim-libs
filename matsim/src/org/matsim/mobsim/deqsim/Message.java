@@ -25,7 +25,7 @@ public abstract class Message implements Comparable<Message> {
 	private SimUnit sendingUnit;
 	private SimUnit receivingUnit;
 	protected int priority = 0;
-	private boolean isAlive=true;
+	private boolean isAlive = true;
 
 	public Message() {
 	}
@@ -74,23 +74,23 @@ public abstract class Message implements Comparable<Message> {
 	public void setReceivingUnit(SimUnit receivingUnit) {
 		this.receivingUnit = receivingUnit;
 	}
-	
+
 	public abstract void handleMessage();
 
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
-	
-	public void killMessage(){
-		isAlive=false;
-	}
-	
-	public void reviveMessage(){
-		isAlive=true;
+
+	public void killMessage() {
+		isAlive = false;
 	}
 
-	public boolean isAlive(){
+	public void reviveMessage() {
+		isAlive = true;
+	}
+
+	public boolean isAlive() {
 		return isAlive;
 	}
-	
+
 }

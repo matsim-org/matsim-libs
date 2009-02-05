@@ -27,7 +27,7 @@ public class LeaveRoadMessage extends EventMessage {
 	@Override
 	public void handleMessage() {
 		Road road = (Road) this.getReceivingUnit();
-		road.leaveRoad(vehicle,getMessageArrivalTime());
+		road.leaveRoad(vehicle, getMessageArrivalTime());
 	}
 
 	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
@@ -40,9 +40,8 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road = (Road) this.getReceivingUnit();
 		BasicEvent event = null;
 
-		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle
-				.getOwnerPerson().getId().toString(), road.getLink().getId()
-				.toString(), vehicle.getLegIndex() - 1);
+		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId().toString(),
+				road.getLink().getId().toString(), vehicle.getLegIndex() - 1);
 
 		SimulationParameters.processEventThread.processEvent(event);
 	}

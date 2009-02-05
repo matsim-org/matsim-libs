@@ -61,15 +61,13 @@ public class MessageFactory {
 		}
 	}
 
-	public static void disposeDeadlockPreventionMessage(
-			DeadlockPreventionMessage message) {
+	public static void disposeDeadlockPreventionMessage(DeadlockPreventionMessage message) {
 		if (!SimulationParameters.isGC_MESSAGES()) {
 			deadlockPreventionMessageQueue.add(message);
 		}
 	}
 
-	public static EndLegMessage getEndLegMessage(Scheduler scheduler,
-			Vehicle vehicle) {
+	public static EndLegMessage getEndLegMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (endLegMessageQueue.size() == 0) {
 			return new EndLegMessage(scheduler, vehicle);
 		} else {
@@ -79,8 +77,7 @@ public class MessageFactory {
 		}
 	}
 
-	public static EnterRoadMessage getEnterRoadMessage(Scheduler scheduler,
-			Vehicle vehicle) {
+	public static EnterRoadMessage getEnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (enterRoadMessageQueue.size() == 0) {
 			return new EnterRoadMessage(scheduler, vehicle);
 		} else {
@@ -90,8 +87,7 @@ public class MessageFactory {
 		}
 	}
 
-	public static StartingLegMessage getStartingLegMessage(Scheduler scheduler,
-			Vehicle vehicle) {
+	public static StartingLegMessage getStartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (startingLegMessageQueue.size() == 0) {
 			return new StartingLegMessage(scheduler, vehicle);
 		} else {
@@ -101,8 +97,7 @@ public class MessageFactory {
 		}
 	}
 
-	public static LeaveRoadMessage getLeaveRoadMessage(Scheduler scheduler,
-			Vehicle vehicle) {
+	public static LeaveRoadMessage getLeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (leaveRoadMessageQueue.size() == 0) {
 			return new LeaveRoadMessage(scheduler, vehicle);
 		} else {
@@ -112,8 +107,7 @@ public class MessageFactory {
 		}
 	}
 
-	public static EndRoadMessage getEndRoadMessage(Scheduler scheduler,
-			Vehicle vehicle) {
+	public static EndRoadMessage getEndRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (endRoadMessageQueue.size() == 0) {
 			return new EndRoadMessage(scheduler, vehicle);
 		} else {
@@ -123,13 +117,11 @@ public class MessageFactory {
 		}
 	}
 
-	public static DeadlockPreventionMessage getDeadlockPreventionMessage(
-			Scheduler scheduler, Vehicle vehicle) {
+	public static DeadlockPreventionMessage getDeadlockPreventionMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (deadlockPreventionMessageQueue.size() == 0) {
 			return new DeadlockPreventionMessage(scheduler, vehicle);
 		} else {
-			DeadlockPreventionMessage message = deadlockPreventionMessageQueue
-					.poll();
+			DeadlockPreventionMessage message = deadlockPreventionMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
 			return message;
 		}

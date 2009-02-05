@@ -42,16 +42,12 @@ public class EnterRoadMessage extends EventMessage {
 
 		// the first EnterLink in a leg is a Wait2LinkEvent
 		if (vehicle.getLinkIndex() == -1) {
-			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(),
-					vehicle.getOwnerPerson().getId().toString(), vehicle
-							.getCurrentLink().getId().toString(), vehicle
-							.getLegIndex() - 1);
+			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
+					.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 		} else {
 
-			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle
-					.getOwnerPerson().getId().toString(), vehicle
-					.getCurrentLink().getId().toString(),
-					vehicle.getLegIndex() - 1);
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
+					.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 		}
 		SimulationParameters.processEventThread.processEvent(event);
 	}

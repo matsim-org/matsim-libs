@@ -23,7 +23,7 @@ import java.util.PriorityQueue;
 
 public class MessageQueue {
 	private PriorityQueue<Message> queue1 = new PriorityQueue<Message>();
-	private int queueSize=0;
+	private int queueSize = 0;
 
 	/*
 	 * Putting a message into the queue
@@ -42,7 +42,7 @@ public class MessageQueue {
 	public void removeMessage(Message m) {
 		m.killMessage();
 		queueSize--;
-		//queue1.removeAll(Collections.singletonList(m));
+		// queue1.removeAll(Collections.singletonList(m));
 	}
 
 	/*
@@ -50,22 +50,22 @@ public class MessageQueue {
 	 */
 	public Message getNextMessage() {
 		Message m = null;
-		if (queue1.peek()!=null){
+		if (queue1.peek() != null) {
 			// skip over dead messages
-			while ((m=queue1.poll())!=null && !m.isAlive()){
-			
+			while ((m = queue1.poll()) != null && !m.isAlive()) {
+
 			}
 			// only decrement, if message fetched
-			if (m!=null){
+			if (m != null) {
 				queueSize--;
 			}
 		}
-		
+
 		return m;
 	}
 
 	public boolean isEmpty() {
-		return queue1.size()==0;
+		return queue1.size() == 0;
 	}
 
 	public int getQueueSize() {

@@ -34,14 +34,12 @@ import org.matsim.population.Person;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 
-
 public class DEQSimulation {
 
 	Population population;
 	NetworkLayer network;
 
-	public DEQSimulation(final NetworkLayer network, final Population population,
-			final Events events) {
+	public DEQSimulation(final NetworkLayer network, final Population population, final Events events) {
 		// constructor
 
 		this.population = population;
@@ -49,16 +47,16 @@ public class DEQSimulation {
 
 		// initialize Simulation parameters
 		SimulationParameters.linkCapacityPeriod = network.getCapacityPeriod();
-		//SimulationParameters.events = events;
+		// SimulationParameters.events = events;
 		// the thread for processing the events
-		SimulationParameters.processEventThread= events;
+		SimulationParameters.processEventThread = events;
 
-		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig()
-				.getParam("simulation", "stuckTime"));
-		SimulationParameters.flowCapacityFactor = Double.parseDouble(Gbl
-				.getConfig().getParam("simulation", "flowCapacityFactor"));
-		SimulationParameters.storageCapacityFactor = Double.parseDouble(Gbl
-				.getConfig().getParam("simulation", "storageCapacityFactor"));
+		SimulationParameters.stuckTime = Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"stuckTime"));
+		SimulationParameters.flowCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam("simulation",
+				"flowCapacityFactor"));
+		SimulationParameters.storageCapacityFactor = Double.parseDouble(Gbl.getConfig().getParam(
+				"simulation", "storageCapacityFactor"));
 
 		// allowed testing to hook in here
 		if (SimulationParameters.testEventHandler != null) {
@@ -76,8 +74,7 @@ public class DEQSimulation {
 		}
 
 		if (SimulationParameters.testPopulationModifier != null) {
-			this.population = SimulationParameters.testPopulationModifier
-					.modifyPopulation(this.population);
+			this.population = SimulationParameters.testPopulationModifier.modifyPopulation(this.population);
 		}
 
 	}
@@ -104,8 +101,7 @@ public class DEQSimulation {
 		}
 
 		scheduler.startSimulation();
-		
-		
+
 		t.endTimer();
 		t.printMeasuredTime("Time needed for one iteration (only DES part): ");
 

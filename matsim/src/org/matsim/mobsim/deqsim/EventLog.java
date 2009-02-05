@@ -32,8 +32,8 @@ public class EventLog {
 	int toNodeId = 0;
 	String type = null;
 
-	public EventLog(double time, int vehicleId, int legNo, int linkId,
-			int fromNodeId, int toNodeId, String type) {
+	public EventLog(double time, int vehicleId, int legNo, int linkId, int fromNodeId, int toNodeId,
+			String type) {
 		super();
 		this.time = time;
 		this.vehicleId = vehicleId;
@@ -111,8 +111,7 @@ public class EventLog {
 		this.type = type;
 	}
 
-	public static boolean compare(ArrayList<EventLog> eventLog1,
-			ArrayList<EventLog> eventLog2) {
+	public static boolean compare(ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2) {
 		int NoOfNotEqualEvents = 0;
 
 		assert eventLog1.size() == eventLog2.size() : "The size of both eventLogs must be the same!";
@@ -140,8 +139,7 @@ public class EventLog {
 		// point) and the link
 		// the event type is ignored for the moment, because in the beginning it
 		// might be different
-		if (Math.rint(eventLog1.getTime() * 10000) == Math.rint(eventLog2
-				.getTime() * 10000)
+		if (Math.rint(eventLog1.getTime() * 10000) == Math.rint(eventLog2.getTime() * 10000)
 				&& eventLog1.getLinkId() == eventLog2.getLinkId()) {
 			return true;
 		} else {
@@ -164,8 +162,7 @@ public class EventLog {
 	// Then compare the usage time of each link for the two different Event logs
 	// print the average(absolute difference): absSumLink
 	// and the sum (absolute difference) in seconds: absAverageLinkDiff
-	public static double absAverageLinkDiff(ArrayList<EventLog> eventLog1,
-			ArrayList<EventLog> eventLog2) {
+	public static double absAverageLinkDiff(ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2) {
 		HashMap<Integer, Double[]> hm = new HashMap<Integer, Double[]>(); // key:
 		// int
 		// (linkId)
@@ -216,8 +213,7 @@ public class EventLog {
 		return absAverage;
 	}
 
-	public static void filterEvents(int linkId, ArrayList<EventLog> eventLog1,
-			ArrayList<EventLog> eventLog2) {
+	public static void filterEvents(int linkId, ArrayList<EventLog> eventLog1, ArrayList<EventLog> eventLog2) {
 		LinkedList<EventLog> list1, list2;
 		list1 = new LinkedList<EventLog>();
 		list2 = new LinkedList<EventLog>();
@@ -247,18 +243,15 @@ public class EventLog {
 	 * Get the travel time of one person. This means the time, between starting
 	 * each leg end its end.
 	 */
-	public static double getTravelTime(ArrayList<EventLog> eventLog1,
-			int vehicleId) {
+	public static double getTravelTime(ArrayList<EventLog> eventLog1, int vehicleId) {
 		double travelTime = 0;
 		double startLegTime = 0;
 
 		for (int i = 0; i < eventLog1.size(); i++) {
 			if (eventLog1.get(i).vehicleId == vehicleId) {
-				if (eventLog1.get(i).type
-						.equalsIgnoreCase(SimulationParameters.START_LEG)) {
+				if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.START_LEG)) {
 					startLegTime = eventLog1.get(i).time;
-				} else if (eventLog1.get(i).type
-						.equalsIgnoreCase(SimulationParameters.END_LEG)) {
+				} else if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.END_LEG)) {
 					travelTime += eventLog1.get(i).time - startLegTime;
 				}
 			}
@@ -277,14 +270,10 @@ public class EventLog {
 		HashMap<Integer, Double> startingTime = new HashMap<Integer, Double>();
 
 		for (int i = 0; i < eventLog1.size(); i++) {
-			if (eventLog1.get(i).type
-					.equalsIgnoreCase(SimulationParameters.START_LEG)) {
-				startingTime.put(eventLog1.get(i).vehicleId,
-						eventLog1.get(i).time);
-			} else if (eventLog1.get(i).type
-					.equalsIgnoreCase(SimulationParameters.END_LEG)) {
-				travelTime += eventLog1.get(i).time
-						- startingTime.get(eventLog1.get(i).vehicleId);
+			if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.START_LEG)) {
+				startingTime.put(eventLog1.get(i).vehicleId, eventLog1.get(i).time);
+			} else if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.END_LEG)) {
+				travelTime += eventLog1.get(i).time - startingTime.get(eventLog1.get(i).vehicleId);
 			}
 		}
 
