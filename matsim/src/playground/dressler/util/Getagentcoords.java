@@ -61,7 +61,10 @@ public class Getagentcoords {
 	public static void main(final String[] args) {
 		// choose instance
 		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
-		final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
+		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
+		final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
+		
+		final String outputPngFilename = "/homes/combi/dressler/V/code/workspace/matsim/output/exitmap.png";
 		boolean planstats = true;
 
 		@SuppressWarnings("unused")
@@ -100,8 +103,8 @@ public class Getagentcoords {
 
 		// create chosen-exit map		
 		if (planstats) {			
-			Double minc = Double.MAX_VALUE;
-			Double maxc = Double.MIN_VALUE;
+			Double minc = +500000000d;
+			Double maxc = -500000000d;
 
 			int width = 300;
 			int height = 300;
@@ -114,7 +117,9 @@ public class Getagentcoords {
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) continue;
 
-				Coord c = plan.getFirstActivity().getCoord();
+				Coord c = plan.getFirstActivity().getLink().getFromNode().getCoord();
+				//Coord c = plan.getFirstActivity().getCoord();
+				//if (c == null) continue; // why would this happen? but happens ...
 				minc = Math.min(c.getX(), minc);
 				minc = Math.min(c.getY(), minc);
 				maxc = Math.max(c.getX(), maxc);
@@ -125,13 +130,16 @@ public class Getagentcoords {
 			Double offset = -minc*scale + 3;
 
 			System.out.println("minc "+ minc + " maxc " + maxc);
-
+			Integer foundpeople = 0;
 			for (Person p : population.getPersons().values()) {
 				Plan plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) continue;
 
-				Coord c = plan.getFirstActivity().getCoord();
+				Coord c = plan.getFirstActivity().getLink().getFromNode().getCoord();
+				
+				//if (c == null) continue; // why would this happen? but happens ...
+				
 				//System.out.println(c.getX() + " " + c.getY());
 				Leg leg = plan.getNextLeg(plan.getFirstActivity());
 				if (leg == null || evaclinks == null) {
@@ -150,7 +158,8 @@ public class Getagentcoords {
 				for (Id id : leg.getRoute().getLinkIds()) {			      
 					if (evaclinks.containsKey(id)) {
 						found = true;
-						System.out.println("Juhu " + id);
+						//System.out.println("Juhu " + id);
+						foundpeople++;
 						g2D.setColor(colours.get(id));
 						g2D.drawOval(X, Y, 1, 1);
 					}
@@ -160,7 +169,8 @@ public class Getagentcoords {
 					g2D.drawOval(X, Y, 1, 1);
 				}
 			}
-			File pngfile = new File("./output/exitmap.png");
+			System.out.println(foundpeople);
+			File pngfile = new File(outputPngFilename);
 			try {
 				ImageIO.write(image, "png", pngfile);
 			} catch (IOException e) {
