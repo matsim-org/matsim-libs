@@ -600,8 +600,8 @@ public class Flow {
 				for (PathEdge edge : path.getPathEdges()){
 					ids.add(edge.getEdge().getId());
 				}
-				BasicRouteImpl route = new BasicRouteImpl();
-				route.setLinkIds(ids);
+				BasicRouteImpl route = new BasicRouteImpl(ids.get(1),ids.get(ids.size()-1));
+				route.setLinkIds(ids);				
 				BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
 				leg.setRoute(route);
 				BasicActImpl home = new BasicActImpl("home");
