@@ -56,7 +56,7 @@ public class SimTest extends TestCase {
 		
 		//ArrayList<EventLog> eventLog1= SimulationParameters.eventOutputLog;
 		
-		ArrayList<EventLog> eventLog2= CppEventFileParser.eventLog;
+		ArrayList<EventLog> eventLog2= CppEventFileParser.getEventLog();
 		
 		//EventLog.print(eventLog1);
 		

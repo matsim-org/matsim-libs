@@ -2,8 +2,10 @@ package org.matsim.mobsim.deqsim.util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -15,7 +17,7 @@ import org.matsim.mobsim.deqsim.SimulationParameters;
 
 public class CppEventFileParser {
 
-	public static ArrayList<EventLog> eventLog = null;
+	private static ArrayList<EventLog> eventLog = null;
 
 	/**
 	 * @param args
@@ -27,7 +29,7 @@ public class CppEventFileParser {
 	}
 
 	public void parse(String eventFileName) {
-		eventLog = CppEventFileParser.parseFile(eventFileName);
+		setEventLog (CppEventFileParser.parseFile(eventFileName));
 		for (int i = 0; i < eventLog.size(); i++) {
 			// eventLog.get(i).print();
 		}
@@ -92,7 +94,8 @@ public class CppEventFileParser {
 
 				line = br.readLine();
 			}
-		} catch (Exception ex) {
+			br.close();
+		} catch (IOException ex) {
 			System.out.println(ex);
 		}
 
@@ -167,6 +170,14 @@ public class CppEventFileParser {
 		System.out.println("POSSIBLE PROBLEM: EVENTS NOT EQUAL");
 		System.out.println(personEvent.toString());
 		deqSimEvent.print();
+	}
+
+	public static ArrayList<EventLog> getEventLog() {
+		return eventLog;
+	}
+
+	public static void setEventLog(ArrayList<EventLog> eventLog) {
+		CppEventFileParser.eventLog = eventLog;
 	}
 
 }
