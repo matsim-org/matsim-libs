@@ -78,7 +78,7 @@ import edu.uci.ics.jung.utils.UserData;
  */
 public class SocialNetworkStatistics {
 
-	private final int writeInterval=50;
+	private final int writeInterval=1;
 	private final Logger log = Logger.getLogger(SocialNetworkStatistics.class);
 	private String statsoutdir;
 
@@ -104,6 +104,7 @@ public class SocialNetworkStatistics {
 
 		// statsoutdir = Gbl.getConfig().socnetmodule().getOutDir()+"stats/";
 		statsoutdir = dir + "/stats/";
+		this.log.warn("Edges written out each iteration change to 50 before checking in!!!!!!");
 	}
 
 	public void openFiles() {
@@ -190,18 +191,64 @@ public class SocialNetworkStatistics {
 
 		runPersonStatistics(iteration, plans, snet);
 		// Edge statistics
-		runEdgeStatistics(iteration, plans);
+//		runEdgeStatistics(iteration, plans);
+		runEdgeStatistics2(iteration,snet);
 
 	}
-
+	private void runEdgeStatistics2(int iter, SocialNetwork snet) {
+		StatisticalMoments smDD = new StatisticalMoments();
+		StatisticalMoments smDur = new StatisticalMoments();
+		StatisticalMoments smNum = new StatisticalMoments();
+		// iter tlast tfirst dist egoid alterid purpose rseed var
+		Set<SocialNetEdge> edges = snet.getLinks();
+		double dyadDist = 0.;
+		Iterator<SocialNetEdge> eIter = edges.iterator();
+		while (eIter.hasNext()) {
+			SocialNetEdge myEdge = (SocialNetEdge) eIter.next();
+			// Distance separating home addresses of two acquaintances
+			dyadDist = getDyadDistance(myEdge);
+			// Average distance separating acquaintances
+			smDD.accumulate(dyadDist);
+			// Need persons to get Id's
+			Person pFrom = myEdge.getPersonFrom();
+			Person pTo = myEdge.getPersonTo();
+			// Average duration of a social link
+			double x1 = myEdge.getTimeLastUsed();
+			double x2 = myEdge.getTimesMet();
+			smDur.accumulate(x1);
+			smNum.accumulate(x2);
+			if(iter%writeInterval==0){
+				try {
+					eout.write(iter + " " + myEdge.getTimeLastUsed() + " "
+							+ myEdge.getTimeMade() + " " + dyadDist + " "
+							+ pFrom.getId() + " " + pTo.getId() + " "
+							+ myEdge.getType() + " "
+							+ myEdge.getTimesMet());
+					eout.write("\r\n");
+//					eout.newLine();
+					eout.flush();
+				} catch (IOException ex) {
+				}
+			}
+		}
+		try {
+			gout.write(" " + smDD.average() + " " + smDur.average() + " "
+					+ smNum.average() / (iter));
+			gout.write("\r\n");
+//			gout.newLine();
+			gout.flush();
+		} catch (IOException ex) {
+		}
+	}
+	
 	private void runEdgeStatistics(int iter, Population plans) {
 		StatisticalMoments smDD = new StatisticalMoments();
 		StatisticalMoments smDur = new StatisticalMoments();
 		StatisticalMoments smNum = new StatisticalMoments();
 		// iter tlast tfirst dist egoid alterid purpose rseed var
-		Set edges = this.g.getEdges();
+		Set<?> edges = this.g.getEdges();
 		double dyadDist = 0.;
-		Iterator eIter = edges.iterator();
+		Iterator<?> eIter = edges.iterator();
 		while (eIter.hasNext()) {
 			Edge myEdge = (Edge) eIter.next();
 			// Distance separating home addresses of two acquaintances
@@ -253,6 +300,17 @@ public class SocialNetworkStatistics {
 		return persons;
 	}
 
+	private double getDyadDistance(SocialNetEdge myEdge) {
+		double dist = 0.;
+		Person pFrom = myEdge.getPersonFrom();
+		Coord fromCoord = ((Act) pFrom.getSelectedPlan().getActsLegs().get(
+				0)).getCoord();
+		Person pTo = myEdge.getPersonTo();
+		Coord toCoord = ((Act) pTo.getSelectedPlan().getActsLegs().get(0))
+		.getCoord();
+		dist = fromCoord.calcDistance(toCoord);
+		return dist;
+	}
 	private double getDyadDistance(Edge myEdge, Population plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
@@ -476,6 +534,11 @@ public class SocialNetworkStatistics {
 			// log.info(myLink.getTimeMade()-myLink.getTimeLastUsed());
 			// Add the link to the graph
 			g.addEdge(e);
+//			System.out.println("0" + " " + e.getUserDatum("timeLastUsed") + " "
+//					+ e.getUserDatum("timeMet") + " " + "0." + " "
+//					+ myLink.getPersonFrom().getId() + " " + myLink.getPersonTo().getId() + " "
+//					+ e.getUserDatum("type") + " "
+//					+ e.getUserDatum("visitNum"));
 //			log.info("Adding edge to JUNG graph object, g is being filled");
 //			Gbl.printMemoryUsage();
 		}
@@ -496,6 +559,7 @@ public class SocialNetworkStatistics {
 		} catch (IOException ex2) {
 		}
 		log.info("Social network output files closed.");
+		
 	}
 
 }
