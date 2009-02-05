@@ -35,9 +35,6 @@ public abstract class SimUnit {
 		scheduler.schedule(m);
 	}
 
-	// this procedure is invoked at the end of the simulation
-	public abstract void finalize();
-
 	public Scheduler getScheduler() {
 		return scheduler;
 	}

@@ -44,12 +44,6 @@ public class Vehicle extends SimUnit {
 		initialize();
 	}
 
-	@Override
-	public void finalize() {
-		// TODO Auto-generated method stub
-
-	}
-
 	// put the first start leg event into the message queue
 	public void initialize() {
 

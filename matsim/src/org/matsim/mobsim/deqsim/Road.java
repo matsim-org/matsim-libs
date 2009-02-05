@@ -96,11 +96,6 @@ public class Road extends SimUnit {
 		gap = null;
 	}
 
-	@Override
-	public void finalize() {
-		// TODO Auto-generated method stub
-
-	}
 
 	public void leaveRoad(Vehicle vehicle, double simTime) {
 		assert (carsOnTheRoad.getFirst() == vehicle);
