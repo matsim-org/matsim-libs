@@ -39,7 +39,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRoute;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
-import org.matsim.utils.geometry.CoordImpl;
 
 public class RandomChangeLocShortestK implements PlanAlgorithm {
 
