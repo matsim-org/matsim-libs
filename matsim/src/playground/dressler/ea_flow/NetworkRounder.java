@@ -41,7 +41,7 @@ public class NetworkRounder {
 	 * @param network
 	 * @param newcap
 	 */
-	public static void roundNetwork(NetworkLayer network,int newcap){
+	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor){
 		double oldcap = network.getCapacityPeriod();
 		if(_debug){
 			System.out.println(oldcap);
@@ -56,7 +56,7 @@ public class NetworkRounder {
 				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
-			double newcapacity =Math.ceil(link.getCapacity(1.)/divisor);
+			double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
 			if(_debug){
 				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
 			}
@@ -66,12 +66,12 @@ public class NetworkRounder {
 		network.setCapacityPeriod(newcap);
 	}
 	
-	public static NetworkLayer roundNetwork(String filename, int newcap){
+	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor){
 		//read network
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(filename);
-		roundNetwork(network, newcap);
+		roundNetwork(network, newcap, flowCapacityFactor);
 		return network;
 		
 	}
@@ -81,18 +81,25 @@ public class NetworkRounder {
 			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 			return;
 		}
-		int cap =30;
+		int cap = 30;
+		double flowCapacityFactor = 1.0d;
 		String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
 		String outputfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_rounded_30.xml";
+		
 		if(args.length==3){
 			inputfile  = args[0];
 			outputfile = args[1];
 			cap = Integer.valueOf(args[2]);
+		} else if (args.length==4){
+			inputfile  = args[0];
+			outputfile = args[1];
+			cap = Integer.valueOf(args[2]);
+			flowCapacityFactor = Double.valueOf(args[3]);
 		}
 		if (args.length == 1){
 			cap =Integer.valueOf(args[0]);
 		}
-		NetworkLayer network = roundNetwork(inputfile,cap);
+		NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor);
 		NetworkWriter writer = new NetworkWriter( network, outputfile);
 		writer.write();
 		
