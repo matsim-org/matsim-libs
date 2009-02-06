@@ -43,6 +43,7 @@ public class NetworkRounder {
 	 */
 	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor){
 		double oldcap = network.getCapacityPeriod();
+		int roundedtozero = 0;
 		if(_debug){
 			System.out.println(oldcap);
 		}
@@ -51,19 +52,23 @@ public class NetworkRounder {
 			System.out.println(divisor);
 		}
 		for (Link link : network.getLinks().values()){
-			double newspeed = Math.round(link.getFreespeed(0.)*newcap);
+			double newspeed = link.getFreespeed(0.)*newcap;
 			if(_debug){
 				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
-			double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
+			//double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
+			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
+			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozero++;
 			if(_debug){
 				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
 			}
 			link.setCapacity(newcapacity);
-			//link.setCapacity(Math.round(link.getCapacity(1.)/divisor));
 		}
 		network.setCapacityPeriod(newcap);
+		//if (_debug){
+			System.out.println("Edge capacities rounded to zero: " + roundedtozero);
+		//}
 	}
 	
 	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor){
@@ -81,10 +86,10 @@ public class NetworkRounder {
 			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 			return;
 		}
-		int cap = 30;
-		double flowCapacityFactor = 1.0d;
-		String inputfile  = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network.xml";
-		String outputfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_rounded_30.xml";
+		int cap = 5;
+		double flowCapacityFactor = 0.1d;
+		String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
+		String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
 		
 		if(args.length==3){
 			inputfile  = args[0];
