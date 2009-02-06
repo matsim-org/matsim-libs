@@ -533,8 +533,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		ArrayList<?> actslegsResult = this.copyActsLegs(actslegsBase);
 		double score=-100000;
 		int [] subtours = new int [planAnalyzeSubtours.getNumSubtours()];
+		int [] subtourDistances = new int [planAnalyzeSubtours.getNumSubtours()];
 		for (int i=0;i<subtours.length;i++){
 			subtours[i]=0;
+			subtourDistances[i] = this.checksubtourDistance2(actslegsBase, planAnalyzeSubtours, i);
 		}
 		/* loop as many times as there are possible combinations of subtours */
 		int index=subtours.length-1;
@@ -543,7 +545,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			boolean tour=false;
 			for (int k=0;k<subtours.length;k++){
 				if (this.possibleModes[subtours[k]].toString()=="walk"){
-					if (this.checkWalkingDistance2(actslegsBase, planAnalyzeSubtours, k)){
+					if (subtourDistances[k]==2){
+						tour=true;
+						break;
+					}
+				}
+				else {
+					if (subtourDistances[k]==0){
 						tour=true;
 						break;
 					}
@@ -844,17 +852,18 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		return 1; // "1" = default rest
 	}
 	
-	private boolean checkWalkingDistance2 (ArrayList<?> actslegs, PlanAnalyzeSubtours planAnalyzeSubtours, int pos){
+	private int checksubtourDistance2 (ArrayList<?> actslegs, PlanAnalyzeSubtours planAnalyzeSubtours, int pos){
 		double distance = 0;
 		for (int k=0;k<((int)(actslegs.size()/2));k++){
 			if (planAnalyzeSubtours.getSubtourIndexation()[k]==pos){
 				distance+=((Act)(actslegs.get(k*2))).getCoord().calcDistance(((Act)(actslegs.get(k*2+2))).getCoord());
 				if (distance>this.maxWalkingDistance) {
-					return true;
+					return 2;
 				}
 			}
 		}
-		return false;	
+		if (distance==0) return 0;
+		return 1;	
 	}
 	
 	
