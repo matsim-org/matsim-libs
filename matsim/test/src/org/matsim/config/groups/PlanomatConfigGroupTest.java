@@ -32,16 +32,19 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		
 //		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
 //		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
-		assertEquals( PlanomatConfigGroup.DEFAULT_JGAP_MAX_GENERATIONS, Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		BasicLeg.Mode[] expectedModes = PlanomatConfigGroup.DEFAULT_POSSIBLE_MODES;
-		BasicLeg.Mode[] actualModes = Gbl.getConfig().planomat().getPossibleModes();
-		assertEquals(expectedModes.length, actualModes.length);
-		for (int ii=0; ii < expectedModes.length; ii++) {
-			assertEquals(expectedModes[ii], actualModes[ii]);
-		}
-		assertEquals( PlanomatConfigGroup.DEFAULT_LEG_TRAVEL_TIME_ESTIMATOR_NAME, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
-		assertEquals( PlanomatConfigGroup.DEFAULT_LEVEL_OF_TIME_RESOLUTION, Gbl.getConfig().planomat().getLevelOfTimeResolution());
-		assertEquals( PlanomatConfigGroup.DEFAULT_DO_LOGGING, Gbl.getConfig().planomat().isDoLogging() );
+		assertEquals( 
+				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getDefaultValue()), 
+				Gbl.getConfig().planomat().getJgapMaxGenerations() );
+		assertEquals(null, Gbl.getConfig().planomat().getPossibleModes());
+		assertEquals( 
+				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
+				Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
+		assertEquals( 
+				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.LEVEL_OF_TIME_RESOLUTION.getDefaultValue()), 
+				Gbl.getConfig().planomat().getLevelOfTimeResolution());
+		assertEquals( 
+				Boolean.parseBoolean(PlanomatConfigGroup.PlanomatConfigParameter.DO_LOGGING.getDefaultValue()), 
+				Gbl.getConfig().planomat().isDoLogging() );
 	}
 
 	public void testAddParam() {

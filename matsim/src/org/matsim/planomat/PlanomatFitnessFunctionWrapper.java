@@ -94,7 +94,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 			legIntermediate = (Leg) actslegs.get(ii * 2 + 1);
 			destination = (Act) actslegs.get(ii * 2 + 2);
 
-			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+			if (Gbl.getConfig().planomat().getPossibleModes() != null) {
 				// set mode
 				subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[ii];
 				modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();

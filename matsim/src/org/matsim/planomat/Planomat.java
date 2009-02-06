@@ -172,7 +172,7 @@ public class Planomat implements PlanAlgorithm {
 				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
 
-			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+			if (Gbl.getConfig().planomat().getPossibleModes() != null) {
 				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
 					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
 				} 
@@ -247,7 +247,7 @@ public class Planomat implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+				if (Gbl.getConfig().planomat().getPossibleModes() != null) {
 					// set mode to result from optimization
 					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();
