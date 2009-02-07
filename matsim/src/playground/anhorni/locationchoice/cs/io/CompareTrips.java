@@ -51,7 +51,8 @@ public class CompareTrips {
 			String curr_line = bufferedReader.readLine(); // Skip header
 					
 			try {		
-				final String header="Id\tin choice set\twmittel\tausmittel\tfollowing trip wmittel\tfollowing trip ausmittel";						
+				final String header="Id\taction\twmittel\tausmittel\t" +
+						"following trip wmittel\tfollowing trip ausmittel";						
 				final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 				out.write(header);
 				out.newLine();								
@@ -82,7 +83,7 @@ public class CompareTrips {
 						String ausmittelOut = this.getAusmittel(ausmittel);
 						MZTrip followingTripMZ = this.getNextTrip(tripId); 
 						
-						out.write(tripId + "\t" + "0" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
+						out.write(tripId + "\t" + "removed from old trip set" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
 								followingTripMZ.getWmittel() + "\t" + followingTripMZ.getAusmittel());
 						out.newLine();
 					}
@@ -98,7 +99,7 @@ public class CompareTrips {
 						String ausmittelOut = this.mzTrips.get(choiceSet.getId()).getAusmittel();
 						MZTrip followingTripMZ = this.getNextTrip(choiceSet.getId().toString()); 
 						
-						out.write(choiceSet.getId().toString() + "\t" + "1" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
+						out.write(choiceSet.getId().toString() + "\t" + "newly added to trip set" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
 								followingTripMZ.getWmittel() +"\t" + followingTripMZ.getAusmittel());
 						out.newLine();
 					}
@@ -190,6 +191,15 @@ public class CompareTrips {
 		}
 		else if (inString.equals("-97")) {
 			outString = "unvollständiger Ausgang";
+		}
+		else if (inString.equals("5")) {
+			outString = "bus";
+		}
+		else if (inString.equals("7")) {
+			outString = "motorbike";
+		}
+		else if (inString.equals("9")) {
+			outString = "bike";
 		}
 		return outString;
 	}
