@@ -17,7 +17,7 @@ public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
 		String outfile = outdir + mode +"_TripStats.txt";
 		
 		try {		
-			final String header="Id\tTravel distance (m)\tTravel time (s)\tTravel speed (km/h)\tTTB (s)\tUsed Buget (%)";
+			final String header="Id\tTravel distance in net (m)\tcrow fly distance_exact (m)\tTravel time in net (s)\tTravel speed (km/h)\tTTB (s)\tUsed Buget (%)";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
@@ -33,8 +33,14 @@ public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
 				double travelSpeed = 3.6 * travelDistance / travelTime;
 				double usedBudgetPercent = 100.0 * travelTime / choiceSet.getTravelTimeBudget();
 				
+				double crowFlyDistance = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
+					calcDistance(choiceSet.getChosenZHFacility().getExactPosition()) +
+					choiceSet.getTrip().getAfterShoppingAct().getCoord().
+					calcDistance(choiceSet.getChosenZHFacility().getExactPosition());
+				
 				out.write(choiceSet.getId() + "\t" + 
 						travelDistance + "\t" + 
+						crowFlyDistance + "\t" + 
 						travelTime + "\t" + 
 						travelSpeed + "\t" + 
 						choiceSet.getTravelTimeBudget() + "\t" +
