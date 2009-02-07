@@ -68,9 +68,10 @@ public class ChoiceSetWriterSimple extends CSWriter {
 							location);
 					out.newLine();
 					
-					out_alternatives.write(choiceSet.getId() + "\t" + choiceSet.getFacilities().size());
-				}					
+					
+				}
 				out.flush();
+				out_alternatives.write(choiceSet.getId() + "\t" + choiceSet.getFacilities().size());
 				out_alternatives.flush();
 				
 				if (!oneIsChosen) {

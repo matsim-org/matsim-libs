@@ -120,11 +120,11 @@ public class GenerateChoiceSets {
 			log.info("out dir: " + this.outdir);
 			log.info("zhFacilitiesFile" + this.zhFacilitiesFile);
 			log.info("shape file:" + this.shapeFile);
-			log.info("walkingSpeed = " + this.walkingSpeed + "m/s");
+			log.info("walkingSpeed = " + this.walkingSpeed + " m/s");
 			log.info("choice set size: " + this.choiceSetSize);
 			log.info("Sampling :" + this.sampling);
 			log.info("readNelson: " + this.readNelson);
-			log.info("walkEllipse: " + this.walkCrowFly);
+			log.info("walk crow fly: " + this.walkCrowFly);
 			log.info("DEQSim : " + this.DEQSim);
 			log.info("mode : " + this.mode);
 
