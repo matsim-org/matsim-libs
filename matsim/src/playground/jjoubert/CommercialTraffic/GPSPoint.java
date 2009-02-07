@@ -1,12 +1,10 @@
 package playground.jjoubert.CommercialTraffic;
 
-import java.util.Comparator;
-
 public class GPSPoint implements Comparable<GPSPoint>{
 	int vehID;
 	int time;
-	double x;
-	double y;
+	double longitude;
+	double latitude;
 	int status;
 	int speed;
 	public int getVehID() {
@@ -21,17 +19,17 @@ public class GPSPoint implements Comparable<GPSPoint>{
 	public void setTime(int time) {
 		this.time = time;
 	}
-	public double getX() {
-		return x;
+	public double getLongitude() {
+		return longitude;
 	}
-	public void setX(double x) {
-		this.x = x;
+	public void setLongitude(double x) {
+		this.longitude = x;
 	}
-	public double getY() {
-		return y;
+	public double getLatitude() {
+		return latitude;
 	}
-	public void setY(double y) {
-		this.y = y;
+	public void setLatitude(double y) {
+		this.latitude = y;
 	}
 	public int getStatus() {
 		return status;
