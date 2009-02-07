@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 // ok:
 import org.matsim.basic.v01.*;
 import org.matsim.interfaces.basic.v01.*;
+import org.matsim.network.Link;
 
 // not ok:
 import org.matsim.events.*;
@@ -46,7 +47,7 @@ ActStartEventHandler
 			double fs = bl.getFreespeed(0.) ; 
 			double cap = bl.getCapacity(0.) ;
 			double nLanes = bl.getLanes(0.) ; // TODO: getNumberOfLanes??
-			// TODO: also getters w/o time argument?  I think that would contribute to robustness ...
+			// TODO: also getters w/o time argument?  I think that would contribute to robustness ...			
 			
 		}
 		
