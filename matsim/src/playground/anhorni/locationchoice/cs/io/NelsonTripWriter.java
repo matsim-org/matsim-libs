@@ -16,7 +16,10 @@ public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
 		String outfile = outdir + name +"_Trips.txt";
 		
 		try {		
-			final String header="Id\tTrip_nr\tTTB (s)\tS_X\tS_Y\tEnd_S\tZ_X\tZ_Y\tStart_Z\tEnd_Z\tE_X\tE_Y\tStart_E";
+			final String header="Id\tTTB (s)\t" +
+					"Prior_X\tPrior_Y\tt_End_Prior (s after midnight)\t" +
+					"Shop_X\tShop_Y\tt_Start_Shop (s after midnight)\tt_End_Shop (s after midnight)\t" +
+					"Posterior_X\tPosterior_Y\ttStart_Posterior (s after midnight)";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
@@ -26,7 +29,6 @@ public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
 			while (choiceSet_it.hasNext()) {
 				ChoiceSet choiceSet = choiceSet_it.next();
 				out.write(choiceSet.getId() + "\t" + 
-						choiceSet.getTrip().getTripNr() + "\t" + 
 						choiceSet.getTravelTimeBudget() + "\t" +
 						choiceSet.getTrip().getBeforeShoppingAct().getCoord().getX() + "\t" +
 						choiceSet.getTrip().getBeforeShoppingAct().getCoord().getY() + "\t" +
