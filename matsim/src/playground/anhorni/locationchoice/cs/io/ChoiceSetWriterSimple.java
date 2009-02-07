@@ -28,7 +28,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		}
 		
 		try {		
-			final String header="id\tTrip_nr\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)\tChosen";
+			final String header="Id\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)\tChosen";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			final BufferedWriter out_alternatives = IOUtils.getBufferedWriter(outfile_alternatives);
@@ -63,7 +63,6 @@ public class ChoiceSetWriterSimple extends CSWriter {
 						chosen;
 					
 					out.write(choiceSet.getId() +"\t" + 
-							choiceSet.getTrip().getTripNr() + "\t" + 
 							choiceSet.getTravelTimeBudget() + "\t" +
 							location);
 					out.newLine();
