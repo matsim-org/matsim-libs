@@ -35,9 +35,10 @@ import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
+import org.matsim.population.routes.CarRoute;
+import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.PlansCalcRoute;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
-import playground.anhorni.locationchoice.cs.helper.PlansCalcRouteWalkReducedSpeed;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
@@ -160,8 +161,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		
 		if (this.crowFly.equals("true")) {
 				leg = new Leg(BasicLeg.Mode.walk);
-				PlansCalcRouteWalkReducedSpeed router = (PlansCalcRouteWalkReducedSpeed)controler.getRoutingAlgorithm();
-				router.handleWalkLeg(leg, fromAct, toAct, fromAct.getEndTime());
+				this.handleWalkLeg(leg, fromAct, toAct, fromAct.getEndTime());
 			}
 			else {
 				leg = new Leg(BasicLeg.Mode.car);
@@ -170,6 +170,22 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		}
 		
 		return leg;
+	}
+	
+	
+	private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
+		// make simple assumption about distance and walking speed
+		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
+		double speed = 4.0 / 3.6; // 4.0 km/h --> m/s
+		// create an empty route, but with realistic travel time
+		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
+		int travTime = (int)(dist / speed);
+		route.setTravelTime(travTime);
+		leg.setRoute(route);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		leg.setArrivalTime(depTime + travTime);
+		return travTime;
 	}
 }
 
