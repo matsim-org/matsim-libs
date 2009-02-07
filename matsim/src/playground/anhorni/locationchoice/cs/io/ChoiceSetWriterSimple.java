@@ -20,6 +20,8 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	public void write(String outdir, String name,List<ChoiceSet> choiceSets)  {
 		
 		String outfile = outdir + name + "_ChoiceSets.txt";
+		String outfile_alternatives = outdir + name + "_numberOfAlternatives.txt";
+		
 		if (!super.checkBeforeWriting(choiceSets)) {
 			log.warn(outfile +" not created");
 			return;
@@ -29,8 +31,11 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			final String header="id\tTrip_nr\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)\tChosen";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
+			final BufferedWriter out_alternatives = IOUtils.getBufferedWriter(outfile_alternatives);
 			out.write(header);
 			out.newLine();
+			out_alternatives.write("id\tnumber of alternatives");
+			out_alternatives.newLine();			
 			
 			Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 			while (choiceSet_it.hasNext()) {
@@ -49,8 +54,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					}
 					else {
 						chosen = "0";
-					}
-										
+					}										
 					location = facility.getId() + "\t" + facility.getCenter().getX() +"\t" + 
 						facility.getCenter().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
 						facility.getExactPosition().getY() + "\t" +
@@ -63,8 +67,11 @@ public class ChoiceSetWriterSimple extends CSWriter {
 							choiceSet.getTravelTimeBudget() + "\t" +
 							location);
 					out.newLine();
+					
+					out_alternatives.write(choiceSet.getId() + "\t" + choiceSet.getFacilities().size());
 				}					
 				out.flush();
+				out_alternatives.flush();
 				
 				if (!oneIsChosen) {
 					log.error("Problem with choice set " + choiceSet.getId());
@@ -72,6 +79,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			}
 			out.flush();
 			out.close();
+			out_alternatives.close();
 						
 		} catch (final IOException e) {
 				Gbl.errorMsg(e);
