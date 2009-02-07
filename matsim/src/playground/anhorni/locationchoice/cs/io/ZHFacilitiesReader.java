@@ -54,8 +54,8 @@ public class ZHFacilitiesReader {
 				String[] entries = curr_line.split("\t", -1);
 				
 				String shopID = entries[0].trim();
-				double xCH = Double.parseDouble(entries[15].trim());
-				double yCH = Double.parseDouble(entries[16].trim());
+				double xCH = Double.parseDouble(entries[1].trim());
+				double yCH = Double.parseDouble(entries[2].trim());
 				
 				Coord exactPosition = new CoordImpl(xCH, yCH);
 				Link closestLink = network.getNearestLink(exactPosition);
