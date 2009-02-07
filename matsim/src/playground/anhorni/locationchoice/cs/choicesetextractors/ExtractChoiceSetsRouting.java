@@ -37,6 +37,7 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.router.PlansCalcRoute;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
+import playground.anhorni.locationchoice.cs.helper.PlansCalcRouteWalkReducedSpeed;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
 import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 
@@ -159,12 +160,15 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		
 		if (this.crowFly.equals("true")) {
 				leg = new Leg(BasicLeg.Mode.walk);
+				PlansCalcRouteWalkReducedSpeed router = (PlansCalcRouteWalkReducedSpeed)controler.getRoutingAlgorithm();
+				router.handleWalkLeg(leg, fromAct, toAct, fromAct.getEndTime());
 			}
 			else {
 				leg = new Leg(BasicLeg.Mode.car);
+				PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
+				router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
 		}
-		PlansCalcRoute router = (PlansCalcRoute)controler.getRoutingAlgorithm();
-		router.handleLeg(leg, fromAct, toAct, fromAct.getEndTime());
+		
 		return leg;
 	}
 }
