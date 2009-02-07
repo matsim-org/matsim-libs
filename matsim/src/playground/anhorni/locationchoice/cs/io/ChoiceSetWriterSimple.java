@@ -20,7 +20,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 	public void write(String outdir, String name,List<ChoiceSet> choiceSets)  {
 		
 		String outfile = outdir + name + "_ChoiceSets.txt";
-		String outfile_alternatives = outdir + name + "_numberOfAlternatives.txt";
+		String outfile_alternatives = outdir + name + "_NumberOfAlternatives.txt";
 		
 		if (!super.checkBeforeWriting(choiceSets)) {
 			log.warn(outfile +" not created");
@@ -34,7 +34,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			final BufferedWriter out_alternatives = IOUtils.getBufferedWriter(outfile_alternatives);
 			out.write(header);
 			out.newLine();
-			out_alternatives.write("id\tnumber of alternatives");
+			out_alternatives.write("Id\tNumber of alternatives");
 			out_alternatives.newLine();			
 			
 			Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
