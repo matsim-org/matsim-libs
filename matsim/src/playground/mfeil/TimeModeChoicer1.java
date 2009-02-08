@@ -98,21 +98,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				}
 				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (move!=0.0){
-					// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
 					double tmpScore = this.chooseModeAllChains((PlanomatXPlan)basePlan, basePlan.getActsLegs(), planAnalyzeSubtours);
 					if (tmpScore!=-100000) {
-						log.warn("Valid initial solution found by first mode choice re-factoring.");
+						log.warn("Valid initial solution found by first mode choice run.");
 						break;
 					}
 					else {
-						/*
-						while(tmpScore==-100000){
-							for (int k=basePlan.getActsLegs().size()-3;k>=2;k-=2){
-								// remove acts if not primary -> requires reference to PlanomatX. Questionable, TimeModeChoicer should be
-								 * no PlanomatX...
-							}
-						}
-						*/
 						// TODO Check whether allowed?
 						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
 						log.warn("No valid initial solution found for "+basePlan.getPerson().getId()+"!");
