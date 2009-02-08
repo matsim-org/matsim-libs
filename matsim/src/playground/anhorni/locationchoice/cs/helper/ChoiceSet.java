@@ -290,4 +290,8 @@ public class ChoiceSet {
 	public void setChosenZHFacility(ZHFacility chosenZHFacility) {
 		this.chosenZHFacility = chosenZHFacility;
 	}
+	public double getTravelTime2ChosenFacility() {
+		int index = this.facilities.indexOf(this.chosenZHFacility);
+		return this.travelTimes2Facilities.get(index);	
+	}
 }

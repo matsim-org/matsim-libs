@@ -37,6 +37,11 @@ public abstract class ChoiceSetExtractor {
 			this.computeChoiceSet(choiceSet, spanningTree, type, this.controler);
 			log.info(index + ": Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
 			index++;
+			
+			if (choiceSet.getTravelTime2ChosenFacility() > 8 * choiceSet.getTravelTimeBudget()) {
+				this.choiceSets.remove(choiceSet);
+				log.info("Removed choice set: " + choiceSet.getId() + " as travel time was implausible");
+			}
 		}		
 	}
 		

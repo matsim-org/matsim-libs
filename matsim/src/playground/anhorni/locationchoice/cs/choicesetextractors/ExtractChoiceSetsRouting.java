@@ -145,8 +145,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 					Id lId = routeLinkAfter_it.next();
 					travelDist += network.getLink(lId).getLength();
 				}
-			}
-						
+			}					
 			if (totalTravelTime <= choiceSet.getTravelTimeBudget()) {			
 				choiceSet.addFacilities(this.zhFacilitiesByLink.get(linkId), totalTravelTime, travelDist);
 			}
@@ -155,7 +154,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 			}
 		}	
 	}
-	
+		
 	private Leg computeLeg(Act fromAct, Act toAct, Controler controler) {	
 		Leg leg = null;
 		
