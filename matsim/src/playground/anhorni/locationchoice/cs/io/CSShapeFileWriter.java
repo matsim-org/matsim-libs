@@ -129,13 +129,13 @@ public class CSShapeFileWriter extends CSWriter {
 		}			
 		try {
 			if (!featuresBefore.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripBeforeLocations.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresBefore, outdir +"/shapefiles/" + name + "_TripPriorLocations.shp");
 			}
 			if (!featuresShop.isEmpty()) {
 				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresShop, outdir +"/shapefiles/" + name + "_TripShopLocations.shp");
 			}
 			if (!featuresAfter.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripAfterLocations.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresAfter, outdir +"/shapefiles/" + name + "_TripPosteriorLocations.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
