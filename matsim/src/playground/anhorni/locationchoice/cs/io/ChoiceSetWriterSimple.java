@@ -46,11 +46,11 @@ public class ChoiceSetWriterSimple extends CSWriter {
 				ChoiceSet choiceSet = choiceSet_it.next();
 				
 				boolean oneIsChosen = false;
-				String location;
 				Iterator<ZHFacility> fac_it = choiceSet.getFacilities().iterator();
 				while (fac_it.hasNext()) {
 					ZHFacility facility = fac_it.next();
 					
+					String location;
 					String chosen;
 					if (facility.getId().compareTo(choiceSet.getChosenZHFacility().getId()) == 0) {
 						chosen = "1";
@@ -76,7 +76,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 						location += "\t" + "-" + "\t" + "-";
 					}
 					else {
-						location = choiceSet.getTravelTime(facility) + "\t" +
+						location += choiceSet.getTravelTime(facility) + "\t" +
 							choiceSet.getTravelDistance(facility);
 					}
 					location +=	"\t" + crowFlyDistanceExact + "\t" +
