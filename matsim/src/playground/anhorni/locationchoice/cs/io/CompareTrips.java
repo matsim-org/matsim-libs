@@ -33,7 +33,15 @@ public class CompareTrips {
 
 	public void compare(String file, List<ChoiceSet> choiceSets) {
 		
-		this.read0("input/MZ2005_Wege.dat");
+		List<String> nelsonChoiceSetIdList = null;
+		if (this.mode.equals("car")) {
+			nelsonChoiceSetIdList= this.readNelsonChoiceSet("input/choice_set_auto.dat");
+		}
+		else if (this.mode.equals("walk")) {
+			nelsonChoiceSetIdList= this.readNelsonChoiceSet("input/choice_set_walk.dat");
+		}
+		this.readMZTrips("input/MZ2005_Wege.dat");
+		
 		
 		List<String> choiceSetIdList = new Vector<String>();	
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
@@ -51,14 +59,17 @@ public class CompareTrips {
 			String curr_line = bufferedReader.readLine(); // Skip header
 					
 			try {		
-				final String header="Id\taction\twmittel\tausmittel\t" +
-						"following trip wmittel\tfollowing trip ausmittel";						
+				final String header="Id\tAction\tWmittel\tAusmittel\t" +
+						"Following trip wmittel\tFollowing trip ausmittel\tIs in old "+ this.mode+ "choice set file [1]";						
 				final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 				out.write(header);
 				out.newLine();								
 				while ((curr_line = bufferedReader.readLine()) != null) {								
 					String[] entries = curr_line.split("\t", -1);					
-					String tripId = entries[0].trim();					
+					String tripId = entries[0].trim();
+					
+					boolean isInNelsonChoiceSet = nelsonChoiceSetIdList.contains(tripId);
+					
 					if (choiceSetIdList.contains(tripId)) {
 						
 						inChoiceSetList.add(tripId);
@@ -84,7 +95,8 @@ public class CompareTrips {
 						MZTrip followingTripMZ = this.getNextTrip(tripId); 
 						
 						out.write(tripId + "\t" + "removed from old trip set" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
-								followingTripMZ.getWmittel() + "\t" + followingTripMZ.getAusmittel());
+								followingTripMZ.getWmittel() + "\t" + followingTripMZ.getAusmittel() + 
+								"\t" + Boolean.toString(isInNelsonChoiceSet));
 						out.newLine();
 					}
 				}
@@ -115,8 +127,7 @@ public class CompareTrips {
 		}
 	}
 	
-	private void read0(String file) {
-		
+	private void readMZTrips(String file) {	
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -156,6 +167,24 @@ public class CompareTrips {
 		} catch (IOException e) {
 				Gbl.errorMsg(e);
 		}
+	}
+	
+	
+	private List<String> readNelsonChoiceSet(String file) {		
+		List<String> nelsonChoiceSetIds = new Vector<String>();
+		try {
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String curr_line = bufferedReader.readLine(); // Skip header						
+			while ((curr_line = bufferedReader.readLine()) != null) {					
+				String[] entries = curr_line.split("\t", -1);
+				String id = entries[0].trim();
+				nelsonChoiceSetIds.add(id);
+			}
+		} catch (IOException e) {
+				Gbl.errorMsg(e);
+		}
+		return nelsonChoiceSetIds;
 	}
 	
 	private String getWmittel(String inString) {
