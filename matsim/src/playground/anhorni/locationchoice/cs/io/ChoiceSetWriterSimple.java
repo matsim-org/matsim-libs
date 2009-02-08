@@ -76,7 +76,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 						location += "\t" + "-" + "\t" + "-";
 					}
 					else {
-						location += choiceSet.getTravelTime(facility) + "\t" +
+						location += "\t" + choiceSet.getTravelTime(facility) + "\t" +
 							choiceSet.getTravelDistance(facility);
 					}
 					location +=	"\t" + crowFlyDistanceExact + "\t" +
