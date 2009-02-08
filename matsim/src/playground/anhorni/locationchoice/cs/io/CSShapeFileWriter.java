@@ -53,7 +53,7 @@ public class CSShapeFileWriter extends CSWriter {
 			
 			ArrayList<Feature> singleFeatures = new ArrayList<Feature>();
 			for (int i = 0; i < facilities.size(); i++) {
-				Coord coord = new CoordImpl(facilities.get(i).getCenter().getX(), facilities.get(i).getCenter().getY());
+				Coord coord = new CoordImpl(facilities.get(i).getMappedposition().getX(), facilities.get(i).getMappedposition().getY());
 				
 				Feature feature = this.createFeature(coord, choiceSet.getId());
 				features.add(feature);

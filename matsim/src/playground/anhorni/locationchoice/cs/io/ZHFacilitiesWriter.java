@@ -28,6 +28,7 @@ public class ZHFacilitiesWriter {
 						
 		this.initGeometries();
 		ArrayList<Feature> features = new ArrayList<Feature>();	
+		ArrayList<Feature> featuresExact = new ArrayList<Feature>();	
 		
 		Iterator<ArrayList<ZHFacility>> facilities_it = zhFacilitiesByLink.values().iterator();
 		while (facilities_it.hasNext()) {
@@ -36,14 +37,15 @@ public class ZHFacilitiesWriter {
 			Iterator<ZHFacility> facilitiesList_it = facilitiesList.iterator();			
 			while (facilitiesList_it.hasNext()) {
 				ZHFacility facility = facilitiesList_it.next();	
-				Coord coord = facility.getCenter();
-				Feature feature = this.createFeature(coord);
-				features.add(feature);
+				Coord coord = facility.getMappedposition();
+				features.add(this.createFeature(coord));
+				featuresExact.add(this.createFeature(facility.getExactPosition()));
 			}
 		}
 		try {
 			if (!features.isEmpty()) {
-				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/facilitiesMapped2Net.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)features, outdir +"/shapefiles/zhFacilitiesPositionMapped2Net.shp");
+				ShapeFileWriter.writeGeometries((Collection<Feature>)featuresExact, outdir +"/shapefiles/zhFacilitiesExactPosition.shp");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

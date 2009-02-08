@@ -6,14 +6,14 @@ import org.matsim.utils.geometry.Coord;
 public class ZHFacility  {
 	
 	private Id id = null;
-	private Coord center = null;	
+	private Coord mappedPosition = null;	
 	private Coord exactPosition = null;
 	private Id linkId;
 	
 	
-	public ZHFacility(final Id id, Coord coord, Coord exactPosition, Id linkId) {
+	public ZHFacility(final Id id, Coord mappedPosition, Coord exactPosition, Id linkId) {
 		this.id = id;
-		this.center = coord;
+		this.mappedPosition = mappedPosition;
 		this.exactPosition = exactPosition;
 		this.linkId = linkId;
 	}
@@ -26,16 +26,16 @@ public class ZHFacility  {
 		this.id = id;
 	}
 
-	public Coord getCenter() {
-		return center;
+	public Coord getMappedposition() {
+		return mappedPosition;
 	}
 
-	public void setCenter(Coord center) {
-		this.center = center;
+	public void setCenter(Coord mappedPosition) {
+		this.mappedPosition = mappedPosition;
 	}
 	
 	public double getCrowFlyDistance(Coord other) {
-		return this.center.calcDistance(other);
+		return this.mappedPosition.calcDistance(other);
 	}
 
 	public Coord getExactPosition() {

@@ -61,15 +61,15 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					}
 					
 					double crowFlyDistanceMapped = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
-						calcDistance(facility.getCenter()) +
-						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getCenter());
+						calcDistance(facility.getMappedposition()) +
+						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getMappedposition());
 					
 					double crowFlyDistanceExact = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
 						calcDistance(facility.getExactPosition()) +
-						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getCenter());
+						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getMappedposition());
 					
-					location = facility.getId() + "\t" + facility.getCenter().getX() +"\t" + 
-						facility.getCenter().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
+					location = facility.getId() + "\t" + facility.getMappedposition().getX() +"\t" + 
+						facility.getMappedposition().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
 						facility.getExactPosition().getY();
 					
 					if (this.crowFly.equals("true") && this.mode.equals("walk")) {

@@ -179,7 +179,7 @@ public class ChoiceSet {
 		ZHFacility mostDistantFacility = null;
 		while (it.hasNext()) {
 			ZHFacility facility = it.next();		
-			if (facility.getCenter().calcDistance(coord) > tempMaxDist) {
+			if (facility.getMappedposition().calcDistance(coord) > tempMaxDist) {
 				mostDistantFacility = facility;
 			}
 		}	
@@ -197,7 +197,7 @@ public class ChoiceSet {
 			ZHFacility facility = this.facilities.get(i);
 
 			if (totalDist > GenerateChoiceSets.epsilon) {
-				val += facility.getCenter().calcDistance(other)/totalDist;
+				val += facility.getMappedposition().calcDistance(other)/totalDist;
 				accProbabilities[i] = val;
 			}
 			else {
@@ -246,7 +246,7 @@ public class ChoiceSet {
 		double totalDist = 0.0;
 		while (it.hasNext()) {
 			ZHFacility facility = it.next();
-			totalDist += facility.getCenter().calcDistance(coord);
+			totalDist += facility.getMappedposition().calcDistance(coord);
 			//log.info("distance " + facility.getCenter().calcDistance(coord));
 		}
 		//log.info("totalDistance " + totalDist);
