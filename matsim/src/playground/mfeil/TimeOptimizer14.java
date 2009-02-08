@@ -614,6 +614,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		return out;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private double setTimes (PlanomatXPlan plan, ArrayList<?> actslegs, double now, int outer, int inner){		
 		double travelTime;
 		for (int i=outer+1;i<=inner-1;i+=2){
