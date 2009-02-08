@@ -60,7 +60,7 @@ public class CompareTrips {
 					
 			try {		
 				final String header="Id\tAction\tWmittel\tAusmittel\t" +
-						"Following trip wmittel\tFollowing trip ausmittel\tIs in old "+ this.mode+ "choice set file [1]";						
+						"Following trip wmittel\tFollowing trip ausmittel\tIs in old "+ this.mode+ " choice set file [1]";						
 				final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 				out.write(header);
 				out.newLine();								
