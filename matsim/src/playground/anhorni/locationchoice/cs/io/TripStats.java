@@ -12,13 +12,25 @@ import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 
 public class TripStats extends CSWriter{
 	
-public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
+	private String mode;
+	private String crowFly;
+	
+	
+	
+	public TripStats(String mode, String crowFly) {
+		super();
+		this.mode = mode;
+		this.crowFly = crowFly;
+	}
+
+	public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
 		
 		String outfile = outdir + mode +"_TripStats.txt";
-		
-		try {		
-			final String header="Id\tTravel distance in net (m)\tcrow fly distance_exact (m)\tTravel time in net (s)\tTravel speed (km/h)\tTTB (s)\tUsed Buget (%)";
-						
+				
+		try {
+
+			final String header ="Id\tTravel distance in net (m)\tcrow fly distance exact (m)\tTravel time in net (s)\tTravel speed in net (km/h)\tTTB (s)\tUsed Buget (%)";
+			
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			out.write(header);
 			out.newLine();
@@ -38,13 +50,17 @@ public void write(String outdir, String mode, List<ChoiceSet> choiceSets)  {
 					choiceSet.getTrip().getAfterShoppingAct().getCoord().
 					calcDistance(choiceSet.getChosenZHFacility().getExactPosition());
 				
-				out.write(choiceSet.getId() + "\t" + 
-						travelDistance + "\t" + 
-						crowFlyDistance + "\t" + 
-						travelTime + "\t" + 
-						travelSpeed + "\t" + 
-						choiceSet.getTravelTimeBudget() + "\t" +
-						usedBudgetPercent);
+				String location = choiceSet.getId().toString();
+				
+				if (this.mode.equals("walk") && this.crowFly.equals("true")) {
+					location += "\t" + "-" + "\t" + crowFlyDistance + "\t" + "-" + "\t" + "-";
+				}
+				else {
+					location += "\t" + travelDistance + "\t" + crowFlyDistance + "\t" + travelTime + "\t" + travelSpeed;
+				}
+				location += "\t" + choiceSet.getTravelTimeBudget() + "\t" + usedBudgetPercent;
+				
+				out.write(location);
 				out.newLine();
 				out.flush();
 			}					

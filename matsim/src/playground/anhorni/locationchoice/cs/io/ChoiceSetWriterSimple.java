@@ -13,8 +13,12 @@ import playground.anhorni.locationchoice.cs.helper.ZHFacility;
 public class ChoiceSetWriterSimple extends CSWriter {
 
 	private final static Logger log = Logger.getLogger(ChoiceSetWriterSimple.class);
+	private String mode;
+	private String crowFly;
 	
-	public ChoiceSetWriterSimple() {
+	public ChoiceSetWriterSimple(String mode, String crowFly) {
+		this.mode = mode;
+		this.crowFly = crowFly;
 	}
 	
 	public void write(String outdir, String name,List<ChoiceSet> choiceSets)  {
@@ -28,7 +32,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 		}
 		
 		try {		
-			final String header="Id\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s)\tTravel_Distance (m)\tChosen";
+			final String header="Id\tTTB (s)\tShop_id\tLink_x\tLink_y\tExact_x\tExact_y\tTravel_Time (s) in net\tTravel_Distance in net (m)\tCrow fly distance (m) exact\tCrow fly distance (m) mapped\tChosen";
 						
 			final BufferedWriter out = IOUtils.getBufferedWriter(outfile);
 			final BufferedWriter out_alternatives = IOUtils.getBufferedWriter(outfile_alternatives);
@@ -54,12 +58,29 @@ public class ChoiceSetWriterSimple extends CSWriter {
 					}
 					else {
 						chosen = "0";
-					}										
+					}
+					
+					double crowFlyDistanceMapped = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
+						calcDistance(facility.getCenter()) +
+						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getCenter());
+					
+					double crowFlyDistanceExact = choiceSet.getTrip().getBeforeShoppingAct().getCoord().
+						calcDistance(facility.getExactPosition()) +
+						choiceSet.getTrip().getAfterShoppingAct().getCoord().calcDistance(facility.getCenter());
+					
 					location = facility.getId() + "\t" + facility.getCenter().getX() +"\t" + 
 						facility.getCenter().getY()+  "\t" + facility.getExactPosition().getX() + "\t" +
-						facility.getExactPosition().getY() + "\t" +
-						choiceSet.getTravelTime(facility) + "\t" +
-						choiceSet.getTravelDistance(facility) + "\t" +
+						facility.getExactPosition().getY();
+					
+					if (this.crowFly.equals("true") && this.mode.equals("walk")) {
+						location += "\t" + "-" + "\t" + "-";
+					}
+					else {
+						location = choiceSet.getTravelTime(facility) + "\t" +
+							choiceSet.getTravelDistance(facility);
+					}
+					location +=	"\t" + crowFlyDistanceExact + "\t" +
+						crowFlyDistanceMapped + "\t" +
 						chosen;
 					
 					out.write(choiceSet.getId() +"\t" + 

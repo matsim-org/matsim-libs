@@ -150,12 +150,12 @@ public class GenerateChoiceSets {
 		new File(this.outdir +"shapefiles/singletrips").mkdir();
 		new File(this.outdir +"shapefiles/singlechoicesets").mkdir();
 		
-		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple();
+		ChoiceSetWriterSimple writer = new ChoiceSetWriterSimple(this.mode, this.walkCrowFly);
 		this.writers.add(writer);	
 		CSShapeFileWriter shpWriter = new CSShapeFileWriter();
 		this.writers.add(shpWriter);
 		
-		TripStats tripStats = new TripStats();
+		TripStats tripStats = new TripStats(this.mode, this.walkCrowFly);
 		this.writers.add(tripStats);
 		
 		

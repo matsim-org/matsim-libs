@@ -176,7 +176,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private double handleWalkLeg(final Leg leg, final Act fromAct, final Act toAct, final double depTime) {
 		// make simple assumption about distance and walking speed
 		double dist = fromAct.getCoord().calcDistance(toAct.getCoord());
-		double speed = 4.0 / 3.6; // 4.0 km/h --> m/s
+		double speed = 5.0 / 3.6; // 4.0 km/h --> m/s
 		// create an empty route, but with realistic travel time
 		CarRoute route = new NodeCarRoute(fromAct.getLink(), toAct.getLink());
 		int travTime = (int)(dist / speed);
