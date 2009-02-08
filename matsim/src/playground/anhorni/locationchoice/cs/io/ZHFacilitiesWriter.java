@@ -38,8 +38,8 @@ public class ZHFacilitiesWriter {
 			while (facilitiesList_it.hasNext()) {
 				ZHFacility facility = facilitiesList_it.next();	
 				Coord coord = facility.getMappedposition();
-				features.add(this.createFeature(coord));
-				featuresExact.add(this.createFeature(facility.getExactPosition()));
+				features.add(this.createFeature(coord, facility.getId()));
+				featuresExact.add(this.createFeature(facility.getExactPosition(), facility.getId()));
 			}
 		}
 		try {
@@ -54,8 +54,9 @@ public class ZHFacilitiesWriter {
 
 
 	private void initGeometries() {
-		AttributeType [] attr = new AttributeType[1];
+		AttributeType [] attr = new AttributeType[2];
 		attr[0] = AttributeTypeFactory.newAttributeType("Point", Point.class);
+		attr[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attr, "point");
@@ -64,12 +65,12 @@ public class ZHFacilitiesWriter {
 		}
 	}
 	
-	private Feature createFeature(Coord coord) {
+	private Feature createFeature(Coord coord, Id id) {
 		
 		Feature feature = null;
 		
 		try {
-			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord)});
+			feature = this.featureType.create(new Object [] {MGC.coord2Point(coord),  id.toString()});
 		} catch (IllegalAttributeException e) {
 			e.printStackTrace();
 		}
