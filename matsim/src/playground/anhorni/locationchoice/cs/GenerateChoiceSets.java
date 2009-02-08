@@ -180,19 +180,7 @@ public class GenerateChoiceSets {
 				
 		if (this.readNelson.equals("true")) {
 			this.carChoiceSets = new NelsonTripReader(this.network, this.zhFacilitiesByLink).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "car");
-			this.walkChoiceSets = new NelsonTripReader(this.network, this.zhFacilitiesByLink).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");
-			
-			NelsonTripWriter nelsonWriter = new NelsonTripWriter();
-			nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
-			nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
-			
-			
-			CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
-			compareTripsCar.compare("input/ttbcar.dat", this.carChoiceSets);
-			
-			CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
-			compareTripsWalk.compare("input/ttbwalk.dat", this.walkChoiceSets);
-				
+			this.walkChoiceSets = new NelsonTripReader(this.network, this.zhFacilitiesByLink).readFiles("input/MZ2005_Wege.dat", "input/810Trips.dat", "walk");				
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
@@ -291,6 +279,18 @@ public class GenerateChoiceSets {
 				writer.write(this.outdir, "walk", this.walkChoiceSets);
 			}	
 		}
+		
+		NelsonTripWriter nelsonWriter = new NelsonTripWriter();
+		nelsonWriter.write(this.outdir, "car", this.carChoiceSets);
+		nelsonWriter.write(this.outdir, "walk", this.walkChoiceSets);
+		
+		
+		CompareTrips compareTripsCar = new CompareTrips(this.outdir, "car");
+		compareTripsCar.compare("input/ttbcar.dat", this.carChoiceSets);
+		
+		CompareTrips compareTripsWalk = new CompareTrips(this.outdir, "walk");
+		compareTripsWalk.compare("input/ttbwalk.dat", this.walkChoiceSets);
+		
 	}
 	
 	private void drawSample() {
