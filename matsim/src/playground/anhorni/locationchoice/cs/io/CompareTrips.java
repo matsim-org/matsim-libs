@@ -107,12 +107,15 @@ public class CompareTrips {
 					ChoiceSet choiceSet = choiceSet_it.next();					
 					if (!inChoiceSetList.contains(choiceSet.getId().toString())) {
 						
+						boolean isInNelsonChoiceSet = nelsonChoiceSetIdList.contains(choiceSet.getId());
+						
 						String wmittelOut = this.mzTrips.get(choiceSet.getId()).getWmittel();
 						String ausmittelOut = this.mzTrips.get(choiceSet.getId()).getAusmittel();
 						MZTrip followingTripMZ = this.getNextTrip(choiceSet.getId().toString()); 
 						
 						out.write(choiceSet.getId().toString() + "\t" + "newly added to trip set" + "\t" + wmittelOut +"\t" + ausmittelOut +"\t" +
-								followingTripMZ.getWmittel() +"\t" + followingTripMZ.getAusmittel());
+								followingTripMZ.getWmittel() +"\t" + followingTripMZ.getAusmittel() +
+								"\t" + Boolean.toString(isInNelsonChoiceSet));
 						out.newLine();
 					}
 				}	
