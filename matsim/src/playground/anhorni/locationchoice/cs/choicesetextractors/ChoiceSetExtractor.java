@@ -47,7 +47,7 @@ public abstract class ChoiceSetExtractor {
 			}
 		}
 		
-		Iterator<ChoiceSet> choiceSets2Remove_it = choiceSets.iterator();
+		Iterator<ChoiceSet> choiceSets2Remove_it = choiceSets2Remove.iterator();
 		while (choiceSets2Remove_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets2Remove_it.next();
 			this.choiceSets.remove(choiceSet);
