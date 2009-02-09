@@ -204,6 +204,12 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//////////////////////////////////////////////////////////////////////
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+		if (Gbl.getConfig().planomat().getPossibleModes().length>0){
+			for (int z=1;z<plan.getActsLegs().size();z+=2){
+				((Leg)(plan.getActsLegs().get(z))).setMode(BasicLeg.Mode.car);
+			}
+		}
+		this.router.run(plan);
 		this.timer.run(plan);
 		while (plan.getScore()==-100000){
 			
