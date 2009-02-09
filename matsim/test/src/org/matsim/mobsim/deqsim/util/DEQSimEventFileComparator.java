@@ -1,4 +1,4 @@
-package playground.wrashid.util;
+package org.matsim.mobsim.deqsim.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,7 +8,6 @@ import org.matsim.events.ActStartEvent;
 import org.matsim.events.PersonEvent;
 import org.matsim.mobsim.deqsim.EventLog;
 import org.matsim.mobsim.deqsim.util.CppEventFileParser;
-import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
 
 
 public class DEQSimEventFileComparator extends TestHandlerDetailedEventChecker {

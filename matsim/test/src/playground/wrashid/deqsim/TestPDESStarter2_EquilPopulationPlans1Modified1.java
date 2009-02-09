@@ -11,12 +11,12 @@ import org.matsim.events.PersonEvent;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.deqsim.EventLog;
 import org.matsim.mobsim.deqsim.util.CppEventFileParser;
+import org.matsim.mobsim.deqsim.util.DEQSimEventFileComparator;
 import org.matsim.mobsim.deqsim.util.DEQSimEventFileTravelTimeComparator;
 import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.scenarios.EquilPopulationPlans1Modified1;
-import playground.wrashid.util.DEQSimEventFileComparator;
 
 public class TestPDESStarter2_EquilPopulationPlans1Modified1 extends MatsimTestCase {
 
