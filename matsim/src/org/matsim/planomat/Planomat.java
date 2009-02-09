@@ -35,7 +35,6 @@ import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicLeg.Mode;
-import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -87,54 +86,54 @@ public class Planomat implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 
-		// distinguish for optimization tools
-		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
-		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
+//		// distinguish for optimization tools
+//		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
+//		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-			// analyze plan: how many activities and subtours do we have?
-			PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.run(plan);
+		// analyze plan: how many activities and subtours do we have?
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(plan);
 
-			org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
+		org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
 
-			org.jgap.Configuration.reset();
+		org.jgap.Configuration.reset();
 
-			IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
-			try {
-				jgapConfiguration.setSampleChromosome(sampleChromosome);
-			} catch (InvalidConfigurationException e1) {
-				e1.printStackTrace();
-			}
-			ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
-			PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( 
-					sf, 
-					plan, 
-					this.legTravelTimeEstimator, 
-					planAnalyzeSubtours );
-			Genotype population = null;
-			try {
-				jgapConfiguration.setFitnessFunction( fitnessFunction );
-				population = Genotype.randomInitialGenotype( jgapConfiguration );
-			} catch (InvalidConfigurationException e) {
-				e.printStackTrace();
-			}
-			IChromosome fittest = null;
-			String logMessage = null;
-			for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
-				population.evolve();
-				if (Gbl.getConfig().planomat().isDoLogging()) {
-					logMessage = "";
-					fittest = population.getFittestChromosome();
-					for (Gene gene : fittest.getGenes()) {
-						logMessage = logMessage.concat(gene.toString() + " ");
-					}
-					logger.info(logMessage);
-				}
-			}
-			fittest = population.getFittestChromosome();
-			this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
-
+		IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
+		try {
+			jgapConfiguration.setSampleChromosome(sampleChromosome);
+		} catch (InvalidConfigurationException e1) {
+			e1.printStackTrace();
 		}
+		ScoringFunction sf = this.scoringFunctionFactory.getNewScoringFunction(plan);
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper( 
+				sf, 
+				plan, 
+				this.legTravelTimeEstimator, 
+				planAnalyzeSubtours );
+		Genotype population = null;
+		try {
+			jgapConfiguration.setFitnessFunction( fitnessFunction );
+			population = Genotype.randomInitialGenotype( jgapConfiguration );
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
+		IChromosome fittest = null;
+		String logMessage = null;
+		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
+			population.evolve();
+			if (Gbl.getConfig().planomat().isDoLogging()) {
+				logMessage = "";
+				fittest = population.getFittestChromosome();
+				for (Gene gene : fittest.getGenes()) {
+					logMessage = logMessage.concat(gene.toString() + " ");
+				}
+				logger.info(logMessage);
+			}
+		}
+		fittest = population.getFittestChromosome();
+		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
+
+//		}
 	}
 
 	protected org.jgap.Configuration initJGAPConfiguration() {
