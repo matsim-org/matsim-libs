@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
@@ -31,6 +33,8 @@ public abstract class ChoiceSetExtractor {
 		String type ="s";
 		
 		int index = 0;
+		List<ChoiceSet> choiceSets2Remove = new Vector<ChoiceSet>();
+		
 		Iterator<ChoiceSet> choiceSet_it = choiceSets.iterator();
 		while (choiceSet_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSet_it.next();										
@@ -38,11 +42,18 @@ public abstract class ChoiceSetExtractor {
 			log.info(index + ": Choice set " + choiceSet.getId().toString() + ": " + choiceSet.getFacilities().size() + " alternatives");
 			index++;
 			
-			if (choiceSet.getTravelTime2ChosenFacility() > 8 * choiceSet.getTravelTimeBudget()) {
-				this.choiceSets.remove(choiceSet);
-				log.info("Removed choice set: " + choiceSet.getId() + " as travel time was implausible");
+			if (choiceSet.getTravelTime2ChosenFacility() > 8 * choiceSet.getTravelTimeBudget()) {	
+				choiceSets2Remove.add(choiceSet);			
 			}
-		}		
+		}
+		
+		Iterator<ChoiceSet> choiceSets2Remove_it = choiceSets.iterator();
+		while (choiceSets2Remove_it.hasNext()) {
+			ChoiceSet choiceSet = choiceSets2Remove_it.next();
+			this.choiceSets.remove(choiceSet);
+			log.info("Removed choice set: " + choiceSet.getId() + " as travel time was implausible");
+		}
+		
 	}
 		
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
