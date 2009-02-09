@@ -63,6 +63,16 @@ public abstract class ChoiceSetExtractor {
 				choiceSets2Remove.add(choiceSet);				
 			}
 			
+			// remove trips with a walk TTB >= 7200 s:
+			if (choiceSet.getId().equals(new IdImpl("27242011")) ||
+				choiceSet.getId().equals(new IdImpl("27898011")) ||
+				choiceSet.getId().equals(new IdImpl("42444011")) ||
+				choiceSet.getId().equals(new IdImpl("65064011")) ||
+				choiceSet.getId().equals(new IdImpl("15359011")) ) {
+				
+				choiceSets2Remove.add(choiceSet);
+			}
+			
 			
 		}
 		
