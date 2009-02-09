@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 import playground.anhorni.locationchoice.cs.helper.SpanningTree;
@@ -45,15 +46,32 @@ public abstract class ChoiceSetExtractor {
 			if (choiceSet.getTravelTime2ChosenFacility() > 8 * choiceSet.getTravelTimeBudget()) {	
 				choiceSets2Remove.add(choiceSet);			
 			}
+			
+			// remove the trips which end outside of canton ZH:
+			/*
+			 * change choice set list to TreeMap or similar
+			 */
+			if (choiceSet.getId().equals(new IdImpl("8160012")) ||
+				choiceSet.getId().equals(new IdImpl("58690014")) ||
+				choiceSet.getId().equals(new IdImpl("30195012")) ||
+				choiceSet.getId().equals(new IdImpl("31953012")) ||
+				choiceSet.getId().equals(new IdImpl("55926012")) ||
+				choiceSet.getId().equals(new IdImpl("58650012")) ||
+				choiceSet.getId().equals(new IdImpl("55443011")) ||
+				choiceSet.getId().equals(new IdImpl("44971012")) ) {
+				
+				choiceSets2Remove.add(choiceSet);				
+			}
+			
+			
 		}
 		
 		Iterator<ChoiceSet> choiceSets2Remove_it = choiceSets2Remove.iterator();
 		while (choiceSets2Remove_it.hasNext()) {
 			ChoiceSet choiceSet = choiceSets2Remove_it.next();
 			this.choiceSets.remove(choiceSet);
-			log.info("Removed choice set: " + choiceSet.getId() + " as travel time was implausible");
-		}
-		
+			log.info("Removed choice set: " + choiceSet.getId() + " as travel time was implausible or trip ended outside canton ZH");
+		}		
 	}
 		
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
