@@ -222,9 +222,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			/* Remove last secondary activity to make plan shorter*/
 			for (int z=plan.getActsLegs().size()-3;z>=2;z-=2){
 				if (this.checkPrimary((Act)plan.getActsLegs().get(z), primActs)		&&
-					!(this.checkForSamePrimary((PlanomatXPlan)plan, z))) continue;
+					!(this.checkForSamePrimary(plan, z))) continue;
 				else {
-					this.removeAct(z/2, (PlanomatXPlan)plan);
+					this.removeAct(z/2, plan);
 					break;
 				}
 			}
@@ -897,7 +897,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 	
 	/* Removes the activity at the given position*/
-	private void removeAct (int position, PlanomatXPlan basePlan){
+	private void removeAct (int position, Plan basePlan){
 		ArrayList<Object> actslegs = basePlan.getActsLegs();
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
@@ -917,7 +917,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	}
 		
 	/* Checks whether a primary act is several times in the plan so that it can be dropped as requested*/
-	public boolean checkForSamePrimary (PlanomatXPlan plan, int position){
+	public boolean checkForSamePrimary (Plan plan, int position){
 		
 		for (int i = 0; i<position*2;i+=2){
 			if (((Act)(plan.getActsLegs().get(position*2))).getFacilityId().equals(((Act)(plan.getActsLegs().get(i))).getFacilityId())	&&
