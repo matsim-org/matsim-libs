@@ -105,11 +105,14 @@ public interface Person extends BasicPerson<Plan, Knowledge>, Customizable{
 	/**
 	 * @param visualizerData sets the optional user data for visualizer
 	 */
+	@Deprecated
 	public void setVisualizerData(final String visualizerData);
 
 	/**
 	 *
 	 * @return Returns the visualizer data
 	 */
+	@Deprecated
 	public String getVisualizerData();
 }
+
