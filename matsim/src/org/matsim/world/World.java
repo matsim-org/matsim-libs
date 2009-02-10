@@ -57,10 +57,12 @@ public class World {
 	// complete
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public final void complete() {
 		complete(new HashSet<String>());
 	}
 	
+	@Deprecated
 	public final void complete(Set<String> excludingLinkTypes) {
 		// 1. remove rules and mappings containing network and/or facility layers
 		Layer f_layer = this.layers.get(Facilities.LAYER_TYPE);
@@ -141,6 +143,7 @@ public class World {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	private final boolean removeMappingRule(final Id l1_id, final Id l2_id) {
 		if ((this.layers.get(l1_id) == null) || (this.layers.get(l2_id) == null)) { return false; }
 		Layer down_layer = null;
@@ -164,6 +167,7 @@ public class World {
 		return true;
 	}
 
+	@Deprecated
 	public final boolean removeMapping(Location loc1, Location loc2) {
 		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
 			// loc1 = down_loc; loc2 = up_loc
@@ -197,6 +201,7 @@ public class World {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public final Layer createLayer(final Id type, final String name) {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
@@ -206,24 +211,28 @@ public class World {
 		return this.createZoneLayer(type,name);
 	}
 
+	@Deprecated
 	public final MappingRule createMappingRule(final String mapping_rule) {
 		MappingRule m = new MappingRule(mapping_rule,this.layers);
 		this.rules.put(m.getDownLayer().getType().toString() + m.getUpLayer().getType().toString(), m);
 		return m;
 	}
 
+	@Deprecated
 	private final ZoneLayer createZoneLayer(final Id type,final String name) {
 		ZoneLayer l = new ZoneLayer(type,name);
 		this.layers.put(l.getType(),l);
 		return l;
 	}
 
+	@Deprecated
 	private final Facilities createFacilityLayer() {
 		Facilities f = new Facilities();
 		this.setFacilityLayer(f);
 		return f;
 	}
 
+	@Deprecated
 	private final NetworkLayer createNetworkLayer() {
 		NetworkLayer n = new NetworkLayer();
 		setNetworkLayer(n);
@@ -234,6 +243,7 @@ public class World {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public void setFacilityLayer(final Facilities facilityLayer) {
 		if (facilityLayer == null) { 
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
@@ -241,6 +251,7 @@ public class World {
 		this.layers.put(Facilities.LAYER_TYPE, facilityLayer);
 	}
 
+	@Deprecated
 	public void setNetworkLayer(final NetworkLayer network) {
 		if (network == null) {
 			throw new IllegalArgumentException("network=null not allowed!");
@@ -256,6 +267,7 @@ public class World {
 	// add methods
 	//////////////////////////////////////////////////////////////////////
 	
+	@Deprecated
 	public final boolean addMapping(Location loc1, Location loc2) {
 		if (this.getMappingRule(loc1.getLayer(),loc2.getLayer()) != null) {
 			// loc1 = down_loc; loc2 = up_loc
@@ -272,6 +284,7 @@ public class World {
 		return true;
 	}
 
+	@Deprecated
 	protected final void addMapping(final MappingRule mapping_rule, final String down_zone_id, final String up_zone_id) {
 		Zone down_zone = (Zone)mapping_rule.getDownLayer().getLocation(down_zone_id);
 		Zone up_zone   = (Zone)mapping_rule.getUpLayer().getLocation(up_zone_id);
@@ -297,26 +310,32 @@ public class World {
 		return this.layers.get(layer_type);
 	}
 
+	@Deprecated
 	public final Layer getLayer(final String layer_type) {
 		return this.layers.get(new IdImpl(layer_type));
 	}
 
+	@Deprecated
 	public final TreeMap<Id,Layer> getLayers() {
 		return this.layers;
 	}
 
+	@Deprecated
 	public final TreeMap<String,MappingRule> getRules() {
 		return this.rules;
 	}
 
+	@Deprecated
 	protected final MappingRule getMappingRule(final Id down_id, final Id up_id) {
 		return this.rules.get(down_id.toString() + up_id.toString());
 	}
 
+	@Deprecated
 	protected final MappingRule getMappingRule(final Layer down_layer, final Layer up_layer) {
 		return this.getMappingRule(down_layer.getType(),up_layer.getType());
 	}
 
+	@Deprecated
 	public final Layer getBottomLayer() {
 		if ((this.bottom_layer == null) && !this.layers.isEmpty()) {
 			throw new RuntimeException("bottom_layer = null while world contains layers!");
@@ -324,6 +343,7 @@ public class World {
 		return this.bottom_layer;
 	}
 
+	@Deprecated
 	public final Layer getTopLayer() {
 		if ((this.top_layer == null) && !this.layers.isEmpty()) {
 			throw new RuntimeException("top_layer = null while world contains layers!");
