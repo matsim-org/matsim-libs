@@ -20,7 +20,7 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 	
 
 	public Population modifyPopulation(Population population) {
-		// modify population: we need act end time (plan has only duration)
+		// modify population: a plan was needed, which contained some properties to be compared with C++
 		this.population=population;
 		Person p=population.getPerson("1");
 		Plan plan= p.getSelectedPlan();
