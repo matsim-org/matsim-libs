@@ -47,8 +47,7 @@ public class SimulationParameters {
 	public static final int PRIORITY_ENTER_ROAD_MESSAGE = 100;
 
 	// INPUT
-	private static double startTime = 0.0; // in s
-	private static double maxSimulationLength = Double.MAX_VALUE; // in s
+	private static double simulationEndTime = Double.MAX_VALUE; // in s
 	private static long linkCapacityPeriod = 0; // in s
 	private static double gapTravelSpeed = 15.0; // in m/s
 	private static double flowCapacityFactor = 1.0; // 1.0 is default
@@ -60,7 +59,7 @@ public class SimulationParameters {
 	 * stuckTime is used for deadlock prevention. when a car waits for more than
 	 * 'stuckTime' for entering next road, it will enter the next. in seconds
 	 */
-	private static double stuckTime = 1800;
+	private static double squeezeTime = 1800;
 	/**
 	 * this must be initialized before starting the simulation! mapping:
 	 * key=linkId used to find a road corresponding to a link
@@ -96,12 +95,12 @@ public class SimulationParameters {
 		GC_MESSAGES = gc_messages;
 	}
 
-	public static double getMaxSimulationLength() {
-		return maxSimulationLength;
+	public static double getSimulationEndTime() {
+		return simulationEndTime;
 	}
 
-	public static void setMaxSimulationLength(double maxSimulationLength) {
-		SimulationParameters.maxSimulationLength = maxSimulationLength;
+	public static void setSimulationEndTime(double simulationEndTime) {
+		SimulationParameters.simulationEndTime = simulationEndTime;
 	}
 
 	public static long getLinkCapacityPeriod() {
@@ -152,12 +151,13 @@ public class SimulationParameters {
 		SimulationParameters.minimumInFlowCapacity = minimumInFlowCapacity;
 	}
 
-	public static double getStuckTime() {
-		return stuckTime;
+
+	public static double getSqueezeTime() {
+		return squeezeTime;
 	}
 
-	public static void setStuckTime(double stuckTime) {
-		SimulationParameters.stuckTime = stuckTime;
+	public static void setSqueezeTime(double squeezeTime) {
+		SimulationParameters.squeezeTime = squeezeTime;
 	}
 
 	public static Events getProcessEventThread() {
@@ -198,14 +198,6 @@ public class SimulationParameters {
 
 	public static void setAllRoads(HashMap<String, Road> allRoads) {
 		SimulationParameters.allRoads = allRoads;
-	}
-
-	public static double getStartTime() {
-		return startTime;
-	}
-
-	public static void setStartTime(double startTime) {
-		SimulationParameters.startTime = startTime;
 	}
 
 }

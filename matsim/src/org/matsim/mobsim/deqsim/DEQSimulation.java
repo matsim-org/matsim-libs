@@ -57,25 +57,27 @@ public class DEQSimulation {
 		
 		// READING SIMULATION PARAMETERS FROM CONFIG FILE
 		final String DEQ_SIM = "deqSim";
-		final String STUCK_TIME = "stuckTime";
+		final String SQUEEZE_TIME = "squeezeTime";
 		final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 		final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 		final String MINIMUM_INFLOW_CAPACITY = "minimumInFlowCapacity";
 		final String CAR_SIZE = "carSize";
 		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
+		final String END_TIME = "endTime";
 
-		String stuckTime = Gbl.getConfig().findParam(DEQ_SIM, STUCK_TIME);
+		String squeezeTime = Gbl.getConfig().findParam(DEQ_SIM, SQUEEZE_TIME);
 		String flowCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, FLOW_CAPACITY_FACTOR);
 		String storageCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, STORAGE_CAPACITY_FACTOR);
 		String minimumInFlowCapacity = Gbl.getConfig().findParam(DEQ_SIM, MINIMUM_INFLOW_CAPACITY);
 		String carSize = Gbl.getConfig().findParam(DEQ_SIM, CAR_SIZE);
 		String gapTravelSpeed = Gbl.getConfig().findParam(DEQ_SIM, GAP_TRAVEL_SPEED);
+		String endTime = Gbl.getConfig().findParam(DEQ_SIM, END_TIME);
 
-		if (stuckTime != null) {
-			SimulationParameters.setStuckTime(Double.parseDouble(stuckTime));
+		if (squeezeTime != null) {
+			SimulationParameters.setSqueezeTime(Double.parseDouble(squeezeTime));
 		} else {
-			log.info("parameter 'stuckTime' not defined. Using default value [s]: "
-					+ SimulationParameters.getStuckTime());
+			log.info("parameter 'squeezeTime' not defined. Using default value [s]: "
+					+ SimulationParameters.getSqueezeTime());
 		}
 		
 		if (flowCapacityFactor != null) {
@@ -113,19 +115,12 @@ public class DEQSimulation {
 					+ SimulationParameters.getGapTravelSpeed());
 		}
 		
-		// get start time
-		// the semantics of this parameter needs to be defined in a consistent way
-		// for this reason it is turned off at the moment
-		/*
-		double startTime = Gbl.getConfig().simulation().getStartTime();
-		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
-		SimulationParameters.setStartTime(startTime);
-		*/
-		
-		// read end time
-		Double stopTime=Gbl.getConfig().simulation().getEndTime();
-		if ((stopTime == Time.UNDEFINED_TIME) || (stopTime == 0)) stopTime = Double.MAX_VALUE;
-		SimulationParameters.setMaxSimulationLength(stopTime);
+		if (endTime != null) {
+			SimulationParameters.setSimulationEndTime(Time.parseTime(endTime));
+		} else {
+			log.info("parameter 'endTime' not defined. Using default value [s]: "
+					+ SimulationParameters.getSimulationEndTime());
+		}
 		
 		
 

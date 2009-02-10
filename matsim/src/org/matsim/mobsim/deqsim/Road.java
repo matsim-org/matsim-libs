@@ -270,11 +270,11 @@ public class Road extends SimUnit {
 			if (deadlockPreventionMessages.size() > 0) {
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
 						deadlockPreventionMessages.getLast().getMessageArrivalTime()
-								+ SimulationParameters.getStuckTime(), this));
+								+ SimulationParameters.getSqueezeTime(), this));
 
 			} else {
 				deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
-						+ SimulationParameters.getStuckTime(), this));
+						+ SimulationParameters.getSqueezeTime(), this));
 			}
 
 		}

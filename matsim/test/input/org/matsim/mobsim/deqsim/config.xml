@@ -22,7 +22,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="20" />
+		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="simulation">
@@ -37,8 +37,13 @@
 	
 	<module name="deqSim">
 		<param name = "simulationType"	value = "java"/>
-		<param name="endTime" value="00:00:00" />
-		
+		<param name="endTime" value="00:06:00" />
+		<param name="flowCapacityFactor" value="2.0" />
+		<param name="storageCapacityFactor" value="3.0" />
+		<param name="minimumInFlowCapacity" value="3600" />
+		<param name="carSize" value="10.0" />
+		<param name="gapTravelSpeed" value="20.0" />
+		<param name="squeezeTime" value="9000" />
 	</module>
 	
 

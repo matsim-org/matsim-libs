@@ -61,7 +61,7 @@ public class JavaPDEQSim3 {
 		// the thread for processing the events
 		SimulationParameters.setProcessEventThread( events);
 
-		SimulationParameters.setStuckTime (Double.parseDouble(Gbl.getConfig().getParam("simulation",
+		SimulationParameters.setSqueezeTime(Double.parseDouble(Gbl.getConfig().getParam("simulation",
 				"stuckTime")));
 		SimulationParameters.setFlowCapacityFactor( Double.parseDouble(Gbl.getConfig().getParam("simulation",
 				"flowCapacityFactor")));
