@@ -69,11 +69,12 @@ public class Vehicle extends SimUnit {
 		// actsLegs(0) is the first activity, actsLegs(1) is the first leg
 		legIndex = 1;
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
-		// an agent starts for a leg (earliest) at the departure time of the leg
-		double departureTime = getCurrentLeg().getDepartureTime();
+		Act firstAct=(Act) actsLegs.get(0);
+		// an agent starts the first leg at the end_time of the fist act
+		double departureTime = firstAct.getEndTime();
 
-		// this is the link, where the first activity took place (actsLegs(0))
-		setCurrentLink(((Act) actsLegs.get(legIndex - 1)).getLink());
+		// this is the link, where the first activity took place
+		setCurrentLink(firstAct.getLink());
 
 		Road road = Road.getRoad(getCurrentLink().getId().toString());
 		// schedule start leg message

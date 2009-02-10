@@ -27,6 +27,7 @@ import org.matsim.events.AgentArrivalEvent;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
+import org.matsim.utils.misc.Time;
 
 public class EndLegMessage extends EventMessage {
 
@@ -49,11 +50,28 @@ public class EndLegMessage extends EventMessage {
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		if ((actsLegs.size() > vehicle.getLegIndex())) {
 			vehicle.setCurrentLeg((Leg) actsLegs.get(vehicle.getLegIndex()));
+			// current act
+			Act currentAct = (Act) actsLegs.get(vehicle.getLegIndex() - 1);
 			// the leg the agent performs
-			double departureTime = vehicle.getCurrentLeg().getDepartureTime();
+
+			// if only duration or end time of act is defined, take that
+			// if both are defined: take the one, which is earlier in time
+			double actDurBasedDepartureTime = Double.MAX_VALUE;
+			double actEndTimeBasedDepartureTime = Double.MAX_VALUE;
+
+			if (currentAct.getDuration() != Time.UNDEFINED_TIME) {
+				actDurBasedDepartureTime = getMessageArrivalTime() + currentAct.getDuration();
+			}
+
+			if (currentAct.getEndTime() != Time.UNDEFINED_TIME) {
+				actEndTimeBasedDepartureTime = currentAct.getEndTime();
+			}
+
+			double departureTime = actDurBasedDepartureTime < actEndTimeBasedDepartureTime ? actDurBasedDepartureTime
+					: actEndTimeBasedDepartureTime;
 
 			/*
-			 * if the departureTime for the leg is in the past (this means we
+			 * if the departureTime from the act is in the past (this means we
 			 * arrived late), then set the departure time to the current
 			 * simulation time this avoids that messages in the past are put
 			 * into the scheduler (which makes no sense anyway)
@@ -63,7 +81,7 @@ public class EndLegMessage extends EventMessage {
 			}
 
 			// update current link (we arrived at a new activity)
-			vehicle.setCurrentLink(((Act) actsLegs.get(vehicle.getLegIndex() - 1)).getLink());
+			vehicle.setCurrentLink(currentAct.getLink());
 
 			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
 			// schedule a departure from the current link in future
@@ -76,8 +94,8 @@ public class EndLegMessage extends EventMessage {
 		BasicEvent event = null;
 
 		// schedule AgentArrivalEvent
-		event = new AgentArrivalEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId()
-				.toString(), vehicle.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
+		event = new AgentArrivalEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId().toString(), vehicle
+				.getCurrentLink().getId().toString(), vehicle.getLegIndex() - 1);
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
@@ -89,8 +107,8 @@ public class EndLegMessage extends EventMessage {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson().getId().toString(), vehicle
-				.getCurrentLink().getId().toString(), nextAct.getType());
+		event = new ActStartEvent(actStartEventTime, vehicle.getOwnerPerson().getId().toString(), vehicle.getCurrentLink().getId()
+				.toString(), nextAct.getType());
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}

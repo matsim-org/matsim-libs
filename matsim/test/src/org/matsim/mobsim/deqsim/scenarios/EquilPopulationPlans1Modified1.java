@@ -3,6 +3,7 @@ package org.matsim.mobsim.deqsim.scenarios;
 import java.util.ArrayList;
 
 import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
+import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -24,9 +25,9 @@ public class EquilPopulationPlans1Modified1 implements PopulationModifier{
 		Person p=population.getPerson("1");
 		Plan plan= p.getSelectedPlan();
 		ArrayList<Object> actsLegs =plan.getActsLegs();
-		((Leg)actsLegs.get(1)).setDepartureTime(360);
-		((Leg)actsLegs.get(3)).setDepartureTime(900); // this requires immediate departure after arrival
-		((Leg)actsLegs.get(5)).setDepartureTime(2000);
+		((Act)actsLegs.get(0)).setEndTime(360);
+		((Act)actsLegs.get(2)).setEndTime(900); // this requires immediate departure after arrival
+		((Act)actsLegs.get(4)).setEndTime(2000);
 		return population;
 	}
 	
