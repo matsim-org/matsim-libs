@@ -125,6 +125,7 @@ public abstract class Gbl {
 	// world creation
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public static final World createWorld() {
 		if (Gbl.world != null) {
 			Gbl.errorMsg("world exists already! Cannot create a 2nd global world.");
@@ -134,6 +135,7 @@ public abstract class Gbl {
 		return Gbl.world;
 	}
 
+	@Deprecated
 	public static final World getWorld() {
 		if (Gbl.world == null) {
 			Gbl.createWorld();
@@ -145,6 +147,7 @@ public abstract class Gbl {
 	// reset scenario
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated
 	public static final void reset() {
 		log.info("Gbl.reset() -- reset config, world");
 		Gbl.config = null;
