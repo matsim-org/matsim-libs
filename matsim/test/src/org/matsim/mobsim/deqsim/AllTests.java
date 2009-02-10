@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim.queuesim");
+		TestSuite suite = new TestSuite("Tests for org.matsim.mobsim.deqsim");
 		//$JUnit-BEGIN$
 		
 		suite.addTestSuite(TestDESStarter_EquilPopulationPlans1Modified1.class);
