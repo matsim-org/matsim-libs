@@ -88,17 +88,22 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
+		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach erstem cleanSchedule mit move = "+move);
 		int loops=1;
 		while (move!=0.0){
 			loops++;
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), basePlan);
+			if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach "+loops+". cleanSchedule mit move = "+move);
 			if (loops>3) {
 				for (int i=2;i<basePlan.getActsLegs().size()-4;i+=2){
 					((Act)basePlan.getActsLegs().get(i)).setDuration(this.minimumTime);
 				}
 				move = this.cleanSchedule(this.minimumTime, basePlan);
+				if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach letztem cleanSchedule mit move = "+move);
 				if (move!=0.0){
+					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor chooseModeAllChains.");
 					double tmpScore = this.chooseModeAllChains((PlanomatXPlan)basePlan, basePlan.getActsLegs(), planAnalyzeSubtours);
+					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach chooseModeAllChains mit score = "+basePlan.getScore());
 					if (tmpScore!=-100000) {
 						log.warn("Valid initial solution found by first mode choice run.");
 						break;
