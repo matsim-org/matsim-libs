@@ -100,7 +100,7 @@ ActStartEventHandler
 		}
 		
 		// need to be able to construct a person:
-		PopulationBuilder pb = new BasicPopulationBuilder(pop) ; 
+		PopulationBuilder pb = pop.getPopulationBuilder() ; 
 		// TODO: BasicPopulationBuilder ist eine Implementation, nicht ein Interface. 
 		// Ich fände es konsistenter, wenn man es über ein Interface erhalten könnte.
 		// Dafür z.B.: pop.getPopulationBuilder() .  M.E. doch kein Problem, oder??
@@ -114,7 +114,7 @@ ActStartEventHandler
 			
 			BasicLocation loc = new BasicLocationImpl() ; // TODO: braucht Implementation
 			Coord coord = new CoordImpl(1.,1.); // TODO: auch dies braucht eine Implementation
-			// loc.setCoord( coord ) ; // TODO: not allowed in interface
+			// loc.setCoord( coord ) ; // TODO: not allowed in interface. ????
 			BasicAct hAct = pb.createAct(plan, "home", loc) ;
 			plan.addAct( hAct ) ;
 			
