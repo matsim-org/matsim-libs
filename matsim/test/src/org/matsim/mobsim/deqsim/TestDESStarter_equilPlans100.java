@@ -36,6 +36,12 @@ public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 	}
 	*/
 	
+	/*
+	 * This test was turn off, because java deqsim is based on time specified on the acts (as mobsim)
+	 * and is not based on times specified on the leg as in c++ deqsim
+	 */
+	
+	/*
 	public void test_equilPlans100_DEQSimEventFileTravelTimeComparator() {
 		Gbl.reset();
 
@@ -44,5 +50,5 @@ public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 				"test/scenarios/equil/plans100.xml",
 				null);
 	}
-
+*/
 }
