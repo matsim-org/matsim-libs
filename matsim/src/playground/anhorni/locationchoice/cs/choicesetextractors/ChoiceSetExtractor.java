@@ -68,7 +68,9 @@ public abstract class ChoiceSetExtractor {
 				choiceSet.getId().equals(new IdImpl("27898011")) ||
 				choiceSet.getId().equals(new IdImpl("42444011")) ||
 				choiceSet.getId().equals(new IdImpl("65064011")) ||
-				choiceSet.getId().equals(new IdImpl("15359011")) ) {
+				choiceSet.getId().equals(new IdImpl("15359011")) ||
+				choiceSet.getId().equals(new IdImpl("27691011")) ||
+				choiceSet.getId().equals(new IdImpl("65679015"))) {
 				
 				choiceSets2Remove.add(choiceSet);
 			}
