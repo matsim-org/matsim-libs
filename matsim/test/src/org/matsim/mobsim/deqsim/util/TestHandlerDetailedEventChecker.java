@@ -39,13 +39,10 @@ import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 
-
-
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
-		TestHandler, ActEndEventHandler, ActStartEventHandler,
-		AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler,
-		LinkEnterEventHandler, LinkLeaveEventHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements TestHandler,
+		ActEndEventHandler, ActStartEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+		AgentWait2LinkEventHandler, AgentArrivalEventHandler, EventHandler, LinkEnterEventHandler,
+		LinkLeaveEventHandler {
 
 	protected HashMap<String, LinkedList<PersonEvent>> events = new HashMap<String, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
@@ -58,10 +55,10 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 	}
 
 	public void checkAssertions() {
-		
+
 		// at least one event
-		assertEquals(true,events.size()>0);
-		
+		assertEquals(true, events.size() > 0);
+
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
 		for (LinkedList<PersonEvent> list : events.values()) {
@@ -75,9 +72,9 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 					System.out.println(list.get(i).time);
 
 					assertEquals(true, false); // in this case, something is
-												// wrong (messages are not
-												// arriving in a consistent
-												// manner)
+					// wrong (messages are not
+					// arriving in a consistent
+					// manner)
 				}
 
 				assertEquals(true, lastTimeStamp <= list.get(i).time);
@@ -88,9 +85,8 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 		// compare plan and events for each agent
 		// compare: type of events, linkId
 		for (LinkedList<PersonEvent> list : events.values()) {
-			Person p = population.getPersons().get(
-					new IdImpl(list.get(0).agentId));
-			//printEvents(list.get(0).agentId);
+			Person p = population.getPersons().get(new IdImpl(list.get(0).agentId));
+			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
 
@@ -103,15 +99,13 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				Leg leg = (Leg) legIter.next();
 
 				// act end event
-				assertEquals(true,
-						list.get(index) instanceof ActEndEvent);
+				assertEquals(true, list.get(index) instanceof ActEndEvent);
 				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
 						((ActEndEvent) list.get(index)).linkId));
 				index++;
-				
+
 				// each leg starts with departure on act link
-				assertEquals(true,
-						list.get(index) instanceof AgentDepartureEvent);
+				assertEquals(true, list.get(index) instanceof AgentDepartureEvent);
 				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
 						((AgentDepartureEvent) list.get(index)).linkId));
 				index++;
@@ -119,38 +113,26 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				// each CAR leg must enter/leave act link
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
 					// the first LinkEnterEvent is a AgentWait2LinkEvent
-					assertEquals(true,
-							list.get(index) instanceof AgentWait2LinkEvent);
-					assertEquals(true, act.getLinkId().toString()
-							.equalsIgnoreCase(
-									((AgentWait2LinkEvent) list.get(index)).linkId));
+					assertEquals(true, list.get(index) instanceof AgentWait2LinkEvent);
+					assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+							((AgentWait2LinkEvent) list.get(index)).linkId));
 					index++;
 
-					assertEquals(true,
-							list.get(index) instanceof LinkLeaveEvent);
-					assertEquals(true, act.getLinkId().toString()
-							.equalsIgnoreCase(
-									((LinkLeaveEvent) list.get(index)).linkId));
+					assertEquals(true, list.get(index) instanceof LinkLeaveEvent);
+					assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
+							((LinkLeaveEvent) list.get(index)).linkId));
 					index++;
 
 					for (Link link : ((CarRoute) leg.getRoute()).getLinks()) {
 						// enter link and leave each link on route
-						assertEquals(true,
-								list.get(index) instanceof LinkEnterEvent);
-						assertEquals(true,
-								link.getId().toString()
-										.equalsIgnoreCase(
-												((LinkEnterEvent) list
-														.get(index)).linkId));
+						assertEquals(true, list.get(index) instanceof LinkEnterEvent);
+						assertEquals(true, link.getId().toString().equalsIgnoreCase(
+								((LinkEnterEvent) list.get(index)).linkId));
 						index++;
 
-						assertEquals(true,
-								list.get(index) instanceof LinkLeaveEvent);
-						assertEquals(true,
-								link.getId().toString()
-										.equalsIgnoreCase(
-												((LinkLeaveEvent) list
-														.get(index)).linkId));
+						assertEquals(true, list.get(index) instanceof LinkLeaveEvent);
+						assertEquals(true, link.getId().toString().equalsIgnoreCase(
+								((LinkLeaveEvent) list.get(index)).linkId));
 						index++;
 					}
 				}
@@ -163,7 +145,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
 						((AgentArrivalEvent) list.get(index)).linkId));
 				index++;
-				
+
 				// each leg ends with arrival on act link
 				assertEquals(true, list.get(index) instanceof ActStartEvent);
 				assertEquals(true, act.getLinkId().toString().equalsIgnoreCase(
@@ -269,23 +251,23 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is
 	// used
-	public void startTestDES(String configFilePath, boolean printEvent,
-			String planFilePath, PopulationModifier populationModifier) {
+	public void startTestDES(String configFilePath, boolean printEvent, String planFilePath,
+			PopulationModifier populationModifier) {
 		String[] args = new String[1];
 		args[0] = configFilePath;
 		this.printEvent = printEvent;
-		SimulationParameters.setTestEventHandler ( this);
+		SimulationParameters.setTestEventHandler(this);
 
 		if (planFilePath != null) {
-			SimulationParameters.setTestPlanPath ( planFilePath);
+			SimulationParameters.setTestPlanPath(planFilePath);
 		} else {
-			SimulationParameters.setTestPlanPath ( null);
+			SimulationParameters.setTestPlanPath(null);
 		}
 
 		if (populationModifier != null) {
-			SimulationParameters.setTestPopulationModifier ( populationModifier);
+			SimulationParameters.setTestPopulationModifier(populationModifier);
 		} else {
-			SimulationParameters.setTestPopulationModifier ( new DummyPopulationModifier());
+			SimulationParameters.setTestPopulationModifier(new DummyPopulationModifier());
 		}
 
 		DEQSimStarterWithoutController.main(args);
@@ -309,8 +291,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 				Leg leg = (Leg) iter.next();
 				// at the moment only cars are simulated on the road
 				if (leg.getMode().equals(BasicLeg.Mode.car)) {
-					expected.expectedLinkEnterEvents += ((CarRoute) leg
-							.getRoute()).getLinks().size() + 1;
+					expected.expectedLinkEnterEvents += ((CarRoute) leg.getRoute()).getLinks().size() + 1;
 				}
 			}
 
@@ -318,11 +299,6 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements
 			expected.expectedLinkLeaveEvents = expected.expectedLinkEnterEvents;
 
 			expectedNumberOfMessages.put(p.getId().toString(), expected);
-
-			if (p.getId().toString().equalsIgnoreCase("225055")) {
-				//printPlanPDES2(plan);
-				//printPlanDES(plan);
-			}
 
 		}
 	}
