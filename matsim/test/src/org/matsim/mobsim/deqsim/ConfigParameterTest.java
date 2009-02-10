@@ -23,10 +23,4 @@ public class ConfigParameterTest extends MatsimTestCase {
 		assertEquals(20.0, SimulationParameters.getGapTravelSpeed());
 		assertEquals(9000.0, SimulationParameters.getSqueezeTime());
 	}
-
-	// TODO: assert, that simulation stops, when target time is reached
-
-	// TODO: simulate using the parameters just one car and see the influence of
-	// the scaling factors
-
 }
