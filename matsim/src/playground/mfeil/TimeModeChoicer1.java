@@ -83,8 +83,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		if (basePlan.getActsLegs().size()==1) return;
 		
 		/* Analysis of subtours */
+		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor planAnalyzeSubtours");
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(basePlan);
+		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach planAnalyzeSubtours");
 		
 		// Initial clean-up of plan for the case actslegs is not sound.
 		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
