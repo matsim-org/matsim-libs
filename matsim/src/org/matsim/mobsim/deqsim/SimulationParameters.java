@@ -47,19 +47,20 @@ public class SimulationParameters {
 	public static final int PRIORITY_ENTER_ROAD_MESSAGE = 100;
 
 	// INPUT
-	private static long maxSimulationLength = 800000; // in s
-	private static long linkCapacityPeriod = 0; // 
+	private static double startTime = 0.0; // in s
+	private static double maxSimulationLength = Double.MAX_VALUE; // in s
+	private static long linkCapacityPeriod = 0; // in s
 	private static double gapTravelSpeed = 15.0; // in m/s
-	private static double flowCapacityFactor = 1.0;
-	private static double storageCapacityFactor = 1.0;
+	private static double flowCapacityFactor = 1.0; // 1.0 is default
+	private static double storageCapacityFactor = 1.0; // 1.0 is default
 	private static double carSize = 7.5; // in meter
 	// in [vehicles/hour] per lane, can be scaled with flow capacity factor
 	private static double minimumInFlowCapacity = 1800;
 	/**
 	 * stuckTime is used for deadlock prevention. when a car waits for more than
-	 * 'stuckTime' for entering next road, it will enter the next
+	 * 'stuckTime' for entering next road, it will enter the next. in seconds
 	 */
-	private static double stuckTime = Double.MAX_VALUE;
+	private static double stuckTime = 1800;
 	/**
 	 * this must be initialized before starting the simulation! mapping:
 	 * key=linkId used to find a road corresponding to a link
@@ -95,11 +96,11 @@ public class SimulationParameters {
 		GC_MESSAGES = gc_messages;
 	}
 
-	public static long getMaxSimulationLength() {
+	public static double getMaxSimulationLength() {
 		return maxSimulationLength;
 	}
 
-	public static void setMaxSimulationLength(long maxSimulationLength) {
+	public static void setMaxSimulationLength(double maxSimulationLength) {
 		SimulationParameters.maxSimulationLength = maxSimulationLength;
 	}
 
@@ -197,6 +198,14 @@ public class SimulationParameters {
 
 	public static void setAllRoads(HashMap<String, Road> allRoads) {
 		SimulationParameters.allRoads = allRoads;
+	}
+
+	public static double getStartTime() {
+		return startTime;
+	}
+
+	public static void setStartTime(double startTime) {
+		SimulationParameters.startTime = startTime;
 	}
 
 }

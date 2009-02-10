@@ -22,6 +22,8 @@ package org.matsim.mobsim.deqsim;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+import org.matsim.controler.Controler;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.deqsim.util.Timer;
@@ -33,9 +35,11 @@ import org.matsim.population.Person;
 
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
+import org.matsim.utils.misc.Time;
 
 public class DEQSimulation {
 
+	private static final Logger log = Logger.getLogger(Controler.class);
 	Population population;
 	NetworkLayer network;
 
@@ -45,21 +49,90 @@ public class DEQSimulation {
 		this.population = population;
 		this.network = network;
 
+		// the thread for processing the events
+		SimulationParameters.setProcessEventThread(events);
+		
 		// initialize Simulation parameters
 		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
-		// the thread for processing the events
-		SimulationParameters.setProcessEventThread( events);
+		
+		// READING SIMULATION PARAMETERS FROM CONFIG FILE
+		final String DEQ_SIM = "deqSim";
+		final String STUCK_TIME = "stuckTime";
+		final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
+		final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
+		final String MINIMUM_INFLOW_CAPACITY = "minimumInFlowCapacity";
+		final String CAR_SIZE = "carSize";
+		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
 
-		SimulationParameters.setStuckTime (Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"stuckTime")));
-		SimulationParameters.setFlowCapacityFactor( Double.parseDouble(Gbl.getConfig().getParam("simulation",
-				"flowCapacityFactor")));
-		SimulationParameters.setStorageCapacityFactor ( Double.parseDouble(Gbl.getConfig().getParam(
-				"simulation", "storageCapacityFactor")));
+		String stuckTime = Gbl.getConfig().findParam(DEQ_SIM, STUCK_TIME);
+		String flowCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, FLOW_CAPACITY_FACTOR);
+		String storageCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, STORAGE_CAPACITY_FACTOR);
+		String minimumInFlowCapacity = Gbl.getConfig().findParam(DEQ_SIM, MINIMUM_INFLOW_CAPACITY);
+		String carSize = Gbl.getConfig().findParam(DEQ_SIM, CAR_SIZE);
+		String gapTravelSpeed = Gbl.getConfig().findParam(DEQ_SIM, GAP_TRAVEL_SPEED);
 
-		// allowed testing to hook in here
+		if (stuckTime != null) {
+			SimulationParameters.setStuckTime(Double.parseDouble(stuckTime));
+		} else {
+			log.info("parameter 'stuckTime' not defined. Using default value [s]: "
+					+ SimulationParameters.getStuckTime());
+		}
+		
+		if (flowCapacityFactor != null) {
+			SimulationParameters.setFlowCapacityFactor((Double.parseDouble(flowCapacityFactor)));
+		} else {
+			log.info("parameter 'flowCapacityFactor' not defined. Using default value: "
+					+ SimulationParameters.getFlowCapacityFactor());
+		}
+		
+		if (storageCapacityFactor != null) {
+			SimulationParameters.setStorageCapacityFactor((Double.parseDouble(storageCapacityFactor)));
+		} else {
+			log.info("parameter 'storageCapacityFactor' not defined. Using default value: "
+					+ SimulationParameters.getStorageCapacityFactor());
+		}
+		
+		if (minimumInFlowCapacity != null) {
+			SimulationParameters.setMinimumInFlowCapacity((Double.parseDouble(minimumInFlowCapacity)));
+		} else {
+			log.info("parameter 'minimumInFlowCapacity' not defined. Using default value [vehicles per hour]: "
+					+ SimulationParameters.getMinimumInFlowCapacity());
+		}
+		
+		if (carSize != null) {
+			SimulationParameters.setCarSize((Double.parseDouble(carSize)));
+		} else {
+			log.info("parameter 'carSize' not defined. Using default value [m]: "
+					+ SimulationParameters.getCarSize());
+		}
+		
+		if (gapTravelSpeed != null) {
+			SimulationParameters.setGapTravelSpeed(Double.parseDouble(gapTravelSpeed));
+		} else {
+			log.info("parameter 'gapTravelSpeed' not defined. Using default value [m/s]: "
+					+ SimulationParameters.getGapTravelSpeed());
+		}
+		
+		// get start time
+		// the semantics of this parameter needs to be defined in a consistent way
+		// for this reason it is turned off at the moment
+		/*
+		double startTime = Gbl.getConfig().simulation().getStartTime();
+		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
+		SimulationParameters.setStartTime(startTime);
+		*/
+		
+		// read end time
+		Double stopTime=Gbl.getConfig().simulation().getEndTime();
+		if ((stopTime == Time.UNDEFINED_TIME) || (stopTime == 0)) stopTime = Double.MAX_VALUE;
+		SimulationParameters.setMaxSimulationLength(stopTime);
+		
+		
+
+		// enable testing to hook in here as a handler
 		if (SimulationParameters.getTestEventHandler() != null) {
-			SimulationParameters.getProcessEventThread().addHandler(SimulationParameters.getTestEventHandler());
+			SimulationParameters.getProcessEventThread().addHandler(
+					SimulationParameters.getTestEventHandler());
 		}
 
 		if (SimulationParameters.getTestPlanPath() != null) {
@@ -73,7 +146,8 @@ public class DEQSimulation {
 		}
 
 		if (SimulationParameters.getTestPopulationModifier() != null) {
-			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(this.population);
+			this.population = SimulationParameters.getTestPopulationModifier().modifyPopulation(
+					this.population);
 		}
 
 	}
@@ -83,7 +157,7 @@ public class DEQSimulation {
 		t.startTimer();
 
 		Scheduler scheduler = new Scheduler();
-		SimulationParameters.setAllRoads (new HashMap<String, Road>());
+		SimulationParameters.setAllRoads(new HashMap<String, Road>());
 
 		// initialize network
 		Road road = null;
@@ -98,8 +172,9 @@ public class DEQSimulation {
 		for (Person person : this.population.getPersons().values()) {
 			vehicle = new Vehicle(scheduler, person);
 		}
-		
-		// just inserted to remove message in bug analysis, that vehicle variable is never read
+
+		// just inserted to remove message in bug analysis, that vehicle
+		// variable is never read
 		vehicle.toString();
 
 		scheduler.startSimulation();
