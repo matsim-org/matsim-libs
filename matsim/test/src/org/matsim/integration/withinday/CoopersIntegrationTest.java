@@ -20,6 +20,9 @@
 package org.matsim.integration.withinday;
 
 import org.matsim.config.Config;
+import org.matsim.controler.events.StartupEvent;
+import org.matsim.controler.listener.StartupListener;
+import org.matsim.events.handler.EventHandler;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.trafficmonitoring.LinkSensorManager;
 import org.matsim.withinday.coopers.CoopersControler;
@@ -69,7 +72,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("5");
 	  lsm.addLinkSensor("7");
-	  controler.getEvents().addHandler(lsm);
+	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		
@@ -100,7 +103,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("5");
 	  lsm.addLinkSensor("7");
-	  controler.getEvents().addHandler(lsm);
+	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		//10 cars have to be guided to the alternative route
@@ -130,7 +133,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
 	  lsm.addLinkSensor("20");
-	  controler.getEvents().addHandler(lsm);
+	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		int count10 = lsm.getLinkTraffic("10");
@@ -162,7 +165,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
 	  lsm.addLinkSensor("20");
-	  controler.getEvents().addHandler(lsm);
+	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		int count10 = lsm.getLinkTraffic("10");
@@ -194,7 +197,7 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		LinkSensorManager lsm = new LinkSensorManager();
 	  lsm.addLinkSensor("10");
 	  lsm.addLinkSensor("20");
-	  controler.getEvents().addHandler(lsm);
+	  controler.addControlerListener(new LoadEventHandler(lsm));
 		
 		controler.run();
 		int count10 = lsm.getLinkTraffic("10");
@@ -203,6 +206,19 @@ public class CoopersIntegrationTest extends MatsimTestCase {
 		System.out.println("traffic link 20: " + count20);
 		assertEquals(2538, count10);
 		assertEquals(5458, count20);		
+	}
+	
+	private static class LoadEventHandler implements StartupListener {
+		
+		private final EventHandler handler;
+		
+		public LoadEventHandler(final EventHandler handler) {
+			this.handler = handler;
+		}
+		
+		public void notifyStartup(StartupEvent event) {
+			event.getControler().getEvents().addHandler(this.handler);		
+		}
 	}
 	
 }
