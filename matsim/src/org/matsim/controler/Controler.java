@@ -79,6 +79,7 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.mobsim.deqsim.DEQSimulation;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -674,8 +675,17 @@ public class Controler {
 
 	protected void runMobSim() {
 		if (this.externalMobsim == null) {
-			QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
-			sim.run();
+			final String DEQ_SIM="deqSim";
+			final String SIMULATION_TYPE="simulationType";
+			final String java="java";
+			String simulationType = Gbl.getConfig().findParam(DEQ_SIM, SIMULATION_TYPE);
+			if (simulationType!=null && simulationType.equalsIgnoreCase(java)){
+				DEQSimulation sim= new DEQSimulation(this.network, this.population, this.events);
+				sim.run();
+			} else {
+				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);
+				sim.run();
+			}
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
 			sim.run();
