@@ -1,7 +1,6 @@
 package org.matsim.mobsim.deqsim;
 
 import org.matsim.controler.Controler;
-import org.matsim.events.Events;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ConfigParameterTest extends MatsimTestCase {
