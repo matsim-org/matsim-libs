@@ -304,11 +304,13 @@ public class PersonImpl implements Person{
 		}
 		return delegate.getKnowledge();
 	}
-	
+
+	@Deprecated
 	public void setVisualizerData(final String visualizerData) {
 		this.visualizerData = visualizerData;
 	}
-
+	
+	@Deprecated
 	public String getVisualizerData() {
 		return this.visualizerData ;
 	}
