@@ -39,7 +39,7 @@ public class TestDESStarter_equilPlans100 extends MatsimTestCase {
 	public void test_equilPlans100_DEQSimEventFileTravelTimeComparator() {
 		Gbl.reset();
 
-		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/src/playground/wrashid/input/deqsim/deq_events100.txt",1);
+		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator("test/input/org/matsim/mobsim/deqsim/deq_events_100.txt",1);
 		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans100.xml",
 				null);
