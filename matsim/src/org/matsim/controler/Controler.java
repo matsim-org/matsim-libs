@@ -250,6 +250,24 @@ public class Controler {
 		this(null, null, config);
 	}
 
+	/**
+	 * (Obviously) instantiates the controler with config, network, and population given.
+	 * This is more tricky than it looks, since a full population needs to be referenced to the
+	 * network, and the population reader knows about the network as a side effect.</p>
+	 * 
+	 *  <i> However,</i> if the population does not contain references to the network (e.g. activity locations
+	 *  given by coordinates, and legs empty), then the referencing seems to be done automagically by the 
+	 *  Controler.  It is, however, still necessary to give a network ...</p>
+	 *  
+	 *  If, for whatever reason, you want the controler to do something, then stop and do some of your code, then
+	 *  resume, you need to look into the concept of ControlerListeners, which are explained by example in src/tutorials/... .
+	 *  
+	 *  Kai, feb'08</p>
+	 * 
+	 * @param config
+	 * @param network
+	 * @param population
+	 */
 	public Controler(final Config config, final NetworkLayer network, final Population population) {
 		this(null, null, config);
 		this.network = network;
