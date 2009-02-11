@@ -30,15 +30,28 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPopulation;
+import org.matsim.config.Config;
+import org.matsim.events.Events;
+import org.matsim.events.algorithms.EventWriterTXT;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriterV5;
+import org.matsim.router.PlansCalcRoute;
+import org.matsim.router.PlansCalcRouteDijkstra;
+import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
+import org.matsim.scoring.EventsToScore;
+import org.matsim.world.World;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
@@ -141,7 +154,7 @@ public class MultiSourceEAF {
 		String networkfile = null;
 		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
 		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		networkfile = "./examples/meine_EA/siouxfalls_network_test.xml";
 		
 		
 		String plansfile = null;
@@ -155,14 +168,16 @@ public class MultiSourceEAF {
 		
 		String outputplansfile = null;
 		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
-		outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s.xml";
+		outputplansfile = "./examples/meine_EA/siouxfalls_plans_test.xml";
 		
-		int uniformDemands = 1;
+		int uniformDemands = 100;
 		
 		//set parameters
 		int timeHorizon = 200000;
 		int rounds = 100000;
 		String sinkid = "supersink";
+		
+		boolean emptylegs = false;
 		
 		//read network
 		NetworkLayer network = new NetworkLayer();
@@ -254,8 +269,25 @@ public class MultiSourceEAF {
 				}
 			}
 			if(outputplansfile!=null){
-				BasicPopulation output = fluss.createPoulation();
+				BasicPopulation output = fluss.createPoulation(emptylegs);
+				if (emptylegs) {
+					Config config = Gbl.createConfig(new String[] {});
+					
+					World world = Gbl.getWorld();
+					world.setNetworkLayer(network);
+					world.complete();
+
+					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory();
+					PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+					//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
+					for (Object O_person : output.getPersons().values()) {
+						Person person = (Person) O_person;
+						Plan plan = person.getPlans().get(0);
+						router.run(plan);
+					}
+				}
 				PopulationWriterV5 popwriter = new PopulationWriterV5(output);
+
 				try {
 				  popwriter.writeFile(outputplansfile);
 				} catch (Exception e) {
