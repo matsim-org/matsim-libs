@@ -89,7 +89,7 @@ public class CMCFtoEvacConverter {
 		 Integer counter = 10;
 		 for(String id : evacnodes){
 			 Id matsimid  = new IdImpl("el"+counter.toString());
-			 network.createLink(matsimid, network.getNode("id"), network.getNode("en1"), 1.,100000. ,100000000000000000000.,1.);
+			 network.createLink(matsimid, network.getNode(id), network.getNode("en1"), 1.,100000. ,100000000000000000000.,1.);
 			 counter++;
 		 }
 		return network;
@@ -163,10 +163,10 @@ public class CMCFtoEvacConverter {
 	
 	
 	public static void main(String[] args) {
-		String networkfile = "";
-		String demandfile = "";
-		String networkfileout = "";
-		String plansfileout = "";
+		String networkfile = "~/skywalker/testcases/swiss_old/org/swissold.xml";
+		String demandfile = "~/skywalker/testcases/swiss_old/org/demandsswissold.xml";
+		String networkfileout = "~/skywalker/testcases/swiss_old/matsimevac/swiss_old_network_evac.xml";
+		String plansfileout = "~/skywalker/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
 		
 		try {
 			NetworkLayer network = constructNetwork(networkfile, demandfile);
@@ -176,7 +176,7 @@ public class CMCFtoEvacConverter {
 			BasicPopulationImpl<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> population = readCMCFDemands(demandfile, network, false);
 			PopulationWriterV5 pwriter = new PopulationWriterV5( population);
 			pwriter.writeFile(plansfileout);
-			System.out.println(demandfile+"conveted "+"output written in :"+plansfileout);
+			System.out.println(demandfile+"conveted succssfully \n"+"output written in :\n"+plansfileout);
 		} catch (JDOMException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
