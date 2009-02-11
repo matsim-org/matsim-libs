@@ -43,6 +43,7 @@ import org.matsim.utils.vis.netvis.streaming.StreamConfig;
 import org.matsim.utils.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.world.World;
 import org.matsim.utils.geometry.Coord;
+import org.matsim.population.routes.*;
 
 
 public class DDcontroller {
@@ -52,46 +53,105 @@ public class DDcontroller {
     	// choose instance
 		//final String netFilename = "./examples/equil/network.xml";
 		//final String plansFilename = "./examples/equil/plans100.xml";
+		final String netFilename = "./examples/meine_EA/siouxfalls_network_test.xml";
 		
-		final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
-		final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
-				
+		//final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
+		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
+		//final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
+		final String plansFilename = "./examples/meine_EA/siouxfalls_plans_test.xml";
 
+		boolean testplans = false; // FIXME !
+		boolean dosim = true;		
+		boolean otfvis = true;
+		boolean netvis = false & (!otfvis);
+		
 		@SuppressWarnings("unused")
-		Config config = Gbl.createConfig(null);
+		Config config = Gbl.createConfig(null);		
 
 		World world = Gbl.getWorld();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = new NetworkLayer();		
 		new MatsimNetworkReader(network).readFile(netFilename);
 		world.setNetworkLayer(network);
 		world.complete();
-
+		
 		Population population = new Population();
 		new MatsimPopulationReader(population).readFile(plansFilename);
-
 		
-		
-		Events events = new Events();
-
-		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-		events.addHandler(eventWriter);
-
-		QueueSimulation sim = new QueueSimulation(network, population, events);
-		sim.openNetStateWriter("./output/simout", netFilename, 10);
-		sim.run();
-
-		eventWriter.closeFile();
-
-		//QueueNetwork qnet = new QueueNetwork(network);
-
-		//String eventFile = Gbl.getConfig().getParam("events","outputFile");
-		/*String eventFile = "./output/equil/ITERS/it.5/5.events.txt.gz";
-		OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 10);
-		mviconverter.convert();
+		if (testplans) {
+			for (Person person : population.getPersons().values()) {
+				Plan plan = person.getSelectedPlan();
+				if (plan == null) {
+					System.out.println("Person " + person.getId() + " has no plan.");
+					continue;
+				}
+				Act act = plan.getFirstActivity();			
+				if (act == null) {
+					System.out.println("Person " + person.getId() + " has no act.");
+					continue;
+				}
+								
+				Leg leg = plan.getNextLeg(act);			
+				if (leg == null) {
+					System.out.println("Person " + person.getId() + " has no leg.");
+					continue;
+				}
+				Route route = leg.getRoute();
+				if (route == null) {
+					System.out.println("Person " + person.getId() + " has no route.");
+					continue;
+				}
 				
-		String[] visargs = {"./output/otfvis.mvi"};
-		OTFVis.main(visargs);*/
+				Node node2 = route.getStartLink().getToNode();
+				Node node1 = null;
+				for (int n = 1; n < route.getLinkIds().size(); n++) {					
+					node1 = network.getLink(route.getLinkIds().get(n)).getFromNode();
+					if (node1.getId() != node2.getId()) {
+					System.out.println("Person " + person.getId() + " starts on link " + act.getLinkId());
+					System.out.println(route.getLinkIds().get(n) + " does not match next link.");					
+					System.out.println(node1.getId() + " != " + node2.getId());
+					}
+					node2 = network.getLink(route.getLinkIds().get(n)).getToNode();
+				}
+				
+				
+			}
+
+			System.out.println("Paths tested.");
+		}
+		
+		if (dosim) {
+			Events events = new Events();
+
+			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+			events.addHandler(eventWriter);
+
+			QueueSimulation sim = new QueueSimulation(network, population, events);
+			sim.openNetStateWriter("./output/simout", netFilename, 10);
+			sim.run();
+
+			eventWriter.closeFile();
+			System.out.println("Simulation done.");
+		}
+		
+		if (otfvis) {
+			QueueNetwork qnet = new QueueNetwork(network);
+
+			//String eventFile = Gbl.getConfig().getParam("events","outputFile");
+			String eventFile = "./output/events.txt";
+			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 10);
+			mviconverter.convert();
+
+			String[] visargs = {"./output/otfvis.mvi"};
+			OTFVis.main(visargs);
+		}
+		
+		if (netvis) {
+			String[] visargs = {"./output/simout"};
+			NetVis.main(visargs);			
+		}
+		
+		System.out.println("Done.");
 				
 	}
 
