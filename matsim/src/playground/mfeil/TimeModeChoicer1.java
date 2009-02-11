@@ -101,6 +101,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach letztem cleanSchedule mit move = "+move);
 				if (move!=0.0){
+					/*
 					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor chooseModeAllChains.");
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
@@ -114,11 +115,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						break;
 					}
 					else {
+					*/
 						// TODO Check whether allowed?
 						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
 						log.warn("No valid initial solution found for "+basePlan.getPerson().getId()+"!");
 						return;
-					}
+					//}
 				}
 			}
 			loops++;
@@ -547,9 +549,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int index=subtours.length-1;
 		//boolean iter = false;
 		for (int i=0; i<java.lang.Math.pow(this.possibleModes.length, subtours.length);i++){
+			if (plan.getPerson().getId().toString().equals("4888333") && i%10==0) log.warn("Person 4888333 in der "+i+". chooseModeAllChains Schleife.");
 			boolean tour=false;
 			for (int k=0;k<subtours.length;k++){
-				if (this.possibleModes[subtours[k]].toString()=="walk"){
+				if (this.possibleModes[subtours[k]].toString().equals("walk")){
 					if (subtourDistances[k]==2){
 						tour=true;
 						break;
