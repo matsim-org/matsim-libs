@@ -38,6 +38,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
+import org.matsim.population.PopulationWriterV5;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
@@ -137,25 +138,31 @@ public class MultiSourceEAF {
 			System.out.println("starting to read input");
 		}
 		
-		String networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
-		//String networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-		//String networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/inken_xmas_network.xml";
+		String networkfile = null;
+		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
+		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
+		networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
 		
 		
-		String plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
-		//String plansfile = null;
+		String plansfile = null;
+		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
+		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans_simple.xml";
+		
 		
 		
 		String demandsfile = null;
-		//String demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
+		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
 		
 		String outputplansfile = null;
-		 
+		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
+		outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s.xml";
+		
+		int uniformDemands = 1;
 		
 		//set parameters
-		int timeHorizon = 2000000;
-		int rounds = 1000;
-		String sinkid = "en2";
+		int timeHorizon = 200000;
+		int rounds = 100000;
+		String sinkid = "supersink";
 		
 		//read network
 		NetworkLayer network = new NetworkLayer();
@@ -167,12 +174,20 @@ public class MultiSourceEAF {
 		HashMap<Node, Integer> demands;
 		if(plansfile!=null){
 			demands = readPopulation(network, plansfile);
-		}else{
+		}else if (demandsfile != null){
 			try {
 				demands = readDemands(network,demandsfile);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
+			}
+		} else {
+			// uniform demands
+			demands = new HashMap<Node, Integer>();
+			for (Node node : network.getNodes().values()) {
+				if (!node.getId().equals(sink.getId())) {
+				  demands.put(node, Math.max(uniformDemands,0));
+				}
 			}
 		}
 		
@@ -195,9 +210,20 @@ public class MultiSourceEAF {
 			if(_debug){
 				System.out.println("starting calculations");
 			}
+			
+			
+			long timeMBF = 0;
+			long timeAugment = 0;
+			long timer1, timer2, timer3;
+			long timeStart = System.currentTimeMillis();
+			
 			//main loop for calculations
-			for (int i=0; i<rounds; i++){
+			int i;
+			for (i=0; i<rounds; i++){
+				timer1 = System.currentTimeMillis();
 				result = routingAlgo.doCalculations();
+				timer2 = System.currentTimeMillis();
+				timeMBF += timer2 - timer1;
 				if (result==null){
 					break;
 				}
@@ -205,18 +231,36 @@ public class MultiSourceEAF {
 					System.out.println("found path: " +  result);
 				}
 				fluss.augment(result);
+				timer3 = System.currentTimeMillis();
+				timeAugment += timer3 - timer2;
+				if (_debug) {
+					if (i % 100 == 0) {
+					  System.out.println("Iteration " + i + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+					}
+				}
+			}
+			if (_debug) {
+				  long timeStop = System.currentTimeMillis();
+				  System.out.println("Iterations: " + i + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 			}
 			if(_debug){
 				System.out.println(fluss.arrivalsToString());
 				System.out.println(fluss.arrivalPatternToString());
-				System.out.println("demands:");
+				System.out.println("unsatisfied demands:");
 				for (Node node : demands.keySet()){
-					System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+					if (demands.get(node) > 0) {
+					  System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+					}
 				}
 			}
 			if(outputplansfile!=null){
 				BasicPopulation output = fluss.createPoulation();
-				//TODO write Population
+				PopulationWriterV5 popwriter = new PopulationWriterV5(output);
+				try {
+				  popwriter.writeFile(outputplansfile);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}								
 			}
 		}
 		if(_debug){
