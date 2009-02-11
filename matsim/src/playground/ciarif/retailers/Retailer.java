@@ -1,23 +1,24 @@
 package playground.ciarif.retailers;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
+import org.matsim.controler.Controler;
+import org.matsim.counts.Volume;
+import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.population.Leg;
-import org.matsim.population.Person;
-import org.matsim.population.Plan;
 import org.matsim.utils.geometry.Coord;
 
 public class Retailer {
 	private final Id id;
 	private final Map<Id,Facility> facilities = new LinkedHashMap<Id,Facility>();
-	
+		
 	protected Retailer(final Id id) {
 		this.id = id;
 	}
@@ -41,7 +42,7 @@ public class Retailer {
 		return this.facilities;
 	}
 	
-	public final Map<Id,Facility> moveFacilities(final NetworkLayer network) {
+	public final Map<Id,Facility> moveFacilitiesRandom(final NetworkLayer network) {
 		for (Facility f : this.facilities.values()) {
 			Object[] links = network.getLinks().values().toArray();
 			int rd = MatsimRandom.random.nextInt(links.length);
@@ -52,4 +53,32 @@ public class Retailer {
 		return this.facilities;
 	}
 	
+	public final Map<Id, Facility> moveFacilitiesMaxLink(Controler controler) {
+		for (Facility f : facilities.values()) {
+			Object[] links = controler.getNetwork().getLinks().values().toArray();
+			int rd = MatsimRandom.random.nextInt(links.length);
+			Link link = (Link)links[rd];
+			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
+			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId().toString());
+			double[] newlink_volumes = controler.getLinkStats().getAvgLinkVolumes(link.getId().toString());
+			System.out.println ("currentlink_volumes = " + currentlink_volumes);
+			double currentlink_volume =0;
+			double newlink_volume =0;
+			for (int j=0; j<currentlink_volumes.length;j=j+1) {
+				currentlink_volume = currentlink_volume + currentlink_volumes[j];
+				
+			}
+			for (int j=0; j<newlink_volumes.length;j=j+1) {
+				newlink_volume = newlink_volume + newlink_volumes[j];
+				
+			}
+			System.out.println ("currentlink_volume = " + currentlink_volume);
+			System.out.println ("newlink_volume = " + newlink_volume);
+			if (newlink_volume >= currentlink_volume) {
+				Coord coord = link.getCenter();
+				f.moveTo(coord);
+			}
+		}
+		return this.facilities;
+	}
 }

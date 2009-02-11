@@ -27,7 +27,7 @@ public class RetailersSummaryWriter {
 			fw = new FileWriter(outfile);
 			System.out.println(outfile);
 			out = new BufferedWriter(fw);
-			out.write("Fac_id\tfac_x\tfac_y\tLink_id\n");
+			out.write("Fac_id\tfac_x\tfac_y\tLink_id\tIteration\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -67,7 +67,7 @@ public class RetailersSummaryWriter {
 					out.write(f.getCenter().getX()+ "\t");
 					out.write(f.getCenter().getY()+"\t");
 					out.write(f.getLink().getId()+"\t");
-					out.write(f.getLink().getId()+"\n");
+					out.write(iter +"\n");
 				}
 			}
 			out.flush();

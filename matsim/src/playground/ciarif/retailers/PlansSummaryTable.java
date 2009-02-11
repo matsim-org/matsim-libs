@@ -38,7 +38,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 //			out.write("pid\tsex\tage\tlicense\tcaravail\temployed\t" +
 //			          "ticketcnt\ttickets\t" +
 //			          "x\ty\n");
-			out.write("pid\tact1\tlink1\t...\tactn\tlinkn\n");
+			out.write("pid\tact1\tlink1\t...\tactn\tlinkn\tIteration\n");
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -52,12 +52,13 @@ public class PlansSummaryTable implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	
-	public void run(Person person) {
+	public void run(Person person, int iter) {
 		try {
 			Plan plan = person.getSelectedPlan();
 			out.write(person.getId() + "\t");
+			
 			//out.write(plan.getScore() + "\t");
-			for (int i=1; i<plan.getActsLegs().size(); i=i+2) {
+			for (int i=1; i<plan.getActsLegs().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
 				Act a = (Act)plan.getActsLegs().get(i+1);
 				//Link arr_link = a.getLink();
@@ -66,12 +67,14 @@ public class PlansSummaryTable implements PlanAlgorithm {
 				
 				
 			}
-			out.write("\n");
+			out.write(iter +"\n");
+			//out.write("\n");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		
 	}
 	
 	//////////////////////////////////////////////////////////////////////

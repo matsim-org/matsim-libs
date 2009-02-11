@@ -33,12 +33,15 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
+import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.BeforeMobsimEvent;
 import org.matsim.controler.events.IterationStartsEvent;
+import org.matsim.controler.listener.AfterMobsimListener;
 import org.matsim.controler.listener.BeforeMobsimListener;
 import org.matsim.controler.listener.IterationStartsListener;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -46,7 +49,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
-public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener{
+public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener, AfterMobsimListener{
 
 	private Retailers retailers;
 	private final RetailersSummaryWriter rs;
@@ -75,13 +78,16 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		for (Retailer r : retailers.getRetailers().values()) {
-			Map<Id,Facility> facs =  r.moveFacilities(controler.getNetwork());
+			//Map<Id,Facility> facs =  r.moveFacilitiesRandom(controler.getNetwork());
+			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
 			movedFacilities.putAll(facs);
 		}
+		
+		int iter = controler.getIteration();
 		this.rs.write(this.retailers);
-				
+		
 		for (Person p : controler.getPopulation().getPersons().values()) {
-			pst.run(p);
+			pst.run(p,iter);
 			for (Plan plan : p.getPlans()) {
 				
 				boolean routeIt = false;
@@ -117,6 +123,18 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 			if (!retailers.addRetailer(r)) { throw new RuntimeException("Could not add retailer id="+r.getId()+" to retailers."); } 
 		}
 		return retailers;
+	}
+
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		// TODO Auto-generated method stub
+		// Here the retailers will get a score for their location
+		//The score at first might be the simple count of the number of shoppers in the facility
+		//A first strategy might be that shops are still looking randomly for a new location, but
+		// they do really relocate only if the number of agents passing through the new link exceed
+		// the one of the older one
+		
+		Controler controler = event.getControler();
+		
 	}
 	
 }
