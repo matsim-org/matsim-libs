@@ -48,10 +48,10 @@ public class Distances {
 		this.network = network;
 		for(Node node : network.getNodes().values()){
 			if(node == specialNode){
-				distLabels.put(node, 0);
+				distLables.put(node, 0);
 			}
 			else{
-				distLabels.put(node, Integer.MAX_VALUE);
+				distLables.put(node, Integer.MAX_VALUE);
 			}
 		}
 	}
