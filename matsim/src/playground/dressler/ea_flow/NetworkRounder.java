@@ -57,6 +57,9 @@ public class NetworkRounder {
 				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
+			//link.setFreespeed(20*newcap);
+			//link.setLength(link.getEuklideanDistance());
+			
 			//double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
 			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
 			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozero++;
@@ -90,7 +93,7 @@ public class NetworkRounder {
 		double flowCapacityFactor = 1.0d;
 		//String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
 		String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
-		String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		String outputfile = "./examples/meine_EA/siouxfalls_network_test.xml";
 		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
 		
 		if(args.length==3){
