@@ -11,7 +11,7 @@ public class ConfigParameterTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true);
 		controler.run();
 		/*
-		 * make asserts sure all simulation parameters are set properly from
+		 * make sure, all simulation parameters are set properly from
 		 * config xml file
 		 */
 

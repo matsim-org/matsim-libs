@@ -33,6 +33,8 @@ public class AllTests {
 		suite.addTestSuite(TestDESStarter_equilPlans100.class);
 		suite.addTestSuite(TestDESStarter_Berlin.class);
 		
+		suite.addTestSuite(ConfigParameterTest.class);
+		
 		suite.addTestSuite(TestEventLog.class);
 		suite.addTestSuite(TestMessageFactory.class);
 		suite.addTestSuite(TestMessageQueue.class);
