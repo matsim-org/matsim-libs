@@ -36,13 +36,14 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
+import org.matsim.population.Act;
+import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
-import playground.dressler.ea_flow.TimeExpandedPath;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink 
  * @author Manuel Schneider
@@ -588,7 +589,7 @@ public class Flow {
 	
 	
 	@SuppressWarnings("unchecked")
-	public BasicPopulation createPoulation(){
+	public BasicPopulation createPoulation(boolean emptylegs){
 		//construct Population
 		BasicPopulation result =
 			new BasicPopulationImpl();
@@ -600,33 +601,83 @@ public class Flow {
 				for (PathEdge edge : path.getPathEdges()){
 					ids.add(edge.getEdge().getId());
 				}
-				BasicRouteImpl route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
-				route.setLinkIds(ids);				
-				BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
-				leg.setRoute(route);
-				BasicActImpl home = new BasicActImpl("h");
-				home.setEndTime(0);
-				home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
-				home.setEndTime(path.getPathEdges().getFirst().getTime());
-				BasicActImpl work = new BasicActImpl("w");
-				work.setEndTime(0);
-				work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
-				Link fromlink =path.getPathEdges().getFirst().getEdge();
-				Link tolink =path.getPathEdges().getLast().getEdge();
 				
-				home.setLinkId(fromlink.getId());
-				work.setLinkId(tolink.getId());
-				for (int i =1 ; i<= nofpersons;i++){
-					Id matsimid  = new IdImpl(id);
-					Person p = new PersonImpl(matsimid);
-					Plan plan = new Plan(p);
-					plan.addAct(home);
-					plan.addLeg(leg);
-					plan.addAct(work);
-					p.addPlan(plan);
-					result.addPerson(p);
-					id++;
+				
+				if (!emptylegs) { // normal case, write the routes!
+					BasicRouteImpl route;				
+					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+					
+					if (ids.size() > 1) {
+						route.setLinkIds(ids.subList(1, ids.size()-1));
+					} else {
+						route.setLinkIds(null);
+					}
+					
+					BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
+					//Leg leg = new Leg(BasicLeg.Mode.car);
+					leg.setRoute(route);
+					BasicActImpl home = new BasicActImpl("h");
+					//Act home = new Act("h", path.getPathEdges().getFirst().getEdge());
+					home.setEndTime(0);
+					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
+					home.setEndTime(path.getPathEdges().getFirst().getTime());
+					BasicActImpl work = new BasicActImpl("w");
+					//Act work = new Act("w", path.getPathEdges().getLast().getEdge());
+					work.setEndTime(0);
+					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
+					Link fromlink =path.getPathEdges().getFirst().getEdge();
+					Link tolink =path.getPathEdges().getLast().getEdge();
+					
+					home.setLinkId(fromlink.getId());
+					work.setLinkId(tolink.getId());
+					for (int i =1 ; i<= nofpersons;i++){
+						Id matsimid  = new IdImpl(id);
+						Person p = new PersonImpl(matsimid);
+						Plan plan = new Plan(p);
+						plan.addAct(home);
+						plan.addLeg(leg);					
+						plan.addAct(work);
+						p.addPlan(plan);
+						result.addPerson(p);
+						id++;
+					}
+					
+				} else { // LEAVE THE ROUTES EMPTY! (sadly, this needs different types ...)
+					BasicRouteImpl route;				
+					route = new BasicRouteImpl(ids.get(0),ids.get(ids.size()-1));
+					
+					//BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.car);
+					Leg leg = new Leg(BasicLeg.Mode.car);
+					leg.setRoute(route);
+					//BasicActImpl home = new BasicActImpl("h");
+					Act home = new Act("h", path.getPathEdges().getFirst().getEdge());
+					home.setEndTime(0);
+					home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
+					home.setEndTime(path.getPathEdges().getFirst().getTime());
+					//BasicActImpl work = new BasicActImpl("w");
+					Act work = new Act("w", path.getPathEdges().getLast().getEdge());
+					work.setEndTime(0);
+					work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
+					Link fromlink =path.getPathEdges().getFirst().getEdge();
+					Link tolink =path.getPathEdges().getLast().getEdge();
+					
+					home.setLinkId(fromlink.getId());
+					work.setLinkId(tolink.getId());
+					for (int i =1 ; i<= nofpersons;i++){
+						Id matsimid  = new IdImpl(id);
+						Person p = new PersonImpl(matsimid);
+						Plan plan = new Plan(p);
+						plan.addAct(home);
+						plan.addLeg(leg);					
+						plan.addAct(work);
+						p.addPlan(plan);
+						result.addPerson(p);
+						id++;
+					}
+										
 				}
+				
+			
 				
 			}else{
 				;//TODO unwind residual edges
