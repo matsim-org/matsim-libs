@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NetworkReaderMatsimV1.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dressler.ea_flow;
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +31,11 @@ import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-
+/**
+ * 
+ * @author Manuel Schneider
+ *
+ */
 public class CMCFNetworkConverter {
 	
 	
@@ -85,9 +108,7 @@ public class CMCFNetworkConverter {
 			System.out.println(inputfile+"  conveted successfully \n"+"output written in: "+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();
-			
 		} catch (IOException e) {
-			
 			e.printStackTrace();
 		}
 		
