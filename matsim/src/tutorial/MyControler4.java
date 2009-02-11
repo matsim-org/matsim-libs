@@ -33,7 +33,6 @@ import org.matsim.population.algorithms.PlanAverageScore;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.vis.netvis.NetVis;
-import org.matsim.world.World;
 
 
 public class MyControler4 {
@@ -45,15 +44,11 @@ public class MyControler4 {
 		@SuppressWarnings("unused")
 		Config config = Gbl.createConfig(new String[] {"./examples/tutorial/myConfigScoring.xml"});
 
-		World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(plansFilename);
+		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		Events events = new Events();
 
@@ -76,6 +71,7 @@ public class MyControler4 {
 
 		eventWriter.closeFile();
 
+		Gbl.setConfig(null);
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);
 	}
