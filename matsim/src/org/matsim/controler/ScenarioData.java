@@ -197,7 +197,7 @@ public class ScenarioData {
 
 			log.info("loading population from " + this.populationFileName);
 			try {
-				new MatsimPopulationReader(this.population).parse(this.populationFileName);
+				new MatsimPopulationReader(this.population, this.network).parse(this.populationFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

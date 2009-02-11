@@ -124,13 +124,13 @@ public class LinkSetRendererRoutes extends RendererA {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		Population plans = new Population(Population.USE_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plans.addAlgorithm(new RouteLinkMarker(this.linkValues));
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();

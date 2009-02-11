@@ -37,7 +37,6 @@ import org.jfree.util.Log;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -256,15 +255,11 @@ public class SelectedPlans2ESRIShape {
 
 		final String outputDir = "./plans/";
 
-		Gbl.createConfig(null);
-		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
-		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		Population population = new Population(Population.NO_STREAMING);
+		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);

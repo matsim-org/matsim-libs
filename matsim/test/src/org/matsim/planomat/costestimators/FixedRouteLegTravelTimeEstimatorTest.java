@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.config.Config;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
@@ -79,17 +80,17 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		super.setUp();
 
-		super.loadConfig(CONFIGFILE);
+		Config config = super.loadConfig(CONFIGFILE);
 
 		log.info("Reading network xml file...");
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		this.network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
 		this.population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		plansReader.readFile(config.plans().getInputFile());
 		this.population.printPlansCount();
 		log.info("Reading plans xml file...done.");
 

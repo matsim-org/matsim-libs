@@ -119,7 +119,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		World world = Gbl.createWorld();
 
 		if (worldFileName != null) {
-			MatsimWorldReader world_parser = new MatsimWorldReader(Gbl.getWorld());
+			MatsimWorldReader world_parser = new MatsimWorldReader(world);
 			world_parser.readFile(worldFileName);
 		}
 

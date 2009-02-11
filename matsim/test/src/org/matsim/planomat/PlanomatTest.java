@@ -77,13 +77,13 @@ public class PlanomatTest extends MatsimTestCase {
 		log.info("Reading facilities xml file...done.");
 
 		log.info("Reading network xml file...");
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
 		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");
@@ -112,14 +112,12 @@ public class PlanomatTest extends MatsimTestCase {
 
 		log.info("Reading plans xml file...");
 		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");
 
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR);
-		
-		
 	}
 
 	private void runATestRun(final PlanomatTestRun testRun) {
@@ -186,7 +184,6 @@ public class PlanomatTest extends MatsimTestCase {
 		assertEquals(expectedChecksum, actualChecksum);
 
 		log.info("Testing " + testRun.toString() + "...done.");
-
 	}
 
 	public void testInitSampleChromosome() {
