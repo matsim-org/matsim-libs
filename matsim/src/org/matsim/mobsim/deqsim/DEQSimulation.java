@@ -56,7 +56,7 @@ public class DEQSimulation {
 		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		
 		// READING SIMULATION PARAMETERS FROM CONFIG FILE
-		final String DEQ_SIM = "deqSim";
+		final String DEQ_SIM = "deqsim";
 		final String SQUEEZE_TIME = "squeezeTime";
 		final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 		final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";

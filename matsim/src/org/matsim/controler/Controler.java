@@ -693,7 +693,7 @@ public class Controler {
 
 	protected void runMobSim() {
 		if (this.externalMobsim == null) {
-			final String DEQ_SIM="deqSim";
+			final String DEQ_SIM="deqsim";
 			final String SIMULATION_TYPE="simulationType";
 			final String java="java";
 			String simulationType = Gbl.getConfig().findParam(DEQ_SIM, SIMULATION_TYPE);
