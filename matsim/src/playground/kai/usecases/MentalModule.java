@@ -100,7 +100,9 @@ ActStartEventHandler
 		}
 		
 		// need to be able to construct a person:
-		PopulationBuilder pb = pop.getPopulationBuilder() ; 
+
+		PopulationBuilder pb = new BasicPopulationBuilder(pop) ; 
+//		PopulationBuilder pb = pop.getPopulationBuilder() ; 
 		// TODO: BasicPopulationBuilder ist eine Implementation, nicht ein Interface. 
 		// Ich fände es konsistenter, wenn man es über ein Interface erhalten könnte.
 		// Dafür z.B.: pop.getPopulationBuilder() .  M.E. doch kein Problem, oder??
