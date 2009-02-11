@@ -87,9 +87,11 @@ public class NetworkRounder {
 			return;
 		}
 		int cap = 5;
-		double flowCapacityFactor = 0.1d;
-		String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
-		String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
+		double flowCapacityFactor = 1.0d;
+		//String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
+		String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
+		String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
 		
 		if(args.length==3){
 			inputfile  = args[0];
