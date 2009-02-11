@@ -40,14 +40,6 @@ public class LinkCarRoute extends AbstractRoute implements CarRoute {
 	private final ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
 
-	/**
-	 * This constructor is only needed for backwards compatibility reasons and thus is
-	 * set to deprecated. New code should make use of the constructor which sets the
-	 * start and the end link of a Route correctly.
-	 */
-	@Deprecated
-	public LinkCarRoute(){}
-	
 	public LinkCarRoute(Link startLink, Link endLink){
 		super(startLink, endLink);
 	}
