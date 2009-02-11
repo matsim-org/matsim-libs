@@ -176,7 +176,7 @@ public class Controler {
 	/* default analyses */
 	/*package*/ CalcLinkStats linkStats = null;
 	/*package*/ CalcLegTimes legTimes = null;
-	/*package*/ VolumesAnalyzer volumes = null;
+	/*package*/ private VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
 
@@ -1114,6 +1114,10 @@ public class Controler {
 
 	public final CalcLinkStats getLinkStats() {
 		return this.linkStats;
+	}
+	
+	public VolumesAnalyzer getVolumes() {
+		return volumes;
 	}
 
 	public final TravelTime getLinkTravelTimes() {
