@@ -44,6 +44,17 @@ public class Distances {
 		}
 	}
 
+	public Distances(final NetworkLayer network, Node specialNode){
+		this.network = network;
+		for(Node node : network.getNodes().values()){
+			if(node == specialNode){
+				distLabels.put(node, 0);
+			}
+			else{
+				distLabels.put(node, Integer.MAX_VALUE);
+			}
+		}
+	}
 	
 	/**----------- Getter and Setter -------------*/
 	

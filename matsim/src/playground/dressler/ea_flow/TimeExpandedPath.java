@@ -448,6 +448,21 @@ public class TimeExpandedPath {
 		TimeExpandedPath._debug=debug;
 	}
 
-	
+
+	/**
+	 * print the path
+	 */
+	public void print(){
+		Link edge;
+		System.out.println("Path waits at source " + this._wait);
+		for(int i = 0; i < this._edges.size(); i++){
+			edge = this._edges.get(i).getEdge();
+			System.out.print("(" + edge.getFromNode().getId() + "," + edge.getToNode().getId() + ")");
+		}
+		System.out.println();
+		System.out.println("Path arrives at sink at " + this._arrival);
+		System.out.println("Path has flow " + this._flow);
+		System.out.println();
+	}
 
 }
