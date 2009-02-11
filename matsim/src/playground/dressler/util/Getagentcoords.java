@@ -60,14 +60,14 @@ public class Getagentcoords {
 
 	public static void main(final String[] args) {
 		// choose instance
-		final String netFilename = "/homes/combi/dressler/V/Project/code/matsim/examples/meine_EA/siouxfalls_network_5s.xml";
+		final String netFilename = "./examples/meine_EA/siouxfalls_network_test.xml";
 		//final String netFilename = "/homes/combi/dressler/V/Project/padang/network/padang_net_evac.xml";
 		
 		//final String plansFilename = "/homes/combi/dressler/V/Project/padang/plans/padang_plans_10p.xml.gz";
 		//final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans.xml";
-		final String plansFilename = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/siouxfalls_5s.xml";
+		final String plansFilename = "./examples/meine_EA/siouxfalls_plans_test.xml";
 		
-		final String outputPngFilename = "/homes/combi/dressler/V/code/workspace/matsim/output/exitmap_SF_5s.png";
+		final String outputPngFilename = "./output/exitmap_SF_test.png";
 		boolean planstats = true;
 
 		@SuppressWarnings("unused")
