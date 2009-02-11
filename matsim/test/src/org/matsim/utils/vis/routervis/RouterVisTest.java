@@ -22,7 +22,6 @@ package org.matsim.utils.vis.routervis;
 
 import org.apache.log4j.Logger;
 import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -44,7 +43,7 @@ public class RouterVisTest extends MatsimTestCase {
 	public void testVisDijkstra(){
 		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
-		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		// calculate reference checksums
@@ -80,7 +79,7 @@ public class RouterVisTest extends MatsimTestCase {
 	public void testVisCLogit(){
 		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
-		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		// calculate reference checksums
@@ -116,7 +115,7 @@ public class RouterVisTest extends MatsimTestCase {
 	public void testVisPSLogit(){
 		final Config config = loadConfig(getInputDirectory() + "../config.xml");
 		// read network
-		final NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		// calculate reference checksums

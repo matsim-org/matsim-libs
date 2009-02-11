@@ -127,7 +127,7 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		}
 	}
 	
-	public void reset(@SuppressWarnings("unused")int iteration) {
+	public void reset(int iteration) {
 		// Not used in that TestCase
 	}
 	

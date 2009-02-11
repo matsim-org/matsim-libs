@@ -30,7 +30,6 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
@@ -48,10 +47,9 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.NetworkUtils;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 
 /**
  * Tests that the QueueSimulation takes a TimeVariant Network into account.
@@ -62,9 +60,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() {
 		loadConfig(null);
-		World world = Gbl.createWorld();
 
-		NetworkLayer network = createNetwork(world);
+		NetworkLayer network = createNetwork();
 		Link link1 = network.getLink("1");
 		Link link2 = network.getLink("2");
 		Link link3 = network.getLink("3");
@@ -105,9 +102,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		final double capacityFactor = 0.5;
 
 		loadConfig(null);
-		final World world = Gbl.createWorld();
 
-		NetworkLayer network = createNetwork(world);
+		NetworkLayer network = createNetwork();
 		Link link1 = network.getLink("1");
 		Link link2 = network.getLink("2");
 		Link link3 = network.getLink("3");
@@ -165,13 +161,12 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkLayer createNetwork(final World world) {
+	private NetworkLayer createNetwork() {
 		// create a network
 		NetworkFactory nf = new NetworkFactory();
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
-		world.setNetworkLayer(network);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -181,7 +176,6 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
-		world.complete();
 
 		return network;
 	}
@@ -197,16 +191,17 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
+	private List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkLayer network,
 			final int count) {
+		double departureTime = depTime;
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
-			Person person = new PersonImpl(new IdImpl(i + (int)depTime));
+			Person person = new PersonImpl(new IdImpl(i + (int)departureTime));
 			Plan plan1 = person.createPlan(true);
 			Act a1 = plan1.createAct("h", depLink);
-			a1.setEndTime(depTime);
+			a1.setEndTime(departureTime);
 			Leg leg1 = plan1.createLeg(BasicLeg.Mode.car);
-			leg1.setDepartureTime(depTime);
+			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
 			CarRoute route = (CarRoute) network.getFactory().createRoute(BasicLeg.Mode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
@@ -214,7 +209,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			plan1.createAct("w", destLink);
 
 			persons.add(person);
-			depTime++;
+			departureTime++;
 		}
 		return persons;
 	}

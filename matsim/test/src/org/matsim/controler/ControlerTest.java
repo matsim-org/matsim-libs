@@ -29,7 +29,6 @@ import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.config.Module;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -67,7 +66,6 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
@@ -76,7 +74,6 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
 		Link link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4, 100, 10, 7200, 1);
-		Gbl.getWorld().complete();
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
 		 * same time at 7am.  */
@@ -194,7 +191,6 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
@@ -203,7 +199,6 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2,  100, 10, 7200, 1);
 		network.createLink(new IdImpl(2), node2, node3, 1000, 10,   36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
-		Gbl.getWorld().complete();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);
@@ -271,7 +266,6 @@ public class ControlerTest extends MatsimTestCase {
 		 * (one having 100secs, the other having 200secs to cross the link).
 		 */
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createWorld().setNetworkLayer(network);
 		network.setCapacityPeriod("01:00:00");
 		Node node1 = network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 		Node node2 = network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
@@ -280,7 +274,6 @@ public class ControlerTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl(1), node1, node2, 100, 10, 7200, 1);
 		network.createLink(new IdImpl(2), node2, node3, 1000, 10, 36, 1);
 		Link link3 = network.createLink(new IdImpl(3), node3, node4,  100, 10, 7200, 1);
-		Gbl.getWorld().complete();
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
 		Population population = new Population(Population.NO_STREAMING);

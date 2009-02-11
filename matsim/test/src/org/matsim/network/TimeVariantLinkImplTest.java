@@ -21,7 +21,6 @@
 package org.matsim.network;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.NetworkChangeEvent.ChangeType;
@@ -325,13 +324,11 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
-		Gbl.createWorld().setNetworkLayer(network);
 
 		// the network has 2 nodes and 1 link, the length is 75 and has by default 4 lanes with a lanes with a cell size of 7.5 m --> storage cap = 40
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
-		Gbl.getWorld().complete();
 		// add a lanes change to 2 at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
 		change1.addLink(link);
@@ -377,13 +374,11 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkPrototype(TimeVariantLinkImpl.class);
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
-		Gbl.createWorld().setNetworkLayer(network);
 
 		// the network has 2 nodes and 1 link, the length is 75 and has  a flow capacity of 1 Veh/s by default
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
 		Link link = network.createLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
-		Gbl.getWorld().complete();
 		// add a flow capacity change to 2 Veh/s at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
 		change1.addLink(link);

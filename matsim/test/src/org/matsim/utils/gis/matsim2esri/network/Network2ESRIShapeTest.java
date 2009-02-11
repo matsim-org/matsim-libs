@@ -53,7 +53,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
 		System.out.println("calculating *.shp file checksums...");
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);;
+		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
@@ -82,7 +82,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
 		System.out.println("calculating *.shp file checksums...");
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);;
+		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
@@ -109,7 +109,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		new Network2ESRIShape(network,outputFileP, builder).write();
 		
 		System.out.println("calculating *.shp file checksums...");
-		long checksum1 = CRCChecksum.getCRCFromFile(ref);;
+		long checksum1 = CRCChecksum.getCRCFromFile(ref);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileP);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);
@@ -138,7 +138,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		new Network2ESRIShape(network,outputFileShp, builder).write();
 		
 		System.out.println("calculating *.shp file checksums...");
-		long checksum1 = CRCChecksum.getCRCFromFile(refShp);;
+		long checksum1 = CRCChecksum.getCRCFromFile(refShp);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(outputFileShp);
 		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
 		assertEquals(checksum1, checksum2);

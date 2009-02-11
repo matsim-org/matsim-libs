@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicLeg.Mode;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
@@ -41,13 +40,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.StringUtils;
-import org.matsim.world.World;
 
 public class RouteLinkFilterTest extends MatsimTestCase {
 
 	public void testRouteLinkFilter() {
 		loadConfig(null); // used to set the default dtd-location
-		Population population = getTestPopulation(Gbl.createWorld());
+		Population population = getTestPopulation();
 
 		TestAlgorithm tester = new TestAlgorithm();
 
@@ -60,12 +58,9 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		assertEquals(2, linkFilter.getCount());
 	}
 
-	private Population getTestPopulation(final
-			World world) {
+	private Population getTestPopulation() {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Link link1 = network.getLink(new IdImpl(1));
 		Link link20 = network.getLink(new IdImpl(20));

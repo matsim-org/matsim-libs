@@ -25,7 +25,6 @@ import java.util.HashMap;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -62,9 +61,6 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 /*	Link link3=*/network.createLink(new IdImpl("3"), node1, node3, 100, 20, 100, 1);
 		Link link4 = network.createLink(new IdImpl("4"), node3, node4, 100, 20, 100, 1);
 		Link link5 = network.createLink(new IdImpl("5"), node4, node5, 20, 20, 100, 1);
-
-		Gbl.createWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		// create a test person
 		Person person = new PersonImpl(new IdImpl("1"));

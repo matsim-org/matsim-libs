@@ -37,7 +37,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.world.World;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really 
@@ -56,11 +55,8 @@ public class XY2LinksTest extends MatsimTestCase {
 		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
-		World world = Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
-		world.setNetworkLayer(network);
-		world.complete();
 		
 		// create one person with missing link in act
 		Population population = new Population(Population.NO_STREAMING);

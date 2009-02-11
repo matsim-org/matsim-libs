@@ -23,6 +23,6 @@ package org.matsim.testcases;
 public enum TestDepth {
 	simple, extended;
 	private static TestDepth choosen = extended;
-	public static TestDepth getDepth () {return choosen;};
-	public static void setDepth (TestDepth newDepth) {choosen = newDepth;};
+	public static TestDepth getDepth () {return choosen;}
+	public static void setDepth (TestDepth newDepth) {choosen = newDepth;}
 }

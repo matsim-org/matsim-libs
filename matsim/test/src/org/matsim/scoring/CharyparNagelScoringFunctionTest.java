@@ -26,7 +26,6 @@ import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.config.Config;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -91,8 +90,6 @@ public class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
 		Link link3 = this.network.createLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
 		this.network.createLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
 		Link link5 = this.network.createLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
-		Gbl.createWorld().setNetworkLayer(this.network);
-		Gbl.getWorld().complete();
 
 		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = this.person.createPlan(true);

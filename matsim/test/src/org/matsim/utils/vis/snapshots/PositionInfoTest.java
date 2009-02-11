@@ -21,7 +21,6 @@
 package org.matsim.utils.vis.snapshots;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -42,11 +41,9 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_shortLink() {
 
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createWorld().setNetworkLayer(network);
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
-		Gbl.getWorld().complete();
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 250, 0, 10, PositionInfo.VehicleState.Driving, null);
@@ -64,11 +61,9 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_longLink() {
 
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createWorld().setNetworkLayer(network);
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 1000));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);
-		Gbl.getWorld().complete();
 
 		// place the vehicle at one quarter of the link
 		PositionInfo posInfo = new PositionInfo(new IdImpl(1), link1, 500, 0, 10, PositionInfo.VehicleState.Driving, null);

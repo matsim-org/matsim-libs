@@ -28,7 +28,7 @@ import org.matsim.utils.CRCChecksum;
 
 public class ReRoutingTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(ReRoutingTest.class);
+	/*package*/ static final Logger log = Logger.getLogger(ReRoutingTest.class);
 
 	public void testReRouting() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");

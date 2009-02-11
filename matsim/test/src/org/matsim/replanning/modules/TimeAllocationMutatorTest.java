@@ -23,7 +23,6 @@ package org.matsim.replanning.modules;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -110,8 +109,6 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("0"), node1, node2, 100, 5, 100, 1);
 		network.createLink(new IdImpl("1"), node2, node3, 100, 5, 100, 1);
 		network.createLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		// setup person
 		Plan plan;

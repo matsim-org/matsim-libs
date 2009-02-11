@@ -34,10 +34,13 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationWriter;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
 
 public class PrimlocModuleTest extends MatsimTestCase{
 
+	// FIXME this test-case has no Assert-statement, so it will always succeed!
+	
 	//////////////////////////////////////////////////////////////////////
 	// test run 01
 	//////////////////////////////////////////////////////////////////////
@@ -72,24 +75,26 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		
 		System.out.println("TEST MODULE PRIMLOC:");
 
+		Config config = Gbl.getConfig();
+		
 		// reading all available input
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());
-		worldReader.readFile(Gbl.getConfig().world().getInputFile());
+		World world = Gbl.createWorld();
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
@@ -97,8 +102,8 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(population);
-		populationReader.readFile(Gbl.getConfig().plans().getInputFile());
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(population, network);
+		populationReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
 		// REAL STUFF HERE
@@ -134,12 +139,12 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
-		WorldWriter world_writer = new WorldWriter(Gbl.getWorld());
+		WorldWriter world_writer = new WorldWriter(world);
 		world_writer.write();
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(Gbl.getConfig());
+		ConfigWriter config_writer = new ConfigWriter(config);
 		config_writer.write();
 		System.out.println("  done.");
 

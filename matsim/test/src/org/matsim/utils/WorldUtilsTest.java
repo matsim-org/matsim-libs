@@ -21,7 +21,6 @@
 package org.matsim.utils;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
@@ -71,7 +70,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 		final double maxX = 9.0;
 		final double maxY = 18.0;
 		final int[] areaCounters = new int[9];
-		final World world = Gbl.createWorld();
+		final World world = new World();
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
 		Zone zone = layer.createZone("1", "4.5", "9", "0", "0", "9", "18", null, "center zone");
 		layer.createZone("2", "30", "15", "9", "0", "51", "30", null, "another zone");
@@ -104,7 +103,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 		final int[] areaCounters = new int[11]; // radius from center in %: 0-10, 10-20, 20- ... -90, 90-100, 100+.
-		final World world = Gbl.createWorld();
+		final World world = new World();
 		ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones for test");
 		Zone zone = layer.createZone("1", "4.5", "9", null, null, null, null, null, "center zone");
 		Zone zone2 = layer.createZone("2", "30", "15", "9", null, null, null, null, "another zone");

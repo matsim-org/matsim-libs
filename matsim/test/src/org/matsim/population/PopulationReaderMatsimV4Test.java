@@ -25,7 +25,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.Route;
@@ -44,8 +43,6 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
 		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse("test/scenarios/equil/network.xml");
-		Gbl.createWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 		Population population = new Population(Population.NO_STREAMING);
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(population, network);
 		reader.parse(getInputDirectory() + "plans2.xml");

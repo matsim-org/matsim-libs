@@ -48,14 +48,11 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 //		String outDbf = getOutputDirectory() + "acts.dbf";
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
@@ -90,14 +87,11 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 //		String outDbf = getOutputDirectory() + "legs.dbf";
 
 		Gbl.createConfig(null);
-		Gbl.createWorld();
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-		Gbl.getWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 
 		Population population = new Population();
-		new MatsimPopulationReader(population).readFile(populationFilename);
+		new MatsimPopulationReader(population, network).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);

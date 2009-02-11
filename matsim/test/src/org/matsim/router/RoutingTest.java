@@ -37,7 +37,6 @@ import org.matsim.router.util.TravelMinCost;
 import org.matsim.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
-import org.matsim.world.World;
 
 public class RoutingTest extends MatsimTestCase {
 
@@ -106,14 +105,13 @@ public class RoutingTest extends MatsimTestCase {
 
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
-		World world = Gbl.createWorld();
 
-		NetworkLayer network = (NetworkLayer) world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		Population population = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(population).readFile(inPlansName);
+		new MatsimPopulationReader(population, network).readFile(inPlansName);
 		population.printPlansCount();
 		long referenceChecksum = CRCChecksum.getCRCFromGZFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);

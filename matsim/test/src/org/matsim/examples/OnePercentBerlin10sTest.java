@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.algorithms.EventWriterTXT;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.mobsim.queuesim.QueueSimulation;
 import org.matsim.network.MatsimNetworkReader;
@@ -34,7 +33,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
-import org.matsim.world.World;
 
 public class OnePercentBerlin10sTest extends MatsimTestCase {
 
@@ -49,7 +47,6 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		MatsimRandom.reset(7411L);
 
-		World world = Gbl.createWorld();
 		// this needs to be done before reading the network
 		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
 		config.simulation().setTimeStepSize(10.0);
@@ -59,11 +56,9 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFileName);
-		world.setNetworkLayer(network);
-		world.complete();
 
 		Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 

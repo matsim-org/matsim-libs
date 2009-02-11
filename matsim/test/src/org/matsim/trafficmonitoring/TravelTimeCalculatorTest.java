@@ -57,11 +57,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// setup global stuff
 		Gbl.createConfig(new String[] {});
-		Gbl.createWorld();
 
 		// setup network
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 
 		// read network
 		new MatsimNetworkReader(network).readFile(networkFile);
@@ -141,11 +139,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// setup global stuff
 		Gbl.createConfig(new String[] {});
-		Gbl.createWorld();
 
 		// setup network
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 
 		// read network
 		new MatsimNetworkReader(network).readFile(networkFile);
@@ -226,11 +222,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// setup global stuff
 		Gbl.createConfig(new String[] {});
-		Gbl.createWorld();
 
 		// setup network
-		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 
 		// read network
 		new MatsimNetworkReader(network).readFile(networkFile);

@@ -24,7 +24,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.withinday.coopers.CoopersControler;
 
-
 /**
  * Several integration tests for the withinday replanning implementation used for the Coopers project.
  * This tests use the ControlInputSB and the ControlInputMB travel time prediction model on a 
@@ -37,14 +36,6 @@ import org.matsim.withinday.coopers.CoopersControler;
  * @author dgrether
  */
 public class CoopersBerlinIntegrationTest extends MatsimTestCase {
-
-	/**
-	 * @see org.matsim.testcases.MatsimTestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
 
 	public void testBerlinReducedSB() {
 		String eventsFileName = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
@@ -68,15 +59,11 @@ public class CoopersBerlinIntegrationTest extends MatsimTestCase {
 				
 		controler.run();
 
-		System.out.println("calculating checksums...");
-		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);;
+		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(eventsFileName);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
-
+		assertEquals("different events-files.", checksum1, checksum2);
 	}
-	
-	
+
 	public void testBerlinReducedMB() {
 		String eventsFileName = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
 		String referenceFileName = getInputDirectory() + "0.events.txt.gz";
@@ -99,11 +86,9 @@ public class CoopersBerlinIntegrationTest extends MatsimTestCase {
 				
 		controler.run();
 		
-		System.out.println("calculating checksums...");
-		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);;
+		long checksum1 = CRCChecksum.getCRCFromGZFile(referenceFileName);
 		long checksum2 = CRCChecksum.getCRCFromGZFile(eventsFileName);
-		System.out.println("checksum = " + checksum2 + " should be: " + checksum1);
-		assertEquals(checksum1, checksum2);
+		assertEquals("different events-files.", checksum1, checksum2);
 	}
 	
 }
