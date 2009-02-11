@@ -52,6 +52,12 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.scoring.CharyparNagelScoringFunctionFactory;
 import org.matsim.scoring.EventsToScore;
 import org.matsim.world.World;
+import org.matsim.router.util.TravelCost;
+import org.matsim.router.util.TravelTime;
+
+import playground.dressler.ea_flow.FakeTravelTimeCost;
+import playground.dressler.ea_flow.Flow;
+import playground.dressler.ea_flow.MBFdynamic_withFlowClass;
 
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervall;
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
@@ -68,6 +74,7 @@ public class MultiSourceEAF {
 	 * debug flag
 	 */
 	private static boolean _debug = false;
+	private static boolean vertexAlgo = true;
 	
 	
 	public static void debug(boolean debug){
@@ -221,7 +228,7 @@ public class MultiSourceEAF {
 			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
 			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
-			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+			
 			if(_debug){
 				System.out.println("starting calculations");
 			}
@@ -233,6 +240,9 @@ public class MultiSourceEAF {
 			long timeStart = System.currentTimeMillis();
 			
 			//main loop for calculations
+			if(vertexAlgo){
+			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+				
 			int i;
 			for (i=0; i<rounds; i++){
 				timer1 = System.currentTimeMillis();
@@ -257,6 +267,15 @@ public class MultiSourceEAF {
 			if (_debug) {
 				  long timeStop = System.currentTimeMillis();
 				  System.out.println("Iterations: " + i + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+			}
+			}
+			else{
+				FakeTravelTimeCost length = new FakeTravelTimeCost();
+				fluss = new Flow(network, length, demands, sink, timeHorizon);
+				TravelCost travelCost = (TravelCost) length;
+				TravelTime travelTime = (TravelTime) length;
+				MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
+				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss);
 			}
 			if(_debug){
 				System.out.println(fluss.arrivalsToString());
