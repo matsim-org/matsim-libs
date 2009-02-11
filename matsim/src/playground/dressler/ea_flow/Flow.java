@@ -604,9 +604,13 @@ public class Flow {
 				route.setLinkIds(ids);				
 				BasicLegImpl leg = new BasicLegImpl(BasicLeg.Mode.walk);
 				leg.setRoute(route);
-				BasicActImpl home = new BasicActImpl("home");
+				BasicActImpl home = new BasicActImpl("h");
+				home.setEndTime(0);
+				home.setCoord(path.getPathEdges().getFirst().getEdge().getFromNode().getCoord());
 				home.setEndTime(path.getPathEdges().getFirst().getTime());
-				BasicActImpl work = new BasicActImpl("work");
+				BasicActImpl work = new BasicActImpl("w");
+				work.setEndTime(0);
+				work.setCoord(path.getPathEdges().getLast().getEdge().getToNode().getCoord());
 				Link fromlink =path.getPathEdges().getFirst().getEdge();
 				Link tolink =path.getPathEdges().getLast().getEdge();
 				
