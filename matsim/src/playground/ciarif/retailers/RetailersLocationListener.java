@@ -78,8 +78,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		for (Retailer r : retailers.getRetailers().values()) {
-			//Map<Id,Facility> facs =  r.moveFacilitiesRandom(controler.getNetwork());
-			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
+			Map<Id,Facility> facs =  r.moveFacilitiesRandom(controler.getNetwork());
 			movedFacilities.putAll(facs);
 		}
 		
@@ -127,12 +126,6 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// TODO Auto-generated method stub
-		// Here the retailers will get a score for their location
-		//The score at first might be the simple count of the number of shoppers in the facility
-		//A first strategy might be that shops are still looking randomly for a new location, but
-		// they do really relocate only if the number of agents passing through the new link exceed
-		// the one of the older one
-		
 		Controler controler = event.getControler();
 		
 	}
