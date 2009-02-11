@@ -44,7 +44,7 @@
 <!--          <meminitial> </meminitial>-->
           <maxmem>512m</maxmem>
           <compilerArguments>
-            <Xmaxwarns>1000</Xmaxwarns>
+            <Xmaxwarns>2000</Xmaxwarns>
             <Xmaxerrs>100</Xmaxerrs>
           </compilerArguments>
           <!-- Uncommenting the following lines can be used to in- or exclude
