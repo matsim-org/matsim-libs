@@ -791,6 +791,13 @@ public class Flow {
 		return this.totalflow;
 	}
 	
+    /** @return the paths
+	*/
+	public LinkedList<TimeExpandedPath> getPaths() {
+		return this._TimeExpandedPaths;
+	}
+	
+	/**
 	
 	/**
 	 * setter for debug mode
