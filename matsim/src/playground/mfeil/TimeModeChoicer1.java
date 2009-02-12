@@ -20,7 +20,7 @@
 package playground.mfeil;
 
 import java.util.ArrayList;
-
+import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
@@ -539,40 +539,36 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	private double chooseModeAllChains (PlanomatXPlan plan, ArrayList<?> actslegsBase, PlanAnalyzeSubtours planAnalyzeSubtours){
 		ArrayList<?> actslegsResult = this.copyActsLegs(actslegsBase);
 		double score=-100000;
-		int [] subtours = new int [planAnalyzeSubtours.getNumSubtours()];
-		int [] subtourDistances = new int [planAnalyzeSubtours.getNumSubtours()];
-		int zeroDistance=0;
-		for (int i=0;i<subtours.length;i++){
-			subtours[i]=0;
-			subtourDistances[i] = this.checksubtourDistance2(actslegsBase, planAnalyzeSubtours, i);
-			if (subtourDistances[i]==0) {
-				zeroDistance++;
+		ArrayList<int[]> subtourDistances = new ArrayList<int[]>();
+		/* Set mode "walk" for all subtours with distance 0 */
+		for (int i=0;i<planAnalyzeSubtours.getNumSubtours();i++){
+			subtourDistances.add(new int []{i,0,this.checksubtourDistance2(actslegsBase, planAnalyzeSubtours, i)}); // subtour, mode pointer, distance
+			if (subtourDistances.get(subtourDistances.size()-1)[2]==0) {
+				subtourDistances.remove(subtourDistances.size()-1);
 				for (int j=1;j<plan.getActsLegs().size();j=j+2){
-					if (planAnalyzeSubtours.getSubtourIndexation()[(j-1)/2]==subtourDistances[i])((Leg)(plan.getActsLegs().get(j))).setMode(BasicLeg.Mode.walk);
+					if (planAnalyzeSubtours.getSubtourIndexation()[(j-1)/2]==i)((Leg)(actslegsBase.get(j))).setMode(BasicLeg.Mode.walk);
 				}
 			}
 		}
 		/* loop as many times as there are possible combinations of subtours */
-		int index=0;
-		for (int i=subtours.length-1;i>=0;i--){
-			if (subtourDistances[i]!=0)index = i;
-			break;
-		}
-		int searchSpace = (int) java.lang.Math.pow(this.possibleModes.length, (subtours.length-zeroDistance));
-		log.warn("For person "+plan.getPerson().getId()+", searchSpace = "+searchSpace);
+		int index = subtourDistances.size()-1;
+		int searchSpace = (int) java.lang.Math.pow(this.possibleModes.length, index+1);
+		log.warn("Call of method chooseModeAllChains() for person "+plan.getPerson().getId()+", searchSpace = "+searchSpace);
 		for (int i=0; i<searchSpace;i++){
 			if (plan.getPerson().getId().toString().equals("4888333") && i%10==0) log.warn("Person 4888333 in der "+i+". chooseModeAllChains Schleife.");
 			boolean tour=false;
-			for (int k=0;k<subtours.length;k++){
-				if (this.possibleModes[subtours[k]].toString().equals("walk")){
-					if (subtourDistances[k]==2){
+			for (int k=0;k<subtourDistances.size();k++){
+				if (this.possibleModes[subtourDistances.get(k)[1]].toString().equals("walk")){
+					if (subtourDistances.get(k)[2]==2){
 						tour=true;
+						//log.warn("Subtour "+subtourDistances.get(k)[0]+" has a 'walk is too far' exclusion.");
 						break;
 					}
 				}
 				else {
-					if (subtourDistances[k]==0){
+					if (subtourDistances.get(k)[2]==0){
 						tour=true;
+						//log.warn("Subtour "+subtourDistances.get(k)[0]+" has a 'non-walk is too short' exclusion.");
 						break;
 					}
 				}
@@ -580,29 +576,34 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			if (!tour){
 				ArrayList<?> actslegs = this.copyActsLegs(actslegsBase);
 				for (int x=1;x<actslegs.size();x+=2){
-					((Leg)(actslegs.get(x))).setMode(this.possibleModes[subtours[planAnalyzeSubtours.getSubtourIndexation()[(int)(x/2)]]]);
+					for (int y=0;y<subtourDistances.size();y++){
+						if (planAnalyzeSubtours.getSubtourIndexation()[(x-1)/2]==subtourDistances.get(y)[0]){
+							((Leg)(actslegs.get(x))).setMode(this.possibleModes[subtourDistances.get(y)[1]]);
+							break;
+						}
+					}
 				}
+				/*
+				log.info("Index is "+index);
+				for (int j=1;j<actslegs.size();j=j+2){
+					log.info ("Iteration "+i+", leg "+j+": mode = "+((Leg)(actslegs.get(j))).getMode());
+				}
+				*/
 				double tmpscore = this.setTimes(plan, actslegs, 0, 0, actslegs.size()-1, 0, actslegs.size()-1);
 				if (tmpscore>score) {
 					score = tmpscore;
 					actslegsResult = this.copyActsLegs(actslegs);
 				}
 			}
-			while (subtours[index]==this.possibleModes.length-1){
-				subtours[index]=0;
+			while (subtourDistances.get(index)[1]==this.possibleModes.length-1){
+				subtourDistances.get(index)[1]=0;
 				if (index!=0) {
-					for (int j=index;j>=0;j--){
-						if (subtourDistances[j]!=0)index = j;
-						break;
-					}
+					index--;
 				}
 			}
-			subtours[index]++;
-			if (index!=subtours.length-1){
-				for (int j=index;j<subtours.length;j++){
-					if (subtourDistances[j]!=0)index = j;
-					break;
-				}
+			subtourDistances.get(index)[1]++;
+			if (index!=subtourDistances.size()-1){
+				index=subtourDistances.size()-1;
 			}
 		/*	if (i>81 && iter==false){
 				log.info("Iteration "+i);

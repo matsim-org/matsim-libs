@@ -219,9 +219,12 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		while (plan.getScore()==-100000){
 			
 			/* Remove last secondary activity to make plan shorter*/
-			for (int z=plan.getActsLegs().size()-3;z>=2;z-=2){
+			for (int z=plan.getActsLegs().size()-3;z>=2;z=z-2){
 				if (this.checkPrimary((Act)plan.getActsLegs().get(z), primActs)		&&
-					!(this.checkForSamePrimary(plan, z))) continue;
+					!(this.checkForSamePrimary(plan, z/2))) {
+					log.warn("In continue Schleife!");
+					continue;
+				}
 				else {
 					this.removeAct(z/2, plan);
 					log.warn("Removed an act of the initial plan for person "+plan.getPerson().getId());
@@ -613,9 +616,8 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 			actHelp.setEndTime(24*3600);
 			actHelp.setStartTime(12*3600);
 			
-			//TODO @ mfeil: This needs improvement!!!
 			Leg legHelp;
-			legHelp = new Leg (BasicLeg.Mode.walk);
+			legHelp = new Leg (BasicLeg.Mode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	
