@@ -2,8 +2,8 @@ package playground.wrashid.PHEV.Utility;
 
 import org.matsim.controler.Controler;
 import org.matsim.events.Events;
-import org.matsim.mobsim.deqsim.DEQSimulation;
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 
 
 
@@ -14,7 +14,7 @@ class DESController extends Controler {
 
 	protected void runMobSim() {
 		
-		new DEQSimulation(this.network, this.population, this.events).run();
+		new JDEQSimulation(this.network, this.population, this.events).run();
 	}
 
 	public static void main(final String[] args) {

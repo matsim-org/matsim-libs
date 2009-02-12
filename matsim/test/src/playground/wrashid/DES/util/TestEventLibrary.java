@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.PersonEvent;
-import org.matsim.mobsim.deqsim.EventLog;
-import org.matsim.mobsim.deqsim.util.CppEventFileParser;
-import org.matsim.mobsim.deqsim.util.EventLibrary;
+import org.matsim.mobsim.jdeqsim.EventLog;
+import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.testcases.MatsimTestCase;
 
 

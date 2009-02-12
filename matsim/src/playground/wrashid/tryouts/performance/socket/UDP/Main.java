@@ -1,6 +1,6 @@
 package playground.wrashid.tryouts.performance.socket.UDP;
 
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 
 import playground.wrashid.tryouts.performance.Test2;
 

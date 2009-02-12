@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;

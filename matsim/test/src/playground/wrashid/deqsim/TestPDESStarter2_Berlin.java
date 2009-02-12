@@ -9,12 +9,12 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.PersonEvent;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.EventLog;
-import org.matsim.mobsim.deqsim.scenarios.EquilPopulationPlans1Modified1;
-import org.matsim.mobsim.deqsim.util.CppEventFileParser;
-import org.matsim.mobsim.deqsim.util.DEQSimEventFileComparator;
-import org.matsim.mobsim.deqsim.util.DEQSimEventFileTravelTimeComparator;
-import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
+import org.matsim.mobsim.jdeqsim.EventLog;
+import org.matsim.mobsim.jdeqsim.scenarios.EquilPopulationPlans1Modified1;
+import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileComparator;
+import org.matsim.mobsim.jdeqsim.util.DEQSimEventFileTravelTimeComparator;
+import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.testcases.MatsimTestCase;
 
 

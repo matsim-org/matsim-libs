@@ -1,7 +1,7 @@
 package playground.wrashid.PDES3;
 
-import org.matsim.mobsim.deqsim.Message;
-import org.matsim.mobsim.deqsim.Scheduler;
+import org.matsim.mobsim.jdeqsim.Message;
+import org.matsim.mobsim.jdeqsim.Scheduler;
 
 import playground.wrashid.PDES2.MessageExecutor;
 

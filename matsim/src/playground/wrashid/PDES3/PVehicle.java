@@ -1,12 +1,12 @@
 package playground.wrashid.PDES3;
 
-import org.matsim.mobsim.deqsim.DeadlockPreventionMessage;
-import org.matsim.mobsim.deqsim.Message;
-import org.matsim.mobsim.deqsim.MessageFactory;
-import org.matsim.mobsim.deqsim.Road;
-import org.matsim.mobsim.deqsim.Scheduler;
-import org.matsim.mobsim.deqsim.SimUnit;
-import org.matsim.mobsim.deqsim.Vehicle;
+import org.matsim.mobsim.jdeqsim.DeadlockPreventionMessage;
+import org.matsim.mobsim.jdeqsim.Message;
+import org.matsim.mobsim.jdeqsim.MessageFactory;
+import org.matsim.mobsim.jdeqsim.Road;
+import org.matsim.mobsim.jdeqsim.Scheduler;
+import org.matsim.mobsim.jdeqsim.SimUnit;
+import org.matsim.mobsim.jdeqsim.Vehicle;
 import org.matsim.population.Person;
 
 

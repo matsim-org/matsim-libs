@@ -1,9 +1,9 @@
 package playground.wrashid.PDES3;
 
-import org.matsim.mobsim.deqsim.Road;
-import org.matsim.mobsim.deqsim.Scheduler;
-import org.matsim.mobsim.deqsim.SimulationParameters;
-import org.matsim.mobsim.deqsim.Vehicle;
+import org.matsim.mobsim.jdeqsim.Road;
+import org.matsim.mobsim.jdeqsim.Scheduler;
+import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.Vehicle;
 import org.matsim.network.Link;
 
 

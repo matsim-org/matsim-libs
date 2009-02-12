@@ -79,7 +79,7 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.mobsim.deqsim.DEQSimulation;
+import org.matsim.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.mobsim.queuesim.ExternalMobsim;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
@@ -695,7 +695,7 @@ public class Controler {
 		if (this.externalMobsim == null) {
 			final String JDEQ_SIM="JDEQSim";
 			if (Gbl.getConfig().getModule(JDEQ_SIM)!=null){
-				DEQSimulation sim= new DEQSimulation(this.network, this.population, this.events);
+				JDEQSimulation sim= new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.network, this.population, this.events);

@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.Link;
 
 import org.matsim.gbl.Gbl;

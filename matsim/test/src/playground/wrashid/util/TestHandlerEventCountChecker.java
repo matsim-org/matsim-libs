@@ -20,11 +20,11 @@ import org.matsim.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.events.handler.EventHandler;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.events.handler.LinkLeaveEventHandler;
-import org.matsim.mobsim.deqsim.DEQSimStarterWithoutController;
-import org.matsim.mobsim.deqsim.SimulationParameters;
-import org.matsim.mobsim.deqsim.util.DummyPopulationModifier;
-import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
-import org.matsim.mobsim.deqsim.util.testable.TestHandler;
+import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
+import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.util.DummyPopulationModifier;
+import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
+import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -170,7 +170,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler  {
 			SimulationParameters.setTestPopulationModifier(new DummyPopulationModifier());
 		}		
 		
-		DEQSimStarterWithoutController.main(args);
+		JDEQSimStarterWithoutController.main(args);
 		this.estimateExpectedNumberOfEvents(SimulationParameters.getTestPopulationModifier().getPopulation());
 		SimulationParameters.getTestEventHandler().checkAssertions();
 	}

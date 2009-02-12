@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import org.matsim.mobsim.deqsim.Message;
+import org.matsim.mobsim.jdeqsim.Message;
 
 
 public class ZoneMessageQueue {

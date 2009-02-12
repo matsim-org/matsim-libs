@@ -2,10 +2,10 @@ package playground.wrashid.oldtests;
 
 import java.util.ArrayList;
 
-import org.matsim.mobsim.deqsim.DEQSimStarterWithoutController;
-import org.matsim.mobsim.deqsim.EventLog;
-import org.matsim.mobsim.deqsim.SimulationParameters;
-import org.matsim.mobsim.deqsim.util.CppEventFileParser;
+import org.matsim.mobsim.jdeqsim.JDEQSimStarterWithoutController;
+import org.matsim.mobsim.jdeqsim.EventLog;
+import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
 
 import junit.framework.TestCase;
 
@@ -38,7 +38,7 @@ public class SimTest extends TestCase {
 		
 			
 		args[0]= baseDir + "config.xml";
-		DEQSimStarterWithoutController.main(args);
+		JDEQSimStarterWithoutController.main(args);
 		
 		//args[0]= baseDir + "deq_events.txt";
 		//CppEventFileParser.main(args);

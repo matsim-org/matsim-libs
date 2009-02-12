@@ -28,7 +28,7 @@ import org.matsim.controler.ScenarioData;
 import org.matsim.events.Events;
 import org.matsim.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.DEQSimulation;
+import org.matsim.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 
@@ -62,7 +62,7 @@ public class DEQSimStarter {
 		Events events = new ParallelEvents(1);
 		
 		// run simulation
-		DEQSimulation client = new DEQSimulation(network, population, events);
+		JDEQSimulation client = new JDEQSimulation(network, population, events);
 		client.run();
 
 		// finish

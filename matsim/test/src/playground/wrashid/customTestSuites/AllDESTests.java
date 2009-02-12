@@ -1,6 +1,6 @@
 package playground.wrashid.customTestSuites;
 
-import org.matsim.mobsim.deqsim.TestDESStarter_Berlin;
+import org.matsim.mobsim.jdeqsim.TestDESStarter_Berlin;
 
 import playground.wrashid.PDES2.ZoneMessageQueueTest;
 import playground.wrashid.PDES2.util.ConcurrentListMPDSCTest;

@@ -8,8 +8,8 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.handler.EventHandler;
-import org.matsim.mobsim.deqsim.util.testable.PopulationModifier;
-import org.matsim.mobsim.deqsim.util.testable.TestHandler;
+import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
+import org.matsim.mobsim.jdeqsim.util.testable.TestHandler;
 
 import playground.wrashid.PDES2.util.ConcurrentListMPDSC;
 import playground.wrashid.PDES2.util.ConcurrentListMPSC;

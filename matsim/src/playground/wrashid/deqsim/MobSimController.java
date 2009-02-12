@@ -21,7 +21,7 @@
 package playground.wrashid.deqsim;
 
 import org.matsim.controler.Controler;
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 
 
 

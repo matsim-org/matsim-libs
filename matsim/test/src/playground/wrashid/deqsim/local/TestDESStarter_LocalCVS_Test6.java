@@ -1,7 +1,7 @@
 package playground.wrashid.deqsim.local;
 
 import org.matsim.gbl.Gbl;
-import org.matsim.mobsim.deqsim.util.TestHandlerDetailedEventChecker;
+import org.matsim.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
 import org.matsim.testcases.MatsimTestCase;
 
 

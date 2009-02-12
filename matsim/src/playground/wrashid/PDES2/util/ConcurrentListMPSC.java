@@ -3,7 +3,7 @@ package playground.wrashid.PDES2.util;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 
 // optimized for multiple producer, single consumer
 public class ConcurrentListMPSC<T> {

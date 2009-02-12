@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.BasicEvent;
-import org.matsim.mobsim.deqsim.util.Timer;
+import org.matsim.mobsim.jdeqsim.util.Timer;
 
 import playground.wrashid.deqsim.PDESStarter2;
 // optimized for multiple producer, single consumer

@@ -2,9 +2,9 @@ package playground.wrashid.PDES2;
 
 import java.util.ArrayList;
 
-import org.matsim.mobsim.deqsim.EventLog;
-import org.matsim.mobsim.deqsim.SimulationParameters;
-import org.matsim.mobsim.deqsim.util.CppEventFileParser;
+import org.matsim.mobsim.jdeqsim.EventLog;
+import org.matsim.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.mobsim.jdeqsim.util.CppEventFileParser;
 
 
 
