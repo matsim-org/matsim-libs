@@ -26,7 +26,7 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCas
 		Gbl.reset();
 
 		DEQSimEventFileComparator deqSimComparator = new DEQSimEventFileComparator(
-				"test/input/org/matsim/mobsim/deqsim/deq_events.txt");
+				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt");
 		deqSimComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans1.xml", new EquilPopulationPlans1Modified1());
 	}
@@ -35,7 +35,7 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends MatsimTestCas
 		Gbl.reset();
 
 		DEQSimEventFileTravelTimeComparator deqSimTravelTimeComparator = new DEQSimEventFileTravelTimeComparator(
-				"test/input/org/matsim/mobsim/deqsim/deq_events.txt", 1);
+				"test/input/org/matsim/mobsim/jdeqsim/deq_events.txt", 1);
 		deqSimTravelTimeComparator.startTestDES("test/scenarios/equil/config.xml", false,
 				"test/scenarios/equil/plans1.xml", new EquilPopulationPlans1Modified1());
 	}
