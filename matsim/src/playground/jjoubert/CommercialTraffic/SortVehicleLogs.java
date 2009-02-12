@@ -1,11 +1,15 @@
 package playground.jjoubert.CommercialTraffic;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 /**
  * 
@@ -14,9 +18,9 @@ import java.util.Collections;
  */
 
 public class SortVehicleLogs {
-	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/";
-	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted/";
-	final static String DELIMITER = ","; // this could be "," or "\t"
+	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/";
+	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Sorted/";
+	final static String DELIMITER = " "; // this could be "," or "\t"
 
 	public static void main (String args[] ){
 		int progress = 0;
@@ -31,17 +35,16 @@ public class SortVehicleLogs {
 			File maxFile = null;
 			for (File theFile : vehicleFiles) {				
 				if(theFile.isFile() && !(theFile.getName().startsWith(".")) ){
-						ArrayList<GPSPoint> log = ActivityLocations.readFileToArray(theFile);
-						int maxNumber = log.size();
+						ArrayList<GPSRecord> log = readFileToArray(theFile);
 						
-						ArrayList<GPSPoint> sortedArray2 = sortTimeMerge(maxNumber, log);
-						if(sortedArray2.size() > maxLines){
-							maxLines = sortedArray2.size();
+						ArrayList<GPSRecord> sortedArray = sortTimeMerge( log );
+						if(sortedArray.size() > maxLines){
+							maxLines = sortedArray.size();
 							maxFile = theFile;
 						}
 						
 						try {
-							writeSortedArray(DESTFOLDER, theFile, sortedArray2, true);
+							writeSortedArray(DESTFOLDER, theFile, sortedArray, true);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -53,9 +56,45 @@ public class SortVehicleLogs {
 			System.out.println("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
 		}
 	}
+	
+	public static ArrayList<GPSRecord> readFileToArray(File thisFile) { // I decided to not read in the speed... useless in DigiCore set
+		int vehID;
+		long time;
+		double longitude;
+		double latitude;
+		int status;
+		int speed;
+		
+		ArrayList<GPSRecord> log = new ArrayList<GPSRecord>();
+		try {
+			Scanner input = new Scanner(new BufferedReader(new FileReader(thisFile) ) );
+			while( input.hasNextLine() ){
+				String [] inputString = input.nextLine().split(DELIMITER);
+				if( inputString.length > 5){
+					try{
+						vehID = Integer.parseInt( inputString[0] );
+						time =  Long.parseLong( inputString[1] );
+						longitude = Double.parseDouble( inputString[2] );
+						latitude = Double.parseDouble( inputString[3] );
+						status = Integer.parseInt( inputString[4] );
+						speed = Integer.parseInt( inputString[5] );
+
+						log.add( new GPSRecord(vehID, time, longitude, latitude, status, speed) );
+					} catch(NumberFormatException e){
+						System.out.print("");
+						e.printStackTrace();
+					} 
+				}
+			}
+			input.close();						
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return log;
+	}
 
 	private static void writeSortedArray(final String destFolder, File theFile,
-			ArrayList<GPSPoint> sortedArray, boolean header) throws IOException {
+			ArrayList<GPSRecord> sortedArray, boolean header) throws IOException {
 		BufferedWriter output = new BufferedWriter(
 				new FileWriter(
 						new File(destFolder + "/" + theFile.getName() ) ) );
@@ -64,6 +103,7 @@ public class SortVehicleLogs {
 			output.write("VehicleID" + DELIMITER + "TIME" + DELIMITER + "LONG" + DELIMITER + "LAT" + DELIMITER + "STATUS" + DELIMITER + "SPEED");
 			output.newLine();
 		}
+		if(sortedArray.size() > 0){
 		// write all points, except the last, with a newLine
 		for (int i = 0; i <= (sortedArray.size()-2); i++){
 			output.write(sortedArray.get(i).getVehID() + DELIMITER + 
@@ -83,11 +123,13 @@ public class SortVehicleLogs {
 				 sortedArray.get(sortedArray.size()-1).getStatus() + DELIMITER +
 				 sortedArray.get(sortedArray.size()-1).getSpeed() );					
 		output.close();
+		} else{
+			System.out.println("There's a problem... empty file");
+		}
 	}
 	
 	
-	private static ArrayList<GPSPoint> sortTimeMerge(int maxNumber,
-			ArrayList<GPSPoint> log) {
+	private static ArrayList<GPSRecord> sortTimeMerge( ArrayList<GPSRecord> log) {
 		Collections.sort(log);		
 		return log;
 	}
