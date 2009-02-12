@@ -379,7 +379,36 @@ public class VertexIntervalls {
 	}
 	**/
 	
+	//------------------------Clean Up--------------------------------//
+	/**
+	 * unifies adjacent intervalls, call only when you feel it is safe to do
+	 */
+	public int cleanup() {
+		int gain = 0;
+		int timestop = getLast().getHighBound();		
+		VertexIntervall i, j;
+		i = getIntervallAt(0);
+		while (i != null) {
+		  if (i.getHighBound() == timestop) break;	
+		  j = getNext(i);
+		  
+		  if ((i.getHighBound() == j.getLowBound()) && (i.getDist() == j.getDist()) &&
+				  (i.getPredecessor() == j.getPredecessor())) {
+			  VertexIntervall ni = new VertexIntervall(i.getLowBound(),j.getHighBound(),i.getDist(), i.getPredecessor());
+			  _tree.remove(i);
+			  _tree.remove(j);
+			  _tree.insert(ni);
+			  i = ni;
+			  gain++;
 
+		  } else {
+			  i = j;
+		  }		 		 
+		}
+		_last = (VertexIntervall) _tree._getLast().obj;
+		return gain;
+	}
+	
 	
 //------------------------MAIN METHOD--------------------------------//
 	
