@@ -101,6 +101,11 @@ public class Flow {
 	private final  int _timeHorizon;
 	
 	/**
+	 * total flow augmented so far
+	 */
+	private int totalflow;
+	
+	/**
 	 * TODO use debug mode
 	 * flag for debug mode
 	 */
@@ -136,6 +141,7 @@ public class Flow {
 		this._sink = sink;
 		_timeHorizon = horizon;
 		this._nonactives = this.nonActives();
+		this.totalflow = 0;
 		
 	}
 	
@@ -160,6 +166,7 @@ public class Flow {
 		this._sink = sink;
 		_timeHorizon = horizon;
 		this._nonactives = this.nonActives();
+		this.totalflow = 0;
 	}
 
 	/**
@@ -248,6 +255,7 @@ public class Flow {
 	 */
 	public void augment(TimeExpandedPath timeExpandedPath){
 		int gamma = bottleNeckCapacity(timeExpandedPath);
+		this.totalflow += gamma;
 		LinkedList<PathEdge> backwardLinks = new LinkedList<PathEdge>();
 		// find backwardLinks in the new path
 		for(PathEdge edge : timeExpandedPath.getPathEdges()){
@@ -689,8 +697,19 @@ public class Flow {
 		
 		return result;
 	}
-	
-	
+
+//////////////////////////////////////////////////////////////////////////////////////
+//------------------- Clean Up---------------------------------------//	
+//////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Call the cleanup-method for each edge 
+	 */
+	public void cleanUp() {		
+		for (EdgeIntervalls EI : _flow.values()) {
+		  EI.cleanup();	
+		}
+	}	
 	
 //////////////////////////////////////////////////////////////////////////////////////
 //-------------------Getters Setters toString---------------------------------------//	
@@ -766,11 +785,12 @@ public class Flow {
 	}
 	
 	/**
-	 * @return the paths
+	 * @return the total flow so far
 	 */
-	public LinkedList<TimeExpandedPath> getPaths() {
-		return this._TimeExpandedPaths;
+	public int getTotalFlow() {
+		return this.totalflow;
 	}
+	
 	
 	/**
 	 * setter for debug mode
