@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+		<param name="numberOfThreads" value="1" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+	</module>
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="test/scenarios/equil/plans2000.xml.gz" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="0.1" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="16:00:00" />
+		<param name="activityMinimalDuration_0" value="" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="07:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="24:00:00" />
+	</module>
+	
+	<module name="planomat">
+		<param name="doLogging" value="true" />
+	</module>
+	
+</config>

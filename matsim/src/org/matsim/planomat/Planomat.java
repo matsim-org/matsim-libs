@@ -25,12 +25,10 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.jgap.Chromosome;
-import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StockRandomGenerator;
 import org.matsim.basic.v01.BasicLeg;
@@ -71,7 +69,6 @@ public class Planomat implements PlanAlgorithm {
 
 	private LegTravelTimeEstimator legTravelTimeEstimator = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
-
 	private Random seedGenerator = null;
 
 	private final static Logger logger = Logger.getLogger(Planomat.class);
@@ -94,9 +91,12 @@ public class Planomat implements PlanAlgorithm {
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(plan);
 
-		org.jgap.Configuration jgapConfiguration = this.initJGAPConfiguration();
+		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(planAnalyzeSubtours);
 
-		org.jgap.Configuration.reset();
+		// JGAP random number generator is initialized for each run
+		// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
+		long seed = this.seedGenerator.nextLong();
+		((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
 
 		IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
 		try {
@@ -122,43 +122,13 @@ public class Planomat implements PlanAlgorithm {
 		for (int i = 0; i < Gbl.getConfig().planomat().getJgapMaxGenerations(); i++) {
 			population.evolve();
 			if (Gbl.getConfig().planomat().isDoLogging()) {
-				logMessage = "";
 				fittest = population.getFittestChromosome();
-				for (Gene gene : fittest.getGenes()) {
-					logMessage = logMessage.concat(gene.toString() + " ");
-				}
+				logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
 				logger.info(logMessage);
 			}
 		}
 		fittest = population.getFittestChromosome();
 		this.writeChromosome2Plan(fittest, plan, planAnalyzeSubtours );
-
-//		}
-	}
-
-	protected org.jgap.Configuration initJGAPConfiguration() {
-
-		DefaultConfiguration jgapConfiguration = new DefaultConfiguration();
-
-		try {
-			// TODO configuration shouldnt be inited for every plan, but once
-			// but currently do not know how to deal with threads because cloning doesn't work because jgap.impl.configuration writes System.Properties
-			Configuration.reset();
-
-			// JGAP random number generator is initialized for each run
-			// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
-			long seed = this.seedGenerator.nextLong();
-			//System.out.println("Seed: " + Long.toString(seed));
-			((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
-
-			// elitist selection (DeJong, 1975)
-			jgapConfiguration.setPreservFittestIndividual(true);
-			jgapConfiguration.setPopulationSize( Gbl.getConfig().planomat().getPopSize() );
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-
-		return jgapConfiguration;
 
 	}
 
@@ -171,7 +141,7 @@ public class Planomat implements PlanAlgorithm {
 				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
 
-			if (Gbl.getConfig().planomat().getPossibleModes() != null) {
+			if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 				for (int ii=0; ii < planAnalyzeSubtours.getNumSubtours(); ii++) {
 					sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Gbl.getConfig().planomat().getPossibleModes().length - 1));
 				} 
@@ -224,7 +194,6 @@ public class Planomat implements PlanAlgorithm {
 
 					activity.setStartTime(now);
 					activity.setDuration((((IntegerGene) individual.getGenes()[ii / 2]).intValue() + this.seedGenerator.nextDouble()) * Planomat.TIME_INTERVAL_SIZE);
-//					activity.setDuration(((DoubleGene) individual.getGenes()[ii / 2]).doubleValue());
 					now += activity.getDuration();
 					activity.setEndTime(now);
 
@@ -246,7 +215,7 @@ public class Planomat implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 
-				if (Gbl.getConfig().planomat().getPossibleModes() != null) {
+				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 					// set mode to result from optimization
 					int subtourIndex = planAnalyzeSubtours.getSubtourIndexation()[ii / 2];
 					int modeIndex = ((IntegerGene) individual.getGene(planAnalyzeSubtours.getSubtourIndexation().length + subtourIndex)).intValue();

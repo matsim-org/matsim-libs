@@ -4,103 +4,15 @@
 
 	<module name="planomat">
 
-		<!-- 
-		PARAMETER NAME: 
-		legTravelTimeEstimator 
-
-		DEFAULT VALUE: 
-		"org.matsim.planomat.costestimators.CetinCompatibleLegTravelTimeEstimator" 
-		  
-		PURPOSE: 
-		Defines how events should be interpreted.   
-		  
-		NOTES: 
-		Different implementations of traffic flow simulations use different interpretations of trips.  
-		Planomat has to use the same interpretation as the used traffic flow simulation. 
-		-->
+		<param name="populationSize" value="10" />
 		<param name="legTravelTimeEstimator" value="org.matsim.planomat.costestimators.CharyparEtAlCompatibleLegTravelTimeEstimator" />
-
-
-		<!--  
-		PARAMETER NAME: 
-		possibleModes 
-
-		EXAMPLES OF VALUES: 
-		"car", "car,pt", "car,pt,walk" 
-
-		DEFAULT VALUE: 
-		"" 
-
-		PURPOSE: 
-		Defines the choice set for leg modes. 
-
-		NOTES: 
-		Planomat will produce no other leg modes than those listed in the value of this parameter. 
-		When set to its default value, leg modes remain untouched, and planomat will only perform time optimization. 
-		-->
 		<param name="possibleModes" value="car,pt" />
-
-
-		<!--  
-		PARAMETER NAME: 
-		jgapMaxGenerations 
-
-		DEFAULT VALUE: 
-		"100"
-
-		PURPOSE: 
-		Number of generations the GA will evolve. 
-
-		NOTES:
-		The more generations are evolved, the more likely the GA finds the optimal solution.
-		The more generations are evolved, the longer is the required computing time.
-		This stop criterion is the simplest possible one.
-		It does not respect different sizes of GA problems, e.g. activity plans with different numbers of activities.
-		It will be replaced soon by a more sophisticated calculation of the number of required generations, prospectively
-		the approach of Greenhalgh, D. und S. Marshall (2000) Convergence criteria for genetic algorithms, SIAM Journal
-		on Computing, 30 (1) 269–282.
-		-->
 		<param name="jgapMaxGenerations" value="1000" />
-		
-		<!--  
-		PARAMETER NAME: 
-		levelOfTimeResolution 
-
-		DEFAULT VALUE: 
-		"7"
-
-		PURPOSE: 
-		Exponent for the number of time bins for the discrete encoding of activity durations. 
-
-		NOTES:
-		The maximum possible duration of an activity is 24 hours. This duration is separated into time bins. 
-		The number of time bins is 2^levelOfTimeResolution. So a value of 6 gives 2^6 = 64 time bins.
-		The higher this parameter is chosen, the shorter is a time bin and the more precise the optimal solution can be approached.
-		It is suggested to leave this parameter at its default value. A change in it becomes useful only if the above mentioned
-		more sophisticated calculation of the number of required generations is implemented.
-		-->
 		<param name="levelOfTimeResolution" value="6" />
-
-		<!--  
-		PARAMETER NAME: 
-		ignoreMe 
-
-		PURPOSE: 
-		This parameter is just for testing purposes for the planomat config module. It is to be ignored. 
-		-->
-		<param name="ignoreMe" value="0815" />
-
-		<!--  
-		PARAMETER NAME: 
-		doLogging 
-
-		DEFAULT VALUE: 
-		"false"
-
-		PURPOSE: 
-		Enables logging in order to get some insight to the planomat functionality. 
-		-->
 		<param name="doLogging" value="true" />
+
+		<!-- This parameter is just for testing purposes for the planomat config module. It is to be ignored. -->
+		<param name="ignoreMe" value="0815" />
 
 	</module>
 

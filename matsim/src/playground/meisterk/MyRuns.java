@@ -89,8 +89,13 @@ public class MyRuns {
 //		Gbl.createWorld();
 //		Gbl.createFacilities();
 
-		run();
+//		run();
 
+		String emptyString = "car";
+		
+		String[] bla = emptyString.split(",");
+		System.out.println(bla.length);
+		
 	}
 
 	public static NetworkLayer initWorldNetwork() {

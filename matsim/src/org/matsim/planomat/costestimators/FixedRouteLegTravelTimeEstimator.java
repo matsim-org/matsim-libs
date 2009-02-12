@@ -48,9 +48,6 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	protected DepartureDelayAverageCalculator tDepDelayCalc;
 	private PlansCalcRoute plansCalcRoute;
 
-	/**
-	 * TODO this variable has to be reset after each agent
-	 */
 	private HashMap<Route, List<Link>> linkRoutesCache = new HashMap<Route, List<Link>>();
 	
 	public FixedRouteLegTravelTimeEstimator(

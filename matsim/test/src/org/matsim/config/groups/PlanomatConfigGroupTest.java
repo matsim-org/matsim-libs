@@ -20,6 +20,8 @@
 
 package org.matsim.config.groups;
 
+import java.util.Arrays;
+
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
@@ -31,11 +33,16 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 		super.loadConfig(this.getInputDirectory() + "empty_config.xml");
 		
 //		assertEquals( PlanomatConfigGroup.DEFAULT_OPTIMIZATION_TOOLBOX, Gbl.getConfig().planomat().getOptimizationToolbox() );
-//		assertEquals( PlanomatConfigGroup.DEFAULT_POPSIZE, Gbl.getConfig().planomat().getPopSize() );
+		assertEquals( 
+				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue()), 
+				Gbl.getConfig().planomat().getPopSize() );
 		assertEquals( 
 				Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getDefaultValue()), 
 				Gbl.getConfig().planomat().getJgapMaxGenerations() );
-		assertEquals(null, Gbl.getConfig().planomat().getPossibleModes());
+		assertTrue(
+				Arrays.deepEquals(
+						new BasicLeg.Mode[]{}, 
+						Gbl.getConfig().planomat().getPossibleModes()));
 		assertEquals( 
 				PlanomatConfigGroup.PlanomatConfigParameter.LEG_TRAVEL_TIME_ESTIMATOR_NAME.getDefaultValue(), 
 				Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
@@ -51,13 +58,16 @@ public class PlanomatConfigGroupTest extends MatsimTestCase {
 
 		super.loadConfig(this.getInputDirectory() + "config.xml");
 
+		assertEquals( 10, Gbl.getConfig().planomat().getPopSize() );
+		
 		BasicLeg.Mode[] expectedModes = new BasicLeg.Mode[]{BasicLeg.Mode.car, BasicLeg.Mode.pt};
 		BasicLeg.Mode[] actualModes = Gbl.getConfig().planomat().getPossibleModes();
 		
-		assertEquals( expectedModes.length, actualModes.length);
-		for (int ii=0; ii < expectedModes.length; ii++) {
-			assertEquals(expectedModes[ii], actualModes[ii]);
-		}
+//		assertEquals( expectedModes.length, actualModes.length);
+//		for (int ii=0; ii < expectedModes.length; ii++) {
+//			assertEquals(expectedModes[ii], actualModes[ii]);
+//		}
+		assertTrue(Arrays.deepEquals(expectedModes, actualModes));
 		assertEquals( PlanomatConfigGroup.CHARYPAR_ET_AL_COMPATIBLE, Gbl.getConfig().planomat().getLegTravelTimeEstimatorName() );
 		assertEquals( 1000, Gbl.getConfig().planomat().getJgapMaxGenerations() );
 		assertEquals( 6, Gbl.getConfig().planomat().getLevelOfTimeResolution() );

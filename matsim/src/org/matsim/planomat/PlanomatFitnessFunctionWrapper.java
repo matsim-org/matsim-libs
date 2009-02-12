@@ -44,8 +44,8 @@ import org.matsim.scoring.ScoringFunction;
  */
 public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
-	public static final double FITNESS_OFFSET = 10000.0;
-
+	private static final double FITNESS_OFFSET = 10000.0;
+	
 	private static final long serialVersionUID = 1L;
 
 	private transient Plan plan;
@@ -66,61 +66,81 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 
 	}
 
+	private double now;
+	private double planScore;
+	private double travelTime;
+	private int numActs;
+	private int legCounter;
+	private int subtourIndex, modeIndex;
+	private BasicLeg.Mode mode;
+	private Act origin, destination;
+	private Leg legIntermediate;
+	private Route tempRoute;
+	private ArrayList<Object> actslegs;
+	
 	@Override
 	protected double evaluate(IChromosome a_subject) {
 
-		double planScore = 0.0;
-		double travelTime;
-		int subtourIndex, modeIndex;
-		BasicLeg.Mode mode = null;
-		Act origin = null, destination = null;
-		Leg legIntermediate = null;
-		Route tempRoute = null;
+		planScore = 0.0;
+		mode = null;
+		origin = null;
+		destination = null;
+		legIntermediate = null;
+		tempRoute = null;
 		
 		sf.reset();
-		double now = 0.0;
+		now = 0.0;
 		// process "middle" activities
-		int numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
+		numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
 
-		ArrayList<Object> actslegs = this.plan.getActsLegs();
+		actslegs = this.plan.getActsLegs();
 
-		for (int ii=0; ii < numActs; ii++) {
+		legCounter = 0;
+		for (Object o : actslegs) {
+			
+			if (o.getClass().equals(Leg.class)) {
+				
+				legIntermediate = (Leg) o;
+				
+				now += (((IntegerGene) a_subject.getGene(legCounter)).intValue() + 0.5) * Planomat.TIME_INTERVAL_SIZE;
 
-			now += (((IntegerGene) a_subject.getGene(ii)).intValue() + 0.5) * Planomat.TIME_INTERVAL_SIZE;
+				sf.startLeg(now, null);
 
-			sf.startLeg(now, null);
+				origin = plan.getPreviousActivity(legIntermediate);
+				destination = plan.getNextActivity(legIntermediate);
 
-			origin = (Act) actslegs.get(ii * 2);
-			legIntermediate = (Leg) actslegs.get(ii * 2 + 1);
-			destination = (Act) actslegs.get(ii * 2 + 2);
+				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+					// set mode
+					subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
+					modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
+					mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
+					legIntermediate.setMode(mode);
+				} // otherwise leave modes untouched
 
-			if (Gbl.getConfig().planomat().getPossibleModes() != null) {
-				// set mode
-				subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[ii];
-				modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
-				mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
-				legIntermediate.setMode(mode);
-			} // otherwise leave modes untouched
+				if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
+					tempRoute = legIntermediate.getRoute();
+				}
+				
+				// set times
+				travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+						this.plan.getPerson().getId(),
+						now,
+						origin,
+						destination,
+						legIntermediate);
 
-			if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
-				tempRoute = legIntermediate.getRoute();
+				now += travelTime;
+
+				if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
+					// recover original route
+					legIntermediate.setRoute(tempRoute);
+				}
+				sf.endLeg(now);
+
+				legCounter++;
+				
 			}
 			
-			// set times
-			travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
-					this.plan.getPerson().getId(),
-					now,
-					origin,
-					destination,
-					legIntermediate);
-
-			now += travelTime;
-
-			if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
-				// recover original route
-				legIntermediate.setRoute(tempRoute);
-			}
-			sf.endLeg(now);
 		}
 
 		sf.finish();
@@ -128,7 +148,8 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		// JGAP accepts only fitness values >= 0. bad plans often have negative scores. So we have to
 		// - make sure a fitness value will be >= 0, but
 		// - see that the fitness landscape will not be distorted too much by this, so we will add an offset (this s**ks, but works)
-		// - could become a problem if some calculation in the GA is based on score ratio (e.g. the calculation of a selection probability)
+		// - theoretically is a problem if GA selection is based on score ratio (e.g. weighted roulette wheel selection)
+//		return Math.max(0.0, sf.getScore());
 		return Math.max(0.0, planScore + PlanomatFitnessFunctionWrapper.FITNESS_OFFSET);
 	}
 

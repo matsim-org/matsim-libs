@@ -43,7 +43,7 @@ public class PlanomatConfigGroup extends Module {
 		 * <h3>Default value</h3>
 		 * "10"
 		 */
-		POPSIZE("populationSize", "10", ""),
+		POPSIZE("populationSize", Integer.toString(Integer.MIN_VALUE), ""),
 		/**
 		 * Number of generations the GA will evolve.
 		 * <h3>Possible values</h3>
@@ -195,18 +195,25 @@ public class PlanomatConfigGroup extends Module {
 		return Integer.parseInt(PlanomatConfigParameter.JGAP_MAX_GENERATIONS.getActualValue());
 	}
 
+	private BasicLeg.Mode[] cachedPossibleModes = null;
+	
 	public BasicLeg.Mode[] getPossibleModes() {
 
-		BasicLeg.Mode[] possibleModes = null; 
-
-		if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals("")) {
-			String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
-			possibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
-			for (int ii=0; ii < possibleModesStringArray.length; ii++) {
-				possibleModes[ii] = BasicLeg.Mode.valueOf(possibleModesStringArray[ii]);
+		if (this.cachedPossibleModes == null) {
+		
+			if (!PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().equals(PlanomatConfigParameter.POSSIBLE_MODES.getDefaultValue())) {
+				String[] possibleModesStringArray = PlanomatConfigParameter.POSSIBLE_MODES.getActualValue().split(",");
+				cachedPossibleModes = new BasicLeg.Mode[possibleModesStringArray.length];
+				for (int ii=0; ii < possibleModesStringArray.length; ii++) {
+					cachedPossibleModes[ii] = BasicLeg.Mode.valueOf(possibleModesStringArray[ii]);
+				}
+			} else {
+				this.cachedPossibleModes = new BasicLeg.Mode[]{};
 			}
+			
 		}
-		return possibleModes;
+
+		return this.cachedPossibleModes;
 
 	}
 
