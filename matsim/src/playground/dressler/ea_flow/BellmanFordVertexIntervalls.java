@@ -273,9 +273,13 @@ public class BellmanFordVertexIntervalls {
 		// dist is the distance from the source to w over v
 
 		// main loop
+		int gain = 0;
 		while (!queue.isEmpty()) {
 			// gets the first vertex in the queue
 			v = queue.poll();
+			
+			// Clean Up before we do anything!
+			gain += _labels.get(v).cleanup();
 
 			// visit neighbors
 			
@@ -298,6 +302,9 @@ public class BellmanFordVertexIntervalls {
 			if(_debug){
 				printStatus();
 			}
+		}
+		if (_debug) {
+		  System.out.println("Removed " + gain + " intervals.");
 		}
 		//System.out.println("finale labels: \n");
 		//printStatus();
