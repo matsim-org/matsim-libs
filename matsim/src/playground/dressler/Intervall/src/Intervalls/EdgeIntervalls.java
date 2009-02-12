@@ -367,7 +367,8 @@ public class EdgeIntervalls {
 	/**
 	 * unifies adjacent intervalls, call only when you feel it is safe to do
 	 */
-	public void cleanup() {
+	public int cleanup() {
+		int gain = 0;
 		int timestop = getLast().getHighBound();
 		EdgeIntervall i, j;
 		i = getIntervallAt(0);
@@ -382,11 +383,13 @@ public class EdgeIntervalls {
 			  _tree.remove(j);
 			  _tree.insert(ni);
 			  i = ni;
+			  gain++;
 
 		  } else {
 			  i = j;
 		  }		 		 
 		}
+		return gain;
 	}
 	
 //------------------------Augmentation--------------------------------//
