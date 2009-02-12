@@ -144,7 +144,6 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		// Initialization
 		//////////////////////////////////////////////////////////////////////
 		log.info("Start for Person "+plan.getPerson().getId());
-		if (plan.getPerson().getId().toString().equals("10")) log.warn("Person 10 dran.");
 		
 		MatsimRandom.getLocalInstance();
 		
@@ -225,6 +224,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					!(this.checkForSamePrimary(plan, z))) continue;
 				else {
 					this.removeAct(z/2, plan);
+					log.warn("Removed an act of the initial plan for person "+plan.getPerson().getId());
 					break;
 				}
 			}

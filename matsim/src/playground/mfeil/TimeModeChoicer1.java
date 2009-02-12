@@ -101,7 +101,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				move = this.cleanSchedule(this.minimumTime, basePlan);
 				if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach letztem cleanSchedule mit move = "+move);
 				if (move!=0.0){
-					/*
+					
 					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor chooseModeAllChains.");
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
@@ -115,12 +115,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 						break;
 					}
 					else {
-					*/
+					
 						// TODO Check whether allowed?
 						basePlan.setScore(-100000);	// Like this, PlanomatX will see that the solution is no proper solution
-						log.warn("No valid initial solution found for "+basePlan.getPerson().getId()+"!");
+						log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
 						return;
-					//}
+					}
 				}
 			}
 			loops++;
@@ -541,14 +541,26 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		double score=-100000;
 		int [] subtours = new int [planAnalyzeSubtours.getNumSubtours()];
 		int [] subtourDistances = new int [planAnalyzeSubtours.getNumSubtours()];
+		int zeroDistance=0;
 		for (int i=0;i<subtours.length;i++){
 			subtours[i]=0;
 			subtourDistances[i] = this.checksubtourDistance2(actslegsBase, planAnalyzeSubtours, i);
+			if (subtourDistances[i]==0) {
+				zeroDistance++;
+				for (int j=1;j<plan.getActsLegs().size();j=j+2){
+					if (planAnalyzeSubtours.getSubtourIndexation()[(j-1)/2]==subtourDistances[i])((Leg)(plan.getActsLegs().get(j))).setMode(BasicLeg.Mode.walk);
+				}
+			}
 		}
 		/* loop as many times as there are possible combinations of subtours */
-		int index=subtours.length-1;
-		//boolean iter = false;
-		for (int i=0; i<java.lang.Math.pow(this.possibleModes.length, subtours.length);i++){
+		int index=0;
+		for (int i=subtours.length-1;i>=0;i--){
+			if (subtourDistances[i]!=0)index = i;
+			break;
+		}
+		int searchSpace = (int) java.lang.Math.pow(this.possibleModes.length, (subtours.length-zeroDistance));
+		log.warn("For person "+plan.getPerson().getId()+", searchSpace = "+searchSpace);
+		for (int i=0; i<searchSpace;i++){
 			if (plan.getPerson().getId().toString().equals("4888333") && i%10==0) log.warn("Person 4888333 in der "+i+". chooseModeAllChains Schleife.");
 			boolean tour=false;
 			for (int k=0;k<subtours.length;k++){
@@ -578,10 +590,20 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 			while (subtours[index]==this.possibleModes.length-1){
 				subtours[index]=0;
-				if (index!=0) index--;
+				if (index!=0) {
+					for (int j=index;j>=0;j--){
+						if (subtourDistances[j]!=0)index = j;
+						break;
+					}
+				}
 			}
 			subtours[index]++;
-			if (index!=subtours.length-1)index++;
+			if (index!=subtours.length-1){
+				for (int j=index;j<subtours.length;j++){
+					if (subtourDistances[j]!=0)index = j;
+					break;
+				}
+			}
 		/*	if (i>81 && iter==false){
 				log.info("Iteration "+i);
 				System.out.println(planAnalyzeSubtours.getNumSubtours()+" und "+java.lang.Math.pow(Gbl.getConfig().planomat().getPossibleModes().length, subtours.length));
