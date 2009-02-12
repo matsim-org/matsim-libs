@@ -90,7 +90,7 @@ public class Facilities extends Layer implements Iterable<Facility> {
 
 		return f;
 	}
-	
+
 	@Deprecated // String arguments in creational patterns are deprecated.  kai, jan09
 	public final Facility createFacility(final String id, final String x, final String y) {
 		return this.createFacility(new IdImpl(id),new CoordImpl(x,y));
@@ -155,6 +155,10 @@ public class Facilities extends Layer implements Iterable<Facility> {
 	@SuppressWarnings("unchecked")
 	public final Map<Id, ? extends Facility> getFacilities() {
 		return (Map<Id, ? extends Facility>) getLocations();
+	}
+
+	public final Facility getFacility(final Id id) {
+		return (Facility) getLocation(id);
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
