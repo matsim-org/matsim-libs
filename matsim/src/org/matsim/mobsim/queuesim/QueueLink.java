@@ -42,50 +42,50 @@ import org.matsim.utils.misc.Time;
  * @author dgrether
  * @author mrieser
  *
- * Queue Model Link implementation
+ * Queue Model Link implementation with the following properties:
+ * <ul>
+ *   <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
+ *   <li>All QueueLane instances which are connected to the ToQueueNode are held in the attribute toNodeQueueLanes</li>
+ *   <li>...</li>
+ * </ul>
  */
 public class QueueLink {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
 
-//	protected static boolean simulateAllLanes = true;
-	
 	private QueueLane originalLane;
 	
 	private List<QueueLane> queueLanes;
-	
+	/**
+	 * The Link instance containing the data
+	 */
 	private final Link link;
 
-	/*package*/ final QueueNetwork queueNetwork;
+	private final QueueNetwork queueNetwork;
 
-	/*package*/ final QueueNode toQueueNode;
-	
-	private List<QueueLane> nodePseudoLinksList;
+	private final QueueNode toQueueNode;
+	/**
+	 * If more than one QueueLane exists this list holds all QueueLanes connected to the QueueNode of the QueueLink
+	 */
+	private List<QueueLane> toNodeQueueLanes;
 	
 	private boolean active = false;
 
 	private List<QueueLane> simLanes = new ArrayList<QueueLane>();
 
-	// ////////////////////////////////////////////////////////////////////
-	// constructors
-	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * Initializes a QueueLink with one QueueLane.
+	 * @param l
+	 * @param queueNetwork
+	 * @param toNode
+	 * @see QueueLink#createLanes(List)
+	 */
 	public QueueLink(final Link l, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		this.link = l;
 		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 
-		// yy: I am really not so happy about these indirect constructors with
-		// long argument lists. But be it if other people
-		// like them. kai, nov06
-		/*
-		 * moved capacity calculation to two methods, to be able to call it from
-		 * outside e.g. for reducing cap in case of an incident
-		 */
-//		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-//		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		this.originalLane = new QueueLane(this, true);
-		//TODO reconsider this
-//		this.originalLane.setOriginalLane(true);
 		this.queueLanes = new ArrayList<QueueLane>();
 		this.queueLanes.add(this.originalLane);
 	}
@@ -102,45 +102,34 @@ public class QueueLink {
 		return this.toQueueNode;
 	}
 
-//	public void recalcTimeVariantAttributes(final double now) {
-//		initFlowCapacity(now);
-//		recalcCapacity(now);
-//	}
-		/*was once reconfigure*/
+	/**
+	 * Initialize the QueueLink with more than one QueueLane
+	 * @param lanes
+	 */
 	/*package*/ void createLanes(List<BasicLane> lanes) {
-//		this.queueLanes = new ArrayList<QueueLane>();
-		if (this.getLink().getLength() < 60){
+		//TODO remove this assumption/warning
+		if (this.getLink().getLength() < 60.0){
 			log.warn("Link " + this.getLink().getId() + " is signalized by traffic light, but its length is less than 60m. This is not recommended." +
-				"Recommended minimum link length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
+				"Recommended minimum lane length is 45m for the signal lane and at least additional 15m space to store 2 vehicles at the original link.");
 		}
 		boolean firstNodeLinkInitialized = false;
-//		double averageSimulatedFlowCapacityPerLane_Veh_s = this.getSimulatedFlowCapacity() / this.getLink().getLanes(Time.UNDEFINED_TIME);
 		
 		for (BasicLane signalLane : lanes) {
-//			double freeSpeed_m_s = this.getLink().getFreespeed(Time.UNDEFINED_TIME);
 			QueueLane lane;
 			if(!firstNodeLinkInitialized){
-//				newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
 				lane = new QueueLane(this, signalLane, false);
-//				this.originalLink.getToLinks().add(newNodePseudoLink);
 				this.originalLane.addToLane(lane);
 
 				this.setToLinks(lane, signalLane.getToLinkIds());
 
-//				int numberOfLanes = signalLane.getNumberOfRepresentedLanes();
-//				newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes, 
-//						freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s, this.effectiveCelleSize);
 				lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
-//				this.originalLink.recalculatePseudoLinkProperties(signalLane.getLength(), 
-//						this.getLink().getLength() - signalLane.getLength(), this.getLink().getLanesAsInt(Time.UNDEFINED_TIME), 
-//						this.getLink().getFreespeed(Time.UNDEFINED_TIME), averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
 				this.originalLane.recalculateProperties(signalLane.getLength(), this.getLink().getLength() - signalLane.getLength(),
 						this.getLink().getLanes(Time.UNDEFINED_TIME));
 				this.queueLanes.add(lane);
 				firstNodeLinkInitialized = true;
 			} 
 			else {
-				// Now we have the original link and one extension pseudo Link
+				// Now we have the original QueueLane and one additional QueueLane
 				// therefore add additional extension links for the rest of the outLinks
 				// Check, if the new extension link is not in proximity of an old one's staring point
 				if (signalLane.getLength() - this.originalLane.getMeterFromLinkEnd() > 15.0) {
@@ -154,39 +143,33 @@ public class QueueLink {
 					// Fix Pointer...
 					// Adjust SC, SQ...
 				}
-  				// New NodePseudoLink will start at originalLink
-//					newNodePseudoLink = new PseudoLink(this, false, signalLane.getId());
+  				// New QueueLane will start at originalLink
 					lane = new QueueLane(this, signalLane, false);
 					this.originalLane.addToLane(lane);
-
 					this.setToLinks(lane, signalLane.getToLinkIds());
 					
-					// Only need to fix properties of new link. Original link hasn't changed
-//					newNodePseudoLink.recalculatePseudoLinkProperties(0, signalLane.getLength(), numberOfLanes_,
-//							freeSpeed_m_s, averageSimulatedFlowCapacityPerLane_Veh_s ,this.effectiveCelleSize);
+					// Only need to fix properties of new QueueLane. Original QueueLane hasn't changed
 					lane.recalculateProperties(0.0, signalLane.getLength(), signalLane.getNumberOfRepresentedLanes());
 					this.queueLanes.add(lane);
 			}
 		}
 		findLayout();
 		addUTurn();
-		resortPseudoLinks();
+		resortQueueLanes();
 	}
-	
 	/**
-	 * TODO dg remove the nodepseudolinkslist!
-	 * Is doing something strange, check it
+	 * 
 	 * @return
 	 */
-	protected List<QueueLane> getNodeQueueLanes() {
-		if ((this.nodePseudoLinksList == null) && (this.queueLanes.size() == 1)){
+	protected List<QueueLane> getToNodeQueueLanes() {
+		if ((this.toNodeQueueLanes == null) && (this.queueLanes.size() == 1)){
 			return this.queueLanes;
 		}
-		return this.nodePseudoLinksList;
+		return this.toNodeQueueLanes;
 	}
 	
 	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
-		for (QueueLane lane : this.nodePseudoLinksList) {
+		for (QueueLane lane : this.toNodeQueueLanes) {
 			lane.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
 		}				
 	}
@@ -240,11 +223,11 @@ public class QueueLink {
 		}
 	}
 
-	private void resortPseudoLinks(){
-		this.nodePseudoLinksList = new ArrayList<QueueLane>();
+	private void resortQueueLanes(){
+		this.toNodeQueueLanes = new ArrayList<QueueLane>();
 		for (QueueLane pseudoLink : this.queueLanes) {
 			if (pseudoLink.getMeterFromLinkEnd() == 0.0){
-				this.nodePseudoLinksList.add(pseudoLink);
+				this.toNodeQueueLanes.add(pseudoLink);
 			}
 		}
 		Collections.sort(this.queueLanes);
@@ -335,24 +318,22 @@ public class QueueLink {
 	}
 
 	protected boolean bufferIsEmpty() {
-//		return this.originalLane.bufferIsEmpty();
-		//TODO dg don't understand this code
+		//TODO dg refactore concept of setThisTimeStepGreen, too complicated -> tooooo much debugging time in case of errors
 		for (QueueLane lane : this.queueLanes){
 			lane.setThisTimeStepGreen(true);
 		}
 		//if there is only one link...
-		if (this.nodePseudoLinksList == null){
+		if (this.toNodeQueueLanes == null){
 			return this.originalLane.bufferIsEmpty();
 		}
-		
-		for (QueueLane lane : this.nodePseudoLinksList){
+		//otherwise we have to do a bit more work
+		for (QueueLane lane : this.toNodeQueueLanes){
 			if (!lane.bufferIsEmpty()){
 				return false;
 			}
 		}
 		return true;
 	}
-
 
 	/**
 	 * TODO this method is not really useful anymore -> remove
@@ -415,10 +396,6 @@ public class QueueLink {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
 	
-	// ////////////////////////////////////////////////////////////////////
-	// getter / setter
-	// ////////////////////////////////////////////////////////////////////
-
 	public VisData getVisData() {
 		return this.originalLane.visdata;
 	}

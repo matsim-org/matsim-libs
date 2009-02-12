@@ -609,7 +609,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		}
 		this.buffer.add(veh);
 		veh.setLastMovedTime(now);
-		this.queueLink.toQueueNode.activateNode();
+		this.queueLink.getToQueueNode().activateNode();
 	}
 	
 	/**

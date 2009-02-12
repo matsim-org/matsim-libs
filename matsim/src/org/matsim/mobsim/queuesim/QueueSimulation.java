@@ -60,7 +60,12 @@ import org.matsim.utils.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 import org.matsim.utils.vis.snapshots.writers.SnapshotWriter;
 import org.matsim.utils.vis.snapshots.writers.TransimsSnapshotWriter;
-
+/**
+ * @author dstrippgen
+ * @author mrieser
+ * @author dgrether
+ * 
+ */
 public class QueueSimulation {
 
 	private int snapshotPeriod = Integer.MAX_VALUE;
@@ -110,6 +115,12 @@ public class QueueSimulation {
 	 */
 	private SortedMap<Id, SignalSystemControler> signalSystemControlerBySystemId;
 
+	/**
+	 * Initialize the QueueSimulation without signal systems
+	 * @param network
+	 * @param plans
+	 * @param events
+	 */
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		Simulation.reset();
 		this.config = Gbl.getConfig();
@@ -122,6 +133,14 @@ public class QueueSimulation {
 		this.agentFactory = new AgentFactory();
 	}
 	
+	/**
+	 * Initialize the QueueSimulation and use the SignalSystems given as parameters
+	 * @param network
+	 * @param plans
+	 * @param events
+	 * @param signalSystems
+	 * @param signalSystemsConfig
+	 */
 	public QueueSimulation(final NetworkLayer network, final Population plans, 
 			final Events events, BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
 		this(network, plans, events);
@@ -171,7 +190,7 @@ public class QueueSimulation {
 			this.signalSystemControlerBySystemId.put(config.getLightSignalSystemId(), controler);
 			BasicLightSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
 			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
-			//TODO set other defaults
+			//TODO set other defaults of xml
 			List<BasicLightSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
 			if ((groups == null) || groups.isEmpty()) {
 				String message = "SignalSystemControler without any SignalGroups defined in SignalSystemConfiguration!";

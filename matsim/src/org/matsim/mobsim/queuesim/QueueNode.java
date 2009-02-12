@@ -179,7 +179,7 @@ public class QueueNode {
 		/* called by the framework, do all necessary action for node movement here */
 		if (this.signalized) {
 			for (QueueLink link : inLinksArrayCache){
-				for (QueueLane lane : link.getNodeQueueLanes()) {
+				for (QueueLane lane : link.getToNodeQueueLanes()) {
 					while (lane.canMoveFirstVehicle()) {
 						QueueVehicle veh = lane.getFirstFromBuffer();
 						if (!this.moveVehicleOverNode(veh, lane, now)) {
@@ -222,7 +222,7 @@ public class QueueNode {
 						inLinksCapSum -= link.getLink().getCapacity(now);
 						this.tempLinks[i] = null;
 						//move the link
-						for (QueueLane lane : link.getNodeQueueLanes()) {
+						for (QueueLane lane : link.getToNodeQueueLanes()) {
 							while (!lane.bufferIsEmpty()) {
 								QueueVehicle veh = lane.getFirstFromBuffer();
 								if (!moveVehicleOverNode(veh, lane, now)) {
