@@ -56,7 +56,7 @@ public class DEQSimulation {
 		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		
 		// READING SIMULATION PARAMETERS FROM CONFIG FILE
-		final String DEQ_SIM = "deqsim";
+		final String JDEQ_SIM = "JDEQSim";
 		final String SQUEEZE_TIME = "squeezeTime";
 		final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 		final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -65,13 +65,13 @@ public class DEQSimulation {
 		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
 		final String END_TIME = "endTime";
 
-		String squeezeTime = Gbl.getConfig().findParam(DEQ_SIM, SQUEEZE_TIME);
-		String flowCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, FLOW_CAPACITY_FACTOR);
-		String storageCapacityFactor = Gbl.getConfig().findParam(DEQ_SIM, STORAGE_CAPACITY_FACTOR);
-		String minimumInFlowCapacity = Gbl.getConfig().findParam(DEQ_SIM, MINIMUM_INFLOW_CAPACITY);
-		String carSize = Gbl.getConfig().findParam(DEQ_SIM, CAR_SIZE);
-		String gapTravelSpeed = Gbl.getConfig().findParam(DEQ_SIM, GAP_TRAVEL_SPEED);
-		String endTime = Gbl.getConfig().findParam(DEQ_SIM, END_TIME);
+		String squeezeTime = Gbl.getConfig().findParam(JDEQ_SIM, SQUEEZE_TIME);
+		String flowCapacityFactor = Gbl.getConfig().findParam(JDEQ_SIM, FLOW_CAPACITY_FACTOR);
+		String storageCapacityFactor = Gbl.getConfig().findParam(JDEQ_SIM, STORAGE_CAPACITY_FACTOR);
+		String minimumInFlowCapacity = Gbl.getConfig().findParam(JDEQ_SIM, MINIMUM_INFLOW_CAPACITY);
+		String carSize = Gbl.getConfig().findParam(JDEQ_SIM, CAR_SIZE);
+		String gapTravelSpeed = Gbl.getConfig().findParam(JDEQ_SIM, GAP_TRAVEL_SPEED);
+		String endTime = Gbl.getConfig().findParam(JDEQ_SIM, END_TIME);
 
 		if (squeezeTime != null) {
 			SimulationParameters.setSqueezeTime(Double.parseDouble(squeezeTime));
@@ -115,8 +115,10 @@ public class DEQSimulation {
 					+ SimulationParameters.getGapTravelSpeed());
 		}
 		
-		if (endTime != null && Time.parseTime(endTime)!=0.0) {
-			SimulationParameters.setSimulationEndTime(Time.parseTime(endTime));
+		if (endTime != null) {
+			if (Time.parseTime(endTime)!=0.0){
+				SimulationParameters.setSimulationEndTime(Time.parseTime(endTime));
+			}
 		} else {
 			log.info("parameter 'endTime' not defined. Using default value [s]: "
 					+ SimulationParameters.getSimulationEndTime());

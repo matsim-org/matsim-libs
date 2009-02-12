@@ -35,7 +35,7 @@
 	</module>
 	
 	
-	<module name="deqsim">
+	<module name="JDEQSim">
 		<param name = "simulationType"	value = "java"/>
 		<param name="endTime" value="00:06:00" />
 		<param name="flowCapacityFactor" value="2.0" />

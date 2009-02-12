@@ -693,11 +693,8 @@ public class Controler {
 
 	protected void runMobSim() {
 		if (this.externalMobsim == null) {
-			final String DEQ_SIM="deqsim";
-			final String SIMULATION_TYPE="simulationType";
-			final String java="java";
-			String simulationType = Gbl.getConfig().findParam(DEQ_SIM, SIMULATION_TYPE);
-			if (simulationType!=null && simulationType.equalsIgnoreCase(java)){
+			final String JDEQ_SIM="JDEQSim";
+			if (Gbl.getConfig().getModule(JDEQ_SIM)!=null){
 				DEQSimulation sim= new DEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
