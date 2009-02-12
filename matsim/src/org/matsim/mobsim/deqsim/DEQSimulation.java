@@ -115,7 +115,7 @@ public class DEQSimulation {
 					+ SimulationParameters.getGapTravelSpeed());
 		}
 		
-		if (endTime != null) {
+		if (endTime != null && Time.parseTime(endTime)!=0.0) {
 			SimulationParameters.setSimulationEndTime(Time.parseTime(endTime));
 		} else {
 			log.info("parameter 'endTime' not defined. Using default value [s]: "
