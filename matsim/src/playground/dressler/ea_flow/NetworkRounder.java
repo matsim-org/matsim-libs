@@ -41,9 +41,10 @@ public class NetworkRounder {
 	 * @param network
 	 * @param newcap
 	 */
-	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor){
+	public static void roundNetwork(NetworkLayer network,int newcap, double flowCapacityFactor, double lengthFactor){
 		double oldcap = network.getCapacityPeriod();
-		int roundedtozero = 0;
+		int roundedtozerocap = 0;
+		int roundedtozerotime = 0;
 		if(_debug){
 			System.out.println(oldcap);
 		}
@@ -57,12 +58,14 @@ public class NetworkRounder {
 				System.out.println("old v: "+link.getFreespeed(0.)+" new v: "+newspeed);
 			}
 			link.setFreespeed(newspeed);
-			//link.setFreespeed(20*newcap);
-			//link.setLength(link.getEuklideanDistance());
+			
+			link.setLength(link.getLength()*lengthFactor);
 			
 			//double newcapacity =Math.ceil(link.getCapacity(1.)/divisor*flowCapacityFactor);
 			double newcapacity =Math.round(link.getCapacity(1.)/divisor*flowCapacityFactor);
-			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozero++;
+			if (newcapacity == 0d && link.getCapacity(1.) != 0d) roundedtozerocap++;
+			if (Math.round(link.getLength()/link.getFreespeed(0)) == 0) roundedtozerotime++; 
+							
 			if(_debug){
 				System.out.println("old c: "+link.getCapacity(1.)+" new c: "+newcapacity);
 			}
@@ -70,16 +73,17 @@ public class NetworkRounder {
 		}
 		network.setCapacityPeriod(newcap);
 		//if (_debug){
-			System.out.println("Edge capacities rounded to zero: " + roundedtozero);
+			System.out.println("Edge capacities rounded to zero: " + roundedtozerocap);
+			System.out.println("Transit times rounded to zero: " + roundedtozerotime);
 		//}
 	}
 	
-	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor){
+	public static NetworkLayer roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor){
 		//read network
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(filename);
-		roundNetwork(network, newcap, flowCapacityFactor);
+		roundNetwork(network, newcap, flowCapacityFactor, lengthFactor);
 		return network;
 		
 	}
@@ -89,27 +93,33 @@ public class NetworkRounder {
 			System.out.println("USAGE: NetworkRounder <inputfile> <outputfile> <cap> OR JUST: NetworkRounder <cap>");
 			return;
 		}
-		int cap = 5;
-		double flowCapacityFactor = 1.0d;
-		//String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
-		String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
-		String outputfile = "./examples/meine_EA/siouxfalls_network_test.xml";
-		//String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_5s_cap.xml";
+		int cap = 10;
+		double flowCapacityFactor = 0.1d;
+		double lengthFactor = 1.0d;
+		String inputfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac.xml";
+		//String inputfile = "./examples/meine_EA/siouxfalls_network.xml";
+		//String outputfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
+		String outputfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_10p_flow_10s_cap.xml";
 		
-		if(args.length==3){
+		if(args.length >=2){
 			inputfile  = args[0];
 			outputfile = args[1];
 			cap = Integer.valueOf(args[2]);
-		} else if (args.length==4){
+		} if (args.length==4){
 			inputfile  = args[0];
 			outputfile = args[1];
 			cap = Integer.valueOf(args[2]);
 			flowCapacityFactor = Double.valueOf(args[3]);
 		}
+		if (args.length >= 5) {
+			lengthFactor = Double.valueOf(args[4]); 
+		}
+		
 		if (args.length == 1){
 			cap =Integer.valueOf(args[0]);
 		}
-		NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor);
+		
+		NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor);
 		NetworkWriter writer = new NetworkWriter( network, outputfile);
 		writer.write();
 		
