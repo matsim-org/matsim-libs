@@ -24,18 +24,13 @@ import org.matsim.network.Link;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**
- * 
+ * Class containing some static helpers to calculate the 
+ * geospatial order of links in an orthogonal coordinate system.
  * @author aneumann
+ * @author dgrether
  *
  */
 public class CalculateAngle {
-
-	private Link inLink;
-
-	private CalculateAngle(Link inLink){		
-		this.inLink = inLink;
-	}
-	
 	/**
 	 * Calculates the most 'left' outLink for a given inLink.
 	 * That's the link a driver would refer to when turning left (no u-turn),
@@ -46,8 +41,7 @@ public class CalculateAngle {
 	 */
 	public static Link getLeftLane(Link inLink){
 		
-		CalculateAngle myCalculateAngle = new CalculateAngle(inLink);
-		TreeMap<Double, Link> result = myCalculateAngle.calculateOutLinksSortedByAngle();
+		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
 
 		if (result.size() == 0){
 			return null;
@@ -65,20 +59,14 @@ public class CalculateAngle {
 	 * one outLink back to the inLinks fromNode.
 	 */
 	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
-		CalculateAngle myCalculateAngle = new CalculateAngle(inLink);
-		return myCalculateAngle.calculateOutLinksSortedByAngle();
-	}
-	
-	private TreeMap<Double, Link> calculateOutLinksSortedByAngle() {
-		
-		CoordImpl coordInLink = getVector(this.inLink);
+		CoordImpl coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		
 		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
 						
-		for (Link outLink : this.inLink.getToNode().getOutLinks().values()) {
+		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
 			
-			if (!(outLink.getToNode().equals(this.inLink.getFromNode()))){
+			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
 				
 				CoordImpl coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
@@ -99,7 +87,7 @@ public class CalculateAngle {
 		return leftLane;
 	}	
 	
-	private CoordImpl getVector(Link link){
+	private static CoordImpl getVector(Link link){
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();		
 		return new CoordImpl(x, y);
