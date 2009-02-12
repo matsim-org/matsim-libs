@@ -59,13 +59,14 @@ public class RetailersSummaryWriter {
 		try {
 			this.retailers = retailers;
 			iter = iter+1;
-			System.out.println("retailers "+ this.retailers.getRetailers().values());
-			out.write("ITERATION N." + iter +"\n");
+			
+			//out.write("ITERATION N." + iter +"\n");
 			for (Retailer r : retailers.getRetailers().values()) {
+				System.out.println("retailer = "+ r.getId());
 				for (Facility f : r.getFacilities().values()) {
 					out.write(f.getId()+"\t");
-					out.write(f.getCenter().getX()+ "\t");
-					out.write(f.getCenter().getY()+"\t");
+					//out.write(f.getCenter().getX()+ "\t");
+					//out.write(f.getCenter().getY()+"\t");
 					out.write(f.getLink().getId()+"\t");
 					out.write(iter +"\n");
 				}

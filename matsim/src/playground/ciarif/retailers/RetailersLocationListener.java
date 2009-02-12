@@ -70,6 +70,11 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
 		
 		Map<Id,Facility> shopFac =  controler.getFacilities().getFacilities("shop");
+		for (Facility f:shopFac.values()) {
+			System.out.println("facility = " + f.getId());
+			System.out.println("facility = " + f.getLink().getId());
+		}
+				
 		ArrayList<Facility> retailerFacilities = this.getFraction(shopFac,0.4);
 		this.retailers = this.createRetailers(retailerFacilities);
 	}
@@ -78,7 +83,7 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		for (Retailer r : retailers.getRetailers().values()) {
-			Map<Id,Facility> facs =  r.moveFacilitiesRandom(controler.getNetwork());
+			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
 			movedFacilities.putAll(facs);
 		}
 		
