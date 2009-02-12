@@ -301,6 +301,8 @@ public class QueueNetwork{
 		Log.warn("ATTENTION: simulateAllNodes is set. Make sure this is not happening while the simulation is running AND ONLY FOR TESTING PURPOSES!!!");
 		simulateAllNodes = simulateAll;
 	}
+	
+	
 
 	
 }

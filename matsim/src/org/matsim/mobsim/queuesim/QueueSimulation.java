@@ -27,16 +27,24 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
 import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
+import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.lightsignalsystems.PlanBasedSignalSystemControler;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkChangeEvent;
 import org.matsim.network.NetworkLayer;
@@ -86,6 +94,21 @@ public class QueueSimulation {
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
 
 	private AgentFactory agentFactory;
+	
+	/**
+	 * The SignalSystemDefinitions accessible by their Id
+	 */
+	private SortedMap<Id, BasicLightSignalSystemDefinition> signalSystemDefinitions;
+	/**
+	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
+	 * to.
+	 */
+	private SortedMap<Id, List<BasicLightSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
+	/**
+	 * Contains the SignalSystemControler instances which can be accessed by the
+	 * Id of the SignalSystemDefinition
+	 */
+	private SortedMap<Id, SignalSystemControler> signalSystemControlerBySystemId;
 
 	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events) {
 		Simulation.reset();
@@ -99,11 +122,69 @@ public class QueueSimulation {
 		this.agentFactory = new AgentFactory();
 	}
 	
-	public QueueSimulation(final NetworkLayer network, final Population plans, final Events events, BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
+	public QueueSimulation(final NetworkLayer network, final Population plans, 
+			final Events events, BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
 		this(network, plans, events);
-		//TODO fill in code for lss storage etc
-		
+		//TODO check null cases before calling init methods
+		initLanes(signalSystems.getLanesToLinkAssignments());
+		initSignalSystems(signalSystems);
+		initSignalSystemController(signalSystemsConfig);
 	}
+	
+	private void initLanes(List<BasicLanesToLinkAssignment> lanesToLinkAssignments) {
+		for (BasicLanesToLinkAssignment laneToLink : lanesToLinkAssignments){
+			QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
+			if (link == null) {
+				String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";
+				log.error(message);
+				throw new IllegalStateException(message);
+			}
+			link.createLanes(laneToLink.getLanes());
+		}
+	}
+
+	private void initSignalSystems(BasicLightSignalSystems signalSystems) {
+		this.signalSystemDefinitions = new TreeMap<Id, BasicLightSignalSystemDefinition>();
+		for (BasicLightSignalSystemDefinition signalSystem : signalSystems.getLightSignalSystemDefinitions()) {
+			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
+		}
+		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicLightSignalGroupDefinition>>();
+		for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getLightSignalGroupDefinitions()) {
+			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
+			//TODO check if quueuLInk null?? or write ScenarioChecker
+			List<BasicLightSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
+			if (list == null) {
+				list = new ArrayList<BasicLightSignalGroupDefinition>();
+				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
+			}
+			list.add(basicLightSignalGroupDefinition);
+			queueLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
+		}
+	}
+	
+	private void initSignalSystemController(List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
+		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
+		for (BasicLightSignalSystemConfiguration config : signalSystemsConfig) {
+			//TODO consider adaptive controlers
+			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
+			this.signalSystemControlerBySystemId.put(config.getLightSignalSystemId(), controler);
+			BasicLightSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
+			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
+			//TODO set other defaults
+			List<BasicLightSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
+			if ((groups == null) || groups.isEmpty()) {
+				String message = "SignalSystemControler without any SignalGroups defined in SignalSystemConfiguration!";
+				log.warn(message);
+			}
+			else {
+				for (BasicLightSignalGroupDefinition group : groups){
+					group.setResponsibleLSAControler(controler);
+				}
+			}
+		}
+	}
+	
 	
 	public final void run() {
 		prepareSim();

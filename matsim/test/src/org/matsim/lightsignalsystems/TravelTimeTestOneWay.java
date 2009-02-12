@@ -64,8 +64,14 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		QueueNetwork.setSimulateAllNodes(true);
 	}
 	
-	
-	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60(){
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		QueueNetwork.setSimulateAllLinks(false);
+		QueueNetwork.setSimulateAllNodes(false);
+	}
+		
+	public void estTrafficLightIntersection2arms_w_TrafficLight_0_60(){
   	Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		String lsaDefinition = this.getClassInputDirectory() + "lsa.xml";
 		String lsaConfig = this.getClassInputDirectory() + "lsa_config.xml";
@@ -134,7 +140,10 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		this.beginningOfLink2 = null;
 		
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
-		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
+		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + 
+				", " + this.beginningOfLink2.numberOfVehPassed_ + 
+				", " + this.beginningOfLink2.firstVehPassTime_s + 
+				", " + this.beginningOfLink2.lastVehPassTime_s);
 		MeasurementPoint queueSimulation = this.beginningOfLink2;
 				
 		// circle time is 60s, green 60s
@@ -147,7 +156,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
   	}  	
 
 	public void handleEvent(LinkEnterEvent event) {
-		
+//		log.info("link enter event id :" + event.linkId);
 		if (event.linkId.equalsIgnoreCase("2")) {
 			if (this.beginningOfLink2 == null){				
 				this.beginningOfLink2 = new MeasurementPoint(event.time + TravelTimeTestOneWay.timeToWaitBeforeMeasure);

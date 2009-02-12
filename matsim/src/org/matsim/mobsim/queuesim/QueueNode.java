@@ -46,6 +46,10 @@ public class QueueNode {
 	private Node node;
 
 	public QueueNetwork queueNetwork;
+	/**
+	 * Indicates whether this node is signalized or not
+	 */
+	private boolean signalized = false;
 
 	public QueueNode(Node n, QueueNetwork queueNetwork) {
 		this.node = n;
@@ -85,11 +89,11 @@ public class QueueNode {
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
-	public boolean moveVehicleOverNode(final QueueVehicle veh, final double now) {
+	public boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
 		Link currentLink = veh.getCurrentLink();
-		QueueLink currentQueueLink = this.queueNetwork.getQueueLink(currentLink.getId());
 		// veh has to move over node
+		QueueLink currentQueueLink = this.queueNetwork.getQueueLink(currentLink.getId());
 		if (nextLink != null) {
 
 			QueueLink nextQueueLink = this.queueNetwork.getQueueLink(nextLink.getId());
@@ -103,7 +107,8 @@ public class QueueNode {
 			 */
 
 			if (nextQueueLink.hasSpace()) {
-				currentQueueLink.popFirstFromBuffer();
+//				currentQueueLink.popFirstFromBuffer();
+				currentLane.popFirstFromBuffer();
 				veh.getDriver().incCurrentNode();
 				nextQueueLink.add(veh);
 				return true;
@@ -117,14 +122,16 @@ public class QueueNode {
 				 * die here, we have a config setting for that!
 				 */
 				if (removeStuckVehicle()) {
-					currentQueueLink.popFirstFromBuffer();
+//					currentQueueLink.popFirstFromBuffer();
+					currentLane.popFirstFromBuffer();
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEvent(now, veh.getDriver().getPerson(), currentLink, veh.getCurrentLeg()));
 				}
 				else {
-					currentQueueLink.popFirstFromBuffer();
+//					currentQueueLink.popFirstFromBuffer();
+					currentLane.popFirstFromBuffer();
 					veh.getDriver().incCurrentNode();
 					nextQueueLink.add(veh);
 					return true;
@@ -134,7 +141,7 @@ public class QueueNode {
 		}
 
 		// --> nextLink == null
-		currentQueueLink.popFirstFromBuffer();
+		currentLane.popFirstFromBuffer();
 		Simulation.decLiving();
 		Simulation.incLost();
 		log.error(
@@ -170,49 +177,69 @@ public class QueueNode {
 	 */
 	public void moveNode(final double now) {
 		/* called by the framework, do all necessary action for node movement here */
-
-		int inLinksCounter = 0;
-		double inLinksCapSum = 0.0;
-		// Check all incoming links for buffered agents
-		for (QueueLink link : this.inLinksArrayCache) {
-			if (!link.bufferIsEmpty()) {
-				this.tempLinks[inLinksCounter] = link;
-				inLinksCounter++;
-				inLinksCapSum += link.getLink().getCapacity(now);
-			}
-		}
-
-		if (inLinksCounter == 0) {
-			this.active = false;
-			return; // Nothing to do
-		}
-
-		int auxCounter = 0;
-		// randomize based on capacity
-		while (auxCounter < inLinksCounter) {
-			double rndNum = MatsimRandom.random.nextDouble() * inLinksCapSum;
-			double selCap = 0.0;
-			for (int i = 0; i < inLinksCounter; i++) {
-				QueueLink link = this.tempLinks[i];
-				if (link == null)
-					continue;
-				selCap += link.getLink().getCapacity(now);
-				if (selCap >= rndNum) {
-//					this.auxLinks[auxCounter] = link;
-					auxCounter++;
-					inLinksCapSum -= link.getLink().getCapacity(now);
-					this.tempLinks[i] = null;
-					//move the link
-					while (!link.bufferIsEmpty()) {
-						QueueVehicle veh = link.getFirstFromBuffer();
-						if (!moveVehicleOverNode(veh, now)) {
+		if (this.signalized) {
+			for (QueueLink link : inLinksArrayCache){
+				for (QueueLane lane : link.getNodeQueueLanes()) {
+					while (lane.canMoveFirstVehicle()) {
+						QueueVehicle veh = lane.getFirstFromBuffer();
+						if (!this.moveVehicleOverNode(veh, lane, now)) {
 							break;
 						}
 					}
-					break;
 				}
 			}
 		}
+		else { // Node is not signal controled -> inLink selection randomized based on capacity
+			int inLinksCounter = 0;
+			double inLinksCapSum = 0.0;
+			// Check all incoming links for buffered agents
+			for (QueueLink link : this.inLinksArrayCache) {
+				if (!link.bufferIsEmpty()) {
+					this.tempLinks[inLinksCounter] = link;
+					inLinksCounter++;
+					inLinksCapSum += link.getLink().getCapacity(now);
+				}
+			}
+			
+			if (inLinksCounter == 0) {
+				this.active = false;
+				return; // Nothing to do
+			}
+			
+			int auxCounter = 0;
+			// randomize based on capacity
+			while (auxCounter < inLinksCounter) {
+				double rndNum = MatsimRandom.random.nextDouble() * inLinksCapSum;
+				double selCap = 0.0;
+				for (int i = 0; i < inLinksCounter; i++) {
+					QueueLink link = this.tempLinks[i];
+					if (link == null)
+						continue;
+					selCap += link.getLink().getCapacity(now);
+					if (selCap >= rndNum) {
+//					this.auxLinks[auxCounter] = link;
+						auxCounter++;
+						inLinksCapSum -= link.getLink().getCapacity(now);
+						this.tempLinks[i] = null;
+						//move the link
+						for (QueueLane lane : link.getNodeQueueLanes()) {
+							while (!lane.bufferIsEmpty()) {
+								QueueVehicle veh = lane.getFirstFromBuffer();
+								if (!moveVehicleOverNode(veh, lane, now)) {
+									break;
+								}
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+	}
+
+	public void setSignalized(boolean b) {
+		this.signalized = b;
 	}
 
 	static boolean removeVehInitialized = false;
@@ -227,4 +254,5 @@ public class QueueNode {
 		removeVehInitialized = true;
 		return removeVehicles;
 	}
+
 }

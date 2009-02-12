@@ -1,5 +1,7 @@
 package playground.andreas.intersection;
 
+import org.matsim.lightsignalsystems.CalculateAngleTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

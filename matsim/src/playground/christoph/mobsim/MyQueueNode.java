@@ -20,20 +20,13 @@
 
 package playground.christoph.mobsim;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.events.AgentReplanEvent;
+import org.matsim.mobsim.queuesim.QueueLane;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
-import org.matsim.mobsim.queuesim.QueueSimulation;
-import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.QueueVehicle;
 import org.matsim.network.Node;
-
-import playground.christoph.events.algorithms.LeaveLinkReplanner;
 
 public class MyQueueNode extends QueueNode{
 	
@@ -48,7 +41,7 @@ public class MyQueueNode extends QueueNode{
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
 	@Override
-	public boolean moveVehicleOverNode(final QueueVehicle veh, final double now) 
+	public boolean moveVehicleOverNode(final QueueVehicle veh, QueueLane lane, final double now) 
 	{
 		/*
 		 * This is just a workaround!
@@ -63,7 +56,7 @@ public class MyQueueNode extends QueueNode{
 //		boolean replanning = (Boolean)veh.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
 //		if(replanning) new LeaveLinkReplanner(this, veh, now);	
 		
-		return super.moveVehicleOverNode(veh, now);
+		return super.moveVehicleOverNode(veh, lane, now);
 	}
 	
 	protected Controler getControler()

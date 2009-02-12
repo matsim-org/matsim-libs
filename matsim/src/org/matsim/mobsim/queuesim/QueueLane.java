@@ -25,17 +25,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.lightsignalsystems.BasicLane;
+import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.AgentStuckEvent;
 import org.matsim.events.AgentWait2LinkEvent;
-import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.LinkLeaveEvent;
 import org.matsim.gbl.Gbl;
+import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
 import org.matsim.population.routes.CarRoute;
@@ -45,10 +49,13 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 
 /**
- * @author dgrether
+ * @author dgrether based on prior implementations of
+ * @author dstrippgen
+ * @author aneumann
+ * @author mrieser
  *
  */
-public class QueueLane {
+public class QueueLane implements Comparable<QueueLane> {
 	
 	private static final Logger log = Logger.getLogger(QueueLane.class);
 
@@ -108,12 +115,48 @@ public class QueueLane {
 	private boolean active = false;
 	
 	private QueueLink queueLink;
+	/**
+	 * This collection contains all Lanes downstream, if null it is the last lane 
+	 * within a QueueLink.
+	 */
+	private List<QueueLane> toLanes;
 	
-	/*package*/ VisData visdata = this.new VisDataImpl();;
+	/*package*/ VisData visdata = this.new VisDataImpl();
+
+	/**
+	 * This flag indicates whether the QueueLane is
+	 * constructed by the original QueueLink of the network (true)
+	 * or to represent a Lane configured in a signal system definition.
+	 */
+	private boolean originalLane;
 	
-	/* package */ QueueLane(QueueLink ql) {
+	private double length_m = Double.NaN;
+	
+	private double freespeedTravelTime = Double.NaN;
+
+	private double meterFromLinkEnd = Double.NaN;
+
+//	private double flowCapacityFractionalRest = Double.NaN;
+	
+	private int visualizerLane;
+	
+	/**
+	 * Contains all Link instances which are reachable from this lane
+	 */
+	private List<Link> destinationLinks = new ArrayList<Link>();
+	
+	private SortedMap<Id, BasicLightSignalGroupDefinition> signalGroups;
+
+	private BasicLane laneData;
+
+	private boolean thisTimeStepGreen = false;
+	
+	/* package */ QueueLane(QueueLink ql, boolean isOriginalLane) {
 		this.queueLink = ql;
-		
+		this.originalLane = isOriginalLane;
+		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+		this.length_m = ql.getLink().getLength();
+		this.meterFromLinkEnd = 0.0;
 		// yy: I am really not so happy about these indirect constructors with
 		// long argument lists. But be it if other people
 		// like them. kai, nov06
@@ -123,9 +166,34 @@ public class QueueLane {
 		 */
 		initFlowCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
 		recalcCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME);
-
 	}
 	
+	
+	/**
+	 * Call recalculateProperties(...) if you use this constructor, otherwise the QueueLane
+	 * is not initialized correctly!
+	 * TODO consider unifying the Constructor and the method
+	 * @param ql
+	 * @param laneData
+	 * @param isOriginalLane
+	 */
+	/*package*/ QueueLane(QueueLink ql, BasicLane laneData, boolean isOriginalLane) {
+		this.queueLink = ql;
+		this.laneData = laneData;
+		this.originalLane = isOriginalLane;
+//		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+	}
+	
+	protected void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition signalGroupDefinition) {
+		for (Id laneId : signalGroupDefinition.getLaneIds()) {
+			if (this.laneData.getId().equals(laneId)) {
+				if (this.signalGroups == null) {
+					this.signalGroups = new TreeMap<Id, BasicLightSignalGroupDefinition>();
+				}
+				this.signalGroups.put(signalGroupDefinition.getId(), signalGroupDefinition);
+			}
+		}
+	}
 	
 	private void initFlowCapacity(final double time) {
 		// network.capperiod is in hours, we need it per sim-tick and multiplied with flowCapFactor
@@ -146,7 +214,7 @@ public class QueueLane {
 		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
 
 		// first guess at storageCapacity:
-		this.storageCapacity = (this.queueLink.getLink().getLength() * this.queueLink.getLink().getLanes(time))
+		this.storageCapacity = (this.length_m * this.queueLink.getLink().getLanes(time))
 				/ ((NetworkLayer) this.queueLink.getLink().getLayer()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -158,9 +226,8 @@ public class QueueLane {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		if (this.storageCapacity < this.queueLink.getLink().getFreespeedTravelTime(time) * this.simulatedFlowCapacity) {
-			double tempStorageCapacity = this.queueLink.getLink().getFreespeedTravelTime(time)
-	    * this.simulatedFlowCapacity;
+		if (this.storageCapacity < this.freespeedTravelTime * this.simulatedFlowCapacity) {
+			double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
 	    if (spaceCapWarningCount <= 10) {
 	        log.warn("Link " + this.queueLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 	        if (spaceCapWarningCount == 10) {
@@ -174,8 +241,46 @@ public class QueueLane {
 
 	
 	public void recalcTimeVariantAttributes(final double now) {
+		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(now);
 		initFlowCapacity(now);
 		recalcCapacity(now);
+	}
+	
+	/*package*/ void recalculateProperties(double meterFromLinkEnd_m, double lengthOfPseudoLink_m, double numberOfLanes) {
+		/*variable was given as parameter in original but the method was called everywhere with the expression below, 
+		 * TODO Check if this is correct! dg[jan09]*/
+		double averageSimulatedFlowCapacityPerLane_Veh_s = this.queueLink.getSimulatedFlowCapacity() / this.queueLink.getLink().getLanes(Time.UNDEFINED_TIME);
+		
+		if(lengthOfPseudoLink_m < 15){
+			log.warn("Length of one of link " + this.queueLink.getLink().getId() + " sublinks is less than 15m." +
+					" Will enlarge length to 15m, since I need at least additional 15m space to store 2 vehicles" +
+					" at the original link.");
+			this.length_m = 15.0;
+		} else {
+			this.length_m = lengthOfPseudoLink_m;
+		}
+		
+		this.meterFromLinkEnd  = meterFromLinkEnd_m;
+		this.freespeedTravelTime = this.length_m / this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+
+		this.simulatedFlowCapacity = numberOfLanes * averageSimulatedFlowCapacityPerLane_Veh_s
+				* SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
+
+		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
+		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+		this.storageCapacity = (this.length_m * numberOfLanes) / 
+								this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * Gbl.getConfig().simulation().getStorageCapFactor();
+		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
+
+		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
+
+		if (this.storageCapacity < this.freespeedTravelTime * this.simulatedFlowCapacity) {
+			this.storageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		}
+	}
+	
+	protected double getMeterFromLinkEnd(){
+		return this.meterFromLinkEnd;
 	}
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -186,6 +291,47 @@ public class QueueLane {
 		this.active = false;
 	}
 	
+	public boolean canMoveFirstVehicle() {
+		if (this.signalGroups == null) {
+			log.fatal("This should never happen, since every lane link at a signalized intersection" +
+					" should have at least one signal(group). Please check integrity of traffic light data on link " + 
+					this.queueLink.getLink().getId() + " lane " + this.laneData.getId() + ". Allowing to move anyway.");
+			this.setThisTimeStepGreen(true);
+			if (this.getFirstFromBuffer() != null) {
+				return true;
+			}
+			return false;
+		}
+		//else everything normal...
+		boolean signalGroupGreen;
+		for (BasicLightSignalGroupDefinition signalGroup : this.signalGroups.values()) {
+			signalGroupGreen = signalGroup.isGreen();
+			if (signalGroupGreen) {
+				this.setThisTimeStepGreen(true);
+			}
+			QueueVehicle firstVeh = this.getFirstFromBuffer();
+			if (firstVeh != null){
+				// check if the vehicle's next link is valid according to signal's specification
+				if (!(signalGroup.getToLinkIds().contains(firstVeh.getDriver().chooseNextLink().getId()) ||
+						firstVeh.getDriver().chooseNextLink().getToNode().equals(this.queueLink.getLink().getFromNode()))) {
+					log.error("Person Id: "+ firstVeh.getDriver().getPerson().getId() + " has invalid route according to signal system specification!");
+					return false;
+				}
+				if (signalGroupGreen) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	protected boolean bufferIsEmpty() {
+		return this.buffer.isEmpty();
+	}
+	
+	protected void setThisTimeStepGreen(boolean b) {
+		this.thisTimeStepGreen = b;
+	}
 
 	private void processVehicleArrival(final double now, final QueueVehicle veh) {
 		QueueSimulation.getEvents().processEvent(
@@ -272,16 +418,20 @@ public class QueueLane {
 	 *          The current time.
 	 */
 	private void moveLinkToBuffer(final double now) {
-
 		QueueVehicle veh;
 		while ((veh = this.vehQueue.peek()) != null) {
-			if (veh.getDepartureTime_s() > now) {
+			//we have an original QueueLink behaviour
+			if ((veh.getDepartureTime_s() > now) && this.originalLane && (this.meterFromLinkEnd == 0.0)){
 				return;
 			}
+			//this is the aneumann PseudoLink behaviour
+			else if (Math.floor(veh.getDepartureTime_s()) > now){
+				return;
+			}
+						
 			// Check if veh has reached destination:
 			if (veh.getDriver().getDestinationLink().getId() == this.queueLink.getLink().getId()) {
 				processVehicleArrival(now, veh);
-
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
 				continue;
@@ -300,7 +450,7 @@ public class QueueLane {
 
 			addToBuffer(veh, now);
 			this.vehQueue.poll();
-		}
+		} // end while
 	}
 	
 	/*package*/ boolean updateActiveStatus() {
@@ -325,22 +475,67 @@ public class QueueLane {
 		return this.active;
 	}
 	
-	// ////////////////////////////////////////////////////////////////////
-	// called from framework, do everything related to link movement here
-	// ////////////////////////////////////////////////////////////////////
-	protected boolean moveLink(final double now) {
-		updateBufferCapacity();
-		// move vehicles from parking into waitingQueue if applicable
-		moveParkToWait(now);
+	
+	/** called from framework, do everything related to link movement here
+	 * 
+	 * @param now current time step
+	 * @return 
+	 */
+	protected boolean moveLane(final double now) {
+		if (this.meterFromLinkEnd == 0.0) {
+			if (this.originalLane || this.thisTimeStepGreen) 
+				updateBufferCapacity();
+		}
+		else {
+			updateBufferCapacity();
+		}
+		
+		this.bufferCap = this.simulatedFlowCapacity;
+
+		
+		if (this.originalLane) {
+			// move vehicles from parking into waitingQueue if applicable
+			moveParkToWait(now);
+		}
 		// move vehicles from link to buffer
 		moveLinkToBuffer(now);
-		// move vehicles from waitingQueue into buffer if possible
-		moveWaitToBuffer(now);
-
+		
+		moveBufferToNextLane(now);
+		
+		if (this.originalLane){
+			// move vehicles from waitingQueue into buffer if possible
+			moveWaitToBuffer(now);
+		}
+		this.setThisTimeStepGreen(false);
 		return this.updateActiveStatus();
 	}
 
+	private void moveBufferToNextLane(final double now) {
+		boolean moveOn = true;
+		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
+			QueueVehicle veh = this.buffer.peek();
+			Link nextLink = veh.getDriver().chooseNextLink();
+			if (nextLink != null) {
+				for (QueueLane toQueueLane : this.toLanes) {
+					for (Link qLink : toQueueLane.getDestinationLinks()) {
+						if (qLink.equals(nextLink)) {
+							if (toQueueLane.hasSpace()) {
+								this.buffer.poll();
+								toQueueLane.add(veh, now);
+							} else
+								moveOn = false;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+
 	/*package*/ boolean moveLinkWaitFirst(final double now) {
+		if (!this.originalLane) {
+			throw new UnsupportedOperationException("Method not yet implemented for multilane simulation!");
+		}
 		updateBufferCapacity();
 		// move vehicles from parking into waitingQueue if applicable
 		moveParkToWait(now);
@@ -353,7 +548,7 @@ public class QueueLane {
 	}
 	
 	private void updateBufferCapacity() {
-		this.bufferCap = this.simulatedFlowCapacity;
+//		this.bufferCap = this.simulatedFlowCapacity;
 		if (this.buffercap_accumulate < 1.0) {
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
@@ -361,8 +556,6 @@ public class QueueLane {
 
 	/*package*/ protected void addParking(final QueueVehicle veh) {
 		this.parkingList.add(veh);
-		this.queueLink.queueNetwork.setLinkActivation(
-				veh.getDepartureTime_s(), this.queueLink);
 	}
 	
 	/**
@@ -372,25 +565,47 @@ public class QueueLane {
 	 * @param veh
 	 *          the vehicle
 	 */
-	/*package*/ void add(final QueueVehicle veh) {
-		double now = SimulationTimer.getTime();
+	/*package*/ void add(final QueueVehicle veh, double now) {
+//		log.debug("add(): " + now);
 		activateLane();
-		veh.getDriver().setCurrentLink(this.queueLink.getLink());
 		this.vehQueue.add(veh);
-		veh.setDepartureTime_s((int) (now + this.queueLink.getLink().getFreespeedTravelTime(now)));
-		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getPerson(),
-						this.queueLink.getLink(), veh.getCurrentLeg()));
+//		veh.setDepartureTime_s((int) (now + this.queueLink.getLink().getFreespeedTravelTime(now)));
+		double departureTime;
+		if (this.originalLane) {
+			// It's the original link,
+			// so we need to start with a 'clean' freeSpeedTravelTime
+			departureTime = (now + this.freespeedTravelTime);
+		} 
+		else {
+			// It's not the original link,
+			// so there is a fractional rest we add to this link's freeSpeedTravelTime
+			departureTime = now + this.freespeedTravelTime
+			+ veh.getDepartureTime_s() - Math.floor(veh.getDepartureTime_s());
+//			veh.setDepartureTime_s(now + this.freespeedTravelTime
+//					+ veh.getDepartureTime_s() - Math.floor(veh.getDepartureTime_s()));
+		}
+		veh.setDepartureTime_s(departureTime);
+		
+		if (this.meterFromLinkEnd == 0.0) {
+			// It's a nodePseudoLink,
+			// so we have to floor the freeLinkTravelTime in order the get the same
+			// results compared to the old mobSim
+			veh.setDepartureTime_s(Math.floor(veh.getDepartureTime_s()));
+		}
+
 	}
 	
 	
 	private void addToBuffer(final QueueVehicle veh, final double now) {
+//		log.debug("addToBuffer: " + now);
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
-		} else if (this.buffercap_accumulate >= 1.0) {
+		} 
+		else if (this.buffercap_accumulate >= 1.0) {
 			this.buffercap_accumulate--;
-		} else {
-			throw new RuntimeException("Buffer of link " + this.queueLink.getLink().getId() + " has no space left!");
+		}
+		else {
+			throw new IllegalStateException("Buffer of link " + this.queueLink.getLink().getId() + " has no space left!");
 		}
 		this.buffer.add(veh);
 		veh.setLastMovedTime(now);
@@ -442,9 +657,6 @@ public class QueueLane {
 		return this.parkingList;
 	}
 
-	protected boolean bufferIsEmpty() {
-		return this.buffer.isEmpty();
-	}
 	
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
@@ -818,8 +1030,46 @@ public class QueueLane {
 			return this.lane;
 		}
 	}
+
+	public void addToLane(QueueLane lane) {
+		if (this.toLanes == null) {
+			this.toLanes = new LinkedList<QueueLane>();
+		}
+		this.toLanes.add(lane);
+	}
 	
+	protected void addDestinationLink(Link l) {
+		this.destinationLinks.add(l);
+	}
 	
+	protected List<Link> getDestinationLinks(){
+		return this.destinationLinks;
+	}
+
 	
+	protected int getVisualizerLane() {
+		return visualizerLane;
+	}
+
 	
+	protected void setVisualizerLane(int visualizerLane) {
+		this.visualizerLane = visualizerLane;
+	}
+	
+	// --- Implementation of Comparable interface ---
+	// Sorts SubLinks of a QueueLink 
+	
+	public int compareTo(QueueLane queueLane) {
+		if (this.meterFromLinkEnd < queueLane.getMeterFromLinkEnd()) {
+			return -1;
+		} else if (this.meterFromLinkEnd > queueLane.getMeterFromLinkEnd()) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	
+
+
 }

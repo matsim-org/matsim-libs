@@ -33,7 +33,9 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LightSignalSystemsReaderTest.class);
 		suite.addTestSuite(LightSignalSystemsConfigReaderTest.class);
-//		suite.addTestSuite(TravelTimeTestOneWay.class);
+		suite.addTestSuite(CalculateAngleTest.class);
+		suite.addTestSuite(TravelTimeTestOneWay.class);
+		suite.addTestSuite(TravelTimeTestFourWays.class);
 		//$JUnit-END$
 		return suite;
 	}
