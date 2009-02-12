@@ -19,6 +19,7 @@
     </license>
   </licenses>
   <build>
+  	<defaultGoal>compiler:compile</defaultGoal>
     <sourceDirectory>src/</sourceDirectory>
     <testSourceDirectory>test/src/</testSourceDirectory>
     <outputDirectory>bin/</outputDirectory>
@@ -194,6 +195,13 @@
     <!-- jaxb 2.1.7 system scope dependencies -->
     <dependency>
       <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-activation-217</artifactId>
+      <version>2.1.7</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/activation.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api-217</artifactId>
       <version>2.1.7</version>
       <scope>system</scope>
@@ -208,25 +216,18 @@
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-activation-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/activation.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-xjc-217</artifactId>
       <version>2.1.7</version>
       <scope>system</scope>
       <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb-xjc.jar</systemPath>
     </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-1impl-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb1-impl.jar</systemPath>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>javax.xml.bind</groupId>-->
+<!--      <artifactId>jaxb-1impl-217</artifactId>-->
+<!--      <version>2.1.7</version>-->
+<!--      <scope>system</scope>-->
+<!--      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb1-impl.jar</systemPath>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-jsr173-217</artifactId>
@@ -305,11 +306,11 @@
       <artifactId>commons-io</artifactId>
       <version>1.2</version>
     </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>junit</groupId>-->
+<!--      <artifactId>junit</artifactId>-->
+<!--      <version>3.8.1</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
