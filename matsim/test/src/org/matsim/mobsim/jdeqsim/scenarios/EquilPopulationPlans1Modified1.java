@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.matsim.mobsim.jdeqsim.util.testable.PopulationModifier;
 import org.matsim.population.Act;
-import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
