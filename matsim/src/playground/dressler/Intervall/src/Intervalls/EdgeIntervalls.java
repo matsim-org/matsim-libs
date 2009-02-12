@@ -362,6 +362,32 @@ public class EdgeIntervalls {
 		return result;
 		
 	}
+
+//------------------------Clean Up--------------------------------//
+	/**
+	 * unifies adjacent intervalls, call only when you feel it is safe to do
+	 */
+	public void cleanup() {
+		int timestop = getLast().getHighBound();
+		EdgeIntervall i, j;
+		i = getIntervallAt(0);
+		while (i != null) {
+		  if (i.getHighBound() == timestop) break;	
+		  j = getNext(i);
+		  
+		  if ((i.getHighBound() == j.getLowBound()) && 
+				  (i.getFlow() == j.getFlow())) {
+			  EdgeIntervall ni = new EdgeIntervall(i.getLowBound(),j.getHighBound(),i.getFlow());
+			  _tree.remove(i);
+			  _tree.remove(j);
+			  _tree.insert(ni);
+			  i = ni;
+
+		  } else {
+			  i = j;
+		  }		 		 
+		}
+	}
 	
 //------------------------Augmentation--------------------------------//
 	
