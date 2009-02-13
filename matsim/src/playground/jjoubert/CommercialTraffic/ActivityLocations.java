@@ -18,8 +18,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class ActivityLocations {
 	
-	public static ArrayList<Activity> homeLocations;
-	public static ArrayList<Activity> activityLocations;
 	public final long STUDY_START = 1199145600; // 01 January 2008 00:00:00
 //	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted";
 //	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities";
@@ -32,7 +30,7 @@ public class ActivityLocations {
 	final static int[] statusStart = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20};
 	final static int[] statusStop = {15,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,145,147};
 	final static int HOME_DURATION_THRESHOLD = 300; // 5 hours for home (expressed in MINUTES)
-	final static int ACTIVITY_MIN_THRESHOLD = 10; // expressed in MINUTES
+	final static int ACTIVITY_MIN_THRESHOLD = 8; // expressed in MINUTES
 	final static int DEG_TO_METER = Vehicle.DEG_TO_METER;
 	final static int DISTANCE_THRESHOLD = Vehicle.DISTANCE_THRESHOLD;
 	public static int progressDots;
@@ -46,9 +44,9 @@ public class ActivityLocations {
 		final File vehicles[] = inFolder.listFiles();
 		int numberOfVehicles = 0;
 		int totalVehicles = vehicles.length - 1;
+		int numberOfMajorActivities = 0;
+		int numberOfMinorActivities = 0;
 		
-		homeLocations = new ArrayList<Activity>();
-		activityLocations = new ArrayList<Activity>();
 		System.out.println("Reading study area: Gauteng");
 		gauteng = SelectGautengVehicles.readGautengPolygon();
 		System.out.println("Done");
@@ -65,11 +63,16 @@ public class ActivityLocations {
 			File vehFolder = new File( VEH_FOLDER );
 			vehFolder.mkdir();
 			
-			
+			// Create all the output file writers 
 			BufferedWriter vehicleStats = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/vehicleStats.txt")));
 			vehicleStats.write(	vehicleStatsHeaderString() );
-			vehicleStats.newLine();
-			
+			vehicleStats.newLine();			
+			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/majorLocations.txt")));
+			majorLocations.write(	locationHeaderString() );
+			majorLocations.newLine();
+			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/minorLocations.txt")));
+			minorLocations.write(	locationHeaderString() );
+			minorLocations.newLine();
 			BufferedWriter hourOfDayInGauteng = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/hourOfDayInGautengStats.txt")));
 			hourOfDayInGauteng.write("Veh_ID" + DELIMITER_OUT + "Hour_of_Day_Start" + DELIMITER_OUT + "Duration" );
 			hourOfDayInGauteng.newLine();
@@ -82,7 +85,23 @@ public class ActivityLocations {
 					processVehicleActivities(thisVehicle, thisFile, log);
 
 					if(thisVehicle.chains.size() > 0){
-						addAllLocations(thisVehicle);
+						// Write home locations to file
+						for(Activity majorActivity: thisVehicle.homeLocation){
+							majorLocations.write( locationString(majorActivity) );
+							majorLocations.newLine();
+							numberOfMajorActivities++;
+						}
+						
+						// Write activity locations to file 
+						for(Chain thisChain: thisVehicle.chains){
+							for(Activity minorActivity: thisChain.activities){
+								minorLocations.write( locationString(minorActivity) );
+								minorLocations.newLine();
+								numberOfMinorActivities++;
+							}
+						}
+						
+						// Write vehicle statistics	to file					
 						vehicleStats.write(	statsString(thisVehicle) );
 						vehicleStats.newLine();
 		
@@ -99,12 +118,13 @@ public class ActivityLocations {
 							hourOfDayInGauteng.newLine();
 						}
 					}
-					
 					numberOfVehicles++;				
 					updateProgress(numberOfVehicles, totalVehicles);
 				}
 			}
 			vehicleStats.close();
+			majorLocations.close();
+			minorLocations.close();
 			hourOfDayInGauteng.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,8 +133,6 @@ public class ActivityLocations {
 		System.out.println();
 		System.out.println();
 		System.out.print("Writing locations to file... " );
-		writeLocationsToFile(homeLocations, "/homeLocations.txt" );
-		writeLocationsToFile(activityLocations, "/activityLocations.txt" );
 		System.out.println("Done" );
 		System.out.println();
 		
@@ -122,8 +140,8 @@ public class ActivityLocations {
 		
 		System.out.println("-------------- SUMMARY  --------------");
 		System.out.println("Number of vehicles processed: " + numberOfVehicles );
-		System.out.println("Total home locations: " + homeLocations.size() );
-		System.out.println("Total activity locations: " + activityLocations.size() );
+		System.out.println("Total home locations: " + numberOfMajorActivities );
+		System.out.println("Total activity locations: " + numberOfMinorActivities );
 		System.out.println("Total time (sec): " + ((int)(((double)(endTime - startTime)) / 1000) ) );
 		System.out.println("Boink points: " + numberOfBoinkPoints );
 		System.out.println("--------------------------------------");
@@ -177,85 +195,47 @@ public class ActivityLocations {
 		}
 		progressDots += dotsAdd;
 	}
-
-	private static void writeLocationsToFile(ArrayList<Activity> locations, String filename) {
-		if(locations.size() > 0){
-			File writeFolder = new File(DESTFOLDER);
-			writeFolder.mkdir();
-			try {
-				BufferedWriter output = new BufferedWriter(new FileWriter(new File (writeFolder.getPath() + filename) ) );
-				output.write("ID" + DELIMITER_OUT + "LONG" + DELIMITER_OUT + "LAT" + DELIMITER_OUT + "Start" + DELIMITER_OUT + "Duration");
-				output.newLine();
-				String hourSpace;
-				String minSpace;
-				String secSpace;
-				for (int i = 0; i < locations.size() - 1; i++) {
-					if( locations.get(i).getStartTime().get(GregorianCalendar.HOUR_OF_DAY) < 10 ){
-						hourSpace = "0";
-					} else{
-						hourSpace = "";
-					}
-					if( locations.get(i).getStartTime().get(GregorianCalendar.MINUTE) < 10 ){
-						minSpace = "0";
-					} else{
-						minSpace = "";
-					}
-					if( locations.get(i).getStartTime().get(GregorianCalendar.SECOND) < 10 ){
-						secSpace = "0";
-					} else{
-						secSpace = "";
-					}
-					output.write( locations.get(i).getLocation().vehID + DELIMITER_OUT + 
-							locations.get(i).getLocation().getCoordinate().x + DELIMITER_OUT + 
-							locations.get(i).getLocation().getCoordinate().y + DELIMITER_OUT +
-							// the day and time
-							"Day_" + 
-							locations.get(i).getStartTime().get(GregorianCalendar.DAY_OF_YEAR) + "_" +
-							hourSpace + locations.get(i).getStartTime().get(GregorianCalendar.HOUR_OF_DAY) + "H" +
-							minSpace + locations.get(i).getStartTime().get(GregorianCalendar.MINUTE) + ":" + 
-							secSpace + locations.get(i).getStartTime().get(GregorianCalendar.SECOND) + DELIMITER_OUT + 
-							locations.get(i).getDuration() );
-					output.newLine();
-				}
-				if( locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.HOUR_OF_DAY) < 10 ){
-					hourSpace = "0";
-				} else{
-					hourSpace = "";
-				}
-				if( locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.MINUTE) < 10 ){
-					minSpace = "0";
-				} else{
-					minSpace = "";
-				}
-				if( locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.SECOND) < 10 ){
-					secSpace = "0";
-				} else{
-					secSpace = "";
-				}
-				output.write(locations.get(locations.size() - 1).getLocation().vehID + DELIMITER_OUT + 
-						locations.get(locations.size() - 1).getLocation().getCoordinate().x + DELIMITER_OUT + 
-						locations.get(locations.size() - 1).getLocation().getCoordinate().y + DELIMITER_OUT +	
-						// the day and time
-						"Day_" +
-						locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.DAY_OF_YEAR) + "_" +
-						locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.HOUR_OF_DAY) + "H" +
-						locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.MINUTE) + ":" + 
-						locations.get(locations.size() - 1).getStartTime().get(GregorianCalendar.SECOND) + DELIMITER_OUT +
-						locations.get(locations.size() - 1).getDuration() );
-				output.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	
+	private static String locationHeaderString(){
+		String s = "ID" + DELIMITER_OUT + "LONG" + DELIMITER_OUT + "LAT" + DELIMITER_OUT + "Start" + DELIMITER_OUT + "Duration";
+		return s;
 	}
+	
+	private static String locationString(Activity activity){
+		String hourSpace;
+		String minSpace;
+		String secSpace;
 
-	private static void addAllLocations(Vehicle thisVehicle) {
-		homeLocations.addAll(thisVehicle.homeLocation);
-		for (Chain chain : thisVehicle.chains) {
-			for (int i = 1; i < chain.activities.size()-2; i++ ) { // don't count two home locations at the end
-				activityLocations.add( chain.activities.get(i) );
-			}
+		if( activity.getStartTime().get(GregorianCalendar.HOUR_OF_DAY) < 10 ){
+			hourSpace = "0";
+		} else{
+			hourSpace = "";
 		}
+		if( activity.getStartTime().get(GregorianCalendar.MINUTE) < 10 ){
+			minSpace = "0";
+		} else{
+			minSpace = "";
+		}
+		if( activity.getStartTime().get(GregorianCalendar.SECOND) < 10 ){
+			secSpace = "0";
+		} else{
+			secSpace = "";
+		}
+		
+		String s = // vehicle
+				   activity.getLocation().vehID + DELIMITER_OUT +
+				   // coordinate
+				   activity.getLocation().getCoordinate().x + DELIMITER_OUT + 
+				   activity.getLocation().getCoordinate().y + DELIMITER_OUT +
+				   // the day and time
+				   "Day_" + 
+				   activity.getStartTime().get(GregorianCalendar.DAY_OF_YEAR) + "_" +
+				   hourSpace + activity.getStartTime().get(GregorianCalendar.HOUR_OF_DAY) + "H" +
+				   minSpace + activity.getStartTime().get(GregorianCalendar.MINUTE) + ":" + 
+				   secSpace + activity.getStartTime().get(GregorianCalendar.SECOND) + DELIMITER_OUT + 
+				   // duration
+				   activity.getDuration();	
+		return s;
 	}
 
 	private static void processVehicleActivities( Vehicle thisVehicle, File file, ArrayList<GPSPoint> log) {
