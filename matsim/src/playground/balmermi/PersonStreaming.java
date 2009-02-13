@@ -41,11 +41,11 @@ public class PersonStreaming {
 
 		System.out.println("person streaming...");
 		
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		Gbl.getWorld().complete();
-		System.out.println("  done.");
+//		System.out.println("  reading facilities xml file... ");
+//		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+//		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
+//		Gbl.getWorld().complete();
+//		System.out.println("  done.");
 
 		System.out.println("  reading the network xml file...");
 		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
@@ -53,10 +53,10 @@ public class PersonStreaming {
 		Gbl.getWorld().complete();
 		System.out.println("  done.");
 
-		new WorldCheck().run(Gbl.getWorld());
-		new WorldConnectLocations().run(Gbl.getWorld());
-		new WorldMappingInfo().run(Gbl.getWorld());
-		new WorldCheck().run(Gbl.getWorld());
+//		new WorldCheck().run(Gbl.getWorld());
+//		new WorldConnectLocations().run(Gbl.getWorld());
+//		new WorldMappingInfo().run(Gbl.getWorld());
+//		new WorldCheck().run(Gbl.getWorld());
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -69,7 +69,7 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		plans.addAlgorithm(new PersonXY2Facility(facilities));
+//		plans.addAlgorithm(new PersonXY2Facility(facilities));
 //		PersonSubTourAnalysis psta = new PersonSubTourAnalysis();
 //		plans.addAlgorithm(psta);
 //		PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt");
