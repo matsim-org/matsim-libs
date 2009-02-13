@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+// TODO balmermi: Johan, read my email
+//import com.thoughtworks.xstream.XStream;
+//import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -438,18 +439,22 @@ public class ActivityLocations {
 	}
 	
 	public static String convertVehicleToXML (Vehicle vehicle){
-		XStream xstream = new XStream(new DomDriver());		
-		return xstream.toXML(vehicle);
+		// TODO balmermi: Johan, read my email
+//		XStream xstream = new XStream(new DomDriver());		
+//		return xstream.toXML(vehicle);
+		return null;
 	}
 	
 	public static Vehicle convertVehicleFromXML (String XMLString){
-		Vehicle vehicle = null;
-		XStream xstream = new XStream(new DomDriver());
-		Object obj = xstream.fromXML(XMLString);
-		if(obj instanceof Vehicle){
-			vehicle = (Vehicle) obj;
-		}
-		return vehicle;
+		// TODO balmermi: Johan, read my email
+//		Vehicle vehicle = null;
+//		XStream xstream = new XStream(new DomDriver());
+//		Object obj = xstream.fromXML(XMLString);
+//		if(obj instanceof Vehicle){
+//			vehicle = (Vehicle) obj;
+//		}
+//		return vehicle;
+		return null;
 	}
 	
 }
