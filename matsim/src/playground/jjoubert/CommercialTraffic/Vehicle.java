@@ -11,13 +11,12 @@ public class Vehicle {
 	public int vehID;
 	public ArrayList<Activity> homeLocation;
 	public ArrayList<Chain> chains;
+	public ArrayList<Activity> gautengActivities;
 	public int avgActivitesPerChain;
 	public int avgChainDuration;
 	public int avgChainDistance; 
 	public int numberOfGautengActivities;
 	public float percentGautengActivities;
-	public ArrayList<Integer> gautengActivityStartTime;
-	public ArrayList<Integer> gautengActivityDuration;
 	public int gautengChainDistance;
 	public int totalActivities;
 	public final static int DISTANCE_THRESHOLD = 2500;
@@ -28,8 +27,7 @@ public class Vehicle {
 		this.vehID = id;
 		this.homeLocation = new ArrayList<Activity>();
 		this.chains = new ArrayList<Chain>();
-		this.gautengActivityStartTime = new ArrayList<Integer>();
-		this.gautengActivityDuration = new ArrayList<Integer>();
+		this.gautengActivities = new ArrayList<Activity>();
 		this.avgActivitesPerChain = 0;
 		this.avgChainDuration = 0;
 		this.avgChainDistance = 0;
@@ -85,7 +83,6 @@ public class Vehicle {
 	}
 
 	private void calcNumberOfGautengActivities(Polygon study){
-		int inGauteng = 0;
 		GeometryFactory gf = new GeometryFactory();
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
@@ -93,9 +90,7 @@ public class Vehicle {
 					for (int i = 1; i < chain.activities.size() - 1; i++ ) { // don't count first and last major locations
 						Point p = gf.createPoint( chain.activities.get(i).getLocation().getCoordinate() );
 						if( study.contains(p) ){
-							inGauteng++;
-							this.gautengActivityStartTime.add( chain.activities.get(i).getStartHour() );
-							this.gautengActivityDuration.add( chain.activities.get(i).getDuration() );
+							this.gautengActivities.add( chain.activities.get(i) );
 							chain.setInGauteng(true);
 						}
 					}
@@ -105,7 +100,7 @@ public class Vehicle {
 				}
 			}
 		}
-		this.numberOfGautengActivities = inGauteng;
+		this.numberOfGautengActivities = this.gautengActivities.size();
 		this.percentGautengActivities = ((float) this.numberOfGautengActivities) / 
 										((float) this.totalActivities);
 	}

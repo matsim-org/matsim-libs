@@ -20,12 +20,12 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ActivityLocations {
 	
 	public final long STUDY_START = 1199145600; // 01 January 2008 00:00:00
-//	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted";
-//	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities";
-//	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/XML";
-	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp";
-	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Activities";
-	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/XML";
+	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Sorted";
+	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/Activities";
+	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/GautengVehicles/XML";
+//	final static String SOURCEFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp";
+//	final static String DESTFOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/Activities";
+//	final static String VEH_FOLDER = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Temp/XML";
 	final static String DELIMITER_IN = " "; // Could also be ',' or other;
 	final static String DELIMITER_OUT = ","; // Could also be ' ';
 	final static int[] statusStart = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20};
@@ -52,7 +52,6 @@ public class ActivityLocations {
 		gauteng = SelectGautengVehicles.readGautengPolygon();
 		System.out.println("Done");
 		System.out.println();
-
 		
 		System.out.println("Processing vehicle files in " + DESTFOLDER + "...");
 		System.out.println();
@@ -69,13 +68,13 @@ public class ActivityLocations {
 			vehicleStats.write(	vehicleStatsHeaderString() );
 			vehicleStats.newLine();			
 			BufferedWriter majorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/majorLocations.txt")));
-			majorLocations.write(	locationHeaderString() );
+			majorLocations.write( locationHeaderString() );
 			majorLocations.newLine();
 			BufferedWriter minorLocations = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/minorLocations.txt")));
-			minorLocations.write(	locationHeaderString() );
+			minorLocations.write( locationHeaderString() );
 			minorLocations.newLine();
 			BufferedWriter hourOfDayInGauteng = new BufferedWriter(new FileWriter(new File(DESTFOLDER + "/hourOfDayInGautengStats.txt")));
-			hourOfDayInGauteng.write("Veh_ID" + DELIMITER_OUT + "Hour_of_Day_Start" + DELIMITER_OUT + "Duration" );
+			hourOfDayInGauteng.write( gautengHeaderString() );
 			hourOfDayInGauteng.newLine();
 			
 			for(int i = 0; i < vehicles.length; i++ ){
@@ -110,12 +109,9 @@ public class ActivityLocations {
 					}
 					
 					// Write hour-of-day-in-Gauteng statistics
-					if(thisVehicle.gautengActivityStartTime.size() > 0){
-						for(int j = 0; j < thisVehicle.gautengActivityStartTime.size(); j++ ){
-							String outputString = String.valueOf( thisVehicle.vehID ) + DELIMITER_OUT +
-												  String.valueOf( thisVehicle.gautengActivityStartTime.get(j) ) + DELIMITER_OUT + 
-												  String.valueOf( thisVehicle.gautengActivityDuration.get(j) );
-							hourOfDayInGauteng.write( outputString );
+					if(thisVehicle.gautengActivities.size() > 0){
+						for(int j = 0; j < thisVehicle.gautengActivities.size(); j++ ){
+							hourOfDayInGauteng.write( gautengString(thisVehicle, j) );
 							hourOfDayInGauteng.newLine();
 						}
 					}
@@ -147,6 +143,24 @@ public class ActivityLocations {
 		System.out.println("Boink points: " + numberOfBoinkPoints );
 		System.out.println("--------------------------------------");
 		
+	}
+
+
+	private static String gautengHeaderString() {
+		return  "Veh_ID" + DELIMITER_OUT + 
+				"Long" + DELIMITER_OUT + 
+				"Lat" + DELIMITER_OUT + 
+				"Hour_of_Day_Start" + DELIMITER_OUT + 
+				"Duration";
+	}
+
+	private static String gautengString(Vehicle thisVehicle, int i) {
+		String outputString = String.valueOf( thisVehicle.vehID ) + DELIMITER_OUT +
+							  String.valueOf(thisVehicle.gautengActivities.get(i).getLocation().coordinate.x ) + DELIMITER_OUT +
+							  String.valueOf( thisVehicle.gautengActivities.get(i).getLocation().coordinate.y ) + DELIMITER_OUT +
+							  String.valueOf( thisVehicle.gautengActivities.get(i).getStartHour() ) + DELIMITER_OUT + 
+							  String.valueOf( thisVehicle.gautengActivities.get(i).getDuration() );
+		return outputString;
 	}
 
 	private static String vehicleStatsHeaderString() {
@@ -198,7 +212,11 @@ public class ActivityLocations {
 	}
 	
 	private static String locationHeaderString(){
-		String s = "ID" + DELIMITER_OUT + "LONG" + DELIMITER_OUT + "LAT" + DELIMITER_OUT + "Start" + DELIMITER_OUT + "Duration";
+		String s = "ID" + DELIMITER_OUT + 
+				   "Long" + DELIMITER_OUT + 
+				   "LAT" + DELIMITER_OUT + 
+				   "Start" + DELIMITER_OUT + 
+				   "Duration";
 		return s;
 	}
 	
