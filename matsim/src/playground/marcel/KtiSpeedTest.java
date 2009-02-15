@@ -42,12 +42,12 @@ import org.matsim.world.World;
 
 public class KtiSpeedTest {
 
-	private static void readTxtEvents(final String filename, final NetworkLayer network, final Events events) {
+	private static void readTxtEvents(final String filename, final Events events) {
 		new MatsimEventsReader(events).readFile(filename);
 		events.printEventsCount();
 	}
 
-	private static void readBinEvents(final String filename, final NetworkLayer network, final Events events) {
+	private static void readBinEvents(final String filename, final Events events) {
 		final EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
 		eventsReader.readFile(filename);
 		events.printEventsCount();
@@ -58,7 +58,7 @@ public class KtiSpeedTest {
 		System.out.println("RUN: calcRouteMTwithTimes");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -66,8 +66,7 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -81,7 +80,7 @@ public class KtiSpeedTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -100,9 +99,9 @@ public class KtiSpeedTest {
 
 		Gbl.startMeasurement();
 		if (config.getParam("events", "inputFormat").equals("matsimDEQ1")) {
-			readBinEvents(config.getParam("events", "inputFile"), network, events);
+			readBinEvents(config.getParam("events", "inputFile"), events);
 		} else {
-			readTxtEvents(config.getParam("events", "inputFile"), network, events);
+			readTxtEvents(config.getParam("events", "inputFile"), events);
 		}
 		Gbl.printElapsedTime();
 		System.out.println("  done.");

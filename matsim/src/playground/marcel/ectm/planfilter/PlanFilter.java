@@ -40,7 +40,6 @@ import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 
 public class PlanFilter {
 
@@ -57,17 +56,16 @@ public class PlanFilter {
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network... " + (new Date()));
 		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
 		final Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 
@@ -125,17 +123,16 @@ public class PlanFilter {
 		double bigRadius = 14000;
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network... " + (new Date()));
 		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading population... " + (new Date()));
 		final Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  finding AOI links");
