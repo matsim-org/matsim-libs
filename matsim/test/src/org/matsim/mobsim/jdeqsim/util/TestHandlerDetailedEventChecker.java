@@ -303,7 +303,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements T
 		}
 	}
 
-	private class ExpectedNumberOfEvents {
+	private static class ExpectedNumberOfEvents {
 		public int expectedLinkEnterEvents;
 		public int expectedLinkLeaveEvents;
 		public int expectedDepartureEvents;
