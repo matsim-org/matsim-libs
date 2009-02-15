@@ -27,7 +27,6 @@ import org.matsim.facilities.Facilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkWriter;
@@ -107,7 +106,7 @@ public class TriangleTest extends MatsimTestCase {
 
 		log.info("running testParserWriter1()...");
 
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		log.info("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(this.config.world().getInputFile());

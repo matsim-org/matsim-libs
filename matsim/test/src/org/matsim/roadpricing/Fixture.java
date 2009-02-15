@@ -41,7 +41,6 @@ import org.matsim.scoring.EventsToScore;
 import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
-import org.matsim.world.World;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -195,11 +194,9 @@ public class Fixture {
 		return person;
 	}
 
-	public static Population createReferencePopulation1(final World world) {
+	public static Population createReferencePopulation1() {
 		// run mobsim once without toll and get score for network1/population1
 		NetworkLayer network = createNetwork1();
-		world.setNetworkLayer(network);
-		world.complete();
 		Population referencePopulation = Fixture.createPopulation1(network);
 		Events events = new Events();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory());

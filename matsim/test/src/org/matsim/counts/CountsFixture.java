@@ -46,7 +46,7 @@ public class CountsFixture {
 		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
 		counts_parser.readFile(config.counts().getCountsFileName());
 
-		this.network = (NetworkLayer)Gbl.createWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
 	}
 

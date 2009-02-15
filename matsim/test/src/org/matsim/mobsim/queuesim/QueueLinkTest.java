@@ -22,7 +22,6 @@ package org.matsim.mobsim.queuesim;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.events.Events;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -114,8 +113,6 @@ public class QueueLinkTest extends MatsimTestCase {
 		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		Gbl.createWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 		this.queueNetwork = new QueueNetwork(network);
 		this.qlink = this.queueNetwork.getQueueLink(new IdImpl("1"));
 		this.qlink.finishInit();

@@ -45,9 +45,8 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.NetworkUtils;
-import org.matsim.world.World;
+import org.matsim.utils.geometry.CoordImpl;
 
 public class QueueSimulationTest extends MatsimTestCase {
 
@@ -61,11 +60,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
@@ -74,7 +71,6 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
 		/* ------ */ network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-		world.complete();
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -151,11 +147,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
@@ -164,7 +158,6 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-		world.complete();
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -233,11 +226,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
@@ -246,7 +237,6 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 100, 10, 60000, 9);
 		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000, 10, 6000, 2);
 		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 100, 10, 60000, 9);
-		world.complete();
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);
@@ -384,11 +374,9 @@ public class QueueSimulationTest extends MatsimTestCase {
 		Config config = Gbl.createConfig(null);
 		config.simulation().setFlowCapFactor(1.0);
 		config.simulation().setStorageCapFactor(1.0);
-		World world = Gbl.createWorld();
 
 		/* build network */
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		network.setCapacityPeriod("1:00:00");
 		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
@@ -403,7 +391,6 @@ public class QueueSimulationTest extends MatsimTestCase {
 		network.createLink(new IdImpl("4"), node4, node5, 1000, 10, 6000, 2);
 		Link link5 = network.createLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
 		Link link6 = network.createLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
-		world.complete();
 
 		/* build plans */
 		Population plans = new Population(Population.NO_STREAMING);

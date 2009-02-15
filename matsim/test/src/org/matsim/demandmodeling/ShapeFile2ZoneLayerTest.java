@@ -23,7 +23,6 @@ package org.matsim.demandmodeling;
 import java.io.IOException;
 
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.CRCChecksum;
 import org.matsim.world.World;
@@ -39,7 +38,7 @@ import org.matsim.world.ZoneLayer;
 public class ShapeFile2ZoneLayerTest extends MatsimTestCase {
 
 	public void testShp2ZoneLayer() throws IOException {
-		final World world = Gbl.createWorld();
+		final World world = new World();
 		final ZoneLayer layer = (ZoneLayer) world.createLayer(new IdImpl("zones"), "zones");
 		final String shpFileName = getInputDirectory() + "zones.shp";
 		final String worldFileName = getOutputDirectory() + "zones.xml";

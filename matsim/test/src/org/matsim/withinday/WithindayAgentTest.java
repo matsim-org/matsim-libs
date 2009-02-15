@@ -83,13 +83,10 @@ public class WithindayAgentTest extends TestCase {
 	}
 
 	private NetworkLayer loadNetwork(final String filename) {
-		Gbl.reset();
 		NetworkLayer network = new NetworkLayer();
 		Gbl.createConfig(null);
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(filename);
-		Gbl.createWorld().setNetworkLayer(network);
-		Gbl.getWorld().complete();
 		return network;
 	}
 
