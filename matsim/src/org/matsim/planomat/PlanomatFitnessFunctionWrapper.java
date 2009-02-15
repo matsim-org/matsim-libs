@@ -26,6 +26,7 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
 import org.matsim.basic.v01.BasicLeg;
+import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.Act;
@@ -63,39 +64,27 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		this.plan = plan;
 		this.legTravelTimeEstimator = legTravelTimeEstimator;
 		this.planAnalyzeSubtours = planAnalyzeSubtours;
-
 	}
 
-	private double now;
-	private double planScore;
-	private double travelTime;
-	private int numActs;
-	private int legCounter;
-	private int subtourIndex, modeIndex;
-	private BasicLeg.Mode mode;
-	private Act origin, destination;
-	private Leg legIntermediate;
-	private Route tempRoute;
-	private ArrayList<Object> actslegs;
 	
 	@Override
 	protected double evaluate(IChromosome a_subject) {
+		double planScore = 0.0;
+		Act origin = null;
+		Act destination = null;
+		Leg legIntermediate = null;
+		Route tempRoute = null;
 
-		planScore = 0.0;
-		mode = null;
-		origin = null;
-		destination = null;
-		legIntermediate = null;
-		tempRoute = null;
+		final PlanomatConfigGroup config = Gbl.getConfig().planomat();
 		
 		sf.reset();
-		now = 0.0;
+		double now = 0.0;
 		// process "middle" activities
-		numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
+		final int numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
 
-		actslegs = this.plan.getActsLegs();
+		final ArrayList<Object> actslegs = this.plan.getActsLegs();
 
-		legCounter = 0;
+		int legCounter = 0;
 		for (Object o : actslegs) {
 			
 			if (o.getClass().equals(Leg.class)) {
@@ -109,12 +98,11 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 				origin = plan.getPreviousActivity(legIntermediate);
 				destination = plan.getNextActivity(legIntermediate);
 
-				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+				if (config.getPossibleModes().length > 0) {
 					// set mode
-					subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
-					modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
-					mode = Gbl.getConfig().planomat().getPossibleModes()[modeIndex];
-					legIntermediate.setMode(mode);
+					int subtourIndex = this.planAnalyzeSubtours.getSubtourIndexation()[legCounter];
+					int modeIndex = ((IntegerGene) a_subject.getGene(numActs + subtourIndex)).intValue();
+					legIntermediate.setMode(config.getPossibleModes()[modeIndex]);
 				} // otherwise leave modes untouched
 
 				if (!legIntermediate.getMode().equals(BasicLeg.Mode.car)) {
@@ -122,7 +110,7 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 				}
 				
 				// set times
-				travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+				double travelTime = this.legTravelTimeEstimator.getLegTravelTimeEstimation(
 						this.plan.getPerson().getId(),
 						now,
 						origin,
