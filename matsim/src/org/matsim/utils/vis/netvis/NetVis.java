@@ -47,7 +47,6 @@ import org.matsim.utils.vis.netvis.renderers.LabelRenderer;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRenderer;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererCOOPERSVehiclesOnly;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererLanes;
-import org.matsim.utils.vis.netvis.renderers.LinkSetRendererRoutes;
 import org.matsim.utils.vis.netvis.renderers.LinkSetRendererVolumes;
 import org.matsim.utils.vis.netvis.renderers.NodeSetRenderer;
 import org.matsim.utils.vis.netvis.renderers.RendererA;
@@ -97,7 +96,6 @@ public class NetVis {
     	if (rendererName == null) linkSetRenderer = new LinkSetRenderer(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererVolumes")) linkSetRenderer = new LinkSetRendererVolumes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererLanes")) linkSetRenderer = new LinkSetRendererLanes(visConfig, network);
-    	else if (rendererName.equals("LinkSetRendererRoutes")) linkSetRenderer = new LinkSetRendererRoutes(visConfig, network);
     	else if (rendererName.equals("LinkSetRendererCOOPERSVehiclesOnly")) linkSetRenderer = new LinkSetRendererCOOPERSVehiclesOnly(visConfig, network);
     	else linkSetRenderer = new LinkSetRenderer(visConfig, network);
 
@@ -125,7 +123,6 @@ public class NetVis {
     	if (rendererName != null) {
     		if (rendererName.equals("LinkSetRendererVolumes")) ((LinkSetRendererVolumes)linkSetRenderer).setControlToolbar(buttonComponent);
     		else if (rendererName.equals("LinkSetRendererLanes")) ((LinkSetRendererLanes)linkSetRenderer).setControlToolbar(buttonComponent);
-    		else if (rendererName.equals("LinkSetRendererRoutes")) ((LinkSetRendererRoutes)linkSetRenderer).setControlToolbar(buttonComponent);
     	}
 
     	// 4. ----- create component serving as drawing area -----
