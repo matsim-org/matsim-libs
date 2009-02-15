@@ -35,9 +35,19 @@ public class MyLSATests {
 //		suite.addTestSuite(TravelTimeTestOneWay.class);
 //		QueueNetwork.setSimulateAllNodes(true);
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.mobsim.queuesim.AllTests.suite());
+
+		System.err.println("disabled some non-compiling lines... / mrieser");
+		System.exit(-1);
+		/* hi, hab da unten zwei Zeilen auskommentiert, weil diese vom normalen
+		 * playground die Tests referenzieren, was offiziell nicht erlaubt ist.
+		 * Tests dürfen playground & core referenzieren, aber nicht umgekehrt.
+		 * musste es deaktivieren, weil sonst mein nightly-script nicht laeuft...
+		 * Die auskommentierten Zeilen sind markiert von mir.
+		 */
+
+//		suite.addTest(org.matsim.mobsim.queuesim.AllTests.suite()); //  disabled mrieser
 //		suite.addTest(org.matsim.integration.AllTests.suite());
-		suite.addTestSuite(org.matsim.integration.EquilTwoAgentsTest.class);
+//		suite.addTestSuite(org.matsim.integration.EquilTwoAgentsTest.class); //  disabled mrieser
 //		suite.addTest(org.matsim.examples.AllTests.suite());
 //		suite.addTest(org.matsim.replanning.AllTests.suite());
 
