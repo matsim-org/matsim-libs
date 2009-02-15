@@ -20,7 +20,9 @@
 package org.matsim.mobsim.jdeqsim;
 
 import java.util.LinkedList;
+
 import org.matsim.network.Link;
+import org.matsim.utils.misc.Time;
 
 public class Road extends SimUnit {
 
@@ -80,7 +82,7 @@ public class Road extends SimUnit {
 		 * same time
 		 */
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* link.getLanesAsInt(SimulationParameters.getLinkCapacityPeriod())
+				* link.getLanesAsInt(Time.UNDEFINED_TIME)
 				* SimulationParameters.getStorageCapacityFactor() / SimulationParameters.getCarSize());
 
 		/**
@@ -92,10 +94,9 @@ public class Road extends SimUnit {
 		}
 
 		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
-				* SimulationParameters.getFlowCapacityFactor() * link
-				.getLanesAsInt(SimulationParameters.getLinkCapacityPeriod()));
+				* SimulationParameters.getFlowCapacityFactor() * link.getLanesAsInt(Time.UNDEFINED_TIME));
 
-		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(SimulationParameters.getLinkCapacityPeriod()) * SimulationParameters.getFlowCapacityFactor());
+		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
 
 		if (inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			inverseInFlowCapacity = maxInverseInFlowCapacity;
@@ -167,9 +168,8 @@ public class Road extends SimUnit {
 
 	public void enterRoad(Vehicle vehicle, double simTime) {
 		// calculate time, when the car reaches the end of the road
-		double nextAvailableTimeForLeavingStreet = Double.MIN_VALUE;
-		nextAvailableTimeForLeavingStreet = simTime + link.getLength()
-				/ link.getFreespeed(SimulationParameters.getLinkCapacityPeriod());
+		double nextAvailableTimeForLeavingStreet = simTime + link.getLength()
+				/ link.getFreespeed(Time.UNDEFINED_TIME);
 
 		noOfCarsPromisedToEnterRoad--;
 		carsOnTheRoad.add(vehicle);
@@ -186,15 +186,15 @@ public class Road extends SimUnit {
 		 * if we are in the front of the queue, then we can just drive with free
 		 * speed to the front and have to have at least inverseFlowCapacity
 		 * time-distance to the previous car
-		 */
+		 */	
 		if (carsOnTheRoad.size() == 1) {
 			nextAvailableTimeForLeavingStreet = Math.max(nextAvailableTimeForLeavingStreet,
 					timeOfLastLeavingVehicle + inverseOutFlowCapacity);
 			vehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
-		} else {
+//		} else { // empty else clause
 			/*
 			 * this car is not the front car in the street queue when the cars
-			 * infront of the current car leave the street and this car becomes
+			 * in front of the current car leave the street and this car becomes
 			 * the front car, it will be waken up.
 			 */
 		}
@@ -202,8 +202,6 @@ public class Road extends SimUnit {
 	}
 
 	public void enterRequest(Vehicle vehicle, double simTime) {
-		double nextAvailableTimeForEnteringStreet = Double.MIN_VALUE;
-
 		/*
 		 * assert maxNumberOfCarsOnRoad >= carsOnTheRoad.size() : "There are
 		 * more cars on the road, than its capacity!"; assert
@@ -220,7 +218,6 @@ public class Road extends SimUnit {
 			 * - check, if the gap needs to be considered for entering the road -
 			 * we can find out, the time since when we have a free road for
 			 * entrance for sure:
-			 * 
 			 */
 
 			// the gap queue will only be empty in the beginning
@@ -232,7 +229,7 @@ public class Road extends SimUnit {
 			}
 
 			noOfCarsPromisedToEnterRoad++;
-			nextAvailableTimeForEnteringStreet = Math.max(Math.max(timeOfLastEnteringVehicle
+			double nextAvailableTimeForEnteringStreet = Math.max(Math.max(timeOfLastEnteringVehicle
 					+ inverseInFlowCapacity, simTime), arrivalTimeOfGap);
 
 			timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
