@@ -37,12 +37,14 @@ public class VolumesCounter implements LinkEnterEventHandler {
 
 	private final TreeMap<String, Integer> links = new TreeMap<String, Integer>();
 
+	private static Integer ONE = Integer.valueOf(1);
+	
 	public void handleEvent(LinkEnterEvent event) {
 		Integer volume = this.links.get(event.linkId);
 		if (volume == null) {
-			volume = Integer.valueOf(1);
+			volume = ONE;
 		} else {
-			volume++;
+			volume = Integer.valueOf(volume.intValue() + 1);
 		}
 		this.links.put(event.linkId, volume);
 	}
