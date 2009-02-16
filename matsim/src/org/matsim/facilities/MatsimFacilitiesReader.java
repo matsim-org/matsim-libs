@@ -25,6 +25,7 @@ import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -38,9 +39,15 @@ import org.xml.sax.SAXException;
 public class MatsimFacilitiesReader extends MatsimXmlParser {
 	// FIXME: Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
 	// naming conventions?  kai, jan09
+	/* because all other readers in Matsim are also called Matsim*Reader,
+	 * e.g. MatsimPopulationReader, MatsimNetworkReader, MatsimWorldReader, ...
+	 * marcel, feb09
+	 */
 
 	private final static String FACILITIES_V1 = "facilities_v1.dtd";
 
+	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
+	
 	private final Facilities facilities;
 	private MatsimXmlParser delegate = null;
 
@@ -87,7 +94,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 		// Currently the only facilities-type is v1
 		if (FACILITIES_V1.equals(doctype)) {
 			this.delegate = new FacilitiesReaderMatsimV1(this.facilities);
-			System.out.println("using facilities_v1-reader.");
+			log.info("using facilities_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
