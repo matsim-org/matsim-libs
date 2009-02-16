@@ -77,7 +77,7 @@ public class DgOtfStarter {
 //		String filename = "/Volumes/data/work/svnWorkspace/matsim/test/output/org/matsim/integration/withinday/CoopersBerlinIntegrationTest/testBerlinReducedSB/ITERS/it.0/0.otfvis.mvi";
 
 		
-		
+		filename = "/Users/dgrether/Desktop/bkickRuns/run704/500.events.mvi";
 		
 		
 		if (filename.endsWith(".veh.gz")) {
