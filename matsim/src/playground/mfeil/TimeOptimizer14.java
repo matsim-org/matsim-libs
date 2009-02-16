@@ -28,6 +28,10 @@ import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.scoring.PlanScorer;
+import org.matsim.controler.Controler;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 
 /**
@@ -111,26 +115,26 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		int lastImprovement 							= 0;
 		
 		
-	//	String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
-	//	Counter.timeOptCounter++;
-	//	PrintStream stream;
-	//	try {
-	//		stream = new PrintStream (new File(outputfile));
-	//	} catch (FileNotFoundException e) {
-	//		e.printStackTrace();
-	//		return;
-	//	}
-	//	stream.print(plan.getScore()+"\t");
-	//	for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-	//	Act act = (Act)plan.getActsLegs().get(z);
-	//		stream.print(act.getType()+"\t");
-	//	}
-	//	stream.println();
-	//	stream.print("\t");
-	//	for (int z= 0;z<plan.getActsLegs().size();z=z+2){
-	//		stream.print(((Act)(plan.getActsLegs()).get(z)).getDur()+"\t");
-	//	}
-	//	stream.println();
+		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
+		Counter.timeOptCounter++;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.print(plan.getScore()+"\t");
+		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+		Act act = (Act)plan.getActsLegs().get(z);
+			stream.print(act.getType()+"\t");
+		}
+		stream.println();
+		stream.print("\t");
+		for (int z= 0;z<plan.getActsLegs().size();z=z+2){
+			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
+		}
+		stream.println();
 		
 		
 		// Copy the plan into all fields of the array neighbourhood
@@ -143,9 +147,9 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		double bestScore = plan.getScore();
 		
 		// Iteration 1
-	//	stream.println("Iteration "+1);
+		stream.println("Iteration "+1);
 		this.createInitialNeighbourhood((PlanomatXPlan)plan, initialNeighbourhood, score, moves);
-		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
+		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position, stream);
 				
 		if (score[pointer]>bestScore){
 			bestSolution = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
@@ -163,10 +167,10 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		// Do Tabu Search iterations
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-	//		stream.println("Iteration "+currentIteration);
+			stream.println("Iteration "+currentIteration);
 			
 			this.createNeighbourhood((PlanomatXPlan)plan, neighbourhood, score, moves, position);
-			pointer = this.findBestSolution (neighbourhood, score, moves, position);
+			pointer = this.findBestSolution (neighbourhood, score, moves, position, stream);
 			
 			if (pointer==-1) {
 				log.info("No valid solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
@@ -197,7 +201,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		}
 	
 		// Update the plan with the final solution 		
-	//	stream.println("Selected solution\t"+bestScore);
+		stream.println("Selected solution\t"+bestScore);
 		ArrayList<Object> al = basePlan.getActsLegs();
 		basePlan.setScore(bestScore);
 		
@@ -341,9 +345,9 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	
 	public double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner){
 		
-		if ((((Act)(actslegs.get(inner))).getDuration()>=OFFSET+this.minimumTime)	||	
+		if ((((Act)(actslegs.get(inner))).getDuration()>=(OFFSET+this.minimumTime))	||	
 				(outer==0	&&	inner==actslegs.size()-1)	||
-				(86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>OFFSET+this.minimumTime){
+				((inner == actslegs.size()-1) && (86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>(OFFSET+this.minimumTime))){
 			return this.setTimes(plan, actslegs, ((Act)(actslegs.get(outer))).getEndTime()+OFFSET, outer, inner);
 			/*
 			double now =((Act)(actslegs.get(outer))).getEndTime()+OFFSET;
@@ -483,7 +487,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position){
+	public int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position, PrintStream stream){
 				
 		int pointer=-1;
 		ArrayList<?> actslegs = new ArrayList<Object>();
@@ -497,14 +501,14 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				position[1]=moves[i][1];
 			}
 			
-	//		stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepTime()+"\t");
-	//		for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
-	//			stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepTime()-((Leg)(neighbourhood[i].get(z-1))).getArrTime())+"\t");
-	//		}
-	//		stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrTime()+"\t");
-	//		stream.println();
+			stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
+			for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
+				stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepartureTime()-((Leg)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
+			}
+			stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
+			stream.println();
 		}
-	//	stream.println("Iteration's best score\t"+firstScore);
+		stream.println("Iteration's best score\t"+firstScore);
 		// clean-up of plan (=bestIterSolution)
 		if (pointer!=-1) this.cleanActs(actslegs);
 		
