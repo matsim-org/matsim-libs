@@ -31,7 +31,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer implements Iterable<Facility> {
@@ -89,11 +88,6 @@ public class Facilities extends Layer implements Iterable<Facility> {
 		}
 
 		return f;
-	}
-
-	@Deprecated // String arguments in creational patterns are deprecated.  kai, jan09
-	public final Facility createFacility(final String id, final String x, final String y) {
-		return this.createFacility(new IdImpl(id),new CoordImpl(x,y));
 	}
 
 	//////////////////////////////////////////////////////////////////////
