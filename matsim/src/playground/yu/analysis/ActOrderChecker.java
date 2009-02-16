@@ -3,8 +3,6 @@
  */
 package playground.yu.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +18,9 @@ import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.io.IOUtils;
 import org.matsim.world.World;
+
+import playground.yu.utils.SimpleWriter;
 
 /**
  * @author yu
@@ -56,42 +55,11 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		actsMap.put(personId, ActOder.getActOder(plan));
 	}
 
-	public static BufferedWriter writeIni(final String outputFilename) {
-		BufferedWriter writer = null;
-		try {
-			writer = IOUtils.getBufferedWriter(outputFilename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return writer;
-	}
-
-	public static void write(BufferedWriter writer, String s) {
-		try {
-			writer.write(s);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void writeln(BufferedWriter writer, String s) {
-		write(writer, s + "\n");
-	}
-
-	public static void writeClose(BufferedWriter writer) {
-		try {
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Gbl.startMeasurement();
 
 		final String netFilename = args[0];
@@ -120,9 +88,9 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		new MatsimPopulationReader(populationB).readFile(plansFilenameB);
 		populationB.runAlgorithms();
 
-		BufferedWriter writer = writeIni(outputFilename);
+		SimpleWriter writer = new SimpleWriter(outputFilename);
 		if (writer != null) {
-			writeln(writer, "personId\toriginal ActChain\tcurrent ActChain");
+			writer.writeln("personId\toriginal ActChain\tcurrent ActChain");
 			Map<Id, String> actsA = aocA.getActsMap();
 			Map<Id, String> actsB = aocB.getActsMap();
 			int c = 0, changed = 0;
@@ -131,15 +99,14 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 				String actChainA = actsA.get(personId);
 				String actChainB = actsB.get(personId);
 				if (!actChainA.equals(actChainB)) {
-					writeln(writer, personId + "\t" + actChainA + "\t"
+					writer.writeln(personId + "\t" + actChainA + "\t"
 							+ actChainB);
 					changed++;
 				}
-				writeln(writer, personId + "\t" + actChainA + "\t"
-						+ actChainB);
+				writer.writeln(personId + "\t" + actChainA + "\t" + actChainB);
 			}
-			writeln(writer, "agents :\t" + c + "\tchanged :\t" + changed);
-			writeClose(writer);
+			writer.writeln("agents :\t" + c + "\tchanged :\t" + changed);
+			writer.close();
 		}
 
 		System.out.println("--> Done!");
