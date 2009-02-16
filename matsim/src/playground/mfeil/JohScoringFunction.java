@@ -421,6 +421,19 @@ public class JohScoringFunction implements ScoringFunction {
 		actParams.setClosingTime(24*3600);
 		utilParams.put(type, actParams);
 		
+		type = "w";
+		actParams = new JohActUtilityParameters("w", uMin_work, uMax_work, alpha_work, beta_work, gamma_work);
+		actParams.setOpeningTime(8*3600);
+		actParams.setClosingTime(18*3600);
+		actParams.setLatestStartTime(10*3600);
+		actParams.setEarliestEndTime(15*3600);
+		utilParams.put(type, actParams);
+		
+		type = "h";
+		actParams = new JohActUtilityParameters("h", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
+		utilParams.put(type, actParams);
+
+		
 	}
 
 	private void handleAct(final double time) {
