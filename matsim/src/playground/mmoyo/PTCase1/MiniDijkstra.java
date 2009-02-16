@@ -55,7 +55,7 @@ public class MiniDijkstra {
 		
 		this.resetValues();
 		
-		//TODO: here must time be accumulated
+		//TODO: time must be accumulated here
 		for (Iterator<Link> iter = linkList.iterator(); iter.hasNext();) {
 			updateCost ((Link) iter.next(), iniTime);
 		}

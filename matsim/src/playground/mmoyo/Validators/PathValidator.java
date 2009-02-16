@@ -1,12 +1,12 @@
-package playground.mmoyo.PTCase2;
+package playground.mmoyo.Validators;
 
 import org.matsim.router.util.LeastCostPathCalculator.Path;
 import org.matsim.network.Link;
 
 
-public class PTPathValidator {
+public class PathValidator {
 
-	public PTPathValidator (){
+	public PathValidator (){
 	
 	}
 	/*Conditions:
@@ -14,7 +14,7 @@ public class PTPathValidator {
 	 * must have at least 3 links
 	 * starts and ends with walking links
 	 * transfer links must be always between standard links
-	 * not have two adjacent walking link
+	 * must not have two adjacent walking links
 	 */
 	public boolean isValid(Path path) {
 		boolean valid = true;
@@ -30,15 +30,21 @@ public class PTPathValidator {
 					linkType= link.getType();
 					if (linkType.equals("Standard")) {
 						hasStandardLinks=true;
-					}else if(linkType=="Transfer"){
+					}else if(linkType.equals("Transfer")){
 						if (i>0){  
 							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){ //TODO:check that transfer links are only between standard link
 								return false;
 							}
-						}//if i>0
-					}else if (linkType=="Walking"){
+						}
+					}else if (linkType.equals("Walking")){
 						if (i>0){
 							if (path.links.get(i-1).getType().equals("Walking")){ //TODO:check that do not have two adjacent walking link
+								return false;
+							}
+						}
+					}else if(linkType.equals("DetTransfer")){
+						if (i>0){  
+							if (!path.links.get(i-1).getType().equals("Standard") || !path.links.get(i+1).getType().equals("Standard")){
 								return false;
 							}
 						}
@@ -50,9 +56,8 @@ public class PTPathValidator {
 				valid=false;
 			}//if pathlinks
 		}else{
-			valid =false;
+			valid=false;
 		}//path1=null
-		
 		return valid;
 	}//is valid
 	

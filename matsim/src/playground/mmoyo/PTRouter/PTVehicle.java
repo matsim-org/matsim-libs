@@ -8,9 +8,6 @@ public class PTVehicle {
 	private int capacity;
 	private boolean hasDedicatedTracks;
 	
-	/**
-	 * TODO: check class vehicle of MATSIM
-	 */
 	public PTVehicle() {
 		super();
 	}

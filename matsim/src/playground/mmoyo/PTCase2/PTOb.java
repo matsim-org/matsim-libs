@@ -68,7 +68,6 @@ public class PTOb {
 		while (iter.hasNext()) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			Link link= (Link)entry.getValue();
-			System.out.println(entry.getKey() + " = " + link.toString());
 		}
 		iter = null;
 		

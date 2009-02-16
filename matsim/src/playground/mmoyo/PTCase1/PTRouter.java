@@ -48,7 +48,6 @@ public class PTRouter{
 		List<Link> ll = Arrays.asList(ptNetworkLayer.getLinks().values().toArray(new Link[ptNetworkLayer.getLinks().size()]));	
 		List<Node> nl = Arrays.asList(ptNetworkLayer.getNodes().values().toArray(new Node[ptNetworkLayer.getNodes().size()]));
 
-		//Con el minidisjtra
 		MiniDijkstra miniDijkstra = new MiniDijkstra(nl, ll, this.ptLinkCostCalculator);
 		
 		Node n1 = cityNetworkLayer.getNodes().get(startNode);
@@ -85,7 +84,7 @@ public class PTRouter{
 
 	/*
 	 *Times the calculation of shortest path algorithm and prints the result 
-	*///based on individual interation
+	*///based on individual iteration
     public void timeComputation(long numIterations, String n1, String n2, int time){
     	long startTime=0;
     	long endTime=0;

@@ -1,6 +1,7 @@
 package playground.mmoyo.PTCase2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
@@ -106,12 +107,10 @@ public class PTTimeTable2{
 		return ptLineList;
 	}
 	
-	
-	
 	//in minutes
 	public double nextDeparture(Id idPTNode,  double dblTime){//,
-		return dblTime +1;
-		/*
+		//return dblTime +1;
+		
 		double[]arrDep= nodeDeparturesMap.get(idPTNode);
 		int x=0;
 		while (arrDep[x]<dblTime){
@@ -121,8 +120,28 @@ public class PTTimeTable2{
 			}
 		}
 		return arrDep[x];
-		*/
 	}
+	
+	//in minutes
+	public double nextDepartureB(Id idPTNode,  double dblTime){//,
+		//return dblTime +1;
+		double[]arrDep= nodeDeparturesMap.get(idPTNode);
+		int index =  Arrays.binarySearch(arrDep, dblTime);  
+		if (index<0){
+			index = -index;
+			if (index <= arrDep.length)index--; else index=-1;	
+		}else{
+			if (index < (arrDep.length-1))index++; else index=-1;	
+		}
+		
+		if (index== -1) {
+			//TODO Define what todo here!!
+		}
+		return arrDep[index];
+		//System.out.println("Next departuere: "+ nextDep);
+	}
+		
+		
 }
 
 /*

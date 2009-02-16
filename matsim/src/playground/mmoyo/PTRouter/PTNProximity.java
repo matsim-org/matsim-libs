@@ -1,6 +1,5 @@
 package playground.mmoyo.PTRouter;
 
-import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +18,7 @@ public class PTNProximity {
 	
 	public PTNProximity (NetworkLayer cityNetworkLayer, NetworkLayer ptNetworkLayer){
 		createCityQuadTree (cityNetworkLayer,ptNetworkLayer);
+
 	}
 	
 	public PTNProximity (NetworkLayer ptNetworkLayer){
@@ -127,7 +127,7 @@ public class PTNProximity {
 	 * @return list of nearest nodes
 	 */
 	
-	public PTNode[] getNearestBusStops(Coord coord, int distance){
+	public PTNode[] getNearestBusStops(Coord coord, int distance, boolean force){
 		double x = coord.getX();
 		double y= coord.getY();
 		Collection<Node> stopList = this.ptQuadTree.get(x, y, distance);
@@ -135,7 +135,7 @@ public class PTNProximity {
 			Node node1 = this.ptQuadTree.get(x, y);
 			
 			//TODO: The agent is forced to walk more than the distance, must be adjusted.
-			if (node1!= null) {
+			if (node1!= null && force) {
 				distance =(int)coord.calcDistance(node1.getCoord()) + 1;
 				stopList = this.ptQuadTree.get(x, y, distance);
 			}
@@ -143,6 +143,9 @@ public class PTNProximity {
 		}
 		return stopList.toArray(new PTNode[stopList.size()]);
 	}
+	
+	
+	
 	
 	public PTNode getNearestNode(final double x, final double y){
 		return (PTNode)ptQuadTree.get(x, y);
@@ -155,7 +158,7 @@ public class PTNProximity {
 	
 	public void printNearestBusStops(Coord coord, int distance){
 		System.out.println ("Bus stops near " + coord.getX() + ", " + coord.getY());
-		Node[] stops = getNearestBusStops(coord, distance);
+		Node[] stops = getNearestBusStops(coord, distance, false);
 		for(int x=0; x <stops.length;x++){
 			System.out.println (stops[x].getId().toString());
 		}

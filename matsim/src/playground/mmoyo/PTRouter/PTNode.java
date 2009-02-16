@@ -15,7 +15,8 @@ public class PTNode extends Node {
 	private IdImpl idFather;
 	private IdImpl idPTLine;
 	private String stationName;
-
+	private IdImpl IdFareStage;
+	
 	public PTNode(IdImpl idImpl, Coord coord, final String type, IdImpl idFather, IdImpl idPTLine) {
 		super(idImpl, coord, type);
 		this.idFather = idFather;
@@ -49,4 +50,12 @@ public class PTNode extends Node {
 	public void setStationName(String stationName) {
 		this.stationName = stationName;
 	}
+
+	public IdImpl getIdFarestage() {
+		return IdFareStage;
+	}
+
+	public void setIdFarestage(IdImpl idFareStage) {
+		IdFareStage = idFareStage;
+	}	
 }

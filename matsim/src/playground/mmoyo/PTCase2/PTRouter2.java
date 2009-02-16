@@ -49,13 +49,13 @@ public class PTRouter2 {
 	}
 		
 	public Path findRoute(Coord coord1, Coord coord2, double time, int distToWalk){
-		PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk);
-		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk);
+		PTNode[] NearStops1= ptnProximity.getNearestBusStops(coord1, distToWalk, false);
+		PTNode[] NearStops2= ptnProximity.getNearestBusStops(coord2, distToWalk, false);
 		PTNode ptNode1=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W1"), coord1);
 		PTNode ptNode2=ptNetworkFactory.CreateWalkingNode(ptNetworkLayer, new IdImpl("W2"), coord2);
 		List <IdImpl> walkingLinkList1 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode1, NearStops1, true);
 		List <IdImpl> walkingLinkList2 = ptNetworkFactory.CreateWalkingLinks(ptNetworkLayer, ptNode2, NearStops2, false);
-		
+
 		Path path = dijkstra.calcLeastCostPath(ptNode1, ptNode2, time);
 		
 		ptNetworkFactory.removeWalkingLinks(ptNetworkLayer, walkingLinkList1);

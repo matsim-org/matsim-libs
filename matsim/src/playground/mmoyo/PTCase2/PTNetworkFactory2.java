@@ -87,18 +87,16 @@ public class PTNetworkFactory2 {
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
 				PTNode ptNode = ((PTNode)ptNetworkLayer.getNode(strIdNode));
-				if (ptNode==null){
+				if (ptNode==null)
 					throw new java.lang.NullPointerException("Node does not exist:" + strIdNode); 
-				}
 	
 				ptNode.setIdPTLine(ptLine.getId());
 				double min = ptLine.getMinutes().get(indexMin);
 				travelTime=min-lastTravelTime;
 				if (!first){
 					for (Link link : (ptNode.getInLinks().values())) {
-						if (link.getFromNode().equals(ptLastNode)){
+						if (link.getFromNode().equals(ptLastNode))
 							linkTravelTimeMap.put(link.getId(), travelTime);
-						}
 					}
 				}
 				ptLastNode= ((PTNode)ptNetworkLayer.getNode(strIdNode));
@@ -114,22 +112,62 @@ public class PTNetworkFactory2 {
 		return ptTimeTable;
 	}
 	
+	public Map<String, List<IdImpl>>  createIntersecionMap(PTTimeTable2 ptTimeTable){
+		//TODO: IntersectionMap should be a class property, maybe in a class "station"
+		Map<String, List<IdImpl>> IntersectionMap = new TreeMap<String, List<IdImpl>>();   
+		for (PTLine ptLine : ptTimeTable.getPtLineList()) {
+			for (String strIdNode: ptLine.getRoute()) {
+				String strNodeBaseId =  getNodeBaseId(strIdNode);
+				if (!IntersectionMap.containsKey(strNodeBaseId)){
+	    			List<IdImpl> ch = new ArrayList<IdImpl>();
+	    			IntersectionMap.put(strNodeBaseId, ch);
+	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode); ///por que????????? checar urgentemente
+	    			//IntersectionMap.get(strBaseIdNode).add(strBaseIdNode);
+	    		}// if IntersectionMap
+	    		IntersectionMap.get(strNodeBaseId).add(new IdImpl(strIdNode));
+			}//for interator String
+		}//for interator ptline
+		return IntersectionMap;
+	}
+	
+	private String getNodeBaseId(String strId){
+		String baseID = strId;
+		if (baseID.charAt(0)=='_' || baseID.charAt(0)=='~')
+			baseID= baseID.substring(1,baseID.length());
+		if(Character.isLetter(baseID.charAt(baseID.length()-1))) 	//example of possible node values at intersection:   999, _999, 999b, _999b
+			baseID= baseID.substring(0,baseID.length()-1);
+		return baseID;
+	}
+	
+	public void createTransferLinks2 (NetworkLayer ptNetworkLayer, Map<String, List<IdImpl>> IntersectionMap){
+		int maxLinkKey=0;
+		for (List <IdImpl>chList : IntersectionMap.values()) {
+			List <IdImpl> chList1 = chList;
+			List <IdImpl> chList2 = chList;
+			if (chList1.size() > 1) {
+				for (IdImpl idNode1 : chList1) {
+					// Create links between children nodes lines
+					for (IdImpl idNode2 : chList2) {
+						if (!idNode1.equals(idNode2))
+							createPTLink(ptNetworkLayer, "T"+ String.valueOf(++maxLinkKey), idNode1.toString(), idNode2.toString(), "Transfer");
+					}//for iter2
+				}// for iter1
+			}// if chlist
+		}// ArrayList <String>chList
+	}
+	
 	private void createTransferLinks(NetworkLayer ptNetworkLayer, PTTimeTable2 ptTimeTable) {
 		Map<String, ArrayList<String>> IntersectionMap = new TreeMap<String, ArrayList<String>>();
 		for (Iterator<PTLine> iterPTLines = ptTimeTable.getPtLineList().iterator(); iterPTLines.hasNext();) {
 			PTLine ptLine = iterPTLines.next();
 			for (Iterator<String> iter = ptLine.getRoute().iterator(); iter.hasNext();) {
 				String strIdNode = iter.next();
-				System.out.println("strIdNode: "+ strIdNode);
 				if(Character.isLetter(strIdNode.charAt(strIdNode.length()-1))){ 	//example of possible node values at intersection:   999, _999, 999b, _999b
 					String keyNode = strIdNode;
-					if (keyNode.charAt(0)=='_'){
+					if (keyNode.charAt(0)=='_')
 						keyNode = "~" + keyNode.substring(1, keyNode.length()-1);
-					}
-					if(Character.isLetter(keyNode.charAt(keyNode.length()-1))){
+					if(Character.isLetter(keyNode.charAt(keyNode.length()-1)))
 						keyNode= keyNode.substring(0,keyNode.length()-1);
-					}
-					
 	    			if (!IntersectionMap.containsKey(keyNode)){
 	    				ArrayList<String> ch = new ArrayList<String>();
 	    				IntersectionMap.put(keyNode, ch);
@@ -154,15 +192,12 @@ public class PTNetworkFactory2 {
 					for (Iterator<String> iter2 = chList2.iterator(); iter2.hasNext();) {
 						String idNode2 = iter2.next();
 						boolean createTransferLink=true;
-						if ((idNode1.charAt(0)=='_' && idNode1.substring(1, idNode1.length()).equals(idNode2))) {
+						if ((idNode1.charAt(0)=='_' && idNode1.substring(1, idNode1.length()).equals(idNode2))) 
 							createTransferLink=false;
-						}
-						if ((idNode2.charAt(0)=='_' && idNode2.substring(1, idNode2.length()).equals(idNode1))) {
+						if ((idNode2.charAt(0)=='_' && idNode2.substring(1, idNode2.length()).equals(idNode1))) 
 							createTransferLink=false;
-						}
-						if (idNode1.equals(idNode2)){
+						if (idNode1.equals(idNode2))
 							createTransferLink=false;
-						}
 						if (createTransferLink) {
 							maxLinkKey++;
 							createPTLink(ptNetworkLayer, "T"+ String.valueOf(maxLinkKey), idNode1, idNode2,"Transfer");
@@ -170,7 +205,7 @@ public class PTNetworkFactory2 {
 					}//for iter2
 				}// for iter1
 			}// if chlist
-		}// while
+		}// ArrayList <String>chList
 	}//createTransferLinks
 	
 	public PTNode CreateWalkingNode(NetworkLayer ptNetworkLayer,IdImpl idNode, Coord coord) {
@@ -187,14 +222,14 @@ public class PTNetworkFactory2 {
 		PTNode toPTNode;
 		
 		for (int x= 0; x<nearNodes.length;x++){
-			if (to==true){
+			if (to){
 				fromPTNode= ptNode;
 				toPTNode= nearNodes[x];
-				idLink= "W" + String.valueOf(x);
+				idLink= "W" + x;
 			}else{
 				fromPTNode=nearNodes[x];
 				toPTNode=  ptNode;
-				idLink= "WW" + String.valueOf(x);
+				idLink= "WW" + x;
 			}
 			createPTLink(ptNetworkLayer, idLink, fromPTNode, toPTNode, "Walking");
 			NewWalkLinks.add(new IdImpl(idLink));
@@ -204,9 +239,15 @@ public class PTNetworkFactory2 {
 	
 	public void removeWalkingLinks(NetworkLayer ptNetworkLayer,List<IdImpl> WalkingLinkList){
 		//Removes temporal links at the end of the ruting process
+		for (IdImpl linkId : WalkingLinkList){
+			Link link = ptNetworkLayer.getLink(linkId);
+			ptNetworkLayer.removeLink(link);
+		}
+		/*
 		for (Iterator<IdImpl> iter = WalkingLinkList.iterator(); iter.hasNext();) {
 			ptNetworkLayer.removeLink(ptNetworkLayer.getLink(iter.next()));
 		}
+		*/
 	}
 	
 	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, String from, String to, String type){
@@ -216,13 +257,17 @@ public class PTNetworkFactory2 {
 		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
 	}
 	
+	private void createPTLink(NetworkLayer ptNetworkLayer, String idLink, IdImpl from, IdImpl to, String type){
+		PTNode fromNode= (PTNode)ptNetworkLayer.getNode(from);
+		PTNode toNode= (PTNode)ptNetworkLayer.getNode(to);
+		createPTLink(ptNetworkLayer, idLink, fromNode, toNode, type);
+	}
+	
 	public void createPTLink(NetworkLayer net, String strIdLink, PTNode fromNode, PTNode toNode, String Type){
-		if (fromNode==null){
+		if (fromNode==null)
 			throw new java.lang.NullPointerException("fromNode does not exist in link:" + strIdLink); 
-		}
-		if (toNode==null){
+		if (toNode==null)
 			throw new java.lang.NullPointerException("toNode does not exist in link:" + strIdLink); 
-		}
 
 		IdImpl idLink = new IdImpl(strIdLink);
 		double length = fromNode.getCoord().calcDistance(toNode.getCoord());
@@ -241,6 +286,34 @@ public class PTNetworkFactory2 {
 		System.out.println("done.");
 	}
 	
+	public void CreateDetachedTransfers (NetworkLayer net, double distance){
+		int x=0;
+		for (Node node: net.getNodes().values()){
+			//WOW combinatoria como hacer para que no se repita la busqueda??   <-No
+			for (Node nearNode : net.getNearestNodes(node.getCoord(), distance)){
+				//System.out.println(nearNode.getId().toString());
+				if(!node.getCoord().equals(nearNode.getCoord())){
+					if (!areConected(node, nearNode)){
+						double distNodes= node.getCoord().calcDistance(nearNode.getCoord());
+						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),node, nearNode, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
+						net.createLink(new org.matsim.basic.v01.IdImpl("DT" + ++x),nearNode, node, distNodes, 1.0, 1.0, 1.0, "0", "DetTransfer");  //DetTransfer
+						//System.out.println(areConected(node, nearNode));
+					}//if !areConected
+				}//!node.getCoord()
+			}//for Node nearNode
+		} //for Node node
+	}//CreateDetachedTransfers
+	
+	//Returns true if a link exists between two nodes
+	public boolean areConected(Node n1, Node n2 ){
+		//TODO: find out what kind of links join the nodes
+		for (Id id : n1.getOutNodes().keySet()){
+			if (n2.getId().equals(id))
+				return true;
+		}
+		return false;
+	}
+	
 	public static void printLinks(NetworkLayer ptNetworkLayer) {
 		//Displays a quick visualization of links with from- and to- nodes
 		for (Link l : ptNetworkLayer.getLinks().values()) {
@@ -253,5 +326,7 @@ public class PTNetworkFactory2 {
 			System.out.print( ")   " + l.getType() );
 		}
 	}
+	
+	
 	
 }
