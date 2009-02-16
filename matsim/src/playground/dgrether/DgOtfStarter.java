@@ -76,6 +76,8 @@ public class DgOtfStarter {
 		//unit test for coopers withinday:
 //		String filename = "/Volumes/data/work/svnWorkspace/matsim/test/output/org/matsim/integration/withinday/CoopersBerlinIntegrationTest/testBerlinReducedSB/ITERS/it.0/0.otfvis.mvi";
 
+	//run 700 first run of estimated utility function
+//		filename = "/Users/dgrether/Desktop/bkickRuns/run700/1000.events.mvi";
 		
 		filename = "/Users/dgrether/Desktop/bkickRuns/run702/500.events.mvi";
 //		filename = "/Users/dgrether/Desktop/bkickRuns/run703/500.events.mvi";
