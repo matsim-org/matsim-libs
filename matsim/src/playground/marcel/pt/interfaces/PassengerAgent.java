@@ -20,6 +20,32 @@
 
 package playground.marcel.pt.interfaces;
 
+import org.matsim.facilities.Facility;
+
+/**
+ * @author mrieser
+ */
 public interface PassengerAgent {
+
+	/**
+	 * Informs a passenger waiting at a stop that a transit line
+	 * has arrived and is ready to be boarded.
+	 *
+	 * TODO [MR] find better name for method
+	 *
+	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
+	 */
+	public boolean ptLineAvailable();
+
+	/**
+	 * Informs a passenger in a transit vehicle that the vehicle has
+	 * arrived at the specified stop.
+	 *
+	 * TODO [MR] find better name for method
+	 * @param stop the stop the vehicle arrived
+	 *
+	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
+	 */
+	public boolean arriveAtStop(final Facility stop);
 
 }

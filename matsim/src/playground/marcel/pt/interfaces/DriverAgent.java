@@ -20,6 +20,13 @@
 
 package playground.marcel.pt.interfaces;
 
+import org.matsim.network.Link;
+
 public interface DriverAgent {
+
+	public Link chooseNextLink();
+
+	public void leaveLink(final Link link);
+	public void enterLink(final Link link); // corresponds to PersonAgent.incCurrentNode; also called for very first link
 
 }

@@ -24,8 +24,8 @@ import org.matsim.events.XmlEventsTester;
 import org.matsim.testcases.MatsimTestCase;
 
 public class DepartureAtFacilityEventTest extends MatsimTestCase {
-	
+
 	public void testWriteReadXml() {
-		XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", new DepartureAtFacilityEvent(3605.0, null));
+		XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", new DepartureAtFacilityEvent(3605.0, null, null));
 	}
 }

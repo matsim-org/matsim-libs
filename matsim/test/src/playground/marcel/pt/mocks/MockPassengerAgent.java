@@ -20,8 +20,20 @@
 
 package playground.marcel.pt.mocks;
 
+import org.matsim.facilities.Facility;
+
 import playground.marcel.pt.interfaces.PassengerAgent;
 
 public class MockPassengerAgent implements PassengerAgent {
+
+	public boolean arriveAtStop(final Facility stop) {
+		// TODO [MR] Auto-generated method stub
+		return false;
+	}
+
+	public boolean ptLineAvailable() {
+		// TODO [MR] Auto-generated method stub
+		return false;
+	}
 
 }

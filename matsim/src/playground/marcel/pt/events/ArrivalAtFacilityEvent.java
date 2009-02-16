@@ -20,21 +20,26 @@
 
 package playground.marcel.pt.events;
 
+import org.matsim.facilities.Facility;
+
 import playground.marcel.pt.interfaces.Vehicle;
 
 public class ArrivalAtFacilityEvent extends VehicleEvent {
 
 	public static final String EVENT_TYPE = "arrivalAtFacility";
-	
-	public ArrivalAtFacilityEvent(final double time, final Vehicle vehicle) {
+
+	public final Facility facility;
+
+	public ArrivalAtFacilityEvent(final double time, final Vehicle vehicle, final Facility facility) {
 		super(time, vehicle);
+		this.facility = facility;
 	}
-	
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "[ArrivalAtFacilityEvent: ]";

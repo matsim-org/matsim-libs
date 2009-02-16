@@ -20,8 +20,19 @@
 
 package playground.marcel.pt.mocks;
 
+import org.matsim.network.Link;
+
 import playground.marcel.pt.interfaces.DriverAgent;
 
 public class MockDriverAgent implements DriverAgent {
+
+	public Link chooseNextLink() {
+		return null;
+	}
+
+	public void leaveLink(Link link) {
+	}
+	public void enterLink(Link link) {
+	}
 
 }

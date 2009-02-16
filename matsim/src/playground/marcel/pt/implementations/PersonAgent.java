@@ -20,9 +20,35 @@
 
 package playground.marcel.pt.implementations;
 
+import org.matsim.facilities.Facility;
+import org.matsim.network.Link;
+
 import playground.marcel.pt.interfaces.DriverAgent;
 import playground.marcel.pt.interfaces.PassengerAgent;
 
 public class PersonAgent implements DriverAgent, PassengerAgent {
+
+	public Link chooseNextLink() {
+		// TODO [MR] Auto-generated method stub
+		return null;
+	}
+
+	public void leaveLink(final Link link) {
+		// TODO [MR] Auto-generated method stub
+	}
+
+	public void enterLink(final Link link) {
+		// TODO [MR] Auto-generated method stub
+	}
+
+	public boolean arriveAtStop(final Facility stop) {
+		// TODO [MR] Auto-generated method stub
+		return false;
+	}
+
+	public boolean ptLineAvailable() {
+		// TODO [MR] Auto-generated method stub
+		return false;
+	}
 
 }
