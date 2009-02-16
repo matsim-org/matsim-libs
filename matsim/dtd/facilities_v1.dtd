@@ -11,7 +11,7 @@
 
 <!ELEMENT facilities        (facility*)>
 <!ATTLIST facilities
-          name              CDATA   #REQUIRED
+          name              CDATA   #IMPLIED
           aggregation_layer CDATA   #IMPLIED
           xml:lang          NMTOKEN "de-CH">
 
