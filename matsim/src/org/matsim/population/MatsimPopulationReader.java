@@ -57,7 +57,9 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * Uses the network available in Gbl.getWorld().
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
+	 * @deprecated use {@link #MatsimPopulationReader(Population, NetworkLayer)}
 	 */
+	@Deprecated
 	public MatsimPopulationReader(final Population plans) {
 		this(plans, (NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE));
 	}
@@ -66,6 +68,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * Creates a new reader for MATSim plans (population) files.
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
+	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
 	 */
 	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
