@@ -26,11 +26,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.matsim.basic.lightsignalsystems.BasicLane;
-import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.BasicLane;
+import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystems;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
 import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;

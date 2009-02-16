@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;

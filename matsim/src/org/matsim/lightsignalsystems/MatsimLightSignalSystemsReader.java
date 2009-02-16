@@ -33,12 +33,12 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 
 import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
-import org.matsim.basic.lightsignalsystems.BasicLane;
-import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemsFactory;
+import org.matsim.basic.signalsystems.BasicLane;
+import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.BasicLightSignalSystemsFactory;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
 import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;

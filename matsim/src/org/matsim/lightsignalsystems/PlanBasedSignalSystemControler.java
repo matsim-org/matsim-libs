@@ -20,12 +20,12 @@
 package org.matsim.lightsignalsystems;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 
 
@@ -67,7 +67,7 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 	
 	
 	/**
-	 * @see org.matsim.basic.lightsignalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition)
+	 * @see org.matsim.basic.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition)
 	 */
 	@Override
 	public boolean givenSignalGroupIsGreen(

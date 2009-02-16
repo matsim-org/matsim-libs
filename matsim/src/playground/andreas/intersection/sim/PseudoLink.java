@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;

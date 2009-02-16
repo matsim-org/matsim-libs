@@ -31,12 +31,12 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
-import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;

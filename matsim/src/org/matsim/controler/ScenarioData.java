@@ -27,8 +27,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalSystems;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystems.BasicLightSignalSystems;
 import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;

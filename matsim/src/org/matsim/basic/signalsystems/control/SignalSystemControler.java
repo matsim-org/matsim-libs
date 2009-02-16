@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * 
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,51 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.basic.signalsystems.control;
 
-package org.matsim.basic.lightsignalsystems;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 
-import org.matsim.basic.v01.Id;
 
 /**
  * @author dgrether
+ *
  */
-public class BasicLightSignalSystemDefinition {
+public abstract class SignalSystemControler {
 
-  private Id id;
-  private double defaultCirculationTime;
-  private double syncronizationOffset;
-  private double defaultInterimTime;
-	
-  public BasicLightSignalSystemDefinition(Id id) {
-  	this.id = id;
-  }
-  
-	public Id getId() {
-		return id;
-	}
-	
-	public double getDefaultCirculationTime() {
-		return defaultCirculationTime;
-	}
-	
-	public void setDefaultCirculationTime(double defaultCirculationTime) {
-		this.defaultCirculationTime = defaultCirculationTime;
-	}
-	
-	public double getDefaultSyncronizationOffset() {
-		return syncronizationOffset;
-	}
-	
-	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
-		this.syncronizationOffset = syncronizationOffset;
-	}
-	
-	public double getDefaultInterimTime() {
-		return defaultInterimTime;
-	}
-	
-	public void setDefaultInterimTime(double defaultInterimTime) {
-		this.defaultInterimTime = defaultInterimTime;
-	}
-
+	public abstract boolean givenSignalGroupIsGreen(BasicLightSignalGroupDefinition signalGroup);
 }

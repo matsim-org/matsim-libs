@@ -3,13 +3,13 @@ package playground.andreas.intersection.tl;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.lightsignalsystems.control.SignalSystemControler;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemControlInfo;
 import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.basic.v01.Id;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 

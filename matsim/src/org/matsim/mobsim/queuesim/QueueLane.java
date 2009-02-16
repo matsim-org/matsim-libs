@@ -29,8 +29,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystems.BasicLane;
-import org.matsim.basic.lightsignalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicLane;
+import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
