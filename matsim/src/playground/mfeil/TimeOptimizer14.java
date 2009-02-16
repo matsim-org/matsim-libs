@@ -114,7 +114,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
 		
-		
+		/*
 		String outputfile = Controler.getOutputFilename("Timer_log"+Counter.timeOptCounter+"_"+plan.getPerson().getId()+".xls");
 		Counter.timeOptCounter++;
 		PrintStream stream;
@@ -135,7 +135,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 			stream.print(((Act)(plan.getActsLegs()).get(z)).getDuration()+"\t");
 		}
 		stream.println();
-		
+		*/
 		
 		// Copy the plan into all fields of the array neighbourhood
 		for (int i = 0; i < initialNeighbourhood.length; i++){
@@ -147,9 +147,9 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		double bestScore = plan.getScore();
 		
 		// Iteration 1
-		stream.println("Iteration "+1);
+	//	stream.println("Iteration "+1);
 		this.createInitialNeighbourhood((PlanomatXPlan)plan, initialNeighbourhood, score, moves);
-		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position, stream);
+		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
 				
 		if (score[pointer]>bestScore){
 			bestSolution = this.copyActsLegs((ArrayList<?>)initialNeighbourhood[pointer]);
@@ -167,10 +167,10 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		// Do Tabu Search iterations
 		for (currentIteration = 2; currentIteration<=MAX_ITERATIONS;currentIteration++){
 			
-			stream.println("Iteration "+currentIteration);
+	//		stream.println("Iteration "+currentIteration);
 			
 			this.createNeighbourhood((PlanomatXPlan)plan, neighbourhood, score, moves, position);
-			pointer = this.findBestSolution (neighbourhood, score, moves, position, stream);
+			pointer = this.findBestSolution (neighbourhood, score, moves, position);
 			
 			if (pointer==-1) {
 				log.info("No valid solutions found for person "+plan.getPerson().getId()+" at iteration "+currentIteration);
@@ -201,7 +201,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 		}
 	
 		// Update the plan with the final solution 		
-		stream.println("Selected solution\t"+bestScore);
+	//	stream.println("Selected solution\t"+bestScore);
 		ArrayList<Object> al = basePlan.getActsLegs();
 		basePlan.setScore(bestScore);
 		
@@ -487,7 +487,7 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position, PrintStream stream){
+	public int findBestSolution (ArrayList<?> [] neighbourhood, double[] score, int [][] moves, int[]position){
 				
 		int pointer=-1;
 		ArrayList<?> actslegs = new ArrayList<Object>();
@@ -500,15 +500,16 @@ public class TimeOptimizer14 implements org.matsim.population.algorithms.PlanAlg
 				position[0]=moves[i][0];
 				position[1]=moves[i][1];
 			}
-			
+			/*
 			stream.print(score[i]+"\t"+((Leg)(neighbourhood[i].get(1))).getDepartureTime()+"\t");
 			for (int z= 2;z<neighbourhood[i].size()-1;z=z+2){
 				stream.print((((Leg)(neighbourhood[i].get(z+1))).getDepartureTime()-((Leg)(neighbourhood[i].get(z-1))).getArrivalTime())+"\t");
 			}
 			stream.print(86400-((Leg)(neighbourhood[i].get(neighbourhood[i].size()-2))).getArrivalTime()+"\t");
 			stream.println();
+			*/
 		}
-		stream.println("Iteration's best score\t"+firstScore);
+	//	stream.println("Iteration's best score\t"+firstScore);
 		// clean-up of plan (=bestIterSolution)
 		if (pointer!=-1) this.cleanActs(actslegs);
 		
