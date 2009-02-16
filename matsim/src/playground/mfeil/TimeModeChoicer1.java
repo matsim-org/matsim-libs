@@ -189,11 +189,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		pointer = this.findBestSolution (initialNeighbourhood, score, moves, position);
 		
 		/* mode choice */ 
-		if (this.modeChoice=="standard"){
-			score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
-		}
-		else if (this.modeChoice=="extended_1"){
-			score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
+		if (this.possibleModes.length>0){
+			if (this.modeChoice=="standard"){
+				score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+			}
+			else if (this.modeChoice=="extended_1"){
+				score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
+			}
 		}
 		
 		if (score[pointer]>bestScore){
@@ -223,11 +225,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 			
 			/* mode choice */ 
-			if (this.modeChoice=="standard"){
-				score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
-			}
-			if (this.modeChoice=="extended_1"){
-				score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
+			if (this.possibleModes.length>0){
+				if (this.modeChoice=="standard"){
+					score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+				}
+				if (this.modeChoice=="extended_1"){
+					score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
+				}
 			}
 			
 			if (score[pointer]>bestScore){
@@ -391,9 +395,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	public double increaseTime(PlanomatXPlan plan, ArrayList<?> actslegs, int outer, int inner,
 			PlanAnalyzeSubtours planAnalyzeSubtours){
 		
-		if ((((Act)(actslegs.get(inner))).getDuration()>=this.OFFSET+this.minimumTime)	||	
+		if ((((Act)(actslegs.get(inner))).getDuration()>=(this.OFFSET+this.minimumTime))	||	
 				(outer==0	&&	inner==actslegs.size()-1)	||
-				(86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>OFFSET+this.minimumTime){
+				((inner==actslegs.size()-1) && (86400+((Act)(actslegs.get(0))).getEndTime()-((Act)(actslegs.get(actslegs.size()-1))).getStartTime())>(OFFSET+this.minimumTime))){
 			
 			if (this.modeChoice=="extended_2"	|| this.modeChoice=="extended_3"){
 				if (this.possibleModes.length>0){
