@@ -12,8 +12,8 @@ import org.matsim.basic.signalsystems.BasicLightSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.lightsignalsystems.MatsimLightSignalSystemConfigurationWriter;
-import org.matsim.lightsignalsystems.MatsimLightSignalSystemsWriter;
+import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
+import org.matsim.signalsystems.MatsimLightSignalSystemsWriter;
 
 public class GenerateZuerrichOutput {
 

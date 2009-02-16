@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

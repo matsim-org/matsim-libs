@@ -28,6 +28,8 @@ import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
 import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
+import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

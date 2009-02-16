@@ -37,6 +37,7 @@ import org.matsim.events.LinkEnterEvent;
 import org.matsim.events.handler.LinkEnterEventHandler;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueSimulation;
+import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

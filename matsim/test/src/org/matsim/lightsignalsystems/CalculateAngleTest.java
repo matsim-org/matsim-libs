@@ -2,6 +2,7 @@ package org.matsim.lightsignalsystems;
 
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
+import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.testcases.MatsimTestCase;
 
 

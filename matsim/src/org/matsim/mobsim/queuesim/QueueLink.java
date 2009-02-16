@@ -33,8 +33,8 @@ import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.LinkEnterEvent;
-import org.matsim.lightsignalsystems.CalculateAngle;
 import org.matsim.network.Link;
+import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.utils.misc.Time;
 
 /**

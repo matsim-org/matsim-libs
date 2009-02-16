@@ -13,7 +13,6 @@ import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;
-import org.matsim.lightsignalsystems.CalculateAngle;
 import org.matsim.mobsim.queuesim.QueueLink;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.mobsim.queuesim.QueueNode;
@@ -23,6 +22,7 @@ import org.matsim.mobsim.queuesim.SimulationTimer;
 import org.matsim.mobsim.queuesim.VisData;
 import org.matsim.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.network.Link;
+import org.matsim.signalsystems.CalculateAngle;
 import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 

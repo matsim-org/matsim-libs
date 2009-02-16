@@ -26,6 +26,8 @@ import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicLightSignalSystems;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
+import org.matsim.signalsystems.MatsimLightSignalSystemsWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

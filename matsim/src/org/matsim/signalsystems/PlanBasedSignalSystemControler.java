@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lightsignalsystems;
+package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
