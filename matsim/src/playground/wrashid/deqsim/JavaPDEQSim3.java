@@ -57,7 +57,7 @@ public class JavaPDEQSim3 {
 		this.network = network;
 
 		// initialize Simulation parameters
-		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
+		//SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		// the thread for processing the events
 		SimulationParameters.setProcessEventThread( events);
 

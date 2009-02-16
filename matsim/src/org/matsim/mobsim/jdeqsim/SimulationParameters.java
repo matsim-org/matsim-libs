@@ -48,7 +48,6 @@ public class SimulationParameters {
 
 	// INPUT
 	private static double simulationEndTime = Double.MAX_VALUE; // in s
-	private static long linkCapacityPeriod = 0; // in s
 	private static double gapTravelSpeed = 15.0; // in m/s
 	private static double flowCapacityFactor = 1.0; // 1.0 is default
 	private static double storageCapacityFactor = 1.0; // 1.0 is default
@@ -103,14 +102,6 @@ public class SimulationParameters {
 		SimulationParameters.simulationEndTime = simulationEndTime;
 	}
 
-	public static long getLinkCapacityPeriod() {
-		return linkCapacityPeriod;
-	}
-
-	public static void setLinkCapacityPeriod(long linkCapacityPeriod) {
-		SimulationParameters.linkCapacityPeriod = linkCapacityPeriod;
-	}
-
 	public static double getGapTravelSpeed() {
 		return gapTravelSpeed;
 	}
@@ -150,7 +141,6 @@ public class SimulationParameters {
 	public static void setMinimumInFlowCapacity(double minimumInFlowCapacity) {
 		SimulationParameters.minimumInFlowCapacity = minimumInFlowCapacity;
 	}
-
 
 	public static double getSqueezeTime() {
 		return squeezeTime;

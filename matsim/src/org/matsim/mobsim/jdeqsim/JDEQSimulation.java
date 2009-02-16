@@ -49,11 +49,9 @@ public class JDEQSimulation {
 		this.population = population;
 		this.network = network;
 
-		// the thread for processing the events
+		// initialize the events handler to which the micro simulatation gives the events
 		SimulationParameters.setProcessEventThread(events);
 		
-		// initialize Simulation parameters
-		SimulationParameters.setLinkCapacityPeriod(network.getCapacityPeriod());
 		
 		// READING SIMULATION PARAMETERS FROM CONFIG FILE
 		final String JDEQ_SIM = "JDEQSim";
