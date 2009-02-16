@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/config_v0.1.xsd">
+  <scenario>
+    <coordinateSystem>CH1903_LV03</coordinateSystem>
+  <!-- new -->
+    <sampleScaleFactor>0.1</sampleScaleFactor>
+    <network>
+      <inputNetworkFile>input/network.xml</inputNetworkFile>
+    </network>
+    <population>
+      <inputPopulationFile>someplanfile.xml.gz</inputPopulationFile>
+    </population>
+    <counts>
+      <inputCountsFile>/ivtch/countsIVTCH.xml
+      </inputCountsFile>
+      <outputformat>kml</outputformat>
+      <distanceFilter>30000</distanceFilter>
+      <countScaleFactor>10</countScaleFactor>
+      <distanceFilterCenterNode>2531</distanceFilterCenterNode>
+    </counts>
+    <world>
+      <inputWorldFile>input/empty_world.xml
+      </inputWorldFile>
+    </world>
+    <facilities>
+      <inputFile>someinput.xml</inputFile>
+    </facilities>
+    <scoring>
+      <learningRate>1.0</learningRate>
+      <brainExpBeta>2.0</brainExpBeta>
+      <lateArrival>-18</lateArrival>
+      <earlyDeparture>-0</earlyDeparture>
+      <performing>+6</performing>
+      <traveling>-6</traveling>
+      <waiting>-0</waiting>
+      <activities>
+        <activity>
+          <type></type>
+          <id></id>
+          <typicalDuration></typicalDuration>
+          <priority></priority>
+          <openingTime></openingTime>
+          <latestStartTime></latestStartTime>
+          <closingTime></closingTime>
+        </activity>
+      </activities>
+    </scoring>
+  </scenario>
+  <simulation>
+    <!-- new -->
+    <runIdentifier>run538</runIdentifier>
+    <runOwner>me</runOwner>
+    <runDate>23-9-2008</runDate>
+    <firstIteraton>1</firstIteraton>
+    <lastIteration>100</lastIteration>
+    <outputDirectory>output/</outputDirectory>
+    <randomSeed>4711</randomSeed>
+    <outputTimeFormat>HH:mm:ss</outputTimeFormat>
+    <localDTDBase>dtd/</localDTDBase>
+    <mobilitySimulation> <!-- mobilitySimulation abstract,   <queueSimulation> implementation -->
+      <startTime>00:00:00</startTime>
+      <endTime>00:00:00</endTime>
+      <snapshotperiod>00:00:00</snapshotperiod>
+      <snapshotFormat>transims</snapshotFormat>
+      <flowCapacityFactor>0.10</flowCapacityFactor>
+      <storageCapacityFactor>0.30</storageCapacityFactor>
+      <stuckTime>100</stuckTime>
+      <removeStuckVehickles>true</removeStuckVehickles>
+    </mobilitySimulation>
+    <replanning>
+      <maxAgentsPlanMemorySize>4</maxAgentsPlanMemorySize>
+      <strategy>
+        <id>1</id>
+        <planSelector>RandomPlanSelector</planSelector>
+        <weight>0.1</weight>
+        <modules>
+          <module>
+            <name>TimeAllocationMutator</name>
+          </module>
+          <module>
+            <name>ReRoute</name>
+          </module>
+        </modules>
+      </strategy>
+      <strategy>
+        <id>1</id>
+        <planSelector>SelectExpBeta</planSelector>
+        <weight>0.9</weight>
+      </strategy>
+    </replanning>
+  </simulation>
+  
+  
+  <module name="mytestmodule">
+    <param name="whatever" value="neverUseThisInMatsimCoreAgain" />
+  </module>
+</config>
