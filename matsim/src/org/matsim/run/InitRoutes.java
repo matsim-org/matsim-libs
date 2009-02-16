@@ -34,7 +34,6 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.utils.misc.ArgumentParser;
-import org.matsim.world.World;
 
 /**
  * Assigns for each leg of each plan of each person an initial (freespeed) route.
@@ -118,15 +117,11 @@ public class InitRoutes {
 		parseArguments(args);
 		this.config = Gbl.createConfig(new String[]{this.configfile, this.dtdfile});
 
-		final World world = Gbl.getWorld();
-
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		world.complete();
 
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);

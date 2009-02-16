@@ -89,7 +89,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
 		Population population2 = new Population(Population.NO_STREAMING);
-		new MatsimPopulationReader(population2).parse(PLANS_FILE_TESTOUTPUT);
+		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPerson(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);
