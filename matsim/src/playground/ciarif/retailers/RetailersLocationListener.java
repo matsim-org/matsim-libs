@@ -26,22 +26,24 @@ package playground.ciarif.retailers;
  * @author ciarif
  */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.controler.Controler;
-import org.matsim.controler.events.AfterMobsimEvent;
 import org.matsim.controler.events.BeforeMobsimEvent;
-import org.matsim.controler.events.IterationStartsEvent;
-import org.matsim.controler.listener.AfterMobsimListener;
+import org.matsim.controler.events.StartupEvent;
 import org.matsim.controler.listener.BeforeMobsimListener;
-import org.matsim.controler.listener.IterationStartsListener;
+import org.matsim.controler.listener.StartupListener;
 import org.matsim.facilities.Facility;
+import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
@@ -49,7 +51,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
-public class RetailersLocationListener implements IterationStartsListener, BeforeMobsimListener, AfterMobsimListener{
+public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
 
 	private Retailers retailers;
 	private final RetailersSummaryWriter rs;
@@ -57,32 +59,55 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 	private final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
 	private final PreProcessLandmarks preprocess = new PreProcessLandmarks(timeCostCalc);
 	private PlansCalcRouteLandmarks pcrl = null;
+	private final String facilityIdFile;
 
-	public RetailersLocationListener(final String retailerSummaryFileName) {
+	public RetailersLocationListener(final String facilityIdFile, final String retailerSummaryFileName) {
+		this.facilityIdFile = facilityIdFile;
 		rs = new RetailersSummaryWriter(retailerSummaryFileName, this.retailers);
 		pst = new PlansSummaryTable ("output/triangle/output_Persons.txt");
 	}
 
-	public void notifyIterationStarts(final IterationStartsEvent event) {
+	public RetailersLocationListener(final String retailerSummaryFileName) {
+		this(null,retailerSummaryFileName);
+	}
+
+	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
 
 		preprocess.run(controler.getNetwork());
 		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
 		
-		Map<Id,Facility> shopFac =  controler.getFacilities().getFacilities("shop");
-		for (Facility f:shopFac.values()) {
-			System.out.println("facility = " + f.getId());
-			System.out.println("facility = " + f.getLink().getId());
+		// define all given retailers
+		ArrayList<Facility> facilities = null;
+		if (this.facilityIdFile == null) {
+			facilities = (ArrayList<Facility>)controler.getFacilities().getFacilities("shop").values();
 		}
-				
-		ArrayList<Facility> retailerFacilities = this.getFraction(shopFac,0.4);
-		this.retailers = this.createRetailers(retailerFacilities);
+		else {
+			try {
+				facilities =  new ArrayList<Facility>();
+				FileReader fr = new FileReader(this.facilityIdFile);
+				BufferedReader br = new BufferedReader(fr);
+				// Skip header
+				String curr_line = br.readLine();
+				while ((curr_line = br.readLine()) != null) {
+					String[] entries = curr_line.split("\t", -1);
+					// header: f_id
+					// index:     0
+					Id fid = new IdImpl(entries[0]);
+					facilities.add(controler.getFacilities().getFacility(fid));
+				}
+			} catch (IOException e) {
+				Gbl.errorMsg(e);
+			}
+		}
+		this.retailers = this.createRetailers(facilities);
 	}
-
+	
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		for (Retailer r : retailers.getRetailers().values()) {
+			// TODO balmermi: replane that with r.runStrategy();
 			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
 			movedFacilities.putAll(facs);
 		}
@@ -128,11 +153,4 @@ public class RetailersLocationListener implements IterationStartsListener, Befor
 		}
 		return retailers;
 	}
-
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// TODO Auto-generated method stub
-		Controler controler = event.getControler();
-		
-	}
-	
 }

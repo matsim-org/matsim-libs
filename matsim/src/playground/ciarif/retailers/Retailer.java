@@ -3,12 +3,8 @@ package playground.ciarif.retailers;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.basic.v01.Id;
 import org.matsim.controler.Controler;
-import org.matsim.counts.Volume;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.network.Link;
@@ -18,9 +14,12 @@ import org.matsim.utils.geometry.Coord;
 public class Retailer {
 	private final Id id;
 	private final Map<Id,Facility> facilities = new LinkedHashMap<Id,Facility>();
+	private final RetailerStrategy strategy;
 		
 	protected Retailer(final Id id) {
 		this.id = id;
+		// TODO balmermi: implement different strategies and instantiate them here
+		this.strategy = null; // implementation of the strategy
 	}
 
 	public final Id getId() {
@@ -41,7 +40,13 @@ public class Retailer {
 	public final Map<Id,Facility> getFacilities() {
 		return this.facilities;
 	}
+
+	public final Map<Id,Facility> runStrategy() {
+		strategy.moveFacilities(this.facilities);
+		return this.facilities;
+	}
 	
+	// strategy: Random Mutation
 	public final Map<Id,Facility> moveFacilitiesRandom(final NetworkLayer network) {
 		for (Facility f : this.facilities.values()) {
 			Object[] links = network.getLinks().values().toArray();
@@ -53,6 +58,7 @@ public class Retailer {
 		return this.facilities;
 	}
 	
+	// strategy: Random choice and compare
 	public final Map<Id, Facility> moveFacilitiesMaxLink(Controler controler) {
 		for (Facility f : facilities.values()) {
 			Object[] links = controler.getNetwork().getLinks().values().toArray();
