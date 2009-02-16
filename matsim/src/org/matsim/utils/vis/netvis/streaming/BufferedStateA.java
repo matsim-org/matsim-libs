@@ -113,7 +113,7 @@ public abstract class BufferedStateA implements StateI {
 
     // -------------------- INNER CLASSES --------------------
 
-    protected class BAOS extends ByteArrayOutputStream {
+    protected static class BAOS extends ByteArrayOutputStream {
         private BAOS(int size) {
             super(size);
         }
@@ -127,7 +127,7 @@ public abstract class BufferedStateA implements StateI {
         }
     }
 
-    protected class BAIS extends ByteArrayInputStream {
+    protected static class BAIS extends ByteArrayInputStream {
         private BAOS source;
 
         private BAIS(BAOS baos) {
