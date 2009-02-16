@@ -36,9 +36,9 @@ import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
-import org.matsim.utils.NetworkUtils;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -71,6 +71,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private final BasicPopulation plans;
 	private final NetworkLayer network;
+	private final Facilities facilities;
 
 	private Person currperson = null;
 	private Desires currdesires = null;
@@ -94,6 +95,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network) {
 		this.plans = pop;
 		this.network = network;
+		this.facilities = (Facilities) Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
 	}
 
 	@Override
@@ -249,7 +251,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if ((x != null) || (y != null)) { log.info("NEW: coords in <location> will be ignored!"); }
 		if (freq != null) { log.info("NEW: Attribute freq in <location> is not supported at the moment!"); }
 
-		this.currfacility = (Facility)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE).getLocation(id);
+		this.currfacility = this.facilities.getFacility(new IdImpl(id));
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
 		this.curractivity = this.currfacility.getActivity(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
@@ -334,7 +336,11 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setDuration(Time.parseTime(atts.getValue("dur")));
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		if (atts.getValue("facility") != null) {
-			this.curract.setFacility(atts.getValue("facility"));
+			Facility f = this.facilities.getFacility(new IdImpl(atts.getValue("facility")));
+			if (f == null) {
+				Gbl.errorMsg("facility id=" + atts.getValue("facility)") + " does not exist!");
+			}
+			this.curract.setFacility(f);
 		}
 		if (this.routeNodes != null) {
 			this.currroute.setNodes(this.prevAct.getLink(), NetworkUtils.getNodes(this.network, this.routeNodes), this.curract.getLink());

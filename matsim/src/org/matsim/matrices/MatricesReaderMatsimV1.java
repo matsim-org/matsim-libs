@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.matsim.gbl.Gbl;
 import org.matsim.utils.io.MatsimXmlParser;
+import org.matsim.world.World;
 import org.xml.sax.Attributes;
 
 /**
@@ -40,9 +41,11 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 
 	private Matrices matrices;
 	private Matrix currMatrix = null;
+	private final World world;
 
-	public MatricesReaderMatsimV1(final Matrices matrices) {
+	public MatricesReaderMatsimV1(final Matrices matrices, final World world) {
 		this.matrices = matrices;
+		this.world = world;
 	}
 
 	@Override
@@ -73,7 +76,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startMatrix(final Attributes atts) {
 		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"), 
-				Gbl.getWorld().getLayer(atts.getValue("world_layer")), atts.getValue("desc"));
+				world.getLayer(atts.getValue("world_layer")), atts.getValue("desc"));
 	}
 
 	private void startEntry(final Attributes  atts) {

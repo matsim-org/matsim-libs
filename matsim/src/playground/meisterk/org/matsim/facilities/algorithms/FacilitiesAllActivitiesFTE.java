@@ -27,11 +27,13 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
@@ -209,9 +211,8 @@ public class FacilitiesAllActivitiesFTE {
 					tempFacilityId = tempFacilities_it.next();
 					attributeId = this.getAttributeIdFromTemporaryFacilityID(tempFacilityId);
 					f = facilities.createFacility(
-							this.getNumberFromTemporaryFacilityID(tempFacilityId),
-							X,
-							Y);
+							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
+							new CoordImpl(X, Y));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before

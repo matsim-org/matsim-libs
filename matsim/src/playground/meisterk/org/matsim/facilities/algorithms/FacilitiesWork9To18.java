@@ -23,11 +23,13 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.v01.BasicOpeningTime.DayType;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
+import org.matsim.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
@@ -77,7 +79,7 @@ public class FacilitiesWork9To18 {
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
-				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);
+				f = facilities.createFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
 				a = f.createActivity("work");
 
 				// equally distribute jobs among facilities
@@ -87,11 +89,11 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTime(DayType.wk, "9:00", "18:00"));
+				a.addOpeningTime(new OpeningTime(DayType.wk, 9*3600, 18*3600));
 			}
 
 			for (int i=0; i<B01S3; i++) {
-				f = facilities.createFacility(Integer.toString(facilityCnt++), X, Y);
+				f = facilities.createFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
 				a = f.createActivity("work");
 
 				// equally distribute jobs among facilities
@@ -101,7 +103,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTime(DayType.wk, "9:00", "18:00"));
+				a.addOpeningTime(new OpeningTime(DayType.wk, 9*3600, 18*3600));
 			}
 
 			hectareCnt++;

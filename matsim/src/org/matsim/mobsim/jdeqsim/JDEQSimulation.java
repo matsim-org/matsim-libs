@@ -29,10 +29,8 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.jdeqsim.util.Timer;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Person;
-
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.utils.misc.Time;
@@ -133,7 +131,7 @@ public class JDEQSimulation {
 		if (SimulationParameters.getTestPlanPath() != null) {
 			// read population
 			Population pop = new Population(Population.NO_STREAMING);
-			PopulationReader plansReader = new MatsimPopulationReader(pop);
+			PopulationReader plansReader = new MatsimPopulationReader(pop, this.network);
 			plansReader.readFile(SimulationParameters.getTestPlanPath());
 
 			this.population = pop;

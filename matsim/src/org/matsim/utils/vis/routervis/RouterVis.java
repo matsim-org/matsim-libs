@@ -41,8 +41,6 @@ import org.matsim.utils.vis.netvis.VisConfig;
 import org.matsim.utils.vis.routervis.multipathrouter.CLogitRouter;
 import org.matsim.utils.vis.routervis.multipathrouter.PSLogitRouter;
 
-
-
 /**
  * RouterVis is a package for router visualization. It creates NetVis compatible
  * files which shows the graph exploration procedure of a LeastCostPathCalculator.
@@ -76,22 +74,16 @@ public class RouterVis {
 		try {
 			this.router = router.getConstructor(prototypeConstructor).newInstance(new Object [] {network, costCalculator, timeCalculator, this.writer});
 		} catch (final InstantiationException e) {
-			e.printStackTrace();
 			ex = e;
 		} catch (final IllegalAccessException e) {
-			e.printStackTrace();
 			ex = e;
 		} catch (final IllegalArgumentException e) {
-			e.printStackTrace();
 			ex = e;
 		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
 			ex = e;
 		} catch (final SecurityException e) {
-			e.printStackTrace();
 			ex = e;
 		} catch (final NoSuchMethodException e) {
-			e.printStackTrace();
 			ex = e;
 		}
 		if (ex != null) {
@@ -99,8 +91,6 @@ public class RouterVis {
 					"Cannot instantiate link from prototype, this should never happen, but never say never!",
 					ex);			
 		}
-
-		
 	}
 
 /**
@@ -175,30 +165,30 @@ public class RouterVis {
 			outputDirSuffix = "/" + args[3];
 		}
 		
-		
+		Config config = null;
 		if (args.length >= 3) {
-			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+			config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 			fromNodeId = new IdImpl(args[1]);
 			toNodeId = new IdImpl(args[2]);
 
 		}	else {
 			log.info(" reading default config file: " + testConfigFile);
-			Gbl.createConfig(new String[] {testConfigFile});
+			config = Gbl.createConfig(new String[] {testConfigFile});
 			fromNodeId = new IdImpl("13");
 			toNodeId = new IdImpl("7");
 		}
 		log.info(" done.");
 		
-		Gbl.getConfig().controler().setOutputDirectory(Gbl.getConfig().controler().getOutputDirectory() + outputDirSuffix);
+		config.controler().setOutputDirectory(config.controler().getOutputDirectory() + outputDirSuffix);
 
 		log.info("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		log.info("  done.");
 
 		log.info("  creating output dir if needed");
-		final File outputDir = new File(Gbl.getConfig().controler().getOutputDirectory());
+		final File outputDir = new File(config.controler().getOutputDirectory());
 		
 		if (!outputDir.exists()){
 			outputDir.mkdirs();
@@ -220,7 +210,7 @@ public class RouterVis {
 		log.info("  done.");
 
 		log.info("  starting NetVis.");
-		final String [] visargs = {Gbl.getConfig().controler().getOutputDirectory() + "/Snapshot"};
+		final String [] visargs = {config.controler().getOutputDirectory() + "/Snapshot"};
 		Gbl.reset();
 		NetVis.main(visargs);
 		log.info("  done.");

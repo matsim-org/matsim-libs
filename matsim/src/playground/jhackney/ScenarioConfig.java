@@ -210,7 +210,7 @@ public abstract class ScenarioConfig {
 	
 	public static final Matrices readMatrices() {
 		System.out.println("  reading matrices xml file... ");
-		new MatsimMatricesReader(Matrices.getSingleton()).readFile(Gbl.getConfig().matrices().getInputFile());
+		new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld()).readFile(Gbl.getConfig().matrices().getInputFile());
 		System.out.println("  done.");
 		return Matrices.getSingleton();
 	}

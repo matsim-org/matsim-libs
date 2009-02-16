@@ -56,7 +56,7 @@ public class ScenarioCreation {
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
+		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld());
 		reader.readFile(Gbl.getConfig().matrices().getInputFile());
 		System.out.println("  done.");
 

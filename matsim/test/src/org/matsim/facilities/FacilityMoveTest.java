@@ -62,7 +62,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 	
 	private final Facilities buildFacilities(World world) {
 		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE,null);
-		facilities.createFacility("f11","1","1");
+		facilities.createFacility(new IdImpl("f11"), new CoordImpl(1, 1));
 		return facilities;
 	}
 	

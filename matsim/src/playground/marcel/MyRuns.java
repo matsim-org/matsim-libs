@@ -175,7 +175,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading kutter data, creating plans... ");
-		final PopulationReaderKutter plansReader = new PopulationReaderKutter(plans);
+		final PopulationReaderKutter plansReader = new PopulationReaderKutter(plans, world.getLayer(new IdImpl("tvz")));
 		plansReader.readFile(config.getParam("kutter", "inputDirectory"));
 		System.out.println("  done.");
 
@@ -288,7 +288,7 @@ public class MyRuns {
 
 		log.info("setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, data.getNetwork());
 		log.info("done.");
 
 		System.gc();System.gc();System.gc();
@@ -1355,7 +1355,7 @@ public class MyRuns {
 		final Config config = Gbl.createConfig(args);
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
+		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld());
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 
@@ -2056,7 +2056,7 @@ public class MyRuns {
 		Gbl.printRoundTime();
 
 		System.out.println("  reading matrices xml file... ");
-		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
+		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton(), Gbl.getWorld());
 		reader.readFile(config.matrices().getInputFile());
 		System.out.println("  done.");
 		Gbl.printRoundTime();

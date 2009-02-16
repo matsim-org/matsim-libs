@@ -22,13 +22,11 @@ package org.matsim.utils.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.gbl.Gbl;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationWriterV5;
-
 
 /**
  * This class provides helper methods to convert the
@@ -43,7 +41,6 @@ public class MatsimXMLFormatConverter {
 		NetworkLayer net = new NetworkLayer();
 		MatsimNetworkReader reader = new MatsimNetworkReader(net);
 		reader.readFile(network);
-		Gbl.getWorld().setNetworkLayer(net);
 		
 		Population pop = new Population(Population.NO_STREAMING);
 		MatsimPopulationReader popreader = new MatsimPopulationReader(pop, net);
@@ -52,4 +49,5 @@ public class MatsimXMLFormatConverter {
 		PopulationWriterV5 writer = new PopulationWriterV5(pop);
 		writer.writeFile(popv5);
 	}
+
 }

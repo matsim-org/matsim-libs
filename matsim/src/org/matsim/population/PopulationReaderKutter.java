@@ -24,16 +24,14 @@ import java.io.IOException;
 
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
-import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.utils.WorldUtils;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.world.World;
+import org.matsim.world.Layer;
 import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
 
 public class PopulationReaderKutter implements PopulationReader {
 
@@ -45,9 +43,11 @@ public class PopulationReaderKutter implements PopulationReader {
 	private final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
 	private long totalcnt = 0;
 	private double totalsum = 0.0;
+	/*package*/ final Layer tvzLayer; // ZoneLayer containing 'tvz' (traffic analysis zones)
 
-	public PopulationReaderKutter(final Population plans) {
+	public PopulationReaderKutter(final Population plans, final Layer tvzLayer) {
 		this.population = plans;
+		this.tvzLayer = tvzLayer;
 		this.parserConfig.setDelimiterRegex("\t");
 	}
 
@@ -158,7 +158,6 @@ public class PopulationReaderKutter implements PopulationReader {
 				6*3600, 3*3600, 2*3600, 2*3600, 5*3600 /* 13-17 */
 		};
 		private final BasicLeg.Mode[] legModes = {BasicLeg.Mode.undefined, BasicLeg.Mode.walk, BasicLeg.Mode.bike, BasicLeg.Mode.car, BasicLeg.Mode.ride, BasicLeg.Mode.pt, BasicLeg.Mode.pt};
-		private final ZoneLayer tvzLayer;
 		private Person currPerson = null;
 		private Plan currPlan = null;
 		private Coord currHome = null;
@@ -166,8 +165,6 @@ public class PopulationReaderKutter implements PopulationReader {
 
 		public PersonRowHandler() {
 			this.idCnt = 0;
-			World world = Gbl.getWorld();
-			this.tvzLayer = (ZoneLayer)world.getLayer(new IdImpl("tvz"));
 		}
 
 		public long getPersonCountCreated() {
@@ -207,8 +204,8 @@ public class PopulationReaderKutter implements PopulationReader {
 			int arrTime = this.currTime;
 			int travTime = 0;
 
-			Zone zone = (Zone)this.tvzLayer.getLocation(cellid);
-			Coord coord = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
+			Zone zone = (Zone)tvzLayer.getLocation(cellid);
+			Coord coord = WorldUtils.getRandomCoordInZone(zone, tvzLayer);
 			String activity = "";
 			int duration = 0;
 			boolean skipActivity = false;
@@ -244,8 +241,8 @@ public class PopulationReaderKutter implements PopulationReader {
 			this.currPlan = this.currPerson.createPlan(true);
 
 			String homeCell = row[1];
-			Zone zone = (Zone)this.tvzLayer.getLocation(homeCell);
-			this.currHome = WorldUtils.getRandomCoordInZone(zone, this.tvzLayer);
+			Zone zone = (Zone)tvzLayer.getLocation(homeCell);
+			this.currHome = WorldUtils.getRandomCoordInZone(zone, tvzLayer);
 
 			// read values of first not-home activity
 			int acttype = Integer.parseInt(row[2]);

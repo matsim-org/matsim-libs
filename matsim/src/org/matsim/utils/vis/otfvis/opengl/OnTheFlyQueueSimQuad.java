@@ -34,8 +34,6 @@ import org.matsim.utils.misc.Time;
 import org.matsim.utils.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.utils.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.utils.vis.otfvis.server.OnTheFlyServer;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 
 /**
@@ -97,7 +95,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
 //		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
-		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
+//		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
 
 		Config config = Gbl.createConfig(args);
 
@@ -113,23 +111,14 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		if(args.length >= 1) {
 			netFileName = config.network().getInputFile();
 			popFileName = config.plans().getInputFile();
-			worldFileName = config.world().getInputFile();
-		}
-
-		World world = Gbl.createWorld();
-
-		if (worldFileName != null) {
-			MatsimWorldReader world_parser = new MatsimWorldReader(world);
-			world_parser.readFile(worldFileName);
+//			worldFileName = config.world().getInputFile();
 		}
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(netFileName);
-		world.setNetworkLayer(net);
-		world.complete();
 
 		Population population = new Population();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 
@@ -138,7 +127,6 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		OnTheFlyQueueSimQuad sim = new OnTheFlyQueueSimQuad(net, population, events);
 
 		config.simulation().setSnapshotFormat("none");// or just set the snapshotPeriod to zero ;-)
-
 
 		sim.run();
 
