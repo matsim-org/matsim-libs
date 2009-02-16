@@ -25,7 +25,6 @@ import org.matsim.events.AgentDepartureEvent;
 import org.matsim.events.BasicEvent;
 import org.matsim.events.Events;
 import org.matsim.events.LinkLeaveEvent;
-import org.matsim.gbl.Gbl;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
@@ -44,7 +43,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		super.setUp();
 
 		// we need a network with just one link
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 
 		double fromX = 100.0;
 		double fromY = 100.0;

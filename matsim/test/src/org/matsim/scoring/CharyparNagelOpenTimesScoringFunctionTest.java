@@ -26,7 +26,6 @@ import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.gbl.Gbl;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
@@ -51,7 +50,6 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		// create facilities, activities in it and open times
 		Facilities facilities = new Facilities();
-		Gbl.getWorld().setFacilityLayer(facilities);
 
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
 		Facility testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);

@@ -72,7 +72,7 @@ public class PlanomatTest extends MatsimTestCase {
 		super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		log.info("Reading facilities xml file...");
-		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 

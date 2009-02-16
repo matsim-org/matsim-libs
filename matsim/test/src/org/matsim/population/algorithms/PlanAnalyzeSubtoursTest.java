@@ -58,7 +58,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		super.loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
 
 		log.info("Reading facilities xml file...");
-		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		facilities = new Facilities();
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 	}

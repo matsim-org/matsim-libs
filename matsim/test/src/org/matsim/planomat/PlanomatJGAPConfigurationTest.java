@@ -52,7 +52,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 	public void testPlanomatJGAPConfiguration() {
 
 		log.info("Reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		Facilities facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
@@ -98,7 +98,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		while (geneticOperatorsIterator.hasNext()) {
 			BaseGeneticOperator bgo = (BaseGeneticOperator) geneticOperatorsIterator.next();
 			if (bgo.getClass().equals(CrossoverOperator.class)) {
-				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent());
+				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent(), EPSILON);
 			} else if (bgo.getClass().equals(MutationOperator.class)) {
 				assertEquals(expectedPopSize, ((MutationOperator) bgo).getMutationRate());
 			}
@@ -108,18 +108,18 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 	public void testPlanomatJGAPConfigurationCarPt() {
 		
 		log.info("Reading facilities xml file...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		Facilities facilities = (Facilities)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
 		log.info("Reading network xml file...");
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		log.info("Reading network xml file...done.");
 
 		log.info("Reading plans xml file...");
 		Population population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		population.printPlansCount();
 		log.info("Reading plans xml file...done.");
@@ -154,7 +154,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		while (geneticOperatorsIterator.hasNext()) {
 			BaseGeneticOperator bgo = (BaseGeneticOperator) geneticOperatorsIterator.next();
 			if (bgo.getClass().equals(CrossoverOperator.class)) {
-				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent());
+				assertEquals(0.6d, ((CrossoverOperator) bgo).getCrossOverRatePercent(), EPSILON);
 			} else if (bgo.getClass().equals(MutationOperator.class)) {
 				assertEquals(expectedPopSize, ((MutationOperator) bgo).getMutationRate());
 			}

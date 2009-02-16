@@ -29,7 +29,6 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.Activity;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.geometry.CoordImpl;
 
@@ -130,7 +129,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("running testKnowledge()...");
 		
 		log.info("  creating test facilities...");
-		Facilities facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
+		Facilities facilities = new Facilities();
 		Facility f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
 		f1.createActivity(H);
 		f1.createActivity(W);
