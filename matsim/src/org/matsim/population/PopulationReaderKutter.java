@@ -204,7 +204,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			int arrTime = this.currTime;
 			int travTime = 0;
 
-			Zone zone = (Zone)tvzLayer.getLocation(cellid);
+			Zone zone = (Zone)tvzLayer.getLocation(new IdImpl(cellid));
 			Coord coord = WorldUtils.getRandomCoordInZone(zone, tvzLayer);
 			String activity = "";
 			int duration = 0;

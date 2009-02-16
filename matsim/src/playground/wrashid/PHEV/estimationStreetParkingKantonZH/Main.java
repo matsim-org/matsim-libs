@@ -8,19 +8,15 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.matsim.basic.v01.Id;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.NetworkReaderMatsimV1;
 import org.matsim.utils.geometry.Coord;
-import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
-import org.matsim.world.Location;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.Zone;
-import org.matsim.world.ZoneLayer;
-
-import playground.wrashid.PHEV.parking.data.Facility;
 
 
 /*
@@ -161,7 +157,7 @@ public class Main {
 		// the links of the city of Zurich
 		linksOfZurichCity = Main.streetsInCommunities.get(communityIdOfZurichCity);
 		layer = world.getLayer("municipality");
-		cityZurichZone=(Zone)layer.getLocation(communityIdOfZurichCity);
+		cityZurichZone=(Zone)layer.getLocation(new IdImpl(communityIdOfZurichCity));
 		
 		
 		// create random city zones
@@ -283,7 +279,7 @@ public class Main {
 		
 		
 		// read street parking data of zurich
-		streetData = StreetParkingReader.readData("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhäuser\\facilities\\input\\streetParking2007_1.txt");
+		streetData = StreetParkingReader.readData("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkhï¿½user\\facilities\\input\\streetParking2007_1.txt");
 		
 		
 		

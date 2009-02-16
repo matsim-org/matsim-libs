@@ -96,7 +96,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = (Link)network.getLocation(10);
+		Link link10 = network.getLink("10");
 
 		if (generateNewCompareData) {
 			BufferedWriter outfile = null;
@@ -179,7 +179,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = (Link)network.getLocation(10);
+		Link link10 = network.getLink("10");
 
 		if (generateNewCompareData) {
 			BufferedWriter outfile = null;
@@ -263,7 +263,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		}
 
 		// prepare comparison
-		Link link10 = (Link)network.getLocation(10);
+		Link link10 = network.getLink("10");
 
 		if (generateNewCompareDataPessimistic) {
 			BufferedWriter outfile = null;

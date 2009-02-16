@@ -90,7 +90,7 @@ public class Municipalities {
 				// 0        1       2       3           4           5           6       7
 
 				Integer m_id = Integer.parseInt(entries[2].trim());
-				Location l = Gbl.getWorld().getLayer(MUNICIPALITY).getLocation(m_id);
+				Location l = Gbl.getWorld().getLayer(MUNICIPALITY).getLocation(new IdImpl(m_id));
 				if (l == null) {
 					System.out.println("    Municipality id=" + m_id + " ignored. (Does not exist in the world layer.)");
 				} else {

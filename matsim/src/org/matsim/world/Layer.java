@@ -146,10 +146,6 @@ public abstract class Layer {
 		return this.locations.get(new IdImpl(location_id));
 	}
 
-	public final Location getLocation(final int location_id) {
-		return this.getLocation(new IdImpl(location_id));
-	}
-
 	/**
 	 * @param center the center coordinate of the to-be-returned locations.
 	 * @return all locations whose center coordinate equals <code>center</code>
