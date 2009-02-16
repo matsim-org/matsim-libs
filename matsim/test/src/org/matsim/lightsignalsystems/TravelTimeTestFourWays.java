@@ -85,7 +85,8 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		try {		
 			this.writer = IOUtils.getBufferedWriter(tempout, true);
 //			new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
-			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events, data.getSignalSystems(), data.getSignalSystemsConfiguration());
+			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+			sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 			sim.run();
 			this.writer.flush();
 			this.writer.close();
@@ -109,7 +110,8 @@ public class TravelTimeTestFourWays extends MatsimTestCase implements	LinkLeaveE
 		try {		
 			this.writer = IOUtils.getBufferedWriter(tempout, true);
 //			new QSim(events, data.getPopulation(), data.getNetwork(), false, newLSADef, newLSADefCfg).run();
-			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events, data.getSignalSystems(), data.getSignalSystemsConfiguration());
+			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+			sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 			sim.run();
 			this.writer.flush();
 			this.writer.close();

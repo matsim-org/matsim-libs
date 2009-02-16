@@ -95,7 +95,8 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 		}
 
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data
-				.getPopulation(), events, signalSystems, lssConfigs);
+				.getPopulation(), events);
+		sim.setSignalSystems(signalSystems, lssConfigs);
 		sim.run();
 		
 		

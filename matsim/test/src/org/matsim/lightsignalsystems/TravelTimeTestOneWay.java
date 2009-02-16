@@ -107,7 +107,8 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 			
 			MatsimLightSignalSystemConfigurationWriter writer = new MatsimLightSignalSystemConfigurationWriter(lssConfigs);
 			writer.writeFile(tempFile);
-			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events, signalSystems, lssConfigs);
+			QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+			sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
 			sim.run();
 //			new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, tempFile).run();
 			results.put(Integer.valueOf(i), this.beginningOfLink2);
@@ -132,7 +133,9 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		ScenarioData data = new ScenarioData(conf);
 		Events events = new Events();
 		events.addHandler(this);
-		new QueueSimulation(data.getNetwork(), data.getPopulation(), events, data.getSignalSystems(), data.getSignalSystemsConfiguration()).run();
+		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
+		sim.setSignalSystems(data.getSignalSystems(), data.getSignalSystemsConfiguration());
+		sim.run();
 //		new QSim(events, data.getPopulation(), data.getNetwork(), false, lsaDefinition, lsaConfig).run();
 		log.debug("tF = 60s, " + this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure_ + ", " + this.beginningOfLink2.numberOfVehPassed_ + ", " + this.beginningOfLink2.firstVehPassTime_s + ", " + this.beginningOfLink2.lastVehPassTime_s);
 		

@@ -115,6 +115,10 @@ public class QueueSimulation {
 	 */
 	private SortedMap<Id, SignalSystemControler> signalSystemControlerBySystemId;
 
+	private BasicLightSignalSystems signalSystems;
+
+	private List<BasicLightSignalSystemConfiguration> signalSystemsConfig;
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -132,23 +136,17 @@ public class QueueSimulation {
 		this.networkLayer = network;
 		this.agentFactory = new AgentFactory();
 	}
-	
+
 	/**
-	 * Initialize the QueueSimulation and use the SignalSystems given as parameters
-	 * @param network
-	 * @param plans
-	 * @param events
+	 * Set the signal systems to be used in simulation
 	 * @param signalSystems
 	 * @param signalSystemsConfig
 	 */
-	public QueueSimulation(final NetworkLayer network, final Population plans, 
-			final Events events, BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
-		this(network, plans, events);
-		//TODO check null cases before calling init methods
-		initLanes(signalSystems.getLanesToLinkAssignments());
-		initSignalSystems(signalSystems);
-		initSignalSystemController(signalSystemsConfig);
+	public void setSignalSystems(BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig){
+		this.signalSystems = signalSystems;
+		this.signalSystemsConfig = signalSystemsConfig;
 	}
+	
 	
 	private void initLanes(List<BasicLanesToLinkAssignment> lanesToLinkAssignments) {
 		for (BasicLanesToLinkAssignment laneToLink : lanesToLinkAssignments){
@@ -349,6 +347,8 @@ public class QueueSimulation {
 
 		prepareNetwork();
 
+		prepareSignalSystems();
+		
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
@@ -367,6 +367,18 @@ public class QueueSimulation {
 		createSnapshotwriter();
 
 		prepareNetworkChangeEventsQueue();
+	}
+	/**
+	 * Initialize the signal systems
+	 */
+	private void prepareSignalSystems() {
+		if (this.signalSystems != null) {
+			initLanes(this.signalSystems.getLanesToLinkAssignments());
+			initSignalSystems(this.signalSystems);
+		}
+		if (this.signalSystemsConfig != null) {
+			initSignalSystemController(this.signalSystemsConfig);
+		}
 	}
 
 	/**
