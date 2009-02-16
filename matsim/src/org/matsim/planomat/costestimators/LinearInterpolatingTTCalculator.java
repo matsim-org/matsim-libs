@@ -229,7 +229,7 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 				Gbl.errorMsg("");
 			}
 			Link link = event.link;
-			if (null == link) link = (Link)this.network.getLocation(event.linkId);
+			if (null == link) link = this.network.getLink(event.linkId);
 			if (null != link) {
 				getTravelTimeRole(link).addTravelTime(starttime.intValue(), timediff);
 			}

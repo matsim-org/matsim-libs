@@ -94,7 +94,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	@Override
 	protected double atxCal(String linkID, String s0) {
 		double att = getLinkTraTime(linkID, Integer.parseInt(s0) * 900);
-		Link l = (Link) network.getLocation(linkID);
+		Link l = network.getLink(linkID);
 		if (l == null)
 			return 0.0;
 		att = (att != 0) ? att : l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME);

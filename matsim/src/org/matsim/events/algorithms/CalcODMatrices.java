@@ -115,7 +115,7 @@ public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureE
 	}
 
 	private Location getLocation(final String linkId) {
-		Link link = (Link)this.network.getLocation(linkId);
+		Link link = this.network.getLink(linkId);
 
 		ArrayList<Location> locs = this.tvzLayer.getNearestLocations(link.getCenter(), null);
 		if (locs.size() > 0) {

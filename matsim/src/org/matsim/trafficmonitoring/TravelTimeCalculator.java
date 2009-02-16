@@ -104,7 +104,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
+			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
 				this.aggregator.addTravelTime(getTravelTimeRole(event.link),e.time,event.time);
 
@@ -122,7 +122,7 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 	public void handleEvent(AgentStuckEvent event) {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
-			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
+			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
 				this.aggregator.addStuckEventTravelTime(getTravelTimeRole(event.link),e.time,event.time);
 			}
@@ -138,20 +138,11 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 		return r;
 	}
 
-
-	//////////////////////////////////////////////////////////////////////
-	// Implementation of TravelTime
-	//////////////////////////////////////////////////////////////////////
-
-	/* (non-Javadoc)
-	 * @see org.matsim.network.TravelCostI#getLinkTravelTime(org.matsim.network.Link, int)
-	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		return this.aggregator.getTravelTime(getTravelTimeRole(link), time); 
 	}
 
-
-	static private class EnterEvent {
+	private static class EnterEvent {
 
 		public final String linkId;
 		public final double time;
@@ -161,5 +152,5 @@ AgentArrivalEventHandler, AgentStuckEventHandler {
 			this.time = time;
 		}
 
-	};
+	}
 }

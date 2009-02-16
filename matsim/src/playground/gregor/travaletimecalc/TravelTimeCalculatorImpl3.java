@@ -91,7 +91,7 @@ LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 		EnterEvent e = this.enterEvents.remove(event.agentId);
 		if ((e != null) && e.linkId.equals(event.linkId)) {
 			double timediff = event.time - e.time;
-			if (event.link == null) event.link = (Link)this.network.getLocation(event.linkId);
+			if (event.link == null) event.link = this.network.getLink(event.linkId);
 			if (event.link != null) {
 				getTravelTimeRole(event.link).addTravelTime(e.time, timediff);
 			}

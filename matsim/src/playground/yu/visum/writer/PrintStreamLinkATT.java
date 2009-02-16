@@ -33,7 +33,7 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	@Override
 	public void printRow(String linkID) throws IOException {
 		try {
-			Link link = (Link) network.getLocation(linkID);
+			Link link = network.getLink(linkID);
 			if (link == null)
 				return;
 			out.writeBytes(link.getOrigId() + SPRT + link.getFromNode().getId()

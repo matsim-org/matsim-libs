@@ -135,7 +135,7 @@ public class StuckVehStats implements AgentDepartureEventHandler, AgentStuckEven
 		System.out.println("LINK\tCAPACITY\tFREESPEED\tLENGTH\tcountStuck\ttimesStuck");
 		for (String linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
-			Link link = (Link)network.getLocation(linkId);
+			Link link = network.getLink(linkId);
 			System.out.print(linkId + "\t" + link.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();

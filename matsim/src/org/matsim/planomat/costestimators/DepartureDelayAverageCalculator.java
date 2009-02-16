@@ -146,7 +146,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
 			Link link = event.link;
-			if (null == link) link = (Link)this.network.getLocation(event.linkId);
+			if (null == link) link = this.network.getLink(event.linkId);
 			if (null != link) {
 				this.getDepartureDelayRole(link).addDepartureDelay(departureTime, departureDelay);
 			}

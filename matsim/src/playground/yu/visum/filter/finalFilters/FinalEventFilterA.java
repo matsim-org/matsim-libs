@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.matsim.events.BasicEvent;
 import org.matsim.events.LinkEnterEvent;
-import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Population;
 
@@ -63,7 +62,7 @@ public abstract class FinalEventFilterA extends EventFilterA {
 		// very important to rebuild LinkEventData Object: event, aim to get
 		// the id and the length of the right link
 		enter.agent = this.plans.getPerson(enter.agentId);
-		enter.link = (Link)network.getLocation(enter.linkId);
+		enter.link = network.getLink(enter.linkId);
 		return enter;
 	}
 
