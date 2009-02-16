@@ -22,12 +22,9 @@ package org.matsim.population;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.Id;
-import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.network.Link;
-import org.matsim.network.NetworkLayer;
 import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
@@ -89,25 +86,6 @@ public class Act extends BasicActImpl {
 		}
 	}
 
-	protected void setFacility(final String f_id) {
-		Facilities facilities = (Facilities)Gbl.getWorld().getLayer(Facilities.LAYER_TYPE);
-		if (facilities == null) { throw new RuntimeException("Facilities Layer does not exist!"); }
-		this.facility = (Facility)facilities.getLocation(f_id);
-		if (this.facility == null) { throw new RuntimeException("facility id="+f_id+" does not exist"); }
-	}
-
-	protected void setLinkFromString(final String link) {
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		if (network == null) {
-			throw new RuntimeException("Network layer does not exist");
-		}
-		this.link = (Link)network.getLocation(link);
-
-		if (this.link == null) {
-			throw new RuntimeException("link=" + link +" does not exist");
-		}
-	}
-
 	@Override
 	public final String toString() {
 		return "[type=" + this.getType() + "]" +
@@ -132,7 +110,7 @@ public class Act extends BasicActImpl {
 	public final Id getLinkId() { // convenience method
 		if (this.link != null)
 			return this.link.getId();
-		return null; // TODO [MR,DG] why not delegate to super.getLinkId()? And shouldn't setLinkId() also be overwritten to prevent nonmatching link/linkId?
+		return null;
 	}
 
 	@Override
