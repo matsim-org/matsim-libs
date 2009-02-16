@@ -101,14 +101,13 @@ public class CreateSelectedPlansTables {
 		this.plans1=new Population(false);
 
 		System.out.println("  reading the network...");
-		this.network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkPath);
-
 	}
 
 	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, this.network);
 		plansReader.readFile(plansfilePath);
 	}
 

@@ -31,8 +31,6 @@ import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
 import org.matsim.population.PopulationWriter;
 import org.matsim.utils.misc.ArgumentParser;
-import org.matsim.world.MatsimWorldReader;
-import org.matsim.world.World;
 
 /**
  * Assigns each activity in each plan of each person in the population a link
@@ -105,20 +103,11 @@ public class XY2Links {
 		parseArguments(args);
 		this.config = Gbl.createConfig(new String[]{this.configfile, this.dtdfile});
 
-		final World world = Gbl.getWorld();
-
-		if (this.config.world().getInputFile() != null) {
-			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-			worldReader.readFile(this.config.world().getInputFile());
-		}
-
 		NetworkLayer network = new NetworkLayer();
-		world.setNetworkLayer(network);
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
-		world.complete();
 
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter);
