@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.IdImpl;
@@ -45,6 +43,7 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.routes.CarRoute;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.coopers.CoopersAgentLogicFactory;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
 import org.matsim.withinday.trafficmanagement.VDSSign;
@@ -53,7 +52,7 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControle
 /**
  * @author dgrether
  */
-public class WithindayAgentTest extends TestCase {
+public class WithindayAgentTest extends MatsimTestCase {
 	
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
