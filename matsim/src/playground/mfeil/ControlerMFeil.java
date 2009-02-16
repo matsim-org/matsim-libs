@@ -90,7 +90,7 @@ public class ControlerMFeil extends Controler {
 						super.getTravelCostCalculator(), 
 						tDepDelayCalc, 
 						super.network);
-				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(legTravelTimeEstimator, this.scoringFunctionFactory);
+				StrategyModule timeOptStrategyModule = new TimeOptInitialiser(this, legTravelTimeEstimator, this.scoringFunctionFactory);
 				strategy.addStrategyModule(timeOptStrategyModule);
 			}
 			else if (classname.equals("Clustering")) {
