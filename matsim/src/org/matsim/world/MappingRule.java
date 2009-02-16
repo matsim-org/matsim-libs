@@ -40,6 +40,7 @@ import org.matsim.network.NetworkLayer;
  * 
  * @author balmermi
  */
+@Deprecated
 public class MappingRule {
 
 	//////////////////////////////////////////////////////////////////////
