@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
 import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
 import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
 import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.lightsignalsystems.MatsimLightSignalSystemConfigurationWriter;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.lightsignalsystemsconfig;
+package org.matsim.basic.signalsystemsconfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,65 +27,19 @@ import org.matsim.basic.v01.Id;
 /**
  * @author dgrether
  */
-public class BasicLightSignalSystemPlan {
+public class BasicPlanBasedLightSignalSystemControlInfo implements BasicLightSignalSystemControlInfo {
 
-	private Id id;
-	private double startTime;
-	private double endTime;
-	private Map<Id, BasicLightSignalGroupConfiguration> groupConfigs;
-	private Double syncronizationOffset = null;
-	private Double circulationTime = null;
-
-	public BasicLightSignalSystemPlan(Id id) {
-		this.id = id;
+	private Map<Id, BasicLightSignalSystemPlan> plans;
+	
+	public Map<Id, BasicLightSignalSystemPlan> getPlans() {
+		return plans;
 	}
 
-	public void setStartTime(double seconds) {
-		this.startTime = seconds;
-	}
-
-	public void setEndTime(double seconds) {
-		this.endTime = seconds;
-	}
-
-	public Id getId() {
-		return id;
-	}
-
-	public void addLightSignalGroupConfiguration(
-			BasicLightSignalGroupConfiguration groupConfig) {
-		if (this.groupConfigs == null) {
-			this.groupConfigs = new HashMap<Id, BasicLightSignalGroupConfiguration>();
+	public void addPlan(BasicLightSignalSystemPlan plan) {
+		if (this.plans == null) {
+			this.plans = new HashMap<Id, BasicLightSignalSystemPlan>();
 		}
-		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
-	}
-	
-	public double getStartTime() {
-		return startTime;
-	}
-	
-	public double getEndTime() {
-		return endTime;
-	}
-	
-	public Map<Id, BasicLightSignalGroupConfiguration> getGroupConfigs() {
-		return groupConfigs;
-	}
-
-	public void setCirculationTime(Double seconds) {
-		this.circulationTime = seconds;
-	}
-	
-	public void setSyncronizationOffset(Double seconds) {
-		this.syncronizationOffset = seconds;
-	}
-
-	public Double getSyncronizationOffset() {
-		return syncronizationOffset;
-	}
-
-	public Double getCirculationTime() {
-		return circulationTime;
+		this.plans.put(plan.getId(), plan);
 	}
 
 }

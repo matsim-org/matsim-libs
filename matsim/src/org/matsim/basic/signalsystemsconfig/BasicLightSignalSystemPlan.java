@@ -17,82 +17,75 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.lightsignalsystemsconfig;
+package org.matsim.basic.signalsystemsconfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.basic.v01.Id;
 
 /**
  * @author dgrether
  */
-public class BasicLightSignalGroupConfiguration {
+public class BasicLightSignalSystemPlan {
 
-	private Id referencedSignalGroupId;
+	private Id id;
+	private double startTime;
+	private double endTime;
+	private Map<Id, BasicLightSignalGroupConfiguration> groupConfigs;
+	private Double syncronizationOffset = null;
+	private Double circulationTime = null;
 
-
-	private double roughCast;
-	private double dropping;
-
-	private Double interimTimeRoughcast = null;
-	private Double interimTimeDropping = null;
-	
-	
-	public BasicLightSignalGroupConfiguration(Id referencedSignalGroupId) {
-		this.referencedSignalGroupId = referencedSignalGroupId;
+	public BasicLightSignalSystemPlan(Id id) {
+		this.id = id;
 	}
 
-
-	
-	public double getRoughCast() {
-		return roughCast;
+	public void setStartTime(double seconds) {
+		this.startTime = seconds;
 	}
 
-
-	
-	public void setRoughCast(double roughCast) {
-		this.roughCast = roughCast;
+	public void setEndTime(double seconds) {
+		this.endTime = seconds;
 	}
 
-
-	
-	public double getDropping() {
-		return dropping;
+	public Id getId() {
+		return id;
 	}
 
-
-	
-	public void setDropping(double dropping) {
-		this.dropping = dropping;
-	}
-
-
-	
-	public Double getInterimTimeRoughcast() {
-		return interimTimeRoughcast;
-	}
-
-
-	
-	public void setInterimTimeRoughcast(Double interimTimeRoughcast) {
-		this.interimTimeRoughcast = interimTimeRoughcast;
-	}
-
-
-	
-	public Double getInterimTimeDropping() {
-		return interimTimeDropping;
-	}
-
-
-	
-	public void setInterimTimeDropping(Double interimTimeDropping) {
-		this.interimTimeDropping = interimTimeDropping;
-	}
-
-
-	
-	public Id getReferencedSignalGroupId() {
-		return referencedSignalGroupId;
+	public void addLightSignalGroupConfiguration(
+			BasicLightSignalGroupConfiguration groupConfig) {
+		if (this.groupConfigs == null) {
+			this.groupConfigs = new HashMap<Id, BasicLightSignalGroupConfiguration>();
+		}
+		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
 	}
 	
+	public double getStartTime() {
+		return startTime;
+	}
+	
+	public double getEndTime() {
+		return endTime;
+	}
+	
+	public Map<Id, BasicLightSignalGroupConfiguration> getGroupConfigs() {
+		return groupConfigs;
+	}
+
+	public void setCirculationTime(Double seconds) {
+		this.circulationTime = seconds;
+	}
+	
+	public void setSyncronizationOffset(Double seconds) {
+		this.syncronizationOffset = seconds;
+	}
+
+	public Double getSyncronizationOffset() {
+		return syncronizationOffset;
+	}
+
+	public Double getCirculationTime() {
+		return circulationTime;
+	}
 
 }

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.lightsignalsystemsconfig;
+package org.matsim.basic.signalsystemsconfig;
 
 /**
  * Currently just a marker interface for all ControlInfo subtypes

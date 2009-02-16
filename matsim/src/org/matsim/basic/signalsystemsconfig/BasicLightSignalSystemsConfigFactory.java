@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.lightsignalsystemsconfig;
+package org.matsim.basic.signalsystemsconfig;
 
 import org.matsim.basic.v01.Id;
 

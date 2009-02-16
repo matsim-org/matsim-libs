@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.lightsignalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.lightsignalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
