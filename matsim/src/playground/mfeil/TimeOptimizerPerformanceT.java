@@ -1,20 +1,21 @@
 package playground.mfeil;
 
 
-import org.matsim.planomat.Planomat;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
+import org.matsim.controler.Controler;
+import org.matsim.gbl.MatsimRandom;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.population.Act;
+import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
-import org.matsim.scoring.*;
-import org.matsim.population.Plan;
-import org.matsim.controler.Controler;
-import org.matsim.gbl.MatsimRandom;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import org.matsim.population.Act;
+import org.matsim.scoring.PlanScorer;
+import org.matsim.scoring.ScoringFunctionFactory;
 
 
 public class TimeOptimizerPerformanceT implements org.matsim.population.algorithms.PlanAlgorithm {
@@ -25,7 +26,11 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	private final PreProcessLandmarks		preProcessRoutingData;
 	
 	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
-		this.timeOptAlgorithm 		= new TimeOptimizer11 (estimator, scorer);
+		System.out.println("disabled code as it doesn't compile. mrieser/16feb2009");
+		System.exit(-1);
+		// TimeOptimizer11 cannot be found
+		this.timeOptAlgorithm 		= null;// = new TimeOptimizer11 (estimator, scorer);
+		
 		//this.timeOptAlgorithm 	= new Planomat (estimator, factory);
 		this.scorer			  		= scorer;
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
