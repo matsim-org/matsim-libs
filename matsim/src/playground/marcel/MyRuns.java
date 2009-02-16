@@ -20,12 +20,8 @@
 
 package playground.marcel;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -165,7 +160,7 @@ public class MyRuns {
 		System.out.println("---   create plans from data from kutter-model");
 		final Config config = Gbl.createConfig(args);
 
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -207,7 +202,7 @@ public class MyRuns {
 		System.out.println("RUN: fmaToTrips");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -247,29 +242,18 @@ public class MyRuns {
 		System.out.println("RUN: convertPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading and writing plans...");
@@ -337,7 +321,7 @@ public class MyRuns {
 		System.out.println("RUN: filterSelectedPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -345,8 +329,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -355,7 +338,7 @@ public class MyRuns {
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plans.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading and writing plans...");
@@ -378,7 +361,7 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansInArea");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -386,16 +369,14 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		final Population plans = new Population(Population.NO_STREAMING);
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
 
@@ -422,16 +403,9 @@ public class MyRuns {
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-//
-//		System.out.println("  reading world xml file... ");
-//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-//		worldReader.readFile(config.world().getInputFile());
-//		System.out.println("  done.");
 
 		System.out.println("  reading the network..." + (new Date()));
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -450,7 +424,7 @@ public class MyRuns {
 //		System.out.println("  reading, filtering and writing population... at " + (new Date()));
 //		final Plans population = new Plans(Plans.USE_STREAMING);
 //
-//		PlansReaderI plansReader = new MatsimPopulationReader(population);
+//		PlansReaderI plansReader = new MatsimPopulationReader(population, network);
 //		final PlansWriter plansWriter = new PlansWriter(population);
 //		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter, areaOfInterest);
 //		filter.setAlternativeAOI(center, radius);
@@ -475,16 +449,9 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansInNetworkArea");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -494,8 +461,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.NO_STREAMING);
 
 		System.out.println("  reading plans...");
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
 
@@ -518,23 +484,15 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansPassingLink");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
 
@@ -595,20 +553,14 @@ public class MyRuns {
 		System.out.println("RUN: filterCars");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
@@ -635,20 +587,14 @@ public class MyRuns {
 		System.out.println("RUN: filterPt");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 
 		System.out.println("  reading plans...");
 		plansReader.readFile(config.plans().getInputFile());
@@ -675,22 +621,15 @@ public class MyRuns {
 		System.out.println("RUN: filterWork");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading, processing, writing plans...");
@@ -713,22 +652,15 @@ public class MyRuns {
 		System.out.println("RUN: filterWorkEdu");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(plans);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading, processing, writing plans...");
@@ -759,22 +691,15 @@ public class MyRuns {
 		System.out.println("RUN: createDebugPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
@@ -804,23 +729,16 @@ public class MyRuns {
 		System.out.println("RUN: removeLinkAndRoute");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-//		System.out.println("  reading world xml file... ");
-//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-//		worldReader.readFile(config.world().getInputFile());
-//		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -846,27 +764,20 @@ public class MyRuns {
 		System.out.println("RUN: calcRoute");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
+		Facilities facilities = (Facilities)new World().createLayer(Facilities.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -904,22 +815,10 @@ public class MyRuns {
 		System.out.println("RUN: calcRouteMTwithTimes");
 
 		Config config = Gbl.createConfig(args);
-		World world = Gbl.createWorld();
-
-		System.out.println("  reading world... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading facilities... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
@@ -927,7 +826,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
@@ -975,12 +874,6 @@ public class MyRuns {
 		System.out.println("RUN: calcRoutePt");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		final PtNetworkLayer ptNetwork = new PtNetworkLayer();
@@ -1013,7 +906,7 @@ public class MyRuns {
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, null);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		System.out.println("  done.");
@@ -1068,12 +961,6 @@ public class MyRuns {
 		System.out.println("RUN: testPt");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		final PtNetworkLayer ptNetwork = new PtNetworkLayer();
@@ -1123,16 +1010,9 @@ public class MyRuns {
 		System.out.println("RUN: calcRealPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1165,23 +1045,16 @@ public class MyRuns {
 		System.out.println("RUN: calcScoreFromEvents_old");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
 
@@ -1217,23 +1090,15 @@ public class MyRuns {
 		System.out.println("RUN: calcScoreFromEvents_new");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
 
@@ -1273,11 +1138,9 @@ public class MyRuns {
 		System.out.println("RUN: convertNetwork");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1302,11 +1165,9 @@ public class MyRuns {
 		System.out.println("RUN: cleanNetwork");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1332,11 +1193,9 @@ public class MyRuns {
 		System.out.println("RUN: calcNofLanes");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1359,11 +1218,9 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetwork");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1389,23 +1246,15 @@ public class MyRuns {
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-//
-//		System.out.println("  reading world xml file... ");
-//		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-//		worldReader.readFile(config.world().getInputFile());
-//		System.out.println("  done.");
 
 		System.out.println("  reading the network... " + (new Date()));
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
-//		PlansReaderI plansReader = new MatsimPopulationReader(population);
-//		plansReader.readFile(config.plans().getInputFile());
+//		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		for (double radius = minRadius; radius <= maxRadius; radius += radiusStep) {
@@ -1444,16 +1293,11 @@ public class MyRuns {
 		System.out.println("RUN: calc1hODMatrices");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
+		final World world = new World();
+		
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1509,12 +1353,6 @@ public class MyRuns {
 		System.out.println("RUN: convertMatrices");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");
 		MatsimMatricesReader reader = new MatsimMatricesReader(Matrices.getSingleton());
@@ -1550,21 +1388,15 @@ public class MyRuns {
 		System.out.println("RUN: calcPlanStatistics");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  setting up plans objects...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  adding plans algorithm... ");
@@ -1628,22 +1460,15 @@ public class MyRuns {
 		System.out.println("RUN: calcTripLength");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		final Population plans = new Population(Population.USE_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final CalcAverageTripLength catl = new CalcAverageTripLength();
 		plans.addAlgorithm(catl);
 		plansReader.readFile(config.plans().getInputFile());
@@ -1664,16 +1489,9 @@ public class MyRuns {
 		System.out.println("RUN: calcTolledTripLength");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
-
+		
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1712,16 +1530,9 @@ public class MyRuns {
 		System.out.println("RUN: generateRealPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1759,7 +1570,7 @@ public class MyRuns {
 		System.out.println("RUN: writeVisumRouten_plans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -1768,8 +1579,7 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1782,7 +1592,7 @@ public class MyRuns {
 		final Population plans = new Population(Population.USE_STREAMING);
 		final VisumWriteRoutes writer = new VisumWriteRoutes("routen.rim", tvz);
 		plans.addAlgorithm(writer);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans);
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
 		System.out.println("  reading plans and running algorithms...");
@@ -1802,22 +1612,15 @@ public class MyRuns {
 	public static void calcLegTimes(final String[] args) {
 		System.out.println("RUN: calcLegTimes");
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		final NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		final NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		System.out.println("  done.");
-
-		System.out.println("  reading facilities xml file... ");
-		Facilities facilities = (Facilities)world.createLayer(Facilities.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading plans...");
 		final Population population = new Population(Population.NO_STREAMING);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(population, network).readFile(config.plans().getInputFile());
 		population.printPlansCount();
 		System.out.println("  done.");
 
@@ -1862,16 +1665,9 @@ public class MyRuns {
 		System.out.println("RUN: calcStuckVehStats");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
-
-		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
-		System.out.println("  done.");
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -1903,11 +1699,9 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetAndPlans");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		System.out.println("  falsifying the network...");
@@ -1921,7 +1715,7 @@ public class MyRuns {
 		System.out.println("  processing plans...");
 		final Population population = new Population(Population.USE_STREAMING);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
-		final PopulationReader plansReader = new MatsimPopulationReader(population);
+		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
@@ -1945,14 +1739,13 @@ public class MyRuns {
 		System.out.println("RUN: visumMatrixTest");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		Runtime.getRuntime().gc();
 		Gbl.printMemoryUsage();
 
 		System.out.println("  reading world xml file... ");
-		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-		worldReader.readFile(config.world().getInputFile());
+		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		Runtime.getRuntime().gc();
@@ -2008,24 +1801,17 @@ public class MyRuns {
 		final TreeMap<Integer, TreeMap<Id, Integer>> linkValues = new TreeMap<Integer, TreeMap<Id, Integer>>();
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		if (useVolumes) {
 
-			System.out.println("  reading world xml file... " + (new Date()));
-			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
-			worldReader.readFile(config.world().getInputFile());
-			System.out.println("  done." + (new Date()));
-
 			System.out.println("  reading plans...");
 			final Population plans = new Population(Population.USE_STREAMING);
-			final PopulationReader plansReader = new MatsimPopulationReader(plans);
+			final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 			plans.addAlgorithm(
 					new AbstractPersonAlgorithm() {
 
@@ -2149,11 +1935,9 @@ public class MyRuns {
 		System.out.println("RUN: network2kml");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -2263,7 +2047,7 @@ public class MyRuns {
 		System.out.println("RUN: readMatrices");
 
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
+		final World world = new World();
 
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
@@ -2285,11 +2069,9 @@ public class MyRuns {
 		System.out.println("RUN: readWriteLinkStats");
 
 		Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		System.out.println("  reading linkstats...");
@@ -2377,11 +2159,9 @@ public class MyRuns {
 	public static void readCounts(final String[] args) {
 		System.out.println("RUN: readCounts");
 		final Config config = Gbl.createConfig(args);
-		final World world = Gbl.createWorld();
 		final Counts counts = new Counts();
 
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE, null);
+		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		new MatsimCountsReader(counts).readFile(config.counts().getCountsFileName());
@@ -2450,49 +2230,6 @@ public class MyRuns {
 	}
 
 	public static void someTest(final String[] args) {
-//		Config config = Gbl.createConfig(args);
-//		NetworkLayer network = new NetworkLayer();
-//		Gbl.startMeasurement();
-//		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-//		Gbl.printRoundTime();
-//		QueueNetwork qnet = new QueueNetwork(network);
-//		Gbl.printRoundTime();
-
-
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (int i = 0; i < 20; i++) {
-			list.add(i);
-		}
-		for (Integer i : list) {
-			System.out.println(i);
-		}
-		System.out.println("size: " + list.size());
-
-		Iterator<Integer> iter = list.iterator();
-		while (iter.hasNext()) {
-			Integer i = iter.next();
-			if (i.intValue() % 3 == 0) {
-				System.out.println("remove");
-				iter.remove();
-			}
-		}
-		System.out.println("size: " + list.size());
-
-		for (Integer i : list) {
-			System.out.println(i);
-		}
-
-
-		try {
-			Scanner input = new Scanner(new BufferedReader(new FileReader(new File("test.txt"))));
-			BufferedReader reader = new BufferedReader(new FileReader(new File("test.txt")));
-
-
-			input.next();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 
