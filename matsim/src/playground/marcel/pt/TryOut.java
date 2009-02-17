@@ -32,16 +32,18 @@ import org.matsim.events.LinkLeaveEvent;
 import org.matsim.events.algorithms.EventWriterXML;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.gbl.Gbl;
 import org.matsim.network.Link;
+import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
-import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.CoordImpl;
+import org.matsim.population.PopulationWriter;
 import org.matsim.world.World;
 
 import playground.marcel.pt.events.ArrivalAtFacilityEvent;
@@ -208,50 +210,64 @@ public class TryOut {
 	 * @return a test network
 	 */
 	private NetworkLayer createNetwork() {
+		final String filename = "../thesis-data/examples/tryout/network.xml";
 		NetworkLayer network = new NetworkLayer();
-		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 1000));
-		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 0));
-		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(500, 500));
-		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(1500, 500));
-		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(2500, 500));
-		Node node6 = network.createNode(new IdImpl("6"), new CoordImpl(3500, 500));
-		Node node7 = network.createNode(new IdImpl("7"), new CoordImpl(4500, 500));
-		Node node8 = network.createNode(new IdImpl("8"), new CoordImpl(5000, 1000));
-		Node node9 = network.createNode(new IdImpl("9"), new CoordImpl(5000, 0));
-		network.createLink(new IdImpl("1"), node1, node3, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("2"), node2, node3, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("3"), node3, node4, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("4"), node4, node5, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("5"), node5, node6, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("6"), node6, node7, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("7"), node7, node8, 1000, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("8"), node7, node9, 1000, 10.0, 3600.0, 1);
+
+//		Node node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 1000));
+//		Node node2 = network.createNode(new IdImpl("2"), new CoordImpl(0, 0));
+//		Node node3 = network.createNode(new IdImpl("3"), new CoordImpl(500, 500));
+//		Node node4 = network.createNode(new IdImpl("4"), new CoordImpl(1500, 500));
+//		Node node5 = network.createNode(new IdImpl("5"), new CoordImpl(2500, 500));
+//		Node node6 = network.createNode(new IdImpl("6"), new CoordImpl(3500, 500));
+//		Node node7 = network.createNode(new IdImpl("7"), new CoordImpl(4500, 500));
+//		Node node8 = network.createNode(new IdImpl("8"), new CoordImpl(5000, 1000));
+//		Node node9 = network.createNode(new IdImpl("9"), new CoordImpl(5000, 0));
+//		network.createLink(new IdImpl("1"), node1, node3, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("2"), node2, node3, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("3"), node3, node4, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("4"), node4, node5, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("5"), node5, node6, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("6"), node6, node7, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("7"), node7, node8, 1000, 10.0, 3600.0, 1);
+//		network.createLink(new IdImpl("8"), node7, node9, 1000, 10.0, 3600.0, 1);
+//
+//		new NetworkWriter(network, filename).write();
+
+		new MatsimNetworkReader(network).readFile(filename);
+		
 		return network;
 	}
 
 	private Facilities createFacilities() {
+		final String filename = "../thesis-data/examples/tryout/facilities.xml";
 		final Facilities facilities = new Facilities();
-		final Facility home = facilities.createFacility(new IdImpl("home"), new CoordImpl(0, 900));
-		home.createActivity("home");
-		final Facility work = facilities.createFacility(new IdImpl("work"), new CoordImpl(0, 900));
-		work.createActivity("work");
-		final Facility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 900));
-		stop1.createActivity("access_pt");
-		final Facility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(0, 900));
-		stop2.createActivity("access_pt");
-		final Facility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(0, 900));
-		stop3.createActivity("access_pt");
-		final Facility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 900));
-		stop4.createActivity("access_pt");
-		final Facility stop5 = facilities.createFacility(new IdImpl("stop5"), new CoordImpl(0, 900));
-		stop5.createActivity("access_pt");
-		final Facility stop6 = facilities.createFacility(new IdImpl("stop6"), new CoordImpl(0, 900));
-		stop6.createActivity("access_pt");
+		
+//		final Facility home = facilities.createFacility(new IdImpl("home"), new CoordImpl(0, 900));
+//		home.createActivity("home");
+//		final Facility work = facilities.createFacility(new IdImpl("work"), new CoordImpl(0, 900));
+//		work.createActivity("work");
+//		final Facility stop1 = facilities.createFacility(new IdImpl("stop1"), new CoordImpl(0, 900));
+//		stop1.createActivity("transitInteraction");
+//		final Facility stop2 = facilities.createFacility(new IdImpl("stop2"), new CoordImpl(0, 900));
+//		stop2.createActivity("transitInteraction");
+//		final Facility stop3 = facilities.createFacility(new IdImpl("stop3"), new CoordImpl(0, 900));
+//		stop3.createActivity("transitInteraction");
+//		final Facility stop4 = facilities.createFacility(new IdImpl("stop4"), new CoordImpl(0, 900));
+//		stop4.createActivity("transitInteraction");
+//		final Facility stop5 = facilities.createFacility(new IdImpl("stop5"), new CoordImpl(0, 900));
+//		stop5.createActivity("transitInteraction");
+//		final Facility stop6 = facilities.createFacility(new IdImpl("stop6"), new CoordImpl(0, 900));
+//		stop6.createActivity("transitInteraction");
+//		
+//		new FacilitiesWriter(facilities, filename).write();
+		
+		new MatsimFacilitiesReader(facilities).readFile(filename);
 
 		return facilities;
 	}
 
 	private Population createPopulation(final NetworkLayer network, final Facilities facilities) {
+		final String filename = "../thesis-data/examples/tryout/population.xml";
 		final Population population = new Population(Population.NO_STREAMING);
 
 		final Person person = new PersonImpl(new IdImpl("1"));
@@ -260,14 +276,17 @@ public class TryOut {
 		final Act homeAct = plan.createAct("home", facilities.getFacility(new IdImpl("home")));
 		homeAct.setEndTime(7.0*3600);
 		final Leg walk1 = plan.createLeg(BasicLeg.Mode.walk);
-		final Act changeMode1 = plan.createAct("access_pt", facilities.getFacility(new IdImpl("stop2")));
+		final Act changeMode1 = plan.createAct("transitIteraction", facilities.getFacility(new IdImpl("stop2")));
 		changeMode1.setDuration(0.0);
 		final Leg bus = plan.createLeg(BasicLeg.Mode.pt);
-		final Act changeMode2 = plan.createAct("access_pt", facilities.getFacility(new IdImpl("stop5")));
+		final Act changeMode2 = plan.createAct("transitIteraction", facilities.getFacility(new IdImpl("stop5")));
 		changeMode2.setDuration(0.0);
 		final Leg walk2 = plan.createLeg(BasicLeg.Mode.walk);
 		final Act workAct = plan.createAct("work", facilities.getFacility(new IdImpl("work")));
 		workAct.setDuration(8.0*3600);
+		
+		Gbl.createConfig(null); // required for plans.outputSample
+		new PopulationWriter(population, filename, "v4").write();
 
 		return population;
 	}
