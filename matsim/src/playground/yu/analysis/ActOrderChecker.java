@@ -79,13 +79,13 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 		Population populationA = new Population();
 		ActOrderChecker aocA = new ActOrderChecker();
 		populationA.addAlgorithm(aocA);
-		new MatsimPopulationReader(populationA).readFile(plansFilenameA);
+		new MatsimPopulationReader(populationA, network).readFile(plansFilenameA);
 		populationA.runAlgorithms();
 
 		Population populationB = new Population();
 		ActOrderChecker aocB = new ActOrderChecker();
 		populationB.addAlgorithm(aocB);
-		new MatsimPopulationReader(populationB).readFile(plansFilenameB);
+		new MatsimPopulationReader(populationB,network).readFile(plansFilenameB);
 		populationB.runAlgorithms();
 
 		SimpleWriter writer = new SimpleWriter(outputFilename);
