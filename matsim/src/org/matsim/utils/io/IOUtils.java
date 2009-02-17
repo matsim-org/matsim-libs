@@ -39,6 +39,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
@@ -89,7 +90,9 @@ public class IOUtils {
 		if (logEvents != null) {
 			for (LoggingEvent e : logEvents) {
 				appender.append(e);
-				warnErrorAppender.append(e);
+				if (e.getLevel().isGreaterOrEqual(Level.WARN)) {
+					warnErrorAppender.append(e);
+				}
 			}
 		}
 	}
