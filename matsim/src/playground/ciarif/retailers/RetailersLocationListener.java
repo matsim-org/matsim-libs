@@ -51,6 +51,7 @@ import org.matsim.router.PlansCalcRouteLandmarks;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 
+
 public class RetailersLocationListener implements StartupListener, BeforeMobsimListener {
 
 	private Retailers retailers;
@@ -78,9 +79,13 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		pcrl = new PlansCalcRouteLandmarks(controler.getNetwork(),preprocess,timeCostCalc, timeCostCalc);
 		
 		// define all given retailers
-		ArrayList<Facility> facilities = null;
+		ArrayList<Facility> facilities = new ArrayList<Facility>();
 		if (this.facilityIdFile == null) {
-			facilities = (ArrayList<Facility>)controler.getFacilities().getFacilities("shop").values();
+			Iterator<Facility> fac_it = controler.getFacilities().getFacilities("shop").values().iterator();
+			for (Facility f:controler.getFacilities().getFacilities("shop").values()) {
+			System.out.println("next = " + f);
+			facilities.add(f);
+			}
 		}
 		else {
 			try {
@@ -107,7 +112,7 @@ public class RetailersLocationListener implements StartupListener, BeforeMobsimL
 		Controler controler = event.getControler();
 		Map<Id,Facility> movedFacilities = new TreeMap<Id,Facility>();
 		for (Retailer r : retailers.getRetailers().values()) {
-			// TODO balmermi: replane that with r.runStrategy();
+			// TODO balmermi: replace that with r.runStrategy();
 			Map<Id,Facility> facs =  r.moveFacilitiesMaxLink(controler);
 			movedFacilities.putAll(facs);
 		}
