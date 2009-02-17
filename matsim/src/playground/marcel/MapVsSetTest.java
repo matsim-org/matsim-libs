@@ -29,12 +29,12 @@ public class MapVsSetTest {
 
 	public static final int NOF_LOOPS = 3600;
 
-	static public class Link {
+	static private class Link {
 		int id;
 		public Link(final int id) { this.id = id; }
 	}
 
-	static public class Node_map {
+	static private class Node_map {
 		int id;
 		Map<Integer, Link> links = new LinkedHashMap<Integer, Link>();
 		Link[] linksArray = null;
