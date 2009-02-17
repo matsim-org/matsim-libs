@@ -54,7 +54,7 @@ public class MyMain {
 		String equilExampleConfig = "examples/equil/configOTF.xml";
 		
 //		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/config.xml";
-		String oneRouteNoModeTest = "../studies/bkickhoefer/oneRouteNoModeTest/configOldUtlFctn.xml";
+		String oneRouteNoModeTest = "../bkick/oneRouteNoModeTest/configOldUtlFctn.xml";
 
 
 //		String config = equilExampleConfig;

@@ -118,7 +118,7 @@ public class BkTestPlansCreator {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String outfile = "../studies/bkickhoefer/oneRouteNoModeTest/plans.xml";
+		String outfile = "../bkick/oneRouteNoModeTest/plans.xml";
 		BkTestPlansCreator pc = new BkTestPlansCreator();
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = pc.createPlans();
 		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);

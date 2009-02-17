@@ -64,7 +64,7 @@ public class BkTestPlansCreatorWithPt {
 		log.info("starting plans creation...");
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = new BasicPopulationImpl();
 		
-		for (int i = 1; i <= 1000; i++) {
+		for (int i = 1; i <= 2000; i++) {
 			BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>> p = new BasicPersonImpl(new IdImpl(i));
 			BasicPlan plan = new BasicPlanImpl();
 			plan.setSelected(true);
@@ -152,7 +152,7 @@ public class BkTestPlansCreatorWithPt {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		String outfile = "../studies/bkickhoefer/oneRouteTwoModeTest/plans.xml";
+		String outfile = "../bkick/oneRouteNoModeTest/plans.xml";
 		BkTestPlansCreatorWithPt pc = new BkTestPlansCreatorWithPt();
 		BasicPopulation<BasicPerson<BasicPlan, BasicKnowledge<BasicActivity>>> pop = pc.createPlans();
 		PopulationWriterV5 writer = new PopulationWriterV5(pop, null);
