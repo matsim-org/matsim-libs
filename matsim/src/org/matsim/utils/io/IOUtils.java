@@ -41,7 +41,6 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.controler.Controler;
 
@@ -80,7 +79,7 @@ public class IOUtils {
 		warnErrorAppender.setName(WARNLOGFILE);
 		//dg dec 08: the following deprecated line should, in theory, be replaced by the code commented below,
 		//however it is only working with the deprecated method
-		warnErrorAppender.setThreshold(Priority.WARN);
+		warnErrorAppender.setThreshold(Level.WARN);
 //		LevelRangeFilter filter = new LevelRangeFilter();
 //		filter.setLevelMax(Level.ALL);
 //		filter.setAcceptOnMatch(true);
