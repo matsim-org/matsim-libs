@@ -32,11 +32,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystems.control.SignalSystemControler;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.v01.Id;
 import org.matsim.config.Config;
 import org.matsim.controler.Controler;
@@ -103,21 +103,21 @@ public class QueueSimulation {
 	/**
 	 * The SignalSystemDefinitions accessible by their Id
 	 */
-	private SortedMap<Id, BasicLightSignalSystemDefinition> signalSystemDefinitions;
+	private SortedMap<Id, BasicSignalSystemDefinition> signalSystemDefinitions;
 	/**
 	 * The SignalGroupDefinitions accessible by the Id of the SignalSystem they belong
 	 * to.
 	 */
-	private SortedMap<Id, List<BasicLightSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
+	private SortedMap<Id, List<BasicSignalGroupDefinition>> signalGroupDefinitionsBySystemId;
 	/**
 	 * Contains the SignalSystemControler instances which can be accessed by the
 	 * Id of the SignalSystemDefinition
 	 */
 	private SortedMap<Id, SignalSystemControler> signalSystemControlerBySystemId;
 
-	private BasicLightSignalSystems signalSystems;
+	private BasicSignalSystems signalSystems;
 
-	private List<BasicLightSignalSystemConfiguration> signalSystemsConfig;
+	private List<BasicSignalSystemConfiguration> signalSystemsConfig;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -142,7 +142,7 @@ public class QueueSimulation {
 	 * @param signalSystems
 	 * @param signalSystemsConfig
 	 */
-	public void setSignalSystems(BasicLightSignalSystems signalSystems, List<BasicLightSignalSystemConfiguration> signalSystemsConfig){
+	public void setSignalSystems(BasicSignalSystems signalSystems, List<BasicSignalSystemConfiguration> signalSystemsConfig){
 		this.signalSystems = signalSystems;
 		this.signalSystemsConfig = signalSystemsConfig;
 	}
@@ -160,18 +160,18 @@ public class QueueSimulation {
 		}
 	}
 
-	private void initSignalSystems(BasicLightSignalSystems signalSystems) {
-		this.signalSystemDefinitions = new TreeMap<Id, BasicLightSignalSystemDefinition>();
-		for (BasicLightSignalSystemDefinition signalSystem : signalSystems.getLightSignalSystemDefinitions()) {
+	private void initSignalSystems(BasicSignalSystems signalSystems) {
+		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
+		for (BasicSignalSystemDefinition signalSystem : signalSystems.getLightSignalSystemDefinitions()) {
 			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
 		}
-		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicLightSignalGroupDefinition>>();
-		for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getLightSignalGroupDefinitions()) {
+		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
+		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getLightSignalGroupDefinitions()) {
 			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
 			//TODO check if quueuLInk null?? or write ScenarioChecker
-			List<BasicLightSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
+			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
 			if (list == null) {
-				list = new ArrayList<BasicLightSignalGroupDefinition>();
+				list = new ArrayList<BasicSignalGroupDefinition>();
 				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
 			}
 			list.add(basicLightSignalGroupDefinition);
@@ -180,22 +180,22 @@ public class QueueSimulation {
 		}
 	}
 	
-	private void initSignalSystemController(List<BasicLightSignalSystemConfiguration> signalSystemsConfig) {
+	private void initSignalSystemController(List<BasicSignalSystemConfiguration> signalSystemsConfig) {
 		this.signalSystemControlerBySystemId = new TreeMap<Id, SignalSystemControler>();
-		for (BasicLightSignalSystemConfiguration config : signalSystemsConfig) {
+		for (BasicSignalSystemConfiguration config : signalSystemsConfig) {
 			//TODO consider adaptive controlers
 			PlanBasedSignalSystemControler controler = new PlanBasedSignalSystemControler(config);
 			this.signalSystemControlerBySystemId.put(config.getLightSignalSystemId(), controler);
-			BasicLightSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
+			BasicSignalSystemDefinition systemDef = this.signalSystemDefinitions.get(config.getLightSignalSystemId());
 			controler.setDefaultCirculationTime(systemDef.getDefaultCirculationTime());
 			//TODO set other defaults of xml
-			List<BasicLightSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
+			List<BasicSignalGroupDefinition> groups = this.signalGroupDefinitionsBySystemId.get(config.getLightSignalSystemId());
 			if ((groups == null) || groups.isEmpty()) {
 				String message = "SignalSystemControler without any SignalGroups defined in SignalSystemConfiguration!";
 				log.warn(message);
 			}
 			else {
-				for (BasicLightSignalGroupDefinition group : groups){
+				for (BasicSignalGroupDefinition group : groups){
 					group.setResponsibleLSAControler(controler);
 				}
 			}

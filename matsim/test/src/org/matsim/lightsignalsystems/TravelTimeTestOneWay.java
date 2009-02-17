@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
@@ -82,7 +82,7 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		
 		ScenarioData data = new ScenarioData(conf);
-		BasicLightSignalSystems signalSystems = data.getSignalSystems();
+		BasicSignalSystems signalSystems = data.getSignalSystems();
 		
 		Events events = new Events();
 		events.addHandler(this);
@@ -96,14 +96,14 @@ public class TravelTimeTestOneWay extends MatsimTestCase implements	LinkLeaveEve
 		for (int i = 1; i <= umlaufzeit; i++) {
 			this.beginningOfLink2 = null;
 
-			List<BasicLightSignalSystemConfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
+			List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
 			MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
 			reader.readFile(lsaConfig);
-			for (BasicLightSignalSystemConfiguration lssConfig : lssConfigs) {
-				BasicPlanBasedLightSignalSystemControlInfo controlInfo = (BasicPlanBasedLightSignalSystemControlInfo) lssConfig.getControlInfo();
-				BasicLightSignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
+			for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
+				BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig.getControlInfo();
+				BasicSignalSystemPlan p = controlInfo.getPlans().get(new IdImpl("2"));
 				p.setCirculationTime((double)umlaufzeit);
-				BasicLightSignalGroupConfiguration group = p.getGroupConfigs().get(new IdImpl("100"));
+				BasicSignalGroupConfiguration group = p.getGroupConfigs().get(new IdImpl("100"));
 				group.setDropping(i);
 			}
 			

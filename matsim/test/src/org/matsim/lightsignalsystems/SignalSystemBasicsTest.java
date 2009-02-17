@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
@@ -75,22 +75,22 @@ public class SignalSystemBasicsTest extends MatsimTestCase implements
 		conf.signalSystems().setSignalSystemConfigFile(lsaConfig);
 		conf.plans().setInputFile(plansFile);
 		ScenarioData data = new ScenarioData(conf);
-		BasicLightSignalSystems signalSystems = data.getSignalSystems();
+		BasicSignalSystems signalSystems = data.getSignalSystems();
 
 		Events events = new Events();
 		events.addHandler(this);
 
-		List<BasicLightSignalSystemConfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
+		List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
 		MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(
 				lssConfigs);
 		reader.readFile(lsaConfig);
-		for (BasicLightSignalSystemConfiguration lssConfig : lssConfigs) {
-			BasicPlanBasedLightSignalSystemControlInfo controlInfo = (BasicPlanBasedLightSignalSystemControlInfo) lssConfig
+		for (BasicSignalSystemConfiguration lssConfig : lssConfigs) {
+			BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfig
 					.getControlInfo();
-			BasicLightSignalSystemPlan p = controlInfo.getPlans()
+			BasicSignalSystemPlan p = controlInfo.getPlans()
 					.get(new IdImpl("2"));
 			p.setCirculationTime(60.0);
-			BasicLightSignalGroupConfiguration group = p.getGroupConfigs().get(
+			BasicSignalGroupConfiguration group = p.getGroupConfigs().get(
 					new IdImpl("100"));
 			group.setDropping(60);
 		}

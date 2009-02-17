@@ -32,11 +32,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.Schema;
 
 import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemsConfigFactory;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemsConfigFactory;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.xml.lightsignalsystemsconfig.XMLAdaptiveLightSignalSystemControlInfoType;
 import org.matsim.basic.xml.lightsignalsystemsconfig.XMLLightSignalGroupConfigurationType;
@@ -54,11 +54,11 @@ public class MatsimLightSignalSystemConfigurationReader {
 
   private XMLLightSignalSystemConfig xmlLssConfig;
 	
-  private BasicLightSignalSystemsConfigFactory factory = new BasicLightSignalSystemsConfigFactory();
+  private BasicSignalSystemsConfigFactory factory = new BasicSignalSystemsConfigFactory();
 
-	private List<BasicLightSignalSystemConfiguration> lssConfigurations;
+	private List<BasicSignalSystemConfiguration> lssConfigurations;
   
-	public MatsimLightSignalSystemConfigurationReader(List<BasicLightSignalSystemConfiguration> lssConfigs) {
+	public MatsimLightSignalSystemConfigurationReader(List<BasicSignalSystemConfiguration> lssConfigs) {
 		this.lssConfigurations = lssConfigs;
 	}
 	
@@ -75,16 +75,16 @@ public class MatsimLightSignalSystemConfigurationReader {
 					new FileInputStream( filename ) );
 
 			for (XMLLightSignalSystemConfigurationType xmlLssConfiguration : xmlLssConfig.getLightSignalSystemConfiguration()){
-				BasicLightSignalSystemConfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
+				BasicSignalSystemConfiguration blssc = factory.createLightSignalSystemConfiguration(new IdImpl(xmlLssConfiguration.getRefId()));
 				
 				XMLLightSignalSystemControlInfoType xmlcit = xmlLssConfiguration.getLightSignalSystemControlInfo();
 				if (xmlcit instanceof XMLPlanbasedlightSignalSystemControlInfoType) {
 					XMLPlanbasedlightSignalSystemControlInfoType xmlpcit = (XMLPlanbasedlightSignalSystemControlInfoType) xmlcit;
 					
-					BasicPlanBasedLightSignalSystemControlInfo controlInfo = factory.createPlanBasedLightSignalSystemControlInfo();
+					BasicPlanBasedSignalSystemControlInfo controlInfo = factory.createPlanBasedLightSignalSystemControlInfo();
 					
 					for (XMLLightSignalSystemPlanType xmlplan : xmlpcit.getLightSignalSystemPlan()) {
-						BasicLightSignalSystemPlan plan = factory.createLightSignalSystemPlan(new IdImpl(xmlplan.getId()));					
+						BasicSignalSystemPlan plan = factory.createLightSignalSystemPlan(new IdImpl(xmlplan.getId()));					
 						plan.setStartTime(getSeconds(xmlplan.getStart().getDaytime()));
 						plan.setEndTime(getSeconds(xmlplan.getStop().getDaytime()));
 						if (xmlplan.getCirculationTime() != null) {
@@ -94,7 +94,7 @@ public class MatsimLightSignalSystemConfigurationReader {
 							plan.setSyncronizationOffset(xmlplan.getSyncronizationOffset().getSeconds());
 						}
 						for (XMLLightSignalGroupConfigurationType xmlgroupconfig : xmlplan.getLightSignalGroupConfiguration()) {
-							BasicLightSignalGroupConfiguration groupConfig = factory.createLightSignalGroupConfiguration(new IdImpl(xmlgroupconfig.getRefId()));
+							BasicSignalGroupConfiguration groupConfig = factory.createLightSignalGroupConfiguration(new IdImpl(xmlgroupconfig.getRefId()));
 							groupConfig.setRoughCast(xmlgroupconfig.getRoughcast().getSec().doubleValue());
 							groupConfig.setDropping(xmlgroupconfig.getDropping().getSec().doubleValue());
 							if (xmlgroupconfig.getInterimTimeRoughcast() != null)

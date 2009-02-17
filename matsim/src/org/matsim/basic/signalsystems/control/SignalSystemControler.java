@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.basic.signalsystems.control;
 
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 
 
 /**
@@ -28,5 +28,5 @@ import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
  */
 public abstract class SignalSystemControler {
 
-	public abstract boolean givenSignalGroupIsGreen(BasicLightSignalGroupDefinition signalGroup);
+	public abstract boolean givenSignalGroupIsGreen(BasicSignalGroupDefinition signalGroup);
 }

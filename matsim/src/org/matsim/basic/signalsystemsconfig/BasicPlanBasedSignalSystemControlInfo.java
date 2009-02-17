@@ -19,29 +19,27 @@
 
 package org.matsim.basic.signalsystemsconfig;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.basic.v01.Id;
 
 /**
  * @author dgrether
  */
-public class BasicLightSignalSystemsConfigFactory {
+public class BasicPlanBasedSignalSystemControlInfo implements BasicSignalSystemControlInfo {
 
-	public BasicLightSignalSystemConfiguration createLightSignalSystemConfiguration(
-			Id refId) {
-		return new BasicLightSignalSystemConfiguration(refId);
+	private Map<Id, BasicSignalSystemPlan> plans;
+	
+	public Map<Id, BasicSignalSystemPlan> getPlans() {
+		return plans;
 	}
 
-	public BasicPlanBasedLightSignalSystemControlInfo createPlanBasedLightSignalSystemControlInfo() {
-		return new BasicPlanBasedLightSignalSystemControlInfo();
-	}
-
-	public BasicLightSignalSystemPlan createLightSignalSystemPlan(Id id) {
-		return new BasicLightSignalSystemPlan(id);
-	}
-
-	public BasicLightSignalGroupConfiguration createLightSignalGroupConfiguration(
-			Id refid) {
-		return new BasicLightSignalGroupConfiguration(refid);
+	public void addPlan(BasicSignalSystemPlan plan) {
+		if (this.plans == null) {
+			this.plans = new HashMap<Id, BasicSignalSystemPlan>();
+		}
+		this.plans.put(plan.getId(), plan);
 	}
 
 }

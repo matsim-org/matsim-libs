@@ -28,9 +28,9 @@ import javax.xml.bind.Marshaller;
 
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
 import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;
@@ -47,11 +47,11 @@ import org.matsim.utils.io.IOUtils;
  */
 public class MatsimLightSignalSystemsWriter {
 	
-	private BasicLightSignalSystems blss;
+	private BasicSignalSystems blss;
 
 	private XMLLightSignalSystems xmlLightSignalSystems;
 	
-	public MatsimLightSignalSystemsWriter(BasicLightSignalSystems basiclss) {
+	public MatsimLightSignalSystemsWriter(BasicSignalSystems basiclss) {
 		this.blss = basiclss;
 		this.xmlLightSignalSystems = convertBasicToXml();
 	}	
@@ -107,7 +107,7 @@ public class MatsimLightSignalSystemsWriter {
 		} //end writing lanesToLinkAssignments
 		
 		//writing lightSignalSystemDefinitions
-		for (BasicLightSignalSystemDefinition lssd : this.blss.getLightSignalSystemDefinitions()) {
+		for (BasicSignalSystemDefinition lssd : this.blss.getLightSignalSystemDefinitions()) {
 			XMLLightSignalSystemDefinitionType xmllssd = fac.createXMLLightSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -127,7 +127,7 @@ public class MatsimLightSignalSystemsWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (BasicLightSignalGroupDefinition lsgd : this.blss.getLightSignalGroupDefinitions()) {
+		for (BasicSignalGroupDefinition lsgd : this.blss.getLightSignalGroupDefinitions()) {
 			XMLLightSignalGroupDefinitionType xmllsgd = fac.createXMLLightSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());

@@ -17,50 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.basic.signalsystems;
+package org.matsim.basic.signalsystemsconfig;
 
 import org.matsim.basic.v01.Id;
 
 /**
  * @author dgrether
  */
-public class BasicLightSignalSystemDefinition {
+public class BasicSignalSystemConfiguration {
 
-  private Id id;
-  private double defaultCirculationTime;
-  private double syncronizationOffset;
-  private double defaultInterimTime;
-	
-  public BasicLightSignalSystemDefinition(Id id) {
-  	this.id = id;
-  }
-  
-	public Id getId() {
-		return id;
+	private final Id lightSignalSystemId;
+
+	private BasicPlanBasedSignalSystemControlInfo controlInfo;
+
+	public BasicSignalSystemConfiguration(final Id lightSignalSystemId) {
+		this.lightSignalSystemId = lightSignalSystemId;
 	}
-	
-	public double getDefaultCirculationTime() {
-		return defaultCirculationTime;
+
+	public void setLightSignalSystemControlInfo(
+			final BasicPlanBasedSignalSystemControlInfo controlInfo) {
+		this.controlInfo = controlInfo;
 	}
-	
-	public void setDefaultCirculationTime(double defaultCirculationTime) {
-		this.defaultCirculationTime = defaultCirculationTime;
+
+	public Id getLightSignalSystemId() {
+		return this.lightSignalSystemId;
 	}
-	
-	public double getDefaultSyncronizationOffset() {
-		return syncronizationOffset;
+
+	public BasicSignalSystemControlInfo getControlInfo() {
+		return this.controlInfo;
 	}
-	
-	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
-		this.syncronizationOffset = syncronizationOffset;
-	}
-	
-	public double getDefaultInterimTime() {
-		return defaultInterimTime;
-	}
-	
-	public void setDefaultInterimTime(double defaultInterimTime) {
-		this.defaultInterimTime = defaultInterimTime;
-	}
+
+
 
 }

@@ -26,11 +26,11 @@ import java.util.List;
  * @author dgrether
  *
  */
-public class BasicLightSignalSystems {
+public class BasicSignalSystems {
 
 	private List<BasicLanesToLinkAssignment> lanesToLinkAssignments;
-	private List<BasicLightSignalSystemDefinition> lightSignalSystemDefinitions;
-	private List<BasicLightSignalGroupDefinition> lightSignalGroupDefinitions;
+	private List<BasicSignalSystemDefinition> lightSignalSystemDefinitions;
+	private List<BasicSignalGroupDefinition> lightSignalGroupDefinitions;
 
 	
 	
@@ -41,12 +41,12 @@ public class BasicLightSignalSystems {
 	}
 
 	
-	public List<BasicLightSignalSystemDefinition> getLightSignalSystemDefinitions() {
+	public List<BasicSignalSystemDefinition> getLightSignalSystemDefinitions() {
 		return lightSignalSystemDefinitions;
 	}
 
 	
-	public List<BasicLightSignalGroupDefinition> getLightSignalGroupDefinitions() {
+	public List<BasicSignalGroupDefinition> getLightSignalGroupDefinitions() {
 		return lightSignalGroupDefinitions;
 	}
 
@@ -64,16 +64,16 @@ public class BasicLightSignalSystems {
 	 * @param lssdef
 	 */
 	public void addLightSignalSystemDefinition(
-			BasicLightSignalSystemDefinition lssdef) {
+			BasicSignalSystemDefinition lssdef) {
 		if (this.lightSignalSystemDefinitions == null) {
-			this.lightSignalSystemDefinitions = new ArrayList<BasicLightSignalSystemDefinition>();
+			this.lightSignalSystemDefinitions = new ArrayList<BasicSignalSystemDefinition>();
 		}
 		this.lightSignalSystemDefinitions.add(lssdef);
 	}
 	
-	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition lsgdef) {
+	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
 		if (this.lightSignalGroupDefinitions == null) {
-			this.lightSignalGroupDefinitions = new ArrayList<BasicLightSignalGroupDefinition>();
+			this.lightSignalGroupDefinitions = new ArrayList<BasicSignalGroupDefinition>();
 		}
 		this.lightSignalGroupDefinitions.add(lsgdef);
 	}

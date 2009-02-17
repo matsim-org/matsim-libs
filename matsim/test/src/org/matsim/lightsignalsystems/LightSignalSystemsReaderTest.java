@@ -21,9 +21,9 @@ package org.matsim.lightsignalsystems;
 
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
@@ -50,7 +50,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   private Id id42 = new IdImpl("42");
   
   public void testParser() {
-  	BasicLightSignalSystems lss = new BasicLightSignalSystems();
+  	BasicSignalSystems lss = new BasicSignalSystems();
   	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   	
@@ -60,7 +60,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   public void testWriter() {
   	String testoutput = this.getOutputDirectory()  + "testLssOutput.xml";
   	//read the test file
-  	BasicLightSignalSystems lss = new BasicLightSignalSystems();
+  	BasicSignalSystems lss = new BasicSignalSystems();
   	MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(lss);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
@@ -68,13 +68,13 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	MatsimLightSignalSystemsWriter writer = new MatsimLightSignalSystemsWriter(lss);
   	writer.writeFile(testoutput);
   	
-  	lss = new BasicLightSignalSystems();
+  	lss = new BasicSignalSystems();
   	reader = new MatsimLightSignalSystemsReader(lss);
   	reader.readFile(testoutput);
   	checkContent(lss);
   }
 
-  private void checkContent(BasicLightSignalSystems lss) {
+  private void checkContent(BasicSignalSystems lss) {
   	assertEquals(1, lss.getLanesToLinkAssignments().size());
   	assertEquals(2, lss.getLightSignalSystemDefinitions().size());
   	assertEquals(2, lss.getLightSignalGroupDefinitions().size());
@@ -92,7 +92,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(60.0, lane.getLength(), EPSILON);
   	assertEquals(2, lane.getNumberOfRepresentedLanes());	
   	
-  	BasicLightSignalSystemDefinition lssd;
+  	BasicSignalSystemDefinition lssd;
   	lssd = lss.getLightSignalSystemDefinitions().get(0);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
@@ -100,7 +100,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(5.0, lssd.getDefaultSyncronizationOffset(), EPSILON);
   	assertEquals(3.0, lssd.getDefaultInterimTime(), EPSILON);
   	
-  	BasicLightSignalGroupDefinition lsgd;
+  	BasicSignalGroupDefinition lsgd;
   	lsgd = lss.getLightSignalGroupDefinitions().get(1);
   	assertNotNull(lsgd);
   	assertEquals(id42, lsgd.getLinkRefId());

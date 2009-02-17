@@ -24,6 +24,6 @@ package org.matsim.basic.signalsystemsconfig;
  * 
  * @author dgrether
  */
-public interface BasicLightSignalSystemControlInfo {
+public interface BasicSignalSystemControlInfo {
 
 }

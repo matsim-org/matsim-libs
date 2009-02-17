@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
 import org.matsim.events.AgentDepartureEvent;
@@ -36,7 +36,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 
 	private boolean amIOriginalLink = false;
 	private Id laneLinkIdSpecifiedInFile;
-	private ArrayList<BasicLightSignalGroupDefinition> sgsOnThisSubLink = null;
+	private ArrayList<BasicSignalGroupDefinition> sgsOnThisSubLink = null;
 
 	/** Haelt alle echten Ziellinks, die von diesem Link erreichbar sind, meist 1-3 */
 	private List<Link> destLinks = new LinkedList<Link>();
@@ -133,11 +133,11 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		return true;
 	}
 	
-	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
+	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition basicLightSignalGroupDefinition) {
 		for (Id laneId : basicLightSignalGroupDefinition.getLaneIds()) {
 			if (this.laneLinkIdSpecifiedInFile.equals(laneId)) {
 				if (this.sgsOnThisSubLink == null) {
-					this.sgsOnThisSubLink = new ArrayList<BasicLightSignalGroupDefinition>();
+					this.sgsOnThisSubLink = new ArrayList<BasicSignalGroupDefinition>();
 				}
 				this.sgsOnThisSubLink.add(basicLightSignalGroupDefinition);
 			}
@@ -162,7 +162,7 @@ public class PseudoLink implements Comparable<PseudoLink> {
 		// Everything seems to be normal, so proceed
 		boolean firstVehInQueueCouldMove = false;
 
-		for (BasicLightSignalGroupDefinition signalGroup : this.sgsOnThisSubLink) {
+		for (BasicSignalGroupDefinition signalGroup : this.sgsOnThisSubLink) {
 			boolean sgIsGreen = signalGroup.isGreen();
 			if (sgIsGreen) {
 				this.setThisTimeStepIsGreen(true);

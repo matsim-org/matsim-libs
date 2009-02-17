@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
@@ -24,7 +24,7 @@ public class GreenTimeReader implements TabularFileHandler {
 		
 //	private boolean isFirstLine = true;
 	
-	private HashMap<Integer, BasicLightSignalSystemConfiguration> lsaConfigMap = new HashMap<Integer, BasicLightSignalSystemConfiguration>();
+	private HashMap<Integer, BasicSignalSystemConfiguration> lsaConfigMap = new HashMap<Integer, BasicSignalSystemConfiguration>();
 
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
@@ -33,12 +33,12 @@ public class GreenTimeReader implements TabularFileHandler {
 		} else {
 //			log.info("Added: " + row.toString());
 			
-			BasicLightSignalSystemConfiguration lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
+			BasicSignalSystemConfiguration lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
 			
 			if(lsa == null){
-				lsa = new BasicLightSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
-				BasicPlanBasedLightSignalSystemControlInfo controlInfo = new BasicPlanBasedLightSignalSystemControlInfo();
-				BasicLightSignalSystemPlan plan = new BasicLightSignalSystemPlan(new IdImpl("1"));
+				lsa = new BasicSignalSystemConfiguration(new IdImpl(Integer.parseInt(row[0])));
+				BasicPlanBasedSignalSystemControlInfo controlInfo = new BasicPlanBasedSignalSystemControlInfo();
+				BasicSignalSystemPlan plan = new BasicSignalSystemPlan(new IdImpl("1"));
 				plan.setCirculationTime(new Double(99.0));
 				plan.setStartTime(0);
 				plan.setEndTime(86399);
@@ -49,19 +49,19 @@ public class GreenTimeReader implements TabularFileHandler {
 				this.lsaConfigMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
-			BasicLightSignalGroupConfiguration sgConfig = new BasicLightSignalGroupConfiguration(new IdImpl(row[1]));
+			BasicSignalGroupConfiguration sgConfig = new BasicSignalGroupConfiguration(new IdImpl(row[1]));
 			sgConfig.setRoughCast(0.0);
 			sgConfig.setDropping(Double.parseDouble(row[2]));
 			sgConfig.setInterimTimeRoughcast(new Double(2.0));
 			sgConfig.setInterimTimeDropping(new Double(3.0));
-			((BasicPlanBasedLightSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
+			((BasicPlanBasedSignalSystemControlInfo) lsa.getControlInfo()).getPlans().get(new IdImpl(1)).addLightSignalGroupConfiguration(sgConfig);
 
 		}
 		
 	}
 	
 	
-	public HashMap<Integer, BasicLightSignalSystemConfiguration> readFile(String filename) throws IOException {
+	public HashMap<Integer, BasicSignalSystemConfiguration> readFile(String filename) throws IOException {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] {" ", "\t"}); // \t
@@ -70,7 +70,7 @@ public class GreenTimeReader implements TabularFileHandler {
 		return this.lsaConfigMap;
 	}
 	
-	public static HashMap<Integer, BasicLightSignalSystemConfiguration> readBasicLightSignalSystemDefinition(String filename){
+	public static HashMap<Integer, BasicSignalSystemConfiguration> readBasicLightSignalSystemDefinition(String filename){
 		
 		GreenTimeReader myLSAFileParser = new GreenTimeReader();
 		try {			

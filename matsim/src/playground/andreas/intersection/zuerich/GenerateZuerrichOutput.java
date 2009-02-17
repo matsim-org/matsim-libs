@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationWriter;
@@ -23,10 +23,10 @@ public class GenerateZuerrichOutput {
 	public static void main(String[] args) {
 		
 		// rausschreiben
-		HashMap<Integer, BasicLightSignalSystemDefinition> basicLightSignalSystemDefinition = LSASystemsReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/lsa_tu.txt");
+		HashMap<Integer, BasicSignalSystemDefinition> basicLightSignalSystemDefinition = LSASystemsReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/lsa_tu.txt");
 		
-		HashMap<Integer, BasicLightSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/sg_greentime.txt");
-		MatsimLightSignalSystemConfigurationWriter matsimLightSignalSystemConfigurationWriter = new MatsimLightSignalSystemConfigurationWriter(new ArrayList<BasicLightSignalSystemConfiguration>(basicLightSignalSystemConfiguration.values()));
+		HashMap<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition("D:/ampel/generateOutputFile/sg_greentime.txt");
+		MatsimLightSignalSystemConfigurationWriter matsimLightSignalSystemConfigurationWriter = new MatsimLightSignalSystemConfigurationWriter(new ArrayList<BasicSignalSystemConfiguration>(basicLightSignalSystemConfiguration.values()));
 		matsimLightSignalSystemConfigurationWriter.writeFile("lsa_config.xml");
 		
 		// sortieren
@@ -77,7 +77,7 @@ public class GenerateZuerrichOutput {
 			}			
 		}
 		
-		HashMap<Id, BasicLightSignalGroupDefinition> basicSGs = new HashMap<Id, BasicLightSignalGroupDefinition>();
+		HashMap<Id, BasicSignalGroupDefinition> basicSGs = new HashMap<Id, BasicSignalGroupDefinition>();
 		
 		for (Integer nodeId : lsaSpurMapping.keySet()) {
 			
@@ -87,10 +87,10 @@ public class GenerateZuerrichOutput {
 
 				if (laneLinkMapping.get(nodeId).get(fromSGId) != null){
 
-					BasicLightSignalGroupDefinition sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
+					BasicSignalGroupDefinition sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
 
 					if (sg == null){
-						sg = new BasicLightSignalGroupDefinition(new IdImpl(laneLinkMapping.get(nodeId).get(lsaSpurMapping.get(nodeId).get(fromSGId).get(0))), new IdImpl(fromSGId.intValue()));
+						sg = new BasicSignalGroupDefinition(new IdImpl(laneLinkMapping.get(nodeId).get(lsaSpurMapping.get(nodeId).get(fromSGId).get(0))), new IdImpl(fromSGId.intValue()));
 						sg.setLightSignalSystemDefinitionId(new IdImpl(fromSGId.intValue()));
 					}
 
@@ -118,18 +118,18 @@ public class GenerateZuerrichOutput {
 			}			
 		}
 		
-		BasicLightSignalSystems basicLightSignalSystems = new BasicLightSignalSystems();
+		BasicSignalSystems basicLightSignalSystems = new BasicSignalSystems();
 		for (BasicLanesToLinkAssignment basicAssignment : basicLaneToLinkAs.values()) {
 			if (!basicAssignment.getLinkId().toString().equalsIgnoreCase("-")){
 				basicLightSignalSystems.addLanesToLinkAssignment(basicAssignment);
 			} else System.err.println("Removed an assignment");			
 		}
-		for (BasicLightSignalGroupDefinition basicSignalGroup : basicSGs.values()) {
+		for (BasicSignalGroupDefinition basicSignalGroup : basicSGs.values()) {
 //			if (basicSignalGroup.getLinkRefId() != null){
 				basicLightSignalSystems.addLightSignalGroupDefinition(basicSignalGroup);
 //			} else System.err.println("Removed a SignalGroup");
 		}
-		for (BasicLightSignalSystemDefinition basicSignalSystem : basicLightSignalSystemDefinition.values()) {
+		for (BasicSignalSystemDefinition basicSignalSystem : basicLightSignalSystemDefinition.values()) {
 			basicLightSignalSystems.addLightSignalSystemDefinition(basicSignalSystem);
 		}
 

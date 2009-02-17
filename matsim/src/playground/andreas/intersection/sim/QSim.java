@@ -28,10 +28,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.Events;
 import org.matsim.mobsim.queuesim.QueueLink;
@@ -71,10 +71,10 @@ public class QSim extends QueueSimulation {
   //dg jan 09 this method is never used
 	private void readSignalSystemControler(){
 		
-		BasicLightSignalSystems newSignalSystems = new BasicLightSignalSystems();
+		BasicSignalSystems newSignalSystems = new BasicSignalSystems();
 		MatsimLightSignalSystemsReader lsaReader = new MatsimLightSignalSystemsReader(newSignalSystems);
 
-		List<BasicLightSignalSystemConfiguration> newSignalSystemsConfig = new ArrayList<BasicLightSignalSystemConfiguration>();
+		List<BasicSignalSystemConfiguration> newSignalSystemsConfig = new ArrayList<BasicSignalSystemConfiguration>();
 	  	MatsimLightSignalSystemConfigurationReader lsaReaderConfig = new MatsimLightSignalSystemConfigurationReader(newSignalSystemsConfig);
 		
 		lsaReader.readFile(this.newLSADef);
@@ -90,7 +90,7 @@ public class QSim extends QueueSimulation {
 
 		// Create a SignalSystemControler for every signal system configuration found
 		if (null != this.newLSADefCfg) {
-			for (BasicLightSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
+			for (BasicSignalSystemConfiguration basicLightSignalSystemConfiguration : newSignalSystemsConfig) {
 				NewSignalSystemControlerImpl newLSAControler = new NewSignalSystemControlerImpl(basicLightSignalSystemConfiguration);
 				sortedLSAControlerMap.put(basicLightSignalSystemConfiguration.getLightSignalSystemId(), newLSAControler);
 			}
@@ -98,11 +98,11 @@ public class QSim extends QueueSimulation {
 			// Set the defaultCirculationTime for every SignalLightControler
 			// depends on the existence of a configuration for every signalsystem specified
 			// TODO [an] defaultSyncronizationOffset and defaultInterimTime still ignored
-			for (BasicLightSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getLightSignalSystemDefinitions()) {
+			for (BasicSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getLightSignalSystemDefinitions()) {
 				sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCirculationTime());
 			}
 			
-			for (BasicLightSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
+			for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
 				
 				if(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()) == null){
 					log.warn("Signal group defined, but corresponding controler with Id " + basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId() + " is missing." +

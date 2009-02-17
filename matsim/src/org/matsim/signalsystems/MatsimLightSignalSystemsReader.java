@@ -35,10 +35,10 @@ import javax.xml.validation.Schema;
 import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemsFactory;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystems.BasicSignalSystemsFactory;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.basic.xml.lightsignalsystems.ObjectFactory;
 import org.matsim.basic.xml.lightsignalsystems.XMLIdRefType;
@@ -54,12 +54,12 @@ import org.xml.sax.SAXException;
  */
 public class MatsimLightSignalSystemsReader {
 	
-	private BasicLightSignalSystems lightSignalSystems;
+	private BasicSignalSystems lightSignalSystems;
    
-  private BasicLightSignalSystemsFactory factory = new BasicLightSignalSystemsFactory();
+  private BasicSignalSystemsFactory factory = new BasicSignalSystemsFactory();
 
 	
-	public MatsimLightSignalSystemsReader(BasicLightSignalSystems lightSignalSystems) {
+	public MatsimLightSignalSystemsReader(BasicSignalSystems lightSignalSystems) {
 		this.lightSignalSystems = lightSignalSystems;
 	}
 	
@@ -111,7 +111,7 @@ public class MatsimLightSignalSystemsReader {
 				lightSignalSystems.addLanesToLinkAssignment(l2lAssignment);
 			}
 			
-			BasicLightSignalSystemDefinition lssdef;
+			BasicSignalSystemDefinition lssdef;
 			for (XMLLightSignalSystemDefinitionType xmllssDef : xmlLssDefinition.getLightSignalSystemDefinition()) {
 				lssdef = factory.createLightSignalSystemDefinition(new IdImpl(xmllssDef.getId()));
 				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime().getSeconds());
@@ -120,7 +120,7 @@ public class MatsimLightSignalSystemsReader {
 				lightSignalSystems.addLightSignalSystemDefinition(lssdef);
 			}
 			//parsing lightSignalGroupDefinitions
-			BasicLightSignalGroupDefinition lsgdef;
+			BasicSignalGroupDefinition lsgdef;
 			for (XMLLightSignalGroupDefinitionType xmllsgdef : xmlLssDefinition.getLightSignalGroupDefinition()) {
 				lsgdef = factory.createLightSignalGroupDefinition(new IdImpl(xmllsgdef.getLinkIdRef()), new IdImpl(xmllsgdef.getId()));
 				lsgdef.setLightSignalSystemDefinitionId(new IdImpl(xmllsgdef.getLightSignalSystemDefinition().getRefId()));

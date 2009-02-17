@@ -9,7 +9,7 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicLane;
 import org.matsim.basic.signalsystems.BasicLanesToLinkAssignment;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.LinkEnterEvent;
 import org.matsim.gbl.Gbl;
@@ -118,7 +118,7 @@ public class QLink extends QueueLink {
 	}
 	
 	@Override
-	public void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition basicLightSignalGroupDefinition) {
+	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition basicLightSignalGroupDefinition) {
 		for (PseudoLink nodePseudoLink : this.nodePseudoLinksList) {
 			nodePseudoLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
 		}				

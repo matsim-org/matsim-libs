@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalSystemDefinition;
+import org.matsim.basic.signalsystems.BasicSignalSystemDefinition;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.utils.io.tabularFileParser.TabularFileParser;
@@ -21,7 +21,7 @@ public class LSASystemsReader implements TabularFileHandler {
 		
 //	private boolean isFirstLine = true;
 	
-	private HashMap<Integer, BasicLightSignalSystemDefinition> lsaMap = new HashMap<Integer, BasicLightSignalSystemDefinition>();
+	private HashMap<Integer, BasicSignalSystemDefinition> lsaMap = new HashMap<Integer, BasicSignalSystemDefinition>();
 
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
@@ -30,10 +30,10 @@ public class LSASystemsReader implements TabularFileHandler {
 		} else {
 //			log.info("Added: " + row.toString());
 			
-			BasicLightSignalSystemDefinition lsa = this.lsaMap.get(Integer.valueOf(row[0]));
+			BasicSignalSystemDefinition lsa = this.lsaMap.get(Integer.valueOf(row[0]));
 			
 			if(lsa == null){
-				lsa = new BasicLightSignalSystemDefinition(new IdImpl(Integer.parseInt(row[0])));
+				lsa = new BasicSignalSystemDefinition(new IdImpl(Integer.parseInt(row[0])));
 				this.lsaMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
@@ -45,7 +45,7 @@ public class LSASystemsReader implements TabularFileHandler {
 	}
 	
 	
-	public HashMap<Integer, BasicLightSignalSystemDefinition> readFile(String filename) throws IOException {
+	public HashMap<Integer, BasicSignalSystemDefinition> readFile(String filename) throws IOException {
 		this.tabFileParserConfig = new TabularFileParserConfig();
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] {" ", "\t"}); // \t
@@ -54,7 +54,7 @@ public class LSASystemsReader implements TabularFileHandler {
 		return this.lsaMap;
 	}
 	
-	public static HashMap<Integer, BasicLightSignalSystemDefinition> readBasicLightSignalSystemDefinition(String filename){
+	public static HashMap<Integer, BasicSignalSystemDefinition> readBasicLightSignalSystemDefinition(String filename){
 		
 		LSASystemsReader myLSAFileParser = new LSASystemsReader();
 		try {			

@@ -22,10 +22,10 @@ package org.matsim.lightsignalsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.basic.v01.Id;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
@@ -50,7 +50,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   
   
   public void estParser() {
-  	List<BasicLightSignalSystemConfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
+  	List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
   	MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
   }
@@ -58,7 +58,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   public void testWriter() {
   	String testoutput = this.getOutputDirectory()  + "testLssConfigOutput.xml";
   	//read the test file
-  	List<BasicLightSignalSystemConfiguration> lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
+  	List<BasicSignalSystemConfiguration> lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
   	MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
@@ -66,21 +66,21 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
   	MatsimLightSignalSystemConfigurationWriter writer = new MatsimLightSignalSystemConfigurationWriter(lssConfigs);
   	writer.writeFile(testoutput);
   	
-  	lssConfigs = new ArrayList<BasicLightSignalSystemConfiguration>();
+  	lssConfigs = new ArrayList<BasicSignalSystemConfiguration>();
   	reader = new MatsimLightSignalSystemConfigurationReader(lssConfigs);
   	reader.readFile(testoutput);
   	checkContent(lssConfigs);
   }
 
-	private void checkContent(List<BasicLightSignalSystemConfiguration> lssConfigs) {
+	private void checkContent(List<BasicSignalSystemConfiguration> lssConfigs) {
 		assertEquals(2, lssConfigs.size());
 		//test first
-		BasicLightSignalSystemConfiguration lssConfiguration = lssConfigs.get(0);
+		BasicSignalSystemConfiguration lssConfiguration = lssConfigs.get(0);
 		assertNotNull(lssConfiguration);
 		assertEquals(id23, lssConfiguration.getLightSignalSystemId());
-		BasicPlanBasedLightSignalSystemControlInfo controlInfo = (BasicPlanBasedLightSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		BasicPlanBasedSignalSystemControlInfo controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
-		BasicLightSignalSystemPlan plan =   controlInfo.getPlans().get(id5);
+		BasicSignalSystemPlan plan =   controlInfo.getPlans().get(id5);
 		assertNotNull(plan);
 		assertEquals(id5, plan.getId());
 		assertEquals(0.0, plan.getStartTime(), EPSILON);
@@ -89,7 +89,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		assertEquals(3.0, plan.getSyncronizationOffset());
 		
 		assertEquals(1, plan.getGroupConfigs().size());
-		BasicLightSignalGroupConfiguration groupConfig = plan.getGroupConfigs().get(id23);
+		BasicSignalGroupConfiguration groupConfig = plan.getGroupConfigs().get(id23);
 		assertNotNull(groupConfig);
 		assertEquals(0.0, groupConfig.getRoughCast(), EPSILON);
 		assertEquals(45.0, groupConfig.getDropping(), EPSILON);
@@ -100,7 +100,7 @@ public class LightSignalSystemsConfigReaderTest extends MatsimTestCase {
 		lssConfiguration = lssConfigs.get(1);
 		assertNotNull(lssConfiguration);
 		assertEquals(id42, lssConfiguration.getLightSignalSystemId());
-		controlInfo = (BasicPlanBasedLightSignalSystemControlInfo) lssConfiguration.getControlInfo();
+		controlInfo = (BasicPlanBasedSignalSystemControlInfo) lssConfiguration.getControlInfo();
 		assertNotNull(controlInfo);
 		plan =   controlInfo.getPlans().get(id8);
 		assertNotNull(plan);

@@ -20,12 +20,12 @@
 package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.signalsystems.control.SignalSystemControler;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalGroupConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemPlan;
-import org.matsim.basic.signalsystemsconfig.BasicPlanBasedLightSignalSystemControlInfo;
+import org.matsim.basic.signalsystemsconfig.BasicSignalGroupConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemPlan;
+import org.matsim.basic.signalsystemsconfig.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.mobsim.queuesim.SimulationTimer;
 
 
@@ -45,19 +45,19 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 			.getLogger(PlanBasedSignalSystemControler.class);
 	
 	private double defaultCirculationTime = Double.NaN;
-	private BasicLightSignalSystemConfiguration config;
+	private BasicSignalSystemConfiguration config;
 
-	private BasicPlanBasedLightSignalSystemControlInfo plans;
+	private BasicPlanBasedSignalSystemControlInfo plans;
 
 
-	public PlanBasedSignalSystemControler(BasicLightSignalSystemConfiguration config) {
-		if (!(config.getControlInfo() instanceof BasicPlanBasedLightSignalSystemControlInfo)) {
+	public PlanBasedSignalSystemControler(BasicSignalSystemConfiguration config) {
+		if (!(config.getControlInfo() instanceof BasicPlanBasedSignalSystemControlInfo)) {
 			String message = "Cannot create a PlanBasedSignalSystemControler without a PlanBasedLightSignalSystemControlInfo instance!";
 			log.error(message);
 			throw new IllegalArgumentException(message);
 		}
 		this.config = config;
-		this.plans = (BasicPlanBasedLightSignalSystemControlInfo)config.getControlInfo();
+		this.plans = (BasicPlanBasedSignalSystemControlInfo)config.getControlInfo();
 	}
 	
 	
@@ -67,12 +67,12 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 	
 	
 	/**
-	 * @see org.matsim.basic.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition)
+	 * @see org.matsim.basic.signalsystems.control.SignalSystemControler#givenSignalGroupIsGreen(org.matsim.basic.signalsystems.BasicSignalGroupDefinition)
 	 */
 	@Override
 	public boolean givenSignalGroupIsGreen(
-			BasicLightSignalGroupDefinition signalGroup) {
-		BasicLightSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
+			BasicSignalGroupDefinition signalGroup) {
+		BasicSignalSystemPlan activePlan = this.plans.getPlans().values().iterator().next();
 		if (activePlan == null) {
 			String message = "No active plan for signalsystem id " + config.getLightSignalSystemId();
 			log.error(message);
@@ -80,7 +80,7 @@ public class PlanBasedSignalSystemControler extends SignalSystemControler {
 		}
 		int currentSecondInPlan = 1 + ((int) (SimulationTimer.getTime() % this.defaultCirculationTime));
 
-		BasicLightSignalGroupConfiguration signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
+		BasicSignalGroupConfiguration signalGroupConfig = activePlan.getGroupConfigs().get(signalGroup.getId());
 		if ( (signalGroupConfig.getRoughCast() < currentSecondInPlan) 
 				&& (currentSecondInPlan <= signalGroupConfig.getDropping())){
 			return true;

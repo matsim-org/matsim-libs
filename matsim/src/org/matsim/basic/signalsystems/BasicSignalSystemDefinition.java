@@ -19,73 +19,48 @@
 
 package org.matsim.basic.signalsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.basic.signalsystems.control.SignalSystemControler;
 import org.matsim.basic.v01.Id;
-import org.matsim.basic.v01.IdImpl;
 
 /**
  * @author dgrether
  */
-public class BasicLightSignalGroupDefinition {
+public class BasicSignalSystemDefinition {
+
+  private Id id;
+  private double defaultCirculationTime;
+  private double syncronizationOffset;
+  private double defaultInterimTime;
+	
+  public BasicSignalSystemDefinition(Id id) {
+  	this.id = id;
+  }
   
-	private final Id id;
-	private Id lightSignalSystemDefinitionId;
-	private List<Id> laneIds;
-	private List<Id> toLinkIds;
-	private final Id linkRefId;
-	
-	private org.matsim.basic.signalsystems.control.SignalSystemControler signalSystemControler = null;
-
-	public BasicLightSignalGroupDefinition(Id linkRefId, Id id) {
-		this.linkRefId = linkRefId;
-		this.id = id;
-	}
-
-	public void setLightSignalSystemDefinitionId(IdImpl id) {
-		this.lightSignalSystemDefinitionId = id;
-	}
-
-	public void addLaneId(Id laneId) {
-		if (this.laneIds == null)
-			this.laneIds = new ArrayList<Id>();
-		this.laneIds.add(laneId);
-	}
-	
-	public Id getLinkRefId() {
-		return linkRefId;
-	}
-
-	public void addToLinkId(Id linkId) {
-		if (this.toLinkIds == null)
-			this.toLinkIds = new ArrayList<Id>();
-		this.toLinkIds.add(linkId);
-	}
-
 	public Id getId() {
 		return id;
 	}
-
-	public Id getLightSignalSystemDefinitionId() {
-		return lightSignalSystemDefinitionId;
-	}
-
-	public List<Id> getLaneIds() {
-		return laneIds;
-	}
-
-	public List<Id> getToLinkIds() {
-		return toLinkIds;
-	}
-
-	public void setResponsibleLSAControler(SignalSystemControler signalSystemControler) {
-		this.signalSystemControler = signalSystemControler;		
+	
+	public double getDefaultCirculationTime() {
+		return defaultCirculationTime;
 	}
 	
-	public boolean isGreen(){
-		return this.signalSystemControler.givenSignalGroupIsGreen(this);
+	public void setDefaultCirculationTime(double defaultCirculationTime) {
+		this.defaultCirculationTime = defaultCirculationTime;
 	}
 	
+	public double getDefaultSyncronizationOffset() {
+		return syncronizationOffset;
+	}
+	
+	public void setDefaultSyncronizationOffset(double syncronizationOffset) {
+		this.syncronizationOffset = syncronizationOffset;
+	}
+	
+	public double getDefaultInterimTime() {
+		return defaultInterimTime;
+	}
+	
+	public void setDefaultInterimTime(double defaultInterimTime) {
+		this.defaultInterimTime = defaultInterimTime;
+	}
+
 }

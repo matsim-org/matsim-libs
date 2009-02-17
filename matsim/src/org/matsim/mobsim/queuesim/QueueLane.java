@@ -30,7 +30,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicLane;
-import org.matsim.basic.signalsystems.BasicLightSignalGroupDefinition;
+import org.matsim.basic.signalsystems.BasicSignalGroupDefinition;
 import org.matsim.basic.v01.BasicLeg;
 import org.matsim.basic.v01.Id;
 import org.matsim.events.AgentArrivalEvent;
@@ -145,7 +145,7 @@ public class QueueLane implements Comparable<QueueLane> {
 	 */
 	private List<Link> destinationLinks = new ArrayList<Link>();
 	
-	private SortedMap<Id, BasicLightSignalGroupDefinition> signalGroups;
+	private SortedMap<Id, BasicSignalGroupDefinition> signalGroups;
 
 	private BasicLane laneData;
 
@@ -184,11 +184,11 @@ public class QueueLane implements Comparable<QueueLane> {
 //		this.freespeedTravelTime = ql.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
 	}
 	
-	protected void addLightSignalGroupDefinition(BasicLightSignalGroupDefinition signalGroupDefinition) {
+	protected void addLightSignalGroupDefinition(BasicSignalGroupDefinition signalGroupDefinition) {
 		for (Id laneId : signalGroupDefinition.getLaneIds()) {
 			if (this.laneData.getId().equals(laneId)) {
 				if (this.signalGroups == null) {
-					this.signalGroups = new TreeMap<Id, BasicLightSignalGroupDefinition>();
+					this.signalGroups = new TreeMap<Id, BasicSignalGroupDefinition>();
 				}
 				this.signalGroups.put(signalGroupDefinition.getId(), signalGroupDefinition);
 			}
@@ -304,7 +304,7 @@ public class QueueLane implements Comparable<QueueLane> {
 		}
 		//else everything normal...
 		boolean signalGroupGreen;
-		for (BasicLightSignalGroupDefinition signalGroup : this.signalGroups.values()) {
+		for (BasicSignalGroupDefinition signalGroup : this.signalGroups.values()) {
 			signalGroupGreen = signalGroup.isGreen();
 			if (signalGroupGreen) {
 				this.setThisTimeStepGreen(true);

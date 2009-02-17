@@ -24,29 +24,75 @@ import org.matsim.basic.v01.Id;
 /**
  * @author dgrether
  */
-public class BasicLightSignalSystemConfiguration {
+public class BasicSignalGroupConfiguration {
 
-	private final Id lightSignalSystemId;
+	private Id referencedSignalGroupId;
 
-	private BasicPlanBasedLightSignalSystemControlInfo controlInfo;
 
-	public BasicLightSignalSystemConfiguration(final Id lightSignalSystemId) {
-		this.lightSignalSystemId = lightSignalSystemId;
-	}
+	private double roughCast;
+	private double dropping;
 
-	public void setLightSignalSystemControlInfo(
-			final BasicPlanBasedLightSignalSystemControlInfo controlInfo) {
-		this.controlInfo = controlInfo;
-	}
-
-	public Id getLightSignalSystemId() {
-		return this.lightSignalSystemId;
-	}
-
-	public BasicLightSignalSystemControlInfo getControlInfo() {
-		return this.controlInfo;
+	private Double interimTimeRoughcast = null;
+	private Double interimTimeDropping = null;
+	
+	
+	public BasicSignalGroupConfiguration(Id referencedSignalGroupId) {
+		this.referencedSignalGroupId = referencedSignalGroupId;
 	}
 
 
+	
+	public double getRoughCast() {
+		return roughCast;
+	}
+
+
+	
+	public void setRoughCast(double roughCast) {
+		this.roughCast = roughCast;
+	}
+
+
+	
+	public double getDropping() {
+		return dropping;
+	}
+
+
+	
+	public void setDropping(double dropping) {
+		this.dropping = dropping;
+	}
+
+
+	
+	public Double getInterimTimeRoughcast() {
+		return interimTimeRoughcast;
+	}
+
+
+	
+	public void setInterimTimeRoughcast(Double interimTimeRoughcast) {
+		this.interimTimeRoughcast = interimTimeRoughcast;
+	}
+
+
+	
+	public Double getInterimTimeDropping() {
+		return interimTimeDropping;
+	}
+
+
+	
+	public void setInterimTimeDropping(Double interimTimeDropping) {
+		this.interimTimeDropping = interimTimeDropping;
+	}
+
+
+	
+	public Id getReferencedSignalGroupId() {
+		return referencedSignalGroupId;
+	}
+	
 
 }

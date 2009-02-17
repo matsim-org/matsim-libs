@@ -27,8 +27,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.basic.signalsystems.BasicLightSignalSystems;
-import org.matsim.basic.signalsystemsconfig.BasicLightSignalSystemConfiguration;
+import org.matsim.basic.signalsystems.BasicSignalSystems;
+import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
 import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -70,8 +70,8 @@ public class ScenarioData {
 	private NetworkLayer network = null;
 	private Facilities facilities = null;
 	private Population population = null;
-	private BasicLightSignalSystems signalSystems = null;
-	private List<BasicLightSignalSystemConfiguration> signalSystemConfigurations = null;
+	private BasicSignalSystems signalSystems = null;
+	private List<BasicSignalSystemConfiguration> signalSystemConfigurations = null;
 	
 	private final NetworkFactory networkFactory;
 	private Config config;
@@ -208,12 +208,12 @@ public class ScenarioData {
 		return this.population;
 	}
 	
-	public BasicLightSignalSystems getSignalSystems() {
+	public BasicSignalSystems getSignalSystems() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
 		if (this.signalSystems == null) {
-			this.signalSystems = new BasicLightSignalSystems();
+			this.signalSystems = new BasicSignalSystems();
 			MatsimLightSignalSystemsReader reader = new MatsimLightSignalSystemsReader(this.signalSystems);
 			log.info("loading signalsystems from " + this.config.signalSystems().getSignalSystemFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemFile());
@@ -221,12 +221,12 @@ public class ScenarioData {
 		return this.signalSystems;
 	}
 	
-	public List<BasicLightSignalSystemConfiguration> getSignalSystemsConfiguration() {
+	public List<BasicSignalSystemConfiguration> getSignalSystemsConfiguration() {
 		if ((this.config == null) || (this.config.signalSystems() == null)){
 			throw new IllegalStateException("SignalSystems can only be loaded if set in config");
 		}
 		if (this.signalSystemConfigurations == null){
-			this.signalSystemConfigurations = new ArrayList<BasicLightSignalSystemConfiguration>();
+			this.signalSystemConfigurations = new ArrayList<BasicSignalSystemConfiguration>();
 			MatsimLightSignalSystemConfigurationReader reader = new MatsimLightSignalSystemConfigurationReader(this.signalSystemConfigurations);
 			log.info("loading signalsystemsconfiguration from " + this.config.signalSystems().getSignalSystemConfigFile());
 			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
