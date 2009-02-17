@@ -87,18 +87,22 @@ public class Planomat implements PlanAlgorithm {
 //		String optiToolboxName = Gbl.getConfig().planomat().getOptimizationToolbox();
 //		if (optiToolboxName.equals(PlanomatConfigGroup.OPTIMIZATION_TOOLBOX_JGAP)) {
 
-		// analyze plan: how many activities and subtours do we have?
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.run(plan);
+		// perform subtour analysis only if mode choice on subtour basis is optimized
+		// (if only times are optimized, subtour analysis is not necessary)
+		PlanAnalyzeSubtours planAnalyzeSubtours = null;
+		if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
+			planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			planAnalyzeSubtours.run(plan);
+		}
 
-		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(planAnalyzeSubtours);
+		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(plan, planAnalyzeSubtours);
 
 		// JGAP random number generator is initialized for each run
 		// but use a random number as seed so every run will draw a different, but deterministic sequence of random numbers
 		long seed = this.seedGenerator.nextLong();
 		((StockRandomGenerator) jgapConfiguration.getRandomGenerator()).setSeed( seed );
 
-		IChromosome sampleChromosome = this.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
+		IChromosome sampleChromosome = this.initSampleChromosome(plan, planAnalyzeSubtours, jgapConfiguration);
 		try {
 			jgapConfiguration.setSampleChromosome(sampleChromosome);
 		} catch (InvalidConfigurationException e1) {
@@ -132,12 +136,13 @@ public class Planomat implements PlanAlgorithm {
 
 	}
 
-	protected IChromosome initSampleChromosome(final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
+	protected IChromosome initSampleChromosome(final Plan plan, final PlanAnalyzeSubtours planAnalyzeSubtours, final org.jgap.Configuration jgapConfiguration) {
 
 		ArrayList<Gene> sampleGenes = new ArrayList<Gene>();
 		try {
 
-			for (int ii=0; ii < planAnalyzeSubtours.getSubtourIndexation().length; ii++) {
+			int numActs = plan.getActsLegs().size() / 2;
+			for (int ii=0; ii < numActs; ii++) {
 				sampleGenes.add(new IntegerGene(jgapConfiguration, 0, Planomat.NUM_TIME_INTERVALS - 1));
 			}
 

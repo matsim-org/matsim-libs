@@ -79,10 +79,9 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 		
 		sf.reset();
 		double now = 0.0;
-		// process "middle" activities
-		final int numActs = this.planAnalyzeSubtours.getSubtourIndexation().length;
 
 		final ArrayList<Object> actslegs = this.plan.getActsLegs();
+		final int numActs = actslegs.size() / 2;
 
 		int legCounter = 0;
 		for (Object o : actslegs) {

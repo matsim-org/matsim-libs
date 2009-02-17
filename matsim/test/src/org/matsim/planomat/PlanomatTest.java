@@ -206,7 +206,7 @@ public class PlanomatTest extends MatsimTestCase {
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(testPlan);
 
-		testChromosome = testee.initSampleChromosome(planAnalyzeSubtours, jgapConfiguration);
+		testChromosome = testee.initSampleChromosome(testPlan, planAnalyzeSubtours, jgapConfiguration);
 		assertEquals(2, testChromosome.getGenes().length);
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[0].getClass());
 		assertEquals(IntegerGene.class, testChromosome.getGenes()[1].getClass());

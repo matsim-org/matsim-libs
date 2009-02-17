@@ -33,6 +33,7 @@ import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.util.ICloneable;
 import org.matsim.config.groups.PlanomatConfigGroup;
 import org.matsim.gbl.Gbl;
+import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 public class PlanomatJGAPConfiguration extends Configuration implements ICloneable {
@@ -42,11 +43,11 @@ public class PlanomatJGAPConfiguration extends Configuration implements ICloneab
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public PlanomatJGAPConfiguration(PlanAnalyzeSubtours planAnalyzeSubtours) {
-		this("", "", planAnalyzeSubtours);
+	public PlanomatJGAPConfiguration(Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
+		this("", "", plan, planAnalyzeSubtours);
 	}
 
-	private PlanomatJGAPConfiguration(String a_id, String a_name, PlanAnalyzeSubtours planAnalyzeSubtours) {
+	private PlanomatJGAPConfiguration(String a_id, String a_name, Plan plan, PlanAnalyzeSubtours planAnalyzeSubtours) {
 		super(a_id, a_name);
 
 		Configuration.reset();
@@ -68,7 +69,8 @@ public class PlanomatJGAPConfiguration extends Configuration implements ICloneab
 			// - population size: equal to the string length, if not specified otherwise (de Jong, 1975)
 			if (Gbl.getConfig().planomat().getPopSize() == Integer.parseInt(PlanomatConfigGroup.PlanomatConfigParameter.POPSIZE.getDefaultValue())) {
 				
-				int populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * planAnalyzeSubtours.getSubtourIndexation().length;
+				int numActs = plan.getActsLegs().size() / 2;
+				int populationSize = Gbl.getConfig().planomat().getLevelOfTimeResolution() * numActs;
 				if (Gbl.getConfig().planomat().getPossibleModes().length > 0) {
 					populationSize += Gbl.getConfig().planomat().getPossibleModes().length * planAnalyzeSubtours.getNumSubtours();
 				}

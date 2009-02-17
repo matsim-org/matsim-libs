@@ -81,7 +81,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		// run testee
-		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(planAnalyzeSubtours);
+		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
 		
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));
@@ -137,7 +137,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		planAnalyzeSubtours.run(testPlan);
 
 		// run testee
-		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(planAnalyzeSubtours);
+		PlanomatJGAPConfiguration jgapConfig = new PlanomatJGAPConfiguration(testPlan, planAnalyzeSubtours);
 		
 		// test correct setting of natural selector
 		assertEquals(0, jgapConfig.getNaturalSelectorsSize(false));

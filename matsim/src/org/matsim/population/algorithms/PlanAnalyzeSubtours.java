@@ -74,6 +74,9 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		ArrayList<Object> actsLegs = plan.getActsLegs();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii).getClass().equals(Act.class)) {
+				// TODO subtour analysis should be possible on link-level, too
+				// not only on facility level
+				// in this case one could run a scenario also without facility information
 				locationIds.add(((Act) actsLegs.get(ii)).getFacility().getId());
 			}
 		}
