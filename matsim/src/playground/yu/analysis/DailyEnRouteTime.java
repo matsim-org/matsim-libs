@@ -22,31 +22,51 @@ import org.matsim.utils.charts.XYLineChart;
 import playground.yu.utils.SimpleWriter;
 
 /**
- * compute modal split of daytime distance
- * 
+ * compute modal split of en route time
  * @author yu
  * 
  */
-public class DaytimeDistance extends AbstractPersonAlgorithm implements
+public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	private double carDist, ptDist, otherDist, totalCounts[], carCounts[],
-			ptCounts[], otherCounts[];
-
 	private int count;
-
+	private double carTime, ptTime, otherTime, totalCounts[], carCounts[],
+	ptCounts[], otherCounts[],carWorkTime, carEducTime, carShopTime,
+	carLeisTime, carHomeTime, carOtherTime, ptWorkTime, ptEducTime,
+	ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime, throughWorkTime,
+	throughEducTime, throughShopTime, throughLeisTime, throughHomeTime,
+	throughOtherTime;
 	private Person person;
 
-	public DaytimeDistance() {
-		carDist = 0.0;
-		ptDist = 0.0;
-		otherDist = 0.0;
+	public DailyEnRouteTime() {
 		count = 0;
+		carTime = 0.0;
+		ptTime = 0.0;
+		otherTime = 0.0;
 		totalCounts = new double[101];
 		carCounts = new double[101];
 		ptCounts = new double[101];
 		otherCounts = new double[101];
+		carWorkTime = 0.0;
+		carEducTime = 0.0;
+		carShopTime = 0.0;
+		carLeisTime = 0.0;
+		carHomeTime = 0.0;
+		carOtherTime = 0.0;
+		ptWorkTime = 0.0;
+		ptEducTime = 0.0;
+		ptShopTime = 0.0;
+		ptLeisTime = 0.0;
+		ptHomeTime = 0.0;
+		ptOtherTime = 0.0;
+		throughWorkTime = 0.0;
+		throughEducTime = 0.0;
+		throughShopTime = 0.0;
+		throughLeisTime = 0.0;
+		throughHomeTime = 0.0;
+		throughOtherTime = 0.0;
 	}
 
+	@Override
 	public void run(Person person) {
 		this.person = person;
 		count++;
@@ -54,61 +74,58 @@ public class DaytimeDistance extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(Plan plan) {
-		double dayDist = 0.0;
-		double carDayDist = 0.0;
-		double ptDayDist = 0.0;
-		double otherDayDist = 0.0;
+		double dayTime = 0.0;
+		double carDayTime = 0.0;
+		double ptDayTime = 0.0;
+		double otherDayTime = 0.0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg bl = (Leg) li.next();
-			double dist = bl.getRoute().getDist() / 1000.0;
+			double time = bl.getTravelTime() / 60.0;
 			if (bl.getDepartureTime() < 86400) {
-				dayDist += dist;
+				dayTime += time;
 				if (Long.parseLong(person.getId().toString()) > 1000000000) {
-					otherDist += dist;
-					otherDayDist += dist;
+					otherTime += time;
+					otherDayTime += time;
 				} else if (bl.getMode().equals(Mode.car)) {
-					carDist += dist;
-					carDayDist += dist;
+					carTime += time;
+					carDayTime += time;
 				} else if (bl.getMode().equals(Mode.pt)) {
-					ptDist += dist;
-					ptDayDist += dist;
+					ptTime += time;
+					ptDayTime += time;
 				}
 			}
 		}
-		for (int i = 0; i <= (int) dayDist; i++)
+		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
 			totalCounts[i]++;
-		for (int i = 0; i <= (int) otherDist; i++)
+		for (int i = 0; i <= Math.min(100, (int) otherDayTime); i++)
 			otherCounts[i]++;
-		for (int i = 0; i <= (int) carDist; i++)
+		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++)
 			carCounts[i]++;
-		for (int i = 0; i <= (int) ptDist; i++)
+		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++)
 			ptCounts[i]++;
 	}
 
 	public void write(String outputFilename) {
-		double sum = carDist + ptDist + otherDist;
-		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
-		sw.writeln("\tDaytime Distance\t(exkl. through-traffic)");
-		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + carDist / (double) count + "\t" + carDist / sum
+		double sum = carTime + ptTime + otherTime;
+		SimpleWriter sw = new SimpleWriter(outputFilename+".txt");
+		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)");
+		sw.writeln("\tmin\t%");
+		sw.writeln("car\t" + carTime / (double) count + "\t" + carTime / sum
 				* 100.0);
-		sw.writeln("pt\t" + ptDist / (double) count + "\t" + ptDist / sum
+		sw.writeln("pt\t" + ptTime / count + "\t" + ptTime / sum * 100.0);
+		sw.writeln("through\t" + otherTime / count + "\t" + otherTime / sum
 				* 100.0);
-		sw.writeln("through\t" + otherDist / (double) count + "\t" + otherDist
-				/ sum * 100.0);
 		sw.writeln("--------------------------------------------");
-		sw.writeln("\tDaytime Distance\t(inkl. through-traffic)");
-		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + (carDist + otherDist) / (double) count + "\t"
-				+ (carDist + otherDist) / sum * 100.0);
-		sw.writeln("pt\t" + ptDist / (double) count + "\t" + ptDist / sum
-				* 100.0);
+		sw.writeln("\tDaily En Route Time\t(inkl. through-traffic)");
+		sw.writeln("\tmin\t%");
+		sw.writeln("car\t" + (carTime + otherTime) / (double) count + "\t"
+				+ (carTime + otherTime) / sum * 100.0);
+		sw.writeln("pt\t" + ptTime / count + "\t" + ptTime / sum * 100.0);
 		try {
 			sw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
 			x[i] = (double) i;
@@ -122,9 +139,9 @@ public class DaytimeDistance extends AbstractPersonAlgorithm implements
 			yPt[i] = ptCounts[i] / (double) count * 100.0;
 			yOther[i] = otherCounts[i] / (double) count * 100.0;
 		}
-		XYLineChart chart = new XYLineChart("Daytime Distance distribution",
-				"Daytime Distance in km",
-				"fraction of persons with daytime distance bigger than x... in %");
+		XYLineChart chart = new XYLineChart("Daily En Route Time Distribution",
+				"Daily En Route Time in min",
+				"fraction of persons with daily en route time longer than x... in %");
 		chart.addSeries("car", x, yCar);
 		chart.addSeries("pt", x, yPt);
 		chart.addSeries("other", x, yOther);
@@ -140,7 +157,7 @@ public class DaytimeDistance extends AbstractPersonAlgorithm implements
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
-		final String outputFilename = "output/669daytimeDistance";
+		final String outputFilename = "output/669dailyEnRouteTime";
 
 		Gbl.createConfig(null);
 
@@ -149,15 +166,15 @@ public class DaytimeDistance extends AbstractPersonAlgorithm implements
 
 		Population population = new Population();
 
-		DaytimeDistance dd = new DaytimeDistance();
-		population.addAlgorithm(dd);
+		DailyEnRouteTime ert = new DailyEnRouteTime();
+		population.addAlgorithm(ert);
 
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
 		population.runAlgorithms();
 
-		dd.write(outputFilename);
+		ert.write(outputFilename);
 
 		System.out.println("--> Done!");
 		Gbl.printElapsedTime();
