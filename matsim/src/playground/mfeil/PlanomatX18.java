@@ -143,7 +143,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		//////////////////////////////////////////////////////////////////////
 		// Initialization
 		//////////////////////////////////////////////////////////////////////
-		log.info("Start for Person "+plan.getPerson().getId());
+		//log.info("Start for Person "+plan.getPerson().getId());
 		
 		MatsimRandom.getLocalInstance();
 		
@@ -253,6 +253,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		tabuList.add(neighbourhood[NEIGHBOURHOOD_SIZE]);
 	//	stream.println("0\t"+neighbourhood[NEIGHBOURHOOD_SIZE].getScore());
 	//	ys[0]=neighbourhood[NEIGHBOURHOOD_SIZE].getScore();
+		
+		// TODO muss dann wieder raus! Nur für Planomat!
+		plan.setScore(scorer.getScore(plan));
 		double bestScore = plan.getScore();
 		scoreStat.add(bestScore);
 		
@@ -286,7 +289,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 						if (infoOnNeighbourhood[x][1]!=-1	||	infoOnNeighbourhood[x][2]!=-1){		
 							long lcStartTime=System.currentTimeMillis();
 							this.locator.handleSubChains(neighbourhood[x], this.getSubChains(neighbourhood[x], infoOnNeighbourhood[x][1], infoOnNeighbourhood[x][2]));
-							lcRunTime+=System.currentTimeMillis()-lcStartTime;
+							lcRunTime+=System.currentTimeMillis()-lcStartTime;							
 						}
 					}
 					else if (this.LC_MODE.equals("fullLC")){
@@ -331,7 +334,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					else if (solution.getActsLegs().size()==13) solution13.add(solution);
 					else solutionLong.add(solution);
 				}
-				/*	
+				/*
 				stream.print(neighbourhood[x].getScore()+"\t");
 				stream.print(infoOnNeighbourhood[x][0]+"\t");
 				stream.print(tabuInNeighbourhood[x]+"\t");
@@ -344,7 +347,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
 				stream.print(infoOnNeighbourhood[x][2]+"\t");
 				stream.println();
-				 */	
+				*/	
 			}
 			
 			/* Find best non-tabu plan. Becomes this iteration's solution. Write it into the tabuList*/
@@ -418,11 +421,11 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//	chart.addMatsimLogo();
 	//	chart.saveAsPng(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"scorestats_.png"), 800, 600);
 		
-	
-	//	stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
-	//	stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);				
-	//	stream.close();
-		
+		/*
+		stream.println ("Dauer der run() Methode: "+(System.currentTimeMillis()-runStartTime));
+		stream.println("Anzahl der Planomat-Aufrufe: "+numberTimerCalls);				
+		stream.close();
+		*/
 		
 		statistics.print(plan.getPerson().getId()+"\t"+lcRunTime+"\t"+timerRunTime+"\t"+(System.currentTimeMillis()-runStartTime)+"\t"+numberTimerCalls+"\t");
 		for (int i=0;i<scoreStat.size();i++){
@@ -431,8 +434,9 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		for (int i=0;i<scoreStat.size();i++){
 			statistics.print(scoreStat.get(i)/bestScore+"\t");
 		}
-		for (int i=0;i<al.size();i+=2){
-			statistics.print(((Act)(al.get(i))).getType()+"\t");
+		for (int i=0;i<al.size();i++){
+			if (i%2==0)	statistics.print(((Act)(al.get(i))).getType()+"\t");
+			else statistics.print((((Leg)(al.get(i))).getTravelTime()/60)+"\t");
 		}
 		//statistics.println(numberIterLC+"\t"+numberUnsuccessfulLC);
 		statistics.println();
@@ -566,7 +570,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 					//return (new int[]{0,-1,positions[1]-1});
 					return (new int[]{0,-1,-1});
 				}
-			return (new int[]{1,0,0});
+				return (new int[]{1,0,0});
 			}
 			else return (new int[]{1,0,0});
 		}
@@ -940,6 +944,10 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private List<SubChain> getSubChains (Plan plan, int first, int second){
 		ManageSubchains manager = new ManageSubchains();
 		if (second-first==1){	// one long subchain
+			/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
+			if (((Leg)plan.getActsLegs().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get((first-1)*2+1)).setTravelTime(1);
+			if (((Leg)plan.getActsLegs().get(first*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get(first*2+1)).setTravelTime(1);
+			if (((Leg)plan.getActsLegs().get(second*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get(second*2+1)).setTravelTime(1);
 			manager.primaryActivityFound((Act)plan.getActsLegs().get((first-1)*2), (Leg)plan.getActsLegs().get((first-1)*2+1));
 			manager.secondaryActivityFound((Act)plan.getActsLegs().get(first*2), (Leg)plan.getActsLegs().get(first*2+1));
 			manager.secondaryActivityFound((Act)plan.getActsLegs().get(second*2), (Leg)plan.getActsLegs().get(second*2+1));
@@ -947,11 +955,17 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		}
 		else{					// two short subchains
 			if (first!=-1){
+				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
+				if (((Leg)plan.getActsLegs().get((first-1)*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get((first-1)*2+1)).setTravelTime(1);
+				if (((Leg)plan.getActsLegs().get(first*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get(first*2+1)).setTravelTime(1);
 				manager.primaryActivityFound((Act)plan.getActsLegs().get((first-1)*2), (Leg)plan.getActsLegs().get((first-1)*2+1));
 				manager.secondaryActivityFound((Act)plan.getActsLegs().get(first*2), (Leg)plan.getActsLegs().get(first*2+1));
 				manager.primaryActivityFound((Act)plan.getActsLegs().get((first+1)*2), null);
 			}
 			if (second!=-1){
+				/* Set travel time to 1sec as otherwise location choice wouldn't react!*/
+				if (((Leg)plan.getActsLegs().get((second-1)*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get((second-1)*2+1)).setTravelTime(1);
+				if (((Leg)plan.getActsLegs().get(second*2+1)).getTravelTime()<1)((Leg)plan.getActsLegs().get(second*2+1)).setTravelTime(1);
 				manager.primaryActivityFound((Act)plan.getActsLegs().get((second-1)*2), (Leg)plan.getActsLegs().get((second-1)*2+1));
 				manager.secondaryActivityFound((Act)plan.getActsLegs().get(second*2), (Leg)plan.getActsLegs().get(second*2+1));
 				manager.primaryActivityFound((Act)plan.getActsLegs().get((second+1)*2), null);
