@@ -98,11 +98,11 @@ public class QSim extends QueueSimulation {
 			// Set the defaultCirculationTime for every SignalLightControler
 			// depends on the existence of a configuration for every signalsystem specified
 			// TODO [an] defaultSyncronizationOffset and defaultInterimTime still ignored
-			for (BasicSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getLightSignalSystemDefinitions()) {
+			for (BasicSignalSystemDefinition basicLightSignalSystemDefinition : newSignalSystems.getSignalSystemDefinitions()) {
 				sortedLSAControlerMap.get(basicLightSignalSystemDefinition.getId()).setCirculationTime(basicLightSignalSystemDefinition.getDefaultCirculationTime());
 			}
 			
-			for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getLightSignalGroupDefinitions()) {
+			for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : newSignalSystems.getSignalGroupDefinitions()) {
 				
 				if(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()) == null){
 					log.warn("Signal group defined, but corresponding controler with Id " + basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId() + " is missing." +
@@ -110,7 +110,7 @@ public class QSim extends QueueSimulation {
 				} else {
 					basicLightSignalGroupDefinition.setResponsibleLSAControler(sortedLSAControlerMap.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId()));
 					QLink qLink = (QLink) this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
-					qLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+					qLink.addSignalGroupDefinition(basicLightSignalGroupDefinition);
 					((QNode) this.network.getNodes().get(qLink.getLink().getToNode().getId())).setIsSignalizedTrue();
 				}
 			}

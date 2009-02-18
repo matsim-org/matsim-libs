@@ -118,7 +118,7 @@ public class QLink extends QueueLink {
 	}
 	
 	@Override
-	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition basicLightSignalGroupDefinition) {
+	public void addSignalGroupDefinition(BasicSignalGroupDefinition basicLightSignalGroupDefinition) {
 		for (PseudoLink nodePseudoLink : this.nodePseudoLinksList) {
 			nodePseudoLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
 		}				
