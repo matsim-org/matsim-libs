@@ -83,14 +83,37 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		if (basePlan.getActsLegs().size()==1) return;
 		
 		/* Analysis of subtours */
-		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor planAnalyzeSubtours");
+		//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor planAnalyzeSubtours");
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		planAnalyzeSubtours.run(basePlan);
-		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach planAnalyzeSubtours");
 		
-		// Initial clean-up of plan for the case actslegs is not sound.
+		
+		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+		/* Make sure that all legs of a subtour have the same mode*/
+		BasicLeg.Mode [] subtourModes = new BasicLeg.Mode [planAnalyzeSubtours.getNumSubtours()];
+		boolean [] subtourFilled = new boolean [subtourModes.length];
+		int [] subtourDis = new int [subtourModes.length];
+		for (int i=0;i<subtourFilled.length;i++) {
+			subtourFilled[i]=false;
+			subtourDis[i]=this.checksubtourDistance2(basePlan.getActsLegs(), planAnalyzeSubtours, i);
+		}
+		for (int i=1;i<basePlan.getActsLegs().size();i=i+2){
+			if (subtourFilled[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==false){
+				/*Make sure that all subtours with distance = 0 are set to "walk" */
+				if (subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==0) {
+					((Leg)(basePlan.getActsLegs().get(i))).setMode(BasicLeg.Mode.walk);
+				}
+				subtourModes[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]=(((Leg)(basePlan.getActsLegs().get(i))).getMode());
+				subtourFilled[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]=true;
+			}
+			else {
+				((Leg)(basePlan.getActsLegs().get(i))).setMode(subtourModes[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]);
+			}
+		}
+		
+		/* Initial clean-up of plan for the case actslegs is not sound*/
 		double move = this.cleanSchedule (((Act)(basePlan.getActsLegs().get(0))).getEndTime(), basePlan);
-		if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach 1. cleanSchedule mit move = "+move);
+		//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach 1. cleanSchedule mit move = "+move);
 		int loops=1;
 		boolean cannotMove = false;
 		while (move!=0.0){
@@ -99,15 +122,15 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					((Act)basePlan.getActsLegs().get(i)).setDuration(this.minimumTime);
 				}
 				move = this.cleanSchedule(this.minimumTime, basePlan);
-				if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach letztem cleanSchedule mit move = "+move);
+				//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach letztem cleanSchedule mit move = "+move);
 				if (move!=0.0){
 					
-					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor chooseModeAllChains.");
+					//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 vor chooseModeAllChains.");
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
 					PlanomatXPlan planAux = new PlanomatXPlan(basePlan.getPerson());
 					planAux.copyPlan(basePlan);
-					double tmpScore = this.chooseModeAllChains(planAux, basePlan.getActsLegs(), planAnalyzeSubtours);
-					if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach chooseModeAllChains mit score = "+basePlan.getScore());
+					double tmpScore = this.chooseModeAllChains(planAux, basePlan.getActsLegs(), planAnalyzeSubtours, subtourDis);
+					//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach chooseModeAllChains mit score = "+basePlan.getScore());
 					if (tmpScore!=-100000) {
 						log.warn("Valid initial solution found by first mode choice run.");
 						// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
@@ -126,7 +149,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			loops++;
 			if (((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move<this.minimumTime) cannotMove = true;
 			move = this.cleanSchedule(java.lang.Math.max(((Act)(basePlan.getActsLegs().get(0))).getEndTime()-move,this.minimumTime), basePlan);
-			if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach "+loops+". cleanSchedule mit move = "+move+". cannotMove = "+cannotMove);
+			//if (basePlan.getPerson().getId().toString().equals("4888333")) log.warn("Person 4888333 nach "+loops+". cleanSchedule mit move = "+move+". cannotMove = "+cannotMove);
 		}
 		// TODO Check whether allowed?
 		basePlan.setScore(this.scorer.getScore(basePlan));	
@@ -191,10 +214,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		/* mode choice */ 
 		if (this.possibleModes.length>0){
 			if (this.modeChoice=="standard"){
-				score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
+				score[pointer]=this.chooseMode(plan, initialNeighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]), planAnalyzeSubtours);
 			}
 			else if (this.modeChoice=="extended_1"){
-				score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours);
+				score[pointer]=this.chooseModeAllChains(plan, initialNeighbourhood[pointer], planAnalyzeSubtours, subtourDis);
 			}
 		}
 		
@@ -230,7 +253,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					score[pointer]=this.chooseMode(plan, neighbourhood[pointer], 0, java.lang.Math.min(moves[pointer][0], moves[pointer][1]), java.lang.Math.max(moves[pointer][0], moves[pointer][1]),planAnalyzeSubtours);
 				}
 				if (this.modeChoice=="extended_1"){
-					score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours);
+					score[pointer]=this.chooseModeAllChains(plan, neighbourhood[pointer], planAnalyzeSubtours, subtourDis);
 				}
 			}
 			
@@ -455,7 +478,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		int distanceOuter = this.checkSubtourDistance(actslegs, planAnalyzeSubtours, (outer/2));
 		for (int i=0;i<this.possibleModes.length;i++){
 	
-			if (this.possibleModes[i].toString()=="walk"){
+			if (this.possibleModes[i].toString().equals("walk")){
 				if (distanceOuter==2) {
 					continue;
 				}
@@ -483,7 +506,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				int distanceInner = this.checkSubtourDistance(actslegs, planAnalyzeSubtours, (inner/2-1));
 				for (int j=0;j<this.possibleModes.length;j++){
 					
-					if (this.possibleModes[i].toString()=="walk"){
+					if (this.possibleModes[j].toString().equals("walk")){
 						if (distanceInner==2) {
 							continue;
 						}
@@ -540,13 +563,13 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	return score;
 	}
 
-	private double chooseModeAllChains (PlanomatXPlan plan, ArrayList<?> actslegsBase, PlanAnalyzeSubtours planAnalyzeSubtours){
+	private double chooseModeAllChains (PlanomatXPlan plan, ArrayList<?> actslegsBase, PlanAnalyzeSubtours planAnalyzeSubtours, int[]subtourDis){
 		ArrayList<?> actslegsResult = this.copyActsLegs(actslegsBase);
 		double score=-100000;
 		ArrayList<int[]> subtourDistances = new ArrayList<int[]>();
 		/* Set mode "walk" for all subtours with distance 0 */
 		for (int i=0;i<planAnalyzeSubtours.getNumSubtours();i++){
-			subtourDistances.add(new int []{i,0,this.checksubtourDistance2(actslegsBase, planAnalyzeSubtours, i)}); // subtour, mode pointer, distance
+			subtourDistances.add(new int []{i,0,subtourDis[i]}); // subtour, mode pointer, distance
 			if (subtourDistances.get(subtourDistances.size()-1)[2]==0) {
 				subtourDistances.remove(subtourDistances.size()-1);
 				for (int j=1;j<plan.getActsLegs().size();j=j+2){
