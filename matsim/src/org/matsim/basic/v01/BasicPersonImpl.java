@@ -31,7 +31,7 @@ import org.matsim.population.Desires;
 public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, BasicKnowledge> {
 
 	private static final Logger log = Logger.getLogger(BasicPersonImpl.class);
-	
+
 	protected List<T> plans = new ArrayList<T>(6);
 	protected Id id;
 	private String sex;
@@ -40,7 +40,7 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 	private String carAvail;
 	private String isEmployed;
 
-	private TreeSet<String> travelcards = null; 
+	private TreeSet<String> travelcards = null;
 	protected BasicKnowledge knowledge = null;
 	private Desires desires = null;
 
@@ -50,14 +50,14 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 		this.id = id;
 	}
 
-	public void setHouseholdId(Id householdId) {
+	public void setHouseholdId(final Id householdId) {
 		this.householdId = householdId;
 	}
-	
+
 	public Id getFiscalHouseholdId(){
 		return this.householdId;
 	}
-	
+
 	/**
 	 * @see org.matsim.basic.v01.BasicPerson#addPlan(T)
 	 */
@@ -114,6 +114,11 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 		return this.carAvail;
 	}
 
+	/**
+	 * @return "yes" if the person has a job
+	 * @deprecated use {@link #isEmployed()}
+	 */
+	@Deprecated
 	public final String getEmployed() {
 		return this.isEmployed;
 	}
@@ -151,14 +156,14 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 	}
 
 
-	
+
 	public final Desires createDesires(final String desc) {
 		if (this.desires == null) {
 			this.desires = new Desires(desc);
 		}
 		return this.desires;
 	}
-	
+
 
 	public final void addTravelcard(final String type) {
 		if (this.travelcards == null) {
@@ -184,8 +189,8 @@ public class BasicPersonImpl<T extends BasicPlan> implements BasicPerson<T, Basi
 		return this.desires;
 	}
 
-	public void setKnowledge(BasicKnowledge knowledge) {
+	public void setKnowledge(final BasicKnowledge knowledge) {
 		this.knowledge = knowledge;
 	}
-	
+
 }

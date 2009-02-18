@@ -44,26 +44,26 @@ public class PersonImpl implements Person{
 
 	private final static Logger log = Logger.getLogger(Person.class);
 
-	private BasicPerson<Plan, Knowledge> delegate;
-	
+	private final BasicPerson<Plan, Knowledge> delegate;
+
 	private Customizable customizableDelegate;
-	
+
 	private String visualizerData = null;
 
 	private Household household;
 
 	protected Plan selectedPlan = null;
 
-	public PersonImpl(Id id) {
+	public PersonImpl(final Id id) {
 		this.delegate = new BasicPersonImpl(id);
 	}
-	
+
 	public void addPlan(final Plan plan) {
 		this.delegate.addPlan(plan);
 		// Make sure there is a selected plan if there is at least one plan
 		if (this.selectedPlan == null) this.selectedPlan = plan;
 	}
-	
+
 	/**
 	 * @see org.matsim.population.Person#getSelectedPlan()
 	 */
@@ -72,9 +72,9 @@ public class PersonImpl implements Person{
 	}
 
 	public void setSelectedPlan(final Plan selectedPlan) {
-		if (delegate.getPlans().contains(selectedPlan)) {
+		if (this.delegate.getPlans().contains(selectedPlan)) {
 			this.selectedPlan = selectedPlan;
-			
+
 		//_FIXME dg nov 08: we should think about the following: the
 		//methods comment states that nothing is changed if the plan
 		//is not contained in the db, however from my point of view
@@ -94,11 +94,11 @@ public class PersonImpl implements Person{
 			setSelectedPlan(p);
 		}
 		// Make sure there is a selected plan if there is at least one plan
-		if (this.getSelectedPlan() == null) 
+		if (this.getSelectedPlan() == null)
 			this.setSelectedPlan(p);
 		return p;
 	}
-	
+
 	public void removeUnselectedPlans() {
 		for (Iterator<Plan> iter = this.delegate.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
@@ -225,7 +225,7 @@ public class PersonImpl implements Person{
 		}
 		return result;
 	}
-	
+
 	public void removeWorstPlans(final int maxSize) {
 		if (this.delegate.getPlans().size() <= maxSize) {
 			return;
@@ -275,12 +275,12 @@ public class PersonImpl implements Person{
 		}
 		return null;
 	}
-	
+
 	public Household getHousehold() {
 		return this.household;
 	}
 
-	public void setHousehold(Household hh) {
+	public void setHousehold(final Household hh) {
 		if (!hh.getMembers().containsKey(this.getId())) {
 			hh.getMembers().put(this.getId(), this);
 			this.household = hh;
@@ -292,107 +292,112 @@ public class PersonImpl implements Person{
 			throw new IllegalStateException("The household with id: " + hh.getId() + " already has a member"
 					+ " with id: " + this.getId() + " the referenced objects however are not equal!");
 		}
-	
+
 	}
 
 
 	public Knowledge createKnowledge(final String desc) {
-		if (delegate.getKnowledge() == null) {
+		if (this.delegate.getKnowledge() == null) {
 			Knowledge k = new Knowledge();
 			k.setDescription(desc);
-			((BasicPersonImpl)delegate).setKnowledge(k);
+			((BasicPersonImpl)this.delegate).setKnowledge(k);
 		}
-		return delegate.getKnowledge();
+		return this.delegate.getKnowledge();
 	}
 
 	@Deprecated
 	public void setVisualizerData(final String visualizerData) {
 		this.visualizerData = visualizerData;
 	}
-	
+
 	@Deprecated
 	public String getVisualizerData() {
 		return this.visualizerData ;
 	}
 
-	public void addTravelcard(String type) {
-		delegate.addTravelcard(type);
+	public void addTravelcard(final String type) {
+		this.delegate.addTravelcard(type);
 	}
 
-	public Desires createDesires(String desc) {
-		return delegate.createDesires(desc);
+	public Desires createDesires(final String desc) {
+		return this.delegate.createDesires(desc);
 	}
 
 	public int getAge() {
-		return delegate.getAge();
+		return this.delegate.getAge();
 	}
 
 	public String getCarAvail() {
-		return delegate.getCarAvail();
+		return this.delegate.getCarAvail();
 	}
 
 	public Desires getDesires() {
-		return delegate.getDesires();
+		return this.delegate.getDesires();
 	}
 
+	/**
+	 * @return "yes" if the person has a job
+	 * @deprecated use {@link #isEmployed()}
+	 */
+	@Deprecated
 	public String getEmployed() {
-		return delegate.getEmployed();
+		return this.delegate.getEmployed();
 	}
 
 	public Id getId() {
-		return delegate.getId();
+		return this.delegate.getId();
 	}
 
 	public Knowledge getKnowledge() {
-		return delegate.getKnowledge();
+		return this.delegate.getKnowledge();
 	}
 
 	public String getLicense() {
-		return delegate.getLicense();
+		return this.delegate.getLicense();
 	}
 
 	public List<Plan> getPlans() {
-		return delegate.getPlans();
+		return this.delegate.getPlans();
 	}
 
 	public String getSex() {
-		return delegate.getSex();
+		return this.delegate.getSex();
 	}
 
 	public TreeSet<String> getTravelcards() {
-		return delegate.getTravelcards();
+		return this.delegate.getTravelcards();
 	}
 
 	public boolean hasLicense() {
-		return delegate.hasLicense();
+		return this.delegate.hasLicense();
 	}
 
 	public boolean isEmployed() {
-		return delegate.isEmployed();
+		return this.delegate.isEmployed();
 	}
 
-	public void setAge(int age) {
-		delegate.setAge(age);
+	public void setAge(final int age) {
+		this.delegate.setAge(age);
 	}
 
-	public void setCarAvail(String carAvail) {
-		delegate.setCarAvail(carAvail);
+	public void setCarAvail(final String carAvail) {
+		this.delegate.setCarAvail(carAvail);
 	}
 
-	public void setEmployed(String employed) {
-		delegate.setEmployed(employed);
+	public void setEmployed(final String employed) {
+		this.delegate.setEmployed(employed);
 	}
 
-	public void setId(Id id) {
-		delegate.setId(id);
+	public void setId(final Id id) {
+		this.delegate.setId(id);
 	}
 
-	public void setLicence(String licence) {
-		delegate.setLicence(licence);
+	public void setLicence(final String licence) {
+		this.delegate.setLicence(licence);
 	}
 
-	public void setSex(String sex) {
-		delegate.setSex(sex);
+	public void setSex(final String sex) {
+		this.delegate.setSex(sex);
 	}
 
 	public Map<String, Object> getCustomAttributes() {
@@ -402,7 +407,7 @@ public class PersonImpl implements Person{
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
-	public void setKnowledge(Knowledge knowledge) {
+	public void setKnowledge(final Knowledge knowledge) {
 		((BasicPersonImpl)this.delegate).setKnowledge(knowledge);
 	}
 

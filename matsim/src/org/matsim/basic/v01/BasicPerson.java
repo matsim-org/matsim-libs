@@ -25,7 +25,7 @@ import java.util.TreeSet;
 import org.matsim.population.Desires;
 
 /**
- * 
+ *
 * @author dgrether
 *
 */
@@ -42,30 +42,35 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 	public Id getId();
 
 	public void setId(final Id id);
-	
+
 	public String getSex();
 
 	public int getAge();
 
-	public String getLicense(); 
+	public String getLicense();
 
-	public boolean hasLicense(); 
+	public boolean hasLicense();
 
 	public String getCarAvail();
 
+	/**
+	 * @return "yes" if the person has a job
+	 * @deprecated use {@link #isEmployed()}
+	 */
+	@Deprecated
 	public String getEmployed();
 
-	public boolean isEmployed(); 
+	public boolean isEmployed();
 
-	public void setAge(final int age); 
+	public void setAge(final int age);
 
-	public void setSex(final String sex); 
+	public void setSex(final String sex);
 
-	public void setLicence(final String licence); 
+	public void setLicence(final String licence);
 
-	public void setCarAvail(final String carAvail); 
+	public void setCarAvail(final String carAvail);
 
-	public void setEmployed(final String employed); 
+	public void setEmployed(final String employed);
 
 //	public Knowledge createKnowledge(final String desc);
 
@@ -76,9 +81,9 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 	public TreeSet<String> getTravelcards();
 
 	public K getKnowledge();
-	
+
 	public Desires getDesires();
-	
+
 	public Id getFiscalHouseholdId();
 
 }
