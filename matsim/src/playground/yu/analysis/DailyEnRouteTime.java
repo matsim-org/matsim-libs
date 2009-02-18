@@ -19,6 +19,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.charts.XYLineChart;
 
+import playground.yu.analysis.DailyDistance.ActTypeStart;
 import playground.yu.utils.SimpleWriter;
 
 /**
@@ -80,18 +81,92 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		double otherDayTime = 0.0;
 		for (LegIterator li = plan.getIteratorLeg(); li.hasNext();) {
 			Leg bl = (Leg) li.next();
+			ActTypeStart ats = null;
+			String tmpActType = plan.getNextActivity(bl).getType();
+			if (tmpActType.startsWith("h"))
+				ats = ActTypeStart.h;
+			else if (tmpActType.startsWith("w"))
+				ats = ActTypeStart.w;
+			else if (tmpActType.startsWith("e"))
+				ats = ActTypeStart.e;
+			else if (tmpActType.startsWith("s"))
+				ats = ActTypeStart.s;
+			else if (tmpActType.startsWith("l"))
+				ats = ActTypeStart.l;
+			else
+				ats = ActTypeStart.o;
 			double time = bl.getTravelTime() / 60.0;
 			if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
 				if (Long.parseLong(person.getId().toString()) > 1000000000) {
 					otherTime += time;
 					otherDayTime += time;
+					switch (ats) {
+					case h:
+						throughHomeTime += time;
+						break;
+					case w:
+						throughWorkTime += time;
+						break;
+					case e:
+						throughEducTime += time;
+						break;
+					case s:
+						throughShopTime += time;
+						break;
+					case l:
+						throughLeisTime += time;
+						break;
+					default:
+						throughOtherTime += time;
+						break;
+					}
 				} else if (bl.getMode().equals(Mode.car)) {
 					carTime += time;
 					carDayTime += time;
+					switch (ats) {
+					case h:
+						carHomeTime += time;
+						break;
+					case w:
+						carWorkTime += time;
+						break;
+					case e:
+						carEducTime += time;
+						break;
+					case s:
+						carShopTime += time;
+						break;
+					case l:
+						carLeisTime += time;
+						break;
+					default:
+						carOtherTime += time;
+						break;
+					}
 				} else if (bl.getMode().equals(Mode.pt)) {
 					ptTime += time;
 					ptDayTime += time;
+					switch (ats) {
+					case h:
+						ptHomeTime += time;
+						break;
+					case w:
+						ptWorkTime += time;
+						break;
+					case e:
+						ptEducTime += time;
+						break;
+					case s:
+						ptShopTime += time;
+						break;
+					case l:
+						ptLeisTime += time;
+						break;
+					default:
+						ptOtherTime += time;
+						break;
+					}
 				}
 			}
 		}
@@ -121,6 +196,22 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		sw.writeln("car\t" + (carTime + otherTime) / (double) count + "\t"
 				+ (carTime + otherTime) / sum * 100.0);
 		sw.writeln("pt\t" + ptTime / count + "\t" + ptTime / sum * 100.0);
+		sw.writeln("--travel destination and modal split--daily on route time--");
+		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
+		sw.writeln("car\t" + carWorkTime + "\t" + carEducTime + "\t"
+				+ carShopTime + "\t" + carLeisTime + "\t" + carHomeTime + "\t"
+				+ carOtherTime);
+		sw.writeln("pt\t" + ptWorkTime + "\t" + ptEducTime + "\t" + ptShopTime
+				+ "\t" + ptLeisTime + "\t" + ptHomeTime + "\t" + ptOtherTime);
+		sw.writeln("through\t" + throughWorkTime + "\t" + throughEducTime
+				+ "\t" + throughShopTime + "\t" + throughLeisTime + "\t"
+				+ throughHomeTime + "\t" + throughOtherTime);
+		sw.writeln("total\t" + (carWorkTime + ptWorkTime + throughWorkTime)
+				+ "\t" + (carEducTime + ptEducTime + throughEducTime) + "\t"
+				+ (carShopTime + ptShopTime + throughShopTime) + "\t"
+				+ (carLeisTime + ptLeisTime + throughLeisTime) + "\t"
+				+ (carHomeTime + ptHomeTime + throughHomeTime) + "\t"
+				+ (carOtherTime + ptOtherTime + throughOtherTime));
 		try {
 			sw.close();
 		} catch (IOException e) {
