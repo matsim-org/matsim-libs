@@ -24,6 +24,7 @@ import org.matsim.basic.v01.LocationType;
 /**
  * @author dgrether
  */
+@Deprecated // not yet clear
 public interface BasicLocation {
 	
 	public Coord getCenter();
