@@ -21,6 +21,8 @@
 package playground.marcel;
 
 import org.matsim.analysis.CalcLegTimes;
+import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.config.Config;
 import org.matsim.events.Events;
 import org.matsim.events.MatsimEventsReader;
@@ -31,6 +33,7 @@ import org.matsim.gbl.Gbl;
 import org.matsim.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.population.PopulationReader;
@@ -88,21 +91,23 @@ public class KtiSpeedTest {
 		System.out.println("  reading events, calculating travel times...");
 		final Events events = new Events();
 		final TravelTimeCalculator ttime = new TravelTimeCalculator(network, 15*60);
-		events.addHandler(ttime);
 
-//		events.addHandler(new VolumesAnalyzer(3600, 24*3600-1, network));
-		events.addHandler(new EventsToScore(population, new CharyparNagelScoringFunctionFactory()));
-		events.addHandler(new EventWriterTXT("testevents.txt"));
+		events.addHandler(new DepartureDelayAverageCalculator(network, 900));
 		events.addHandler(new CalcLegTimes(population));
+		events.addHandler(new LegHistogram(300));
+		events.addHandler(new EventsToScore(population, new CharyparNagelScoringFunctionFactory()));
+		events.addHandler(ttime);
+		events.addHandler(new VolumesAnalyzer(900, 30*3600, network));
+		events.addHandler(new EventWriterTXT("testevents.txt"));
 
 		events.printEventHandlers();
 
 		Gbl.startMeasurement();
-		if (config.getParam("events", "inputFormat").equals("matsimDEQ1")) {
-			readBinEvents(config.getParam("events", "inputFile"), events);
-		} else {
+//		if (config.getParam("events", "inputFormat").equals("matsimDEQ1")) {
+//			readBinEvents(config.getParam("events", "inputFile"), events);
+//		} else {
 			readTxtEvents(config.getParam("events", "inputFile"), events);
-		}
+//		}
 		Gbl.printElapsedTime();
 		System.out.println("  done.");
 
@@ -127,7 +132,7 @@ public class KtiSpeedTest {
 	}
 
 	public static void main(final String[] args) {
-		calcRouteMTwithTimes(args);
+		calcRouteMTwithTimes(new String[] {"../mystudies/myconfig.xml"});
 	}
 
 }

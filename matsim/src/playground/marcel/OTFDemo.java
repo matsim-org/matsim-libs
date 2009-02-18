@@ -44,12 +44,18 @@ public class OTFDemo {
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng2b/100.visualsizer.mvi"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng-data/config.xml"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/runs/gauteng3/100.visualization.mvi"});
-//		org.matsim.run.OTFVis.main(new String[] {"-convert", "/Volumes/Data/VSP/runs/gauteng3/100.events.txt.gz", "/Volumes/Data/VSP/runs/gauteng-data/routes_network_1000mplus.xml.gz", "/Volumes/Data/VSP/runs/gauteng3/100.visualization.mvi", "300"});
-		
+
+		//		org.matsim.run.OTFVis.main(new String[] {"-convert", "/Volumes/Data/VSP/runs/gauteng3/100.events.txt.gz", "/Volumes/Data/VSP/runs/gauteng-data/routes_network_1000mplus.xml.gz", "/Volumes/Data/VSP/runs/gauteng3/100.visualization.mvi", "300"});
+
 		// BVG-Demo
-//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run487/100.T.veh.gz", "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run487/it.500/500.events.mvi"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/cvs/vsp-cvs/runs/run628/it.500/500.events.mvi"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Users/cello/10.events.mvi"});
+//		org.matsim.run.OTFVis.main(new String[] {"output/0.otfvis.mvi"});
 //		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/zurich/config.xml"});
-		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/berlin/config.xml"});
+//		org.matsim.run.OTFVis.main(new String[] {"/Volumes/Data/VSP/talks/20081002_BVG/berlin/config.xml"});
+
+//		org.matsim.run.OTFVis.main(new String[] {"../shared-svn/studies/schweiz-ivtch/pt-experimental/config_otfvis.xml"});
 
 //		org.matsim.run.OTFVis.main(new String[] {});
 
