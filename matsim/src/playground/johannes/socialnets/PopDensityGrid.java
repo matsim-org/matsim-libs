@@ -30,9 +30,9 @@ import java.io.IOException;
 import org.matsim.config.Config;
 import org.matsim.controler.ScenarioData;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Person;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.io.IOUtils;
 
 /**

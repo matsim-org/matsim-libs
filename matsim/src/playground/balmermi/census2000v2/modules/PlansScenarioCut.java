@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.Coord;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;

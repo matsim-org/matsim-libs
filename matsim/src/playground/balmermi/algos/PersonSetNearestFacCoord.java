@@ -25,12 +25,12 @@ import java.util.Iterator;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.Coord;
 
 public class PersonSetNearestFacCoord extends AbstractPersonAlgorithm implements PlanAlgorithm {
 

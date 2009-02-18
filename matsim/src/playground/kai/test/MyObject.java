@@ -6,10 +6,10 @@ import org.matsim.facilities.Facility;
 import org.matsim.interfaces.basic.v01.BasicAct;
 import org.matsim.interfaces.basic.v01.BasicLink;
 import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.LinkImpl;
 import org.matsim.population.Act;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

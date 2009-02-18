@@ -45,4 +45,6 @@ public interface BasicPopulation<T extends BasicPerson> {
 	
 	@Deprecated
 	public T getPerson(String personId);
+
+	public BasicPopulationBuilder getPopulationBuilder();
 }

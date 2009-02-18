@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.Coord;
 
 public class NetworkScenarioCut {
 

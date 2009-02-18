@@ -22,7 +22,7 @@ package org.matsim.socialnetworks.algorithms;
 
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.Facility;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 public class FacilitiesFindScenarioMinMaxCoords {

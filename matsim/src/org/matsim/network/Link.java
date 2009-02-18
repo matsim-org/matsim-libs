@@ -1,7 +1,7 @@
 package org.matsim.network;
 
 import org.matsim.interfaces.basic.v01.BasicLink;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.world.Location;
 
 public interface Link extends BasicLink, Location {

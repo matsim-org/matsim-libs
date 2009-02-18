@@ -21,11 +21,11 @@
 package org.matsim.facilities;
 
 import org.matsim.basic.v01.IdImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.World;
 import org.matsim.world.ZoneLayer;

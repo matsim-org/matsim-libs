@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.io.MatsimXmlParser;
 import org.matsim.writer.MatsimXmlWriter;
 import org.xml.sax.Attributes;

@@ -69,7 +69,7 @@ import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;

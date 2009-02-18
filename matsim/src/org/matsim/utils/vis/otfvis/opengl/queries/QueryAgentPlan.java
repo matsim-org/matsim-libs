@@ -31,6 +31,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.events.Events;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.mobsim.queuesim.QueueNetwork;
 import org.matsim.network.Link;
@@ -41,7 +42,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.vis.otfvis.data.OTFServerQuad;
 import org.matsim.utils.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.utils.vis.otfvis.interfaces.OTFDrawer;

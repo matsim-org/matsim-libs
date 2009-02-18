@@ -40,7 +40,7 @@ import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
 import org.matsim.gbl.MatsimResource;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;

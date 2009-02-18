@@ -29,10 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.basic.signalsystems.BasicSignalSystems;
 import org.matsim.basic.signalsystemsconfig.BasicSignalSystemConfiguration;
+import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.facilities.Facilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicScenario;
+import org.matsim.interfaces.basic.v01.Coord;
+import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkChangeEventsParser;
 import org.matsim.network.NetworkFactory;
@@ -42,6 +46,7 @@ import org.matsim.population.MatsimPopulationReader;
 import org.matsim.population.Population;
 import org.matsim.signalsystems.MatsimLightSignalSystemConfigurationReader;
 import org.matsim.signalsystems.MatsimLightSignalSystemsReader;
+import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.xml.sax.SAXException;
@@ -53,7 +58,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class ScenarioData {
+public class ScenarioData implements BasicScenario {
 	private final String worldFileName;
 	private final String networkFileName;
 	private final String facilitiesFileName;
@@ -232,6 +237,18 @@ public class ScenarioData {
 			reader.readFile(this.config.signalSystems().getSignalSystemConfigFile());
 		}
 		return this.signalSystemConfigurations;
+	}
+
+	public Config getConfig() {
+		return this.config;
+	}
+
+	public Coord createCoord(double d, double e) {
+		return new CoordImpl( d, e ) ;
+	}
+
+	public Id createId(String string) {
+		return new IdImpl( string) ;
 	}
 	
 }

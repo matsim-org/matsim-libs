@@ -28,12 +28,12 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.network.Node;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.misc.Time;
 

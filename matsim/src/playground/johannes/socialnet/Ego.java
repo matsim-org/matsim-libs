@@ -29,7 +29,7 @@ import org.matsim.basic.v01.BasicActivity;
 import org.matsim.basic.v01.BasicKnowledge;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 
 import playground.johannes.graph.SparseVertex;
 

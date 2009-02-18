@@ -34,8 +34,9 @@ import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
-import org.matsim.basic.v01.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.Link;
@@ -170,5 +171,11 @@ public class PopulationBuilderImpl implements BasicPopulationBuilder {
 		}
 		throw new IllegalArgumentException("Knowledge must contain at least one Activity!");
 	}
+
+//	public BasicAct createAct(BasicPlan plan, String string, Coord coord) {
+//		
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 }

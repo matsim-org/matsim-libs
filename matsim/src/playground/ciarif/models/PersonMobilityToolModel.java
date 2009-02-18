@@ -24,12 +24,12 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000.data.Persons;

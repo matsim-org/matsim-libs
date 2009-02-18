@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.gbl.MatsimRandom;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;

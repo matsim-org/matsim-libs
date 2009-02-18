@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,46 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.geometry;
+package org.matsim.interfaces.basic.v01;
 
-/*
- * In MATSim, generally Cartesian Coordinates are used, with x increasing
- * to the right, and y increasing to the top:
- * 
- *     ^
- *   y |
- *     |     x
- *   (0/0) ---->
+import java.util.List;
+
+import org.matsim.basic.v01.*;
+import org.matsim.interfaces.basic.v01.*;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
+
+/**
+ * @author dgrether
  */
+public interface BasicPopulationBuilder {
 
-public interface Coord {
+	BasicPerson createPerson(Id id) throws Exception;
 
-	public void setX(final double x); 
+	BasicPlan createPlan(BasicPerson currentPerson);
 
-	public void setY(final double y);
+	@Deprecated // to be clarified
+	BasicAct createAct(BasicPlan basicPlan, String currentActType, BasicLocation currentlocation);
 
-	public void setXY(final double x, final double y);
+	BasicLeg createLeg(BasicPlan basicPlan, Mode legMode);
 
-	public double getX();
-
-	public double getY();
-
-
-	/* 
-	 * I have deactivated the following functions, as I am not sure if
-	 * they should be part of an Interface. The functions would be useful
-	 * in anycase, but they may blow up the interface behind the scope
-	 * of the interface.
-	 * requiring "equals()" to be implemented could help preventing errors
-	 * "calcDistance" is ``nice to have''
-	 * maybe both functions could be implemented in a static utils class,
-	 * e.g. "CartesianCoordUtils", which would implement several math.
-	 * operators for CoordI-Objects like test for equality, subtraction
-	 * (=calcDistance) and other often-used functions for Coords.
-	 * [Rie, 2006-08-29]
+	/**
+	 * Creates a new Route object
+	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+	 * @return a BasicRoute Object with the links set accordingly
 	 */
-// 	public boolean equals(Object o);
-// 	
- 	public double calcDistance(final Coord other);
-	
+	BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
+
+	BasicPlan createPlan(BasicPerson person, boolean selected);
+
+	BasicActivity createActivity(String type, BasicLocation currentlocation);
+
+	BasicKnowledge createKnowledge(List<BasicActivity> currentActivities);
+
+//	BasicAct createAct(BasicPlan plan, String string, Coord coord);
+
 }

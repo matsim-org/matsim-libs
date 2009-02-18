@@ -23,6 +23,7 @@ package playground.dgrether;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -38,7 +39,6 @@ import org.matsim.population.PopulationWriterHandlerImplV4;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.utils.NetworkUtils;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 

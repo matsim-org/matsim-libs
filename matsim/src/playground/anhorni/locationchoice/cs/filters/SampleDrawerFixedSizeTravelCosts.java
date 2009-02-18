@@ -3,7 +3,8 @@ package playground.anhorni.locationchoice.cs.filters;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
+
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 
 

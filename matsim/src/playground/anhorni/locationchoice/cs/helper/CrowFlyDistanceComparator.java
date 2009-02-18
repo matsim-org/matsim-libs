@@ -23,7 +23,7 @@ package playground.anhorni.locationchoice.cs.helper;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 
 public class CrowFlyDistanceComparator implements Comparator<ZHFacility>, Serializable {
 	private static final long serialVersionUID = 1L;

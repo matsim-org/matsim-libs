@@ -75,6 +75,7 @@ public interface BasicPerson<T extends BasicPlan, K extends BasicKnowledge> {
 
 //	public Knowledge createKnowledge(final String desc);
 
+	@Deprecated // should either be in Builder, or not there at all (too new)
 	public Desires createDesires(final String desc);
 
 	public void addTravelcard(final String type);

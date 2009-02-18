@@ -21,8 +21,8 @@
 package org.matsim.basic.v01;
 
 import org.matsim.interfaces.basic.v01.BasicAct;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 
 public class BasicActImpl implements BasicAct {

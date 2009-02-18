@@ -38,6 +38,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -47,7 +48,6 @@ import org.matsim.population.Person;
 import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.PopulationWriterV5;
-import org.matsim.utils.geometry.Coord;
 import org.xml.sax.SAXException;
 /**
  * 

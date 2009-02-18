@@ -22,7 +22,7 @@ package org.matsim.utils.geometry.transformations;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;

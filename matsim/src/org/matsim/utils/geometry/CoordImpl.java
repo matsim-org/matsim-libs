@@ -22,6 +22,8 @@ package org.matsim.utils.geometry;
 
 import java.io.Serializable;
 
+import org.matsim.interfaces.basic.v01.Coord;
+
 
 public class CoordImpl implements Serializable, Coord {
 

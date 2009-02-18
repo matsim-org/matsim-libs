@@ -6,13 +6,14 @@ import org.apache.log4j.Logger;
 
 // ok:
 import org.matsim.basic.v01.*;
+import org.matsim.controler.ScenarioData;
+import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.*;
 import org.matsim.network.Link;
 
 // not ok:
 import org.matsim.events.*;
 import org.matsim.events.handler.*;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 @SuppressWarnings("unused")
@@ -28,9 +29,13 @@ ActStartEventHandler
 {
 	private static final Logger log = Logger.getLogger(MentalModule.class);
 	
-	public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNetwork<BasicNode,BasicLink> net ) {
+	public MentalModule ( BasicScenario sc ) {
+//		public MentalModule ( BasicPopulation<BasicPerson> pop, BasicNetwork<BasicNode,BasicLink> net, Gbl gbl ) {
 		// TODO What is the recommended type safety approach?
 		
+		BasicNetwork<BasicNode,BasicLink> net = (BasicNetwork   ) sc.getNetwork() ;
+		BasicPopulation<BasicPerson>      pop = (BasicPopulation) sc.getPopulation() ;
+				
 		// go through network and copy to my personal network:
 		for ( BasicNode bn : net.getNodes().values() ) {
 			Id id = bn.getId();
@@ -101,39 +106,40 @@ ActStartEventHandler
 		
 		// need to be able to construct a person:
 
-		BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(pop) ; 
-//		PopulationBuilder pb = pop.getPopulationBuilder() ; 
+//		BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(pop) ; 
+		BasicPopulationBuilder pb = pop.getPopulationBuilder() ; 
 		// TODO: BasicPopulationBuilder ist eine Implementation, nicht ein Interface. 
 		// Ich fände es konsistenter, wenn man es über ein Interface erhalten könnte.
 		// Dafür z.B.: pop.getPopulationBuilder() .  M.E. doch kein Problem, oder??
 		
-		try {
-			Id id = new IdImpl(1) ; // TODO: auch dies braucht eine Implementation
-			BasicPerson person = pb.createPerson(id) ;
-			
-			BasicPlan plan = pb.createPlan(person) ;
-			person.addPlan(plan) ;
-			
-			BasicLocation loc = new BasicLocationImpl() ; // TODO: braucht Implementation
-			Coord coord = new CoordImpl(1.,1.); // TODO: auch dies braucht eine Implementation
-			// loc.setCoord( coord ) ; // TODO: not allowed in interface. ????
-			BasicAct hAct = pb.createAct(plan, "home", loc) ;
-			plan.addAct( hAct ) ;
-			
-			BasicLeg leg = pb.createLeg(plan, BasicLeg.Mode.bike) ;
-			plan.addLeg( leg ) ;
-			
-			List<Id> routeIdList = new ArrayList<Id>() ;
-			routeIdList.add(id) ; routeIdList.add(id) ;
-			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
-			leg.setRoute(route) ;
-			
-			BasicAct wAct = pb.createAct(plan, "work", loc ) ;
-			plan.addAct( wAct ) ;
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Id id = sc.createId("1") ; // TODO: auch dies braucht eine Implementation
+//			BasicPerson person = pb.createPerson(id) ;
+//			
+//			BasicPlan plan = pb.createPlan(person) ;
+//			person.addPlan(plan) ;
+//			
+//			Coord coord = sc.createCoord(1.,1.) ;
+//			BasicLocation loc = pb.createFacility( coord ) ;
+//			
+//			BasicAct hAct = pb.createAct(plan, "home", loc ) ;
+//			plan.addAct( hAct ) ;
+//			
+//			BasicLeg leg = pb.createLeg(plan, BasicLeg.Mode.bike) ;
+//			plan.addLeg( leg ) ;
+//			
+//			List<Id> routeIdList = new ArrayList<Id>() ;
+//			routeIdList.add(id) ; routeIdList.add(id) ;
+//			BasicRoute route = pb.createRoute(id, id, routeIdList ) ;
+//			leg.setRoute(route) ;
+//			
+//			BasicLink link ;
+//			BasicAct wAct = pb.createAct(plan, "work", link ) ;
+//			plan.addAct( wAct ) ;
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
 
 	}

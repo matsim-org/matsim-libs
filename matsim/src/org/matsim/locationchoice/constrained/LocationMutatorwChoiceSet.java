@@ -28,13 +28,13 @@ import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Plan;
 import org.matsim.router.PlansCalcRoute;
-import org.matsim.utils.geometry.Coord;
 
 
 

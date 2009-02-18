@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.matsim.utils.collections.QuadTree;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.Coord;
 
 /**
  *  Searches in the Public Transport Network for the closest bus/train stops

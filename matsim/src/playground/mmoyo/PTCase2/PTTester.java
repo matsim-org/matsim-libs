@@ -3,13 +3,13 @@ package playground.mmoyo.PTCase2;
 import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.MatsimPopulationReader;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.Coord;
 
 
 

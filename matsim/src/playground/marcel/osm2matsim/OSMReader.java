@@ -28,9 +28,9 @@ import java.util.Stack;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.counts.Count;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.utils.io.MatsimXmlParser;

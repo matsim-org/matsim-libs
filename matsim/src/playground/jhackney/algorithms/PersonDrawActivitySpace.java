@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.ActivitySpace;
 import org.matsim.population.ActivitySpaceBean;
 import org.matsim.population.ActivitySpaceCassini;
@@ -35,7 +36,6 @@ import org.matsim.population.ActivitySpaceSuperEllipse;
 import org.matsim.population.Knowledge;
 import org.matsim.population.Person;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.utils.geometry.Coord;
 
 public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 

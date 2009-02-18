@@ -23,12 +23,12 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.Coord;
 
 /**
  * Filters out plans from persons where none of the act's locations are within

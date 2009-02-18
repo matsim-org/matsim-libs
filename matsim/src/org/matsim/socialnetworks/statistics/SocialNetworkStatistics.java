@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
@@ -44,7 +45,6 @@ import org.matsim.socialnetworks.algorithms.PersonCalculateActivitySpaces;
 import org.matsim.socialnetworks.algorithms.PlanEuclideanLength;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 
 import cern.colt.list.DoubleArrayList;

@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.BasicOpeningTime;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.utils.misc.Time;

@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
+import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.Id;
 
 
@@ -33,6 +34,8 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 	private String name = null;
 	
 	private Map<Id, T> persons = new TreeMap<Id, T>();
+	
+	private BasicPopulationBuilder pb = new BasicPopulationBuilderImpl(this);
 
 	/**
 	 * @see org.matsim.interfaces.basic.v01.BasicPopulation#addPerson(T)
@@ -67,6 +70,10 @@ public class BasicPopulationImpl <T extends BasicPerson> implements BasicPopulat
 
 	public Map<Id, T> getPersons() {
 		return this.persons;
+	}
+
+	public BasicPopulationBuilder getPopulationBuilder() {
+		return this.pb ;
 	}
 
 }

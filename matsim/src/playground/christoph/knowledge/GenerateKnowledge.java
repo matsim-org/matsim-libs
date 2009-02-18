@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.basic.v01.BasicPlanImpl.ActIterator;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -38,7 +39,6 @@ import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.population.routes.CarRoute;
-import org.matsim.utils.geometry.Coord;
 
 import playground.christoph.knowledge.utils.GetAllLinks;
 

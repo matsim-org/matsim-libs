@@ -20,8 +20,8 @@
 
 package org.matsim.utils.geometry.transformations;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.CoordinateTransformation;
 

@@ -1,7 +1,7 @@
 package playground.anhorni.locationchoice.cs.helper;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.utils.geometry.Coord;
 
 public class MZTrip {
 	

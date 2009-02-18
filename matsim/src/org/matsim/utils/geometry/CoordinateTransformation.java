@@ -20,6 +20,8 @@
 
 package org.matsim.utils.geometry;
 
+import org.matsim.interfaces.basic.v01.Coord;
+
 
 /**
  * A simple interface to convert coordinates from one coordinate system to

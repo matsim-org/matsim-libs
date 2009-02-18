@@ -7,13 +7,13 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.population.Act;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.world.Location;
 

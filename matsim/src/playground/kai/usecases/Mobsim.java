@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.*;
 import org.matsim.events.*;
 import org.matsim.interfaces.basic.v01.*;
-import org.matsim.utils.geometry.Coord;
 
 @SuppressWarnings("unused")
 public class Mobsim {

@@ -8,6 +8,7 @@ import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.config.Config;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
@@ -20,7 +21,6 @@ import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 import playground.mmoyo.PTRouter.PTNProximity;

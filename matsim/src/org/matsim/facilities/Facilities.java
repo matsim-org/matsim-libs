@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Layer;
 
 public class Facilities extends Layer implements Iterable<Facility> {

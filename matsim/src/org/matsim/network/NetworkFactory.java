@@ -27,11 +27,11 @@ import java.util.Map;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
 import org.matsim.interfaces.basic.v01.BasicNode;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.routes.NodeCarRouteFactory;
 import org.matsim.population.routes.Route;
 import org.matsim.population.routes.RouteFactory;
-import org.matsim.utils.geometry.Coord;
 
 /**
  * @author dgrether

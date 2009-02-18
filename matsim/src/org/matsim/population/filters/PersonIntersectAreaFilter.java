@@ -23,6 +23,7 @@ package org.matsim.population.filters;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.population.Act;
@@ -32,7 +33,6 @@ import org.matsim.population.Plan;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.Coord;
 
 /**
  * Filters all persons out whose routes do not lead at least once through

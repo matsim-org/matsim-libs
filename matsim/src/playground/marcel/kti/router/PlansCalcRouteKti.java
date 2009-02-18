@@ -23,6 +23,7 @@ package playground.marcel.kti.router;
 import java.util.List;
 
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.network.NetworkLayer;
@@ -35,7 +36,6 @@ import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.PreProcessLandmarks;
 import org.matsim.router.util.TravelCost;
 import org.matsim.router.util.TravelTime;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 

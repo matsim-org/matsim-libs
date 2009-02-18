@@ -24,11 +24,11 @@ import java.util.Iterator;
 
 import org.matsim.basic.v01.BasicActImpl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Act;
 import org.matsim.population.Leg;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
-import org.matsim.utils.geometry.Coord;
 
 /**
  * Moves the geographical location of act's a random amount to north/south and east/west,

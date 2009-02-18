@@ -37,6 +37,7 @@ import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
 import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
@@ -54,7 +55,6 @@ import org.matsim.population.Vehicle;
 import org.matsim.population.VehicleReaderV1;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 

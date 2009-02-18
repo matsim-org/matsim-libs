@@ -22,9 +22,9 @@ package org.matsim.network.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordinateTransformation;
 
 public class NetworkTransform {

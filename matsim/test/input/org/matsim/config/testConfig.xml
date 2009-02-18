@@ -47,6 +47,7 @@
       </activities>
     </scoring>
   </scenario>
+  
   <simulation>
     <!-- new -->
     <runIdentifier>run538</runIdentifier>

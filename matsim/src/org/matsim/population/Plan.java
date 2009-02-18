@@ -28,11 +28,11 @@ import org.matsim.basic.v01.BasicPlanImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.Gbl;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.stats.algorithms.PlanStats;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.misc.Time;
 
 public class Plan extends BasicPlanImpl {

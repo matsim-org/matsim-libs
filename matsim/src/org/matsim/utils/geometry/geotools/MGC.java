@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.referencing.CRS;
-import org.matsim.utils.geometry.Coord;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
@@ -60,7 +60,7 @@ public class MGC {
 
 
 	/**
-	 * Converts a MATSim {@link org.matsim.utils.geometry.Coord} into a Geotools <code>Coordinate</code>
+	 * Converts a MATSim {@link org.matsim.interfaces.basic.v01.Coord} into a Geotools <code>Coordinate</code>
 	 * @param coord MATSim coordinate
 	 * @return Geotools coordinate
 	 */
@@ -69,7 +69,7 @@ public class MGC {
 	}
 
 	/**
-	 * Converts a Geotools <code>Coordinate</code> into a MATSim {@link org.matsim.utils.geometry.Coord}
+	 * Converts a Geotools <code>Coordinate</code> into a MATSim {@link org.matsim.interfaces.basic.v01.Coord}
 	 * @param coord MATSim coordinate
 	 * @return Geotools coordinate
 	 */
@@ -78,7 +78,7 @@ public class MGC {
 	}
 
 	/**
-	 * Converts a MATSim {@link org.matsim.utils.geometry.Coord} into a Geotools <code>Point</code>
+	 * Converts a MATSim {@link org.matsim.interfaces.basic.v01.Coord} into a Geotools <code>Point</code>
 	 * @param coord MATSim coordinate
 	 * @return Geotools point
 	 */
@@ -87,7 +87,7 @@ public class MGC {
 	}
 
 	/**
-	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.utils.geometry.Coord}
+	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.interfaces.basic.v01.Coord}
 	 * @param point Geotools point
 	 * @return MATSim coordinate
 	 */

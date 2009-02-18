@@ -33,6 +33,7 @@ import java.util.TreeSet;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
@@ -40,7 +41,6 @@ import org.matsim.population.routes.CarRoute;
 import org.matsim.population.routes.NodeCarRoute;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.utils.collections.QuadTree;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 import org.matsim.utils.misc.Time;
 

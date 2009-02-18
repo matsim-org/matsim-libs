@@ -20,7 +20,6 @@
 
 package org.matsim.interfaces.basic.v01;
 
-import org.matsim.utils.geometry.Coord;
 
 /**
  *

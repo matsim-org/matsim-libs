@@ -23,12 +23,12 @@
  */
 package playground.johannes.socialnets;
 
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
 import org.matsim.router.Dijkstra;
 import org.matsim.router.util.LeastCostPathCalculator.Path;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.utils.geometry.CoordImpl;
 
 /**

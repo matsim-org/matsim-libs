@@ -6,10 +6,10 @@ import java.util.Map;
 import org.matsim.controler.Controler;
 import org.matsim.facilities.Facility;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
-import org.matsim.utils.geometry.Coord;
 
 public class Retailer {
 	private final Id id;

@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facilities;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.population.Act;
 import org.matsim.population.Knowledge;
@@ -41,7 +42,6 @@ import org.matsim.socialnetworks.algorithms.FacilitiesFindScenarioMinMaxCoords;
 import org.matsim.socialnetworks.socialnet.SocialNetEdge;
 import org.matsim.socialnetworks.socialnet.SocialNetwork;
 import org.matsim.socialnetworks.statistics.GeoStatistics;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Location;
 import org.matsim.world.Zone;
 

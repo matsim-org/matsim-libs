@@ -26,6 +26,7 @@ import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
 import org.matsim.interfaces.basic.v01.BasicLeg;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.Act;
@@ -34,7 +35,6 @@ import org.matsim.population.PersonImpl;
 import org.matsim.population.Plan;
 import org.matsim.population.Population;
 import org.matsim.utils.WorldUtils;
-import org.matsim.utils.geometry.Coord;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 

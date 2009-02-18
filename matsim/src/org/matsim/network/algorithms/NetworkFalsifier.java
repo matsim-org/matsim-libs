@@ -21,10 +21,10 @@
 package org.matsim.network.algorithms;
 
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.network.Link;
 import org.matsim.network.NetworkLayer;
 import org.matsim.network.Node;
-import org.matsim.utils.geometry.Coord;
 
 /**
  * Falsifies a network, so it can more legally be redistributed, by moving the nodes by a random amount

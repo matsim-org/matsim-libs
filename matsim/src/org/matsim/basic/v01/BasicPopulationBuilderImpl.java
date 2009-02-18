@@ -28,8 +28,9 @@ import org.matsim.interfaces.basic.v01.BasicLocation;
 import org.matsim.interfaces.basic.v01.BasicPerson;
 import org.matsim.interfaces.basic.v01.BasicPlan;
 import org.matsim.interfaces.basic.v01.BasicPopulation;
-import org.matsim.basic.v01.BasicPopulationBuilder;
+import org.matsim.interfaces.basic.v01.BasicPopulationBuilder;
 import org.matsim.interfaces.basic.v01.BasicRoute;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.Id;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 
@@ -111,5 +112,13 @@ public class BasicPopulationBuilderImpl implements BasicPopulationBuilder {
 		}
 		return kn;
 	}
+
+//	public BasicAct createAct(BasicPlan basicPlan, String currentActType, Coord coord) {
+//		
+//			BasicActImpl act = new BasicActImpl(currentActType);
+//			basicPlan.addAct(act);
+//			act.setCoord(coord);
+//			return act;
+//	}
 
 }

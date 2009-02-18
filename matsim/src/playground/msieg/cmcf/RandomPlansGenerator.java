@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.basic.v01.IdImpl;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.Link;
 import org.matsim.network.MatsimNetworkReader;
@@ -46,7 +47,6 @@ import org.matsim.router.Dijkstra;
 import org.matsim.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.router.util.LeastCostPathCalculator;
 import org.matsim.router.util.PreProcessDijkstra;
-import org.matsim.utils.geometry.Coord;
 import org.xml.sax.SAXException;
 
 /**

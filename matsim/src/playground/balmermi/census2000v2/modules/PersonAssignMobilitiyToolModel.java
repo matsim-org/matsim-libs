@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Activity;
 import org.matsim.gbl.Gbl;
 import org.matsim.gbl.MatsimRandom;
+import org.matsim.interfaces.basic.v01.Coord;
 import org.matsim.population.Person;
 import org.matsim.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.utils.geometry.Coord;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
