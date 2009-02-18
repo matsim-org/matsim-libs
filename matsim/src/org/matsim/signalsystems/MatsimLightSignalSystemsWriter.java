@@ -107,7 +107,7 @@ public class MatsimLightSignalSystemsWriter {
 		} //end writing lanesToLinkAssignments
 		
 		//writing lightSignalSystemDefinitions
-		for (BasicSignalSystemDefinition lssd : this.blss.getLightSignalSystemDefinitions()) {
+		for (BasicSignalSystemDefinition lssd : this.blss.getSignalSystemDefinitions()) {
 			XMLLightSignalSystemDefinitionType xmllssd = fac.createXMLLightSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
@@ -127,7 +127,7 @@ public class MatsimLightSignalSystemsWriter {
 		}
 		
 		//writing lightSignalGroupDefinitions
-		for (BasicSignalGroupDefinition lsgd : this.blss.getLightSignalGroupDefinitions()) {
+		for (BasicSignalGroupDefinition lsgd : this.blss.getSignalGroupDefinitions()) {
 			XMLLightSignalGroupDefinitionType xmllsgd = fac.createXMLLightSignalGroupDefinitionType();
 			xmllsgd.setLinkIdRef(lsgd.getLinkRefId().toString());
 			xmllsgd.setId(lsgd.getId().toString());

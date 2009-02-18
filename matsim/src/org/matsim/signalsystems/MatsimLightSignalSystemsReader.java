@@ -117,7 +117,7 @@ public class MatsimLightSignalSystemsReader {
 				lssdef.setDefaultCirculationTime(xmllssDef.getDefaultCirculationTime().getSeconds());
 				lssdef.setDefaultInterimTime(xmllssDef.getDefaultInterimTime().getSeconds());
 				lssdef.setDefaultSyncronizationOffset(xmllssDef.getDefaultSyncronizationOffset().getSeconds());
-				lightSignalSystems.addLightSignalSystemDefinition(lssdef);
+				lightSignalSystems.addSignalSystemDefinition(lssdef);
 			}
 			//parsing lightSignalGroupDefinitions
 			BasicSignalGroupDefinition lsgdef;
@@ -130,7 +130,7 @@ public class MatsimLightSignalSystemsReader {
 				for (XMLIdRefType refIds : xmllsgdef.getToLink()) {
 					lsgdef.addToLinkId(new IdImpl(refIds.getRefId()));
 				}
-				lightSignalSystems.addLightSignalGroupDefinition(lsgdef);
+				lightSignalSystems.addSignalGroupDefinition(lsgdef);
 			}
 		} catch (JAXBException e) {
 			e.printStackTrace();

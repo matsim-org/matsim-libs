@@ -41,12 +41,12 @@ public class BasicSignalSystems {
 	}
 
 	
-	public List<BasicSignalSystemDefinition> getLightSignalSystemDefinitions() {
+	public List<BasicSignalSystemDefinition> getSignalSystemDefinitions() {
 		return lightSignalSystemDefinitions;
 	}
 
 	
-	public List<BasicSignalGroupDefinition> getLightSignalGroupDefinitions() {
+	public List<BasicSignalGroupDefinition> getSignalGroupDefinitions() {
 		return lightSignalGroupDefinitions;
 	}
 
@@ -63,7 +63,7 @@ public class BasicSignalSystems {
 	/**
 	 * @param lssdef
 	 */
-	public void addLightSignalSystemDefinition(
+	public void addSignalSystemDefinition(
 			BasicSignalSystemDefinition lssdef) {
 		if (this.lightSignalSystemDefinitions == null) {
 			this.lightSignalSystemDefinitions = new ArrayList<BasicSignalSystemDefinition>();
@@ -71,7 +71,7 @@ public class BasicSignalSystems {
 		this.lightSignalSystemDefinitions.add(lssdef);
 	}
 	
-	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
+	public void addSignalGroupDefinition(BasicSignalGroupDefinition lsgdef) {
 		if (this.lightSignalGroupDefinitions == null) {
 			this.lightSignalGroupDefinitions = new ArrayList<BasicSignalGroupDefinition>();
 		}

@@ -163,7 +163,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(1, this.qlink.vehOnLinkCount());
 		assertFalse(this.qlink.bufferIsEmpty());
 		// v1 leaves buffer
-		assertEquals(v1, this.qlink.popFirstFromBuffer());
+		assertEquals(v1, this.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
 		assertEquals(1, this.qlink.vehOnLinkCount());
 		assertTrue(this.qlink.bufferIsEmpty());
 		// time step 3, v2 moves to buffer
@@ -171,7 +171,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(0, this.qlink.vehOnLinkCount());
 		assertFalse(this.qlink.bufferIsEmpty());
 		// v2 leaves buffer
-		assertEquals(v2, this.qlink.popFirstFromBuffer());
+		assertEquals(v2, this.qlink.getToNodeQueueLanes().get(0).popFirstFromBuffer());
 		assertEquals(0, this.qlink.vehOnLinkCount());
 		assertTrue(this.qlink.bufferIsEmpty());
 		// time step 4, empty link

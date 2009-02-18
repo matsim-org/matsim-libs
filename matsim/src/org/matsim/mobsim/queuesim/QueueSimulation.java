@@ -162,11 +162,11 @@ public class QueueSimulation {
 
 	private void initSignalSystems(BasicSignalSystems signalSystems) {
 		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
-		for (BasicSignalSystemDefinition signalSystem : signalSystems.getLightSignalSystemDefinitions()) {
+		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitions()) {
 			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
 		}
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getLightSignalGroupDefinitions()) {
+		for (BasicSignalGroupDefinition basicLightSignalGroupDefinition : signalSystems.getSignalGroupDefinitions()) {
 			QueueLink queueLink = this.network.getQueueLink(basicLightSignalGroupDefinition.getLinkRefId());
 			//TODO check if quueuLInk null?? or write ScenarioChecker
 			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId());
@@ -175,7 +175,7 @@ public class QueueSimulation {
 				this.signalGroupDefinitionsBySystemId.put(basicLightSignalGroupDefinition.getLightSignalSystemDefinitionId(), list);
 			}
 			list.add(basicLightSignalGroupDefinition);
-			queueLink.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+			queueLink.addSignalGroupDefinition(basicLightSignalGroupDefinition);
 			this.network.getNodes().get(queueLink.getLink().getToNode().getId()).setSignalized(true);
 		}
 	}

@@ -49,7 +49,8 @@ import org.matsim.utils.vis.snapshots.writers.PositionInfo;
 
 
 /**
- * @author dgrether based on prior implementations of
+ * 
+ * @author dgrether based on prior QueueLink implementations of
  * @author dstrippgen
  * @author aneumann
  * @author mrieser

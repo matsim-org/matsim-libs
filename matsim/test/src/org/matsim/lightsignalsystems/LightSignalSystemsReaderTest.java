@@ -76,8 +76,8 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
 
   private void checkContent(BasicSignalSystems lss) {
   	assertEquals(1, lss.getLanesToLinkAssignments().size());
-  	assertEquals(2, lss.getLightSignalSystemDefinitions().size());
-  	assertEquals(2, lss.getLightSignalGroupDefinitions().size());
+  	assertEquals(2, lss.getSignalSystemDefinitions().size());
+  	assertEquals(2, lss.getSignalGroupDefinitions().size());
   	BasicLanesToLinkAssignment l2la;
   	l2la = lss.getLanesToLinkAssignments().get(0);
   	assertNotNull(l2la);
@@ -93,7 +93,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(2, lane.getNumberOfRepresentedLanes());	
   	
   	BasicSignalSystemDefinition lssd;
-  	lssd = lss.getLightSignalSystemDefinitions().get(0);
+  	lssd = lss.getSignalSystemDefinitions().get(0);
   	assertNotNull(lssd);
   	assertEquals(id23, lssd.getId());
   	assertEquals(60.0, lssd.getDefaultCirculationTime(), EPSILON);
@@ -101,7 +101,7 @@ public class LightSignalSystemsReaderTest extends MatsimTestCase {
   	assertEquals(3.0, lssd.getDefaultInterimTime(), EPSILON);
   	
   	BasicSignalGroupDefinition lsgd;
-  	lsgd = lss.getLightSignalGroupDefinitions().get(1);
+  	lsgd = lss.getSignalGroupDefinitions().get(1);
   	assertNotNull(lsgd);
   	assertEquals(id42, lsgd.getLinkRefId());
   	assertEquals(id42, lsgd.getId());

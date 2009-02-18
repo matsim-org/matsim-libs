@@ -126,11 +126,11 @@ public class GenerateZuerrichOutput {
 		}
 		for (BasicSignalGroupDefinition basicSignalGroup : basicSGs.values()) {
 //			if (basicSignalGroup.getLinkRefId() != null){
-				basicLightSignalSystems.addLightSignalGroupDefinition(basicSignalGroup);
+				basicLightSignalSystems.addSignalGroupDefinition(basicSignalGroup);
 //			} else System.err.println("Removed a SignalGroup");
 		}
 		for (BasicSignalSystemDefinition basicSignalSystem : basicLightSignalSystemDefinition.values()) {
-			basicLightSignalSystems.addLightSignalSystemDefinition(basicSignalSystem);
+			basicLightSignalSystems.addSignalSystemDefinition(basicSignalSystem);
 		}
 
 		

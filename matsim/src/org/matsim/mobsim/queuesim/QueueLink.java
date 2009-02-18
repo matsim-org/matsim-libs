@@ -42,32 +42,89 @@ import org.matsim.utils.misc.Time;
  * @author dgrether
  * @author mrieser
  *
+ * A QueueLink can consist of one or more QueueLanes, which may have the following layout
+ * (Dashes stand for the borders of the QueueLink, equal signs (=) depict one lane, 
+ * plus signs (+) symbolize a decision point where one lane splits into several lanes) :
+ * <pre>
+ * ----------------
+ * ================
+ * ----------------
+ *</pre>
+ *
+ *<pre>
+ * ----------------
+ *          =======
+ * ========+
+ *          =======
+ * ----------------
+ *</pre>
+ *
+ *<pre>
+ * ----------------
+ *         ========
+ * =======+========
+ *         ========
+ * ----------------
+ * </pre>
+ * 
+ * 
+ * The following layouts are not allowed:
+ * <pre>
+ * ----------------
+ * ================
+ * ================
+ * ----------------
+ *</pre>
+ *
+ *<pre>
+ * ----------------
+ * =======
+ *        +========
+ * =======
+ * ----------------
+ * </pre>
+ * 
+ *
  * Queue Model Link implementation with the following properties:
  * <ul>
  *   <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
- *   <li>All QueueLane instances which are connected to the ToQueueNode are held in the attribute toNodeQueueLanes</li>
+ *   <li>Each QueueLink has at least one QueueLane. All QueueVehicles added to the QueueLink
+ *   are placed on this always existing instance.
+ *    </li>
+ *   <li>All QueueLane instances which are connected to the ToQueueNode are 
+ *   held in the attribute toNodeQueueLanes</li>
  *   <li>...</li>
  * </ul>
  */
 public class QueueLink {
 
 	final private static Logger log = Logger.getLogger(QueueLink.class);
-
-	private QueueLane originalLane;
-	
-	private List<QueueLane> queueLanes;
+		
 	/**
 	 * The Link instance containing the data
 	 */
 	private final Link link;
-
+	/**
+	 * Reference to the QueueNetwork instance this link belongs to.
+	 */
 	private final QueueNetwork queueNetwork;
-
+	/**
+	 * Reference to the QueueNode which is at the end of each QueueLink instance
+	 */
 	private final QueueNode toQueueNode;
 	/**
-	 * If more than one QueueLane exists this list holds all QueueLanes connected to the QueueNode of the QueueLink
+	 * The QueueLane instance which always exists.
 	 */
-	private List<QueueLane> toNodeQueueLanes;
+	private QueueLane originalLane;
+	/**
+	 * A List holding all QueueLane instances of the QueueLink
+	 */
+	private List<QueueLane> queueLanes;
+	/**
+	 * If more than one QueueLane exists this list holds all QueueLanes connected to 
+	 * the (To)QueueNode of the QueueLink
+	 */
+	private List<QueueLane> toNodeQueueLanes = null;
 	
 	private boolean active = false;
 
@@ -90,17 +147,6 @@ public class QueueLink {
 		this.queueLanes.add(this.originalLane);
 	}
 
-	public Link getLink() {
-		return this.link;
-	}
-	
-	protected QueueNetwork getQueueNetwork() {
-		return this.queueNetwork;
-	}
-
-	protected QueueNode getToQueueNode() {
-		return this.toQueueNode;
-	}
 
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
@@ -168,9 +214,9 @@ public class QueueLink {
 		return this.toNodeQueueLanes;
 	}
 	
-	public void addLightSignalGroupDefinition(BasicSignalGroupDefinition basicLightSignalGroupDefinition) {
+	protected void addSignalGroupDefinition(BasicSignalGroupDefinition basicSignalGroupDefinition) {
 		for (QueueLane lane : this.toNodeQueueLanes) {
-			lane.addLightSignalGroupDefinition(basicLightSignalGroupDefinition);
+			lane.addLightSignalGroupDefinition(basicSignalGroupDefinition);
 		}				
 	}
 	
@@ -336,13 +382,9 @@ public class QueueLink {
 	}
 
 	/**
-	 * TODO this method is not really useful anymore -> remove
+	 * 
 	 * @return
 	 */
-	QueueVehicle popFirstFromBuffer() {
-		return this.originalLane.popFirstFromBuffer();
-	}
-
 	public boolean hasSpace() {
 		return this.originalLane.hasSpace();
 	}
@@ -383,6 +425,19 @@ public class QueueLink {
 	public void addActiveLane(QueueLane queueLane) {
 		this.simLanes.add(queueLane);
 	}
+	
+	public Link getLink() {
+		return this.link;
+	}
+	
+	protected QueueNetwork getQueueNetwork() {
+		return this.queueNetwork;
+	}
+
+	protected QueueNode getToQueueNode() {
+		return this.toQueueNode;
+	}
+
 
 	/**
 	 * This method returns the normalized capacity of the link, i.e. the capacity
