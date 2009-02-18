@@ -67,7 +67,7 @@ public class PlansCreator {
 					 double ran = MatsimRandom.random.nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -133,7 +133,7 @@ public class PlansCreator {
 					 double ran = MatsimRandom.random.nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -198,7 +198,7 @@ public class PlansCreator {
 					 
 					 double ran = MatsimRandom.random.nextDouble();
 					 
-					 out.write("\t<person id=\""+personID+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -265,7 +265,7 @@ public class PlansCreator {
 					 double ran = MatsimRandom.random.nextDouble();
 					 
 					 
-					 out.write("\t<person id=\""+personID+"\">\n");
+					 out.write("\t<person id=\""+personID+"\" age=\""+((int)(MatsimRandom.random.nextDouble()*100))+"\">\n");
 					 
 					 out.write("\t\t<knowledge>\n");
 					 out.write("\t\t\t<activity type=\"home\">\n");
@@ -303,7 +303,7 @@ public class PlansCreator {
 					 out.write("\t\t\t<act type=\"leisure\" link=\""+linkIDLeisure+"\" facility=\""+locationIDLeisure+"\" x=\""+leisureX+"\" y=\""+leisureY+"\" start_time=\"18:00:00\" dur=\"02:00:00\" end_time=\"20:00:00\" />\n");
 					 out.write("\t\t\t<leg num=\"3\" mode=\"car\" dep_time=\"20:00:00\" trav_time=\"00:00:00\" arr_time=\"20:00:00\">\n");
 					 out.write("\t\t\t</leg>\n");
-					 out.write("\t\t\t<act type=\"home\" link=\""+(4*(networkSize-1)+i)+"\" facility=\""+(3*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"9000.0\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
+					 out.write("\t\t\t<act type=\"home\" link=\""+(9*(networkSize-1)+i)+"\" facility=\""+(3*(networkSize-1)+i)+"\" x=\""+(i*distance-distance/2)+"\" y=\"9000.0\" start_time=\"20:00:00\" dur=\"04:00:00\" end_time=\"24:00:00\" />\n");
 					 out.write("\t\t</plan>\n");
 					 
 					 out.write("\t</person>\n\n");
