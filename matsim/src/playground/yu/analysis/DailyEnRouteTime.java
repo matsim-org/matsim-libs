@@ -1,13 +1,13 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
@@ -25,56 +25,54 @@ import playground.yu.utils.SimpleWriter;
 /**
  * compute modal split of en route time
  * @author yu
- * 
+ *
  */
 public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
 	private int count;
-	private double carTime, ptTime, otherTime, totalCounts[], carCounts[],
-	ptCounts[], otherCounts[],carWorkTime, carEducTime, carShopTime,
-	carLeisTime, carHomeTime, carOtherTime, ptWorkTime, ptEducTime,
-	ptShopTime, ptLeisTime, ptHomeTime, ptOtherTime, throughWorkTime,
-	throughEducTime, throughShopTime, throughLeisTime, throughHomeTime,
-	throughOtherTime;
+	private double carTime, ptTime, otherTime;
+	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
+	private double carWorkTime, carEducTime, carShopTime, carLeisTime, carHomeTime, carOtherTime, ptWorkTime, ptEducTime, ptShopTime, ptLeisTime,
+			ptHomeTime, ptOtherTime, throughWorkTime, throughEducTime, throughShopTime, throughLeisTime, throughHomeTime, throughOtherTime;
 	private Person person;
 
 	public DailyEnRouteTime() {
-		count = 0;
-		carTime = 0.0;
-		ptTime = 0.0;
-		otherTime = 0.0;
-		totalCounts = new double[101];
-		carCounts = new double[101];
-		ptCounts = new double[101];
-		otherCounts = new double[101];
-		carWorkTime = 0.0;
-		carEducTime = 0.0;
-		carShopTime = 0.0;
-		carLeisTime = 0.0;
-		carHomeTime = 0.0;
-		carOtherTime = 0.0;
-		ptWorkTime = 0.0;
-		ptEducTime = 0.0;
-		ptShopTime = 0.0;
-		ptLeisTime = 0.0;
-		ptHomeTime = 0.0;
-		ptOtherTime = 0.0;
-		throughWorkTime = 0.0;
-		throughEducTime = 0.0;
-		throughShopTime = 0.0;
-		throughLeisTime = 0.0;
-		throughHomeTime = 0.0;
-		throughOtherTime = 0.0;
+		this.count = 0;
+		this.carTime = 0.0;
+		this.ptTime = 0.0;
+		this.otherTime = 0.0;
+		this.totalCounts = new double[101];
+		this.carCounts = new double[101];
+		this.ptCounts = new double[101];
+		this.otherCounts = new double[101];
+		this.carWorkTime = 0.0;
+		this.carEducTime = 0.0;
+		this.carShopTime = 0.0;
+		this.carLeisTime = 0.0;
+		this.carHomeTime = 0.0;
+		this.carOtherTime = 0.0;
+		this.ptWorkTime = 0.0;
+		this.ptEducTime = 0.0;
+		this.ptShopTime = 0.0;
+		this.ptLeisTime = 0.0;
+		this.ptHomeTime = 0.0;
+		this.ptOtherTime = 0.0;
+		this.throughWorkTime = 0.0;
+		this.throughEducTime = 0.0;
+		this.throughShopTime = 0.0;
+		this.throughLeisTime = 0.0;
+		this.throughHomeTime = 0.0;
+		this.throughOtherTime = 0.0;
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		this.person = person;
-		count++;
+		this.count++;
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		double dayTime = 0.0;
 		double carDayTime = 0.0;
 		double ptDayTime = 0.0;
@@ -98,120 +96,120 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 			double time = bl.getTravelTime() / 60.0;
 			if (bl.getDepartureTime() < 86400) {
 				dayTime += time;
-				if (Long.parseLong(person.getId().toString()) > 1000000000) {
-					otherTime += time;
+				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
+					this.otherTime += time;
 					otherDayTime += time;
 					switch (ats) {
 					case h:
-						throughHomeTime += time;
+						this.throughHomeTime += time;
 						break;
 					case w:
-						throughWorkTime += time;
+						this.throughWorkTime += time;
 						break;
 					case e:
-						throughEducTime += time;
+						this.throughEducTime += time;
 						break;
 					case s:
-						throughShopTime += time;
+						this.throughShopTime += time;
 						break;
 					case l:
-						throughLeisTime += time;
+						this.throughLeisTime += time;
 						break;
 					default:
-						throughOtherTime += time;
+						this.throughOtherTime += time;
 						break;
 					}
 				} else if (bl.getMode().equals(Mode.car)) {
-					carTime += time;
+					this.carTime += time;
 					carDayTime += time;
 					switch (ats) {
 					case h:
-						carHomeTime += time;
+						this.carHomeTime += time;
 						break;
 					case w:
-						carWorkTime += time;
+						this.carWorkTime += time;
 						break;
 					case e:
-						carEducTime += time;
+						this.carEducTime += time;
 						break;
 					case s:
-						carShopTime += time;
+						this.carShopTime += time;
 						break;
 					case l:
-						carLeisTime += time;
+						this.carLeisTime += time;
 						break;
 					default:
-						carOtherTime += time;
+						this.carOtherTime += time;
 						break;
 					}
 				} else if (bl.getMode().equals(Mode.pt)) {
-					ptTime += time;
+					this.ptTime += time;
 					ptDayTime += time;
 					switch (ats) {
 					case h:
-						ptHomeTime += time;
+						this.ptHomeTime += time;
 						break;
 					case w:
-						ptWorkTime += time;
+						this.ptWorkTime += time;
 						break;
 					case e:
-						ptEducTime += time;
+						this.ptEducTime += time;
 						break;
 					case s:
-						ptShopTime += time;
+						this.ptShopTime += time;
 						break;
 					case l:
-						ptLeisTime += time;
+						this.ptLeisTime += time;
 						break;
 					default:
-						ptOtherTime += time;
+						this.ptOtherTime += time;
 						break;
 					}
 				}
 			}
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayTime); i++)
-			totalCounts[i]++;
+			this.totalCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) otherDayTime); i++)
-			otherCounts[i]++;
+			this.otherCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) carDayTime); i++)
-			carCounts[i]++;
+			this.carCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayTime); i++)
-			ptCounts[i]++;
+			this.ptCounts[i]++;
 	}
 
-	public void write(String outputFilename) {
-		double sum = carTime + ptTime + otherTime;
+	public void write(final String outputFilename) {
+		double sum = this.carTime + this.ptTime + this.otherTime;
 		SimpleWriter sw = new SimpleWriter(outputFilename+".txt");
 		sw.writeln("\tDaily En Route Time\t(exkl. through-traffic)");
 		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + carTime / (double) count + "\t" + carTime / sum
+		sw.writeln("car\t" + this.carTime / this.count + "\t" + this.carTime / sum
 				* 100.0);
-		sw.writeln("pt\t" + ptTime / count + "\t" + ptTime / sum * 100.0);
-		sw.writeln("through\t" + otherTime / count + "\t" + otherTime / sum
+		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum * 100.0);
+		sw.writeln("through\t" + this.otherTime / this.count + "\t" + this.otherTime / sum
 				* 100.0);
 		sw.writeln("--------------------------------------------");
 		sw.writeln("\tDaily En Route Time\t(inkl. through-traffic)");
 		sw.writeln("\tmin\t%");
-		sw.writeln("car\t" + (carTime + otherTime) / (double) count + "\t"
-				+ (carTime + otherTime) / sum * 100.0);
-		sw.writeln("pt\t" + ptTime / count + "\t" + ptTime / sum * 100.0);
+		sw.writeln("car\t" + (this.carTime + this.otherTime) / this.count + "\t"
+				+ (this.carTime + this.otherTime) / sum * 100.0);
+		sw.writeln("pt\t" + this.ptTime / this.count + "\t" + this.ptTime / sum * 100.0);
 		sw.writeln("--travel destination and modal split--daily on route time--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
-		sw.writeln("car\t" + carWorkTime + "\t" + carEducTime + "\t"
-				+ carShopTime + "\t" + carLeisTime + "\t" + carHomeTime + "\t"
-				+ carOtherTime);
-		sw.writeln("pt\t" + ptWorkTime + "\t" + ptEducTime + "\t" + ptShopTime
-				+ "\t" + ptLeisTime + "\t" + ptHomeTime + "\t" + ptOtherTime);
-		sw.writeln("through\t" + throughWorkTime + "\t" + throughEducTime
-				+ "\t" + throughShopTime + "\t" + throughLeisTime + "\t"
-				+ throughHomeTime + "\t" + throughOtherTime);
-		sw.writeln("total\t" + (carWorkTime + ptWorkTime + throughWorkTime)
-				+ "\t" + (carEducTime + ptEducTime + throughEducTime) + "\t"
-				+ (carShopTime + ptShopTime + throughShopTime) + "\t"
-				+ (carLeisTime + ptLeisTime + throughLeisTime) + "\t"
-				+ (carHomeTime + ptHomeTime + throughHomeTime) + "\t"
-				+ (carOtherTime + ptOtherTime + throughOtherTime));
+		sw.writeln("car\t" + this.carWorkTime + "\t" + this.carEducTime + "\t"
+				+ this.carShopTime + "\t" + this.carLeisTime + "\t" + this.carHomeTime + "\t"
+				+ this.carOtherTime);
+		sw.writeln("pt\t" + this.ptWorkTime + "\t" + this.ptEducTime + "\t" + this.ptShopTime
+				+ "\t" + this.ptLeisTime + "\t" + this.ptHomeTime + "\t" + this.ptOtherTime);
+		sw.writeln("through\t" + this.throughWorkTime + "\t" + this.throughEducTime
+				+ "\t" + this.throughShopTime + "\t" + this.throughLeisTime + "\t"
+				+ this.throughHomeTime + "\t" + this.throughOtherTime);
+		sw.writeln("total\t" + (this.carWorkTime + this.ptWorkTime + this.throughWorkTime)
+				+ "\t" + (this.carEducTime + this.ptEducTime + this.throughEducTime) + "\t"
+				+ (this.carShopTime + this.ptShopTime + this.throughShopTime) + "\t"
+				+ (this.carLeisTime + this.ptLeisTime + this.throughLeisTime) + "\t"
+				+ (this.carHomeTime + this.ptHomeTime + this.throughHomeTime) + "\t"
+				+ (this.carOtherTime + this.ptOtherTime + this.throughOtherTime));
 		try {
 			sw.close();
 		} catch (IOException e) {
@@ -219,16 +217,16 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		}
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
-			x[i] = (double) i;
+			x[i] = i;
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
 		double yOther[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = totalCounts[i] / (double) count * 100.0;
-			yCar[i] = carCounts[i] / (double) count * 100.0;
-			yPt[i] = ptCounts[i] / (double) count * 100.0;
-			yOther[i] = otherCounts[i] / (double) count * 100.0;
+			yTotal[i] = this.totalCounts[i] / this.count * 100.0;
+			yCar[i] = this.carCounts[i] / this.count * 100.0;
+			yPt[i] = this.ptCounts[i] / this.count * 100.0;
+			yOther[i] = this.otherCounts[i] / this.count * 100.0;
 		}
 		XYLineChart chart = new XYLineChart("Daily En Route Time Distribution",
 				"Daily En Route Time in min",
@@ -243,7 +241,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";

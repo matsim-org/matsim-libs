@@ -1,13 +1,13 @@
 /**
- * 
+ *
  */
 package playground.yu.analysis;
 
 import java.io.IOException;
 
-import org.matsim.basic.v01.BasicLeg.Mode;
 import org.matsim.basic.v01.BasicPlanImpl.LegIterator;
 import org.matsim.gbl.Gbl;
+import org.matsim.interfaces.basic.v01.BasicLeg.Mode;
 import org.matsim.network.MatsimNetworkReader;
 import org.matsim.network.NetworkLayer;
 import org.matsim.population.Leg;
@@ -23,18 +23,18 @@ import playground.yu.utils.SimpleWriter;
 
 /**
  * compute modal split of through distance
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DailyDistance extends AbstractPersonAlgorithm implements
 		PlanAlgorithm {
-	private double carDist, ptDist, otherDist, totalCounts[], carCounts[],
-			ptCounts[], otherCounts[], carWorkDist, carEducDist, carShopDist,
-			carLeisDist, carHomeDist, carOtherDist, ptWorkDist, ptEducDist,
-			ptShopDist, ptLeisDist, ptHomeDist, ptOtherDist, throughWorkDist,
-			throughEducDist, throughShopDist, throughLeisDist, throughHomeDist,
-			throughOtherDist;
+	private double carDist, ptDist, otherDist;
+
+	final double totalCounts[], carCounts[], ptCounts[], otherCounts[];
+
+	private double carWorkDist, carEducDist, carShopDist, carLeisDist, carHomeDist, carOtherDist, ptWorkDist, ptEducDist, ptShopDist, ptLeisDist,
+			ptHomeDist, ptOtherDist, throughWorkDist, throughEducDist, throughShopDist, throughLeisDist, throughHomeDist, throughOtherDist;
 
 	private int count;
 
@@ -42,44 +42,45 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 	public enum ActTypeStart {
 		h, w, s, e, l, o
-	};
-
-	public DailyDistance() {
-		carDist = 0.0;
-		ptDist = 0.0;
-		otherDist = 0.0;
-		count = 0;
-		totalCounts = new double[101];
-		carCounts = new double[101];
-		ptCounts = new double[101];
-		otherCounts = new double[101];
-		carWorkDist = 0.0;
-		carEducDist = 0.0;
-		carShopDist = 0.0;
-		carLeisDist = 0.0;
-		carHomeDist = 0.0;
-		carOtherDist = 0.0;
-		ptWorkDist = 0.0;
-		ptEducDist = 0.0;
-		ptShopDist = 0.0;
-		ptLeisDist = 0.0;
-		ptHomeDist = 0.0;
-		ptOtherDist = 0.0;
-		throughWorkDist = 0.0;
-		throughEducDist = 0.0;
-		throughShopDist = 0.0;
-		throughLeisDist = 0.0;
-		throughHomeDist = 0.0;
-		throughOtherDist = 0.0;
 	}
 
-	public void run(Person person) {
+	public DailyDistance() {
+		this.carDist = 0.0;
+		this.ptDist = 0.0;
+		this.otherDist = 0.0;
+		this.count = 0;
+		this.totalCounts = new double[101];
+		this.carCounts = new double[101];
+		this.ptCounts = new double[101];
+		this.otherCounts = new double[101];
+		this.carWorkDist = 0.0;
+		this.carEducDist = 0.0;
+		this.carShopDist = 0.0;
+		this.carLeisDist = 0.0;
+		this.carHomeDist = 0.0;
+		this.carOtherDist = 0.0;
+		this.ptWorkDist = 0.0;
+		this.ptEducDist = 0.0;
+		this.ptShopDist = 0.0;
+		this.ptLeisDist = 0.0;
+		this.ptHomeDist = 0.0;
+		this.ptOtherDist = 0.0;
+		this.throughWorkDist = 0.0;
+		this.throughEducDist = 0.0;
+		this.throughShopDist = 0.0;
+		this.throughLeisDist = 0.0;
+		this.throughHomeDist = 0.0;
+		this.throughOtherDist = 0.0;
+	}
+
+	@Override
+	public void run(final Person person) {
 		this.person = person;
-		count++;
+		this.count++;
 		run(person.getSelectedPlan());
 	}
 
-	public void run(Plan plan) {
+	public void run(final Plan plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;
@@ -103,122 +104,122 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 			double dist = bl.getRoute().getDist() / 1000.0;
 			if (bl.getDepartureTime() < 86400) {
 				dayDist += dist;
-				if (Long.parseLong(person.getId().toString()) > 1000000000) {
-					otherDist += dist;
+				if (Long.parseLong(this.person.getId().toString()) > 1000000000) {
+					this.otherDist += dist;
 					otherDayDist += dist;
 					switch (ats) {
 					case h:
-						throughHomeDist += dist;
+						this.throughHomeDist += dist;
 						break;
 					case w:
-						throughWorkDist += dist;
+						this.throughWorkDist += dist;
 						break;
 					case e:
-						throughEducDist += dist;
+						this.throughEducDist += dist;
 						break;
 					case s:
-						throughShopDist += dist;
+						this.throughShopDist += dist;
 						break;
 					case l:
-						throughLeisDist += dist;
+						this.throughLeisDist += dist;
 						break;
 					default:
-						throughOtherDist += dist;
+						this.throughOtherDist += dist;
 						break;
 					}
 				} else if (bl.getMode().equals(Mode.car)) {
-					carDist += dist;
+					this.carDist += dist;
 					carDayDist += dist;
 					switch (ats) {
 					case h:
-						carHomeDist += dist;
+						this.carHomeDist += dist;
 						break;
 					case w:
-						carWorkDist += dist;
+						this.carWorkDist += dist;
 						break;
 					case e:
-						carEducDist += dist;
+						this.carEducDist += dist;
 						break;
 					case s:
-						carShopDist += dist;
+						this.carShopDist += dist;
 						break;
 					case l:
-						carLeisDist += dist;
+						this.carLeisDist += dist;
 						break;
 					default:
-						carOtherDist += dist;
+						this.carOtherDist += dist;
 						break;
 					}
 				} else if (bl.getMode().equals(Mode.pt)) {
-					ptDist += dist;
+					this.ptDist += dist;
 					ptDayDist += dist;
 					switch (ats) {
 					case h:
-						ptHomeDist += dist;
+						this.ptHomeDist += dist;
 						break;
 					case w:
-						ptWorkDist += dist;
+						this.ptWorkDist += dist;
 						break;
 					case e:
-						ptEducDist += dist;
+						this.ptEducDist += dist;
 						break;
 					case s:
-						ptShopDist += dist;
+						this.ptShopDist += dist;
 						break;
 					case l:
-						ptLeisDist += dist;
+						this.ptLeisDist += dist;
 						break;
 					default:
-						ptOtherDist += dist;
+						this.ptOtherDist += dist;
 						break;
 					}
 				}
 			}
 		}
 		for (int i = 0; i <= Math.min(100, (int) dayDist); i++)
-			totalCounts[i]++;
+			this.totalCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) otherDayDist); i++)
-			otherCounts[i]++;
+			this.otherCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) carDayDist); i++)
-			carCounts[i]++;
+			this.carCounts[i]++;
 		for (int i = 0; i <= Math.min(100, (int) ptDayDist); i++)
-			ptCounts[i]++;
+			this.ptCounts[i]++;
 	}
 
-	public void write(String outputFilename) {
-		double sum = carDist + ptDist + otherDist;
+	public void write(final String outputFilename) {
+		double sum = this.carDist + this.ptDist + this.otherDist;
 		SimpleWriter sw = new SimpleWriter(outputFilename + ".txt");
 		sw.writeln("\tDaily Distance\t(exkl. through-traffic)");
 		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + carDist / (double) count + "\t" + carDist / sum
+		sw.writeln("car\t" + this.carDist / this.count + "\t" + this.carDist / sum
 				* 100.0);
-		sw.writeln("pt\t" + ptDist / (double) count + "\t" + ptDist / sum
+		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
-		sw.writeln("through\t" + otherDist / (double) count + "\t" + otherDist
+		sw.writeln("through\t" + this.otherDist / this.count + "\t" + this.otherDist
 				/ sum * 100.0);
 		sw.writeln("--------------------------------------------");
 		sw.writeln("\tDaily Distance\t(inkl. through-traffic)");
 		sw.writeln("\tkm\t%");
-		sw.writeln("car\t" + (carDist + otherDist) / (double) count + "\t"
-				+ (carDist + otherDist) / sum * 100.0);
-		sw.writeln("pt\t" + ptDist / (double) count + "\t" + ptDist / sum
+		sw.writeln("car\t" + (this.carDist + this.otherDist) / this.count + "\t"
+				+ (this.carDist + this.otherDist) / sum * 100.0);
+		sw.writeln("pt\t" + this.ptDist / this.count + "\t" + this.ptDist / sum
 				* 100.0);
 		sw.writeln("--travel destination and modal split--daily distance--");
 		sw.writeln("\twork\teducation\tshopping\tleisure\thome\tother...");
-		sw.writeln("car\t" + carWorkDist + "\t" + carEducDist + "\t"
-				+ carShopDist + "\t" + carLeisDist + "\t" + carHomeDist + "\t"
-				+ carOtherDist);
-		sw.writeln("pt\t" + ptWorkDist + "\t" + ptEducDist + "\t" + ptShopDist
-				+ "\t" + ptLeisDist + "\t" + ptHomeDist + "\t" + ptOtherDist);
-		sw.writeln("through\t" + throughWorkDist + "\t" + throughEducDist
-				+ "\t" + throughShopDist + "\t" + throughLeisDist + "\t"
-				+ throughHomeDist + "\t" + throughOtherDist);
-		sw.writeln("total\t" + (carWorkDist + ptWorkDist + throughWorkDist)
-				+ "\t" + (carEducDist + ptEducDist + throughEducDist) + "\t"
-				+ (carShopDist + ptShopDist + throughShopDist) + "\t"
-				+ (carLeisDist + ptLeisDist + throughLeisDist) + "\t"
-				+ (carHomeDist + ptHomeDist + throughHomeDist) + "\t"
-				+ (carOtherDist + ptOtherDist + throughOtherDist));
+		sw.writeln("car\t" + this.carWorkDist + "\t" + this.carEducDist + "\t"
+				+ this.carShopDist + "\t" + this.carLeisDist + "\t" + this.carHomeDist + "\t"
+				+ this.carOtherDist);
+		sw.writeln("pt\t" + this.ptWorkDist + "\t" + this.ptEducDist + "\t" + this.ptShopDist
+				+ "\t" + this.ptLeisDist + "\t" + this.ptHomeDist + "\t" + this.ptOtherDist);
+		sw.writeln("through\t" + this.throughWorkDist + "\t" + this.throughEducDist
+				+ "\t" + this.throughShopDist + "\t" + this.throughLeisDist + "\t"
+				+ this.throughHomeDist + "\t" + this.throughOtherDist);
+		sw.writeln("total\t" + (this.carWorkDist + this.ptWorkDist + this.throughWorkDist)
+				+ "\t" + (this.carEducDist + this.ptEducDist + this.throughEducDist) + "\t"
+				+ (this.carShopDist + this.ptShopDist + this.throughShopDist) + "\t"
+				+ (this.carLeisDist + this.ptLeisDist + this.throughLeisDist) + "\t"
+				+ (this.carHomeDist + this.ptHomeDist + this.throughHomeDist) + "\t"
+				+ (this.carOtherDist + this.ptOtherDist + this.throughOtherDist));
 		try {
 			sw.close();
 		} catch (IOException e) {
@@ -227,16 +228,16 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 
 		double x[] = new double[101];
 		for (int i = 0; i < 101; i++)
-			x[i] = (double) i;
+			x[i] = i;
 		double yTotal[] = new double[101];
 		double yCar[] = new double[101];
 		double yPt[] = new double[101];
 		double yOther[] = new double[101];
 		for (int i = 0; i < 101; i++) {
-			yTotal[i] = totalCounts[i] / (double) count * 100.0;
-			yCar[i] = carCounts[i] / (double) count * 100.0;
-			yPt[i] = ptCounts[i] / (double) count * 100.0;
-			yOther[i] = otherCounts[i] / (double) count * 100.0;
+			yTotal[i] = this.totalCounts[i] / this.count * 100.0;
+			yCar[i] = this.carCounts[i] / this.count * 100.0;
+			yPt[i] = this.ptCounts[i] / this.count * 100.0;
+			yOther[i] = this.otherCounts[i] / this.count * 100.0;
 		}
 		XYLineChart chart = new XYLineChart("Daily Distance distribution",
 				"Daily Distance in km",
@@ -251,7 +252,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
